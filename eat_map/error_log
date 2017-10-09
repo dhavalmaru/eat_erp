@@ -1,0 +1,144 @@
+[27-Dec-2016 08:31:08 Etc/GMT] PHP Notice:  Undefined variable: addr_list in /home/eatangcp/public_html/eat_erp/eat_map/save_map.php on line 18
+[27-Dec-2016 09:25:52 Etc/GMT] PHP Notice:  Undefined variable: addr_list in /home/eatangcp/public_html/eat_erp/eat_map/save_map.php on line 18
+[27-Dec-2016 09:38:19 Etc/GMT] PHP Notice:  Undefined variable: addr_list in /home/eatangcp/public_html/eat_erp/eat_map/save_map.php on line 18
+[27-Dec-2016 10:24:29 Etc/GMT] PHP Notice:  Undefined variable: result in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 22
+[27-Dec-2016 10:24:29 Etc/GMT] PHP Warning:  mysql_fetch_row() expects parameter 1 to be resource, null given in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 22
+[27-Dec-2016 10:24:29 Etc/GMT] PHP Notice:  Undefined variable: mlabel in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 26
+[27-Dec-2016 10:24:53 Etc/GMT] PHP Notice:  Undefined variable: result in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 22
+[27-Dec-2016 10:24:53 Etc/GMT] PHP Warning:  mysql_fetch_row() expects parameter 1 to be resource, null given in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 22
+[27-Dec-2016 10:24:53 Etc/GMT] PHP Notice:  Undefined variable: mlabel in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 26
+[27-Dec-2016 10:24:57 Etc/GMT] PHP Notice:  Undefined variable: result in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 22
+[27-Dec-2016 10:24:57 Etc/GMT] PHP Warning:  mysql_fetch_row() expects parameter 1 to be resource, null given in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 22
+[27-Dec-2016 10:24:57 Etc/GMT] PHP Notice:  Undefined variable: mlabel in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 26
+[27-Dec-2016 10:25:16 Etc/GMT] PHP Notice:  Undefined variable: result in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 22
+[27-Dec-2016 10:25:16 Etc/GMT] PHP Warning:  mysql_fetch_row() expects parameter 1 to be resource, null given in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 22
+[27-Dec-2016 10:25:16 Etc/GMT] PHP Notice:  Undefined variable: mlabel in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 26
+[27-Dec-2016 10:25:36 Etc/GMT] PHP Notice:  Undefined variable: result in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 22
+[27-Dec-2016 10:25:36 Etc/GMT] PHP Warning:  mysql_fetch_row() expects parameter 1 to be resource, null given in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 22
+[27-Dec-2016 10:25:36 Etc/GMT] PHP Notice:  Undefined variable: mlabel in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 26
+[27-Dec-2016 10:26:18 Etc/GMT] PHP Notice:  Undefined variable: result in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 22
+[27-Dec-2016 10:26:18 Etc/GMT] PHP Warning:  mysql_fetch_row() expects parameter 1 to be resource, null given in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 22
+[27-Dec-2016 10:26:18 Etc/GMT] PHP Notice:  Undefined variable: mlabel in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 26
+[27-Dec-2016 10:26:40 Etc/GMT] PHP Notice:  Undefined variable: result in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 22
+[27-Dec-2016 10:26:40 Etc/GMT] PHP Warning:  mysql_fetch_row() expects parameter 1 to be resource, null given in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 22
+[27-Dec-2016 10:26:40 Etc/GMT] PHP Notice:  Undefined variable: mlabel in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 26
+[27-Dec-2016 10:27:48 Etc/GMT] PHP Notice:  Undefined variable: result in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 22
+[27-Dec-2016 10:27:48 Etc/GMT] PHP Warning:  mysql_fetch_row() expects parameter 1 to be resource, null given in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 22
+[27-Dec-2016 10:27:48 Etc/GMT] PHP Notice:  Undefined variable: mlabel in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 26
+[27-Dec-2016 10:27:59 Etc/GMT] PHP Notice:  Undefined variable: result in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 22
+[27-Dec-2016 10:27:59 Etc/GMT] PHP Warning:  mysql_fetch_row() expects parameter 1 to be resource, null given in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 22
+[27-Dec-2016 10:27:59 Etc/GMT] PHP Notice:  Undefined variable: mlabel in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 26
+[27-Dec-2016 10:28:42 Etc/GMT] PHP Notice:  Undefined variable: result in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 22
+[27-Dec-2016 10:28:42 Etc/GMT] PHP Warning:  mysql_fetch_row() expects parameter 1 to be resource, null given in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 22
+[27-Dec-2016 10:28:42 Etc/GMT] PHP Notice:  Undefined variable: mlabel in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 26
+[27-Dec-2016 10:32:35 Etc/GMT] PHP Notice:  Undefined variable: result in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 22
+[27-Dec-2016 10:32:35 Etc/GMT] PHP Warning:  mysql_fetch_row() expects parameter 1 to be resource, null given in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 22
+[27-Dec-2016 10:32:35 Etc/GMT] PHP Notice:  Undefined variable: mlabel in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 26
+[27-Dec-2016 10:33:28 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 10:33:28 Etc/GMT] PHP Notice:  Undefined index: dist_name in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 10:33:28 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 10:33:28 Etc/GMT] PHP Notice:  Undefined index: addr_dist in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 10:33:37 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 10:33:37 Etc/GMT] PHP Notice:  Undefined index: dist_name in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 10:33:37 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 10:33:37 Etc/GMT] PHP Notice:  Undefined index: addr_dist in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 10:33:52 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 10:33:52 Etc/GMT] PHP Notice:  Undefined index: dist_name in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 10:33:52 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 10:33:52 Etc/GMT] PHP Notice:  Undefined index: addr_dist in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 10:36:28 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 10:36:28 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 10:36:56 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 10:36:56 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 10:37:16 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 10:37:16 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 10:40:53 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 10:40:53 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 10:42:56 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 10:42:56 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 10:55:24 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 10:55:24 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 10:58:35 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 10:58:35 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 10:59:06 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 10:59:06 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:01:46 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:01:46 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:02:22 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:02:22 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:02:56 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:02:56 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:04:00 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:04:00 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:06:19 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:06:19 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:07:24 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:07:24 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:08:49 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:08:49 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:13:15 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:13:15 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:13:31 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:13:31 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:13:43 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:13:43 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:13:49 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:13:49 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:14:11 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:14:11 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:16:19 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:16:19 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:16:29 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:16:29 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:17:00 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:17:00 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:18:05 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:18:05 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:29:49 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:29:49 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:30:04 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:30:04 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:30:48 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:30:48 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:33:06 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:33:06 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:33:38 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:33:38 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:33:45 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:33:45 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:40:19 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:40:19 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:50:30 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:50:30 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:58:39 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:58:39 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:59:29 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:59:29 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:59:47 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:59:47 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:59:56 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 11:59:56 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 12:00:02 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 12:00:02 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 12:00:52 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 12:00:52 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 12:04:41 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 12:04:41 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 12:04:57 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 12:04:57 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 12:05:06 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 12:05:06 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 12:05:10 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 12:05:10 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 12:05:51 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 12:05:51 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 12:07:17 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 12:07:17 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 12:07:27 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 12:07:27 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 12:07:36 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[27-Dec-2016 12:07:36 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[28-Dec-2016 03:28:36 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[28-Dec-2016 03:28:36 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[29-Dec-2016 04:33:51 Etc/GMT] PHP Notice:  Use of undefined constant dist_name - assumed 'dist_name' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24
+[29-Dec-2016 04:33:51 Etc/GMT] PHP Notice:  Use of undefined constant addr_dist - assumed 'addr_dist' in /home/eatangcp/public_html/eat_erp/eat_map/get_map.php on line 24

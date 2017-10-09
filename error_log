@@ -1,0 +1,14 @@
+[12-May-2017 21:03:40 Asia/Kolkata] PHP Parse error:  syntax error, unexpected '$mailSent' (T_VARIABLE) in /home/eatangcp/public_html/eat_erp/application/controllers/Sales_rep.php on line 203
+[30-May-2017 15:57:51 Asia/Kolkata] PHP Fatal error:  Call to undefined method Sales_rep_model::get_data_promoter() in /home/eatangcp/public_html/eat_erp/application/controllers/Export.php on line 165
+[30-May-2017 15:58:02 Asia/Kolkata] PHP Fatal error:  Call to undefined method Sales_rep_model::get_data_promoter() in /home/eatangcp/public_html/eat_erp/application/controllers/Export.php on line 165
+[30-May-2017 15:58:03 Asia/Kolkata] PHP Fatal error:  Call to undefined method Sales_rep_model::get_data_promoter() in /home/eatangcp/public_html/eat_erp/application/controllers/Export.php on line 165
+[30-May-2017 15:58:04 Asia/Kolkata] PHP Fatal error:  Call to undefined method Sales_rep_model::get_data_promoter() in /home/eatangcp/public_html/eat_erp/application/controllers/Export.php on line 165
+[30-May-2017 15:58:23 Asia/Kolkata] PHP Fatal error:  Call to undefined method Sales_rep_model::get_data_promoter() in /home/eatangcp/public_html/eat_erp/application/controllers/Export.php on line 165
+[12-Jun-2017 17:43:42 Asia/Kolkata] PHP Parse error:  syntax error, unexpected end of file in /home/eatangcp/public_html/eat_erp/application/models/Export_model.php on line 2024
+[13-Jun-2017 17:52:48 Asia/Kolkata] PHP Fatal error:  Call to undefined method Tax_invoice_model::set_delivery_status() in /home/eatangcp/public_html/eat_erp/application/controllers/Distributor_out.php on line 182
+[13-Jun-2017 17:52:57 Asia/Kolkata] PHP Fatal error:  Call to undefined method Tax_invoice_model::set_delivery_status() in /home/eatangcp/public_html/eat_erp/application/controllers/Distributor_out.php on line 182
+[13-Jun-2017 17:53:08 Asia/Kolkata] PHP Fatal error:  Call to undefined method Tax_invoice_model::set_delivery_status() in /home/eatangcp/public_html/eat_erp/application/controllers/Distributor_out.php on line 182
+[13-Jun-2017 17:54:20 Asia/Kolkata] PHP Fatal error:  Call to undefined method Tax_invoice_model::set_delivery_status() in /home/eatangcp/public_html/eat_erp/application/controllers/Distributor_out.php on line 182
+[13-Jun-2017 17:57:21 Asia/Kolkata] PHP Fatal error:  Call to undefined method Tax_invoice_model::set_delivery_status() in /home/eatangcp/public_html/eat_erp/application/controllers/Distributor_out.php on line 182
+[04-Jul-2017 13:46:02 Asia/Kolkata] PHP Fatal error:  Call to a member function generate_promoter_stock_report_cron() on a non-object in /home/eatangcp/public_html/eat_erp/application/controllers/Promoter_checkout_location.php on line 187
+[24-Jul-2017 19:20:16 Asia/Kolkata] PHP Parse error:  syntax error, unexpected '$i' (T_VARIABLE), expecting ';' in /home/eatangcp/public_html/eat_erp/application/models/Tax_invoice_model.php on line 760
