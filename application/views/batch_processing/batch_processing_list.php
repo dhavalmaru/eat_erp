@@ -80,7 +80,11 @@
 											<td><?php echo $data[$i]->product_name; ?></td>
 											<td><?php echo format_money($data[$i]->qty_in_bar,2); ?></td>
 											<td><?php echo format_money($data[$i]->actual_wastage,2); ?></td>
-											<td><?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
+											<td>
+												<span style="display:none;">
+                                                    <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
+                                                </span>
+												<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
 										</tr>
 										<?php } ?>
 									</tbody>

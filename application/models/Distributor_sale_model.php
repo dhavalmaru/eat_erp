@@ -33,7 +33,7 @@ function get_data($status='', $id=''){
             (select * from distributor_sale".$cond.") A 
             left join 
             (select * from distributor_master) B 
-            on (A.distributor_id=B.id) order by A.modified_on desc";
+            on (A.distributor_id=B.id) where A.status='Approved' order by A.modified_on desc";
     $query=$this->db->query($sql);
     return $query->result();
 }

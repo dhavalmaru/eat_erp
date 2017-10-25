@@ -61,7 +61,11 @@
 													<td><a href="<?php echo base_url().'index.php/sales_rep_target/edit/'.$data[$i]->id; ?>"><?php echo $data[$i]->month; ?></a></td>
 													<td><?php echo format_money($data[0]->target); ?></td>
 													<td><?php echo $data[$i]->sales_rep_name; ?></td>
-													<td><?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
+													<td>
+														<span style="display:none;">
+                                                            <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
+                                                        </span>
+														<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
 												</tr>
 												<?php } ?>
 											</tbody>

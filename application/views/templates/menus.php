@@ -180,7 +180,8 @@
                                         echo base_url().'index.php/Dashboard_sales_rep';
                                       }
                                     } else {
-                                        echo base_url().'index.php/Dashboard';
+                                       if ($Dashboard==0) echo base_url().'index.php/Dashboard/Dashboardscreen';
+                                       else echo base_url().'index.php/Dashboard';
                                     }
                                     // echo base_url().'index.php/dashboard'; 
                                     ?>"> 

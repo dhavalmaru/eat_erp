@@ -60,32 +60,52 @@ function get_data($status='', $id=''){
 
 function get_distributor_out_data1($status='', $id=''){
     if($status!=""){
+        // if ($status=="Approved"){
+        //     // $cond=" where status='Approved' and (delivery_status='Delivered' or delivery_status is null or delivery_status = '') and distributor_name='Sample'";
+        //     $cond=" where status='Approved' and distributor_name='Sample'";
+        // } else if ($status=="pending"){
+        //     $cond=" where status='Pending' and (delivery_status='Pending' or delivery_status is null or delivery_status = '') and distributor_name='Sample'";
+        // } else if ($status=="pending_for_approval"){
+        //     $cond=" where status='Pending' and (delivery_status='GP Issued' or delivery_status='Delivered Not Complete' or delivery_status='Delivered') and distributor_name='Sample'";
+        // } else if ($status=="pending_for_delivery"){
+        //     $cond=" where (status='Approved' or status='Rejected') and delivery_status='Pending' and distributor_name='Sample'";
+        // } else if ($status=="gp_issued"){
+        //     $cond=" where (status='Approved' or status='Rejected') and delivery_status='GP Issued' and distributor_name='Sample'";
+        // } else if ($status=="delivered_not_complete"){
+        //     $cond=" where (status='Approved' or status='Rejected') and delivery_status='Delivered Not Complete' and distributor_name='Sample'";
+        // } else {
+        //     $cond=" where status='".$status."' and distributor_name='Sample'";
+        // }
+
         if ($status=="Approved"){
-            // $cond=" where status='Approved' and (delivery_status='Delivered' or delivery_status is null or delivery_status = '') and distributor_name='Sample'";
-            $cond=" where status='Approved' and distributor_name='Sample'";
+            // $cond=" where status='Approved' and (delivery_status='Delivered' or delivery_status is null or delivery_status = '') and (distributor_id='1' or distributor_id='189')";
+            $cond=" where status='Approved' and (distributor_id='1' or distributor_id='189')";
         } else if ($status=="pending"){
-            $cond=" where status='Pending' and (delivery_status='Pending' or delivery_status is null or delivery_status = '') and distributor_name='Sample'";
+            $cond=" where status='Pending' and (delivery_status='Pending' or delivery_status is null or delivery_status = '') and (distributor_id='1' or distributor_id='189')";
         } else if ($status=="pending_for_approval"){
-            $cond=" where status='Pending' and (delivery_status='GP Issued' or delivery_status='Delivered Not Complete' or delivery_status='Delivered') and distributor_name='Sample'";
+            $cond=" where status='Pending' and (delivery_status='GP Issued' or delivery_status='Delivered Not Complete' or delivery_status='Delivered') and (distributor_id='1' or distributor_id='189')";
         } else if ($status=="pending_for_delivery"){
-            $cond=" where (status='Approved' or status='Rejected') and delivery_status='Pending' and distributor_name='Sample'";
+            $cond=" where (status='Approved' or status='Rejected') and delivery_status='Pending' and (distributor_id='1' or distributor_id='189')";
         } else if ($status=="gp_issued"){
-            $cond=" where (status='Approved' or status='Rejected') and delivery_status='GP Issued' and distributor_name='Sample'";
+            $cond=" where (status='Approved' or status='Rejected') and delivery_status='GP Issued' and (distributor_id='1' or distributor_id='189')";
         } else if ($status=="delivered_not_complete"){
-            $cond=" where (status='Approved' or status='Rejected') and delivery_status='Delivered Not Complete' and distributor_name='Sample'";
+            $cond=" where (status='Approved' or status='Rejected') and delivery_status='Delivered Not Complete' and (distributor_id='1' or distributor_id='189')";
         } else {
-            $cond=" where status='".$status."' and distributor_name='Sample'";
+            $cond=" where status='".$status."' and (distributor_id='1' or distributor_id='189')";
         }
         
     } else {
-        $cond=" where distributor_name='Sample'";
+        // $cond=" where distributor_name='Sample'";
+        $cond=" where (distributor_id='1' or distributor_id='189')";
     }
 
     if($id!=""){
         if($cond=="") {
-            $cond=" where d_id='".$id."' and distributor_name='Sample'";
+            // $cond=" where d_id='".$id."' and distributor_name='Sample'";
+            $cond=" where d_id='".$id."' and (distributor_id='1' or distributor_id='189')";
         } else {
-            $cond=$cond." and d_id='".$id."' and distributor_name='Sample'";
+            // $cond=$cond." and d_id='".$id."' and distributor_name='Sample'";
+            $cond=$cond." and d_id='".$id."' and (distributor_id='1' or distributor_id='189')";
         }
     }
 
@@ -528,6 +548,52 @@ function save_data($id=''){
         $blogger_email_id = $this->input->post('blogger_email_id');
     }
 
+    $sql="select * from series_master where type='Voucher'";
+    $query=$this->db->query($sql);
+    $result=$query->result();
+    if(count($result)>0){
+        $series=intval($result[0]->series)+1;
+
+        $sql="update series_master set series = '$series' where type = 'Voucher'";
+        $this->db->query($sql);
+    } else {
+        $series=1;
+
+        $sql="insert into series_master (type, series) values ('Voucher', '$series')";
+        $this->db->query($sql);
+    }
+
+    if (isset($date_of_processing)){
+        $financial_year=calculateFiscalYearForDate($date_of_processing);
+    } else {
+        $financial_year="";
+    }
+    
+    $voucher_no = 'WHPL/'.$financial_year.'/voucher/'.strval($series);
+
+    $sql="select * from series_master where type='Gate_Pass'";
+    $query=$this->db->query($sql);
+    $result=$query->result();
+    if(count($result)>0){
+        $series=intval($result[0]->series)+1;
+
+        $sql="update series_master set series = '$series' where type = 'Gate_Pass'";
+        $this->db->query($sql);
+    } else {
+        $series=1;
+
+        $sql="insert into series_master (type, series) values ('Gate_Pass', '$series')";
+        $this->db->query($sql);
+    }
+
+    if (isset($date_of_processing)){
+        $financial_year=calculateFiscalYearForDate($date_of_processing);
+    } else {
+        $financial_year="";
+    }
+    
+    $gate_pass_no = 'WHPL/'.$financial_year.'/gate_pass/'.strval($series);
+
     $data = array(
         'date_of_processing' => $date_of_processing,
         'invoice_no' => $this->input->post('invoice_no'),
@@ -566,7 +632,9 @@ function save_data($id=''){
         'blogger_name' => $blogger_name,
         'blogger_address' => $blogger_address,
         'blogger_phone_no' => $blogger_phone_no,
-        'blogger_email_id' => $blogger_email_id
+        'blogger_email_id' => $blogger_email_id,
+        'voucher_no' => $voucher_no,
+        'gate_pass_no' => $gate_pass_no
     );
 
     if($id==''){

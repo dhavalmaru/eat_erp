@@ -64,6 +64,24 @@ function get_data_qty($status='', $id=''){
     return $query->result();
 }
 
+	
+	
+function update_checkout1(){
+	
+	$data4 = array(
+					'checkout_status' => 'checkout',
+    
+			     	);
+	
+		$this->db->where('checkout_status', 'checkin') ;
+		$this->db->update('promoter_location', $data4);
+}
+	
+	
+	
+	
+	
+
 function save_data($id=''){
     $now=date('Y-m-d H:i:s');
     $curusr=$this->session->userdata('session_id');

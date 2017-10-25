@@ -34,7 +34,7 @@ function get_data($status='', $id=''){
     }
 
     $sql = "select E.*, F.sales_rep_name from 
-            (select C.*, D.depot_name from 
+            (select C.*, D.depot_name, D.state as depot_state from 
             (select A.*, B.distributor_name, B.sell_out from 
             (select * from distributor_in".$cond.") A 
             left join 
@@ -121,16 +121,84 @@ function save_data($id=''){
         }
 
         $ref_id = $this->input->post('ref_id');
+        $sales_return_no = $this->input->post('sales_return_no');
 
         $remarks = $this->input->post('remarks');
 
         if($status == 'Rejected'){
-            $sql = "Update distributor_in Set status='$status', approved_by='$curusr', approved_on='$now' where id = '$id'";
+            $sql = "Update distributor_in Set status='$status', remarks='$remarks', approved_by='$curusr', approved_on='$now' where id = '$id'";
             $this->db->query($sql);
 
             $action='Distributor In Entry '.$status.'.';
         } else {
             if($id!='' || $ref_id!=''){
+                if($sales_return_no==null || $sales_return_no==''){
+                    $sql="select * from series_master where type='Sales_Return'";
+                    $query=$this->db->query($sql);
+                    $result=$query->result();
+                    if(count($result)>0){
+                        $series=intval($result[0]->series)+1;
+
+                        $sql="update series_master set series = '$series' where type = 'Sales_Return'";
+                        $this->db->query($sql);
+                    } else {
+                        $series=1;
+
+                        $sql="insert into series_master (type, series) values ('Sales_Return', '$series')";
+                        $this->db->query($sql);
+                    }
+
+                    if (isset($date_of_processing)){
+                        if($date_of_processing==''){
+                            $financial_year="";
+                        } else {
+                            $financial_year=calculateFiscalYearForDate($date_of_processing);
+                        }
+                    } else {
+                        $financial_year="";
+                    }
+                    
+                    $sales_return_no = 'WHPL/'.$financial_year.'/sales_return/'.strval($series);
+                }
+
+                if($ref_id!=null && $ref_id!=''){
+                    $sql = "select * from distributor_out where distributor_in_id = '$ref_id' and distributor_id = '189'";
+                } else {
+                    $sql = "select * from distributor_out where distributor_in_id = '$id' and distributor_id = '189'";
+                }
+                $query=$this->db->query($sql);
+                $result = $query->result();
+                if(count($result)>0){
+                    $voucher_no = $result[0]->voucher_no;
+
+                    if($voucher_no==null || $voucher_no==''){
+                        $sql="select * from series_master where type='Voucher'";
+                        $query=$this->db->query($sql);
+                        $result=$query->result();
+                        if(count($result)>0){
+                            $series=intval($result[0]->series)+1;
+
+                            $sql="update series_master set series = '$series' where type = 'Voucher'";
+                            $this->db->query($sql);
+                        } else {
+                            $series=1;
+
+                            $sql="insert into series_master (type, series) values ('Voucher', '$series')";
+                            $this->db->query($sql);
+                        }
+
+                        if (isset($date_of_processing)){
+                            $financial_year=calculateFiscalYearForDate($date_of_processing);
+                        } else {
+                            $financial_year="";
+                        }
+                        
+                        $voucher_no = 'WHPL/'.$financial_year.'/voucher/'.strval($series);
+                    }
+                } else {
+                    $voucher_no = '';
+                }
+                
                 if($ref_id!=null && $ref_id!=''){
                     $sql = "Update distributor_in A, distributor_in B 
                             Set A.date_of_processing=B.date_of_processing, A.depot_id=B.depot_id, A.distributor_id=B.distributor_id,
@@ -139,7 +207,9 @@ function save_data($id=''){
                                 A.is_expired=B.is_expired, A.final_cost_amount=B.final_cost_amount, 
                                 A.status='$status', A.remarks='$remarks', 
                                 A.modified_by=B.modified_by, A.modified_on=B.modified_on, 
-                                A.approved_by='$curusr', A.approved_on='$now' 
+                                A.approved_by='$curusr', A.approved_on='$now', A.sales_return_no = '$sales_return_no', 
+                                A.cgst = B.cgst, A.sgst = B.sgst, A.igst = B.igst, A.cgst_amount = B.cgst_amount, 
+                                A.sgst_amount = B.sgst_amount, A.igst_amount = B.igst_amount 
                             WHERE A.id = '$ref_id' and B.id = '$id'";
                     $this->db->query($sql);
 
@@ -170,11 +240,23 @@ function save_data($id=''){
                             WHERE distributor_in_id = '$id'";
                     $this->db->query($sql);
 
+                    $sql = "Update distributor_out set voucher_no = '$voucher_no' WHERE distributor_in_id = '$ref_id' and distributor_id = '189'";
+                    $this->db->query($sql);
+
                     $id = $ref_id;
                 } else {
                     $sql = "Update distributor_in A 
-                            Set A.status='$status', A.remarks='$remarks', A.approved_by='$curusr', A.approved_on='$now' 
+                            Set A.status='$status', A.remarks='$remarks', A.approved_by='$curusr', A.approved_on='$now', 
+                                A.sales_return_no = '$sales_return_no' 
                             WHERE A.id = '$id'";
+                    $this->db->query($sql);
+
+                    $sql = "Update distributor_out set status = '$status', 
+                                    remarks='$remarks', approved_by='$curusr', approved_on='$now' 
+                            WHERE distributor_in_id = '$id'";
+                    $this->db->query($sql);
+
+                    $sql = "Update distributor_out set voucher_no = '$voucher_no' WHERE distributor_in_id = '$id' and distributor_id = '189'";
                     $this->db->query($sql);
                 }
 
@@ -213,7 +295,7 @@ function save_data($id=''){
                     'sales_rep_id' => $this->input->post('sales_rep_id'),
                     'amount' => format_number($this->input->post('total_amount'),2),
                     'tax' => $this->input->post('tax'),
-                    'cst' => format_number($this->input->post('cst'),2),
+                    'cst' => format_number($this->input->post('tax_per'),2),
                     'tax_amount' => format_number($this->input->post('tax_amount'),2),
                     'final_amount' => format_number($this->input->post('final_amount'),2),
                     'final_cost_amount' => format_number($this->input->post('cost_final_amount'),2),
@@ -224,7 +306,14 @@ function save_data($id=''){
                     'modified_on' => $now,
                     'is_expired' => $checked_status,
                     'is_exchanged' => $exchanged_status,
-                    'ref_id' => $ref_id
+                    'ref_id' => $ref_id,
+                    'sales_return_no' => $this->input->post('sales_return_no'),
+                    'cgst' => format_number($this->input->post('cgst'),2),
+                    'sgst' => format_number($this->input->post('sgst'),2),
+                    'igst' => format_number($this->input->post('igst'),2),
+                    'cgst_amount' => format_number($this->input->post('cgst_amount'),2),
+                    'sgst_amount' => format_number($this->input->post('sgst_amount'),2),
+                    'igst_amount' => format_number($this->input->post('igst_amount'),2)
                 );
 
         if($id==''){
@@ -252,7 +341,12 @@ function save_data($id=''){
         $rate=$this->input->post('rate[]');
         $amount=$this->input->post('amount[]');
         $cost_rate=$this->input->post('cost_rate[]');
-        $cost_total_amount1=$this->input->post('cost_total_amount1[]');
+        $cost_total_amt=$this->input->post('cost_total_amt[]');
+        $cgst_amt=$this->input->post('cgst_amt[]');
+        $sgst_amt=$this->input->post('sgst_amt[]');
+        $igst_amt=$this->input->post('igst_amt[]');
+        $tax_amt=$this->input->post('tax_amt[]');
+        $total_amt=$this->input->post('total_amt[]');
 
         for ($k=0; $k<count($type); $k++) {
             if(isset($type[$k]) and $type[$k]!="") {
@@ -271,12 +365,16 @@ function save_data($id=''){
                             'rate' => format_number($rate[$k],2),
                             'amount' => format_number($amount[$k],2),
                             'cost_rate' => format_number($cost_rate[$k],2),
-                            'cost_amount' => format_number($cost_total_amount1[$k],2)
+                            'cost_amount' => format_number($cost_total_amt[$k],2),
+                            'cgst_amt' => format_number($cgst_amt[$k],2),
+                            'sgst_amt' => format_number($sgst_amt[$k],2),
+                            'igst_amt' => format_number($igst_amt[$k],2),
+                            'tax_amt' => format_number($tax_amt[$k],2),
+                            'total_amt' => format_number($total_amt[$k],2)
                         );
                 $this->db->insert('distributor_in_items', $data);
             }
         }
-
 
 
 
@@ -326,7 +424,7 @@ function save_data($id=''){
             $cost_rate=$this->input->post('cost_rate[]');
             $grams=$this->input->post('grams[]');
             $rate=$this->input->post('rate[]');
-            $amount=$this->input->post('cost_total_amount1[]');
+            $amount=$this->input->post('cost_total_amt[]');
 
             for ($k=0; $k<count($type); $k++) {
                 if(isset($type[$k]) and $type[$k]!="") {
@@ -351,6 +449,9 @@ function save_data($id=''){
 
         }
 
+
+
+
         if($exchanged=="1") {
             // $data = array(
             //             'date_of_processing' => $date_of_processing,
@@ -359,7 +460,7 @@ function save_data($id=''){
             //             'sales_rep_id' => $this->input->post('sales_rep_id'),
             //             'amount' => format_number($this->input->post('total_amount'),2),
             //             'tax' => $this->input->post('tax'),
-            //             'cst' => format_number($this->input->post('cst'),2),
+            //             'cst' => format_number($this->input->post('tax_per'),2),
             //             'tax_amount' => format_number($this->input->post('tax_amount_ex'),2),
             //             'final_amount' => format_number($this->input->post('final_amount_ex'),2),
             //             'final_cost_amount' => format_number($this->input->post('cost_final_amount_ex'),2),
@@ -395,7 +496,11 @@ function save_data($id=''){
             $rate=$this->input->post('rate_ex[]');
             $amount=$this->input->post('amount_ex[]');
             $cost_rate=$this->input->post('cost_rate_ex[]');
-            $cost_total_amount1=$this->input->post('cost_total_amount1_ex[]');
+            $cost_total_amt=$this->input->post('cost_total_amt_ex[]');
+            $cgst_amt_ex=$this->input->post('cgst_amt_ex[]');
+            $sgst_amt_ex=$this->input->post('sgst_amt_ex[]');
+            $igst_amt_ex=$this->input->post('igst_amt_ex[]');
+            $tax_amt_ex=$this->input->post('tax_amt_ex[]');
 
             for ($k=0; $k<count($type); $k++) {
                 if(isset($type[$k]) and $type[$k]!="") {
@@ -414,15 +519,15 @@ function save_data($id=''){
                                 'rate' => format_number($rate[$k],2),
                                 'amount' => format_number($amount[$k],2),
                                 'cost_rate' => format_number($cost_rate[$k],2),
-                                'cost_amount' => format_number($cost_total_amount1[$k],2)
+                                'cost_amount' => format_number($cost_total_amt[$k],2),
+                                'cgst_amount' => format_number($cgst_amt_ex[$k],2),
+                                'sgst_amount' => format_number($sgst_amt_ex[$k],2),
+                                'igst_amount' => format_number($igst_amt_ex[$k],2),
+                                'tax_amount' => format_number($tax_amt_ex[$k],2)
                             );
                     $this->db->insert('distributor_out_exchange_items', $data);
                 }
             }
-
-
-
-
 
             $data = array(
                         'date_of_processing' => $date_of_processing,
@@ -431,7 +536,7 @@ function save_data($id=''){
                         'sales_rep_id' => $this->input->post('sales_rep_id'),
                         'amount' => format_number($this->input->post('total_amount_ex'),2),
                         'tax' => $this->input->post('tax'),
-                        'tax_per' => format_number($this->input->post('cst'),2),
+                        'tax_per' => format_number($this->input->post('tax_per'),2),
                         'tax_amount' => format_number($this->input->post('tax_amount_ex'),2),
                         'final_amount' => format_number($this->input->post('final_amount_ex'),2),
                         'status' => $status,
@@ -440,7 +545,13 @@ function save_data($id=''){
                         'modified_by' => $curusr,
                         'modified_on' => $now,
                         'distributor_in_id' => $id,
-                        'distributor_in_type' => 'exchanged'
+                        'distributor_in_type' => 'exchanged',
+                        'cgst' => format_number($this->input->post('cgst'),2),
+                        'sgst' => format_number($this->input->post('sgst'),2),
+                        'igst' => format_number($this->input->post('igst'),2),
+                        'cgst_amount' => format_number($this->input->post('cgst_amount'),2),
+                        'sgst_amount' => format_number($this->input->post('sgst_amount'),2),
+                        'igst_amount' => format_number($this->input->post('igst_amount'),2)
                     );
             
             $sql = "select * from distributor_out where distributor_in_id = '$id' and distributor_in_type = 'exchanged'";
@@ -467,7 +578,7 @@ function save_data($id=''){
             $cost_rate=$this->input->post('cost_rate_ex[]');
             $grams=$this->input->post('grams_ex[]');
             $rate=$this->input->post('rate_ex[]');
-            $amount=$this->input->post('cost_total_amount1_ex[]');
+            $amount=$this->input->post('cost_total_amt_ex[]');
 
             for ($k=0; $k<count($type); $k++) {
                 if(isset($type[$k]) and $type[$k]!="") {
@@ -484,7 +595,12 @@ function save_data($id=''){
                                 'sell_rate' => format_number($sell_rate[$k],2),
                                 'grams' => format_number($grams[$k],2),
                                 'rate' => format_number($rate[$k],2),
-                                'amount' => format_number($amount[$k],2)
+                                'amount' => format_number($amount[$k],2),
+                                'cgst_amt' => format_number($cgst_amt[$k],2),
+                                'sgst_amt' => format_number($sgst_amt[$k],2),
+                                'igst_amt' => format_number($igst_amt[$k],2),
+                                'tax_amt' => format_number($tax_amt[$k],2),
+                                'total_amt' => format_number($total_amt[$k],2)
                             );
                     $this->db->insert('distributor_out_items', $data);
                 }

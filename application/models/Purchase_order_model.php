@@ -62,6 +62,26 @@ function get_purchase_order_payment_details($id){
     return $query->result();
 }
 
+function get_vendor_state($id){
+    $sql = "select state from vendor_master where id = '$id'";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_rate($id){
+    $sql = "select rate from raw_material_master where id = $id";
+    $query=$this->db->query($sql);
+	//echo $sql;
+    return $query->result();
+}
+
+function get_hsn($id){
+    $sql = "select hsn_code from raw_material_master where id = $id";
+    $query=$this->db->query($sql);
+	//echo $sql;
+    return $query->result();
+}
+
 function save_data($id=''){
     $now=date('Y-m-d H:i:s');
     $curusr=$this->session->userdata('session_id');
@@ -113,7 +133,12 @@ function save_data($id=''){
     $raw_material=$this->input->post('raw_material[]');
     $qty=$this->input->post('qty[]');
     $rate=$this->input->post('rate[]');
-    $cst=$this->input->post('cst[]');
+	$hsn=$this->input->post('hsn[]');
+     $cgst=$this->input->post('cgst[]');
+	  $sgst=$this->input->post('sgst[]');
+	   $igst=$this->input->post('igst[]');
+	 // $vendor_id=$this->input->post('vendor_id');
+	
     $amount=$this->input->post('amount[]');
 
     for ($k=0; $k<count($raw_material); $k++) {
@@ -123,8 +148,11 @@ function save_data($id=''){
                         'purchase_order_id' => $id,
                         'item_id' => $item_id,
                         'qty' => format_number($qty[$k],2),
+						'hsn'=>$hsn[$k],
                         'rate' => format_number($rate[$k],2),
-                        'cst' => format_number($cst[$k],2),
+						 'cgst' => format_number($cgst[$k],2),
+						  'sgst' => format_number($sgst[$k],2),
+                        'igst' => format_number($igst[$k],2),
                         'amount' => format_number($amount[$k],2)
                     );
             $this->db->insert('purchase_order_items', $data);

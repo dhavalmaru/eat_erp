@@ -47,8 +47,9 @@ function get_user_role_options($id=''){
     $query=$this->db->query("SELECT * FROM user_role_options WHERE role_id = '$id' and section in('Vendors', 'Depot', 'Raw_Material', 
                             'Tax', 'Product', 'Box', 'Sales_Rep', 'Distributor', 'City_Master', 'Purchase_Order', 'Raw_Material_In', 
                             'Batch_Processing', 'Distributor_Out', 'Distributor_In', 'Depot_Transfer', 'Distributor_Transfer', 
-                            'Bar_To_Box_Transfer', 'Box_To_Bar_Transfer', 'Distributor_Sale', 'User', 'User_Roles', 'Log', 'Reports',
-                            'Sales_Rep_Route_Plan', 'Sales_Rep_Distributors', 'Sales_Rep_Orders', 'Sales_Rep_Payment_Receivables', 'Dashboard', 'Bank_Master', 'Area', 'Distributor_Type', 'Zone', 'Payment', 'Credit_Debit_Note', 'Sales_Rep_Target') 
+                            'Bar_To_Box', 'Box_To_Bar', 'Distributor_Sale', 'User', 'User_Roles', 'Log', 'Reports',
+                            'Sales_Rep_Route_Plan', 'Sales_Rep_Distributors', 'Sales_Rep_Orders', 'Sales_Rep_Payment_Receivables', 
+                            'Dashboard', 'Bank_Master', 'Area', 'Distributor_Type', 'Zone', 'Payment', 'Credit_Debit_Note', 'Sales_Rep_Target') 
                             order by id");
     $result=$query->result();
     $editoptions=array();
@@ -72,8 +73,8 @@ function get_user_role_options($id=''){
             else if ($result[$i]->section=="Distributor_In") $num=13;
             else if ($result[$i]->section=="Depot_Transfer") $num=14;
             else if ($result[$i]->section=="Distributor_Transfer") $num=15;
-            else if ($result[$i]->section=="Bar_To_Box_Transfer") $num=16;
-            else if ($result[$i]->section=="Box_To_Bar_Transfer") $num=17;
+            else if ($result[$i]->section=="Bar_To_Box") $num=16;
+            else if ($result[$i]->section=="Box_To_Bar") $num=17;
             else if ($result[$i]->section=="Distributor_Sale") $num=18;
             else if ($result[$i]->section=="User") $num=19;
             else if ($result[$i]->section=="User_Roles") $num=20;
@@ -106,8 +107,9 @@ function save_data($id=''){
     $sects=array('Vendors', 'Depot', 'Raw_Material', 
                 'Tax', 'Product', 'Box', 'Sales_Rep', 'Distributor', 'City_Master', 'Purchase_Order', 'Raw_Material_In', 
                 'Batch_Processing', 'Distributor_Out', 'Distributor_In', 'Depot_Transfer', 'Distributor_Transfer', 
-                'Bar_To_Box_Transfer', 'Box_To_Bar_Transfer', 'Distributor_Sale', 'User', 'User_Roles', 'Log', 'Reports',
-                'Sales_Rep_Route_Plan', 'Sales_Rep_Distributors', 'Sales_Rep_Orders', 'Sales_Rep_Payment_Receivables','Dashboard', 'Bank_Master', 'Area', 'Distributor_Type', 'Zone', 'Payment', 'Credit_Debit_Note', 'Sales_Rep_Target');
+                'Bar_To_Box', 'Box_To_Bar', 'Distributor_Sale', 'User', 'User_Roles', 'Log', 'Reports',
+                'Sales_Rep_Route_Plan', 'Sales_Rep_Distributors', 'Sales_Rep_Orders', 'Sales_Rep_Payment_Receivables', 
+                'Dashboard', 'Bank_Master', 'Area', 'Distributor_Type', 'Zone', 'Payment', 'Credit_Debit_Note', 'Sales_Rep_Target');
     $vw=$this->input->post('view[]');
     $ins=$this->input->post('insert[]');
     $upd=$this->input->post('update[]');
@@ -146,82 +148,42 @@ function save_data($id=''){
     $viw=$insrt=$updt=$delt=$apprs=$expt=NULL;
 
     for ($i=0; $i < count($sects) ; $i++) { 
-        if(count($vw)>$a){
-            if($vw[$a]==$i){
+        $viw[$i]=0;
+        $insrt[$i]=0;
+        $updt[$i]=0;
+        $delt[$i]=0;
+        $apprs[$i]=0;
+        $expt[$i]=0;
+
+        for($j=0; $j<count($vw); $j++){
+            if($vw[$j]==$i){
                 $viw[$i]=1;
-                if(count($viw)>$a){
-                    $a++;
-                }
-            } else {
-                $viw[$i]=0;
-            }    
-        } else {
-            $viw[$i]=0;
+            }
         }
-
-        if(count($ins)>$b) {
-            if($ins[$b]==$i){
+        for($j=0; $j<count($ins); $j++){
+            if($ins[$j]==$i){
                 $insrt[$i]=1;
-                if(count($insrt)>$b){
-                    $b++;
-                }
-            } else {
-                $insrt[$i]=0;
             }
-        } else {
-            $insrt[$i]=0;
         }
-
-        if(count($upd)>$c) {
-            if($upd[$c]==$i){
+        for($j=0; $j<count($upd); $j++){
+            if($upd[$j]==$i){
                 $updt[$i]=1;
-                if(count($updt)>$c){
-                    $c++;
-                }
-            } else {
-                $updt[$i]=0;
             }
-        } else {
-            $updt[$i]=0;
         }
-       
-        if(count($del)>$d) {
-            if($del[$d]==$i){
+        for($j=0; $j<count($del); $j++){
+            if($del[$j]==$i){
                 $delt[$i]=1;
-                if(count($delt)>$d){
-                    $d++;
-                }
-            } else {
-                $delt[$i]=0;
             }
-        } else {
-            $delt[$i]=0;
         }
-
-        if(count($apps)>$e) {
-            if($apps[$e]==$i){
+        for($j=0; $j<count($apps); $j++){
+            if($apps[$j]==$i){
                 $apprs[$i]=1;
-                if(count($apprs)>$e){
-                    $e++;
-                }
-            } else {
-                $apprs[$i]=0;
             }
-        } else {
-            $apprs[$i]=0;
         }
-
-        if(count($exp)>$f) {
-            if($exp[$f]==$i){
+        for($j=0; $j<count($exp); $j++){
+            if($exp[$j]==$i){
                 $expt[$i]=1;
-                if(count($expt)>$f){
-                    $f++;
-                }
-            } else {
-                $expt[$i]=0;
             }
-        } else {
-            $expt[$i]=0;
         }
     }
 
@@ -239,6 +201,10 @@ function save_data($id=''){
             'r_approvals' => $apprs[$i],
             'r_export' => $expt[$i]
          );
+
+        // echo json_encode($data);
+        // echo '<br/>';
+
         $this->db->insert('user_role_options', $data);
     }
 

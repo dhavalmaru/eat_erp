@@ -28,7 +28,7 @@ class Dashboard_promoter extends CI_Controller
             $data['store']=$this->dashboard_promoter_model->get_store();
             // $data['target']=$this->dashboard_promoter_model->get_target();
             // $data['payment_receivable']=$this->sales_rep_payment_receivable_model->get_data();
-            // $data['sales_rep_id']=$this->session->userdata('sales_rep_id');
+                $data['sales_rep_id']=$this->session->userdata('sales_rep_id');
 
             load_view('dashboard/dashboard_promoter_details', $data);
         } else {

@@ -1264,6 +1264,9 @@ $("#form_distributor_out_details").validate({
                     return ($("#shipping_address_no:checked").length);
                 }
             }
+        },
+        order_no: {
+            required: true
         }
     },
 
@@ -1312,6 +1315,18 @@ $('#form_distributor_out_details').submit(function() {
 function check_product_availablity_for_distributor_out() {
     var validator = $("#form_distributor_out_details").validate();
     var valid = true;
+
+    if($("#distributor_id").val()=="214"){
+        var order=$("#order_no").val();
+        var pattern= /^\d{3}-?\d{7}-?\d{7}$/;
+        if(!pattern.test(order)) {
+            var errors = {};
+            var name = $('#order_no').attr('name');
+            errors[name] = "Please Enter Valid Order No eg. 123-1234567-1234567.";
+            validator.showErrors(errors);
+            valid = false;
+        }
+    }
 
     if($('.type').length=='0'){
         var errors = {};

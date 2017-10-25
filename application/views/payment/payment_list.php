@@ -130,7 +130,11 @@
 											<td><?php echo $data[$i]->b_name; ?></td>
 											<td><?php echo $data[$i]->distributor_name; ?></td>
 											<td><?php echo format_money($data[$i]->total_amount,2); ?></td>
-											<td><?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
+											<td>
+												<span style="display:none;">
+                                                    <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
+                                                </span>
+												<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
 											<td><?php echo $data[$i]->status; ?></td>
 											<td class="view_payment_slip" style="text-align:center;vertical-align: middle;"><?php if ($data[$i]->id!=null) { ?><a href="<?php echo base_url().'index.php/payment/view_payment_slip/'.$data[$i]->id; ?>" target="_blank"> <span class="fa fa-file-pdf-o"></span></a><?php } ?></td>
 										</tr>

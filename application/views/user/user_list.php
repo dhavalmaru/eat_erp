@@ -61,7 +61,11 @@
 											<td><a href="<?php echo base_url().'index.php/user/edit/'.$data[$i]->id; ?>"><?php echo $data[$i]->first_name . ' ' . $data[$i]->middle_name . ' ' . $data[$i]->last_name; ?></a></td>
 											<td><?php echo $data[$i]->email_id; ?></td>
 											<td><?php echo $data[$i]->mobile; ?></td>
-											<td><?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
+											<td>
+												<span style="display:none;">
+                                                    <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
+                                                </span>
+												<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
 										</tr>
 										<?php } ?>
 									</tbody>

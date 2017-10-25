@@ -119,7 +119,7 @@ class Export extends CI_Controller {
             $data['sample_report_name'] = 'All_Distributor_Ledger_Report.xlsx';
         } else if($rep_id==15){
             $data['report_type'] = 'Promoter Stock';
-            $data['report_name'] = 'Promoter Stock';
+            $data['report_name'] = 'Promoter Sales';
             $data['sample_report_name'] = 'Promoter_Stock_Report.xlsx';
         } else if($rep_id==16){
             $data['report_type'] = 'Ledger Report';
@@ -131,7 +131,7 @@ class Export extends CI_Controller {
             $data['sample_report_name'] = 'Trial_Balance_Report.xlsx';
         } else if($rep_id==18){
             $data['report_type'] = 'Stock Details';
-            $data['report_name'] = 'Sale Invoice SKU Report';
+            $data['report_name'] = 'Sales Report';
             $data['sample_report_name'] = 'Sale_Invoice_SKU_Report.xlsx';
         } else if($rep_id==19){
             $data['report_type'] = 'Sample & Expired Report';
@@ -144,7 +144,7 @@ class Export extends CI_Controller {
         } else {
             $data['report_id'] = $rep_id;
             $data['distributor'] = $this->distributor_model->get_data('Approved');
-            $data['salesrep'] = $this->sales_rep_model->get_data('Approved');
+            $data['salesrep'] = $this->sales_rep_model->get_data_dist('Approved');
             $data['promoter'] = $this->sales_rep_model->get_data_promoter('Approved');
             $data['ledger'] = $this->accountledger_model->get_ledger_data('Approved');
 

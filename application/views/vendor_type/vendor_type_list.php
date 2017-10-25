@@ -62,7 +62,11 @@
 										<tr>
 											<td style="text-align:center;"><?php echo $i+1; ?></td>
 											<td><a href="<?php echo base_url().'index.php/vendor_type/edit/'.$data[$i]->id; ?>"><?php echo $data[$i]->vendor_type; ?></a></td>
-											<td><?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
+											<td>
+												<span style="display:none;">
+                                                    <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
+                                                </span>
+												<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
 										</tr>
 										<?php } ?>
 									</tbody>

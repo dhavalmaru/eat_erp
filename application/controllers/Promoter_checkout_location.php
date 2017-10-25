@@ -35,6 +35,8 @@ class Promoter_checkout_location extends CI_Controller{
     public function add($id){
         $data['id'] = $id;
         $data['dist_name'] = $this->promoter_checkout_location_model->get_dist_name($id);
+		
+		
         $result=$this->promoter_checkout_location_model->get_access();
         if(count($result)>0) {
             if($result[0]->r_insert == 1) {
@@ -70,8 +72,22 @@ class Promoter_checkout_location extends CI_Controller{
         }
     }
 
+	 function update_checkout() {
+		// $id= $this->input->post('id');
+		// $date_of_visit=$this->input->post('date_of_visit');
+   
+		$data['data4'] =$this->promoter_checkout_location_model->update_checkout1();
+
+		// $data = array(
+		
+		        // 'checkout_status'=> $this->input->post('checkout_status'),
+
+		             // );
+ 
+		     }  
+
+	
     public function save($id=""){
-         
         if($id == ""){
             $this->promoter_checkout_location_model->save_data('');
         } else {
@@ -87,6 +103,10 @@ class Promoter_checkout_location extends CI_Controller{
         echo $result;
     }
 
+	
+	
+	
+	
     public function email_promoter_stock(){
         $date = date('Y-m-d');
         // $date = '2017-06-10';
@@ -151,9 +171,9 @@ class Promoter_checkout_location extends CI_Controller{
                 $message = '<html><head></head><body>Hi,<br /><br />
                             Please find below Promoters Stock Report for - '.$date.'. <br /><br />'.$table.'<br/>
                             <br />Thanks</body></html>';
-                $to_email = 'anish.oberoi@eatanytime.in,rishit.sanghvi@otbconsulting.co.in,swapnil.darekar@otbconsulting.co.in,shailesh.kanathe@eatanytime.in,vaibhav.desai@eatanytime.in';
+                // $to_email = 'anish.oberoi@eatanytime.in,rishit.sanghvi@otbconsulting.co.in,swapnil.darekar@otbconsulting.co.in,shailesh.kanathe@eatanytime.in,vaibhav.desai@eatanytime.in';
                 $bcc="dhaval.maru@otbconsulting.co.in";
-                // $to_email = 'dhaval.maru@otbconsulting.co.in';
+                $to_email = 'dhaval.maru@otbconsulting.co.in';
                 // $to_email = 'dhaval.maru@otbconsulting.co.in';
                 $mailSent=send_email($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc);
 
@@ -224,9 +244,9 @@ class Promoter_checkout_location extends CI_Controller{
                             Please find below Promoters Check in Report for - '.$date.'. <br /><br />'.$table.'<br/>
                             <br />Thanks</body></html>';
                             // echo $message;
-                $to_email = 'rishit.sanghvi@otbconsulting.co.in,anish.oberoi@eatanytime.in,swapnil.darekar@otbconsulting.co.in,shailesh.kanathe@eatanytime.in,vaibhav.desai@eatanytime.in';
+                // $to_email = 'rishit.sanghvi@otbconsulting.co.in,anish.oberoi@eatanytime.in,swapnil.darekar@otbconsulting.co.in,shailesh.kanathe@eatanytime.in,vaibhav.desai@eatanytime.in';
                 $bcc="dhaval.maru@otbconsulting.co.in";
-                // $to_email = 'dhaval.maru@otbconsulting.co.in';
+                $to_email = 'dhaval.maru@otbconsulting.co.in';
                 // $to_email = 'dhaval.maru@otbconsulting.co.in';
                 $mailSent=send_email($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc);
 

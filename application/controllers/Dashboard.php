@@ -11,6 +11,7 @@ class Dashboard extends CI_Controller
       
         $this->load->helper('common_functions');
         $this->load->model('dashboard_model');
+		// $this->load->library('session');
     }
 
     //index function

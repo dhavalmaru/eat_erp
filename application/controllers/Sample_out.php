@@ -109,7 +109,7 @@ class Sample_out extends CI_Controller{
                 $data['depot'] = $this->depot_model->get_data('Approved');
                 $data['distributor'] = $this->distributor_model->get_data_with_sample('Approved');
                 $data['distributor1'] = $this->distributor_model->get_data_without_sample('Approved');
-                $data['sales_rep'] = $this->sales_rep_model->get_data('Approved');
+                $data['sales_rep'] = $this->sales_rep_model->get_data_dist('Approved');
                 $data['box'] = $this->box_model->get_data('Approved');
                 $data['bar'] = $this->product_model->get_data('Approved');
                 $data['bank'] = $this->bank_model->get_data('Approved');
@@ -133,7 +133,7 @@ class Sample_out extends CI_Controller{
                 $data['depot'] = $this->depot_model->get_data('Approved');
                 $data['distributor'] = $this->distributor_model->get_data_with_sample('Approved');
                 $data['distributor1'] = $this->distributor_model->get_data_without_sample('Approved');
-                $data['sales_rep'] = $this->sales_rep_model->get_data('Approved');
+                $data['sales_rep'] = $this->sales_rep_model->get_data_dist('Approved');
                 $data['box'] = $this->box_model->get_data('Approved');
                 $data['bar'] = $this->product_model->get_data('Approved');
                 $data['distributor_out_items'] = $this->sample_out_model->get_distributor_out_items($d_id);

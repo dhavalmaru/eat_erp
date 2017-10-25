@@ -148,7 +148,7 @@ class Sales_rep extends CI_Controller{
         // $date = '2017-03-22';
         $from_email = 'cs@eatanytime.in';
         $from_email_sender = 'Eat ERP';
-        $bcc = 'prasad.bhisale@otbconsulting.co.in';
+        // $bcc = 'prasad.bhisale@otbconsulting.co.in';
         // $bcc = 'rishit.sanghvi@otbconsulting.co.in, swapnil.darekar@otbconsulting.co.in';
         $subject = 'Route Plan For - ' . $date;
         $links = '';
@@ -253,10 +253,10 @@ class Sales_rep extends CI_Controller{
                 $message = '<html><head></head><body>Hi,<br /><br />
                             Please find below '.$data[$i]->sales_rep_name.' Location For - '.$date.'. <br /><br />'.$table.'<br/>
                             <br />Thanks</body></html>';
-                $to_email = $data[$i]->email_id.',rishit.sanghvi@otbconsulting.co.in,swapnil.darekar@otbconsulting.co.in';
+                // $to_email = $data[$i]->email_id.',rishit.sanghvi@otbconsulting.co.in,swapnil.darekar@otbconsulting.co.in';
                 $bcc="dhaval.maru@otbconsulting.co.in";
                 // $to_email = 'dhaval.maru@otbconsulting.co.in,dhavalbright@gmail.com';
-                // $to_email = 'dhaval.maru@otbconsulting.co.in';
+                $to_email = 'dhaval.maru@otbconsulting.co.in';
                 $mailSent=send_email($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc);
 
                 echo $message;

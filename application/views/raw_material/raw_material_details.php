@@ -53,7 +53,32 @@
                                                 </div>
                                             </div>
                                         </div>
+                                
+									<!--piyu code-->
+									
+									<br><br>
+									<div class="form-group" >
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">HSN Code <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="hsn_code" id="hsn_code" placeholder="HSN Code" value="<?php if(isset($data)) { echo  $data[0]->hsn_code; } ?>"/>
+                                            </div>
+                                           <label class="col-md-2 col-sm-2 col-xs-12 control-label">Rate (In Rs) <span class="asterisk_sign">*</span></label>
+                                              <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="rate" placeholder="Rate" value="<?php if (isset($data)) { echo $data[0]->rate; } ?>"/>
+                                            </div>
+                                        </div>
                                     </div>
+							</div><!--form-grp-->
+									
+									
+									
+									
+									
+									
+									
+									
+									
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Remarks </label>

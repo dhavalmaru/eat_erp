@@ -83,7 +83,11 @@
 											<td><?php echo $data[$i]->vendor_name; ?></td>
 											<td><?php echo $data[$i]->depot_name; ?></td>
 											<td><?php echo format_money($data[$i]->amount,2); ?></td>
-											<td><?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
+											<td>
+												<span style="display:none;">
+                                                    <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
+                                                </span>
+												<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
 											<td style="text-align:center;vertical-align: middle;"><?php if ($data[$i]->id!=null) { ?><a href="<?php echo base_url().'index.php/purchase_order/view_purchase_order/'.$data[$i]->id; ?>" target="_blank"> <span class="fa fa-file-pdf-o"></span></a><?php } ?></td>
 											<td style="text-align:center; vertical-align: middle;"><a href="<?php echo base_url().'index.php/purchase_order/view_payment_details/'.$data[$i]->id; ?>"><span class="fa fa-eye"  ></span></a></td>
 											<td style="text-align:center; vertical-align: middle;"><a href="<?php echo base_url().'index.php/purchase_order/send_email/'.$data[$i]->id; ?>"><span class="fa fa-paper-plane-o"></span></a></td>

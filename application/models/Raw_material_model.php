@@ -40,12 +40,15 @@ function save_data($id=''){
     
     $data = array(
         'rm_name' => $this->input->post('rm_name'),
+		'hsn_code'=> $this->input->post('hsn_code'),
+		'rate'=> $this->input->post('rate'),
         'status' => $this->input->post('status'),
         'remarks' => $this->input->post('remarks'),
+		
         'modified_by' => $curusr,
         'modified_on' => $now
     );
-
+    // echo $data;
     if($id==''){
         $data['created_by']=$curusr;
         $data['created_on']=$now;

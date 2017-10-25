@@ -78,7 +78,11 @@
 											<td><?php echo $data[$i]->cost; ?></td>
 											<td><?php echo $data[$i]->anticipated_wastage; ?></td>
 											<!-- <td><?php //echo $data[$i]->rate_of_box; ?></td> -->
-											<td><?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
+											<td>
+												<span style="display:none;">
+                                                    <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
+                                                </span>
+												<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
 										</tr>
 										<?php } ?>
 									</tbody>

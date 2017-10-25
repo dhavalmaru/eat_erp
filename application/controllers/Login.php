@@ -42,7 +42,7 @@ class Login extends CI_Controller
 
             $this->session->set_userdata($sessiondata);
 
-            $logarray['table_id']=$uid;
+            $logarray['table_id']='1';
             $logarray['module_name']='Login';
             $logarray['cnt_name']='Login';
             $logarray['action']='Logged in';
@@ -56,13 +56,15 @@ class Login extends CI_Controller
                     redirect(base_url().'index.php/Dashboard_sales_rep');
                 }
             } else {
-                $result=$this->dashboard_model->get_access();
-                if(count($result)>0) {
-                    redirect(base_url().'index.php/Dashboard');
+                 $result=$this->dashboard_model->get_access();
+                 if(count($result)>0) {
+					 //echo '<script>alert("'.$this->session->userdata('role_id').'");</script>';
+                     redirect(base_url().'index.php/Dashboard');
                 }
                 else {
-                    redirect(base_url().'index.php/Dashboard/Dashboardscreen');
-                }
+                     redirect(base_url().'index.php/Dashboard/Dashboardscreen');
+                 }
+				// echo $this->session->userdata('role_id');
             }
         } else {
             echo "<script>alert('Invalid Username or Password.');</script>";

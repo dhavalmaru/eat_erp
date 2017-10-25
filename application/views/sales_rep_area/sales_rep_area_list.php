@@ -64,7 +64,11 @@
 		                                                <a href="<?php echo base_url().'index.php/sales_rep_area/edit/'.$data[$i]->id; ?>"><?php echo (($data[$i]->date_of_visit!=null && $data[$i]->date_of_visit!='')?date('d/m/Y',strtotime($data[$i]->date_of_visit)):''); ?></a>
 		                                            </td>
 													<td><?php echo $data[$i]->area; ?></td>
-													<td><?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
+													<td>
+														<span style="display:none;">
+	                                                        <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
+	                                                    </span>
+														<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
 												</tr>
 												<?php } ?>
 											</tbody>

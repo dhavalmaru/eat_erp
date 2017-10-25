@@ -49,7 +49,7 @@
     		<!-- PAGE CONTENT -->
     		<?php $this->load->view('templates/menus');?>
             <?php if($status=='pending_for_approval') { ?>
-                <form id="form_distributor_out_list" role="form" class="form-horizontal" method="post" action="<?php echo base_url().'index.php/distributor_out/authorise'; ?>" target="_blank">
+                <form id="form_distributor_out_list" role="form" class="form-horizontal" method="post" action="<?php echo base_url().'index.php/distributor_out/authorise'; ?>">
             <?php } else if($status=='pending_for_delivery') { ?>
                 <form id="form_distributor_out_list" role="form" class="form-horizontal" method="post" action="<?php echo base_url().'index.php/distributor_out/set_delivery_status'; ?>" target="_blank">
             <?php } else if($status=='gp_issued') { ?>
@@ -60,12 +60,15 @@
     		<div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
 
     			<div class="heading-h3"> 
-    				<div class="heading-h3-heading mobile-head">	 <a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp;  Sales List  </div>						 
+    				<div class="heading-h3-heading mobile-head">
+                        <a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp;  Sales List  
+                        <input type="hidden" id="form_status" name="form_status" value="<?php if(isset($status)) echo $status; ?>">
+                    </div>						 
     				<div class="heading-h3-heading mobile-head">
                         <div class="pull-right btn-margin"> 
                             <?php $this->load->view('templates/download');?>    
                         </div>
-                        <div class="pull-right btn-margin" style="margin-left: 5px; <?php if(($access[0]->r_edit=='1' && ($status=='pending_for_delivery' || $status=='gp_issued')) || ($access[0]->r_approvals=='1' && $status=='pending_for_approval')) echo ''; else echo 'display: none;';?>">
+                        <div class="pull-right btn-margin" style="margin-left: 5px; <?php if(($access[0]->r_edit=='1' && ($status=='pending_for_delivery' || $status=='gp_issued'))) echo ''; else echo 'display: none;';?>">
                             <a class="btn btn-success btn-block btn-padding" data-toggle="modal" href="#myModal">
                                 <span class="fa fa-shopping-cart"></span> <?php if($status=='pending_for_delivery') echo 'Select Delivery Person'; else if($status=='gp_issued') echo 'Select Delivery Status'; else if($status=='pending_for_approval') echo 'Authorise Records'; ?>
                             </a>
@@ -161,7 +164,7 @@
     										<table id="customers10" class="table datatable table-bordered">
     											<thead>
     												<tr>
-                                                        <th width="65" align="center" style="<?php if($status!='pending_for_delivery' && $status!='gp_issued' && $status!='pending_for_approval') echo 'display: none;'; ?>">Select</th>
+                                                        <th width="65" align="center" style="<?php //if($status!='pending_for_delivery' && $status!='gp_issued' && $status!='pending_for_approval') echo 'display: none;'; ?>">Select</th>
                                                         <th width="65" align="center">Sr. No.</th>
                                                         <th width="156">Date Of processing</th>
     													<th width="130">Invoice No</th>
@@ -175,7 +178,7 @@
                                                         <th width="110" >Delivery Status</th>
                                                         <th width="110" >Delivery Person</th>
     													<th width="105" style="text-align:center;">View Invoice</th>
-                                                        <th width="105" style="text-align:center; <?php if($status!='gp_issued') echo 'display: none;'; ?>">View GP</th>
+                                                        <th width="105" style="text-align:center; <?php //if($status!='gp_issued') echo 'display: none;'; ?>">View GP</th>
     													<th width="50" style="display:none;">Resend Invoice</th>
     												</tr>
     											</thead>
@@ -235,11 +238,9 @@
                                     <input type="hidden" name="delivery_status" id="delivery_status" value="GP Issued" />
                                 </div>
 
-                                <br/>
-                                <label class="control-label">Status <span class="asterisk_sign">*</span></label>
-                                <br/>
+                                <label class="control-label" style="display: none;">Status <span class="asterisk_sign">*</span></label>
                                 <div class="">
-                                    <select name="status" id="status" class="form-control">
+                                    <select name="status" id="status" class="form-control" style="display: none;">
                                         <!-- <option value="Pending">Active</option> -->
                                         <option value="Approved">Active</option>
                                         <option value="InActive">InActive</option>
@@ -256,11 +257,9 @@
                                     </select>
                                 </div>
 
-                                <br/>
-                                <label class="control-label">Status <span class="asterisk_sign">*</span></label>
-                                <br/>
+                                <label class="control-label" style="display: none;">Status <span class="asterisk_sign">*</span></label>
                                 <div class="">
-                                    <select name="status" id="status" class="form-control">
+                                    <select name="status" id="status" class="form-control" style="display: none;">
                                         <!-- <option value="Pending">Active</option> -->
                                         <option value="Approved">Active</option>
                                         <option value="InActive">InActive</option>
@@ -367,6 +366,7 @@
             var status = '<?php echo $status; ?>';
             var len = 10;
             var columnDefs = [];
+
             if(status == 'pending_for_delivery' || status == 'gp_issued' || status == 'pending_for_approval') {
                 len = -1;
 
@@ -374,11 +374,30 @@
                     columnDefs = [        
                                     {
                                         "targets": [15],
-                                        "visible": false
+                                        "visible": false,
+                                        "searchable": false
+                                    }
+                                ];
+                } else if(status == 'pending_for_approval') {
+                    columnDefs = [    
+                                    {
+                                        "targets": [0],
+                                        "visible": false,
+                                        "searchable": false
+                                    },       
+                                    {
+                                        "targets": [14],
+                                        "visible": false,
+                                        "searchable": false
+                                    }, 
+                                    {
+                                        "targets": [15],
+                                        "visible": false,
+                                        "searchable": false
                                     }
                                 ];
                 } else {
-                    columnDefs = [        
+                    columnDefs = [      
                                     {
                                         "targets": [14],
                                         "visible": false,
@@ -386,7 +405,8 @@
                                     },
                                     {
                                         "targets": [15],
-                                        "visible": false
+                                        "visible": false,
+                                        "searchable": false
                                     }
                                 ];
                 }

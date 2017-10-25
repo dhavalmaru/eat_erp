@@ -68,7 +68,11 @@
 													<td><?php echo $data[$i]->distributor_name; ?></td>
 													<td><?php echo $data[$i]->distributor_type; ?></td>
 													<td><?php echo $data[$i]->distributor_status; ?></td>
-													<td><?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
+													<td>
+														<span style="display:none;">
+                                                            <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
+                                                        </span>
+														<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
 												</tr>
 												<?php } ?>
 											</tbody>

@@ -107,6 +107,7 @@
 										<tr>
 											<th width="58" style="text-align:center;">Sr. No.</th>
 											<th width="150" >Date Of processing</th>
+											<th width="250">Sales Return No</th>
 											<th width="250">Depot Name</th>
 											<th width="250"  >Distributor Name</th>
 											<th width="250" >Sales Representative Name</th>
@@ -125,11 +126,16 @@
                                                 </span>
                                                 <a href="<?php echo base_url().'index.php/distributor_in/edit/'.$data[$i]->id; ?>"><?php echo (($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('d/m/Y',strtotime($data[$i]->date_of_processing)):''); ?></a>
                                             </td>
+											<td><?php echo $data[$i]->sales_return_no; ?></td>
 											<td><?php echo $data[$i]->depot_name; ?></td>
 											<td><?php echo $data[$i]->distributor_name; ?></td>
 											<td><?php echo $data[$i]->sales_rep_name; ?></td>
 											<td><?php echo format_money($data[$i]->amount,2); ?></td>
-											<td><?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
+											<td>
+												<span style="display:none;">
+                                                    <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
+                                                </span>
+												<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
 											<td><?php echo $data[$i]->status; ?></td>
 										</tr>
 										<?php } ?>

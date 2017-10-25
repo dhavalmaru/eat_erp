@@ -12,6 +12,7 @@ class Distributor_out extends CI_Controller{
         $this->load->helper('form');
         $this->load->library('session');
         $this->load->library('email');
+		 $this->load->library('form_validation');
         $this->load->helper('common_functions');
         $this->load->model('distributor_out_model');
         $this->load->model('box_model');
@@ -38,8 +39,25 @@ class Distributor_out extends CI_Controller{
         // }
 
         $this->checkstatus('pending_for_delivery');
-    }
+		
+		
+}
 
+		 function select_validate($distributor_id)
+            {
+                 if($distributor_id=="amazon direct")
+                    {$this->form_validation->set_message('select_validate', 'order no should be in 333-7777777-7777777');
+                    return false;}
+                else 
+                    {   return true;    }
+            }
+
+	
+	
+	
+	
+	
+	
     public function get_data($status){
         // $status = 'Approved';
 
@@ -52,19 +70,21 @@ class Distributor_out extends CI_Controller{
         $data = array();
 
         for($i=0;$i<count($r);$i++){
-            if($status=='pending_for_delivery' || $status=='gp_issued' || $status=='pending_for_approval'){
+            if($status=='pending_for_delivery' || $status=='gp_issued'){
                 $data[] = array(
                             '<input type="checkbox" id="check_'.$i.'" class="check icheckbox" name="check_val[]" value="'.$r[$i]->id.'" onChange="set_checkbox(this);" />
                             <input type="hidden" id="input_check_'.$i.'" name="check[]" value="false" />',
 
                             $i+1,
 
-                            '<span style="display:none;">'.
+                            '<span style="display:none;">
+                            <input type="hidden" id="date_of_processing_'.$i.'" name="date_of_processing[]" value="'.$r[$i]->date_of_processing.'" />'.
                                 (($r[$i]->date_of_processing!=null && $r[$i]->date_of_processing!='')?date('Ymd',strtotime($r[$i]->date_of_processing)):'')
                             .'</span>'.
                             (($r[$i]->date_of_processing!=null && $r[$i]->date_of_processing!='')?date('d/m/Y',strtotime($r[$i]->date_of_processing)):''),
 
-                            '<span style="display:none;">'.
+                            '<span style="display:none;">
+                            <input type="hidden" id="invoice_no_'.$i.'" name="invoice_no[]" value="'.$r[$i]->invoice_no.'" />'.
                                 (isset($r[$i]->invoice_no)?str_pad(substr($r[$i]->invoice_no, strrpos($r[$i]->invoice_no, "/")+1),10,"0",STR_PAD_LEFT):'')
                             .'</span>'.
                             $r[$i]->invoice_no,
@@ -94,7 +114,7 @@ class Distributor_out extends CI_Controller{
                                             base_url().'index.php/distributor_out/view_tax_invoice_old/'.$r[$i]->id:
                                             base_url().'index.php/distributor_out/view_tax_invoice/'.$r[$i]->id).
                                         '" target="_blank"> 
-                                    <span class="fa fa-file-pdf-o"></span>
+                                    <span class="fa fa-file-pdf-o" style="font-size:20px;"></span>
                                 </a>'
                                 :''),
 
@@ -102,7 +122,7 @@ class Distributor_out extends CI_Controller{
                                         ((strtotime($r[$i]->date_of_processing)<strtotime('2017-07-01'))?
                                         base_url().'index.php/distributor_out/view_gate_pass_old/'.$r[$i]->id:
                                         base_url().'index.php/distributor_out/view_gate_pass/'.$r[$i]->id).
-                                    '" target="_blank">  <span class="fa fa-file-pdf-o"></span>
+                                    '" target="_blank">  <span class="fa fa-file-pdf-o" style="font-size:20px;"></span>
                             </a>',
 
                             '<a href="#"><span class="fa fa-eye">Resend Invoice</span></a>'
@@ -114,14 +134,16 @@ class Distributor_out extends CI_Controller{
 
                             $i+1,
 
-                            '<span style="display:none;">'.
+                            '<span style="display:none;">
+                            <input type="hidden" id="date_of_processing_'.$i.'" name="date_of_processing[]" value="'.$r[$i]->date_of_processing.'" />'.
                                 (($r[$i]->date_of_processing!=null && $r[$i]->date_of_processing!='')?date('Ymd',strtotime($r[$i]->date_of_processing)):'')
                             .'</span>'.
                             '<a href="'.base_url().'index.php/distributor_out/edit/'.$r[$i]->d_id.'">'.
                                 (($r[$i]->date_of_processing!=null && $r[$i]->date_of_processing!='')?date('d/m/Y',strtotime($r[$i]->date_of_processing)):'').
                             '</a>',
 
-                            '<span style="display:none;">'.
+                            '<span style="display:none;">
+                            <input type="hidden" id="invoice_no_'.$i.'" name="invoice_no[]" value="'.$r[$i]->invoice_no.'" />'.
                                 (isset($r[$i]->invoice_no)?str_pad(substr($r[$i]->invoice_no, strrpos($r[$i]->invoice_no, "/")+1),10,"0",STR_PAD_LEFT):'')
                             .'</span>'.
                             $r[$i]->invoice_no,
@@ -151,7 +173,7 @@ class Distributor_out extends CI_Controller{
                                             base_url().'index.php/distributor_out/view_tax_invoice_old/'.$r[$i]->id:
                                             base_url().'index.php/distributor_out/view_tax_invoice/'.$r[$i]->id).
                                         '" target="_blank"> 
-                                    <span class="fa fa-file-pdf-o"></span>
+                                    <span class="fa fa-file-pdf-o" style="font-size:20px;"></span>
                                 </a>'
                                 :''),
 
@@ -159,7 +181,7 @@ class Distributor_out extends CI_Controller{
                                         ((strtotime($r[$i]->date_of_processing)<strtotime('2017-07-01'))?
                                         base_url().'index.php/distributor_out/view_gate_pass_old/'.$r[$i]->id:
                                         base_url().'index.php/distributor_out/view_gate_pass/'.$r[$i]->id).
-                                    '" target="_blank">  <span class="fa fa-file-pdf-o"></span>
+                                    '" target="_blank">  <span class="fa fa-file-pdf-o" style="font-size:20px;"></span>
                             </a>',
 
                             '<a href="#"><span class="fa fa-eye">Resend Invoice</span></a>'
@@ -181,6 +203,8 @@ class Distributor_out extends CI_Controller{
     public function checkstatus($status=''){
         $result=$this->distributor_out_model->get_access();
         if(count($result)>0) {
+            $curusr = $this->session->userdata('session_id');
+
             $data['access']=$result;
 			if($status=='All') {
 				$status='';
@@ -202,20 +226,28 @@ class Distributor_out extends CI_Controller{
                         $active=$active+1;
 
 
-                    if (strtoupper(trim($count_data[$i]->status))=="PENDING" && (strtoupper(trim($count_data[$i]->delivery_status))=="GP ISSUED" || strtoupper(trim($count_data[$i]->delivery_status))=="DELIVERED NOT COMPLETE" || strtoupper(trim($count_data[$i]->delivery_status))=="DELIVERED"))
+                    if ((strtoupper(trim($count_data[$i]->status))=="PENDING" && 
+                        (strtoupper(trim($count_data[$i]->delivery_status))=="PENDING" || 
+                            strtoupper(trim($count_data[$i]->delivery_status))=="GP ISSUED" || 
+                            strtoupper(trim($count_data[$i]->delivery_status))=="DELIVERED NOT COMPLETE" || 
+                            strtoupper(trim($count_data[$i]->delivery_status))=="DELIVERED")) || 
+                        strtoupper(trim($count_data[$i]->status))=="DELETED")
                         $pending_for_approval=$pending_for_approval+1;
-                    else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && (strtoupper(trim($count_data[$i]->delivery_status))=="DELIVERED" || $count_data[$i]->delivery_status==null))
+                    else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && 
+                                (strtoupper(trim($count_data[$i]->delivery_status))=="DELIVERED" || $count_data[$i]->delivery_status==null))
                         // $active=$active+1;
                         $active=$active;
                     else if (strtoupper(trim($count_data[$i]->status))=="INACTIVE")
                         $inactive=$inactive+1;
-                    else if (strtoupper(trim($count_data[$i]->status))=="PENDING")
+                    else if ((strtoupper(trim($count_data[$i]->status))=="PENDING" && 
+                                ($count_data[$i]->delivery_status==null || $count_data[$i]->delivery_status=='')) || 
+                            strtoupper(trim($count_data[$i]->status))=="REJECTED")
                         $pending=$pending+1;
-                    else if ((strtoupper(trim($count_data[$i]->status))=="APPROVED" || strtoupper(trim($count_data[$i]->status))=="REJECTED") && strtoupper(trim($count_data[$i]->delivery_status))=="PENDING")
+                    else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && strtoupper(trim($count_data[$i]->delivery_status))=="PENDING")
                         $pending_for_delivery=$pending_for_delivery+1;
-                    else if ((strtoupper(trim($count_data[$i]->status))=="APPROVED" || strtoupper(trim($count_data[$i]->status))=="REJECTED") && strtoupper(trim($count_data[$i]->delivery_status))=="GP ISSUED")
+                    else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && strtoupper(trim($count_data[$i]->delivery_status))=="GP ISSUED")
                         $gp_issued=$gp_issued+1;
-                    else if ((strtoupper(trim($count_data[$i]->status))=="APPROVED" || strtoupper(trim($count_data[$i]->status))=="REJECTED") && strtoupper(trim($count_data[$i]->delivery_status))=="DELIVERED NOT COMPLETE")
+                    else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && strtoupper(trim($count_data[$i]->delivery_status))=="DELIVERED NOT COMPLETE")
                         $delivered_not_complete=$delivered_not_complete+1;
                 }
             }
@@ -277,7 +309,7 @@ class Distributor_out extends CI_Controller{
                 $data['access'] = $this->distributor_out_model->get_access();
                 $data['depot'] = $this->depot_model->get_data('Approved');
                 $data['distributor'] = $this->distributor_model->get_data_without_sample('Approved');
-                $data['sales_rep'] = $this->sales_rep_model->get_data('Approved');
+                $data['sales_rep'] = $this->sales_rep_model->get_data_dist('Approved');
                 $data['box'] = $this->box_model->get_data('Approved');
                 $data['bar'] = $this->product_model->get_data('Approved');
                 $data['bank'] = $this->bank_model->get_data('Approved');
@@ -300,7 +332,7 @@ class Distributor_out extends CI_Controller{
                 $data['data'] = $this->distributor_out_model->get_distributor_out_data('', $d_id);
                 $data['depot'] = $this->depot_model->get_data('Approved');
                 $data['distributor'] = $this->distributor_model->get_data('Approved');
-                $data['sales_rep'] = $this->sales_rep_model->get_data('Approved');
+                $data['sales_rep'] = $this->sales_rep_model->get_data_dist('Approved');
                 $data['box'] = $this->box_model->get_data('Approved');
                 $data['bar'] = $this->product_model->get_data('Approved');
                 $data['distributor_out_items'] = $this->distributor_out_model->get_distributor_out_items($d_id);
@@ -395,19 +427,25 @@ class Distributor_out extends CI_Controller{
 
     public function authorise(){
         $status=$this->input->post('status');
+        $form_status = $this->input->post('form_status');
 
         if($status=="Approved"){
             $this->distributor_out_model->approve_records();
         } else {
             $this->distributor_out_model->reject_records();
         }
+
+        redirect(base_url().'index.php/distributor_out/checkstatus/pending_for_approval');
     }
 
     public function set_delivery_status(){
         // echo 'Hii';
 
         $this->distributor_out_model->set_delivery_status();
-        // redirect(base_url().'index.php/distributor_out/checkstatus/gp_issued');
+        $status=$this->input->post('status');
+        if($status=='InActive') {
+            redirect(base_url().'index.php/distributor_out');
+        }
     }
 
     public function set_delivery_status2(){

@@ -173,8 +173,8 @@
 														<th width="110" >Status</th>
                                                         <th width="110" >Delivery Status</th>
                                                         <th width="110" >Delivery Person</th>
-    													<th width="105" style="text-align:center; <?php if($status=='pending_for_delivery') echo 'display: none;'; ?>">View Invoice</th>
-                                                        <th width="105" style="text-align:center; <?php if($status!='gp_issued') echo 'display: none;'; ?>">View GP</th>
+    													<th width="105" style="text-align:center; <?php if($status=='pending_for_delivery') echo 'display: none;'; ?>">View Voucher</th>
+                                                        <th width="105" style="text-align:center; display:none;">View GP</th>
     													<th width="50" style="display:none;">Resend Invoice</th>
     												</tr>
     											</thead>
@@ -214,7 +214,7 @@
                                                         </td>
                                                         <td><?php echo $data[$i]->del_person_name; ?></td>
     													<td style="text-align:center; vertical-align: middle; <?php if($status=='pending_for_delivery') echo 'display: none;'; ?>"><?php if (($data[$i]->invoice_no!=null && $data[$i]->invoice_no!='') || ($data[$i]->voucher_no!=null && $data[$i]->voucher_no!='')) { ?><a href="<?php echo base_url().'index.php/sample_out/view_tax_invoice/'.$data[$i]->id; ?>" target="_blank">  <span class="fa fa-file-pdf-o"></span></a><?php } ?></td>
-                                                        <td style="text-align:center; vertical-align: middle; <?php if($status!='gp_issued') echo 'display: none;'; ?>"><a href="<?php echo base_url().'index.php/sample_out/view_gate_pass/'.$data[$i]->id; ?>" target="_blank">  <span class="fa fa-file-pdf-o"></span></a></td>
+                                                        <td style="text-align:center; vertical-align: middle; display:none;"><a href="<?php echo base_url().'index.php/sample_out/view_gate_pass/'.$data[$i]->id; ?>" target="_blank">  <span class="fa fa-file-pdf-o"></span></a></td>
     													<td style="text-align:center; vertical-align: middle; display:none;"><a href="<?php //echo base_url().'index.php/distributor_out/view_payment_details/'.$data[$i]->id; ?>#"><span class="fa fa-eye">Resend Invoice</span></a></td>
     												</tr>
     												<?php } ?>

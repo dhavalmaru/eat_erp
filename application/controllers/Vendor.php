@@ -32,6 +32,26 @@ class Vendor extends CI_Controller{
         }
     }
 
+	
+	public function get_data(){
+        $id=$this->input->post('id');
+        // $id=1;
+
+        $result=$this->raw_material_model->get_data('', $id);
+        $data['result'] = 0;
+        if(count($result)>0) {
+            $data['result'] = 1;
+            $data['rm_name'] = $result[0]->rm_name;
+            $data['hsn_code'] = $result[0]->hsn_code;
+            $data['rate'] = $result[0]->rate;
+        }
+
+        echo json_encode($data);
+    }
+	
+	
+	
+	
     public function add(){
         $result=$this->vendor_model->get_access();
         if(count($result)>0) {

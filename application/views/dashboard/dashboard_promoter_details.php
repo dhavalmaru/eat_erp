@@ -315,7 +315,7 @@
 
                         <div class="heading-h2 row dashboard-heading"  >
                             <div class="row  ">
-                                <div class=""> 
+                              <!--  <div class=""> -->
                                     <?php if(isset($checkout_status)) { 
                                             if($checkout_status=="false") { ?>
                                     <div class="col-md-12 col-sm-12 col-xs-12" style="text-align: center;">
@@ -333,16 +333,19 @@
                                     <div class="col-md-12 col-sm-12 col-xs-12" style="text-align: center;">
                                         <span>Checked in at <?php echo $store[0]->store_name ?></span>
                                     </div>
+									    
                                     <div class="col-md-12 col-sm-12 col-xs-12" style="text-align: center;">
                                         &nbsp;
                                     </div>
+									
+									
                                     <div class="col-md-12 col-sm-12 col-xs-12" style="text-align: center;">
                                         <a class="btn btn-md btn-padding" href="<?php echo base_url(); ?>index.php/promoter_checkout_location/add/<?php echo $store[0]->id ?>">
                                             <span class="fa fa-minus"></span> Check-out
                                         </a>
                                     </div>
                                     <?php } } ?> 
-                                </div>
+                                <!--</div>-->
                             </div>
                         </div>
 

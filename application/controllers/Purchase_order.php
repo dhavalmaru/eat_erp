@@ -62,7 +62,11 @@ class Purchase_order extends CI_Controller{
                 $data['item_id'][$i] = $result[$i]->item_id;
                 $data['qty'][$i] = $result[$i]->qty;
                 $data['rate'][$i] = $result[$i]->rate;
-                $data['cst'][$i] = $result[$i]->cst;
+				
+                // $data['cst'][$i] = $result[$i]->cst;
+				$data['cgst'][$i] = $result[$i]->cgst;
+				$data['sgst'][$i] = $result[$i]->sgst;
+				$data['igst'][$i] = $result[$i]->igst;
                 $data['amount'][$i] = $result[$i]->amount;
             }
         }
@@ -135,6 +139,56 @@ class Purchase_order extends CI_Controller{
     public function update($id){
         $this->purchase_order_model->save_data($id);
         redirect(base_url().'index.php/purchase_order');
+    }
+	
+	public function get_vendor_state($id){
+		$result=$this->purchase_order_model->get_vendor_state($id);
+		$data['result'] = 0;
+        if(count($result)>0) {
+            $data['result'] = 1;
+            for($i=0; $i<count($result); $i++){
+                $data['state'][$i] = $result[$i]->state;
+				echo $data['state'][$i];
+			} 
+		}
+		else
+		{
+			echo "state_not_found";
+		}
+    }
+	
+	public function get_rate($id){    
+	$result=$this->purchase_order_model->get_rate($id);    
+	//echo $result;
+    $data['result'] = 0;
+        if(count($result)>0) {
+            $data['result'] = 1;
+            for($i=0; $i<count($result); $i++){
+                $data['rate'][$i] = $result[$i]->rate;
+				echo $data['rate'][$i];
+			}
+		}
+		else
+		{
+			echo "0.00";
+		}
+    }
+	
+	public function get_hsn($id){   
+	$result=$this->purchase_order_model->get_hsn($id);
+	//echo $result;
+    $data['result'] = 0;
+        if(count($result)>0) {
+            $data['result'] = 1;
+            for($i=0; $i<count($result); $i++){
+                $data['hsn_code'][$i] = $result[$i]->hsn_code;
+				echo $data['hsn_code'][$i];
+			}
+		}
+		else
+		{
+			echo "0000";
+		}
     }
     
     public function check_box_availablity(){
