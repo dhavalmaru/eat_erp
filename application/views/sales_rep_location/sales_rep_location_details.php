@@ -20,6 +20,8 @@
             #map {
                 height: 100%;
             }
+			
+			
         </style>
     </head>
     <body>
@@ -161,9 +163,11 @@
                         </div>
                         <div class="panel-footer">
                             <a href="<?php echo base_url(); ?>index.php/sales_rep_location" class="btn btn-danger" type="reset" id="reset">Cancel</a>
-                            <a data-toggle="modal" href="#myModal" class="btn btn-success pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Follow Up</a>
-                            <input type="submit" value="Place Order" name="srld" class="btn btn-success pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>margin-right: 15px;"/>
-                            <input type="submit" value="Save" name="srld" class="btn btn-success pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>margin-right: 15px;"/>
+                            <a data-toggle="modal" id="followup_anc" href="#myModal" class="btn btn-success pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Follow Up</a>
+							
+						
+                            <input type="submit" id="pl_ord" value="Place Order" name="srld" class="btn btn-success pull-right  " style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>margin-right: 15px;"/>
+                            <input type="submit" value="Save" id="Saver" name="srld" class="btn btn-success pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>margin-right: 15px;"/>
                         </div>
 
 
@@ -181,7 +185,8 @@
                                 <label class="control-label">Follow Up Date<span class="asterisk_sign">*</span></label>
                                 <br/>
                                 <div class="">
-                                    <input type="text" class="form-control datepicker" name="followup_date" id="followup_date" placeholder="Follow Up Date" value="<?php if(isset($data)) echo (($data[0]->followup_date!=null && $data[0]->followup_date!='')?date('d/m/Y',strtotime($data[0]->followup_date)):date('d/m/Y')); else echo date('d/m/Y'); ?>"/>
+                                    <input type="text" class="form-control datepicker"  
+									name="followup_date" id="followup_date" placeholder="Follow Up Date" value="<?php if(isset($data)) echo (($data[0]->followup_date!=null && $data[0]->followup_date!='')?date('d/m/Y',strtotime($data[0]->followup_date)):date('d/m/Y')); else echo date('d/m/Y'); ?>"/>
                                 </div>
                             
                         </div>
@@ -223,20 +228,40 @@
 						
 						$("#latitude").val(location.coords.latitude);
 						$("#longitude").val(location.coords.longitude);
+					
+						document.getElementById("Saver").disabled = false;
+						document.getElementById("followup_anc").style.display = "block";
+						document.getElementById("pl_ord").disabled = false;
+					
 					}, function(error) {
 						clearTimeout(location_timeout);
 						geolocFail();
 					});
+					
 				}
 				else {
 					geolocFail();
+					//document.getElementById("Saver").disabled = true;
+					//document.getElementById("followup_anc").disabled = true;
+					//document.getElementById("pl_ord").style.display = "none";
+					
+					
 				}
             });
 			
 			function geolocFail() {
 				alert("Please switch on GPS!!!");
+				document.getElementById("Saver").disabled = true;
+					document.getElementById("followup_anc").style.display = "none";
+					document.getElementById("pl_ord").disabled = true;
 			}
 
+			
+			
+			
+			
+			
+			
             $('#distributor_type').change(function(){
                 distributor_type_change();
             });

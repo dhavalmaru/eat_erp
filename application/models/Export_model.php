@@ -2276,7 +2276,8 @@ function generate_agingwise_report() {
     //         (select * from distributor_master) H 
     //         on (G.distributor_id = H.id) where G.tot_receivable > 0";
 
-    $sql = "select G.*, H.distributor_name from 
+    $sql = "select I.*, J.distributor_type, J.sales_rep_name,J.area,J.location from 
+			(select G.*, H.type_id,H.distributor_name from 
             (select F.distributor_id, F.days_0_30, F.days_30_45, F.days_46_60, F.days_61_90, F.days_91_above, 
                 (F.days_0_30+F.days_30_45+F.days_46_60+F.days_61_90+F.days_91_above) as tot_receivable from 
             (select E.distributor_id, case when (E.days_91_above-E.paid_amount)>0 then 
@@ -2306,7 +2307,7 @@ function generate_agingwise_report() {
                 case when no_of_days>=61 and no_of_days<=90 then final_amount else 0 end as days_61_90, 
                 case when no_of_days>=91 then final_amount else 0 end as days_91_above from 
             (select id, distributor_id, datediff('$date', date_of_processing) as no_of_days, 
-                final_amount from distributor_out where status = 'Approved' and date_of_processing<='$date') A) B 
+                final_amount from distributor_out where status = 'Approved' and date_of_processing<='$date' and distributor_id NOT IN(1,64,65,66,189,237)) A) B 
             group by distributor_id) C 
             left join 
             (select distributor_id, round(sum(paid_amount),0) as paid_amount from 
@@ -2322,8 +2323,18 @@ function generate_agingwise_report() {
                 date_of_transaction<='$date' group by distributor_id) AA group by distributor_id) D 
             on (C.distributor_id = D.distributor_id)) E) F) G 
             left join 
-            (select * from distributor_master) H 
-            on (G.distributor_id = H.id) where G.tot_receivable > 0";
+            (select * FROM distributor_master) H 
+            on (G.distributor_id = H.id) where G.tot_receivable > 0) I 
+			left join 
+			(select P.id, P.type_id,P.distributor_name,P.location_id,S.distributor_type,T.sales_rep_name,Q.area,U.location
+			from distributor_master P 
+			left join distributor_type_master S on P.type_id=S.id 
+			left join sales_rep_master T on P.sales_rep_id=T.id
+			left join area_master Q on P.area_id=Q.id
+			left join location_master U on P.location_id=U.id) J 
+			on (I.distributor_id = J.id)";
+			
+
     $query=$this->db->query($sql);
     $data=$query->result();
     
@@ -2337,18 +2348,100 @@ function generate_agingwise_report() {
             $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
         }
 
+		
+		
+		
+		
         $row=1;
         $col=0;
 
         //------------ setting headers of excel -------------
+		
+		
+		$objPHPExcel->getActiveSheet()->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		$this->excel->getActiveSheet()->getStyle('A1')->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle()->getFont('A1')->setSize(12);
+        $this->excel->getActiveSheet()->getStyle('A1')->getFont()->setSize(36);
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Distributor Id");
+		
+		
+		
+		
+		$objPHPExcel->getActiveSheet()->getStyle('B1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		$this->excel->getActiveSheet()->getStyle('B1')->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle()->getFont('B1')->setSize(12);
+        $this->excel->getActiveSheet()->getStyle('B1')->getFont()->setSize(36);
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, "Distributor Name");
+		
+		
+		$objPHPExcel->getActiveSheet()->getStyle('C1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		$this->excel->getActiveSheet()->getStyle('C1')->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle()->getFont('C1')->setSize(12);
+        $this->excel->getActiveSheet()->getStyle('C1')->getFont()->setSize(36);
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, "0 - 30 Days");
+		
+
+		
+		$objPHPExcel->getActiveSheet()->getStyle('D1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		$this->excel->getActiveSheet()->getStyle('D1')->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle()->getFont('D1')->setSize(12);
+        $this->excel->getActiveSheet()->getStyle('D1')->getFont()->setSize(36);
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, "30 - 45 Days");
+		
+		
+		$objPHPExcel->getActiveSheet()->getStyle('E1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		$this->excel->getActiveSheet()->getStyle('E1')->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle()->getFont('E1')->setSize(12);
+        $this->excel->getActiveSheet()->getStyle('E1')->getFont()->setSize(36);
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, "46 - 60 Days");
+		
+		$objPHPExcel->getActiveSheet()->getStyle('F1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		$this->excel->getActiveSheet()->getStyle('F1')->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle()->getFont('F1')->setSize(12);
+        $this->excel->getActiveSheet()->getStyle('F1')->getFont()->setSize(36);
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, "61 - 90 Days");
+		
+		$objPHPExcel->getActiveSheet()->getStyle('G1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		$this->excel->getActiveSheet()->getStyle('G1')->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle()->getFont('G1')->setSize(12);
+        $this->excel->getActiveSheet()->getStyle('G1')->getFont()->setSize(36);
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, "91+");
+		
+		
+		$objPHPExcel->getActiveSheet()->getStyle('H1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		$this->excel->getActiveSheet()->getStyle('H1')->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle()->getFont('H1')->setSize(12);
+        $this->excel->getActiveSheet()->getStyle('H1')->getFont()->setSize(36);
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, "Total Receivable");
+		
+		
+		$objPHPExcel->getActiveSheet()->getStyle('I1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		$this->excel->getActiveSheet()->getStyle('I1')->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle()->getFont('I1')->setSize(12);
+        $this->excel->getActiveSheet()->getStyle('I1')->getFont()->setSize(36);
+		$objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+8].$row, "Distributor Type"); 
+		
+		
+		$objPHPExcel->getActiveSheet()->getStyle('J1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		$this->excel->getActiveSheet()->getStyle('J1')->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle()->getFont('J1')->setSize(12);
+        $this->excel->getActiveSheet()->getStyle('J1')->getFont()->setSize(36);
+		$objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+9].$row, "Sales Representative Name");
+		
+		$objPHPExcel->getActiveSheet()->getStyle('K1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		$this->excel->getActiveSheet()->getStyle('K1')->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle()->getFont('K1')->setSize(12);
+        $this->excel->getActiveSheet()->getStyle('K1')->getFont()->setSize(36);
+		$objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+10].$row, "Area");
+		
+		
+		$objPHPExcel->getActiveSheet()->getStyle('L1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		$this->excel->getActiveSheet()->getStyle('L1')->getFont()->setBold(true);
+		$objPHPExcel->getActiveSheet()->getStyle()->getFont('L1')->setSize(12);
+        $this->excel->getActiveSheet()->getStyle('L1')->getFont()->setSize(36);
+		$objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+11].$row, "Location");
+		
+
 
         for($i=0; $i<count($data); $i++){
             $row=$row+1;
@@ -2360,6 +2453,12 @@ function generate_agingwise_report() {
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, $data[$i]->days_61_90);
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, $data[$i]->days_91_above);
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, $data[$i]->tot_receivable);
+			$objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+8].$row, $data[$i]->distributor_type);
+			$objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+9].$row, $data[$i]->sales_rep_name);
+			$objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+10].$row, $data[$i]->area);
+			$objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+11].$row, $data[$i]->location);
+			
+			
         }
 
         $row=$row+1;
@@ -2369,23 +2468,46 @@ function generate_agingwise_report() {
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, '=sum('.$col_name[$col+5].'2'.':'.$col_name[$col+5].strval($row-1).')');
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, '=sum('.$col_name[$col+6].'2'.':'.$col_name[$col+6].strval($row-1).')');
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, '=sum('.$col_name[$col+7].'2'.':'.$col_name[$col+7].strval($row-1).')');
+		
         
-        $objPHPExcel->getActiveSheet()->getStyle('A1:'.$col_name[$col+7].$row)->applyFromArray(array(
+		
+		
+		
+		
+        $objPHPExcel->getActiveSheet()->getStyle('A1:'.$col_name[$col+11].$row)->applyFromArray(array(
             'borders' => array(
                 'allborders' => array(
-                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                    'style' => PHPExcel_Style_Border::BORDER_THIN,
+					// 'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER
+					
+				
                 )
             )
         ));
 
-        $objPHPExcel->getActiveSheet()->getStyle('A1:H1')->getFill()->applyFromArray(array(
+		
+		
+        $objPHPExcel->getActiveSheet()->getStyle('A1:L1')->getFill()->applyFromArray(array(
             'type' => PHPExcel_Style_Fill::FILL_SOLID,
+			
             'startcolor' => array(
-                'rgb' => 'D9D9D9'
+                'rgb' => 'D9D9D9',
+				
+				
             )
         ));
-        for($col = 'A'; $col < 'I'; $col++) {
+		
+		
+				
+		 
+		 
+		
+		
+		
+		
+        for($col = 'A'; $col < 'M'; $col++) {
             $objPHPExcel->getActiveSheet()->getColumnDimension($col)->setAutoSize(true);
+			
         }
 
         $filename='Agingwise_Report.xls';
