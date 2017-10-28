@@ -45,7 +45,7 @@ function generate_tax_invoice_old($id) {
         $gate_pass_no=null;
         $date_of_processing=null;
         $total_amount=0;
-        $order_no=null;
+        $order_no=0;
         $order_date=null;
         $supplier_ref=null;
         $despatch_doc_no=null;
@@ -1646,7 +1646,8 @@ function get_final_data($check, $sales_rep_id){
             $gate_pass_no=$result[0]->gate_pass_no;
             $date_of_processing=$result[0]->date_of_processing;
             $total_amount=floatval($result[0]->amount);
-            $order_no=$result[0]->order_no;
+      
+			$order_no=$result[0]->order_no;
             $order_date=$result[0]->order_date;
             $supplier_ref=$result[0]->supplier_ref;
             $despatch_doc_no=$result[0]->despatch_doc_no;
@@ -1674,6 +1675,7 @@ function get_final_data($check, $sales_rep_id){
             $reverse_charge=$result[0]->reverse_charge;
             $transport_type=$result[0]->transport_type;
             $vehicle_number=$result[0]->vehicle_number;
+			
             $discount=$result[0]->discount;
             $cgst=$result[0]->cgst;
             $sgst=$result[0]->sgst;
@@ -1731,6 +1733,7 @@ function get_final_data($check, $sales_rep_id){
             $invoice_amount = 0;
         }
         $data['total_amount']=round($total_amount,2);
+		
         $data['order_no']=$order_no;
         $data['order_date']=$order_date;
         $data['supplier_ref']=$supplier_ref;
@@ -1770,9 +1773,12 @@ function get_final_data($check, $sales_rep_id){
             $data['reverse_charge']='No';
             $data['gst_reverse_charge']=0;
         }
+		
+		
         
         $data['transport_type']=$transport_type;
         $data['vehicle_number']=$vehicle_number;
+		 $data['order_no']=$order_no; 
         
         $data['shipping_address']=$shipping_address;
         $data['con_name']=$con_name;
@@ -2218,6 +2224,11 @@ function generate_gate_pass($dist_out_id) {
     $now=date('Y-m-d H:i:s');
     $curusr=$this->session->userdata('session_id');
 
+	
+	$sql="select order_no from distributor_out";
+	 $query=$this->db->query($sql);
+	 $query_result=$query->result();
+	
     $sql = "select distinct delivery_sales_rep_id from distributor_out where id in (".$dist_out_id.") order by delivery_sales_rep_id";
     $query=$this->db->query($sql);
     $query_result=$query->result();

@@ -17,7 +17,7 @@
         <!-- EOF CSS INCLUDE -->    
 		<style>
 		.sidenav1 {
-   height: 50%;
+    height: 50%;
     width: 0;
     position: fixed;
     z-index: 1;
@@ -49,6 +49,11 @@
     right: 25px;
     font-size: 50px;
     margin-left: 50px;
+}
+
+#main {
+    transition: margin-left .5s;
+    padding: 16px;
 }
 
 @media screen and (max-height: 450px) {
@@ -144,17 +149,7 @@
     						</a>
     					</div> -->
     				</div>	
-<!-- <span class="mysidenav" onclick="openNav()" style="text-align:center;">Live Status of Sale</span>	 -->
-					<select onchange="dp_status(this.value);" class="mysidenav">
-						<option value="0"><?php if($selectedstatus!=""){echo $selectedstatus;}else{echo 'Select Status';} ?></option>
-						<option value="1">Approved (<?php echo $active; ?>)</option>
-						<option value="2">Pending (<?php echo $pending; ?>)</option>
-						<option value="3">Approval Pending (<?php echo $pending_for_approval; ?>) </option>
-						<option value="4">Delivery Pending (<?php echo $pending_for_delivery; ?>)</option>
-						<option value="5">GP Issued (<?php echo $gp_issued; ?>)</option>
-						<option value="6">InComplete (<?php echo $delivered_not_complete; ?>)</option>
-						<option value="7">Cancelled (<?php echo $inactive; ?>)</option>
-					</select>				
+<span class="mysidenav" onclick="openNav()" style="text-align:center;">Live Status of Sale</span>					
     			</div>
 				
 <!-- Use any element to open the sidenav -->
@@ -616,47 +611,19 @@
                 table.DataTable(tableOptions);
             });
         });
-		function dp_status(str)
-		{
-			if(str=='1')
-			{
-				window.location.href="<?php echo base_url(); ?>index.php/distributor_out/checkstatus/Approved";
-			}	
-			else if(str=='2')
-			{
-				window.location.href="<?php echo base_url(); ?>index.php/distributor_out/checkstatus/pending";
-			}
-			else if(str=='3')
-			{
-				window.location.href="<?php echo base_url(); ?>index.php/distributor_out/checkstatus/pending_for_approval";
-			}
-			else if(str=='4')
-			{
-				window.location.href="<?php echo base_url(); ?>index.php/distributor_out/checkstatus/pending_for_delivery";
-			}
-			else if(str=='5')
-			{
-				window.location.href="<?php echo base_url(); ?>index.php/distributor_out/checkstatus/gp_issued";
-			}
-			else if(str=='6')
-			{
-				window.location.href="<?php echo base_url(); ?>index.php/distributor_out/checkstatus/delivered_not_complete";
-			}
-			else if(str=='7')
-			{
-				window.location.href="<?php echo base_url(); ?>index.php/distributor_out/checkstatus/InActive";
-			}
-			else
-			{
-				alert("Please select a status.");
-			}
-		}
-		function openNav() {
+		
+		/* Set the width of the side navigation to 250px and the left margin of the page content to 250px and add a black background color to body */
+function openNav() {
     document.getElementById("mySidenav").style.width = "250px";
+    document.getElementById("main").style.marginLeft = "250px";
+    document.body.style.backgroundColor = "rgba(0,0,0,0.4)";
 }
 
+/* Set the width of the side navigation to 0 and the left margin of the page content to 0, and the background color of body to white */
 function closeNav() {
     document.getElementById("mySidenav").style.width = "0";
+    document.getElementById("main").style.marginLeft = "0";
+    document.body.style.backgroundColor = "white";
 }
     </script>
 	<!-- END SCRIPTS -->      

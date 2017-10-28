@@ -223,33 +223,9 @@ class Distributor_out extends CI_Controller{
             $delivered_not_complete=0;
 			
 			//I have added this code.
-			if($status=="Approved")
+			if($status=="")
 			{
-				$selectedstatus='Approved';//$status;
-			}
-			else if($status=="pending")
-			{
-				$selectedstatus='Pending';//$status;
-			}
-			else if($status=="pending_for_approval")
-			{
-				$selectedstatus='Approval Pending';//$status;
-			}
-			else if($status=="InActive")
-			{
-				$selectedstatus='Cancelled';//$status;
-			}
-			else if($status=="pending_for_delivery")
-			{
-				$selectedstatus='Delivery Pending';//$status;
-			}
-			else if($status=="gp_issued")
-			{
-				$selectedstatus='GP Issued';//$status;
-			}
-			else if($status=="delivered_not_complete")
-			{
-				$selectedstatus="InComplete";
+				$selectedstatus=$status;
 			}
 			else
 			{

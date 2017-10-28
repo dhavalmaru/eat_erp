@@ -1265,9 +1265,9 @@ $("#form_distributor_out_details").validate({
                 }
             }
         },
-        order_no: {
-            required: true
-        }
+        // order_no: {
+            // required: true
+        // }
     },
 
     ignore: ":not(:visible)",

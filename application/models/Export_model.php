@@ -3243,6 +3243,23 @@ function generate_sales_representative_location_report() {
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row1, $this->input->post('to_date'));
         //$row1=$row1+1;
         
+		
+		
+
+		  
+		  // $objPHPExcel->getActiveSheet()->mergeCells('L5:Q5');
+		  // $objPHPExcel->getActiveSheet()->getStyle('L5')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+		  // $this->excel->getActiveSheet()->getStyle('L5')->getFont()->setBold(true);
+          // $objPHPExcel->getActiveSheet()->getStyle()->getFont('L5')->setSize(12);
+          // $this->excel->getActiveSheet()->getStyle('L5')->getFont()->setSize(36);
+		  
+		  
+		   // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row1, "Total Sales");
+        
+				
+		 
+		
+		
         //------------ setting headers of excel -------------
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Date of Visit");
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, "Sales Representative Name");
@@ -3254,6 +3271,19 @@ function generate_sales_representative_location_report() {
 		$objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, "Creation Date");
 		$objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+8].$row, "Time");
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+9].$row, "Time Difference");
+		$objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+10].$row, "modified_on_time");
+		
+		
+		
+		$objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+11].$row, "orange_bar");
+		$objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+12].$row, "mint_bar");
+		$objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+13].$row, "butterscotch_bar");
+	    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+14].$row, "chocopeanut_bar");
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+15].$row, "bambaiyachaat_bar"); 
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+16].$row, "mangoginger_bar"); 
+				   
+			
+		  
 
         for($i=0; $i<count($data); $i++){
             $row=$row+1;
@@ -3267,13 +3297,26 @@ function generate_sales_representative_location_report() {
 			$objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, $data[$i]->modified_on);
 			$objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+8].$row, $data[$i]->modified_on_time);
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+9].$row, $data[$i]->diff.' minutes');
+			$objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+10].$row, $data[$i]->modified_on_time);
+			
+			$objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+11].$row, $data[$i]->orange_bar);
+			$objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+12].$row, $data[$i]->mint_bar);
+			$objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+13].$row, $data[$i]->butterscotch_bar);
+			$objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+14].$row, $data[$i]->chocopeanut_bar);
+			$objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+15].$row, $data[$i]->bambaiyachaat_bar);
+			$objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+16].$row, $data[$i]->mangoginger_bar);
+			
+			
+			
+			
+			
         }
 
         // $row=$row+1;
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, '=sum('.$col_name[$col+4].'2'.':'.$col_name[$col+4].strval($row-1).')');
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, '=sum('.$col_name[$col+5].'2'.':'.$col_name[$col+5].strval($row-1).')');
         
-        $objPHPExcel->getActiveSheet()->getStyle('A6:'.$col_name[$col+9].$row)->applyFromArray(array(
+        $objPHPExcel->getActiveSheet()->getStyle('A6:'.$col_name[$col+16].$row)->applyFromArray(array(
             'borders' => array(
                 'allborders' => array(
                     'style' => PHPExcel_Style_Border::BORDER_THIN
@@ -3281,13 +3324,13 @@ function generate_sales_representative_location_report() {
             )
         ));
 
-        $objPHPExcel->getActiveSheet()->getStyle('A6:J6')->getFill()->applyFromArray(array(
+        $objPHPExcel->getActiveSheet()->getStyle('A6:Q6')->getFill()->applyFromArray(array(
             'type' => PHPExcel_Style_Fill::FILL_SOLID,
             'startcolor' => array(
                 'rgb' => 'D9D9D9'
             )
         ));
-        for($col = 'A'; $col <= 'J'; $col++) {
+        for($col = 'A'; $col <= 'Q'; $col++) {
             $objPHPExcel->getActiveSheet()->getColumnDimension($col)->setAutoSize(true);
         }
 

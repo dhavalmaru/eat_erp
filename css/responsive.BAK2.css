@@ -94,7 +94,7 @@ ul.topnav li.icon {display: none;}
      overflow:none!important;; 
 }
   .box-shadow-inside { display:block;} 
-  .mysidenav{display:block;margin-top: 80px;height: 25px;}
+  .mysidenav{display:block;}
 }
 
 @media only screen and (max-width:575px)  {.responsive-margin { width:100%; background:#fff; padding:6px 15px 3px; text-align:right;   }

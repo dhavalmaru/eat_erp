@@ -231,10 +231,13 @@
                                     <td width="30%">Transporter Mode:</td>
                                     <td><?php if (isset($invoice_details[$inv_cnt]['transport_type'])) echo $invoice_details[$inv_cnt]['transport_type']; ?></td>
                                 </tr>
-                                <tr>
-                                    <td>Vehicle Number: </td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['vehicle_number'])) echo $invoice_details[$inv_cnt]['vehicle_number']; ?></td>
+                               
+								
+								 <tr>
+                                    <td>PO Number: </td>
+                                    <td><?php if (isset($invoice_details[$inv_cnt]['order_no'])) echo $invoice_details[$inv_cnt]['order_no']; ?></td>
                                 </tr>
+								
                                 <tr>
                                     <td>Date of Supply: </td>
                                     <td><?php if (isset($invoice_details[$inv_cnt]['date_of_processing'])) echo (($invoice_details[$inv_cnt]['date_of_processing']!=null && $invoice_details[$inv_cnt]['date_of_processing']!='')?date('d-M-y',strtotime($invoice_details[$inv_cnt]['date_of_processing'])):''); ?></td>
@@ -616,10 +619,12 @@
                                     <td width="30%">Transporter Mode:</td>
                                     <td><?php if (isset($invoice_details[$inv_cnt]['transport_type'])) echo $invoice_details[$inv_cnt]['transport_type']; ?></td>
                                 </tr>
-                                <tr>
-                                    <td>Vehicle Number: </td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['vehicle_number'])) echo $invoice_details[$inv_cnt]['vehicle_number']; ?></td>
+                                
+								 <tr>
+                                    <td>PO Number: </td>
+                                    <td><?php if (isset($invoice_details[$inv_cnt]['order_no'])) echo $invoice_details[$inv_cnt]['order_no']; ?></td>
                                 </tr>
+								
                                 <tr>
                                     <td>Date of Supply: </td>
                                     <td><?php if (isset($invoice_details[$inv_cnt]['date_of_processing'])) echo (($invoice_details[$inv_cnt]['date_of_processing']!=null && $invoice_details[$inv_cnt]['date_of_processing']!='')?date('d-M-y',strtotime($invoice_details[$inv_cnt]['date_of_processing'])):''); ?></td>
@@ -1001,10 +1006,12 @@
                                     <td width="30%">Transporter Mode:</td>
                                     <td><?php if (isset($invoice_details[$inv_cnt]['transport_type'])) echo $invoice_details[$inv_cnt]['transport_type']; ?></td>
                                 </tr>
-                                <tr>
-                                    <td>Vehicle Number: </td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['vehicle_number'])) echo $invoice_details[$inv_cnt]['vehicle_number']; ?></td>
+                               
+								 <tr>
+                                    <td>PO Number: </td>
+                                    <td><?php if (isset($invoice_details[$inv_cnt]['order_no'])) echo $invoice_details[$inv_cnt]['order_no']; ?></td>
                                 </tr>
+								
                                 <tr>
                                     <td>Date of Supply: </td>
                                     <td><?php if (isset($invoice_details[$inv_cnt]['date_of_processing'])) echo (($invoice_details[$inv_cnt]['date_of_processing']!=null && $invoice_details[$inv_cnt]['date_of_processing']!='')?date('d-M-y',strtotime($invoice_details[$inv_cnt]['date_of_processing'])):''); ?></td>
