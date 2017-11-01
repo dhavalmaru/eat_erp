@@ -222,7 +222,7 @@ class Distributor_out extends CI_Controller{
             $gp_issued=0;
             $delivered_not_complete=0;
 			
-			//I have added this code.
+			//responsive drop down list code 
 			if($status=="Approved")
 			{
 				$selectedstatus='Approved';//$status;
@@ -255,7 +255,7 @@ class Distributor_out extends CI_Controller{
 			{
 				$selectedstatus=$status;
 			}
-			//I have added this code.
+			//responsive drop down list code 
 			
             if (count($result)>0){
                 for($i=0;$i<count($count_data);$i++){

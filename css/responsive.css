@@ -90,11 +90,18 @@ ul.topnav li.icon {display: none;}
 .nav-units, .nav-transactions, .nav-contacts {
     position: relative;
     width: 100%;
-    height: auto;;
+    height: auto;
      overflow:none!important;; 
 }
   .box-shadow-inside { display:block;} 
-  .mysidenav{display:block;margin-top: 80px;height: 25px;}
+  .mysidenav{
+	  display:block;
+	  margin-top:80px;
+	  height: 25px;
+	  background-color:#ddd!important; 
+	  font-size:14px;
+	  color:#000!important;
+	  margin-right: 5px;}
 }
 
 @media only screen and (max-width:575px)  {.responsive-margin { width:100%; background:#fff; padding:6px 15px 3px; text-align:right;   }

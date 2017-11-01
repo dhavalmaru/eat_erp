@@ -144,7 +144,7 @@
     						</a>
     					</div> -->
     				</div>	
-<!-- <span class="mysidenav" onclick="openNav()" style="text-align:center;">Live Status of Sale</span>	 -->
+<!-- <span class="mysidenav" onclick="openNav()" style="text-align:center;">Live Status of Sale</span>	  #2c2c2c-->
 					<select onchange="dp_status(this.value);" class="mysidenav">
 						<option value="0"><?php if($selectedstatus!=""){echo $selectedstatus;}else{echo 'Select Status';} ?></option>
 						<option value="1">Approved (<?php echo $active; ?>)</option>
@@ -154,7 +154,7 @@
 						<option value="5">GP Issued (<?php echo $gp_issued; ?>)</option>
 						<option value="6">InComplete (<?php echo $delivered_not_complete; ?>)</option>
 						<option value="7">Cancelled (<?php echo $inactive; ?>)</option>
-					</select>				
+					</select>			
     			</div>
 				
 <!-- Use any element to open the sidenav -->
