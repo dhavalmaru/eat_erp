@@ -81,7 +81,7 @@
                                           
 											
 											<?php if(isset($data)){?>
-											    <input type="text" class="form-control"  name="distributor_id" id="distributor_id" value="<?php if(isset($data)) echo $data[0]->distributor_name;?>" style="<?php if(isset($data)) {if($data[0]->distributor_type=='Old') echo ''; else  echo 'display: none;';} ?>" readonly >
+											    <input type="text" class="form-control"  name="distributor_id" id="distributor_id" value="<?php if(isset($data)) echo $data[0]->distributor_name;?>" style="<?php if(isset($data)) {if($data[0]->distributor_type=='Old') echo ''; else  echo 'display: none;';} ?>" >
 											
 													
 													<?php } else{?>
@@ -99,7 +99,7 @@
 											
 											
 											
-                                            <input type="text" class="form-control" name="distributor_name" id="distributor_name" style="<?php if(isset($data)) {if($data[0]->distributor_type=='Old') echo 'display: none;';} else {echo 'display: none;';} ?>" placeholder="Distributor Name" value="<?php if(isset($data)) echo $data[0]->distributor_name;?>" readonly />
+                                            <input type="text" class="form-control" name="distributor_name" id="distributor_name" style="<?php if(isset($data)) {if($data[0]->distributor_type=='Old') echo 'display: none;';} else {echo 'display: none;';} ?>" placeholder="Distributor Name" value="<?php if(isset($data)) echo $data[0]->distributor_name;?>" />
                                         </div>
                                         <label class="col-md-2 col-sm-2 col-xs-12 control-label disstatus" style="display:none;">Status <span class="asterisk_sign">*</span></label>
                                         <div class="col-md-4 col-sm-4 col-xs-12 disstatus" style="display:none;">
