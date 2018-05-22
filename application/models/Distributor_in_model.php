@@ -33,7 +33,8 @@ function get_data($status='', $id=''){
         }
     }
 
-    $sql = "select E.*, F.sales_rep_name from 
+    $sql = "select G.*, H.first_name, H.last_name from 
+            (select E.*, F.sales_rep_name from 
             (select C.*, D.depot_name, D.state as depot_state from 
             (select A.*, B.distributor_name, B.sell_out from 
             (select * from distributor_in".$cond.") A 
@@ -45,7 +46,10 @@ function get_data($status='', $id=''){
             on (C.depot_id=D.id)) E 
             left join 
             (select * from sales_rep_master) F 
-            on (E.sales_rep_id=F.id) order by E.modified_on desc";
+            on (E.sales_rep_id=F.id)) G 
+            left join 
+            (select * from user_master) H 
+            on(G.created_by=H.id) order by G.modified_on desc";
     $query=$this->db->query($sql);
     return $query->result();
 }
@@ -347,6 +351,7 @@ function save_data($id=''){
         $igst_amt=$this->input->post('igst_amt[]');
         $tax_amt=$this->input->post('tax_amt[]');
         $total_amt=$this->input->post('total_amt[]');
+        $batch_no=$this->input->post('batch_no[]');
 
         for ($k=0; $k<count($type); $k++) {
             if(isset($type[$k]) and $type[$k]!="") {
@@ -370,7 +375,8 @@ function save_data($id=''){
                             'sgst_amt' => format_number($sgst_amt[$k],2),
                             'igst_amt' => format_number($igst_amt[$k],2),
                             'tax_amt' => format_number($tax_amt[$k],2),
-                            'total_amt' => format_number($total_amt[$k],2)
+                            'total_amt' => format_number($total_amt[$k],2),
+                            'batch_no' => $batch_no[$k]
                         );
                 $this->db->insert('distributor_in_items', $data);
             }
@@ -576,9 +582,15 @@ function save_data($id=''){
             $box=$this->input->post('box_ex[]');
             $qty=$this->input->post('qty_ex[]');
             $cost_rate=$this->input->post('cost_rate_ex[]');
+            $sell_rate=$this->input->post('sell_rate_ex[]');
             $grams=$this->input->post('grams_ex[]');
             $rate=$this->input->post('rate_ex[]');
             $amount=$this->input->post('cost_total_amt_ex[]');
+            $cgst_amt=$this->input->post('cgst_amt_ex[]');
+            $sgst_amt=$this->input->post('sgst_amt_ex[]');
+            $igst_amt=$this->input->post('igst_amt_ex[]');
+            $tax_amt=$this->input->post('tax_amt_ex[]');
+            $total_amt=$this->input->post('total_amt_ex[]');
 
             for ($k=0; $k<count($type); $k++) {
                 if(isset($type[$k]) and $type[$k]!="") {
@@ -833,6 +845,48 @@ function check_product_qty_availablity(){
     } else {
         return 0;
     }
+}
+
+function get_distributor_in_items_for_receipt($id){
+    $sql = "select D.*, E.batch_no from 
+            (select C.*, case when C.type='Box' then C.box_name else C.product_name end as description, 
+                    case when C.type='Box' then C.box_hsn_code else C.product_hsn_code end as hsn_code from 
+            (select C.*, B.box_name, B.hsn_code as box_hsn_code from 
+            (select A.*, B.product_name, B.hsn_code as product_hsn_code from 
+            (select type, qty, sell_rate, grams, rate, amount, cost_rate, cost_amount, cgst_amt, sgst_amt, igst_amt, total_amt, batch_no, 
+                case when type='Box' then item_id else null end as box_id, 
+                case when type='Bar' then item_id else null end as bar_id from distributor_in_items 
+                where distributor_in_id = '$id') A 
+            left join 
+            (select * from product_master) B 
+            on (A.bar_id=B.id)) C 
+            left join 
+            (select * from box_master) B 
+            on (C.box_id=B.id)) C) D 
+            left join 
+            (select * from batch_master) E 
+            on (D.batch_no=E.id)";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_distributor_out_items_for_exchange($id){
+    $sql = "select C.*, case when C.type='Box' then C.box_name else C.product_name end as description, 
+                    case when C.type='Box' then C.box_hsn_code else C.product_hsn_code end as hsn_code from 
+            (select C.*, B.box_name, B.hsn_code as box_hsn_code from 
+            (select A.*, B.product_name, B.hsn_code as product_hsn_code from 
+            (select type, qty, sell_rate, grams, rate, amount, cost_rate, cost_amount, cgst_amount, sgst_amount, igst_amount, tax_amount, 
+                case when type='Box' then item_id else null end as box_id, 
+                case when type='Bar' then item_id else null end as bar_id from distributor_out_exchange_items 
+                where distributor_in_id = '$id') A 
+            left join 
+            (select * from product_master) B 
+            on (A.bar_id=B.id)) C 
+            left join 
+            (select * from box_master) B 
+            on (C.box_id=B.id)) C";
+    $query=$this->db->query($sql);
+    return $query->result();
 }
 }
 ?>

@@ -36,6 +36,32 @@
                                  <div class="panel panel-default">
 								
 								<div class="panel-body">
+								
+								
+								      <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Type</label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12" >
+                                                <select name="type_id" id="type_id" class="form-control">
+                                                    <option value="">Select</option>
+                                                    <?php if(isset($type)) { for ($k=0; $k < count($type) ; $k++) { ?>
+                                                            <option value="<?php echo $type[$k]->id; ?>" <?php if (isset($data)) { if($type[$k]->id==$data[0]->type_id) { echo 'selected'; } } ?>><?php echo $type[$k]->distributor_type; ?></option>
+                                                    <?php }} ?>
+                                                </select>
+                                            </div>
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Zone</label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <select name="zone_id" id="zone_id" class="form-control">
+                                                    <option value="">Select</option>
+                                                    <?php if(isset($zone)) { for ($k=0; $k < count($zone) ; $k++) { ?>
+                                                            <option value="<?php echo $zone[$k]->id; ?>" <?php if (isset($data)) { if($zone[$k]->id==$data[0]->zone_id) { echo 'selected'; } } ?>><?php echo $zone[$k]->zone; ?></option>
+                                                    <?php }} ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+									
+								
 									<div class="form-group"  >
 										<div class="col-md-12 col-sm-12 col-xs-12">
 											 <label class="col-md-2 col-sm-2 col-xs-12 control-label">Area <span class="asterisk_sign">*</span></label>
@@ -90,7 +116,41 @@
             var BASE_URL="<?php echo base_url()?>";
         </script>
         <script type="text/javascript" src="<?php echo base_url(); ?>js/validations.js"></script>
+<script type='text/javascript'>
 
+
+ 
+    // City change
+    $('#type_id').change(function(){
+      var type_id = $(this).val();
+		//console.log(reporting_manager_id);
+      // AJAX request
+      $.ajax({
+        url:'<?=base_url()?>index.php/area/get_zone',
+        method: 'post',
+        data: {type_id: type_id},
+        dataType: 'json',
+        success: function(response){
+
+ 
+          $('#zone_id').find('option').not(':first').remove();
+      
+
+          // Add options
+		  // response = $.parseJSON(response);
+		  console.log(response);
+          $.each(response,function(index,data){
+             $('#zone_id').append('<option value="'+data['id']+'">'+data['zone']+'</option>');
+        
+          });
+        }
+     });
+   });
+   
+   
+ 
+   </script>
+   
     <!-- END SCRIPTS -->      
     </body>
 </html>

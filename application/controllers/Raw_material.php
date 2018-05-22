@@ -42,6 +42,7 @@ class Raw_material extends CI_Controller{
             $data['rm_name'] = $result[0]->rm_name;
             $data['hsn_code'] = $result[0]->hsn_code;
             $data['rate'] = $result[0]->rate;
+            $data['tax_per'] = $result[0]->tax_per;
         }
 
         echo json_encode($data);

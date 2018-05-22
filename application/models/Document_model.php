@@ -159,8 +159,8 @@ class Document_model Extends CI_Model{
                         $data = array(
                             'doc_ref_id' => $doc_ref_id,
                             'doc_ref_type' => $doc_ref_type,
-                            'doc_type_id' => $doctype[$k],
-                            'doc_doc_id' => $docname[$k],
+                            'doc_type_id' => (($doctype[$k]=='')?null:$doctype[$k]),
+                            'doc_doc_id' => (($docname[$k]=='')?null:$docname[$k]),
                             'doc_ref_name' => $docrefname[$k],
                             'doc_description' => $docdesc[$k],
                             'doc_ref_no' => $docref[$k],
@@ -182,8 +182,8 @@ class Document_model Extends CI_Model{
                         $data = array(
                             'doc_ref_id' => $doc_ref_id,
                             'doc_ref_type' => $doc_ref_type,
-                            'doc_type_id' => $doctype[$k],
-                            'doc_doc_id' => $docname[$k],
+                            'doc_type_id' => (($doctype[$k]=='')?null:$doctype[$k]),
+                            'doc_doc_id' => (($docname[$k]=='')?null:$docname[$k]),
                             'doc_ref_name' => $docrefname[$k],
                             'doc_description' => $docdesc[$k],
                             'doc_ref_no' => $docref[$k],

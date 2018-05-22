@@ -14,6 +14,7 @@ class Distributor_sale extends CI_Controller{
         $this->load->library('email');
         $this->load->helper('common_functions');
         $this->load->model('distributor_sale_model');
+        $this->load->model('zone_model');
         $this->load->model('box_model');
         $this->load->model('distributor_model');
         $this->load->model('product_model');
@@ -42,7 +43,11 @@ class Distributor_sale extends CI_Controller{
                 $data['distributor'] = $this->distributor_model->get_data('Approved', '', 'super stockist');
                 $data['box'] = $this->box_model->get_data('Approved');
                 $data['bar'] = $this->product_model->get_data('Approved');
-                $data['super_stockist_distributor'] = $this->distributor_sale_model->get_super_stockist_distributor();
+                //$data['store'] = $this->distributor_sale_model->get_store();
+                // $data['zone'] = $this->distributor_sale_model->get_zone();
+                $data['zone'] = $this->zone_model->get_data('Approved','','ss_stores');
+				//$data['location'] = $this->distributor_sale_model->get_location_data();
+				//$data['location'] = $this->distributor_sale_model->get_location();
 
                 load_view('distributor_sale/distributor_sale_details', $data);
             } else {
@@ -54,18 +59,62 @@ class Distributor_sale extends CI_Controller{
         }
     }
 
+    public function get_distributor_details(){ 
+        $postData = $this->input->post();
+        $distributor_id = $postData['distributor_id'];
+        $data = $this->distributor_sale_model->get_distributor_details($distributor_id);
+        echo json_encode($data); 
+    }
+
+    public function get_distributor_zone(){ 
+        $postData = $this->input->post();
+        $type_id = $postData['type_id'];
+        $data = $this->distributor_sale_model->get_distributor_zone($type_id);
+        echo json_encode($data); 
+    }
+
+    public function get_store(){ 
+        $postData = $this->input->post();
+    	$zone_id = $postData['zone_id'];
+        $data = $this->distributor_sale_model->get_store($zone_id);
+        echo json_encode($data); 
+    }
+
+    // public function get_location_data(){ 
+
+    // $postData = $this->input->post();
+
+    // $data = $this->distributor_sale_model->get_location_data($postData);
+    // echo json_encode($data); 
+    // }
+	
+	public function get_location_data(){ 
+        $postData = $this->input->post();
+        $zone_id = $postData['zone_id'];
+        $store_id = $postData['store_id'];
+        $data = $this->distributor_sale_model->get_location_data($store_id,$zone_id);
+        echo json_encode($data); 
+    }
+
     public function edit($id){
         $result=$this->distributor_sale_model->get_access();
         if(count($result)>0) {
             if($result[0]->r_view == 1 || $result[0]->r_edit == 1) {
                 $data['access'] = $this->distributor_sale_model->get_access();
                 $data['data'] = $this->distributor_sale_model->get_data('', $id);
-                $data['distributor'] = $this->distributor_model->get_data('Approved');
+				$data['distributor'] = $this->distributor_model->get_data('Approved', '', 'super stockist');
                 $data['box'] = $this->box_model->get_data('Approved');
                 $data['bar'] = $this->product_model->get_data('Approved');
                 $data['distributor_sale_items'] = $this->distributor_sale_model->get_distributor_sale_items($id);
-                $data['super_stockist_distributor'] = $this->distributor_sale_model->get_super_stockist_distributor();
-
+				$zone_id=$data['data'][0]->zone_id;
+				$store_id=$data['data'][0]->store_id;
+				$data['store'] = $this->distributor_sale_model->get_store($zone_id);
+				$data['location'] = $this->distributor_sale_model->get_location_data($store_id,$zone_id);
+				//$data['location'] = $this->distributor_sale_model->get_location_data();
+				//$data['location'] = $this->distributor_sale_model->get_location();
+				// $data['zone'] = $this->distributor_sale_model->get_zone();
+                $data['zone'] = $this->zone_model->get_data('Approved','','ss_stores');
+				  
                 load_view('distributor_sale/distributor_sale_details', $data);
             } else {
                 echo "Unauthorized access";

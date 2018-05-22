@@ -102,12 +102,28 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Type </label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select class="form-control" name="sr_type">
+                                                <select class="form-control" name="sr_type"> <?php if(isset($data)) {if ($data[0]->sr_type=='Promoter') echo 'selected';}?>
                                                     <option value="">Select</option>
                                                     <option value="Sales Representative" <?php if(isset($data)) {if ($data[0]->sr_type=='Sales Representative') echo 'selected';}?>>Sales Representative</option>
-                                                    <option value="Promoter" <?php if(isset($data)) {if ($data[0]->sr_type=='Promoter') echo 'selected';}?>>Promoter</option>
+                                                    <option value="Promoter">Promoter</option>
+                                                    <option value="Merchandizer" <?php if(isset($data)) {if ($data[0]->sr_type=='Merchandizer') echo 'selected';}?>>Merchandizer</option>
                                                 </select>
                                             </div>
+											
+											   <!--<label class="col-md-2 col-sm-2 col-xs-12 control-label">Reporting Manger </label>
+											 <div class="col-md-4 col-sm-4 col-xs-12">
+                                           
+												
+												 <select name="reporting_manager_id" id="reporting_manager_id" class="form-control">
+                                                    <option value="">Select</option>
+                                                    <?php //if(isset($manager_data)) { for ($k=0; $k < count($manager_data) ; $k++) { ?>
+                                                            <option value="<?php// echo $manager_data[$k]->id; ?>"<?php// if (isset($data)) { if($manager_data[$k]->id==$data[0]->reporting_manager_id) { echo 'selected'; } } ?><?php //if(isset($data)) { if($data[0]->reporting_manager_id)  echo 'selected'; } ?>><?php// echo $manager_data[$k]->sales_rep_name; ?></option>
+                                                    <?php //}} ?>
+                                                </select>
+												
+												
+                                            </div>-->
+											
                                         </div>
                                     </div>
                                     <div class="form-group">

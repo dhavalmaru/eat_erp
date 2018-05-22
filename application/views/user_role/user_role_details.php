@@ -114,6 +114,17 @@
                                                                                                <td class="center"></td>
                                                                                                <td class="center"></td>
                                                                                           </tr>
+																						  
+																						    <tr id="">
+                                                                                               <td colspan="7" style="font-weight:bold;font-size:18px">Master</td>
+                                                                                              
+                                                                                            
+                                                                                          </tr>
+																						    <tr id="">
+                                                                                        
+                                                                                                <td colspan="7" style="font-weight:500;font-size:15px">Product</td>
+                                                                                          	</tr>
+                                                                                          
      																	<tr id="trow_1">
      																		<td>Vendors</td>
      																		<td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="0" <?php if(isset($editoptions[0])) { if($editoptions[0]->r_view == 1) { echo 'checked';} } ?> /></td>
@@ -168,6 +179,24 @@
      																		<td class="center"><input type="checkbox" class="cls_chk" name="approval[]" value="5" <?php if(isset($editoptions[5])) { if($editoptions[5]->r_approvals == 1) { echo 'checked';} } ?> /></td>
      																		<td class="center"><input type="checkbox" class="cls_chk" name="export[]" value="5" <?php if(isset($editoptions[5])) { if($editoptions[5]->r_export == 1) { echo 'checked';} } ?> /></td>
      																	</tr>
+																		
+																				
+																				<tr id="trow_36">
+     																		<td>Ingredients  Master</td>
+     																		<td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="35" <?php if(isset($editoptions[35])) { if($editoptions[35]->r_view == 1) { echo 'checked';} } ?> /></td>
+     																		<td class="center"><input type="checkbox" class="cls_chk" name="insert[]" value="35" <?php if(isset($editoptions[35])) { if($editoptions[35]->r_insert == 1) { echo 'checked';} } ?> /></td>
+     																		<td class="center"><input type="checkbox" class="cls_chk" name="update[]" value="35" <?php if(isset($editoptions[35])) { if($editoptions[35]->r_edit == 1) { echo 'checked';} } ?> /></td>
+     																		<td class="center"><input type="checkbox" class="cls_chk" name="delete[]" value="35" <?php if(isset($editoptions[35])) { if($editoptions[35]->r_delete == 1) { echo 'checked';} } ?> /></td>
+     																		<td class="center"><input type="checkbox" class="cls_chk" name="approval[]" value="35" <?php if(isset($editoptions[35])) { if($editoptions[35]->r_approvals == 1) { echo 'checked';} } ?> /></td>
+     																		<td class="center"><input type="checkbox" class="cls_chk" name="export[]" value="35" <?php if(isset($editoptions[35])) { if($editoptions[35]->r_export == 1) { echo 'checked';} } ?> /></td>
+     																	</tr>
+																		
+																		
+     																
+																		
+																		<tr id="">
+                                                                                        
+                                                                        <td colspan="7" style="font-weight:500;font-size:15px">Sales</td>  </tr>
      																	<tr id="trow_7">
      																		<td>Sales Representative</td>
      																		<td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="6" <?php if(isset($editoptions[6])) { if($editoptions[6]->r_view == 1) { echo 'checked';} } ?> /></td>
@@ -186,7 +215,87 @@
      																		<td class="center"><input type="checkbox" class="cls_chk" name="approval[]" value="7" <?php if(isset($editoptions[7])) { if($editoptions[7]->r_approvals == 1) { echo 'checked';} } ?> /></td>
      																		<td class="center"><input type="checkbox" class="cls_chk" name="export[]" value="7" <?php if(isset($editoptions[7])) { if($editoptions[7]->r_export == 1) { echo 'checked';} } ?> /></td>
      																	</tr>
-     																	<tr id="trow_9">
+																		
+																		   <tr id="trow_31">
+                                                                                               <td>Distributor Type</td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="30" <?php if(isset($editoptions[30])) { if($editoptions[30]->r_view == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="insert[]" value="30" <?php if(isset($editoptions[30])) { if($editoptions[30]->r_insert == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="update[]" value="30" <?php if(isset($editoptions[30])) { if($editoptions[30]->r_edit == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="delete[]" value="30" <?php if(isset($editoptions[30])) { if($editoptions[30]->r_delete == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="approval[]" value="30" <?php if(isset($editoptions[30])) { if($editoptions[30]->r_approvals == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="export[]" value="30" <?php if(isset($editoptions[30])) { if($editoptions[30]->r_export == 1) { echo 'checked';} } ?> /></td>
+                                                                                          </tr>
+																						  
+																						      <tr id="trow_32">
+                                                                                               <td>Zone</td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="31" <?php if(isset($editoptions[31])) { if($editoptions[31]->r_view == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="insert[]" value="31" <?php if(isset($editoptions[31])) { if($editoptions[31]->r_insert == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="update[]" value="31" <?php if(isset($editoptions[31])) { if($editoptions[31]->r_edit == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="delete[]" value="31" <?php if(isset($editoptions[31])) { if($editoptions[31]->r_delete == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="approval[]" value="31" <?php if(isset($editoptions[31])) { if($editoptions[31]->r_approvals == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="export[]" value="31" <?php if(isset($editoptions[31])) { if($editoptions[31]->r_export == 1) { echo 'checked';} } ?> /></td>
+                                                                                          </tr>
+     															
+                                                                                          <tr id="trow_30">
+                                                                                               <td>Area</td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="29" <?php if(isset($editoptions[29])) { if($editoptions[29]->r_view == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="insert[]" value="29" <?php if(isset($editoptions[29])) { if($editoptions[29]->r_insert == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="update[]" value="29" <?php if(isset($editoptions[29])) { if($editoptions[29]->r_edit == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="delete[]" value="29" <?php if(isset($editoptions[29])) { if($editoptions[29]->r_delete == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="approval[]" value="29" <?php if(isset($editoptions[29])) { if($editoptions[29]->r_approvals == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="export[]" value="29" <?php if(isset($editoptions[29])) { if($editoptions[29]->r_export == 1) { echo 'checked';} } ?> /></td>
+                                                                                          </tr>
+																						  
+																						   <tr id="trow_37">
+                                                                                               <td>Location</td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="36" <?php if(isset($editoptions[36])) { if($editoptions[36]->r_view == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="insert[]" value="36" <?php if(isset($editoptions[36])) { if($editoptions[36]->r_insert == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="update[]" value="36" <?php if(isset($editoptions[36])) { if($editoptions[36]->r_edit == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="delete[]" value="36" <?php if(isset($editoptions[36])) { if($editoptions[36]->r_delete == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="approval[]" value="36" <?php if(isset($editoptions[36])) { if($editoptions[36]->r_approvals == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="export[]" value="36" <?php if(isset($editoptions[36])) { if($editoptions[36]->r_export == 1) { echo 'checked';} } ?> /></td>
+                                                                                          </tr>
+																						  
+																						  
+																						    <tr id="trow_38">
+                                                                                               <td>Sr Mapping </td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="37" <?php if(isset($editoptions[37])) { if($editoptions[37]->r_view == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="insert[]" value="37" <?php if(isset($editoptions[37])) { if($editoptions[37]->r_insert == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="update[]" value="37" <?php if(isset($editoptions[37])) { if($editoptions[37]->r_edit == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="delete[]" value="37" <?php if(isset($editoptions[37])) { if($editoptions[37]->r_delete == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="approval[]" value="37" <?php if(isset($editoptions[37])) { if($editoptions[37]->r_approvals == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="export[]" value="37" <?php if(isset($editoptions[37])) { if($editoptions[37]->r_export == 1) { echo 'checked';} } ?> /></td>
+                                                                                          </tr>
+																						  
+																						  
+																						    <tr id="trow_39">
+                                                                                               <td>Relationship Master</td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="38" <?php if(isset($editoptions[38])) { if($editoptions[38]->r_view == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="insert[]" value="38" <?php if(isset($editoptions[38])) { if($editoptions[38]->r_insert == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="update[]" value="38" <?php if(isset($editoptions[38])) { if($editoptions[38]->r_edit == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="delete[]" value="38" <?php if(isset($editoptions[38])) { if($editoptions[38]->r_delete == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="approval[]" value="38" <?php if(isset($editoptions[38])) { if($editoptions[38]->r_approvals == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="export[]" value="38" <?php if(isset($editoptions[38])) { if($editoptions[38]->r_export == 1) { echo 'checked';} } ?> /></td>
+                                                                                          </tr>
+																						  
+																						      <tr id="trow_40">
+                                                                                               <td>Store Master</td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="39" <?php if(isset($editoptions[39])) { if($editoptions[39]->r_view == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="insert[]" value="39" <?php if(isset($editoptions[39])) { if($editoptions[39]->r_insert == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="update[]" value="39" <?php if(isset($editoptions[39])) { if($editoptions[39]->r_edit == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="delete[]" value="39" <?php if(isset($editoptions[39])) { if($editoptions[39]->r_delete == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="approval[]" value="39" <?php if(isset($editoptions[39])) { if($editoptions[39]->r_approvals == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="export[]" value="39" <?php if(isset($editoptions[39])) { if($editoptions[39]->r_export == 1) { echo 'checked';} } ?> /></td>
+                                                                                          </tr>
+                                                                                       
+                                                                                       
+                                                                            
+                                                                                        
+																						  
+																		<tr id="">
+                                                                                        
+																			<td colspan="7" style="font-weight:500;font-size:15px">Global</td>	
+																			<tr id="trow_9">
      																		<td>City Master</td>
      																		<td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="8" <?php if(isset($editoptions[8])) { if($editoptions[8]->r_view == 1) { echo 'checked';} } ?> /></td>
      																		<td class="center"><input type="checkbox" class="cls_chk" name="insert[]" value="8" <?php if(isset($editoptions[8])) { if($editoptions[8]->r_insert == 1) { echo 'checked';} } ?> /></td>
@@ -204,33 +313,41 @@
                                                                                                <td class="center"><input type="checkbox" class="cls_chk" name="approval[]" value="28" <?php if(isset($editoptions[28])) { if($editoptions[28]->r_approvals == 1) { echo 'checked';} } ?> /></td>
                                                                                                <td class="center"><input type="checkbox" class="cls_chk" name="export[]" value="28" <?php if(isset($editoptions[28])) { if($editoptions[28]->r_export == 1) { echo 'checked';} } ?> /></td>
                                                                                           </tr>
-                                                                                          <tr id="trow_30">
-                                                                                               <td>Area</td>
-                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="29" <?php if(isset($editoptions[29])) { if($editoptions[29]->r_view == 1) { echo 'checked';} } ?> /></td>
-                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="insert[]" value="29" <?php if(isset($editoptions[29])) { if($editoptions[29]->r_insert == 1) { echo 'checked';} } ?> /></td>
-                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="update[]" value="29" <?php if(isset($editoptions[29])) { if($editoptions[29]->r_edit == 1) { echo 'checked';} } ?> /></td>
-                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="delete[]" value="29" <?php if(isset($editoptions[29])) { if($editoptions[29]->r_delete == 1) { echo 'checked';} } ?> /></td>
-                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="approval[]" value="29" <?php if(isset($editoptions[29])) { if($editoptions[29]->r_approvals == 1) { echo 'checked';} } ?> /></td>
-                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="export[]" value="29" <?php if(isset($editoptions[29])) { if($editoptions[29]->r_export == 1) { echo 'checked';} } ?> /></td>
+																		</tr>																		<tr id="">
+                                                                                        
+																			<td colspan="7" style="font-weight:500;font-size:15px">Accounting</td>	
+																			
+																			      <tr id="trow_41">
+                                                                                               <td>Vendor Type</td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="40" <?php if(isset($editoptions[40])) { if($editoptions[40]->r_view == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="insert[]" value="40" <?php if(isset($editoptions[40])) { if($editoptions[40]->r_insert == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="update[]" value="40" <?php if(isset($editoptions[40])) { if($editoptions[40]->r_edit == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="delete[]" value="40" <?php if(isset($editoptions[40])) { if($editoptions[40]->r_delete == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="approval[]" value="40" <?php if(isset($editoptions[40])) { if($editoptions[40]->r_approvals == 1) { echo 'checked';} } ?> /></td>
+                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="export[]" value="40" <?php if(isset($editoptions[40])) { if($editoptions[40]->r_export == 1) { echo 'checked';} } ?> /></td>
                                                                                           </tr>
-                                                                                          <tr id="trow_31">
-                                                                                               <td>Distributor Type</td>
-                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="30" <?php if(isset($editoptions[30])) { if($editoptions[30]->r_view == 1) { echo 'checked';} } ?> /></td>
-                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="insert[]" value="30" <?php if(isset($editoptions[30])) { if($editoptions[30]->r_insert == 1) { echo 'checked';} } ?> /></td>
-                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="update[]" value="30" <?php if(isset($editoptions[30])) { if($editoptions[30]->r_edit == 1) { echo 'checked';} } ?> /></td>
-                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="delete[]" value="30" <?php if(isset($editoptions[30])) { if($editoptions[30]->r_delete == 1) { echo 'checked';} } ?> /></td>
-                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="approval[]" value="30" <?php if(isset($editoptions[30])) { if($editoptions[30]->r_approvals == 1) { echo 'checked';} } ?> /></td>
-                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="export[]" value="30" <?php if(isset($editoptions[30])) { if($editoptions[30]->r_export == 1) { echo 'checked';} } ?> /></td>
-                                                                                          </tr>
-                                                                                          <tr id="trow_32">
-                                                                                               <td>Zone</td>
-                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="31" <?php if(isset($editoptions[31])) { if($editoptions[31]->r_view == 1) { echo 'checked';} } ?> /></td>
-                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="insert[]" value="31" <?php if(isset($editoptions[31])) { if($editoptions[31]->r_insert == 1) { echo 'checked';} } ?> /></td>
-                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="update[]" value="31" <?php if(isset($editoptions[31])) { if($editoptions[31]->r_edit == 1) { echo 'checked';} } ?> /></td>
-                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="delete[]" value="31" <?php if(isset($editoptions[31])) { if($editoptions[31]->r_delete == 1) { echo 'checked';} } ?> /></td>
-                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="approval[]" value="31" <?php if(isset($editoptions[31])) { if($editoptions[31]->r_approvals == 1) { echo 'checked';} } ?> /></td>
-                                                                                               <td class="center"><input type="checkbox" class="cls_chk" name="export[]" value="31" <?php if(isset($editoptions[31])) { if($editoptions[31]->r_export == 1) { echo 'checked';} } ?> /></td>
-                                                                                          </tr>
+																			
+																			</tr>
+																			
+																			<tr id="">
+                                                                                        
+																			<td colspan="7"   style="font-weight:bold;font-size:18px">Transaction</td>	
+																			</tr>
+																			<tr id="">
+                                                                                        
+																			<td colspan="7" style="font-weight:500;font-size:15px">Production</td>	
+																			
+																			
+																			<tr id="trow_42">
+     																		<td>Batch Master</td>
+     																		<td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="41" <?php if(isset($editoptions[41])) { if($editoptions[41]->r_view == 1) { echo 'checked';} } ?> /></td>
+     																		<td class="center"><input type="checkbox" class="cls_chk" name="insert[]" value="41" <?php if(isset($editoptions[41])) { if($editoptions[41]->r_insert == 1) { echo 'checked';} } ?> /></td>
+     																		<td class="center"><input type="checkbox" class="cls_chk" name="update[]" value="41" <?php if(isset($editoptions[41])) { if($editoptions[41]->r_edit == 1) { echo 'checked';} } ?> /></td>
+     																		<td class="center"><input type="checkbox" class="cls_chk" name="delete[]" value="41" <?php if(isset($editoptions[41])) { if($editoptions[41]->r_delete == 1) { echo 'checked';} } ?> /></td>
+     																		<td class="center"><input type="checkbox" class="cls_chk" name="approval[]" value="41" <?php if(isset($editoptions[41])) { if($editoptions[41]->r_approvals == 1) { echo 'checked';} } ?> /></td>
+     																		<td class="center"><input type="checkbox" class="cls_chk" name="export[]" value="41" <?php if(isset($editoptions[41])) { if($editoptions[41]->r_export == 1) { echo 'checked';} } ?> /></td>
+     																	</tr>
+																			
      																	<tr id="trow_10">
      																		<td>Purchase Order</td>
      																		<td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="9" <?php if(isset($editoptions[9])) { if($editoptions[9]->r_view == 1) { echo 'checked';} } ?> /></td>
@@ -258,6 +375,13 @@
      																		<td class="center"><input type="checkbox" class="cls_chk" name="approval[]" value="11" <?php if(isset($editoptions[11])) { if($editoptions[11]->r_approvals == 1) { echo 'checked';} } ?> /></td>
      																		<td class="center"><input type="checkbox" class="cls_chk" name="export[]" value="11" <?php if(isset($editoptions[11])) { if($editoptions[11]->r_export == 1) { echo 'checked';} } ?> /></td>
      																	</tr>
+																		
+																		
+																		</tr>
+																		<tr id="">
+																		<td colspan="7" style="font-weight:500;font-size:15px">Sales</td>	
+																	
+																	
      																	<tr id="trow_13">
      																		<td>Sales</td>
      																		<td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="12" <?php if(isset($editoptions[12])) { if($editoptions[12]->r_view == 1) { echo 'checked';} } ?> /></td>
@@ -276,6 +400,35 @@
      																		<td class="center"><input type="checkbox" class="cls_chk" name="approval[]" value="13" <?php if(isset($editoptions[13])) { if($editoptions[13]->r_approvals == 1) { echo 'checked';} } ?> /></td>
      																		<td class="center"><input type="checkbox" class="cls_chk" name="export[]" value="13" <?php if(isset($editoptions[13])) { if($editoptions[13]->r_export == 1) { echo 'checked';} } ?> /></td>
      																	</tr>
+																		
+																			<tr id="trow_19">
+     																		<td>Super Stockist Sale</td>
+     																		<td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="18" <?php if(isset($editoptions[18])) { if($editoptions[18]->r_view == 1) { echo 'checked';} } ?> /></td>
+     																		<td class="center"><input type="checkbox" class="cls_chk" name="insert[]" value="18" <?php if(isset($editoptions[18])) { if($editoptions[18]->r_insert == 1) { echo 'checked';} } ?> /></td>
+     																		<td class="center"><input type="checkbox" class="cls_chk" name="update[]" value="18" <?php if(isset($editoptions[18])) { if($editoptions[18]->r_edit == 1) { echo 'checked';} } ?> /></td>
+     																		<td class="center"><input type="checkbox" class="cls_chk" name="delete[]" value="18" <?php if(isset($editoptions[18])) { if($editoptions[18]->r_delete == 1) { echo 'checked';} } ?> /></td>
+     																		<td class="center"><input type="checkbox" class="cls_chk" name="approval[]" value="18" <?php if(isset($editoptions[18])) { if($editoptions[18]->r_approvals == 1) { echo 'checked';} } ?> /></td>
+     																		<td class="center"><input type="checkbox" class="cls_chk" name="export[]" value="18" <?php if(isset($editoptions[18])) { if($editoptions[18]->r_export == 1) { echo 'checked';} } ?> /></td>
+     																	</tr>
+																		
+																		
+																			<tr id="trow_43">
+     																		<td>Super Stockist Sale Return</td>
+     																		<td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="42" <?php if(isset($editoptions[42])) { if($editoptions[42]->r_view == 1) { echo 'checked';} } ?> /></td>
+     																		<td class="center"><input type="checkbox" class="cls_chk" name="insert[]" value="42" <?php if(isset($editoptions[42])) { if($editoptions[42]->r_insert == 1) { echo 'checked';} } ?> /></td>
+     																		<td class="center"><input type="checkbox" class="cls_chk" name="update[]" value="42" <?php if(isset($editoptions[42])) { if($editoptions[42]->r_edit == 1) { echo 'checked';} } ?> /></td>
+     																		<td class="center"><input type="checkbox" class="cls_chk" name="delete[]" value="42" <?php if(isset($editoptions[42])) { if($editoptions[42]->r_delete == 1) { echo 'checked';} } ?> /></td>
+     																		<td class="center"><input type="checkbox" class="cls_chk" name="approval[]" value="42" <?php if(isset($editoptions[42])) { if($editoptions[42]->r_approvals == 1) { echo 'checked';} } ?> /></td>
+     																		<td class="center"><input type="checkbox" class="cls_chk" name="export[]" value="42" <?php if(isset($editoptions[42])) { if($editoptions[42]->r_export == 1) { echo 'checked';} } ?> /></td>
+     																	</tr>
+																		
+     																	</tr>
+																		
+																		<tr id="">
+																		<td colspan="7" style="font-weight:500;font-size:15px">Bank</td>	
+																		
+																		
+																		
                                                                                           <tr id="trow_33">
                                                                                                <td>Payment Details</td>
                                                                                                <td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="32" <?php if(isset($editoptions[32])) { if($editoptions[32]->r_view == 1) { echo 'checked';} } ?> /></td>
@@ -294,6 +447,11 @@
                                                                                                <td class="center"><input type="checkbox" class="cls_chk" name="approval[]" value="33" <?php if(isset($editoptions[33])) { if($editoptions[33]->r_approvals == 1) { echo 'checked';} } ?> /></td>
                                                                                                <td class="center"><input type="checkbox" class="cls_chk" name="export[]" value="33" <?php if(isset($editoptions[33])) { if($editoptions[33]->r_export == 1) { echo 'checked';} } ?> /></td>
                                                                                           </tr>
+                                                                                          </tr>
+																						  
+																		<tr id="">
+																		<td colspan="7" style="font-weight:500;font-size:15px">Transfer</td>	</tr>		  
+																						  
      																	<tr id="trow_15">
      																		<td>Depot Transfer</td>
      																		<td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="14" <?php if(isset($editoptions[14])) { if($editoptions[14]->r_view == 1) { echo 'checked';} } ?> /></td>
@@ -330,15 +488,9 @@
      																		<td class="center"><input type="checkbox" class="cls_chk" name="approval[]" value="17" <?php if(isset($editoptions[17])) { if($editoptions[17]->r_approvals == 1) { echo 'checked';} } ?> /></td>
      																		<td class="center"><input type="checkbox" class="cls_chk" name="export[]" value="17" <?php if(isset($editoptions[17])) { if($editoptions[17]->r_export == 1) { echo 'checked';} } ?> /></td>
      																	</tr>
-     																	<tr id="trow_19">
-     																		<td>Super Stockist Sale</td>
-     																		<td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="18" <?php if(isset($editoptions[18])) { if($editoptions[18]->r_view == 1) { echo 'checked';} } ?> /></td>
-     																		<td class="center"><input type="checkbox" class="cls_chk" name="insert[]" value="18" <?php if(isset($editoptions[18])) { if($editoptions[18]->r_insert == 1) { echo 'checked';} } ?> /></td>
-     																		<td class="center"><input type="checkbox" class="cls_chk" name="update[]" value="18" <?php if(isset($editoptions[18])) { if($editoptions[18]->r_edit == 1) { echo 'checked';} } ?> /></td>
-     																		<td class="center"><input type="checkbox" class="cls_chk" name="delete[]" value="18" <?php if(isset($editoptions[18])) { if($editoptions[18]->r_delete == 1) { echo 'checked';} } ?> /></td>
-     																		<td class="center"><input type="checkbox" class="cls_chk" name="approval[]" value="18" <?php if(isset($editoptions[18])) { if($editoptions[18]->r_approvals == 1) { echo 'checked';} } ?> /></td>
-     																		<td class="center"><input type="checkbox" class="cls_chk" name="export[]" value="18" <?php if(isset($editoptions[18])) { if($editoptions[18]->r_export == 1) { echo 'checked';} } ?> /></td>
-     																	</tr>
+     																	
+     																	<tr id="">
+																		<td colspan="7"  style="font-weight:bold;font-size:18px">Users</td></tr>
      																	<tr id="trow_20">
      																		<td>User</td>
      																		<td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="19" <?php if(isset($editoptions[19])) { if($editoptions[19]->r_view == 1) { echo 'checked';} } ?> /></td>
@@ -357,6 +509,11 @@
      																		<td class="center"><input type="checkbox" class="cls_chk" name="approval[]" value="20" <?php if(isset($editoptions[20])) { if($editoptions[20]->r_approvals == 1) { echo 'checked';} } ?> /></td>
      																		<td class="center"><input type="checkbox" class="cls_chk" name="export[]" value="20" <?php if(isset($editoptions[20])) { if($editoptions[20]->r_export == 1) { echo 'checked';} } ?> /></td>
      																	</tr>
+
+     														
+																		
+																			<tr id="">
+																		<td colspan="7"  style="font-weight:bold;font-size:18px">Sales Rep Target</td>	      </tr>
                                                                                           <tr id="trow_35">
                                                                                                <td>Sales Rep Target</td>
                                                                                                <td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="34" <?php if(isset($editoptions[34])) { if($editoptions[34]->r_view == 1) { echo 'checked';} } ?> /></td>
@@ -366,7 +523,8 @@
                                                                                                <td class="center"><input type="checkbox" class="cls_chk" name="approval[]" value="34" <?php if(isset($editoptions[34])) { if($editoptions[34]->r_approvals == 1) { echo 'checked';} } ?> /></td>
                                                                                                <td class="center"><input type="checkbox" class="cls_chk" name="export[]" value="34" <?php if(isset($editoptions[34])) { if($editoptions[34]->r_export == 1) { echo 'checked';} } ?> /></td>
                                                                                           </tr>
-     																	<tr id="trow_24">
+                                                                                    
+     																	<tr id="trow_24" style="display:none;">
      																		<td>Sales Rep Route Plan</td>
      																		<td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="23" <?php if(isset($editoptions[23])) { if($editoptions[23]->r_view == 1) { echo 'checked';} } ?> /></td>
      																		<td class="center"><input type="checkbox" class="cls_chk" name="insert[]" value="23" <?php if(isset($editoptions[23])) { if($editoptions[23]->r_insert == 1) { echo 'checked';} } ?> /></td>
@@ -375,8 +533,8 @@
      																		<td class="center"><input type="checkbox" class="cls_chk" name="approval[]" value="23" <?php if(isset($editoptions[23])) { if($editoptions[23]->r_approvals == 1) { echo 'checked';} } ?> /></td>
      																		<td class="center"><input type="checkbox" class="cls_chk" name="export[]" value="23" <?php if(isset($editoptions[23])) { if($editoptions[23]->r_export == 1) { echo 'checked';} } ?> /></td>
      																	</tr>
-     																	<tr id="trow_25">
-     																		<td>Sales Rep Distributors</td>
+     																	<tr id="trow_25" style="display:none;">
+     																		<td >Sales Rep Distributors</td>
      																		<td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="24" <?php if(isset($editoptions[24])) { if($editoptions[24]->r_view == 1) { echo 'checked';} } ?> /></td>
      																		<td class="center"><input type="checkbox" class="cls_chk" name="insert[]" value="24" <?php if(isset($editoptions[24])) { if($editoptions[24]->r_insert == 1) { echo 'checked';} } ?> /></td>
      																		<td class="center"><input type="checkbox" class="cls_chk" name="update[]" value="24" <?php if(isset($editoptions[24])) { if($editoptions[24]->r_edit == 1) { echo 'checked';} } ?> /></td>
@@ -384,7 +542,7 @@
      																		<td class="center"><input type="checkbox" class="cls_chk" name="approval[]" value="24" <?php if(isset($editoptions[24])) { if($editoptions[24]->r_approvals == 1) { echo 'checked';} } ?> /></td>
      																		<td class="center"><input type="checkbox" class="cls_chk" name="export[]" value="24" <?php if(isset($editoptions[24])) { if($editoptions[24]->r_export == 1) { echo 'checked';} } ?> /></td>
      																	</tr>
-     																	<tr id="trow_26">
+     																	<tr id="trow_26" style="display:none;">
      																		<td>Sales Rep Orders</td>
      																		<td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="25" <?php if(isset($editoptions[25])) { if($editoptions[25]->r_view == 1) { echo 'checked';} } ?> /></td>
      																		<td class="center"><input type="checkbox" class="cls_chk" name="insert[]" value="25" <?php if(isset($editoptions[25])) { if($editoptions[25]->r_insert == 1) { echo 'checked';} } ?> /></td>
@@ -393,7 +551,7 @@
      																		<td class="center"><input type="checkbox" class="cls_chk" name="approval[]" value="25" <?php if(isset($editoptions[25])) { if($editoptions[25]->r_approvals == 1) { echo 'checked';} } ?> /></td>
      																		<td class="center"><input type="checkbox" class="cls_chk" name="export[]" value="25" <?php if(isset($editoptions[25])) { if($editoptions[25]->r_export == 1) { echo 'checked';} } ?> /></td>
      																	</tr>
-     																	<tr id="trow_27">
+     																	<tr id="trow_27" style="display:none;">
      																		<td>Sales Rep Payment Receivables</td>
      																		<td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="26" <?php if(isset($editoptions[26])) { if($editoptions[26]->r_view == 1) { echo 'checked';} } ?> /></td>
      																		<td class="center"><input type="checkbox" class="cls_chk" name="insert[]" value="26" <?php if(isset($editoptions[26])) { if($editoptions[26]->r_insert == 1) { echo 'checked';} } ?> /></td>
@@ -402,15 +560,23 @@
      																		<td class="center"><input type="checkbox" class="cls_chk" name="approval[]" value="26" <?php if(isset($editoptions[26])) { if($editoptions[26]->r_approvals == 1) { echo 'checked';} } ?> /></td>
      																		<td class="center"><input type="checkbox" class="cls_chk" name="export[]" value="26" <?php if(isset($editoptions[26])) { if($editoptions[26]->r_export == 1) { echo 'checked';} } ?> /></td>
      																	</tr>
+																		
+																			<tr id="">
+																		<td colspan="7"  style="font-weight:bold;font-size:18px"> Log</td>	
      																	<tr id="trow_22">
      																		<td>Log</td>
      																		<td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="21" <?php if(isset($editoptions[21])) { if($editoptions[21]->r_view == 1) { echo 'checked';} } ?> /></td>
      																		<td colspan="5" class="center">&nbsp;</td>
      																	</tr>
+     																	</tr>
+																		<tr id="">
+																		<td colspan="7"  style="font-weight:bold;font-size:18px"> Reports
      																	<tr id="trow_23">
      																		<td> <span class="">Reports</span> <a class="reports" href="javascript:void(0);"><span class="badge badge-info pull-right"> View Reports</span></a></td>
      																		<td class="center"><input type="checkbox" class="cls_chk" name="view[]" value="22" <?php if(isset($editoptions[22])) { if($editoptions[22]->r_view == 1) { echo 'checked';} } ?> /></td>
      																		<td colspan="5" class="center">&nbsp;</td>
+     																	</tr>
+																		</td>	
      																	</tr>
      																</tbody>
      															</table>
@@ -425,25 +591,115 @@
      													<a class="reports" href="javascript:void(0);" ><span class="badge  pull-right" style="margin-top:-5px;"> X </span></a>
      												</div> 
      												<br clear="all"/>
-
+														<div id="checkboxes">
      												<div class="row push-up-10">
-     													<div id="checkboxes">
+     											
      														<div class="col-md-4 col-sm-4 col-xs-12" <?php if(isset($rep_grp_1)) {if($rep_grp_1==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>>
      															<div class="">
      																<label class="selectAllLabel">
-     																	<h3 class=" pull-left">Stock Report</h3> 
+     																	<h3 class=" pull-left">Sales</h3> 
      																	<input type="checkbox" id="selectall-1"/>
      																</label>
      															</div> 
      															<div class="panel panel-success">
      																<div class="panel-body list-group" id="friendslist-1">
-     																	<label class="list-group-item-reports" <?php if(isset($rep_1_view)) {if($rep_1_view==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>> <input type="checkbox" id="group1_a" name="report[]" value="1" <?php if(isset($rep_1)) {if($rep_1==1) echo 'checked';} ?> /> Sale Invoice </label>
-     																	<label class="list-group-item-reports" <?php if(isset($rep_2_view)) {if($rep_2_view==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>> <input type="checkbox" id="group1_b" name="report[]" value="2" <?php if(isset($rep_2)) {if($rep_2==1) echo 'checked';} ?> /> Raw Material Stock </label>
-     																	<label class="list-group-item-reports" <?php if(isset($rep_3_view)) {if($rep_3_view==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><input type="checkbox" id="group1_c" name="report[]" value="3" <?php if(isset($rep_3)) {if($rep_3==1) echo 'checked';} ?> /> Production </label>
-     																	<label class="list-group-item-reports" <?php if(isset($rep_4_view)) {if($rep_4_view==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><input type="checkbox" id="group1_d" name="report[]" value="4" <?php if(isset($rep_4)) {if($rep_4==1) echo 'checked';} ?> /> Product Stock </label>
+																	<label class="list-group-item-reports" <?php if(isset($rep_18_view)) {if($rep_18_view==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>> <input type="checkbox" id="group1_a" name="report[]" value="18" <?php if(isset($rep_18)) {if($rep_18==1) echo 'checked';} ?> />Sales Report</label>
+     																<label class="list-group-item-reports" <?php if(isset($rep_15_view)) {if($rep_15_view==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>> <input type="checkbox" id="group1_b" name="report[]" value="15" <?php if(isset($rep_15)) {if($rep_15==1) echo 'checked';} ?> /> Promoter Sales </label>
+     																	
+     																
+     																</div>
+     															</div>
+     															</div>
+     											
+															
+															
+																	
+													
+															
+															
+															
+															
+																
+															<div class="col-md-4 col-sm-4 col-xs-12" <?php if(isset($rep_grp_3)) {if($rep_grp_3==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>>
+     															<div class="">
+     																<label class="selectAllLabel">
+     																	<h3 class=" pull-left">MIS</h3> 
+     																	<input type="checkbox" id="selectall-3"/>
+     																</label>
+     															</div> 
+     															<div class="panel panel-success">
+     																<div class="panel-body list-group" id="friendslist-3">
+     																	
+     																	<label class="list-group-item-reports" <?php if(isset($rep_7_view)) {if($rep_7_view==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>> <input type="checkbox" id="group3_a" name="report[]" value="7" <?php if(isset($rep_7)) {if($rep_7==1) echo 'checked';} ?> /> Distributor Master </label>
+     																	<label class="list-group-item-reports" <?php if(isset($rep_9_view)) {if($rep_9_view==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><input type="checkbox" id="group3_b" name="report[]" value="9" <?php if(isset($rep_9)) {if($rep_9==1) echo 'checked';} ?> /> Payment Receivables </label>
+     																	<label class="list-group-item-reports" <?php if(isset($rep_5_view)) {if($rep_5_view==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><input type="checkbox" id="group3_c" name="report[]" value="5" <?php if(isset($rep_5)) {if($rep_5==1) echo 'checked';} ?> /> Distributor Ledger </label>
+																		
+																		<label class="list-group-item-reports" <?php if(isset($rep_6_view)) {if($rep_6_view==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><input type="checkbox" id="group3_d" name="report[]" value="6" <?php if(isset($rep_6)) {if($rep_6==1) echo 'checked';} ?> />  Aging Wise </label>
+																		
+																		<label class="list-group-item-reports " style="display:none" <?php if(isset($rep_17_view)) {if($rep_17_view==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><input type="checkbox" id="group3_e" name="report[]" value="17" <?php if(isset($rep_17)) {if($rep_17==1) echo 'checked';} ?> />  Trial Balance Report </label>
+																		
+																	
+																		
+																
      																</div>
      															</div>
      														</div>
+															
+														
+															
+																	<div class="col-md-4 col-sm-4 col-xs-12" <?php if(isset($rep_grp_4)) {if($rep_grp_4==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>>
+     															<div class="">
+     																<label class="selectAllLabel">
+     																	<h3 class=" pull-left">Sales Monitoring</h3> 
+     																	<input type="checkbox" id="selectall-4"/>
+     																</label>
+     															</div> 
+     															<div class="panel panel-success">
+     																<div class="panel-body list-group" id="friendslist-4">
+     																	
+     																	<label class="list-group-item-reports" <?php if(isset($rep_13_view)) {if($rep_13_view==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>> <input type="checkbox" id="group4_a" name="report[]" value="13" <?php if(isset($rep_13)) {if($rep_13==1) echo 'checked';} ?> />   Sales Representative Location  </label>
+     																	<label class="list-group-item-reports" <?php if(isset($rep_21_view)) {if($rep_21_view==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><input type="checkbox" id="group4_b" name="report[]" value="20" <?php if(isset($rep_20)) {if($rep_20==1) echo 'checked';} ?> />   Sales Representative Route Plan   </label>
+     																	<label class="list-group-item-reports" <?php if(isset($rep_21_view)) {if($rep_21_view==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><input type="checkbox" id="group4_c" name="report[]" value="21" <?php if(isset($rep_21)) {if($rep_21==1) echo 'checked';} ?> />  Promoters Location  </label>
+																		
+																		
+																		
+																	
+																		
+																
+     																</div>
+     															</div>
+     														</div>
+     														</div>
+															
+														<div class="row push-up-10">
+															
+																	<div class="col-md-4 col-sm-4 col-xs-12" <?php if(isset($rep_grp_2)) {if($rep_grp_2==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>>
+													
+     															<div class="">
+     																<label class="selectAllLabel">
+     																	<h3 class=" pull-left">Production</h3> 
+     																	<input type="checkbox" id="selectall-2"/>
+     																</label>
+     															</div> 
+     															<div class="panel panel-success">
+     																<div class="panel-body list-group" id="friendslist-2">
+     																	
+     																	<label class="list-group-item-reports" <?php if(isset($rep_2_view)) {if($rep_2_view==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>> <input type="checkbox" id="group2_a" name="report[]" value="2" <?php if(isset($rep_2)) {if($rep_2==1) echo 'checked';} ?> /> Raw Material Stock </label>
+     																	<label class="list-group-item-reports" <?php if(isset($rep_3_view)) {if($rep_3_view==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><input type="checkbox" id="group2_b" name="report[]" value="3" <?php if(isset($rep_3)) {if($rep_3==1) echo 'checked';} ?> /> Production </label>
+     																	<label class="list-group-item-reports" <?php if(isset($rep_4_view)) {if($rep_4_view==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><input type="checkbox" id="group2_c" name="report[]" value="4" <?php if(isset($rep_4)) {if($rep_4==1) echo 'checked';} ?> /> Product Stock </label>
+																		
+																		<label class="list-group-item-reports" <?php if(isset($rep_10_view)) {if($rep_10_view==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><input type="checkbox" id="group2_d" name="report[]" value="10" <?php if(isset($rep_10)) {if($rep_10==1) echo 'checked';} ?> /> Purchase Order</label>
+																		
+																		<label class="list-group-item-reports" <?php if(isset($rep_11_view)) {if($rep_11_view==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><input type="checkbox" id="group2_e" name="report[]" value="11" <?php if(isset($rep_11)) {if($rep_11==1) echo 'checked';} ?> /> Production Data </label>
+																		
+																	
+																		
+																		<label class="list-group-item-reports" <?php if(isset($rep_12_view)) {if($rep_12_view==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><input type="checkbox" id="group2_f" name="report[]" value="12" <?php if(isset($rep_12)) {if($rep_12==1) echo 'checked';} ?> /> Purchase Variance </label>
+     																</div>
+     															</div>
+     															</div>
+     													
+															
      														<br clear="all"/>
      													</div>
      												</div>

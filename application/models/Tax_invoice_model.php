@@ -753,8 +753,6 @@ function generate_gate_pass_old() {
     load_view('invoice/gate_pass_old', $final_data);
 }
 
-
-
 function generate_gate_pass_old_print() {
     $now=date('Y-m-d H:i:s');
     $curusr=$this->session->userdata('session_id');
@@ -1241,8 +1239,6 @@ function generate_gate_pass_old_print() {
     load_view('invoice/invoice-print', $final_data);
 }
 
-
-
 function view_gate_pass_old($distid) {
     $now=date('Y-m-d H:i:s');
     $curusr=$this->session->userdata('session_id');
@@ -1634,15 +1630,44 @@ function get_final_data($check, $sales_rep_id){
 
     $inv_cnt = 0;
     $vou_cnt = 0;
+    $series=0;
+    //if($gate_pass_no==null || $gate_pass_no==''){
+    $result = $this->distributor_out_model->get_data('',$check[0]);
+    if(count($result)>0){
+        $gate_pass_no=$result[0]->gate_pass_no;
+        if($gate_pass_no==null || $gate_pass_no==''){
+            $sql="select * from series_master where type='Gate_Pass_invoice'";
+            $query=$this->db->query($sql);
+            $result=$query->result();
+            if(count($result)>0){
+                $series=intval($result[0]->series)+1;
+
+                $sql="update series_master set series = '$series' where type = 'Gate_Pass_invoice'";
+                $this->db->query($sql);
+            } else {
+                $series=1;
+
+                $sql="insert into series_master (type, series) values ('Gate_Pass_invoice', '$series')";
+                $this->db->query($sql);
+            }
+        }
+    }
+        
+    //}
+
 
     for($i=0; $i<count($check); $i++){
         $id = $check[$i];
         $data = array();
         $result = $this->distributor_out_model->get_data('', $id);
         if(count($result)>0){
+
+            
+
             $distributor_id=$result[0]->distributor_id;
             $invoice_no=$result[0]->invoice_no;
             $voucher_no=$result[0]->voucher_no;
+			$gatepass_date=$result[0]->gatepass_date;
             $gate_pass_no=$result[0]->gate_pass_no;
             $date_of_processing=$result[0]->date_of_processing;
             $total_amount=floatval($result[0]->amount);
@@ -1686,6 +1711,21 @@ function get_final_data($check, $sales_rep_id){
             $reverse_charge=$result[0]->reverse_charge;
             $round_off_amount=$result[0]->round_off_amount;
             $invoice_amount=$result[0]->invoice_amount;
+            $invoice_date=$result[0]->invoice_date;
+
+            if($gate_pass_no==null || $gate_pass_no==''){
+                if (isset($date_of_processing)){
+                    $financial_year=calculateFiscalYearForDate($date_of_processing);
+                } else {
+                    $financial_year="";
+                }
+                
+                $gate_pass_no = 'WHPL/'.$financial_year.'/gp/'.strval($series);
+
+                $sql="update distributor_out set gate_pass_no = '$gate_pass_no' where id = '$id'";
+                $this->db->query($sql);
+            }
+
         } else {
             $distributor_id=0;
             $invoice_no=null;
@@ -1731,9 +1771,10 @@ function get_final_data($check, $sales_rep_id){
             $reverse_charge = null;
             $round_off_amount = 0;
             $invoice_amount = 0;
+            $invoice_date = null;
         }
         $data['total_amount']=round($total_amount,2);
-		
+		$data['gatepass_date']=$gatepass_date;
         $data['order_no']=$order_no;
         $data['order_date']=$order_date;
         $data['supplier_ref']=$supplier_ref;
@@ -1752,6 +1793,7 @@ function get_final_data($check, $sales_rep_id){
 
         $data['round_off_amount']=$round_off_amount;
         $data['invoice_amount']=$invoice_amount;
+        $data['invoice_date']=$invoice_date;
 
         if($discount>0){
             $data['discount']=$discount;
@@ -1888,7 +1930,7 @@ function get_final_data($check, $sales_rep_id){
                     $this->db->query($sql);
                 }
 
-                if($gate_pass_no==null || $gate_pass_no==''){
+               if($gate_pass_no==null || $gate_pass_no==''){
                     $sql="select * from series_master where type='Gate_Pass'";
                     $query=$this->db->query($sql);
                     $result=$query->result();
@@ -1969,7 +2011,15 @@ function get_final_data($check, $sales_rep_id){
                 $vou_cnt = $vou_cnt + 1;
 
             } else if ($send_invoice==1) {
-                if($invoice_no==null || $invoice_no==''){
+                $distributor_in_type = '';
+                $sql="select * from distributor_out where id='$id'";
+                $query=$this->db->query($sql);
+                $result=$query->result();
+                if(count($result)>0){
+                    $distributor_in_type = $result[0]->distributor_in_type;
+                }
+
+                if(($invoice_no==null || $invoice_no=='') && strtoupper($distributor_in_type)!='EXCHANGED'){
                     $sql="select * from series_master where type='Tax_Invoice'";
                     $query=$this->db->query($sql);
                     $result=$query->result();
@@ -1985,15 +2035,23 @@ function get_final_data($check, $sales_rep_id){
                         $this->db->query($sql);
                     }
 
-                    if (isset($date_of_processing)){
-                        $financial_year=calculateFiscalYearForDate($date_of_processing);
+                    // if (isset($date_of_processing)){
+                    //     $financial_year=calculateFiscalYearForDate($date_of_processing);
+                    // } else {
+                    //     $financial_year="";
+                    // }
+                    
+                    $invoice_date=date('Y-m-d');
+
+                    if (isset($invoice_date)){
+                        $financial_year=calculateFiscalYearForDate($invoice_date);
                     } else {
                         $financial_year="";
                     }
                     
                     $invoice_no = 'WHPL/'.$financial_year.'/'.strval($series);
 
-                    $sql="update distributor_out set invoice_no = '$invoice_no' where id = '$id'";
+                    $sql="update distributor_out set invoice_no = '$invoice_no', invoice_date = '$invoice_date' where id = '$id'";
                     $this->db->query($sql);
                 }
 
@@ -2040,6 +2098,7 @@ function get_final_data($check, $sales_rep_id){
     $final_data['delivery_for']=array();
     $final_data['pending_payments']=array();
     $final_data['distributor_details']=array();
+    $final_data['sku_batch_details']=array();
 
     if(count($check)>0){
         $distributor_out_id = implode(", ", $check);
@@ -2059,7 +2118,7 @@ function get_final_data($check, $sales_rep_id){
 
         $data['sku_details']=array();
         $sql = "select AA.sku_name, AA.type, sum(AA.qty) as total_qty from 
-                (select A.*, case when A.type='Bar' then B.product_name else C.box_name end as sku_name 
+                (select A.*, case when A.type='Bar' then B.short_name else C.short_name end as sku_name 
                     from distributor_out_items A left join product_master B on(A.item_id=B.id and A.type='Bar') 
                     left join box_master C on(A.item_id=C.id and A.type='Box') 
                     where A.distributor_out_id in (".$distributor_out_id.")) AA group by AA.sku_name, AA.type";
@@ -2116,6 +2175,79 @@ function get_final_data($check, $sales_rep_id){
         $result=$query->result();
         if(count($result)>0){
             $final_data['pending_payments']=$result;
+        }
+
+
+        $sql = "select Q.* from 
+                (select O.*, P.batch_id_as_per_fssai from 
+                (select M.*, N.location from 
+                (select K.*, L.sales_rep_name from 
+                (select I.*, J.depot_name, J.address as depot_address, J.city as depot_city, J.pincode as depot_pincode, 
+                    J.state as depot_state, J.state_code as depot_state_code, J.country as depot_country from 
+                (select G.*, H.distributor_name, H.sell_out, H.state as distributor_state, H.class, H.location_id from 
+                (select E.*, F.product_name from 
+                (select C.*, D.box_name from 
+                (select A.*, B.id as sales_item_id, B.type, B.item_id, B.qty, B.rate, B.sell_rate, B.amount as item_amt, B.batch_no from 
+                (select * from distributor_out where id in (".$distributor_out_id.")) A 
+                left join 
+                (select * from distributor_out_items where distributor_out_id in (".$distributor_out_id.")) B 
+                on (A.id = B.distributor_out_id)) C 
+                left join 
+                (select * from box_master) D 
+                on (C.type = 'Box' and C.item_id = D.id)) E 
+                left join 
+                (select * from product_master) F 
+                on (E.type = 'Bar' and E.item_id = F.id)) G 
+                left join 
+                (select * from distributor_master) H 
+                on (G.distributor_id=H.id)) I 
+                left join 
+                (select * from depot_master) J 
+                on (I.depot_id=J.id)) K 
+                left join 
+                (select * from sales_rep_master) L 
+                on (K.sales_rep_id=L.id)) M 
+                left join 
+                (select * from location_master) N 
+                on (M.location_id=N.id)) O 
+                left join 
+                (select * from batch_processing) P 
+                on (O.batch_no=P.id)) Q 
+                order by Q.invoice_no, Q.batch_id_as_per_fssai";
+        $query=$this->db->query($sql);
+        $result=$query->result_array();
+        if(count($result)>0){
+            for($i=0; $i<count($result); $i++){
+                $batch_no = $result[$i]['batch_no'];
+                $total_batch_no = explode(",", $batch_no);
+                for($j=0; $j<count($total_batch_no); $j++){
+                    $total_batch_no[$j] = intval($total_batch_no[$j]);
+                }
+                $batch_no = implode(', ', $total_batch_no);
+
+                // echo $batch_no;
+                // echo '<br/>';
+
+                $sql = "select batch_no from batch_master where id in (".$batch_no.")"; 
+                $query=$this->db->query($sql);
+                $result2=$query->result_array();
+                if(count($result2)>0){
+                    $batch_no = '';
+                    for($j=0; $j<count($result2); $j++){
+                        $batch_no = $batch_no . $result2[$j]['batch_no'] . ', ';
+                        // echo $batch_no;
+                        // echo '<br/>';
+                    }
+                    if(strpos($batch_no, ',')>0){
+                        $batch_no = substr($batch_no, 0, strrpos($batch_no, ','));
+                    }
+                    // echo $batch_no;
+                    // echo '<br/>';
+                    $result[$i]['batch_id_as_per_fssai'] = $batch_no;
+                }
+            }
+
+            $final_data['sku_batch_details']=$result;
         }
 
 
@@ -2224,10 +2356,9 @@ function generate_gate_pass($dist_out_id) {
     $now=date('Y-m-d H:i:s');
     $curusr=$this->session->userdata('session_id');
 
-	
 	$sql="select order_no from distributor_out";
-	 $query=$this->db->query($sql);
-	 $query_result=$query->result();
+    $query=$this->db->query($sql);
+    $query_result=$query->result();
 	
     $sql = "select distinct delivery_sales_rep_id from distributor_out where id in (".$dist_out_id.") order by delivery_sales_rep_id";
     $query=$this->db->query($sql);
@@ -2264,7 +2395,6 @@ function generate_gate_pass($dist_out_id) {
                             );
                     $this->db->insert('gp_data',$data);
                 }
-
 
                 $final_data =  $this->get_final_data($check, $sales_rep_id);
 
@@ -2367,6 +2497,9 @@ function view_gate_pass($distid) {
                 }
                 
                 $final_data = $this->get_final_data($check, $sales_rep_id);
+
+                // dump($final_data);
+
                 load_view('invoice/gate_pass', $final_data);
             }
         }

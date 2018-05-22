@@ -1,4 +1,3 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <body>
@@ -8,16 +7,11 @@
 <title>Gate Pass</title>
 <link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url().'css/fontawesome/font-awesome.min.css'; ?>"/>
 <style>
-    /*@import "fontawesome/font-awesome.min.css";*/
-
     @font-face {
         font-family: "OpenSans-Regular";
         src: url("<?php echo base_url().'/assets/invoice/'; ?>OpenSans-Regular.ttf") format("truetype");
     }
     @media print{@page {size: portrait}}
-    /*@media all {
-        .page-break { display: none; }
-    }*/
     @media print {
         .page-break { display: block; page-break-after: always; }
     }
@@ -40,10 +34,14 @@
 <body style="margin: 1px;">
     <?php if(count($sku_details)>0){ ?>
     <div class="gate_pass_details">
-        <div style="width:1000px;">
+        <div>
             <div align="center" style="background:#f00;"><strong><h1>Gate Pass</h1></strong></div>
             <div style="width:400px;  ">
                 <table cellspacing="0" cellpadding="5" border="1"> 
+                    <tr>
+                        <td width="185">Gate Pass No</td>
+                        <td width="189" colspan="5"><div align="right"> <?php echo $delivery_for[0]->gate_pass_no; ?></div></td>
+                    </tr>
                     <tr>
                         <td width="185">Location</td>
                         <td width="189" colspan="5"><div align="right"><?php if(isset($voucher_details[0]['depot_name'])) echo $voucher_details[0]['depot_name']; else if(isset($invoice_details[0]['depot_name'])) echo $invoice_details[0]['depot_name']; ?></div></td>
@@ -52,6 +50,10 @@
                         <td>Date</td>
                         <td colspan="5"><div align="right"><?php echo date('d-M-y'); ?></div></td>
                     </tr>
+                    <!-- <tr>
+                        <td>Gate Pass No</td>
+                        <td colspan="5"><div align="right"><?php //if(isset($voucher_details[0]['gate_pass_no'])) echo $voucher_details[0]['gate_pass_no']; else if(isset($invoice_details[0]['gate_pass_no'])) echo $invoice_details[0]['gate_pass_no']; ?></div></td>
+                    </tr> -->
                     <tr>
                         <td>Delivery Person</td>
                         <td colspan="5"><div align="right"><?php if(isset($sales_rep_details[0]->sales_rep_name)) echo $sales_rep_details[0]->sales_rep_name; ?></div></td>
@@ -151,12 +153,62 @@
 
 
 
+    <?php if(count($sku_batch_details)>0){ ?>
+    <div class="gate_pass_details">
+        <div>
+            <div align="center" style="background:#f00;"><strong><h1>Batch No Details</h1></strong></div><br />
+            <div style=""> 
+                <table cellspacing="0" cellpadding="5" border="1" width="100%">
+                    <tr>
+                        <td width="54"><div align="center"><strong>Sr. No.</strong></div></td>
+                        <td width="238"><div align="center"><strong>Distributor Name</strong></div></td>
+                        <td width="227"><div align="center"><strong>SKU Name</strong></div></td>
+                        <td width="117"><div align="center"><strong>Type</strong></div></td>
+                        <td width="102"><div align="center"><strong>Quantity</strong></div></td>
+                        <td width="102"><div align="center"><strong>Batch No</strong></div></td>
+                    </tr>
+                    <?php $invoice_no = ''; $previous_invoice_no = ''; ?>
+                    <?php for($i=0; $i<count($sku_batch_details); $i++){ ?>
+                    <?php 
+                        $invoice_no = $sku_batch_details[$i]['invoice_no'];
+                        if($invoice_no!=$previous_invoice_no) { 
+                    ?>
+                            <tr class="batch_no">
+                                <td colspan="6">
+                                    Invoice - <?php echo $sku_batch_details[$i]['invoice_no']; ?>
+                                </td>
+                            </tr>
+                    <?php 
+                            $previous_invoice_no = $sku_batch_details[$i]['invoice_no'];
+                            $j=1;
+                        }
+                    ?>
+                        <tr>
+                            <td><div><?php echo $i+1; ?></div></td>
+                            <td><?php echo $sku_batch_details[$i]['distributor_name']; ?></td>
+                            <td><?php echo (($sku_batch_details[$i]['type']=='Bar')?str_replace(",", "", $sku_batch_details[$i]['product_name']):str_replace(",", "", $sku_batch_details[$i]['box_name'])); ?></td>
+                            <td><div><?php echo $sku_batch_details[$i]['type']; ?></div></td>
+                            <td><div align="right"><?php echo $sku_batch_details[$i]['qty']; ?></div></td>
+                            <td><div><?php echo $sku_batch_details[$i]['batch_id_as_per_fssai']; ?></div></td>
+                        </tr>
+                    <?php } ?>
+                </table>
+            </div><br />
+        </div>
+    </div>
+
+    <div class="page-break"><span>&nbsp;</span></div>
+    <?php } ?>
+
+
+
+
     <?php for($inv_cnt=0; $inv_cnt<count($invoice_details); $inv_cnt++){ ?>
     <div style="width:100%;  float:left; margin-right:20px;   ">
         <center style="width:100%;display:inline-block;margin:0 auto;">
             <img src="<?php echo base_url().'/assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:150px;" />
             <p style="font-size:12px;line-height:18px;margin:0;margin-bottom:10px;">
-                B-505, Veena sur, Mahavir Nagar Kandivali-West,Mumbai - 67 
+                C/109, Hind Saurashtra Ind. Estate. 85/86, Andheri Kurla Road, Marol Naka, Andheri East. Mumbai 400059
                 <br /> +91 8268000456 
                 <br><a href="mailto:cs@eatanytime.in">cs@eatanytime.in</a><br>
                 GSTIN: 27AABCW7811R1ZN
@@ -210,7 +262,7 @@
                                     <td>Invoice No: </td><td><?php if (isset($invoice_details[$inv_cnt]['invoice_no'])) echo $invoice_details[$inv_cnt]['invoice_no']; ?></td>
                                 </tr>
                                 <tr>
-                                    <td>Invoice Date: </td><td><?php if (isset($invoice_details[$inv_cnt]['date_of_processing'])) echo (($invoice_details[$inv_cnt]['date_of_processing']!=null && $invoice_details[$inv_cnt]['date_of_processing']!='')?date('d-M-y',strtotime($invoice_details[$inv_cnt]['date_of_processing'])):''); ?></td>
+                                    <td>Invoice Date: </td><td><?php if (isset($invoice_details[$inv_cnt]['invoice_date'])) echo (($invoice_details[$inv_cnt]['invoice_date']!=null && $invoice_details[$inv_cnt]['invoice_date']!='')?date('d-M-y',strtotime($invoice_details[$inv_cnt]['invoice_date'])):''); ?></td>
                                 </tr>
                                 <tr >
                                     <td>State: </td>
@@ -544,7 +596,7 @@
         <center style="width:100%;display:inline-block;margin:0 auto;">
             <img src="<?php echo base_url().'/assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:150px;" />
             <p style="font-size:12px;line-height:18px;margin:0;margin-bottom:10px;">
-                B-505, Veena sur, Mahavir Nagar Kandivali-West,Mumbai - 67 
+                C/109, Hind Saurashtra Ind. Estate. 85/86, Andheri Kurla Road, Marol Naka, Andheri East. Mumbai 400059
                 <br /> +91 8268000456 
                 <br><a href="mailto:cs@eatanytime.in">cs@eatanytime.in</a><br>
                 GSTIN: 27AABCW7811R1ZN
@@ -598,7 +650,7 @@
                                     <td>Invoice No: </td><td><?php if (isset($invoice_details[$inv_cnt]['invoice_no'])) echo $invoice_details[$inv_cnt]['invoice_no']; ?></td>
                                 </tr>
                                 <tr>
-                                    <td>Invoice Date: </td><td><?php if (isset($invoice_details[$inv_cnt]['date_of_processing'])) echo (($invoice_details[$inv_cnt]['date_of_processing']!=null && $invoice_details[$inv_cnt]['date_of_processing']!='')?date('d-M-y',strtotime($invoice_details[$inv_cnt]['date_of_processing'])):''); ?></td>
+                                    <td>Invoice Date: </td><td><?php if (isset($invoice_details[$inv_cnt]['invoice_date'])) echo (($invoice_details[$inv_cnt]['invoice_date']!=null && $invoice_details[$inv_cnt]['invoice_date']!='')?date('d-M-y',strtotime($invoice_details[$inv_cnt]['invoice_date'])):''); ?></td>
                                 </tr>
                                 <tr >
                                     <td>State: </td>
@@ -931,7 +983,7 @@
         <center style="width:100%;display:inline-block;margin:0 auto;">
             <img src="<?php echo base_url().'/assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:150px;" />
             <p style="font-size:12px;line-height:18px;margin:0;margin-bottom:10px;">
-                B-505, Veena sur, Mahavir Nagar Kandivali-West,Mumbai - 67 
+                C/109, Hind Saurashtra Ind. Estate. 85/86, Andheri Kurla Road, Marol Naka, Andheri East. Mumbai 400059
                 <br /> +91 8268000456 
                 <br><a href="mailto:cs@eatanytime.in">cs@eatanytime.in</a><br>
                 GSTIN: 27AABCW7811R1ZN
@@ -985,7 +1037,7 @@
                                     <td>Invoice No: </td><td><?php if (isset($invoice_details[$inv_cnt]['invoice_no'])) echo $invoice_details[$inv_cnt]['invoice_no']; ?></td>
                                 </tr>
                                 <tr>
-                                    <td>Invoice Date: </td><td><?php if (isset($invoice_details[$inv_cnt]['date_of_processing'])) echo (($invoice_details[$inv_cnt]['date_of_processing']!=null && $invoice_details[$inv_cnt]['date_of_processing']!='')?date('d-M-y',strtotime($invoice_details[$inv_cnt]['date_of_processing'])):''); ?></td>
+                                    <td>Invoice Date: </td><td><?php if (isset($invoice_details[$inv_cnt]['invoice_date'])) echo (($invoice_details[$inv_cnt]['invoice_date']!=null && $invoice_details[$inv_cnt]['invoice_date']!='')?date('d-M-y',strtotime($invoice_details[$inv_cnt]['invoice_date'])):''); ?></td>
                                 </tr>
                                 <tr >
                                     <td>State: </td>

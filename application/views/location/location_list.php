@@ -53,7 +53,11 @@
 									<thead>
 										<tr>
 											<th width="65" style="text-align:center;">Sr. No.</th>
+											
 											<th>Location</th>
+											<th>Distributor Type</th>
+											<th>Zone</th>
+											<th>Area</th>
 											<th width="110">Creation Date</th>
 										</tr>
 									</thead>
@@ -62,6 +66,9 @@
 										<tr>
 											<td style="text-align:center;"><?php echo $i+1; ?></td>
 											<td><a href="<?php echo base_url().'index.php/location/edit/'.$data[$i]->id; ?>"><?php echo $data[$i]->location; ?></a></td>
+											<td><?php echo $data[$i]->distributor_type; ?></td>
+											<td><?php echo $data[$i]->zone; ?></td>
+											<td><?php echo $data[$i]->area; ?></td>
 											<td>
 												<span style="display:none;">
                                                     <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>

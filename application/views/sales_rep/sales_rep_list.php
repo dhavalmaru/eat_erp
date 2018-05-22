@@ -36,35 +36,84 @@
               <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
                 
                    	<div class="heading-h3"> 
-                   	<div class="heading-h3-heading mobile-head">	 <a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp; Sales Representative List  </div>						 
-					  	<div class="heading-h3-heading mobile-head">
+                   	<div class="heading-h3-heading mobile-head"  style="width: 25%;">	 <a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp; Sales Representative List  </div>						 
+					  	<div class="heading-h3-heading mobile-head"  style="width: 75%;">
 					  	<div class="pull-right btn-margin">	
 							<?php $this->load->view('templates/download');?>	
 						</div>
+                        <div class="container u-posRelative u-textRight">
+                            <div class="pull-right btn-margin"  style="<?php if($access[0]->r_insert=='0') echo 'display: none;';?>">
+                                <a class="btn btn-success" href="<?php echo base_url() . 'index.php/sales_rep/add'; ?>">
+                                    <span class="fa fa-plus"></span> Add Sales Representative
+                                </a>
+                            </div>
+                           <!-- <div class="pull-right   btn-margin" style="<?php if($access[0]->r_view=='0') echo 'display: none;';?>">
+                                <a class="btn btn-success btn-block btn-padding" href="<?php echo base_url(); ?>index.php/sales_rep/sales_rep_route_plan">
+                                    <span class="fa fa-plus"></span> Sales Representative Route Plan
+                                </a>
+                            </div>
+                            <div class="pull-right   btn-margin" style="<?php if($access[0]->r_view=='0') echo 'display: none;';?>">
+                                <a class="btn btn-success btn-block btn-padding" href="<?php echo base_url(); ?>index.php/sales_rep/sales_rep_location">
+                                    <span class="fa fa-plus"></span> Promoters Location
+                                </a>
+                            </div>-->
+							
+                        </div>
 			     	</div>	      
                 	</div>
 
                 	<div class="nav-contacts ng-scope" ui-view="@nav">
     				<div class="u-borderBottom u-bgColorBreadcrumb ng-scope">
+    					
+    				</div>
+    				</div>
+					
+					<div class="nav-contacts ng-scope" ui-view="@nav">
+    				<div class="u-borderBottom u-bgColorBreadcrumb ng-scope">
     					<div class="container u-posRelative u-textRight">
-	                    	<div class="pull-left btn-margin"  style="<?php if($access[0]->r_insert=='0') echo 'display: none;';?>">
-								<a class="btn btn-success" href="<?php echo base_url() . 'index.php/sales_rep/add'; ?>">
-									<span class="fa fa-plus"></span> Add Sales Representative
-								</a>
-							</div>
-							<div class="pull-left   btn-margin" style="<?php if($access[0]->r_view=='0') echo 'display: none;';?>">
-								<a class="btn btn-success btn-block btn-padding" href="<?php echo base_url(); ?>index.php/sales_rep/sales_rep_route_plan">
-									<span class="fa fa-plus"></span> Sales Representative Route Plan
-								</a>
-							</div>
-							<div class="pull-left   btn-margin" style="<?php if($access[0]->r_view=='0') echo 'display: none;';?>">
-								<a class="btn btn-success btn-block btn-padding" href="<?php echo base_url(); ?>index.php/sales_rep/sales_rep_location">
-									<span class="fa fa-plus"></span> Promoters Location
-								</a>
-							</div>
+    						
+
+    						<ul class="m-nav--linetriangle" ng-swipe-left="app.onInnerSwipe($event);" ng-swipe-right="app.onInnerSwipe($event);">
+    							<!--<li class="all">
+    								<a  href="<?php //echo base_url(); ?>index.php/distributor_in/checkstatus/All">
+    									<span class="ng-binding">All</span>
+    									<span id="approved">  (<?php //echo $all; ?>)  </span>
+    								</a>
+    							</li>-->
+
+    							<li class="salesrep" >
+    								<a  href="<?php echo base_url(); ?>index.php/sales_rep/checkstatus/salesrep">
+    									<span class="ng-binding"> Sales Representative</span>
+    									<span id="salesrep"> (<?php echo $salesrep; ?>)</span>
+    								</a>
+    							</li>
+
+    							<li class="promoter">
+    								<a  href="<?php echo base_url(); ?>index.php/sales_rep/checkstatus/promoter">
+    									<span class="ng-binding"> Promoter</span>
+    									<span id="promoter"> (<?php echo $promoter; ?>) </span>
+    								</a>
+    							</li>
+
+                                <li class="merchandiser">
+                                    <a  href="<?php echo base_url(); ?>index.php/sales_rep/checkstatus/merchandiser">
+                                        <span class="ng-binding">Merchandiser</span>
+                                        <span id="merchandiser"> (<?php echo $merchandiser; ?>) </span>
+                                    </a>
+                                </li>
+
+                                <li class="inactive">
+                                    <a  href="<?php echo base_url(); ?>index.php/sales_rep/checkstatus/InActive">
+                                        <span class="ng-binding">Inactive</span>
+                                        <span id="inactive"> (<?php echo $inactive; ?>) </span>
+                                    </a>
+                                </li>
+
+    						</ul>
+    						
     					</div>
     				</div>
-    				</div>
+    			</div>
                 
                 <!-- PAGE CONTENT WRAPPER -->
                 <div class="page-content-wrap">                
@@ -80,7 +129,7 @@
 											<th width="65" style="text-align:center;">Sr. No.</th>
 											<th width="300" >Sales Representative Name</th>
 											<th width="120">PAN No</th>
-											<th width="300"  >Email Id</th>
+											<th width="300">Email Id</th>
 											<th width="110">Mobile No</th>
 											<th width="190">Target Per Month (In Rs)</th>
 											<th width="110">Creation Date</th>
@@ -123,6 +172,25 @@
         <!-- END PAGE CONTAINER -->
 						
         <?php $this->load->view('templates/footer');?>
+
+        <script>
+            $(document).ready(function() {
+                var url = window.location.href;
+
+                if(url.includes('InActive')){
+                    $('.inactive').attr('class','active');
+                }
+                else if(url.includes('promoter')){
+                    $('.promoter').attr('class','active');
+                }
+                else  if(url.includes('merchandiser')){
+                    $('.merchandiser').attr('class','active');
+                } 
+                else {
+                    $('.salesrep').attr('class','active');
+                }
+            });
+        </script>
 		
     <!-- END SCRIPTS -->      
     </body>

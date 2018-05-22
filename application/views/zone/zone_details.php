@@ -36,13 +36,29 @@
                                  <div class="panel panel-default">
 								
 								<div class="panel-body">
+								
 									<div class="form-group"  >
 										<div class="col-md-12 col-sm-12 col-xs-12">
+											 <label class="col-md-2 col-sm-2 col-xs-12 control-label">Distributor Type <span class="asterisk_sign">*</span></label>
+                                          <div class="col-md-4 col-sm-4 col-xs-12" >
+                                                <select name="type_id"  id="type_id" class="form-control">
+                                                    <option value="">Select</option>
+                                                    <?php if(isset($type)) { for ($k=0; $k < count($type) ; $k++) { ?>
+                                                            <option value="<?php echo $type[$k]->id; ?>" <?php if (isset($data)) { if($type[$k]->id==$data[0]->type_id) { echo 'selected'; } } ?>><?php echo $type[$k]->distributor_type; ?></option>
+                                                    <?php }} ?>
+                                                </select>
+                                            </div>
+											
 											 <label class="col-md-2 col-sm-2 col-xs-12 control-label">Zone <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
                                                 <input type="text" class="form-control" name="zone" id="zone" placeholder="Zone Name" value="<?php if(isset($data)) echo $data[0]->zone;?>"/>
                                             </div>
+                                         </div>
+                                        </div>
+									<div class="form-group"  >
+										<div class="col-md-12 col-sm-12 col-xs-12">
+											
                                             <div style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
                                                 <label class="col-md-2 col-sm-2 col-xs-12 control-label">Status <span class="asterisk_sign">*</span></label>
                                                 <div class="col-md-4 col-sm-4 col-xs-12">

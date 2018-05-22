@@ -83,6 +83,19 @@ class Distributor extends CI_Controller{
             $this->load->view('login/main_page');
         }
     }
+	
+	    public function single_locations($status=''){
+        $result=$this->distributor_model->get_access();
+        if(count($result)>0) {
+            
+            load_view_without_data('distributor/distributor_single_loc_map');
+
+        } else {
+            echo '<script>alert("You donot have access to this page.");</script>';
+            $this->load->view('login/main_page');
+        }
+    }
+
 
     public function get_data(){
         $id=$this->input->post('id');
@@ -122,6 +135,24 @@ class Distributor extends CI_Controller{
             $this->load->view('login/main_page');
         }
     }
+	
+	 public function get_distributor_single_locations(){
+        $id=$this->input->post('id');
+        // $id=1;
+
+        $result=$this->distributor_model->get_data('', $id);
+        $data['result'] = 0;
+        if(count($result)>0) {
+            $data['result'] = 1;
+            $data['google_address'] = $result[0]->google_address;
+            $data['latitude'] = $result[0]->latitude;
+            $data['longitude'] = $result[0]->longitude;
+           
+        }
+
+        echo json_encode($data);
+    }
+	
 
     public function add(){
         $result=$this->distributor_model->get_access();
@@ -186,10 +217,26 @@ class Distributor extends CI_Controller{
         echo $result;
     }
 
+	public function get_zone(){ 
+   
+    $postData = $this->input->post();
+
+    $data = $this->area_model->get_zone($postData);
+    echo json_encode($data); 
+	}
+
+	public function get_area(){ 
+   
+    $postData = $this->input->post();
+
+    $data = $this->location_model->get_area($postData);
+    echo json_encode($data); 
+	}
+	
     public function get_shipping_state() {
         $id=$this->input->post('id');
         // $id=1;
-
+		$data=array();
         $result=$this->distributor_model->get_shipping_state($id);
         if(count($result)>0) {
             $data['state'] = $result[0]->con_state;

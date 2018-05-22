@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>        
+    <head>
         <!-- META SECTION -->
         <title>EAT ERP</title>            
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -16,10 +16,29 @@
         <!-- EOF CSS INCLUDE -->      
 		
 		<style>		 
-			th{text-align:center;}
-			.center{text-align:center;}
+            th{text-align:center;}
+            .center{text-align:center;}
+            @media print {
+                body * {
+                    visibility: hidden;
+                }
+                #form_batch_processing_details * {
+                    visibility: visible;
+                }
+                #form_batch_processing_details {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                }
+                .print_hide {
+                    display: none;
+                }
+            }
+            .download {
+                font-size: 21px;
+                color: #5cb85c;
+            }
 		</style>
-		
     </head>
     <body>								
         <!-- START PAGE CONTAINER -->
@@ -37,15 +56,28 @@
                     <div class="row main-wrapper">
 					    <div class="main-container">           
                          <div class="box-shadow">	
-                            <form id="form_batch_processing_details" role="form" class="form-horizontal" method="post" action="<?php if (isset($data)) echo base_url(). 'index.php/batch_processing/update/' . $data[0]->id; else echo base_url().'index.php/batch_processing/save'; ?>">
+                            <form id="form_batch_processing_details" role="form" class="form-horizontal" method="post" action="<?php if (isset($data)) echo base_url(). 'index.php/batch_processing/update/' . $data[0]->id; else echo base_url().'index.php/batch_processing/save'; ?>" enctype="multipart/form-data" >
                                <div class="box-shadow-inside">
                                 <div class="col-md-12 custom-padding" style="padding:0;" >
                                  <div class="panel panel-default">
 							     	<div class="panel-body">
 									<div class="form-group"  >
 										<div class="col-md-12 col-sm-12 col-xs-12">
-											<label class="col-md-2 col-sm-2 col-xs-12 control-label">Batch Id <span class="asterisk_sign">*</span></label>
-                                          <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Batch No <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <select name="batch_no_id" id="batch_no_id" class="form-control" onChange="set_batch_no();">
+                                                    <option value="">Select</option>
+                                                    <?php if(isset($batch_no)) { for ($k=0; $k < count($batch_no) ; $k++) { ?>
+                                                            <option value="<?php echo $batch_no[$k]->id; ?>" <?php if(isset($data)) { if($batch_no[$k]->id==$data[0]->batch_no_id) { echo 'selected'; } } ?>><?php echo $batch_no[$k]->batch_no; ?></option>
+                                                    <?php }} ?>
+                                                </select>
+                                                <!-- <input type="hidden" name="depot_id" id="depot_id" value="<?php //if(isset($data)) { echo  $data[0]->depot_id; } ?>"/>
+                                                <input type="text" class="form-control load_depot" name="depot" id="depot" placeholder="Type To Select Depot...." value="<?php //if(isset($data)) { echo  $data[0]->depot_name; } ?>"/> -->
+                                            </div>
+
+
+											<label class="col-md-2 col-sm-2 col-xs-12 control-label" style="display: none;">Batch Id <span class="asterisk_sign">*</span></label>
+                                          <div class="col-md-4 col-sm-4 col-xs-12" style="display: none;">
                                                 <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
                                                 <input type="text" class="form-control" name="batch_id_as_per_fssai" id="batch_id_as_per_fssai" placeholder="Batch Id" value="<?php if(isset($data)) { echo  $data[0]->batch_id_as_per_fssai; } ?>"/>
                                             </div>
@@ -55,6 +87,7 @@
                                             </div>
 										</div>
 									</div>
+
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Depot <span class="asterisk_sign">*</span></label>
@@ -68,68 +101,95 @@
                                                 <!-- <input type="hidden" name="depot_id" id="depot_id" value="<?php //if(isset($data)) { echo  $data[0]->depot_id; } ?>"/>
                                                 <input type="text" class="form-control load_depot" name="depot" id="depot" placeholder="Type To Select Depot...." value="<?php //if(isset($data)) { echo  $data[0]->depot_name; } ?>"/> -->
                                             </div>
+											
+											<label class="col-md-2 col-sm-2 col-xs-12 control-label">No.of Batches <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="no_of_batch" id="no_of_batch" placeholder="No.of Batches" value="<?php if (isset($data)) { echo $data[0]->no_of_batch; } ?>"/>
+                                            </div>
+											
+											
+                                           
                                         </div>
                                     </div>
-
-                            	<div class="h-scroll">	
-                                       <div class="table-stripped form-group" style="padding:15px;" >
 									
-                                        <table class="table table-bordered" style="margin-bottom: 0px; ">
-                                        <thead>
-                                            <tr>
-                                                <th  >Raw Material</th>
-                                                <th width="200">Qty (In Kg)</th>
-                                                <th width="75">Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="raw_material_details">
-                                        <?php $i=0; if(isset($raw_material_stock)) {
-                                                for($i=0; $i<count($raw_material_stock); $i++) { ?>
-                                            <tr id="raw_material_<?php echo $i; ?>_row">
-                                                <td>
-                                                    <select name="raw_material_id[]" class="form-control raw_material" id="raw_material_<?php echo $i;?>">
-                                                        <option value="">Select</option>
-                                                        <?php if(isset($raw_material)) { for ($k=0; $k < count($raw_material) ; $k++) { ?>
-                                                                <option value="<?php echo $raw_material[$k]->id; ?>" <?php if($raw_material[$k]->id==$raw_material_stock[$i]->raw_material_id) { echo 'selected'; } ?>><?php echo $raw_material[$k]->rm_name; ?></option>
-                                                        <?php }} ?>
-                                                    </select>
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control qty" name="qty[]" id="qty_<?php echo $i; ?>" placeholder="Qty" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->qty; } ?>"/>
-                                                </td>
-                                               <td style="text-align:center;     vertical-align: middle;">
-                                                    <a id="raw_material_<?php echo $i; ?>_row_delete" class="delete_row" href="#"> <span class="fa trash fa-trash-o"  ></span></a>
-                                                </td>
-                                            </tr>
-                                        <?php }} else { ?>
-                                            <tr id="raw_material_<?php echo $i; ?>_row">
-                                                <td>
-                                                    <select name="raw_material_id[]" class="form-control raw_material" id="raw_material_<?php echo $i;?>">
-                                                        <option value="">Select</option>
-                                                        <?php if(isset($raw_material)) { for ($k=0; $k < count($raw_material) ; $k++) { ?>
-                                                                <option value="<?php echo $raw_material[$k]->id; ?>"><?php echo $raw_material[$k]->rm_name; ?></option>
-                                                        <?php }} ?>
-                                                    </select>
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control qty" name="qty[]" id="qty_<?php echo $i; ?>" placeholder="Qty" value=""/>
-                                                </td>
-                                                <td style="text-align:center;     vertical-align: middle;">
-                                                    <a id="raw_material_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>
-                                                </td>
-                                            </tr>
-                                        <?php } ?>
-                                        </tbody>
-                                        <tfoot>
-                                            <tr>
-                                                <td colspan="5">
-                                                    <button type="button" class="btn btn-success" id="repeat-raw_material" style=" ">+</button>
-                                                </td>
-                                            </tr>
-                                        </tfoot>
-                                        </table>
+									    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Product <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <select name="product_id" id="product_id" class="form-control">
+                                                    <option value="">Select</option>
+                                                    <?php if(isset($product)) { for ($k=0; $k < count($product); $k++) { ?>
+                                                            <option value="<?php echo $product[$k]->id; ?>" <?php if(isset($data)) { if($product[$k]->id==$data[0]->product_id) { echo 'selected'; } } ?>><?php echo $product[$k]->product_name; ?></option>
+                                                    <?php }} ?>
+                                                </select>
+                                                <!-- <input type="hidden" name="product_id" id="product_id" value="<?php //if(isset($data)) { echo  $data[0]->product_id; } ?>"/>
+                                                <input type="text" class="form-control load_product" name="product" id="product" placeholder="Type To Select Product...." value="<?php //if(isset($data)) { echo  $data[0]->product_name; } ?>"/> -->
+                                            </div>
+                                          
+                                        </div>
                                     </div>
-								</div>
+						
+									
+									
+                                    <div class="h-scroll">	
+                                        <div class="table-stripped form-group" style="padding:15px;">
+                                            <table class="table table-bordered" style="margin-bottom: 0px; ">
+                                            <thead>
+                                                <tr>
+                                                    <th  >Raw Material</th>
+                                                    <th width="200">Qty (In Kg)</th>
+                                                    <th width="75" style="display:none;">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="raw_material_details">
+                                            <?php $i=0; if(isset($raw_material_stock)) {
+                                                    for($i=0; $i<count($raw_material_stock); $i++) { ?>
+                                                <tr id="raw_material_<?php echo $i; ?>_row">
+                                                    <td>
+                                                        <select name="raw_material_id[]" class="form-control raw_material" id="raw_material_<?php echo $i;?>">
+                                                            <option value="">Select</option>
+                                                            <?php if(isset($raw_material)) { for ($k=0; $k < count($raw_material) ; $k++) { ?>
+                                                                    <option value="<?php echo $raw_material[$k]->id; ?>" <?php if($raw_material[$k]->id==$raw_material_stock[$i]->raw_material_id) { echo 'selected'; } ?>><?php echo $raw_material[$k]->rm_name; ?></option>
+                                                            <?php }} ?>
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control qty" name="qty[]" id="qty_<?php echo $i; ?>" placeholder="Qty" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->qty; } ?>"/>
+                                                    </td>
+                                                   <td style="text-align:center;  display:none;   vertical-align: middle;">
+                                                        <a id="raw_material_<?php echo $i; ?>_row_delete" class="delete_row" href="#"> <span class="fa trash fa-trash-o"  ></span></a>
+                                                    </td>
+                                                </tr>
+                                            <?php }} else { ?>
+                                                <tr id="raw_material_<?php echo $i; ?>_row">
+                                                    <td>
+                                                        <select name="raw_material_id[]" class="form-control raw_material" id="raw_material_<?php echo $i;?>">
+                                                            <option value="">Select</option>
+                                                            <?php if(isset($raw_material)) { for ($k=0; $k < count($raw_material) ; $k++) { ?>
+                                                                    <option value="<?php echo $raw_material[$k]->id; ?>"><?php echo $raw_material[$k]->rm_name; ?></option>
+                                                            <?php }} ?>
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control qty" name="qty[]" id="qty_<?php echo $i; ?>" placeholder="Qty" value=""/>
+                                                    </td>
+                                                    <td style="text-align:center;  display:none;   vertical-align: middle;">
+                                                        <a id="raw_material_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>
+                                                    </td>
+                                                </tr>
+                                            <?php } ?>
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <td colspan="5" style="display:none;">
+                                                        <button type="button" class="btn btn-success" id="repeat-raw_material" style=" ">+</button>
+                                                    </td>
+                                                </tr>
+                                            </tfoot>
+                                            </table>
+                                        </div>
+    								</div>
+
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Total (In Kg) <span class="asterisk_sign">*</span></label>
@@ -144,17 +204,7 @@
                                     </div>
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Product <span class="asterisk_sign">*</span></label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="product_id" id="product_id" class="form-control">
-                                                    <option value="">Select</option>
-                                                    <?php if(isset($product)) { for ($k=0; $k < count($product); $k++) { ?>
-                                                            <option value="<?php echo $product[$k]->id; ?>" <?php if(isset($data)) { if($product[$k]->id==$data[0]->product_id) { echo 'selected'; } } ?>><?php echo $product[$k]->product_name; ?></option>
-                                                    <?php }} ?>
-                                                </select>
-                                                <!-- <input type="hidden" name="product_id" id="product_id" value="<?php //if(isset($data)) { echo  $data[0]->product_id; } ?>"/>
-                                                <input type="text" class="form-control load_product" name="product" id="product" placeholder="Type To Select Product...." value="<?php //if(isset($data)) { echo  $data[0]->product_name; } ?>"/> -->
-                                            </div>
+                                            
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Qty In Bar <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control format_number" name="qty_in_bar" id="qty_in_bar" placeholder="Qty In Bar" value="<?php if (isset($data)) { echo $data[0]->qty_in_bar; } ?>"/>
@@ -202,6 +252,70 @@
                                             </div>
                                         </div>
                                     </div>
+									
+									
+                                	<div class="h-scroll">	
+                                        <div class="table-stripped form-group" style="padding:15px;">
+                                            <table class="table table-bordered" style="margin-bottom: 0px; ">
+                                            <thead>
+                                                <tr>
+                                                    <th>Document Title</th>
+                                                    <th>Upload Files</th>
+                                                  
+                                                 
+                                                    <th width="75">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="bar_image_details">
+                                            <?php $i=0; if(isset($batch_images)) {
+                                                    for($i=0; $i<count($batch_images); $i++) { ?>
+                                                <tr id="bar_image_<?php echo $i; ?>_row">
+    												<td>
+                                                        <input type="text" class="form-control title" name="title[]" id="title_<?php echo $i; ?>" placeholder="title"value="<?php if (isset($batch_images)) { echo $batch_images[$i]->title; } ?>">
+                                                    </td>
+                                                    <td>
+                                                        <div class="col-md-9 col-sm-9 col-xs-9">
+                                                            <input type="hidden" class="form-control" name="receivable_doc[]" value="<?php if(isset($batch_images)) {echo $batch_images[$i]->receivable_doc;} ?>" />
+                                                            <input type="hidden" class="form-control" name="image_path[]" value="<?php if(isset($batch_images)) {echo $batch_images[$i]->image;} ?>" />
+        												    <input type="file" class="fileinput btn btn-info btn-small bar_image" name="image_<?php echo $i; ?>" id="image_<?php echo $i; ?>" placeholder="image"/>
+                                                        </div>
+                                                        <?php if(isset($batch_images)) {if($batch_images[$i]->image!= '') { ?>
+                                                        <div class="col-md- col-sm-3 col-xs-3">
+        												    <a target="_blank" id="batch_doc_file_download<?php echo $i; ?>" href="<?php echo base_url().$batch_images[$i]->image; ?>"><span class="fa download fa-download" ></span></a>
+                                                        </div>
+        												<?php }} ?>
+    												</td>
+                                                   <td style="text-align:center;  vertical-align: middle;">
+                                                        <a id="bar_image_<?php echo $i; ?>_row_delete" class="delete_row" href="#"> <span class="fa trash fa-trash-o"  ></span></a>
+                                                    </td>
+                                                </tr>
+                                            <?php }} else { ?>
+                                                <tr id="bar_image_<?php echo $i; ?>_row">
+                                                    <td>
+                                                        <input type="text" class="form-control title" name="title[]" id="title_<?php echo $i; ?>" placeholder="title" value=""/>
+                                                    </td>
+                                                    <td>
+    												    <input type="hidden" class="form-control" name="receivable_doc[]" id="receivable_doc_<?php echo $i; ?>" value="" />
+                                                        <input type="hidden" class="form-control" name="image_path[]" value="" />
+                                                        <input type="file" class="fileinput btn btn-info btn-small  bar_image" name="image_<?php echo $i; ?>" id="image_<?php echo $i; ?>" placeholder="image" value=""/>
+                                                    </td>
+                                                    <td style="text-align:center;     vertical-align: middle;">
+                                                        <a id="bar_image_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>
+                                                    </td>
+                                                </tr>
+                                            <?php } ?>
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <td colspan="5">
+                                                        <button type="button" class="btn btn-success" id="repeat-bar_image" style=" ">+</button>
+                                                    </td>
+                                                </tr>
+                                            </tfoot>
+                                            </table>
+                                        </div>
+    								</div>
+									
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Remarks </label>
@@ -210,12 +324,12 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-										</div>
+                                    </div>
+									</div>
 										<br clear="all"/>
 									</div>
 								</div>
-                                <div class="panel-footer">
+                                <div class="panel-footer print_hide">
 									<a href="<?php echo base_url(); ?>index.php/batch_processing" class="btn btn-danger" type="reset" id="reset">Cancel</a>
                                     <button class="btn btn-success pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</button>
                                 </div>
@@ -255,14 +369,22 @@
                 $("#output_kg").blur(function(){
                     get_wastage();
                 });
+				 $("#no_of_batch").blur(function(){
+                    get_wastage();
+                });
                 $(".datepicker1").datepicker({ maxDate: 0,changeMonth: true,yearRange:'-100:+0',changeYear: true });
                 
                 addMultiInputNamingRules('#form_batch_processing_details', 'select[name="raw_material_id[]"]', { required: true }, "");
                 addMultiInputNamingRules('#form_batch_processing_details', 'input[name="qty[]"]', { required: true }, "");
             });
+            
+            function set_batch_no(){
+                $("#batch_id_as_per_fssai").val($("#batch_no_id option:selected").text());
+            }
 
             function get_wastage(){
                 var qty = 0;
+				
                 var total_qty = 0;
                 $('.qty').each(function(){
                     qty = parseFloat(get_number($(this).val(),2));
@@ -314,41 +436,202 @@
                 $("#anticipated_wastage").val(Math.round(anticipated_wastage*100)/100);
                 $("#wastage_variance").val(Math.round(wastage_variance*100)/100);
             }
-
-            jQuery(function(){
-                var counter = $('.raw_material').length;
-                $('#repeat-raw_material').click(function(event){
-                    event.preventDefault();
-                    var newRow = jQuery('<tr id="raw_material_'+counter+'_row">'+
+			
+			
+			
+			       // function get_no_of_batch()
+				   // {
+					
+					// var no_of_batch = $("#no_of_batch").val();
+					// console.log(no_of_batch);
+					 // var product_id = $("#product_id").val();
+					  // $.ajax({
+                    // url:BASE_URL+'index.php/batch_processing/get_data',
+                    // method:"post",
+                    // data:{no_of_batch:no_of_batch},
+                    // dataType:"json",
+                    // async:false,
+                    // success: function(data){
+                       
+                            // no_of_batch = data.no_of_batch;
+                          
+                       
+                    // },
+                    // error: function (response) {
+                        // var r = jQuery.parseJSON(response.responseText);
+                        // alert("Message: " + r.Message);
+                        // alert("StackTrace: " + r.StackTrace);
+                        // alert("ExceptionType: " + r.ExceptionType);
+                    // }
+                // });
+					
+				   // }
+			
+			
+			
+			
+			  $('#product_id').on('change', function() {
+                  // alert( this.value ); // or $(this).val()
+                  get_raw_material();
+                });
+				 $("#no_of_batch").blur(function(){
+                    get_raw_material();
+                });
+				
+			  function get_raw_material(){
+				  // get_no_of_batch();
+				  
+                var product_id = $('#product_id').val();
+					console.log(product_id);
+					var no_of_batch = $("#no_of_batch").val();
+					// var qty_per_batch = parseFloat(get_number($("#qty_per_batch").val(),2));
+				//var qty_per_batch=no_of_batch*qty_per_batch;
+                
+                $.ajax({
+                    url:BASE_URL+'index.php/batch_processing/get_batch_raw_material1',
+                    method:"post",
+                    data:{id:product_id,no_of_batch:no_of_batch},
+                    dataType:"json",
+                    async:false,
+                    success: function(data){
+						console.log(data.length);
+                        if(data.length>0){
+							
+                            // $("#raw_material_details > tbody").html("");
+                            // $("tbody", "#raw_material_details").remove();
+                            $("#raw_material_details").empty();
+							console.log('jsonData '+data);
+							
+							 var counter = $('.raw_material').length;
+					
+					var newRow='';
+					for (var i = 0; i < data.length; i++) {
+						 var parsejson = data[i];
+						 parsejson.qty_per_batch= no_of_batch * parsejson.qty_per_batch
+						 console.log(parsejson.rm_name);
+						newRow += '<tr id="raw_material_'+counter+'_row">'+
                                             '<td>'+
                                                 '<select name="raw_material_id[]" class="form-control raw_material" id="raw_material_'+counter+'">'+
-                                                    '<option value="">Select</option>'+
-                                                    '<?php if(isset($raw_material)) { for ($k=0; $k < count($raw_material) ; $k++) { ?>'+
-                                                            '<option value="<?php echo $raw_material[$k]->id; ?>"><?php echo $raw_material[$k]->rm_name; ?></option>'+
-                                                    '<?php }} ?>'+
+                                                    '<option value="'+parsejson.rm_id+'">'+parsejson.rm_name+'</option>'+
                                                 '</select>'+
                                             '</td>'+
                                             '<td>'+
-                                                '<input type="text" class="form-control qty" name="qty[]" id="qty_'+counter+'" placeholder="Qty" value=""/>'+
+                                                 '<input type="text" class="form-control qty" name="qty[]" id="qty_'+counter+'" placeholder="Qty" value="' +parsejson.qty_per_batch + '" onchange="get_amount(this)" />' + 
                                             '</td>'+
-                                            '<td style="text-align:center;  vertical-align: middle;">'+
+                                            '<td style="text-align:center; display:none; vertical-align: middle;">'+
                                                 '<a id="raw_material_'+counter+'_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>'+
                                             '</td>'+
+                                        '</tr>';
+										
+										   counter++;
+					}
+					console.log(newRow);
+					
+					 $('#raw_material_details').append(newRow);
+					
+              
+                 
+				
+					
+					 
+                            $('.format_number').keyup(function(){
+                                format_number(this);
+                            });
+                            // $(".qty").blur(function(){
+                                // get_amount($(this));
+                            // });
+                            // $(".rate").blur(function(){
+                                // get_amount($(this));
+                            // });
+                            $('.delete_row').click(function(event){
+                                delete_row($(this));
+                                get_wastage();
+                            });
+
+                           
+                        }
+                    },
+                    error: function (response) {
+                        var r = jQuery.parseJSON(response.responseText);
+                        alert("Message: " + r.Message);
+                        alert("StackTrace: " + r.StackTrace);
+                        alert("ExceptionType: " + r.ExceptionType);
+                    }
+                });
+            }
+					
+							
+							
+							
+							
+							
+							
+					
+            // jQuery(function(){
+                // var counter = $('.raw_material').length;
+                // $('#repeat-raw_material').click(function(event){
+                    // event.preventDefault();
+                    // var newRow = jQuery('<tr id="raw_material_'+counter+'_row">'+
+                                            // '<td>'+
+                                                // '<select name="raw_material_id[]" class="form-control raw_material" id="raw_material_'+counter+'">'+
+                                                    // '<option value="">Select</option>'+
+                                                    // '<?php if(isset($raw_material)) { for ($k=0; $k < count($raw_material) ; $k++) { ?>'+
+                                                            // '<option value="<?php echo $raw_material[$k]->id; ?>"><?php echo $raw_material[$k]->rm_name; ?></option>'+
+                                                    // '<?php }} ?>'+
+                                                // '</select>'+
+                                            // '</td>'+
+                                            // '<td>'+
+                                                // '<input type="text" class="form-control qty" name="qty[]" id="qty_'+counter+'" placeholder="Qty" value=""/>'+
+                                            // '</td>'+
+                                            // '<td style="text-align:center;  vertical-align: middle;">'+
+                                                // '<a id="raw_material_'+counter+'_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>'+
+                                            // '</td>'+
+                                        // '</tr>');
+                    // $('#raw_material_details').append(newRow);
+                    // $('.format_number').keyup(function(){
+                        // format_number(this);
+                    // });
+                    // $(".qty").blur(function(){
+                        // get_wastage();
+                    // });
+                    // $('.delete_row').click(function(event){
+                        // delete_row($(this));
+                        // get_wastage();
+                    // });
+                    // counter++;
+                // });
+            // });
+			
+			
+			       jQuery(function(){
+                var counter = $('.title').length;
+				
+                $('#repeat-bar_image').click(function(event){
+                    event.preventDefault();
+                    var newRow = jQuery('<tr id="bar_image_'+counter+'_row">'+
+                                          '<td>'+
+                                                '<input type="title" class="form-control title" name="title[]" id="title_'+counter+'" placeholder="title" value=""/>'+
+                                            '</td>'+
+                                            '<td>'+
+											 '<input type="hidden" class="form-control receivable_doc" name="receivable_doc[]" value="receivable_doc_'+counter+'" />'+
+                                                '<input type="file" class="fileinput btn btn-info btn-small bar_image" name="image_'+counter+'" id="image_'+counter+'" placeholder="image" value=""/>'+
+                                            '</td>'+
+                                            '<td style="text-align:center;  vertical-align: middle;">'+
+                                                '<a id="bar_image_'+counter+'_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>'+
+                                            '</td>'+
                                         '</tr>');
-                    $('#raw_material_details').append(newRow);
-                    $('.format_number').keyup(function(){
-                        format_number(this);
-                    });
-                    $(".qty").blur(function(){
-                        get_wastage();
-                    });
+                    $('#bar_image_details').append(newRow);
+                  
+                 
                     $('.delete_row').click(function(event){
                         delete_row($(this));
-                        get_wastage();
+                      
                     });
                     counter++;
                 });
             });
+			
+			
         </script>
     <!-- END SCRIPTS -->      
     </body>

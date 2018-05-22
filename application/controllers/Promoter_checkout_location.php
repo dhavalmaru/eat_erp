@@ -36,7 +36,6 @@ class Promoter_checkout_location extends CI_Controller{
         $data['id'] = $id;
         $data['dist_name'] = $this->promoter_checkout_location_model->get_dist_name($id);
 		
-		
         $result=$this->promoter_checkout_location_model->get_access();
         if(count($result)>0) {
             if($result[0]->r_insert == 1) {
@@ -72,7 +71,7 @@ class Promoter_checkout_location extends CI_Controller{
         }
     }
 
-	 function update_checkout() {
+    function update_checkout() {
 		// $id= $this->input->post('id');
 		// $date_of_visit=$this->input->post('date_of_visit');
    
@@ -80,11 +79,10 @@ class Promoter_checkout_location extends CI_Controller{
 
 		// $data = array(
 		
-		        // 'checkout_status'=> $this->input->post('checkout_status'),
+            // 'checkout_status'=> $this->input->post('checkout_status'),
 
-		             // );
- 
-		     }  
+        // );
+    }  
 
 	
     public function save($id=""){
@@ -103,10 +101,6 @@ class Promoter_checkout_location extends CI_Controller{
         echo $result;
     }
 
-	
-	
-	
-	
     public function email_promoter_stock(){
         $date = date('Y-m-d');
         // $date = '2017-06-10';
@@ -122,71 +116,64 @@ class Promoter_checkout_location extends CI_Controller{
         // $data = $this->sales_rep_model->get_sales_rep_details($date);
         // for($i=0; $i<count($data); $i++){
 
-            $loc_data = $this->export_model->generate_promoter_stock_report_cron($date, $date);
-            echo count($loc_data);
-            if(count($loc_data)>0){
-                $tr = '';
+        $loc_data = $this->export_model->generate_promoter_stock_report_cron($date, $date);
+        // echo count($loc_data);
+        if(count($loc_data)>0){
+            $tr = '';
 
-                for($j=0; $j<count($loc_data); $j++){
-                    $total_amount = $loc_data[$j]->butterscotch + $loc_data[$j]->mint + $loc_data[$j]->orange + $loc_data[$j]->chocopeanut +$loc_data[$j]->bambaiyachaat + $loc_data[$j]->mangoginger;
+            for($j=0; $j<count($loc_data); $j++){
+                $total_amount = $loc_data[$j]->butterscotch + $loc_data[$j]->mint + $loc_data[$j]->orange + $loc_data[$j]->chocopeanut +$loc_data[$j]->bambaiyachaat + $loc_data[$j]->mangoginger;
 
-
-
-                    $tr = $tr . '<tr>';
-                    $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->date_of_visit.'</td>';
-                    $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->sales_rep_name.'</td>';
-                    $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->store_name.'</td>';
-                    $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->in_time.'</td>';
-                    $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->out_time.'</td>';
-                    $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->orange.'</td>';
-                    $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->butterscotch.'</td>';
-                    $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->mint.'</td>';
-                    $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->chocopeanut.'</td>';
-                    $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->bambaiyachaat.'</td>';
-                    $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->mangoginger.'</td>';
-                    $tr = $tr . '<td style="text-align:center;">'.$total_amount.'</td>';
-                    $tr = $tr . '</tr>';
-                }
-
-
-                $table = '<table border="1" style="border-collapse: collapse;">
-                            <tr>
-                                <th style="text-align:center;">Date of Visit</th>
-                                <th style="text-align:center;">Promoter Name</th>
-                                <th style="text-align:center;">Store Name</th>
-                                <th style="text-align:center;">In Time</th>
-                                <th style="text-align:center;">Out Time</th>
-                                <th style="text-align:center;">Orange Bar</th>
-                                <th style="text-align:center;">Butterscotch Bar</th>
-                                <th style="text-align:center;">Mint Bar</th>
-                                <th style="text-align:center;">Choco Peanut Bar</th>
-                                <th style="text-align:center;">Bambaiya Chaat Bar</th>
-                                <th style="text-align:center;">Mango Ginger Bar</th>
-                                <th style="text-align:center;">Total</th>
-                            </tr>
-                            '.$tr.'
-                        </table>';
-
-
-                $message = '<html><head></head><body>Hi,<br /><br />
-                            Please find below Promoters Stock Report for - '.$date.'. <br /><br />'.$table.'<br/>
-                            <br />Thanks</body></html>';
-                // $to_email = 'anish.oberoi@eatanytime.in,rishit.sanghvi@otbconsulting.co.in,swapnil.darekar@otbconsulting.co.in,shailesh.kanathe@eatanytime.in,vaibhav.desai@eatanytime.in';
-                $bcc="dhaval.maru@otbconsulting.co.in";
-                $to_email = 'dhaval.maru@otbconsulting.co.in';
-                // $to_email = 'dhaval.maru@otbconsulting.co.in';
-                $mailSent=send_email($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc);
-
-                echo $message;
-                echo '<br/>';
-                echo $mailSent;
-                echo '<br/><br/>';
+                $tr = $tr . '<tr>';
+                $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->date_of_visit.'</td>';
+                $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->sales_rep_name.'</td>';
+                $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->store_name.'</td>';
+                $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->in_time.'</td>';
+                $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->out_time.'</td>';
+                $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->orange.'</td>';
+                $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->butterscotch.'</td>';
+                $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->mint.'</td>';
+                $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->chocopeanut.'</td>';
+                $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->bambaiyachaat.'</td>';
+                $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->mangoginger.'</td>';
+                $tr = $tr . '<td style="text-align:center;">'.$total_amount.'</td>';
+                $tr = $tr . '</tr>';
             }
-            // echo 'd'/;
+
+            $table = '<table border="1" style="border-collapse: collapse;">
+                        <tr>
+                            <th style="text-align:center;">Date of Visit</th>
+                            <th style="text-align:center;">Promoter Name</th>
+                            <th style="text-align:center;">Store Name</th>
+                            <th style="text-align:center;">In Time</th>
+                            <th style="text-align:center;">Out Time</th>
+                            <th style="text-align:center;">Orange Bar</th>
+                            <th style="text-align:center;">Butterscotch Bar</th>
+                            <th style="text-align:center;">Mint Bar</th>
+                            <th style="text-align:center;">Choco Peanut Bar</th>
+                            <th style="text-align:center;">Bambaiya Chaat Bar</th>
+                            <th style="text-align:center;">Mango Ginger Bar</th>
+                            <th style="text-align:center;">Total</th>
+                        </tr>
+                        '.$tr.'
+                    </table>';
+
+            $message = '<html><head></head><body>Hi,<br /><br />
+                        Please find below Promoters Stock Report for - '.$date.'. <br /><br />'.$table.'<br/>
+                        <br />Thanks</body></html>';
+            $to_email = 'rishit.sanghvi@eatanytime.in,swapnil.darekar@eatanytime.in';
+            $bcc="dhaval.maru@otbconsulting.co.in";
+            //$to_email = 'dhaval.maru@otbconsulting.co.in';
+            $mailSent=send_email($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc);
+
+            echo $message;
+            echo '<br/>';
+            echo $mailSent;
+            echo '<br/><br/>';
+        }
+        // echo 'd'/;
         // }
     }
-
-
 
     public function email_promoter_check_in(){
         $date = date('Y-m-d');
@@ -244,9 +231,9 @@ class Promoter_checkout_location extends CI_Controller{
                             Please find below Promoters Check in Report for - '.$date.'. <br /><br />'.$table.'<br/>
                             <br />Thanks</body></html>';
                             // echo $message;
-                // $to_email = 'rishit.sanghvi@otbconsulting.co.in,anish.oberoi@eatanytime.in,swapnil.darekar@otbconsulting.co.in,shailesh.kanathe@eatanytime.in,vaibhav.desai@eatanytime.in';
+                $to_email = 'rishit.sanghvi@eatanytime.in,swapnil.darekar@eatanytime.in';
                 $bcc="dhaval.maru@otbconsulting.co.in";
-                $to_email = 'dhaval.maru@otbconsulting.co.in';
+                // $to_email = 'dhaval.maru@otbconsulting.co.in';
                 // $to_email = 'dhaval.maru@otbconsulting.co.in';
                 $mailSent=send_email($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc);
 

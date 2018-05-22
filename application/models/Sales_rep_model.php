@@ -15,12 +15,29 @@ function get_access(){
     return $query->result();
 }
 
-function get_data($status='', $id=''){
-    if($status!=""){
+function get_manager_data($status='', $id='')
+
+{
+	$sql = "select * from sales_rep_master";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+
+function get_sales_rep_route($status='', $id=''){
+    $cond="";
+    if($status!="" && $status=='InActive'){
         $cond=" where status='".$status."'";
-    } else {
-        $cond="";
+    } else if($status=="Approved") {
+        $cond=" where status='Approved' ";
+    } else if($status!="") {
+        $cond=" where status='Approved' and sr_type='Sales Representative
+'";
     }
+   // else {
+       // $cond=" where status='Approved'";   
+   // }
+
 
     if($id!=""){
         if($cond=="") {
@@ -30,6 +47,44 @@ function get_data($status='', $id=''){
         }
     }
 
+     $sql = "select * from sales_rep_master where status='Approved' and sr_type='Sales Representative' order by modified_on desc";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+
+
+function get_data($status='', $id=''){
+    $cond="";
+    if($status!="" && $status=='InActive'){
+        $cond=" where status='".$status."'";
+    } else if($status=="Approved") {
+        $cond=" where status='Approved' ";
+    } else if($status!="") {
+        $cond=" where status='Approved' and sr_type='".$status."'";
+    }
+    // else {
+    //     $cond=" where status='Approved'";   
+    // }
+
+
+    if($id!=""){
+        if($cond=="") {
+            $cond=" where id='".$id."'";
+        } else {
+            $cond=$cond." and id='".$id."'";
+        }
+    }
+
+    $sql = "select * from sales_rep_master".$cond." order by modified_on desc";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_data_inactive($status='', $id=''){
+    
+    $cond=" where status='InActive'";   
+    
     $sql = "select * from sales_rep_master".$cond." order by modified_on desc";
     $query=$this->db->query($sql);
     return $query->result();
@@ -91,7 +146,8 @@ function save_data($id=''){
         'remarks' => $this->input->post('remarks'),
         'modified_by' => $curusr,
         'modified_on' => $now,
-        'sr_type' => $this->input->post('sr_type')
+        'sr_type' => $this->input->post('sr_type'),
+       // 'reporting_manager_id' => $this->input->post('reporting_manager_id')
     );
 
     if($id==''){
@@ -132,6 +188,7 @@ function save_data($id=''){
             'modified_by' => $curusr,
             'modified_on' => $now,
             'sales_rep_id' => $id
+			 
         );
 
         $this->db->insert('user_master',$data);
@@ -160,7 +217,9 @@ function check_sales_rep_availablity(){
 }
 
 function get_sales_rep_details($date){
-    $query=$this->db->query("select distinct A.sales_rep_id, B.sales_rep_name, B.email_id from sales_rep_location A left join sales_rep_master B on (A.sales_rep_id=B.id) where A.date_of_visit = '$date'");
+    $query=$this->db->query("select distinct A.sales_rep_id, B.sales_rep_name, B.email_id 
+                            from sales_rep_location A left join sales_rep_master B on (A.sales_rep_id=B.id) 
+                            where A.date_of_visit = '$date'");
     return $query->result();
 }
 }

@@ -52,39 +52,46 @@ class Reports extends CI_Controller
         $data['rep_grp_1']=0;
         $data['rep_grp_2']=0;
         $data['rep_grp_3']=0;
-        // $data['rep_grp_4']=0;
-        // $data['rep_grp_5']=0;
+		$data['rep_grp_4']=0;
+  //$data['rep_grp_5']=0;
         // $data['rep_grp_6']=0;
 
-        if (isset($data['rep_1'])) {if ($data['rep_1']==1) {if (isset($data['rep_1_view'])) {if ($data['rep_1_view']==1) $data['rep_grp_1']=1;}}}
-        if (isset($data['rep_2'])) {if ($data['rep_2']==1) {if (isset($data['rep_2_view'])) {if ($data['rep_2_view']==1) $data['rep_grp_1']=1;}}}
-        if (isset($data['rep_3'])) {if ($data['rep_3']==1) {if (isset($data['rep_3_view'])) {if ($data['rep_3_view']==1) $data['rep_grp_1']=1;}}}
-        if (isset($data['rep_4'])) {if ($data['rep_4']==1) {if (isset($data['rep_4_view'])) {if ($data['rep_4_view']==1) $data['rep_grp_1']=1;}}}
-        if (isset($data['rep_5'])) {if ($data['rep_5']==1) {if (isset($data['rep_5_view'])) {if ($data['rep_5_view']==1) $data['rep_grp_1']=1;}}}
-        if (isset($data['rep_6'])) {if ($data['rep_6']==1) {if (isset($data['rep_6_view'])) {if ($data['rep_6_view']==1) $data['rep_grp_1']=1;}}}
-        if (isset($data['rep_18'])) {if ($data['rep_18']==1) {if (isset($data['rep_18_view'])) {if ($data['rep_18_view']==1) $data['rep_grp_1']=1;}}}
+        //if (isset($data['rep_1'])) {if ($data['rep_1']==1) {if (isset($data['rep_1_view'])) {if ($data['rep_1_view']==1) $data['rep_grp_1']=1;}}}
+     
 
-        if (isset($data['rep_7'])) {if ($data['rep_7']==1) {if (isset($data['rep_7_view'])) {if ($data['rep_7_view']==1) $data['rep_grp_2']=1;}}}
-        if (isset($data['rep_8'])) {if ($data['rep_8']==1) {if (isset($data['rep_8_view'])) {if ($data['rep_8_view']==1) $data['rep_grp_2']=1;}}}
-        if (isset($data['rep_9'])) {if ($data['rep_9']==1) {if (isset($data['rep_9_view'])) {if ($data['rep_9_view']==1) $data['rep_grp_2']=1;}}}
+        if (isset($data['rep_18'])) {if ($data['rep_18']==1) {if (isset($data['rep_18_view'])) {if ($data['rep_18_view']==1) $data['rep_grp_1']=1;}}}
+        if (isset($data['rep_15'])) {if ($data['rep_15']==1) {if (isset($data['rep_15_view'])) {if ($data['rep_15_view']==1) $data['rep_grp_1']=1;}}}
+		
+		
+
+		if (isset($data['rep_2'])) {if ($data['rep_2']==1) {if (isset($data['rep_2_view'])) {if ($data['rep_2_view']==1) $data['rep_grp_2']=1;}}}
+        if (isset($data['rep_3'])) {if ($data['rep_3']==1) {if (isset($data['rep_3_view'])) {if ($data['rep_3_view']==1) $data['rep_grp_2']=1;}}}
+        if (isset($data['rep_4'])) {if ($data['rep_4']==1) {if (isset($data['rep_4_view'])) {if ($data['rep_4_view']==1) $data['rep_grp_2']=1;}}}
         if (isset($data['rep_10'])) {if ($data['rep_10']==1) {if (isset($data['rep_10_view'])) {if ($data['rep_10_view']==1) $data['rep_grp_2']=1;}}}
         if (isset($data['rep_11'])) {if ($data['rep_11']==1) {if (isset($data['rep_11_view'])) {if ($data['rep_11_view']==1) $data['rep_grp_2']=1;}}}
         if (isset($data['rep_12'])) {if ($data['rep_12']==1) {if (isset($data['rep_12_view'])) {if ($data['rep_12_view']==1) $data['rep_grp_2']=1;}}}
         
-        $data['rep_12']=0;
+   
 
-        if (isset($data['rep_13'])) {if ($data['rep_13']==1) {if (isset($data['rep_13_view'])) {if ($data['rep_13_view']==1) $data['rep_grp_2']=1;}}}
-        if (isset($data['rep_14'])) {if ($data['rep_14']==1) {if (isset($data['rep_14_view'])) {if ($data['rep_14_view']==1) $data['rep_grp_2']=1;}}}
-        if (isset($data['rep_15'])) {if ($data['rep_15']==1) {if (isset($data['rep_15_view'])) {if ($data['rep_15_view']==1) $data['rep_grp_2']=1;}}}
-        if (isset($data['rep_16'])) {if ($data['rep_16']==1) {if (isset($data['rep_16_view'])) {if ($data['rep_16_view']==1) $data['rep_grp_2']=1;}}}
-        if (isset($data['rep_17'])) {if ($data['rep_17']==1) {if (isset($data['rep_17_view'])) {if ($data['rep_17_view']==1) $data['rep_grp_2']=1;}}}
+        if (isset($data['rep_5'])) {if ($data['rep_5']==1) {if (isset($data['rep_5_view'])) {if ($data['rep_5_view']==1) $data['rep_grp_3']=1;}}}
+        if (isset($data['rep_6'])) {if ($data['rep_6']==1) {if (isset($data['rep_6_view'])) {if ($data['rep_6_view']==1) $data['rep_grp_3']=1;}}}
+        if (isset($data['rep_7'])) {if ($data['rep_7']==1) {if (isset($data['rep_7_view'])) {if ($data['rep_7_view']==1) $data['rep_grp_3']=1;}}}
+		  if (isset($data['rep_8'])) {if ($data['rep_8']==1) {if (isset($data['rep_8_view'])) {if ($data['rep_8_view']==1) $data['rep_grp_3']=1;}}}
+		    if (isset($data['rep_9'])) {if ($data['rep_9']==1) {if (isset($data['rep_9_view'])) {if ($data['rep_9_view']==1) $data['rep_grp_3']=1;}}}
+			  if (isset($data['rep_14'])) {if ($data['rep_14']==1) {if (isset($data['rep_14_view'])) {if ($data['rep_14_view']==1) $data['rep_grp_3']=1;}}}
+        if (isset($data['rep_16'])) {if ($data['rep_16']==1) {if (isset($data['rep_16_view'])) {if ($data['rep_16_view']==1) $data['rep_grp_3']=1;}}}
+        if (isset($data['rep_17'])) {if ($data['rep_17']==1) {if (isset($data['rep_17_view'])) {if ($data['rep_17_view']==1) $data['rep_grp_3']=1;}}}
         
-        $data['rep_17']=0;
+
+		
+		
+		 if (isset($data['rep_13'])) {if ($data['rep_13']==1) {if (isset($data['rep_13_view'])) {if ($data['rep_13_view']==1) $data['rep_grp_4']=1;}}}
+	if (isset($data['rep_20'])) {if ($data['rep_20']==1) {if (isset($data['rep_20_view'])) {if ($data['rep_20_view']==1) $data['rep_grp_4']=1;}}}
+
+		if (isset($data['rep_21'])) {if ($data['rep_21']==1) {if (isset($data['rep_21_view'])) {if ($data['rep_21_view']==1) $data['rep_grp_5']=1;}}}
 
         // if (isset($data['rep_19'])) {if ($data['rep_19']==1) {if (isset($data['rep_19_view'])) {if ($data['rep_19_view']==1) $data['rep_grp_4']=1;}}}
-        // if (isset($data['rep_20'])) {if ($data['rep_20']==1) {if (isset($data['rep_20_view'])) {if ($data['rep_20_view']==1) $data['rep_grp_4']=1;}}}
-
-        // if (isset($data['rep_21'])) {if ($data['rep_21']==1) {if (isset($data['rep_21_view'])) {if ($data['rep_21_view']==1) $data['rep_grp_5']=1;}}}
+      
         // if (isset($data['rep_22'])) {if ($data['rep_22']==1) {if (isset($data['rep_22_view'])) {if ($data['rep_22_view']==1) $data['rep_grp_5']=1;}}}
         // if (isset($data['rep_23'])) {if ($data['rep_23']==1) {if (isset($data['rep_23_view'])) {if ($data['rep_23_view']==1) $data['rep_grp_5']=1;}}}
         // if (isset($data['rep_24'])) {if ($data['rep_24']==1) {if (isset($data['rep_24_view'])) {if ($data['rep_24_view']==1) $data['rep_grp_5']=1;}}}
@@ -96,33 +103,45 @@ class Reports extends CI_Controller
         // if (isset($data['rep_29'])) {if ($data['rep_29']==1) {if (isset($data['rep_29_view'])) {if ($data['rep_29_view']==1) $data['rep_grp_6']=1;}}}
         // if (isset($data['rep_30'])) {if ($data['rep_30']==1) {if (isset($data['rep_30_view'])) {if ($data['rep_30_view']==1) $data['rep_grp_6']=1;}}}
 
-        // $data['rep_grp_1']=0;
-        // $data['rep_grp_2']=0;
-        $data['rep_grp_3']=0;
-        // $data['rep_grp_4']=0;
-        // $data['rep_grp_5']=0;
+        $data['rep_grp_1']=0;
+        $data['rep_grp_2']=0;
+		$data['rep_grp_3']=0;
+        $data['rep_grp_4']=0;
+      //  $data['rep_grp_5']=0;
         // $data['rep_grp_6']=0;
 
-        if (isset($data['rep_1_view'])) {if ($data['rep_1_view']==1) $data['rep_grp_1']=1;}
-        if (isset($data['rep_2_view'])) {if ($data['rep_2_view']==1) $data['rep_grp_1']=1;}
-        if (isset($data['rep_3_view'])) {if ($data['rep_3_view']==1) $data['rep_grp_1']=1;}
-        if (isset($data['rep_4_view'])) {if ($data['rep_4_view']==1) $data['rep_grp_1']=1;}
-        if (isset($data['rep_5_view'])) {if ($data['rep_5_view']==1) $data['rep_grp_1']=1;}
-        if (isset($data['rep_6_view'])) {if ($data['rep_6_view']==1) $data['rep_grp_1']=1;}
-        if (isset($data['rep_18_view'])) {if ($data['rep_18_view']==1) $data['rep_grp_1']=1;}
+        //if (isset($data['rep_1_view'])) {if ($data['rep_1_view']==1) $data['rep_grp_1']=1;}
 
-        if (isset($data['rep_7_view'])) {if ($data['rep_7_view']==1) $data['rep_grp_2']=1;}
-        if (isset($data['rep_8_view'])) {if ($data['rep_8_view']==1) $data['rep_grp_2']=1;}
-        if (isset($data['rep_9_view'])) {if ($data['rep_9_view']==1) $data['rep_grp_2']=1;}
+        if (isset($data['rep_18_view'])) {if ($data['rep_18_view']==1) $data['rep_grp_1']=1;}
+        if (isset($data['rep_15_view'])) {if ($data['rep_15_view']==1) $data['rep_grp_1']=1;}
+
+		
+
+		
+		
+		if (isset($data['rep_2_view'])) {if ($data['rep_2_view']==1) $data['rep_grp_2']=1;}
+        if (isset($data['rep_3_view'])) {if ($data['rep_3_view']==1) $data['rep_grp_2']=1;}
+        if (isset($data['rep_4_view'])) {if ($data['rep_4_view']==1) $data['rep_grp_2']=1;}
         if (isset($data['rep_10_view'])) {if ($data['rep_10_view']==1) $data['rep_grp_2']=1;}
         if (isset($data['rep_11_view'])) {if ($data['rep_11_view']==1) $data['rep_grp_2']=1;}
         if (isset($data['rep_12_view'])) {if ($data['rep_12_view']==1) $data['rep_grp_2']=1;}
+		
+		
+		
+		if (isset($data['rep_5_view'])) {if ($data['rep_5_view']==1) $data['rep_grp_3']=1;}
+        if (isset($data['rep_6_view'])) {if ($data['rep_6_view']==1) $data['rep_grp_3']=1;}
+        if (isset($data['rep_7_view'])) {if ($data['rep_7_view']==1) $data['rep_grp_3']=1;}
+        if (isset($data['rep_8_view'])) {if ($data['rep_8_view']==1) $data['rep_grp_2']=1;}
+        if (isset($data['rep_9_view'])) {if ($data['rep_9_view']==1) $data['rep_grp_3']=1;}
+        if (isset($data['rep_14_view'])) {if ($data['rep_14_view']==1) $data['rep_grp_3']=1;}
+		if (isset($data['rep_16_view'])) {if ($data['rep_16_view']==1) $data['rep_grp_3']=1;}
+        if (isset($data['rep_17_view'])) {if ($data['rep_17_view']==1) $data['rep_grp_3']=1;}
 
-        if (isset($data['rep_13_view'])) {if ($data['rep_13_view']==1) $data['rep_grp_2']=1;}
-        if (isset($data['rep_14_view'])) {if ($data['rep_14_view']==1) $data['rep_grp_2']=1;}
-        if (isset($data['rep_15_view'])) {if ($data['rep_15_view']==1) $data['rep_grp_2']=1;}
-        if (isset($data['rep_16_view'])) {if ($data['rep_16_view']==1) $data['rep_grp_2']=1;}
-        if (isset($data['rep_17_view'])) {if ($data['rep_17_view']==1) $data['rep_grp_2']=1;}
+        if (isset($data['rep_13_view'])) {if ($data['rep_13_view']==1) $data['rep_grp_4']=1;}
+        if (isset($data['rep_20_view'])) {if ($data['rep_20_view']==1) $data['rep_grp_4']=1;}
+        if (isset($data['rep_21_view'])) {if ($data['rep_21_view']==1) $data['rep_grp_4']=1;}
+
+ 
 
         // if (isset($data['rep_19_view'])) {if ($data['rep_19_view']==1) $data['rep_grp_4']=1;}
         // if (isset($data['rep_20_view'])) {if ($data['rep_20_view']==1) $data['rep_grp_4']=1;}
@@ -141,7 +160,7 @@ class Reports extends CI_Controller
 
         // $data['rep_grp_1']=0;
         // $data['rep_grp_2']=0;
-        $data['rep_grp_3']=0;
+       // $data['rep_grp_3']=0;
 
         load_view('reports/view_reports', $data);
     }

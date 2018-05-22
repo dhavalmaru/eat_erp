@@ -36,7 +36,7 @@ class Promoter_location extends CI_Controller{
         if(count($result)>0) {
             if($result[0]->r_insert == 1) {
                 $data['access'] = $this->promoter_location_model->get_access();
-                $data['distributor'] = $this->promoter_location_model->get_dist_list('Approved');
+                $data['distributor'] = $this->promoter_location_model->get_dist_list();
 
                 load_view('promoter_location/promoter_location_details', $data);
             } else {

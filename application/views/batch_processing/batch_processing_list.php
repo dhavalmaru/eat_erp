@@ -63,13 +63,14 @@
 											<th width="80">Qty In Bar</th>
 											<th width="150">Actual Wastage (In Kg)</th>
 											<th width="100">Creation Date</th>
+											<th width="105">View Receipt</th>
 										</tr>
 									</thead>
 									<tbody>
 										<?php for ($i=0; $i < count($data); $i++) { ?>
 										<tr>
 											<td  style="text-align:center;"><?php echo $i+1; ?></td>
-											<td><a href="<?php echo base_url().'index.php/batch_processing/edit/'.$data[$i]->id; ?>"><?php echo $data[$i]->batch_id_as_per_fssai; ?></a></td>
+											<td><a href="<?php echo base_url().'index.php/batch_processing/edit/'.$data[$i]->id; ?>"><?php echo $data[$i]->batch_no; ?></a></td>
 											<td>
                                                 <span style="display:none;">
                                                     <?php echo (($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('Ymd',strtotime($data[$i]->date_of_processing)):''); ?>
@@ -84,7 +85,9 @@
 												<span style="display:none;">
                                                     <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
                                                 </span>
-												<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
+												<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?>
+											</td>
+											<td><a href="<?php echo base_url().'index.php/batch_processing/view_batch_processing_receipt/'.$data[$i]->id; ?>" target="_blank"><span class="fa fa-file-pdf-o" style="font-size:20px;"></span></a></td>
 										</tr>
 										<?php } ?>
 									</tbody>

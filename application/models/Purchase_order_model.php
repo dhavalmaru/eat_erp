@@ -132,15 +132,16 @@ function save_data($id=''){
 
     $raw_material=$this->input->post('raw_material[]');
     $qty=$this->input->post('qty[]');
+    $hsn_code=$this->input->post('hsn_code[]');
     $rate=$this->input->post('rate[]');
-	$hsn=$this->input->post('hsn[]');
-     $cgst=$this->input->post('cgst[]');
-	  $sgst=$this->input->post('sgst[]');
-	   $igst=$this->input->post('igst[]');
-	 // $vendor_id=$this->input->post('vendor_id');
-	
+    $tax_per=$this->input->post('tax_per[]');
     $amount=$this->input->post('amount[]');
-
+    $cgst_amt=$this->input->post('cgst_amt[]');
+    $sgst_amt=$this->input->post('sgst_amt[]');
+    $igst_amt=$this->input->post('igst_amt[]');
+    $tax_amt=$this->input->post('tax_amt[]');
+    $total_amt=$this->input->post('total_amt[]');
+	
     for ($k=0; $k<count($raw_material); $k++) {
         if(isset($raw_material[$k]) and $raw_material[$k]!="") {
             $item_id=$raw_material[$k];
@@ -148,12 +149,15 @@ function save_data($id=''){
                         'purchase_order_id' => $id,
                         'item_id' => $item_id,
                         'qty' => format_number($qty[$k],2),
-						'hsn'=>$hsn[$k],
+						'hsn_code'=>$hsn_code[$k],
                         'rate' => format_number($rate[$k],2),
-						 'cgst' => format_number($cgst[$k],2),
-						  'sgst' => format_number($sgst[$k],2),
-                        'igst' => format_number($igst[$k],2),
-                        'amount' => format_number($amount[$k],2)
+                        'tax_per' => format_number($tax_per[$k],2),
+                        'amount' => format_number($amount[$k],2),
+                        'cgst_amt' => format_number($cgst_amt[$k],2),
+                        'sgst_amt' => format_number($sgst_amt[$k],2),
+                        'igst_amt' => format_number($igst_amt[$k],2),
+                        'tax_amt' => format_number($tax_amt[$k],2),
+                        'total_amt' => format_number($total_amt[$k],2)
                     );
             $this->db->insert('purchase_order_items', $data);
         }
@@ -164,8 +168,6 @@ function save_data($id=''){
     $logarray['cnt_name']='Purchase_Order';
     $logarray['action']=$action;
     $this->user_access_log_model->insertAccessLog($logarray);
-
-    // $this->tax_invoice_model->generate_tax_invoice($id);
 }
 
 function save_payment_details($id=''){

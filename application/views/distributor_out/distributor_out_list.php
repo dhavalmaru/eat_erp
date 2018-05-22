@@ -10,64 +10,69 @@
         <link rel="icon" href="<?php echo base_url(); ?>favicon.ico" type="image/x-icon" />
         <!-- END META SECTION -->
         
-           <!-- CSS INCLUDE -->        
-          <link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>css/theme-blue.css"/>
+        <!-- CSS INCLUDE -->        
+        <link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>css/theme-blue.css"/>
 		<link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>mobile-menu/vendor-1437d0659c.css"/>
 		<link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url().'css/custome_vj_css.css'; ?>"/>    
         <!-- EOF CSS INCLUDE -->    
 		<style>
-		.sidenav1 {
-   height: 50%;
-    width: 0;
-    position: fixed;
-    z-index: 1;
-    top: 0;
-    left: 0;
-    background-color: #111;
-    overflow-x: hidden;
-    transition: 0.5s;
-    padding-top: 60px;
-	margin-top: 100px;
-}
-
-.sidenav1 a {
-    padding: 8px 8px 8px 32px;
-    text-decoration: none;
-    font-size: 15px;
-    color: #818181;
-    display: block;
-    transition: 0.3s;
-}
-
-.sidenav1 a:hover {
-    color: #f1f1f1;
-}
-
-.sidenav1 .closebtn {
-    position: absolute;
-    top: 0;
-    right: 25px;
-    font-size: 50px;
-    margin-left: 50px;
-}
-
-@media screen and (max-height: 450px) {
-  .sidenav1 {padding-top: 15px;}
-  .sidenav1 a {font-size: 18px;}
-}
-		</style>
-		<style>
-		.nav-contacts { margin-top:-5px;}
-		.heading-h3 { border:none!important;}
-		@media only screen and (min-width:711px) and (max-width:722px) {.u-bgColorBreadcrumb {
-		    background-color: #eee;
-		    padding-bottom: 13px;
-		}}
-		@media only screen and (min-width:813px) and (max-width:822px) {.u-bgColorBreadcrumb {
-		    background-color: #eee;
-		    padding-bottom:50px!important;
-		}}
-        #customers10 {width: 100% !important;}
+    		.sidenav1 {
+               height: 50%;
+                width: 0;
+                position: fixed;
+                z-index: 1;
+                top: 0;
+                left: 0;
+                background-color: #111;
+                overflow-x: hidden;
+                transition: 0.5s;
+                padding-top: 60px;
+            	margin-top: 100px;
+            }
+            .sidenav1 a {
+                padding: 8px 8px 8px 32px;
+                text-decoration: none;
+                font-size: 15px;
+                color: #818181;
+                display: block;
+                transition: 0.3s;
+            }
+            .sidenav1 a:hover {
+                color: #f1f1f1;
+            }
+            .sidenav1 .closebtn {
+                position: absolute;
+                top: 0;
+                right: 25px;
+                font-size: 50px;
+                margin-left: 50px;
+            }
+            @media screen and (max-height: 450px) {
+              .sidenav1 {padding-top: 15px;}
+              .sidenav1 a {font-size: 18px;}
+            }
+    		</style>
+    		<style>
+    		.nav-contacts { margin-top:-5px;}
+    		.heading-h3 { border:none!important;}
+    		@media only screen and (min-width:711px) and (max-width:722px) {
+                .u-bgColorBreadcrumb {
+        		    background-color: #eee;
+        		    padding-bottom: 13px;
+        		}
+            }
+    		@media only screen and (min-width:813px) and (max-width:822px) {
+                .u-bgColorBreadcrumb {
+        		    background-color: #eee;
+        		    padding-bottom:50px!important;
+        		}
+            }
+            @media only screen and (min-width:999px) {
+                .mysidenav {
+                    display: none;
+                }
+            }
+            #customers10 {width: 100% !important;}
 		</style>	
     </head>
     <body>
@@ -110,7 +115,8 @@
             <?php if($status=='pending_for_approval') { ?>
                 <form id="form_distributor_out_list" role="form" class="form-horizontal" method="post" action="<?php echo base_url().'index.php/distributor_out/authorise'; ?>">
             <?php } else if($status=='pending_for_delivery') { ?>
-                <form id="form_distributor_out_list" role="form" class="form-horizontal" method="post" action="<?php echo base_url().'index.php/distributor_out/set_delivery_status'; ?>" target="_blank">
+                <!-- <form id="form_distributor_out_list" role="form" class="form-horizontal" method="post" action="<?php //echo base_url().'index.php/distributor_out/set_delivery_status'; ?>" target="_blank"> -->
+                    <form id="form_distributor_out_list" role="form" class="form-horizontal" method="post" action="<?php echo base_url().'index.php/distributor_out/get_batch_details'; ?>" target="_blank">
             <?php } else if($status=='gp_issued') { ?>
                 <form id="form_distributor_out_list" role="form" class="form-horizontal" method="post" action="<?php echo base_url().'index.php/distributor_out/set_delivery_status2'; ?>">
             <?php } else { ?>
@@ -126,12 +132,30 @@
                     </div>						 
     				<div class="heading-h3-heading mobile-head">
                         <div class="pull-right btn-margin"> 
-                            <?php $this->load->view('templates/download');?>    
+                            <?php //$this->load->view('templates/download');?>
+                            <a class="btn btn-danger btn-padding dropdown-toggle" href="<?php echo base_url().'index.php/export/generate_distributor_out_sku_details/'.$status; ?>"><i class="fa fa-download"></i> &nbsp;Download</a>
                         </div>
                         <div class="pull-right btn-margin" style="margin-left: 5px; <?php if(($access[0]->r_edit=='1' && ($status=='pending_for_delivery' || $status=='gp_issued'))) echo ''; else echo 'display: none;';?>">
-                            <a class="btn btn-success btn-block btn-padding" data-toggle="modal" href="#myModal">
-                                <span class="fa fa-shopping-cart"></span> <?php if($status=='pending_for_delivery') echo 'Select Delivery Person'; else if($status=='gp_issued') echo 'Select Delivery Status'; else if($status=='pending_for_approval') echo 'Authorise Records'; ?>
-                            </a>
+                            <!-- <a class="btn btn-success btn-block btn-padding" data-toggle="modal" href="#myModal">
+                                <span class="fa fa-shopping-cart"></span> <?php //if($status=='pending_for_delivery') echo 'Select Delivery Person'; else if($status=='gp_issued') echo 'Select Delivery Status'; else if($status=='pending_for_approval') echo 'Authorise Records'; ?>
+                            </a> -->
+                            <!-- <button class="btn btn-success btn-block btn-padding" type="button" onClick="get_batch_details();">
+                                <span class="fa fa-shopping-cart"></span> <?php //if($status=='pending_for_delivery') echo 'Select Delivery Person'; else if($status=='gp_issued') echo 'Select Delivery Status'; else if($status=='pending_for_approval') echo 'Authorise Records'; ?>
+                            </button> -->
+
+                            <?php if($status=='pending_for_delivery') { ?>
+                                <button class="btn btn-success" type="submit">
+                                    <span class="fa fa-shopping-cart"></span> Select Delivery Person
+                                </button>
+                            <?php } else if($status=='gp_issued') { ?>
+                                <button class="btn btn-success btn-block btn-padding" type="button" onClick="get_batch_details();">
+                                    <span class="fa fa-shopping-cart"></span> Select Delivery Status
+                                </button>
+                            <?php } else if($status=='pending_for_approval') { ?>
+                                <button class="btn btn-success btn-block btn-padding" type="button" onClick="get_batch_details();">
+                                    <span class="fa fa-shopping-cart"></span> Authorise Records
+                                </button>
+                            <?php } ?>
                         </div>
                         <div class="pull-right btn-margin" style="<?php if($access[0]->r_insert=='0' || $status=='pending_for_delivery' || $status=='gp_issued' || $status=='delivered_not_complete' || $status=='pending_for_approval') echo 'display: none;';?>">
                             <a class="btn btn-success btn-block btn-padding" href="<?php echo base_url(); ?>index.php/distributor_out/add">
@@ -245,8 +269,10 @@
                                                         <th width="65" align="center">Sr. No.</th>
                                                         <th width="156">Date Of processing</th>
     													<th width="130">Invoice No</th>
+                                                        <th width="130">Invoice Date</th>
     													<th width="140">Depot Name</th>
     													<th width="140">Distributor Name</th>
+                                                        <th width="140">PO No</th>
                                                         <th width="140">Location</th>
     													<th width="220" >Sales Representative Name</th>
     													<th width="120" >Amount (In Rs)</th>
@@ -275,10 +301,10 @@
     		<!-- END PAGE CONTENT -->
 
             <!-- Modal -->
-            <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal fade" id="myModal" role="dialog" style="<?php if($status=='pending_for_delivery') {echo 'padding-top:0px;';} ?>">
                 <div class="modal-dialog">
                     <!-- Modal content-->
-                    <div class="modal-content">
+                    <div class="modal-content" style="<?php if($access[0]->r_edit=='1' && $status=='pending_for_delivery') { echo 'width: 500px;'; } ?>">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal">&times;</button>
                             <h4 class="modal-title">
@@ -308,8 +334,8 @@
                                 <div class="">
                                     <select name="sales_rep_id" id="sales_rep_id" class="form-control">
                                         <option value="">Select</option>
-                                        <?php if(isset($sales_rep)) { for ($k=0; $k < count($sales_rep) ; $k++) { ?>
-                                                <option value="<?php echo $sales_rep[$k]->id; ?>"><?php echo $sales_rep[$k]->sales_rep_name; ?></option>
+                                        <?php if(isset($sales_rep1)) { for ($k=0; $k < count($sales_rep1) ; $k++) { ?>
+                                                <option value="<?php echo $sales_rep1[$k]->id; ?>"><?php echo $sales_rep1[$k]->sales_rep_name;?></option>
                                         <?php }} ?>
                                     </select>
                                     <input type="hidden" name="delivery_status" id="delivery_status" value="GP Issued" />
@@ -361,6 +387,7 @@
     <script type="text/javascript">
         var BASE_URL="<?php echo base_url()?>";
     </script>
+    <script type="text/javascript" src="<?php echo base_url(); ?>js/validations.js"></script>
 	<script>
     	$(document).ready(function() {               
 
@@ -410,11 +437,22 @@
             }
         });
 
+        // $('#btn_save').click(function(){
+        //     $('#myModal').modal('toggle');
+        //     blFlag = true;
+        // });
+        
         $('#btn_save').click(function(){
-            $('#myModal').modal('toggle');
-            blFlag = true;
-        });
+            // console.log($("#form_distributor_out_list").valid());
 
+            if (!$("#form_distributor_out_list").valid()) {
+                return false;
+            } else {
+                $('#myModal').modal('toggle');
+                blFlag = true;
+            }
+        });
+        
         // $('input[name="check_val[]"]').on('ifChanged', function(event){
         //     var v = $(this).is(':checked')?$(this).val():'false';
         //     var id = $(this).attr('id');
@@ -426,6 +464,61 @@
             var id = elem.id;
             $('#input_'+id).val(v);
         };
+
+        var get_batch_details = function() {
+            $('#myModal').modal('show');
+
+            // console.log('true');
+
+            // $.ajax({
+            //     url:BASE_URL+'index.php/Distributor_out/get_batch_details',
+            //     method:"post",
+            //     data:$('#form_distributor_out_list').serialize(),
+            //     dataType:"html",
+            //     async:false,
+            //     success: function(data){
+            //         $('#batch_details').html(data);
+
+            //         addMultiInputNamingRules('#form_distributor_out_list', 'input[name="batch_no[]"]', { required: true }, "");
+            //     },
+            //     error: function (response) {
+            //         var r = jQuery.parseJSON(response.responseText);
+            //         alert("Message: " + r.Message);
+            //         alert("StackTrace: " + r.StackTrace);
+            //         alert("ExceptionType: " + r.ExceptionType);
+            //     }
+            // });
+        }
+
+        var set_batch = function(elem){
+            var id = elem.id;
+            var index = id.substr(id.lastIndexOf('_')+1);
+
+            // console.log(index);
+
+            var batch_no = $('#batch_no_'+index).val();
+            var item_type = $('#item_type_'+index).val();
+            var item_id = $('#item_id_'+index).val();
+
+            var counter = $('.batch_no').length;
+
+            // console.log(batch_no);
+            // console.log(counter);
+
+            var check_item_type = '';
+            var check_item_id = '';
+
+            for(var i=0; i<counter; i++){
+                if(i!=index){
+                    check_item_type = $('#item_type_'+i).val();
+                    check_item_id = $('#item_id_'+i).val();
+
+                    if(check_item_type==item_type && check_item_id==item_id){
+                        $('#batch_no_'+i).val(batch_no);
+                    }
+                }
+            }
+        }
 
         // $('#form_distributor_out_list').on('submit', function(e) {
         //     e.preventDefault();
@@ -450,7 +543,7 @@
                 if(status == 'gp_issued') {
                     columnDefs = [        
                                     {
-                                        "targets": [15],
+                                        "targets": [17],
                                         "visible": false,
                                         "searchable": false
                                     }
@@ -463,12 +556,12 @@
                                         "searchable": false
                                     },       
                                     {
-                                        "targets": [14],
+                                        "targets": [16],
                                         "visible": false,
                                         "searchable": false
                                     }, 
                                     {
-                                        "targets": [15],
+                                        "targets": [17],
                                         "visible": false,
                                         "searchable": false
                                     }
@@ -476,12 +569,12 @@
                 } else {
                     columnDefs = [      
                                     {
-                                        "targets": [14],
+                                        "targets": [16],
                                         "visible": false,
                                         "searchable": false
                                     },
                                     {
-                                        "targets": [15],
+                                        "targets": [17],
                                         "visible": false,
                                         "searchable": false
                                     }
@@ -497,12 +590,12 @@
                                         // "defaultContent": '<input type="hidden" id="input_check_0" name="check[]" value="false" />'
                                     },
                                     {
-                                        "targets": [14],
+                                        "targets": [16],
                                         "visible": false,
                                         "searchable": false
                                     },
                                     {
-                                        "targets": [15],
+                                        "targets": [17],
                                         "visible": false,
                                         "searchable": false
                                     }
@@ -652,12 +745,12 @@
 			}
 		}
 		function openNav() {
-    document.getElementById("mySidenav").style.width = "250px";
-}
+            document.getElementById("mySidenav").style.width = "250px";
+        }
 
-function closeNav() {
-    document.getElementById("mySidenav").style.width = "0";
-}
+        function closeNav() {
+            document.getElementById("mySidenav").style.width = "0";
+        }
     </script>
 	<!-- END SCRIPTS -->      
     </body>

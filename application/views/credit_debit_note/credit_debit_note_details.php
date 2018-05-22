@@ -56,7 +56,10 @@
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
                                                 <input type="hidden" class="form-control" name="ref_id" id="ref_id" value="<?php if(isset($data)) echo $data[0]->ref_id;?>"/>
+                                                <input type="hidden" class="form-control" name="ref_no" id="ref_no" value="<?php if(isset($data)) { echo $data[0]->ref_no; } ?>"/>
+                                                <input type="hidden" class="form-control" name="ref_date" id="ref_date" value="<?php if(isset($data)) { echo (($data[0]->ref_date!=null && $data[0]->ref_date!='')?date('d/m/Y',strtotime($data[0]->ref_date)):''); } ?>"/>
                                                 <input type="text" class="form-control datepicker1" name="date_of_transaction" id="date_of_transaction" placeholder="Date" value="<?php if(isset($data)) echo (($data[0]->date_of_transaction!=null && $data[0]->date_of_transaction!='')?date('d/m/Y',strtotime($data[0]->date_of_transaction)):''); ?>"/>
+
                                             </div>
 										</div>
 									</div>
@@ -70,9 +73,16 @@
                                                             <option value="<?php echo $distributor[$k]->id; ?>" <?php if(isset($data)) { if($distributor[$k]->id==$data[0]->distributor_id) { echo 'selected'; } } ?>><?php echo $distributor[$k]->distributor_name; ?></option>
                                                     <?php }} ?>
                                                 </select>
+                                                <input type="hidden" class="form-control" name="state" id="state" value=""/>
+                                                <input type="hidden" class="form-control" name="state_code" id="state_code" value=""/>
                                                 <!-- <input type="hidden" name="distributor_id" id="distributor_id" value="<?php //if(isset($data)) { echo $data[0]->distributor_id; } ?>"/>
                                                 <input type="text" class="form-control load_distributor" name="distributor" id="distributor" placeholder="Type To Select Distributor...." value="<?php //if(isset($data)) { echo $data[0]->distributor_name; } ?>"/> -->
                                             </div>
+                                            
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Total Outstanding (In Rs) <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="total_outstanding" id="total_outstanding" placeholder="Total Outstanding" value="" readonly />
@@ -88,9 +98,54 @@
                                                     <option value="Debit Note" <?php if(isset($data)) {if ($data[0]->transaction=='Debit Note') echo 'selected';}?>>Debit Note</option>
                                                 </select>
                                             </div>
+                                            
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Amount (In Rs) <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="amount" id="amount" placeholder="Amount" value="<?php if(isset($data)) echo $data[0]->amount;?>" />
+                                                <input type="text" class="form-control" name="amount_without_tax" id="amount_without_tax" placeholder="Amount" value="<?php if(isset($data)) echo $data[0]->amount_without_tax;?>" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Tax (In %) <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="tax" id="tax" placeholder="Tax" value="<?php if(isset($data)) echo $data[0]->tax;?>" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">IGST (In Rs) <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="igst" id="igst" placeholder="IGST" value="<?php if(isset($data)) echo $data[0]->igst;?>" readonly />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">CGST (In Rs) <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="cgst" id="cgst" placeholder="CGST" value="<?php if(isset($data)) echo $data[0]->cgst;?>" readonly />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">SGST (In Rs) <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="sgst" id="sgst" placeholder="SGST" value="<?php if(isset($data)) echo $data[0]->sgst;?>" readonly />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Total Amount (In Rs) <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="total_amount" id="total_amount" placeholder="Total Amount" value="<?php if(isset($data)) echo $data[0]->amount;?>" readonly />
                                             </div>
                                         </div>
                                     </div>
@@ -154,7 +209,7 @@
             $(document).ready(function(){
                 if(!$('#btn_submit').is(':visible')){
                     $("input[type!='hidden']").attr("disabled", true);
-                    $("select:visible").attr("disabled", true);
+                    // $("select:visible").attr("disabled", true);
                     $("textarea").attr("disabled", true);
 
                     $("#btn_approve").attr("disabled", false);
@@ -164,11 +219,70 @@
 
                 $("#distributor_id").change(function(){
                     get_distributor_details();
+                    get_tax();
                 });
+
+                $("#amount_without_tax").change(function(){
+                    get_tax();
+                });
+
+                $("#tax").change(function(){
+                    get_tax();
+                });
+
                 $(".datepicker1").datepicker({ maxDate: 0,changeMonth: true,yearRange:'-100:+0',changeYear: true });
 
                 get_distributor_details();
             });
+
+
+            function get_tax(){
+                $.ajax({
+                    url:BASE_URL+'index.php/Distributor/get_data',
+                    method:"post",
+                    data:{id:$('#distributor_id').val()},
+                    dataType:"json",
+                    async:false,
+                    success: function(data){
+                        if(data.result==1){
+                            if(!isNaN($('#amount_without_tax').val()) && $('#amount_without_tax').val()!='' && !isNaN($('#tax').val()) && $('#tax').val()!=''){
+                                if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550") {
+                                    var state = data.state;
+                                    var state_code = data.state_code;
+                                    if (state_code=='27')
+                                    {
+                                        $('#igst').val("0");
+                                        var tax = $('#tax').val();
+                                        var amount = $('#amount_without_tax').val();
+                                        cgst=(tax/2)*amount/100;
+                                        sgst=(tax/2)*amount/100;
+                                        $('#cgst').val(cgst);
+                                        $('#sgst').val(sgst);
+                                        var total_amount = parseInt(amount)+parseInt(cgst)+parseInt(sgst);
+                                        $('#total_amount').val(total_amount);
+                                    }
+                                    else {
+                                        $('#cgst').val('0');
+                                        $('#sgst').val('0');
+                                        var tax = $('#tax').val();
+                                        var amount = $('#amount_without_tax').val();
+                                        igst=tax*amount/100;
+                                        $('#igst').val(igst);
+                                        var total_amount = parseInt(amount)+parseInt(igst);
+                                        $('#total_amount').val(total_amount);
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    error: function (response) {
+                        var r = jQuery.parseJSON(response.responseText);
+                        alert("Message: " + r.Message);
+                        alert("StackTrace: " + r.StackTrace);
+                        alert("ExceptionType: " + r.ExceptionType);
+                    }
+                });
+            }
 
             function get_distributor_details(){
                 var distributor_id = $('#distributor_id').val();

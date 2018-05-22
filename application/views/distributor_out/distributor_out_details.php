@@ -56,6 +56,7 @@
                                                 <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) {if(strrpos($data[0]->d_id, "d_") !== false) echo $data[0]->id;}?>"/>
                                                 <input type="hidden" class="form-control" name="ref_id" id="ref_id" value="<?php if(isset($data)) echo $data[0]->ref_id;?>"/>
                                                 <input type="hidden" name="invoice_no" id="invoice_no" value="<?php if(isset($data)) { echo $data[0]->invoice_no; } ?>"/>
+                                                
                                                 <input type="text" class="form-control datepicker1" name="date_of_processing" id="date_of_processing" placeholder="Date" value="<?php if(isset($data)) echo (($data[0]->date_of_processing!=null && $data[0]->date_of_processing!='')?date('d/m/Y',strtotime($data[0]->date_of_processing)):date('d/m/Y')); else echo date('d/m/Y'); ?>"/>
                                             </div>
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Depot <span class="asterisk_sign">*</span></label>
@@ -547,6 +548,15 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="form-group" <?php if(isset($data)) echo 'style="display:block;"'; else echo 'style="display:none;"';?> >
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Invoice Date <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control datepicker1" name="invoice_date" id="invoice_date" placeholder="Date" value="<?php if(isset($data)) echo (($data[0]->invoice_date!=null && $data[0]->invoice_date!='')?date('d/m/Y',strtotime($data[0]->invoice_date)):date('d/m/Y')); else echo date('d/m/Y'); ?>"/>
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Remarks </label>
@@ -566,10 +576,10 @@
 									<a href="<?php echo base_url(); ?>index.php/distributor_out" class="btn btn-danger pull-right" type="reset" id="reset">Cancel</a>
                                     <!-- <button class="btn btn-success pull-right" style="<?php //if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</button> -->
                                     <?php $curusr=$this->session->userdata('session_id'); ?>
-                                    <input type="submit" class="btn btn-success btn-sm" id="btn_submit" name="btn_submit" value="Submit For Approval" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_edit=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || $data[0]->status=='InActive')) echo ''; else echo 'display: none;';} else if($access[0]->r_insert=='1') echo ''; else echo 'display: none;';} else echo 'display: none;'; ?>" />
-                                    <input type="submit" class="btn btn-danger btn-sm" id="btn_delete" name="btn_delete" value="Delete" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_delete=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved') && $data[0]->status!='InActive') echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
-                                    <input type="submit" class="btn btn-success btn-sm" id="btn_approve" name="btn_approve" value="Approve" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
-                                    <input type="submit" class="btn btn-danger btn-sm" id="btn_reject" name="btn_reject" value="Reject" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+                                    <input type="submit" class="btn btn-success btn-sm" id="btn_submit" name="btn_submit" value="Submit For Approval" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_edit=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || $data[0]->status=='InActive' || ($data[0]->depot_name=='' && $data[0]->status=='Pending'))) echo ''; else echo 'display: none;';} else if($access[0]->r_insert=='1') echo ''; else echo 'display: none;';} else echo 'display: none;'; ?>" />
+                                    <input type="submit" class="btn btn-danger btn-sm" id="btn_delete" name="btn_delete" value="Delete" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_delete=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || ($data[0]->depot_name=='' && $data[0]->status=='Pending')) && $data[0]->status!='InActive') echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+                                    <input type="submit" class="btn btn-success btn-sm" id="btn_approve" name="btn_approve" value="Approve" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive' && $data[0]->depot_name!='')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+                                    <input type="submit" class="btn btn-danger btn-sm" id="btn_reject" name="btn_reject" value="Reject" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive' && $data[0]->depot_name!='')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
                                 </div>
 							</form>
 							
@@ -655,43 +665,36 @@
 
                     $('tfoot').hide();
                     $('.table_action').hide();
-
                 } else {
                     $(".datepicker1").datepicker({ maxDate: 0,changeMonth: true,yearRange:'-100:+0',changeYear: true });
                 }
 
                 $(".type").change(function(){
                     show_item($(this));
+					get_sell_rate();
                 });
                 $(".bar").change(function(){
                     get_bar_details($(this));
+					get_sell_rate();
                 });
                 $(".box").change(function(){
                     get_box_details($(this));
+					get_sell_rate();
                 });
                 $(".qty").blur(function(){
                     get_amount($(this));
+					get_sell_rate();
                 });
                 $(".sell_rate").blur(function(){
                     get_amount($(this));
+					get_sell_rate();
                 });
                 $('.delete_row').click(function(event){
                     delete_row($(this));
                     get_total();
                 });
                 $('#distributor_id').on('change', function(event){
-                    get_distributor_details($('#distributor_id').val());
-					
-                    if($('#distributor_consignee_id').val()!='') {
-                        get_consignee_details1($('#distributor_consignee_id').val());
-                    }
-                    if($('#distributor_id').val()==1){
-                        $('#sample_distributor_div').show();
-                    } else {
-                        $('#sample_distributor_div').hide();
-                    }
-
-                    get_distributor_consignee_details($('#distributor_id').val());
+                    set_distributor_details();
                 });
                 $('#depot_id').on('change', function(event){
                     get_depot_details($('#depot_id').val());
@@ -703,6 +706,11 @@
                 $('#state').on('change', function(event){
                     get_sell_rate();
                 });
+				
+				$('#city').on('change', function(event){
+					
+                   get_sell_rate();
+                });
 
                 $('#distributor_consignee_id').on('change', function(event) { 
                     if($('#distributor_consignee_id').val()!='') {
@@ -712,7 +720,6 @@
                         get_distributor_details($('#distributor_id').val());
                     }
                     // alert('hi');
-                    
                 });
 
                 function get_consignee_details1(distributor_consignee_id) {
@@ -725,8 +732,12 @@
                         success: function(data){
                             //if(data.result==1){
                                 // console.log(data.state);
-                                $('#state').val(data.state);
-                                $('#state_code').val(data.state_code);
+								//alert($('#distributor_id').val());
+								if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550") {
+									alert($('#distributor_id').val());
+									$('#state').val(data.state);
+									$('#state_code').val(data.state_code);
+								}
                                 // alert(data.state);
                                 get_sell_rate();
                             //}
@@ -778,7 +789,9 @@
                 addMultiInputNamingRules('#form_distributor_out_details', 'input[name="qty[]"]', { required: true }, "");
                 addMultiInputNamingRules('#form_distributor_out_details', 'input[name="sell_rate[]"]', { required: true }, "");
 
-                get_distributor_details($('#distributor_id').val());
+                // get_distributor_details($('#distributor_id').val());
+                set_distributor_details();
+
                 if($('#distributor_consignee_id').val()!='') {
                     get_consignee_details1($('#distributor_consignee_id').val());
                 }
@@ -793,6 +806,21 @@
                 //     get_distributor_details($('#sample_distributor_id').val());
                 // }
             });
+
+            function set_distributor_details(){
+                get_distributor_details($('#distributor_id').val());
+                    
+                if($('#distributor_consignee_id').val()!='') {
+                    get_consignee_details1($('#distributor_consignee_id').val());
+                }
+                if($('#distributor_id').val()==1){
+                    $('#sample_distributor_div').show();
+                } else {
+                    $('#sample_distributor_div').hide();
+                }
+
+                get_distributor_consignee_details($('#distributor_id').val());
+            }
 
             function show_item(elem){
                 var id = elem.attr('id');
@@ -871,7 +899,7 @@
                     async:false,
                     success: function(data){
                         if(data.result==1){
-                            if(distributor_id==42 || distributor_id==214){
+                            if(distributor_id==42 || distributor_id==214 || distributor_id==550){
                                 $('#sell_out').val($("#discount").val());
                             } else {
                                 $('#sell_out').val(data.sell_out);
@@ -881,7 +909,8 @@
                                 $('#distributor_name').val(data.product_name);
                             }
 
-                            if($('#distributor_id').val()!="214") {
+                            if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550") {
+
                                 $('#state').val(data.state);
                                 $('#state_code').val(data.state_code);
                             }
@@ -941,7 +970,7 @@
                     }
                 });
 
-                if(distributor_id==42 || distributor_id==214){
+                if(distributor_id==42 || distributor_id==214 || distributor_id==550){
                     $('.direct').show();
                 } else {
                     $('.direct').hide();
@@ -952,6 +981,8 @@
                 var tax_per = parseFloat(get_number($("#tax_per").val(),2));
                 var depot_state = $("#depot_state").val();
                 var state = $("#state").val();
+				// console.log($('#state').val());
+				// console.log($('#city').val());
                 var cgst = 0;
                 var sgst = 0;
                 var igst = 0;
@@ -1375,18 +1406,23 @@
                     });
                     $(".type").change(function(){
                         show_item($(this));
+						get_sell_rate();
                     });
                     $(".bar").change(function(){
                         get_bar_details($(this));
+						get_sell_rate();
                     });
                     $(".box").change(function(){
                         get_box_details($(this));
+						get_sell_rate();
                     });
                     $(".qty").blur(function(){
                         get_amount($(this));
+						get_sell_rate();
                     });
                     $(".sell_rate").blur(function(){
                         get_amount($(this));
+						get_sell_rate();
                     });
                     $('.delete_row').click(function(event){
                         delete_row($(this));
@@ -1396,8 +1432,5 @@
                 });
             });
         </script>
-
-        
-    <!-- END SCRIPTS -->      
     </body>
 </html>

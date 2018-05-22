@@ -61,13 +61,15 @@ class Purchase_order extends CI_Controller{
             for($i=0; $i<count($result); $i++){
                 $data['item_id'][$i] = $result[$i]->item_id;
                 $data['qty'][$i] = $result[$i]->qty;
+                $data['hsn_code'][$i] = $result[$i]->hsn_code;
                 $data['rate'][$i] = $result[$i]->rate;
-				
-                // $data['cst'][$i] = $result[$i]->cst;
-				$data['cgst'][$i] = $result[$i]->cgst;
-				$data['sgst'][$i] = $result[$i]->sgst;
-				$data['igst'][$i] = $result[$i]->igst;
+                $data['tax_per'][$i] = $result[$i]->tax_per;
                 $data['amount'][$i] = $result[$i]->amount;
+				$data['cgst_amt'][$i] = $result[$i]->cgst_amt;
+				$data['sgst_amt'][$i] = $result[$i]->sgst_amt;
+				$data['igst_amt'][$i] = $result[$i]->igst_amt;
+                $data['tax_amt'][$i] = $result[$i]->tax_amt;
+                $data['total_amt'][$i] = $result[$i]->total_amt;
             }
         }
 
@@ -150,26 +152,22 @@ class Purchase_order extends CI_Controller{
                 $data['state'][$i] = $result[$i]->state;
 				echo $data['state'][$i];
 			} 
-		}
-		else
-		{
+		} else {
 			echo "state_not_found";
 		}
     }
 	
 	public function get_rate($id){    
-	$result=$this->purchase_order_model->get_rate($id);    
-	//echo $result;
-    $data['result'] = 0;
+    	$result=$this->purchase_order_model->get_rate($id);    
+    	//echo $result;
+        $data['result'] = 0;
         if(count($result)>0) {
             $data['result'] = 1;
             for($i=0; $i<count($result); $i++){
                 $data['rate'][$i] = $result[$i]->rate;
 				echo $data['rate'][$i];
 			}
-		}
-		else
-		{
+		} else {
 			echo "0.00";
 		}
     }

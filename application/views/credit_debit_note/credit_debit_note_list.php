@@ -109,8 +109,9 @@
 											<th width="300">Transaction</th>
 											<th width="110">Amount (In Rs) </th>
 											<th width="100">Creation Date</th>
-											<th width="110"> Remarks</th>
-											<th width="110"> Status</th>
+											<th width="110">Remarks</th>
+											<th width="110">Status</th>
+											<th width="110">View Credit Debit Note</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -133,6 +134,13 @@
 												<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
 											<td><?php echo $data[$i]->remarks; ?></td>
 											<td><?php echo $data[$i]->status; ?></td>
+											<td>
+												<?php if($data[$i]->ref_no!=null && $data[$i]->ref_no!=''){ ?>
+													<a href="<?php echo base_url().'index.php/credit_debit_note/view_credit_debit_note/'.$data[$i]->id; ?>" target="_blank"> 
+					                                    <span class="fa fa-file-pdf-o" style="font-size:20px;"></span>
+					                                </a>
+												<?php } ?>
+											</td>
 										</tr>
 										<?php } ?>
 									</tbody>

@@ -29,7 +29,7 @@
         <!-- PAGE CONTENT -->
         <?php $this->load->view('templates/menus');?>
         <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
-        <div class="heading-h2"><a href="<?php echo base_url().'index.php/dashboard_sales_rep'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp; <a href="<?php echo base_url().'index.php/sales_rep_location'; ?>" > Location List </a>  &nbsp; &#10095; &nbsp; Location Details</div>
+        <div class="heading-h2">Dashboard &nbsp; &#10095; &nbsp; Location Details</div>
 
         <!-- PAGE CONTENT WRAPPER -->
         <div class="page-content-wrap">

@@ -29,7 +29,7 @@
         <!-- PAGE CONTENT -->
         <?php $this->load->view('templates/menus');?>
         <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
-        <div class="heading-h2"><a href="<?php echo base_url().'index.php/dashboard_sales_rep'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp; <a href="<?php echo base_url().'index.php/sales_rep_location'; ?>" > Location List </a>  &nbsp; &#10095; &nbsp; Location Details</div>
+        <div class="heading-h2"> Dashboard &nbsp; &#10095; &nbsp; Location Details</div>
 
         <!-- PAGE CONTENT WRAPPER -->
         <div class="page-content-wrap">
@@ -83,67 +83,89 @@
 
                                 <div class="form-group">
                                     <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">EAT Anytime Orange Bar </label>
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Orange </label>
                                         <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="number" value="" class="form-control" name="orange_bar_opening" placeholder="Opening Stock"></textarea>
+                                            <input type="number" value="" class="form-control" name="orange_bar_opening" placeholder="Opening Stock">
                                         </div>
                                         <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="number" value="<?php if(isset($data1)) echo $data1[0]->orange_bar;?>" class="form-control" name="orange_bar" placeholder="Closing Stock"></textarea>
+                                            <input type="number" value="<?php if(isset($data1)) echo $data1[0]->orange_bar;?>" class="form-control" name="orange_bar" placeholder="Closing Stock">
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group" style="display: none;">
                                     <div class="col-md-12 col-sm-12 col-xs-12">
                                         <label class="col-md-2 col-sm-2 col-xs-12 control-label">EAT Anytime Mint Bar </label>
                                         <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="number" value="" class="form-control" name="mint_bar_opening" placeholder="Opening Stock"></textarea>
+                                            <input type="number" value="" class="form-control" name="mint_bar_opening" placeholder="Opening Stock">
                                         </div>
                                         <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="number" value="<?php if(isset($data1)) echo $data1[0]->mint_bar;?>" class="form-control" name="mint_bar" placeholder="Closing Stock"></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">EAT Anytime Butterscotch Bar </label>
-                                        <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="number" value="" class="form-control" name="butterscotch_bar_opening" placeholder="Opening Stock"></textarea>
-                                        </div>
-                                        <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="number" value="<?php if(isset($data1)) echo $data1[0]->butterscotch_bar;?>" class="form-control" name="butterscotch_bar" placeholder="Closing Stock"></textarea>
+                                            <input type="number" value="<?php if(isset($data1)) echo $data1[0]->mint_bar;?>" class="form-control" name="mint_bar" placeholder="Closing Stock">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">EAT Anytime Chocolate Peanut Butter Bar </label>
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Butterscotch </label>
                                         <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="number" value="<?php if(isset($data1)) echo $data1[0]->chocopeanut_bar;?>" class="form-control" name="chocopeanut_bar_opening" placeholder="Opening Stock"></textarea>
+                                            <input type="number" value="" class="form-control" name="butterscotch_bar_opening" placeholder="Opening Stock">
                                         </div>
                                         <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="number" value="<?php if(isset($data1)) echo $data1[0]->chocopeanut_bar;?>" class="form-control" name="chocopeanut_bar" placeholder="Closing Stock"></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">EAT Anytime Bambaiya Chaat Bar </label>
-                                        <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="number" value="" class="form-control" name="bambaiyachaat_bar_opening" placeholder="Opening Stock"></textarea>
-                                        </div>
-                                        <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="number" value="<?php if(isset($data1)) echo $data1[0]->bambaiyachaat_bar;?>" class="form-control" name="bambaiyachaat_bar" placeholder="Closing Stock"></textarea>
+                                            <input type="number" value="<?php if(isset($data1)) echo $data1[0]->butterscotch_bar;?>" class="form-control" name="butterscotch_bar" placeholder="Closing Stock">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">EAT Anytime Mango Ginger Bar </label>
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Choco Peanut Butter </label>
                                         <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="number" value="" class="form-control" name="mangoginger_bar_opening" placeholder="Opening Stock"></textarea>
+                                            <input type="number" value="<?php if(isset($data1)) echo $data1[0]->chocopeanut_bar;?>" class="form-control" name="chocopeanut_bar_opening" placeholder="Opening Stock">
                                         </div>
                                         <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="number" value="<?php if(isset($data1)) echo $data1[0]->mangoginger_bar;?>" class="form-control" name="mangoginger_bar" placeholder="Closing Stock"></textarea>
+                                            <input type="number" value="<?php if(isset($data1)) echo $data1[0]->chocopeanut_bar;?>" class="form-control" name="chocopeanut_bar" placeholder="Closing Stock">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12 col-sm-12 col-xs-12">
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Bambaiya Chaat </label>
+                                        <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <input type="number" value="" class="form-control" name="bambaiyachaat_bar_opening" placeholder="Opening Stock">
+                                        </div>
+                                        <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <input type="number" value="<?php if(isset($data1)) echo $data1[0]->bambaiyachaat_bar;?>" class="form-control" name="bambaiyachaat_bar" placeholder="Closing Stock">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12 col-sm-12 col-xs-12">
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Mango Ginger </label>
+                                        <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <input type="number" value="" class="form-control" name="mangoginger_bar_opening" placeholder="Opening Stock">
+                                        </div>
+                                        <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <input type="number" value="<?php if(isset($data1)) echo $data1[0]->mangoginger_bar;?>" class="form-control" name="mangoginger_bar" placeholder="Closing Stock">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12 col-sm-12 col-xs-12">
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Berry Blast </label>
+                                        <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <input type="number" value="" class="form-control" name="berry_bar_opening" placeholder="Opening Stock">
+                                        </div>
+                                        <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <input type="number" value="<?php if(isset($data1)) echo $data1[0]->berry_bar;?>" class="form-control" name="berry_bar" placeholder="Closing Stock">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12 col-sm-12 col-xs-12">
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Chywanprash </label>
+                                        <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <input type="number" value="" class="form-control" name="chywanprash_bar_opening" placeholder="Opening Stock">
+                                        </div>
+                                        <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <input type="number" value="<?php if(isset($data1)) echo $data1[0]->chywanprash_bar;?>" class="form-control" name="chywanprash_bar" placeholder="Closing Stock">
                                         </div>
                                     </div>
                                 </div>
@@ -196,8 +218,7 @@
 						clearTimeout(location_timeout);
 						geolocFail();
 					});
-				}
-				else {
+				} else {
 					geolocFail();
 				}
             });

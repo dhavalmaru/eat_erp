@@ -51,7 +51,7 @@
             <!-- PAGE CONTENT -->
 			   <?php $this->load->view('templates/menus');?>
               <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
-                   <div class="heading-h2"><a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp; <a href="<?php echo base_url().'index.php/sales_rep'; ?>" > Sales Representative List </a>  &nbsp; &#10095; &nbsp; Sales Representative Location </div>
+                   <div class="heading-h2"><a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp; <a href="<?php echo base_url().'index.php/Reports/view_reports'; ?>" > Reports </a>  &nbsp; &#10095; &nbsp; Promotor Location </div>
                 
                 
                 <!-- PAGE CONTENT WRAPPER -->
@@ -79,7 +79,7 @@
                                     </div>
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Sales Representative <span class="asterisk_sign">*</span></label>
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Promotor<span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <select name="sales_rep_id" id="sales_rep_id" class="form-control">
                                                     <option value="">Select</option>
@@ -91,7 +91,7 @@
                                             <div class="col-md-1 col-sm-1 col-xs-12"></div>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <a class="btn btn-success btn-block" id="get_location">
-                                                    Get Sales Representative Location
+                                                    Get Promotor Location
                                                 </a>
                                             </div>
                                             <div class="col-md-1 col-sm-1 col-xs-12"></div>

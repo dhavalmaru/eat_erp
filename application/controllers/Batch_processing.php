@@ -16,12 +16,15 @@ class Batch_processing extends CI_Controller{
         $this->load->model('batch_processing_model');
         $this->load->model('product_model');
         $this->load->model('depot_model');
+        $this->load->model('batch_master_model');
         $this->load->model('raw_material_model');
+       // $this->load->model('ingredients_master');
         $this->load->model('stock_model');
         $this->load->database();
     }
 
     //index function
+	
     public function index(){
         $result=$this->batch_processing_model->get_access();
         if(count($result)>0) {
@@ -35,6 +38,21 @@ class Batch_processing extends CI_Controller{
         }
     }
 
+	    // public function get_data(){
+        // $id=$this->input->post('id');
+       // $id=1;
+
+        // $result=$this->batch_processing_model->get_data('', $id);
+        // $data['result'] = 0;
+        // if(count($result)>0) {
+            // $data['result'] = 1;
+            // $data['product_id'] = $result[0]->product_id;
+            // $data['no_of_batch'] = $result[0]->no_of_batch;
+          
+        // }
+
+        // echo json_encode($data);
+    // }
     public function add(){
         $result=$this->batch_processing_model->get_access();
         if(count($result)>0) {
@@ -42,6 +60,7 @@ class Batch_processing extends CI_Controller{
                 $data['access'] = $this->batch_processing_model->get_access();
                 $data['product'] = $this->product_model->get_data('Approved');
                 $data['depot'] = $this->depot_model->get_data('Approved');
+                $data['batch_no'] = $this->batch_master_model->get_data('Approved');
                 $data['raw_material'] = $this->raw_material_model->get_data('Approved');
 
                 load_view('batch_processing/batch_processing_details', $data);
@@ -62,8 +81,17 @@ class Batch_processing extends CI_Controller{
                 $data['data'] = $this->batch_processing_model->get_data('', $id);
                 $data['product'] = $this->product_model->get_data('Approved');
                 $data['depot'] = $this->depot_model->get_data('Approved');
+                $data['batch_no'] = $this->batch_master_model->get_data('Approved');
                 $data['raw_material'] = $this->raw_material_model->get_data('Approved');
                 $data['raw_material_stock'] = $this->batch_processing_model->get_batch_raw_material($id);
+              
+				   $data['batch_images'] = $this->batch_processing_model->get_batch_images($id);
+				
+				    // $query=$this->db->query("SELECT * FROM batch_images WHERE batch_processing_id = '$id'");
+                // $result=$query->result();
+                // if(count($result)>0){
+                    // $data['batch_images']=$result;
+                // }
 
                 load_view('batch_processing/batch_processing_details', $data);
             } else {
@@ -74,9 +102,32 @@ class Batch_processing extends CI_Controller{
             $this->load->view('login/main_page');
         }
     }
+	
+		    public function get_batch_raw_material1(){
+			$product_id=$this->input->post('product_id');
+        // $id=1;
+
+        $result=$this->batch_processing_model->get_batch_raw_material1($product_id);
+		
+        // $data['result'] = 0;
+        // if(count($result)>0) {
+            // $data['result'] = 1;
+            // for($i=0; $i<count($result); $i++){
+                // $data['raw_material_id'][$i] = $result[$i]->rm_id;
+                // $data['qty'][$i] = $result[$i]->qty_per_batch;
+              
+            // }
+        // }
+
+        echo json_encode($result);
+    }
+	
 
     public function save(){
+		
+		
         $this->batch_processing_model->save_data();
+   
         redirect(base_url().'index.php/batch_processing');
     }
 
@@ -94,10 +145,20 @@ class Batch_processing extends CI_Controller{
         $result = $this->stock_model->check_raw_material_availablity();
         echo $result;
     }
+	
+	 
+
 
     public function check_raw_material_qty_availablity(){
         $result = $this->stock_model->check_raw_material_qty_availablity();
         echo $result;
+    }
+
+    public function view_batch_processing_receipt($id){
+        $data['data'] = $this->batch_processing_model->get_data('', $id);
+        $data['batch_processing_items'] = $this->batch_processing_model->get_batch_raw_material($id);
+
+        load_view('invoice/batch_processing_receipt', $data);
     }
 }
 ?>

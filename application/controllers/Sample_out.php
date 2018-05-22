@@ -152,12 +152,12 @@ class Sample_out extends CI_Controller{
 
     public function save(){
         $this->sample_out_model->save_data();
-        redirect(base_url().'index.php/sample_out/checkstatus/pending_for_delivery');
+        redirect(base_url().'index.php/distributor_out/checkstatus/pending_for_delivery');
     }
 
     public function update($id){
         $this->sample_out_model->save_data($id);
-        redirect(base_url().'index.php/sample_out/checkstatus/pending_for_delivery');
+        redirect(base_url().'index.php/distributor_out/checkstatus/pending_for_delivery');
     }
     
     public function check_box_availablity(){
@@ -198,13 +198,72 @@ class Sample_out extends CI_Controller{
         }
     }
 
+    public function view_gate_pass($distid){
+        $this->tax_invoice_model->view_gate_pass($distid);
+    }
+
+    // public function set_delivery_status(){
+    //     $this->sample_out_model->set_delivery_status();
+    //     redirect(base_url().'index.php/sample_out/checkstatus/gp_issued');
+    // }
+
     public function set_delivery_status(){
+        // echo 'Hii';
+
+        $this->sample_out_model->set_delivery_status();
+        $status=$this->input->post('status');
+        if($status=='InActive') {
+            redirect(base_url().'index.php/sample_out');
+        }
+    }
+
+    public function set_sku_batch(){
+        $this->sample_out_model->set_sku_batch();
+        $status=$this->input->post('status');
+        if($status=='InActive') {
+            redirect(base_url().'index.php/sample_out');
+        }
+    }
+
+    public function set_delivery_status2(){
         $this->sample_out_model->set_delivery_status();
         redirect(base_url().'index.php/sample_out/checkstatus/gp_issued');
     }
 
-    public function view_gate_pass($distid){
-        $this->tax_invoice_model->view_gate_pass($distid);
+    public function get_batch_details(){
+        $result=$this->sample_out_model->get_access();
+        if(count($result)>0) {
+            if($result[0]->r_view == 1 || $result[0]->r_edit == 1) {
+                $data['access'] = $this->sample_out_model->get_access();
+                $data['data'] = $this->sample_out_model->get_sku_details();
+                $data['batch_details'] = $this->sample_out_model->get_batch_details();
+
+                $check1=$this->input->post('check');
+                $check = array();
+                $j=0;
+                for($i=0; $i<count($check1); $i++){
+                    if($check1[$i]!='false'){
+                        $check[$j] = $check1[$i];
+                        $j = $j + 1;
+                    }
+                }
+                $distributor_out_id = implode(", ", $check);
+                $data['distributor_out_id']=$distributor_out_id;
+
+                $query=$this->db->query("SELECT * FROM sales_rep_master WHERE sr_type='Merchandizer'");
+                $result=$query->result();
+                $data['sales_rep1']=$result;
+
+                // dump($data['data']);
+
+                load_view('distributor_out/sample_out_sku_details', $data);
+            } else {
+                echo "Unauthorized access";
+            }
+        } else {
+            echo '<script>alert("You donot have access to this page.");</script>';
+            $this->load->view('login/main_page');
+        }
     }
 
     // public function view_payment_details($id){

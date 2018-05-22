@@ -32,6 +32,29 @@
                 font-size: 21px;
                 color: #cc2127;
             }
+            @media print {
+                body * {
+                    visibility: hidden;
+                }
+                #form_distributor_in_details * {
+                    visibility: visible;
+                }
+                #form_distributor_in_details {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                }
+                .print_hide {
+                    display: none;
+                }
+                .col-md-4 {
+                    width: 50%;
+                    display: inline-flex;
+                }
+                .col-md-2 {
+                    display: inline-flex;
+                }
+            }
 		</style>
     </head>
     <body>								
@@ -49,9 +72,9 @@
 					    <div class="main-container">           
                          <div class="box-shadow">							
                             <form id="form_distributor_in_details" role="form" class="form-horizontal" method="post" action="<?php if (isset($data)) echo base_url(). 'index.php/distributor_in/update/' . $data[0]->id; else echo base_url().'index.php/distributor_in/save'; ?>">
-                               <div class="box-shadow-inside">
+                                <div class="box-shadow-inside">
                                 <div class="col-md-12 custom-padding" style="padding:0;" >
-                                 <div class="panel panel-default">
+                                <div class="panel panel-default">
 								
 							 	<div class="panel-body">
 									<div class="form-group" >
@@ -136,7 +159,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group" style="display: none;">
+                                    <div class="form-group"  >
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <!-- <label class="col-md-2 col-sm-2 col-xs-12 control-label">Total Amount (In Rs) <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
@@ -150,28 +173,29 @@
                                     </div>
 
 
-                                   <div class="h-scroll">	
+                                    <div class="h-scroll">	
                                     <h2 style="padding:20px;padding-bottom:0px;">Stock In</h2>
-                                       <div class="table-stripped form-group" style="padding:15px;" >
+                                    <div class="table-stripped form-group" style="padding:15px;" >
                                         <table class="table table-bordered" style="margin-bottom: 0px; ">
                                         <thead>
                                             <tr>
-                                                <th style="width: 100px">Type <span class="asterisk_sign">*</span></th>
-                                                <th style="width: 250px">Item <span class="asterisk_sign">*</span></th>
+                                                <th style="width: 75px">Type <span class="asterisk_sign">*</span></th>
+                                                <th style="width: 200px">Item <span class="asterisk_sign">*</span></th>
                                                 <th>Qty <span class="asterisk_sign">*</span></th>
-                                                <th>Rate (In Rs)</th>
+                                                <th class="print_hide">Rate (In Rs)</th>
                                                 <th>Sell Rate (In Rs) <span class="asterisk_sign">*</span></th>
                                                 <th style="display:none;">Cost Rate (In Rs) <span class="asterisk_sign">*</span></th>
                                                 <th style="display: none;">Grams</th>
-                                                <th>Amount (In Rs)</th>
-                                                <th>CGST (In Rs)</th>
-                                                <th>SGST (In Rs)</th>
-                                                <th>IGST (In Rs)</th>
-                                                <th>Tax (In Rs)</th>
+                                                <th class="print_hide">Amount (In Rs)</th>
+                                                <th class="print_hide">CGST (In Rs)</th>
+                                                <th class="print_hide">SGST (In Rs)</th>
+                                                <th class="print_hide">IGST (In Rs)</th>
+                                                <th class="print_hide">Tax (In Rs)</th>
                                                 <!-- <th>VAT (In Rs)</th> -->
                                                 <th>Total Amount (In Rs)</th>
                                                 <th style="display:none;">Cost Total Amount (In Rs)</th>
-                                                <th style="text-align:center;">Action</th>
+                                                <th style="width: 100px">Batch</th>
+                                                <th style="text-align:center;" class="print_hide">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody id="box_details">
@@ -203,7 +227,7 @@
                                                 <td>
                                                     <input type="text" class="form-control qty" name="qty[]" id="qty_<?php echo $i; ?>" placeholder="Qty" value="<?php if (isset($distributor_in_items)) { echo $distributor_in_items[$i]->qty; } ?>"/>
                                                 </td>
-                                                <td>
+                                                <td class="print_hide">
                                                     <input type="text" class="form-control rate" name="rate[]" id="rate_<?php echo $i; ?>" placeholder="Rate" value="<?php if (isset($distributor_in_items)) { echo $distributor_in_items[$i]->rate; } ?>" readonly />
                                                 </td>
                                                 <td>
@@ -215,19 +239,19 @@
                                                 <td style="display: none;">
                                                     <input type="text" class="form-control grams" name="grams[]" id="grams_<?php echo $i; ?>" placeholder="Grams" value="<?php if (isset($distributor_in_items)) { echo $distributor_in_items[$i]->grams; } ?>" readonly />
                                                 </td>
-                                                <td>
+                                                <td class="print_hide">
                                                     <input type="text" class="form-control amount" name="amount[]" id="amount_<?php echo $i; ?>" placeholder="Amount" value="<?php if (isset($distributor_in_items)) { echo $distributor_in_items[$i]->amount; } ?>" readonly />
                                                 </td>
-                                                <td>
+                                                <td class="print_hide">
                                                     <input type="text" class="form-control cgst_amt" name="cgst_amt[]" id="cgst_amt_<?php echo $i; ?>" placeholder="CGST Amount" value="" readonly />
                                                 </td>
-                                                <td>
+                                                <td class="print_hide">
                                                     <input type="text" class="form-control sgst_amt" name="sgst_amt[]" id="sgst_amt_<?php echo $i; ?>" placeholder="SGST Amount" value="" readonly />
                                                 </td>
-                                                <td>
+                                                <td class="print_hide">
                                                     <input type="text" class="form-control igst_amt" name="igst_amt[]" id="igst_amt_<?php echo $i; ?>" placeholder="IGST Amount" value="" readonly />
                                                 </td>
-                                                <td>
+                                                <td class="print_hide">
                                                     <input type="text" class="form-control tax_amt" name="tax_amt[]" id="tax_amt_<?php echo $i; ?>" placeholder="Tax Amount" value="" readonly />
                                                 </td>
                                                 <!-- <td>
@@ -239,8 +263,17 @@
                                                 <td style="display: none;">
                                                     <input type="text" class="form-control cost_total_amt" name="cost_total_amt[]" id="cost_total_amt_<?php echo $i; ?>" placeholder="Total Amount" value="<?php if (isset($distributor_in_items)) { echo $distributor_in_items[$i]->cost_amount; } ?>" readonly />
                                                 </td>
+                                                <td>
+                                                    <select name="batch_no[]" class="form-control batch_no" id="batch_no_<?php echo $i;?>" data-error="#err_batch_no_<?php echo $i;?>">
+                                                        <option value="">Select</option>
+                                                        <?php if(isset($batch)) { for ($k=0; $k < count($batch); $k++) { ?>
+                                                                <option value="<?php echo $batch[$k]->id; ?>" <?php if($batch[$k]->id==$distributor_in_items[$i]->batch_no) { echo 'selected'; } ?>><?php echo $batch[$k]->batch_no; ?></option>
+                                                        <?php }} ?>
+                                                    </select>
+                                                    <div id="err_batch_no_<?php echo $i;?>"></div>
+                                                </td>
 
-                                                <td style="text-align:center;     vertical-align: middle;">
+                                                <td style="text-align:center; vertical-align: middle;" class="print_hide">
                                                     <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>
                                                 </td>
                                             </tr>
@@ -271,7 +304,7 @@
                                                 <td>
                                                     <input type="text" class="form-control qty" name="qty[]" id="qty_<?php echo $i; ?>" placeholder="Qty" value=""/>
                                                 </td>
-                                                <td>
+                                                <td class="print_hide">
                                                     <input type="text" class="form-control rate" name="rate[]" id="rate_<?php echo $i; ?>" placeholder="Rate" value="" readonly />
                                                 </td>
                                                 <td>
@@ -283,19 +316,19 @@
                                                 <td style="display: none;">
                                                     <input type="text" class="form-control grams" name="grams[]" id="grams_<?php echo $i; ?>" placeholder="Grams" value="" readonly />
                                                 </td>
-                                                <td>
+                                                <td class="print_hide">
                                                     <input type="text" class="form-control amount" name="amount[]" id="amount_<?php echo $i; ?>" placeholder="Amount" value="" readonly />
                                                 </td>
-                                                <td>
+                                                <td class="print_hide">
                                                     <input type="text" class="form-control cgst_amt" name="cgst_amt[]" id="cgst_amt_<?php echo $i; ?>" placeholder="CGST Amount" value="" readonly />
                                                 </td>
-                                                <td>
+                                                <td class="print_hide">
                                                     <input type="text" class="form-control sgst_amt" name="sgst_amt[]" id="sgst_amt_<?php echo $i; ?>" placeholder="SGST Amount" value="" readonly />
                                                 </td>
-                                                <td>
+                                                <td class="print_hide">
                                                     <input type="text" class="form-control igst_amt" name="igst_amt[]" id="igst_amt_<?php echo $i; ?>" placeholder="IGST Amount" value="" readonly />
                                                 </td>
-                                                <td>
+                                                <td class="print_hide">
                                                     <input type="text" class="form-control tax_amt" name="tax_amt[]" id="tax_amt_<?php echo $i; ?>" placeholder="Tax Amount" value="" readonly />
                                                 </td>
                                                 <!-- <td>
@@ -307,7 +340,17 @@
                                                 <td style="display: none;">
                                                     <input type="text" class="form-control cost_total_amt" name="cost_total_amt[]" id="cost_total_amt_<?php echo $i; ?>" placeholder="Total Amount" value="" readonly />
                                                 </td>
-                                                <td style="text-align:center;     vertical-align: middle;">
+                                                <td>
+                                                    <select name="batch_no[]" class="form-control batch_no" id="batch_no_<?php echo $i;?>" data-error="#err_batch_no_<?php echo $i;?>">
+                                                        <option value="">Select</option>
+                                                        <?php if(isset($batch)) { for ($k=0; $k < count($batch); $k++) { ?>
+                                                                <option value="<?php echo $batch[$k]->id; ?>"><?php echo $batch[$k]->batch_no; ?></option>
+                                                        <?php }} ?>
+                                                    </select>
+                                                    <div id="err_batch_no_<?php echo $i;?>"></div>
+                                                </td>
+
+                                                <td style="text-align:center; vertical-align: middle;" class="print_hide">
                                                     <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>
                                                 </td>
                                             </tr>
@@ -315,7 +358,7 @@
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <td colspan="9">
+                                                <td colspan="16">
                                                     <button type="button" class="btn btn-success" id="repeat-box" >+</button>
                                                 </td>
                                             </tr>
@@ -337,25 +380,25 @@
                                                 <th style="width: 100px">Type <span class="asterisk_sign">*</span></th>
                                                 <th style="width: 250px">Item <span class="asterisk_sign">*</span></th>
                                                 <th>Qty <span class="asterisk_sign">*</span></th>
-                                                <th>Rate (In Rs)</th>
+                                                <th class="print_hide">Rate (In Rs)</th>
                                                 <th>Sell Rate (In Rs) <span class="asterisk_sign">*</span></th>
-                                                <th style="display: none;">Cost Rate (In Rs) <span class="asterisk_sign">*</span></th>
-                                                <th style="display: none;">Grams</th>
-                                                <th>Amount (In Rs)</th>
-                                                <th>CGST (In Rs)</th>
-                                                <th>SGST (In Rs)</th>
-                                                <th>IGST (In Rs)</th>
-                                                <th>Tax (In Rs)</th>
+                                                <th style="display: none;" class="print_hide">Cost Rate (In Rs) <span class="asterisk_sign">*</span></th>
+                                                <th style="display: none;" class="print_hide">Grams</th>
+                                                <th class="print_hide">Amount (In Rs)</th>
+                                                <th class="print_hide">CGST (In Rs)</th>
+                                                <th class="print_hide">SGST (In Rs)</th>
+                                                <th class="print_hide">IGST (In Rs)</th>
+                                                <th class="print_hide">Tax (In Rs)</th>
                                                 <!-- <th>VAT (In Rs)</th> -->
                                                 <th>Total Amount (In Rs)</th>
                                                 <th style="display: none;">Cost Total Amount (In Rs)</th>
-                                                <th style="text-align:center;">Action</th>
+                                                <th style="text-align:center;" class="print_hide">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody id="box_details_ex">
                                         <?php $i=0; if(isset($distributor_in_items_ex)) {
                                                 for($i=0; $i<count($distributor_in_items_ex); $i++) { ?>
-                                            <tr id="box_<?php echo $i; ?>_row">
+                                            <tr id="box_ex_<?php echo $i; ?>_row">
                                                 <td>
                                                     <select name="type_ex[]" class="form-control type" id="type_ex_<?php echo $i;?>">
                                                         <option value="">Select</option>
@@ -381,7 +424,7 @@
                                                 <td>
                                                     <input type="text" class="form-control qty_ex" name="qty_ex[]" id="qty_ex_<?php echo $i; ?>" placeholder="Qty" value="<?php if (isset($distributor_in_items_ex)) { echo $distributor_in_items_ex[$i]->qty; } ?>"/>
                                                 </td>
-                                                <td>
+                                                <td class="print_hide">
                                                     <input type="text" class="form-control rate_ex" name="rate_ex[]" id="rate_ex_<?php echo $i; ?>" placeholder="Rate" value="<?php if (isset($distributor_in_items_ex)) { echo $distributor_in_items_ex[$i]->rate; } ?>" readonly />
                                                 </td>
                                                 <td>
@@ -393,19 +436,19 @@
                                                 <td style="display: none;">
                                                     <input type="text" class="form-control grams_ex" name="grams_ex[]" id="grams_ex_<?php echo $i; ?>" placeholder="Grams" value="<?php if (isset($distributor_in_items_ex)) { echo $distributor_in_items_ex[$i]->grams; } ?>" readonly />
                                                 </td>
-                                                <td>
+                                                <td class="print_hide">
                                                     <input type="text" class="form-control amount_ex" name="amount_ex[]" id="amount_ex_<?php echo $i; ?>" placeholder="Amount" value="<?php if (isset($distributor_in_items_ex)) { echo $distributor_in_items_ex[$i]->amount; } ?>" readonly />
                                                 </td>
-                                                <td>
+                                                <td class="print_hide">
                                                     <input type="text" class="form-control cgst_amt_ex" name="cgst_amt_ex[]" id="cgst_amt_ex_<?php echo $i; ?>" placeholder="CGST Amount" value="" readonly />
                                                 </td>
-                                                <td>
+                                                <td class="print_hide">
                                                     <input type="text" class="form-control sgst_amt_ex" name="sgst_amt_ex[]" id="sgst_amt_ex_<?php echo $i; ?>" placeholder="SGST Amount" value="" readonly />
                                                 </td>
-                                                <td>
+                                                <td class="print_hide">
                                                     <input type="text" class="form-control igst_amt_ex" name="igst_amt_ex[]" id="igst_amt_ex_<?php echo $i; ?>" placeholder="IGST Amount" value="" readonly />
                                                 </td>
-                                                <td>
+                                                <td class="print_hide">
                                                     <input type="text" class="form-control tax_amt_ex" name="tax_amt_ex[]" id="tax_amt_ex_<?php echo $i; ?>" placeholder="Tax Amount" value="" readonly />
                                                 </td>
                                                 <!-- <td>
@@ -418,12 +461,12 @@
                                                     <input type="text" class="form-control cost_total_amt_ex" name="cost_total_amt_ex[]" id="cost_total_amt_ex_<?php echo $i; ?>" placeholder="Total Amount" value="<?php if (isset($distributor_in_items_ex)) { echo $distributor_in_items_ex[$i]->cost_amount; } ?>" readonly />
                                                 </td>
 
-                                                <td style="text-align:center;     vertical-align: middle;">
-                                                    <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>
+                                                <td style="text-align:center; vertical-align: middle;" class="print_hide">
+                                                    <a id="box_ex_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>
                                                 </td>
                                             </tr>
                                         <?php }} else { ?>
-                                            <tr id="box_<?php echo $i; ?>_row">
+                                            <tr id="box_ex_<?php echo $i; ?>_row">
                                                 <td>
                                                     <select name="type_ex[]" class="form-control type_ex" id="type_ex_<?php echo $i;?>">
                                                         <option value="">Select</option>
@@ -449,7 +492,7 @@
                                                 <td>
                                                     <input type="text" class="form-control qty_ex" name="qty_ex[]" id="qty_ex_<?php echo $i; ?>" placeholder="Qty" value=""/>
                                                 </td>
-                                                <td>
+                                                <td class="print_hide">
                                                     <input type="text" class="form-control rate_ex" name="rate_ex[]" id="rate_ex_<?php echo $i; ?>" placeholder="Rate" value="" readonly />
                                                 </td>
                                                 <td>
@@ -461,19 +504,19 @@
                                                 <td style="display: none;">
                                                     <input type="text" class="form-control grams_ex" name="grams_ex[]" id="grams_ex_<?php echo $i; ?>" placeholder="Grams" value="" readonly />
                                                 </td>
-                                                <td>
+                                                <td class="print_hide">
                                                     <input type="text" class="form-control amount_ex" name="amount_ex[]" id="amount_ex_<?php echo $i; ?>" placeholder="Amount" value="" readonly />
                                                 </td>
-                                                <td>
+                                                <td class="print_hide">
                                                     <input type="text" class="form-control cgst_amt_ex" name="cgst_amt_ex[]" id="cgst_amt_ex_<?php echo $i; ?>" placeholder="CGST Amount" value="" readonly />
                                                 </td>
-                                                <td>
+                                                <td class="print_hide">
                                                     <input type="text" class="form-control sgst_amt_ex" name="sgst_amt_ex[]" id="sgst_amt_ex_<?php echo $i; ?>" placeholder="SGST Amount" value="" readonly />
                                                 </td>
-                                                <td>
+                                                <td class="print_hide">
                                                     <input type="text" class="form-control igst_amt_ex" name="igst_amt_ex[]" id="igst_amt_ex_<?php echo $i; ?>" placeholder="IGST Amount" value="" readonly />
                                                 </td>
-                                                <td>
+                                                <td class="print_hide">
                                                     <input type="text" class="form-control tax_amt_ex" name="tax_amt_ex[]" id="tax_amt_ex_<?php echo $i; ?>" placeholder="Tax Amount" value="" readonly />
                                                 </td>
                                                 <!-- <td>
@@ -485,15 +528,15 @@
                                                 <td style="display: none;">
                                                     <input type="text" class="form-control cost_total_amt_ex" name="cost_total_amt_ex[]" id="cost_total_amt_ex_<?php echo $i; ?>" placeholder="Total Amount" value="" readonly />
                                                 </td>
-                                                <td style="text-align:center;     vertical-align: middle;">
-                                                    <a id="box<?php echo $i; ?>_row_delete_ex" class="delete_row_ex" href="#"><span class="fa trash fa-trash-o"  ></span></a>
+                                                <td style="text-align:center; vertical-align: middle;" class="print_hide">
+                                                    <a id="box_ex_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>
                                                 </td>
                                             </tr>
                                         <?php } ?>
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <td colspan="9">
+                                                <td colspan="15">
                                                     <button type="button" class="btn btn-success" id="repeat-box_ex" >+</button>
                                                 </td>
                                             </tr>
@@ -557,9 +600,9 @@
 									<br clear="all"/>
 								  </div>
 								</div>
-                                <div class="panel-footer">
+                                <?php $curusr=$this->session->userdata('session_id'); ?>
+                                <div class="panel-footer print_hide">
                                     <a href="<?php echo base_url(); ?>index.php/distributor_in" class="btn btn-danger btn-sm pull-right" type="reset" id="reset">Cancel</a>
-                                    <?php $curusr=$this->session->userdata('session_id'); ?>
                                     <input type="submit" class="btn btn-success btn-sm" id="btn_submit" name="btn_submit" value="Submit For Approval" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_edit=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || $data[0]->status=='InActive')) echo ''; else echo 'display: none;';} else if($access[0]->r_insert=='1') echo ''; else echo 'display: none;';} else echo 'display: none;'; ?>" />
                                     <input type="submit" class="btn btn-danger btn-sm" id="btn_delete" name="btn_delete" value="Delete" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_delete=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved') && $data[0]->status!='InActive') echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
                                     <input type="submit" class="btn btn-success btn-sm" id="btn_approve" name="btn_approve" value="Approve" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
@@ -660,15 +703,18 @@
                 });
                 
                 
-                addMultiInputNamingRules('#form_bar_to_box_details', 'select[name="box[]"]', { required: true }, "");
-                addMultiInputNamingRules('#form_distributor_out_details', 'select[name="bar[]"]', { required: true }, "");
-                addMultiInputNamingRules('#form_bar_to_box_details', 'input[name="qty[]"]', { required: true }, "");
-                addMultiInputNamingRules('#form_distributor_out_details', 'input[name="sell_rate[]"]', { required: true }, "");
+                addMultiInputNamingRules('#form_distributor_in_details', 'select[name="type[]"]', { required: true }, "");
+                addMultiInputNamingRules('#form_distributor_in_details', 'select[name="bar[]"]', { required: true }, "");
+                addMultiInputNamingRules('#form_distributor_in_details', 'select[name="box[]"]', { required: true }, "");
+                addMultiInputNamingRules('#form_distributor_in_details', 'input[name="qty[]"]', { required: true }, "");
+                addMultiInputNamingRules('#form_distributor_in_details', 'input[name="sell_rate[]"]', { required: true }, "");
+                addMultiInputNamingRules('#form_distributor_in_details', 'input[name="batch_no[]"]', { required: true }, "");
 
-                addMultiInputNamingRules('#form_bar_to_box_details', 'select[name="box_ex[]"]', { required: true }, "");
-                addMultiInputNamingRules('#form_distributor_out_details', 'select[name="bar_ex[]"]', { required: true }, "");
-                addMultiInputNamingRules('#form_bar_to_box_details', 'input[name="qty_ex[]"]', { required: true }, "");
-                addMultiInputNamingRules('#form_distributor_out_details', 'input[name="sell_rate_ex[]"]', { required: true }, "");
+                addMultiInputNamingRules('#form_distributor_in_details', 'select[name="type_ex[]"]', { required: true }, "");
+                addMultiInputNamingRules('#form_distributor_in_details', 'select[name="bar_ex[]"]', { required: true }, "");
+                addMultiInputNamingRules('#form_distributor_in_details', 'select[name="box_ex[]"]', { required: true }, "");
+                addMultiInputNamingRules('#form_distributor_in_details', 'input[name="qty_ex[]"]', { required: true }, "");
+                addMultiInputNamingRules('#form_distributor_in_details', 'input[name="sell_rate_ex[]"]', { required: true }, "");
 
                 get_distributor_details($('#distributor_id').val());
             });
@@ -1069,6 +1115,7 @@
                 if (isNaN(qty)) qty=0;
                 if (isNaN(grams)) grams=0;
                 if (isNaN(rate)) rate=0;
+                if (isNaN(cost)) cost=0;
 
                 // var cst = parseFloat(get_number($("#cst").val(),2));
                 // var sell_rate = rate-((rate*sell_out)/100);
@@ -1152,6 +1199,7 @@
                 if (isNaN(qty)) qty=0;
                 if (isNaN(grams)) grams=0;
                 if (isNaN(rate)) rate=0;
+                if (isNaN(cost)) cost=0;
 
                 // var cst = parseFloat(get_number($("#cst").val(),2));
                 // var sell_rate = rate-((rate*sell_out)/100);
@@ -1235,6 +1283,7 @@
                 if (isNaN(qty)) qty=0;
                 if (isNaN(grams)) grams=0;
                 if (isNaN(rate)) rate=0;
+                if (isNaN(cost)) cost=0;
 
                 // var cst = parseFloat(get_number($("#cst").val(),2));
                 // var sell_rate = rate-((rate*sell_out)/100);
@@ -1793,31 +1842,31 @@
                                             '<td>' + 
                                                 '&nbsp;' + 
                                             '</td>' + 
-                                            '<td>' + 
+                                            '<td class="print_hide">' + 
                                                 '&nbsp;' + 
                                             '</td>' +
                                             '<td>' + 
                                                 'Total' + 
                                             '</td>' + 
-                                            '<td style="display: none;">' + 
+                                            '<td style="display: none;" class="print_hide">' + 
                                                 '<input type="text" class="form-control grams" name="grams[]" id="grams_'+counter+'" placeholder="Grams" value="" readonly />' + 
                                             '</td>' + 
-                                            '<td>' + 
+                                            '<td class="print_hide">' + 
                                                 '<input type="text" class="form-control" name="total_amount" id="total_amount" placeholder="Total Amount" value="<?php if (isset($data)) { echo $data[0]->amount; } ?>" readonly />' + 
                                             '</td>' + 
                                             '<!-- <td>' + 
                                                 '<input type="text" class="form-control" name="tax_amount" id="tax_amount" placeholder="CST Amount" value="<?php //if (isset($data)) { echo $data[0]->tax_amount; } ?>" readonly />' + 
                                             '</td> -->' + 
-                                            '<td>' + 
+                                            '<td class="print_hide">' + 
                                                 '<input type="text" class="form-control" name="cgst_amount" id="cgst_amount" placeholder="CGST Amount" value="<?php if (isset($data)) { echo $data[0]->cgst_amount; } ?>" readonly />' + 
                                             '</td>' + 
-                                            '<td>' + 
+                                            '<td class="print_hide">' + 
                                                 '<input type="text" class="form-control" name="sgst_amount" id="sgst_amount" placeholder="SGST Amount" value="<?php if (isset($data)) { echo $data[0]->sgst_amount; } ?>" readonly />' + 
                                             '</td>' + 
-                                            '<td>' + 
+                                            '<td class="print_hide">' + 
                                                 '<input type="text" class="form-control" name="igst_amount" id="igst_amount" placeholder="IGST Amount" value="<?php if (isset($data)) { echo $data[0]->igst_amount; } ?>" readonly />' + 
                                             '</td>' + 
-                                            '<td>' + 
+                                            '<td class="print_hide">' + 
                                                 '<input type="text" class="form-control" name="tax_amount" id="tax_amount" placeholder="Tax Amount" value="<?php if (isset($data)) { echo $data[0]->tax_amount; } ?>" readonly />' + 
                                             '</td>' + 
                                             '<td>' + 
@@ -1827,6 +1876,9 @@
                                                 '<input type="text" class="form-control" name="cost_final_amount" id="cost_final_amount" placeholder="Cost Final Amount" value="<?php if(isset($data)) { echo $data[0]->final_cost_amount; } ?>" readonly />' + 
                                             '</td>' + 
                                             '<td style="text-align:center;">' + 
+                                                '&nbsp;' + 
+                                            '</td>' + 
+                                            '<td style="text-align:center;" class="print_hide">' + 
                                                 '&nbsp;' + 
                                             '</td>' + 
                                         '</tr>');
@@ -1843,7 +1895,7 @@
                                             '<td>' + 
                                                 '&nbsp;' + 
                                             '</td>' + 
-                                            '<td>' + 
+                                            '<td class="print_hide">' + 
                                                 '&nbsp;' + 
                                             '</td>' +
                                             '<td>' + 
@@ -1852,22 +1904,22 @@
                                             '<td style="display: none;">' + 
                                                 '<input type="text" class="form-control grams" name="grams_ex[]" id="grams_ex_'+counter+'" placeholder="Grams" value="" readonly />' + 
                                             '</td>' + 
-                                            '<td>' + 
+                                            '<td class="print_hide">' + 
                                                 '<input type="text" class="form-control" name="total_amount_ex" id="total_amount_ex" placeholder="Total Amount" value="<?php if (isset($data)) { echo $data[0]->amount; } ?>" readonly />' + 
                                             '</td>' + 
                                             '<!-- <td>' + 
                                                 '<input type="text" class="form-control" name="tax_amount_ex" id="tax_amount_ex" placeholder="CST Amount" value="<?php //if (isset($data)) { echo $data[0]->tax_amount; } ?>" readonly />' + 
                                             '</td> -->' + 
-                                            '<td>' + 
+                                            '<td class="print_hide">' + 
                                                 '<input type="text" class="form-control" name="cgst_amoun_ex" id="cgst_amount_ex" placeholder="CGST Amount" value="<?php if (isset($data)) { echo $data[0]->cgst_amount; } ?>" readonly />' + 
                                             '</td>' + 
-                                            '<td>' + 
+                                            '<td class="print_hide">' + 
                                                 '<input type="text" class="form-control" name="sgst_amount_ex" id="sgst_amount_ex" placeholder="SGST Amount" value="<?php if (isset($data)) { echo $data[0]->sgst_amount; } ?>" readonly />' + 
                                             '</td>' + 
-                                            '<td>' + 
+                                            '<td class="print_hide">' + 
                                                 '<input type="text" class="form-control" name="igst_amount_ex" id="igst_amount_ex" placeholder="IGST Amount" value="<?php if (isset($data)) { echo $data[0]->igst_amount; } ?>" readonly />' + 
                                             '</td>' + 
-                                            '<td>' + 
+                                            '<td class="print_hide">' + 
                                                 '<input type="text" class="form-control" name="tax_amount_ex" id="tax_amount_ex" placeholder="Tax Amount" value="<?php if (isset($data)) { echo $data[0]->tax_amount; } ?>" readonly />' + 
                                             '</td>' + 
                                             '<td>' + 
@@ -1876,7 +1928,7 @@
                                             '<td style="display: none;">' + 
                                                 '<input type="text" class="form-control" name="cost_final_amount_ex" id="cost_final_amount_ex" placeholder="Cost Final Amount" value="<?php if(isset($data)) { echo $data[0]->final_cost_amount; } ?>" readonly />' + 
                                             '</td>' + 
-                                            '<td style="text-align:center;">' + 
+                                            '<td style="text-align:center;" class="print_hide">' + 
                                                 '&nbsp;' + 
                                             '</td>' + 
                                         '</tr>');
@@ -1910,7 +1962,7 @@
                                             '<td>' + 
                                                 '<input type="text" class="form-control qty" name="qty[]" id="qty_'+counter+'" placeholder="Qty" value=""/>' + 
                                             '</td>' + 
-                                            '<td>' + 
+                                            '<td class="print_hide">' + 
                                                 '<input type="text" class="form-control rate" name="rate[]" id="rate_'+counter+'" placeholder="Rate" value="" readonly />' + 
                                             '</td>' + 
                                             '<td>' + 
@@ -1922,22 +1974,22 @@
                                             '<td style="display: none;">' + 
                                                 '<input type="text" class="form-control grams" name="grams[]" id="grams_'+counter+'" placeholder="Grams" value="" readonly />' + 
                                             '</td>' + 
-                                            '<td>' + 
+                                            '<td class="print_hide">' + 
                                                 '<input type="text" class="form-control amount" name="amount[]" id="amount_'+counter+'" placeholder="Amount" value="" readonly />' + 
                                             '</td>' + 
                                             '<!-- <td>' + 
                                                 '<input type="text" class="form-control vat1" name="vat1[]" id="vat1_'+counter+'" placeholder="VAT" value="" readonly />' + 
                                             '</td> -->' + 
-                                            '<td>' + 
+                                            '<td class="print_hide">' + 
                                                 '<input type="text" class="form-control cgst_amt" name="cgst_amt[]" id="cgst_amt_'+counter+'" placeholder="CGST Amount" value="" readonly />' + 
                                             '</td>' + 
-                                            '<td>' + 
+                                            '<td class="print_hide">' + 
                                                 '<input type="text" class="form-control sgst_amt" name="sgst_amt[]" id="sgst_amt_'+counter+'" placeholder="SGST Amount" value="" readonly />' + 
                                             '</td>' + 
-                                            '<td>' + 
+                                            '<td class="print_hide">' + 
                                                 '<input type="text" class="form-control igst_amt" name="igst_amt[]" id="igst_amt_'+counter+'" placeholder="IGST Amount" value="" readonly />' + 
                                             '</td>' + 
-                                            '<td>' + 
+                                            '<td class="print_hide">' + 
                                                 '<input type="text" class="form-control tax_amt" name="tax_amt[]" id="tax_amt_'+counter+'" placeholder="VAT" value="" readonly />' + 
                                             '</td>' + 
                                             '<td>' + 
@@ -1946,8 +1998,17 @@
                                             '<td style="display: none;">' + 
                                                 '<input type="text" class="form-control cost_total_amt" name="cost_total_amt[]" id="cost_total_amt_'+counter+'" placeholder="Cost Total Amount" value="" readonly />' + 
                                             '</td>' + 
-                                            '<td style="text-align:center;">' + 
-                                                '<a id="box_'+counter+'_row_delete_ex" class="delete_row_ex" href="#"><span class="fa trash fa-trash-o"  ></span></a>' + 
+                                            '<td>' + 
+                                                '<select name="batch_no[]" class="form-control batch_no" id="batch_no_'+counter+'" data-error="#err_batch_no_'+counter+'">' + 
+                                                    '<option value="">Select</option>' + 
+                                                    '<?php if(isset($batch)) { for ($k=0; $k < count($batch); $k++) { ?>' + 
+                                                            '<option value="<?php echo $batch[$k]->id; ?>"><?php echo $batch[$k]->batch_no; ?></option>' + 
+                                                    '<?php }} ?>' + 
+                                                '</select>' + 
+                                                '<div id="err_batch_no_'+counter+'"></div>' + 
+                                            '</td>' + 
+                                            '<td style="text-align:center;" class="print_hide">' + 
+                                                '<a id="box_'+counter+'_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>' + 
                                             '</td>' + 
                                         '</tr>');
                     $('#box_details').append(newRow);
@@ -1982,7 +2043,7 @@
 
                 $('#repeat-box_ex').click(function(event){
                     event.preventDefault();
-                    var newRow = jQuery('<tr id="box_'+counter+'_row">' + 
+                    var newRow = jQuery('<tr id="box_ex_'+counter+'_row">' + 
                                             '<td>' + 
                                                 '<select name="type_ex[]" class="form-control type_ex" id="type_ex_'+counter+'">' + 
                                                     '<option value="">Select</option>' + 
@@ -2008,7 +2069,7 @@
                                             '<td>' + 
                                                 '<input type="text" class="form-control qty_ex" name="qty_ex[]" id="qty_ex_'+counter+'" placeholder="Qty" value=""/>' + 
                                             '</td>' + 
-                                            '<td>' + 
+                                            '<td class="print_hide">' + 
                                                 '<input type="text" class="form-control rate_ex" name="rate_ex[]" id="rate_ex_'+counter+'" placeholder="Rate" value="" readonly />' + 
                                             '</td>' + 
                                             '<td>' + 
@@ -2020,22 +2081,22 @@
                                             '<td style="display: none;">' + 
                                                 '<input type="text" class="form-control grams_ex" name="grams_ex[]" id="grams_ex_'+counter+'" placeholder="Grams" value="" readonly />' + 
                                             '</td>' + 
-                                            '<td>' + 
+                                            '<td class="print_hide">' + 
                                                 '<input type="text" class="form-control amount_ex" name="amount_ex[]" id="amount_ex_'+counter+'" placeholder="Amount" value="" readonly />' + 
                                             '</td>' + 
                                             '<!-- <td>' + 
                                                 '<input type="text" class="form-control vat1_ex" name="vat1_ex[]" id="vat1_ex_'+counter+'" placeholder="VAT" value="" readonly />' + 
                                             '</td> -->' + 
-                                            '<td>' + 
+                                            '<td class="print_hide">' + 
                                                 '<input type="text" class="form-control cgst_amt_ex" name="cgst_amt_ex[]" id="cgst_amt_ex_'+counter+'" placeholder="CGST Amount" value="" readonly />' + 
                                             '</td>' + 
-                                            '<td>' + 
+                                            '<td class="print_hide">' + 
                                                 '<input type="text" class="form-control sgst_amt_ex" name="sgst_amt_ex[]" id="sgst_amt_ex_'+counter+'" placeholder="SGST Amount" value="" readonly />' + 
                                             '</td>' + 
-                                            '<td>' + 
+                                            '<td class="print_hide">' + 
                                                 '<input type="text" class="form-control igst_amt_ex" name="igst_amt_ex[]" id="igst_amt_ex_'+counter+'" placeholder="IGST Amount" value="" readonly />' + 
                                             '</td>' + 
-                                            '<td>' + 
+                                            '<td class="print_hide">' + 
                                                 '<input type="text" class="form-control tax_amt_ex" name="tax_amt_ex[]" id="tax_amt_ex_'+counter+'" placeholder="VAT" value="" readonly />' + 
                                             '</td>' + 
                                             '<td>' + 
@@ -2044,8 +2105,8 @@
                                             '<td style="display: none;">' + 
                                                 '<input type="text" class="form-control cost_total_amt_ex" name="cost_total_amt_ex[]" id="cost_total_amt_ex_'+counter+'" placeholder="Cost Total Amount" value="" readonly />' + 
                                             '</td>' + 
-                                            '<td style="text-align:center;">' + 
-                                                '<a id="box_'+counter+'_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>' + 
+                                            '<td style="text-align:center;" class="print_hide">' + 
+                                                '<a id="box_ex_'+counter+'_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>' + 
                                             '</td>' + 
                                         '</tr>');
                     $('#box_details_ex').append(newRow);
@@ -2071,7 +2132,7 @@
                     // $(".cost_rate").blur(function(){
                     //     get_amount($(this));
                     // });
-                    $('.delete_row_ex').click(function(event){
+                    $('.delete_row').click(function(event){
                         delete_row($(this));
                         get_total_ex();
                     });

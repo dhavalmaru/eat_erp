@@ -24,7 +24,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |
 */
 // $config['base_url'] = 'https://www.eatanytime.in/test/';
-$config['base_url'] = 'http://localhost:8081/eat_erp/';
+$config['base_url'] = 'http://localhost/eat_erp/';
 
 /*
 |--------------------------------------------------------------------------
@@ -514,4 +514,5 @@ $config['rewrite_short_tags'] = FALSE;
 $config['proxy_ips'] = '';
 
 $config['txnTypeArray']=array("p"=>"purchase","s"=>"sales","r"=>"rent","l"=>"loan","e"=>"expense","m"=>"maintenance","o"=>"other_expense","t"=>"other_schedule");
-$config['template_path']="C:/xampp/htdocs/eat_erp/assets/templates/";
+// $config['template_path']="/home/eatangcp/public_html/test/assets/templates/";
+$config['template_path']="C:/wamp64/www/eat_erp/assets/templates/";

@@ -65,11 +65,13 @@ function save_data($id=''){
     }
     
     $data = array(
-        'date_of_receipt' => $date_of_receipt,
+         'date_of_receipt' => $date_of_receipt,
         'purchase_order_id' => $this->input->post('purchase_order_id'),
         'vendor_id' => $this->input->post('vendor_id'),
-        'cst' => format_number($this->input->post('cst'),2),
-        'excise' => format_number($this->input->post('excise'),2),
+		'amt' =>format_number($this->input->post('total_amount'),2),
+		'cgst_amt' =>format_number($this->input->post('cgst_amount'),2),
+		'sgst_amt' =>format_number($this->input->post('sgst_amount'),2),
+		'igst_amt' =>format_number($this->input->post('igst_amount'),2),
         'final_amount' => format_number($this->input->post('final_amount'),2),
         'depot_id' => $this->input->post('depot_id'),
         'status' => $this->input->post('status'),
@@ -97,8 +99,15 @@ function save_data($id=''){
     $raw_material_id=$this->input->post('raw_material[]');
     $qty=$this->input->post('qty[]');
     $rate=$this->input->post('rate[]');
+	$hsn_code=$this->input->post('hsn_code[]');
+    $tax_per=$this->input->post('tax_per[]');
     $amount=$this->input->post('amount[]');
-
+    $cgst_amt=$this->input->post('cgst_amt[]');
+    $sgst_amt=$this->input->post('sgst_amt[]');
+    $igst_amt=$this->input->post('igst_amt[]');
+    $tax_amt=$this->input->post('tax_amt[]');
+    $total_amt=$this->input->post('total_amt[]');
+	
     for ($k=0; $k<count($raw_material_id); $k++) {
         if(isset($raw_material_id[$k]) and $raw_material_id[$k]!="") {
             $data = array(
@@ -106,7 +115,17 @@ function save_data($id=''){
                         'raw_material_id' => $raw_material_id[$k],
                         'qty' => format_number($qty[$k],2),
                         'rate' => format_number($rate[$k],2),
-                        'amount' => format_number($amount[$k],2)
+						'hsn_code'=>$hsn_code[$k],
+                        'tax_per' => format_number($tax_per[$k],2),
+                        'amount' => format_number($amount[$k],2),
+                        'cgst_amt' => format_number($cgst_amt[$k],2),
+                        'sgst_amt' => format_number($sgst_amt[$k],2),
+                        'igst_amt' => format_number($igst_amt[$k],2),
+                        'tax_amt' => format_number($tax_amt[$k],2),
+                        'total_amt' => format_number($total_amt[$k],2),
+						   // 'final_amt' => format_number($final_amt[$k],2)
+						
+                       
                     );
             $this->db->insert('raw_material_stock', $data);
         }

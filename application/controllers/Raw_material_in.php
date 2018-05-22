@@ -44,6 +44,7 @@ class Raw_material_in extends CI_Controller{
                 $data['depot'] = $this->depot_model->get_data('Approved');
                 $data['raw_material'] = $this->raw_material_model->get_data('Approved');
                 $data['purchase_order'] = $this->purchase_order_model->get_data('Approved');
+				 
 
                 load_view('raw_material_in/raw_material_in_details', $data);
             } else {

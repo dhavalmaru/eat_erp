@@ -118,12 +118,13 @@
     												<tr>
     													<th width="65"  style="text-align:center;" >Sr. No.</th>
     													<th width=" ">Distributor Name</th>
-    													<th width=" ">Sales Representative</th>
+    													<!--th width=" ">Sales Representative</th-->
                                                         <th width=" ">Location</th>
     													<th width=" ">Sell Out (In %)</th>
     													<th width=" ">Credit Period (In Days)</th>
     													<th width=" ">Status</th>
     													<th width=" ">Creation Date</th>
+    													<th width=" ">Action</th>
     												</tr>
     											</thead>
     											<tbody>
@@ -131,7 +132,7 @@
     												<tr>
     													<td style="text-align:center;"><?php echo $i+1; ?></td>
     													<td><a href="<?php echo base_url().'index.php/distributor/edit/'.$data[$i]->d_id; ?>"><?php echo $data[$i]->distributor_name; ?></a></td>
-    													<td><?php echo $data[$i]->sales_rep_name; ?></td>
+    													<!--td><?php //echo $data[$i]->sales_rep_name; ?></td-->
                                                         <td><?php echo $data[$i]->location; ?></td>
     													<td><?php echo $data[$i]->sell_out; ?></td>
     													<td><?php echo $data[$i]->credit_period; ?></td>
@@ -141,6 +142,7 @@
                                                                 <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
                                                             </span>
                                                             <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
+															<td><a href="<?php echo base_url().'index.php/distributor/single_locations/'.$data[$i]->id; ?>">View Map</a></td>
     												</tr>
     												<?php } ?>
     											</tbody>

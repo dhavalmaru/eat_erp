@@ -42,9 +42,9 @@ function save_data($id=''){
         'rm_name' => $this->input->post('rm_name'),
 		'hsn_code'=> $this->input->post('hsn_code'),
 		'rate'=> $this->input->post('rate'),
+        'tax_per'=> $this->input->post('tax_per'),
         'status' => $this->input->post('status'),
         'remarks' => $this->input->post('remarks'),
-		
         'modified_by' => $curusr,
         'modified_on' => $now
     );

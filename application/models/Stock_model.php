@@ -147,12 +147,14 @@ function check_bar_qty_availablity_for_depot(){
     $depot_id=$this->input->post('depot_id');
     $product_id=$this->input->post('product_id');
     $qty=floatval(format_number($this->input->post('qty')));
+    $ref_id=$this->input->post('ref_id');
 
-    // $id=4;
-    // $module="depot_transfer";
-    // $depot_id=4;
-    // $raw_material_id=5;
-    // $qty=floatval(format_number('1,00,00,000'));
+    // $id=3721;
+    // $module='distributor_out';
+    // $depot_id=2;
+    // $product_id=6;
+    // $qty=0;
+    // $ref_id=0;
     
     $depot_transfer_cond="";
     if($module=="depot_transfer"){
@@ -169,6 +171,10 @@ function check_bar_qty_availablity_for_depot(){
     $distributor_out_cond="";
     if($module=="distributor_out"){
         $distributor_out_cond=" and id<>'$id'";
+
+        if($ref_id!=''){
+            $distributor_out_cond=$distributor_out_cond." and ref_id<>'$ref_id'";
+        }
     }
     $bar_to_box_cond="";
     if($module=="bar_to_box"){
@@ -226,6 +232,13 @@ function check_bar_qty_availablity_for_depot(){
         $tot_qty_out=0;
     }
 
+    // echo $tot_qty_in;
+    // echo '<br/>';
+    // echo $tot_qty_out;
+    // echo '<br/>';
+    // echo $qty;
+    // echo '<br/>';
+
     if (($tot_qty_in-$tot_qty_out-$qty)<0){
         return 1;
     } else {
@@ -278,6 +291,7 @@ function check_box_qty_availablity_for_depot(){
     $depot_id=$this->input->post('depot_id');
     $box_id=$this->input->post('box_id');
     $qty=floatval(format_number($this->input->post('qty')));
+    $ref_id=$this->input->post('ref_id');
 
     // $id=4;
     // $module="depot_transfer";
@@ -300,6 +314,10 @@ function check_box_qty_availablity_for_depot(){
     $distributor_out_cond="";
     if($module=="distributor_out"){
         $distributor_out_cond=" and id<>'$id'";
+
+        if($ref_id!=''){
+            $distributor_out_cond=$distributor_out_cond." and ref_id<>'$ref_id'";
+        }
     }
     $bar_to_box_cond="";
     if($module=="bar_to_box"){

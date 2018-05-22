@@ -124,7 +124,7 @@ class User_roles extends CI_Controller
     }
 
     public function get_report_groups(){
-        for($i=1; $i<17; $i++) {
+        for($i=1; $i<30; $i++) {
             $data['rep_' . $i . '_view'] = 1;
         }
 
@@ -140,33 +140,47 @@ class User_roles extends CI_Controller
         $data['rep_grp_1']=0;
         $data['rep_grp_2']=0;
         $data['rep_grp_3']=0;
-        // $data['rep_grp_4']=0;
+        $data['rep_grp_4']=0;
         // $data['rep_grp_5']=0;
         // $data['rep_grp_6']=0;
 
-        if (isset($data['rep_1_view'])) {if ($data['rep_1_view']==1) $data['rep_grp_1']=1;}
-        if (isset($data['rep_2_view'])) {if ($data['rep_2_view']==1) $data['rep_grp_1']=1;}
-        if (isset($data['rep_3_view'])) {if ($data['rep_3_view']==1) $data['rep_grp_1']=1;}
-        if (isset($data['rep_4_view'])) {if ($data['rep_4_view']==1) $data['rep_grp_1']=1;}
-        if (isset($data['rep_5_view'])) {if ($data['rep_5_view']==1) $data['rep_grp_1']=1;}
-        if (isset($data['rep_6_view'])) {if ($data['rep_6_view']==1) $data['rep_grp_1']=1;}
-
-        if (isset($data['rep_7_view'])) {if ($data['rep_7_view']==1) $data['rep_grp_2']=1;}
-        if (isset($data['rep_8_view'])) {if ($data['rep_8_view']==1) $data['rep_grp_2']=1;}
-        if (isset($data['rep_9_view'])) {if ($data['rep_9_view']==1) $data['rep_grp_2']=1;}
+        //if (isset($data['rep_1_view'])) {if ($data['rep_1_view']==1) $data['rep_grp_1']=1;}
+		if (isset($data['rep_18_view'])) {if ($data['rep_18_view']==1) $data['rep_grp_1']=1;}
+		if (isset($data['rep_15_view'])) {if ($data['rep_15_view']==1) $data['rep_grp_1']=1;}
+		
+		if (isset($data['rep_5_view'])) {if ($data['rep_5_view']==1) $data['rep_grp_3']=1;}
+        if (isset($data['rep_6_view'])) {if ($data['rep_6_view']==1) $data['rep_grp_3']=1;}
+        if (isset($data['rep_7_view'])) {if ($data['rep_7_view']==1) $data['rep_grp_3']=1;}
+        if (isset($data['rep_14_view'])) {if ($data['rep_14_view']==1) $data['rep_grp_3']=1;}
+        if (isset($data['rep_17_view'])) {if ($data['rep_17_view']==1) $data['rep_grp_3']=1;}
+        if (isset($data['rep_9_view'])) {if ($data['rep_9_view']==1) $data['rep_grp_3']=1;}
+		
+		
+		if (isset($data['rep_2_view'])) {if ($data['rep_2_view']==1) $data['rep_grp_2']=1;}
+        if (isset($data['rep_3_view'])) {if ($data['rep_3_view']==1) $data['rep_grp_2']=1;}
+        if (isset($data['rep_4_view'])) {if ($data['rep_4_view']==1) $data['rep_grp_2']=1;}
         if (isset($data['rep_10_view'])) {if ($data['rep_10_view']==1) $data['rep_grp_2']=1;}
 
-        if (isset($data['rep_11_view'])) {if ($data['rep_11_view']==1) $data['rep_grp_3']=1;}
-        if (isset($data['rep_12_view'])) {if ($data['rep_12_view']==1) $data['rep_grp_3']=1;}
-        if (isset($data['rep_13_view'])) {if ($data['rep_13_view']==1) $data['rep_grp_3']=1;}
-        if (isset($data['rep_14_view'])) {if ($data['rep_14_view']==1) $data['rep_grp_3']=1;}
-        if (isset($data['rep_15_view'])) {if ($data['rep_15_view']==1) $data['rep_grp_3']=1;}
-        if (isset($data['rep_16_view'])) {if ($data['rep_16_view']==1) $data['rep_grp_3']=1;}
+        if (isset($data['rep_11_view'])) {if ($data['rep_11_view']==1) $data['rep_grp_2']=1;}
+        if (isset($data['rep_12_view'])) {if ($data['rep_12_view']==1) $data['rep_grp_2']=1;}
+		
+		
+		
+		
+        if (isset($data['rep_13_view'])) {if ($data['rep_13_view']==1) $data['rep_grp_4']=1;}
+		if (isset($data['rep_20_view'])) {if ($data['rep_20_view']==1) $data['rep_grp_4']=1;}
+        if (isset($data['rep_21_view'])) {if ($data['rep_21_view']==1) $data['rep_grp_4']=1;}
+		
+		
+		
+
+        // if (isset($data['rep_15_view'])) {if ($data['rep_15_view']==1) $data['rep_grp_3']=1;}
+        // if (isset($data['rep_16_view'])) {if ($data['rep_16_view']==1) $data['rep_grp_3']=1;}
 
         // if (isset($data['rep_17_view'])) {if ($data['rep_17_view']==1) $data['rep_grp_4']=1;}
         // if (isset($data['rep_18_view'])) {if ($data['rep_18_view']==1) $data['rep_grp_4']=1;}
         // if (isset($data['rep_19_view'])) {if ($data['rep_19_view']==1) $data['rep_grp_4']=1;}
-        // if (isset($data['rep_20_view'])) {if ($data['rep_20_view']==1) $data['rep_grp_4']=1;}
+
 
         // if (isset($data['rep_21_view'])) {if ($data['rep_21_view']==1) $data['rep_grp_5']=1;}
         // if (isset($data['rep_22_view'])) {if ($data['rep_22_view']==1) $data['rep_grp_5']=1;}

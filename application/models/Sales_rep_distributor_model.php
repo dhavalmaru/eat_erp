@@ -97,6 +97,9 @@ function get_data1($status='', $id=''){
     } else {
         $cond2=$cond2." and status != 'Active'";
     }
+	
+	
+	
 
     // $sql = "select G.* from 
             // (select E.*, concat(ifnull(F.first_name,''),' ',ifnull(F.last_name,'')) as user_name from 
@@ -127,14 +130,80 @@ function get_data1($status='', $id=''){
             A.modified_by, A.modified_on, state_code, gst_number from 
             (select * from distributor_master".$cond2.") A 
             left join 
-            (select * from area_master) D 
-            on (A.Area_id = D.id)) C   ".$cond." 
+            (select * from sr_mapping) D 
+            on (A.area_id = D.area_id and A.zone_id = D.zone_id and A.location_id = D.location_id and  (A.sales_rep_id = D.reporting_manager_id OR A.sales_rep_id = D.sales_rep_id1 OR A.sales_rep_id = D.sales_rep_id2))) C   ".$cond." 
             order by distributor_name asc";
 			
     $query=$this->db->query($sql);
     return $query->result();
 }
 
+
+
+
+function get_data2($status='', $id=''){
+    // if($status!=""){
+        // $cond=" where status='".$status."'";
+    // } else {
+        // $cond="";
+    // }
+
+    // if($id!=""){
+        // if($cond=="") {
+            // $cond=" where id='".$id."'";
+        // } else {
+            // $cond=$cond." and id='".$id."'";
+        // }
+    // }
+
+    $sales_rep_id=$this->session->userdata('sales_rep_id');
+    // if($sales_rep_id!=""){
+        // $cond2=" where sales_rep_id='".$sales_rep_id."'";
+    // } else {
+        // $cond2="";
+    // }
+
+    // if($cond2=="") {
+        // $cond2=" where status != 'Active'";
+    // } else {
+        // $cond2=$cond2." and status != 'Active'";
+    // }
+	
+	
+	
+
+    // $sql = "select G.* from 
+            // (select E.*, concat(ifnull(F.first_name,''),' ',ifnull(F.last_name,'')) as user_name from 
+            // (
+            // (select C.id, C.sales_rep_id, C.distributor_name, C.address, C.city, C.pincode, C.state, 
+            // C.country, C.vat_no, C.contact_person, C.contact_no, C.margin, C.doc_document, C.document_name, 
+            // D.area, C.status, C.remarks, C.modified_by, C.modified_on from 
+            // (select concat('d_',A.id) as id, A.sales_rep_id, A.distributor_name, A.address, A.city, A.pincode, A.state, 
+            // A.country, A.tin_number as vat_no, B.contact_person, B.mobile as contact_no, A.sell_out as margin, 
+            // null as doc_document, null as document_name, A.area_id, A.status, A.remarks, A.modified_by, A.modified_on from 
+            // (select * from distributor_master".$cond2.") A 
+            // left join 
+            // (select * from distributor_contacts) B 
+            // on (A.id = B.distributor_id)) C 
+            // left join 
+            // (select * from area_master) D 
+            // on (C.Area_id = D.id))) E 
+            // left join 
+            // (select * from user_master) F 
+            // on (E.modified_by=F.id)) G ".$cond." 
+            // order by distributor_name asc";
+	
+	$sql = 
+			
+			"SELECT  concat('d_',A.id) as id, A.sales_rep_id, A.distributor_name, A.address, A.city, A.pincode, A.state, 
+            A.country, A.tin_number as vat_no, A.sell_out as margin, 
+            null as doc_document, null as document_name, A.area_id, A.status, A.remarks, 
+            A.modified_by, A.modified_on FROM distributor_master A LEFT JOIN sr_mapping B ON (A.area_id = B.area_id and A.zone_id = B.zone_id and  A.type_id = B.type_id) where status='approved' and
+		(B.reporting_manager_id=".$sales_rep_id." OR B.sales_rep_id1=".$sales_rep_id." OR B.sales_rep_id2=".$sales_rep_id." )  order by A.distributor_name asc";
+			
+    $query=$this->db->query($sql);
+    return $query->result();
+}
 
 function save_data($id=''){
     $now=date('Y-m-d H:i:s');

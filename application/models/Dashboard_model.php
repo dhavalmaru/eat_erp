@@ -175,10 +175,140 @@ class Dashboard_model extends CI_Model {
         return $query->result();
     }
 
-    function get_total_product_stock() {
-        $sql="select DD.depot_id, DD.product_id, sum(DD.tot_qty) as tot_qty, DD.depot_name, DD.product_name, DD.denominations, sum(DD.total_bars) as total_bars from 
+    // function get_total_product_stock() {
+    //     $sql="select DD.depot_id, DD.product_id, sum(DD.tot_qty) as tot_qty, DD.depot_name, DD.short_name, DD.denominations, sum(DD.total_bars) as total_bars from 
 
-            (select H.*, I.product_name, 1 as denominations, tot_qty as total_bars from 
+    //         (select H.*, I.short_name, 1 as denominations, tot_qty as total_bars from 
+    //         (select F.*, G.depot_name from 
+    //         (select E.depot_id, E.product_id, sum(tot_qty) as tot_qty from 
+    //         (select C.depot_id, C.product_id, ifnull(C.qty_in,0)-ifnull(D.qty_out,0) as tot_qty from 
+    //         (select AA.depot_id, AA.product_id, sum(AA.qty) as qty_in from 
+    //         (select depot_id, product_id, qty_in_bar as qty from batch_processing where status = 'Approved' 
+    //         union all 
+    //         select A.depot_in_id as depot_id, B.item_id as product_id, B.qty from 
+    //         (select * from depot_transfer where status = 'Approved') A 
+    //         inner join 
+    //         (select * from depot_transfer_items where type = 'Bar') B 
+    //         on (A.id = B.depot_transfer_id) 
+    //         union all 
+    //         select A.depot_id, B.item_id as product_id, B.qty from 
+    //         (select * from distributor_in where status = 'Approved') A 
+    //         inner join 
+    //         (select * from distributor_in_items where type = 'Bar') B 
+    //         on (A.id = B.distributor_in_id) 
+    //         union all 
+    //         select C.depot_id, D.product_id, ifnull(C.qty,0)*ifnull(D.qty,0) as qty from 
+    //         (select A.depot_id, B.box_id, B.qty from 
+    //         (select * from box_to_bar where status = 'Approved') A 
+    //         inner join 
+    //         (select * from box_to_bar_qty) B 
+    //         on (A.id = B.box_to_bar_id)) C 
+    //         inner join 
+    //         (select * from box_product) D 
+    //         on (C.box_id = D.box_id)) AA group by AA.depot_id, AA.product_id) C 
+    //         left join 
+    //         (select BB.depot_id, BB.product_id, sum(BB.qty) as qty_out from 
+    //         (select A.depot_out_id as depot_id, B.item_id as product_id, B.qty from 
+    //         (select * from depot_transfer where status = 'Approved') A 
+    //         inner join 
+    //         (select * from depot_transfer_items where type = 'Bar') B 
+    //         on (A.id = B.depot_transfer_id) 
+    //         union all 
+    //         select A.depot_id, B.item_id as product_id, B.qty from 
+    //         (select * from distributor_out where status = 'Approved') A 
+    //         inner join 
+    //         (select * from distributor_out_items where type = 'Bar') B 
+    //         on (A.id = B.distributor_out_id) 
+    //         union all 
+    //         select C.depot_id, D.product_id, ifnull(C.qty,0)*ifnull(D.qty,0) as qty from 
+    //         (select A.depot_id, B.box_id, B.qty from 
+    //         (select * from bar_to_box where status = 'Approved') A 
+    //         inner join 
+    //         (select * from bar_to_box_qty) B 
+    //         on (A.id = B.bar_to_box_id)) C 
+    //         inner join 
+    //         (select * from box_product) D 
+    //         on (C.box_id = D.box_id)) BB group by BB.depot_id, BB.product_id) D 
+    //         on (C.depot_id=D.depot_id and C.product_id=D.product_id)) E 
+    //         group by E.depot_id, E.product_id) F 
+    //         left join 
+    //         (select * from depot_master where status = 'Approved') G 
+    //         on (F.depot_id=G.id)) H 
+    //         left join 
+    //         (select * from product_master where status = 'Approved') I 
+    //         on (H.product_id=I.id)
+
+    //         union all 
+
+    //         select CC.depot_id, CC.product_id, sum(CC.tot_qty) as tot_qty, CC.depot_name, CC.short_name, CC.denominations, sum(CC.total_bars) as total_bars from 
+    //         (select AA.depot_id, BB.product_id, AA.tot_qty, AA.depot_name, BB.short_name, BB.qty as denominations, ifnull(AA.tot_qty,0)*ifnull(BB.qty,0) as total_bars from 
+    //         (select H.*, I.short_name from
+    //         (select F.*, G.depot_name from 
+    //         (select E.depot_id, E.box_id, sum(tot_qty) as tot_qty from 
+    //         (select C.depot_id, C.box_id, ifnull(C.qty_in,0)-ifnull(D.qty_out,0) as tot_qty from 
+    //         (select AA.depot_id, AA.box_id, sum(AA.qty) as qty_in from 
+    //         (select A.depot_in_id as depot_id, B.item_id as box_id, B.qty from 
+    //         (select * from depot_transfer where status = 'Approved') A 
+    //         inner join 
+    //         (select * from depot_transfer_items where type = 'Box') B 
+    //         on (A.id = B.depot_transfer_id) 
+    //         union all 
+    //         select A.depot_id, B.item_id as box_id, B.qty from 
+    //         (select * from distributor_in where status = 'Approved') A 
+    //         inner join 
+    //         (select * from distributor_in_items where type = 'Box') B 
+    //         on (A.id = B.distributor_in_id) 
+    //         union all 
+    //         select A.depot_id, B.box_id, B.qty from 
+    //         (select * from bar_to_box where status = 'Approved') A 
+    //         inner join 
+    //         (select * from bar_to_box_qty) B 
+    //         on (A.id = B.bar_to_box_id)) AA group by AA.depot_id, AA.box_id) C 
+    //         left join 
+    //         (select BB.depot_id, BB.box_id, sum(BB.qty) as qty_out from 
+    //         (select A.depot_out_id as depot_id, B.item_id as box_id, B.qty from 
+    //         (select * from depot_transfer where status = 'Approved') A 
+    //         inner join 
+    //         (select * from depot_transfer_items where type = 'Box') B 
+    //         on (A.id = B.depot_transfer_id) 
+    //         union all 
+    //         select A.depot_id, B.item_id as box_id, B.qty from 
+    //         (select * from distributor_out where status = 'Approved') A 
+    //         inner join 
+    //         (select * from distributor_out_items where type = 'Box') B 
+    //         on (A.id = B.distributor_out_id) 
+    //         union all 
+    //         select A.depot_id, B.box_id, B.qty from 
+    //         (select * from box_to_bar where status = 'Approved') A 
+    //         inner join 
+    //         (select * from box_to_bar_qty) B 
+    //         on (A.id = B.box_to_bar_id)) BB group by BB.depot_id, BB.box_id) D 
+    //         on (C.depot_id=D.depot_id and C.box_id=D.box_id)) E 
+    //         group by E.depot_id, E.box_id) F 
+    //         left join 
+    //         (select * from depot_master where status = 'Approved') G 
+    //         on (F.depot_id=G.id)) H 
+    //         left join 
+    //         (select * from box_master where status = 'Approved') I 
+    //         on (H.box_id=I.id)) AA 
+    //         left join 
+    //         (select A.*, B.short_name from box_product A left join product_master B on (A.product_id = B.id)) BB 
+    //         on (AA.box_id = BB.box_id)) CC 
+    //         where CC.tot_qty > 0
+    //         group by CC.depot_id, CC.product_id, CC.depot_name, CC.short_name, CC.denominations) DD 
+
+    //         where DD.tot_qty > 0
+    //         group by DD.depot_id, DD.product_id, DD.depot_name, DD.short_name, DD.denominations 
+    //         order by DD.product_id, DD.depot_id, DD.denominations";
+    //     $query=$this->db->query($sql);
+    //     return $query->result();
+    // }
+
+
+    function get_total_product_stock() {
+        $sql="select DD.depot_id, DD.product_id, sum(DD.tot_qty) as tot_qty, DD.depot_name, DD.short_name, sum(DD.total_bars) as total_bars from 
+
+            (select H.*, I.short_name, 1 as denominations, tot_qty as total_bars from 
             (select F.*, G.depot_name from 
             (select E.depot_id, E.product_id, sum(tot_qty) as tot_qty from 
             (select C.depot_id, C.product_id, ifnull(C.qty_in,0)-ifnull(D.qty_out,0) as tot_qty from 
@@ -232,17 +362,17 @@ class Dashboard_model extends CI_Model {
             on (C.depot_id=D.depot_id and C.product_id=D.product_id)) E 
             group by E.depot_id, E.product_id) F 
             left join 
-            (select * from depot_master where status = 'Approved') G 
+            (select * from depot_master) G 
             on (F.depot_id=G.id)) H 
             left join 
-            (select * from product_master where status = 'Approved') I 
+            (select * from product_master) I 
             on (H.product_id=I.id)
 
             union all 
 
-            select CC.depot_id, CC.product_id, sum(CC.tot_qty) as tot_qty, CC.depot_name, CC.product_name, CC.denominations, sum(CC.total_bars) as total_bars from 
-            (select AA.depot_id, BB.product_id, AA.tot_qty, AA.depot_name, BB.product_name, BB.qty as denominations, ifnull(AA.tot_qty,0)*ifnull(BB.qty,0) as total_bars from 
-            (select H.*, I.box_name from
+            select CC.depot_id, CC.product_id, sum(CC.tot_qty) as tot_qty, CC.depot_name, CC.short_name, CC.denominations, sum(CC.total_bars) as total_bars from 
+            (select AA.depot_id, BB.product_id, AA.tot_qty, AA.depot_name, BB.short_name, BB.qty as denominations, ifnull(AA.tot_qty,0)*ifnull(BB.qty,0) as total_bars from 
+            (select H.*, I.short_name from
             (select F.*, G.depot_name from 
             (select E.depot_id, E.box_id, sum(tot_qty) as tot_qty from 
             (select C.depot_id, C.box_id, ifnull(C.qty_in,0)-ifnull(D.qty_out,0) as tot_qty from 
@@ -286,26 +416,77 @@ class Dashboard_model extends CI_Model {
             on (C.depot_id=D.depot_id and C.box_id=D.box_id)) E 
             group by E.depot_id, E.box_id) F 
             left join 
-            (select * from depot_master where status = 'Approved') G 
+            (select * from depot_master) G 
             on (F.depot_id=G.id)) H 
             left join 
-            (select * from box_master where status = 'Approved') I 
+            (select * from box_master) I 
             on (H.box_id=I.id)) AA 
             left join 
-            (select A.*, B.product_name from box_product A left join product_master B on (A.product_id = B.id)) BB 
+            (select A.*, B.short_name from box_product A left join product_master B on (A.product_id = B.id)) BB 
             on (AA.box_id = BB.box_id)) CC 
             where CC.tot_qty > 0
-            group by CC.depot_id, CC.product_id, CC.depot_name, CC.product_name, CC.denominations) DD 
+            group by CC.depot_id, CC.product_id, CC.depot_name, CC.short_name, CC.denominations) DD 
 
             where DD.tot_qty > 0
-            group by DD.depot_id, DD.product_id, DD.depot_name, DD.product_name, DD.denominations 
-            order by DD.product_id, DD.depot_id, DD.denominations";
+            group by DD.depot_id, DD.product_id, DD.depot_name, DD.short_name
+            order by  DD.depot_id,DD.product_id";
         $query=$this->db->query($sql);
         return $query->result();
     }
 
+
+    // function get_product_stock_for_distributor() {
+    //     $sql="select J.*, K.short_name from 
+    //         (select H.*, I.distributor_name from 
+    //         (select F.*, G.sale_qty, ifnull(F.tot_qty,0)-ifnull(G.sale_qty,0) as bal_qty from 
+    //         (select E.distributor_id, E.product_id, sum(tot_qty) as tot_qty from 
+    //         (select C.distributor_id, C.product_id, ifnull(C.qty_in,0)-ifnull(D.qty_out,0) as tot_qty from 
+    //         (select AA.distributor_id, AA.product_id, sum(AA.qty) as qty_in from 
+    //         (select A.distributor_in_id as distributor_id, B.item_id as product_id, B.qty from 
+    //         (select * from distributor_transfer where status = 'Approved') A 
+    //         inner join 
+    //         (select * from distributor_transfer_items where type = 'Bar') B 
+    //         on (A.id = B.distributor_transfer_id) 
+    //         union all 
+    //         select A.distributor_id, B.item_id as product_id, B.qty from 
+    //         (select * from distributor_out where status = 'Approved') A 
+    //         inner join 
+    //         (select * from distributor_out_items where type = 'Bar') B 
+    //         on (A.id = B.distributor_out_id)) AA group by AA.distributor_id, AA.product_id) C 
+    //         left join 
+    //         (select BB.distributor_id, BB.product_id, sum(BB.qty) as qty_out from 
+    //         (select A.distributor_out_id as distributor_id, B.item_id as product_id, B.qty from 
+    //         (select * from distributor_transfer where status = 'Approved') A 
+    //         inner join 
+    //         (select * from distributor_transfer_items where type = 'Bar') B 
+    //         on (A.id = B.distributor_transfer_id) 
+    //         union all 
+    //         select A.distributor_id, B.item_id as product_id, B.qty from 
+    //         (select * from distributor_in where status = 'Approved') A 
+    //         inner join 
+    //         (select * from distributor_in_items where type = 'Bar') B 
+    //         on (A.id = B.distributor_in_id)) BB group by BB.distributor_id, BB.product_id) D 
+    //         on (C.distributor_id=D.distributor_id and C.product_id=D.product_id)) E 
+    //         group by E.distributor_id, E.product_id) F 
+    //         left join 
+    //         (select A.distributor_id, B.item_id as product_id, sum(B.qty) as sale_qty from 
+    //         (select * from distributor_sale where status = 'Approved') A 
+    //         inner join 
+    //         (select * from distributor_sale_items where type = 'Bar') B 
+    //         on (A.id = B.distributor_sale_id) group by A.distributor_id, B.item_id) G 
+    //         on (F.distributor_id=G.distributor_id and F.product_id=G.product_id)) H 
+    //         left join 
+    //         (select * from distributor_master where status = 'Approved' and class = 'super stockist') I 
+    //         on (H.distributor_id=I.id) where distributor_name is not null) J 
+    //         left join 
+    //         (select * from product_master where status = 'Approved') K 
+    //         on (J.product_id=K.id) order by J.distributor_name";
+    //     $query=$this->db->query($sql);
+    //     return $query->result();
+    // }
+
     function get_product_stock_for_distributor() {
-        $sql="select J.*, K.product_name from 
+        $sql="select J.distributor_id, J.distributor_name, J.product_id, K.short_name, sum(bal_qty) as bal_qty from 
             (select H.*, I.distributor_name from 
             (select F.*, G.sale_qty, ifnull(F.tot_qty,0)-ifnull(G.sale_qty,0) as bal_qty from 
             (select E.distributor_id, E.product_id, sum(tot_qty) as tot_qty from 
@@ -343,21 +524,73 @@ class Dashboard_model extends CI_Model {
             inner join 
             (select * from distributor_sale_items where type = 'Bar') B 
             on (A.id = B.distributor_sale_id) group by A.distributor_id, B.item_id) G 
-            on (F.distributor_id=G.distributor_id)) H 
+            on (F.distributor_id=G.distributor_id and F.product_id=G.product_id)) H 
             left join 
             (select * from distributor_master where status = 'Approved' and class = 'super stockist') I 
             on (H.distributor_id=I.id) where distributor_name is not null) J 
             left join 
             (select * from product_master where status = 'Approved') K 
-            on (J.product_id=K.id)";
+            on (J.product_id=K.id) 
+            group by J.distributor_id, J.distributor_name, J.product_id, K.short_name 
+            order by J.distributor_name, J.product_id";
         $query=$this->db->query($sql);
         return $query->result();
     }
 
+    // function get_box_stock_for_distributor() {
+    //     $sql="select J.*, K.short_name from 
+    //         (select H.*, I.distributor_name from 
+    //         (select F.*, G.sale_qty, ifnull(F.tot_qty,0)-ifnull(G.sale_qty,0) as bal_qty from 
+    //         (select E.distributor_id, E.box_id, sum(tot_qty) as tot_qty from 
+    //         (select C.distributor_id, C.box_id, ifnull(C.qty_in,0)-ifnull(D.qty_out,0) as tot_qty from 
+    //         (select AA.distributor_id, AA.box_id, sum(AA.qty) as qty_in from 
+    //         (select A.distributor_in_id as distributor_id, B.item_id as box_id, B.qty from 
+    //         (select * from distributor_transfer where status = 'Approved') A 
+    //         inner join 
+    //         (select * from distributor_transfer_items where type = 'Box') B 
+    //         on (A.id = B.distributor_transfer_id) 
+    //         union all 
+    //         select A.distributor_id, B.item_id as box_id, B.qty from 
+    //         (select * from distributor_out where status = 'Approved') A 
+    //         inner join 
+    //         (select * from distributor_out_items where type = 'Box') B 
+    //         on (A.id = B.distributor_out_id)) AA group by AA.distributor_id, AA.box_id) C 
+    //         left join 
+    //         (select BB.distributor_id, BB.box_id, sum(BB.qty) as qty_out from 
+    //         (select A.distributor_out_id as distributor_id, B.item_id as box_id, B.qty from 
+    //         (select * from distributor_transfer where status = 'Approved') A 
+    //         inner join 
+    //         (select * from distributor_transfer_items where type = 'Box') B 
+    //         on (A.id = B.distributor_transfer_id) 
+    //         union all 
+    //         select A.distributor_id, B.item_id as box_id, B.qty from 
+    //         (select * from distributor_in where status = 'Approved') A 
+    //         inner join 
+    //         (select * from distributor_in_items where type = 'Box') B 
+    //         on (A.id = B.distributor_in_id)) BB group by BB.distributor_id, BB.box_id) D 
+    //         on (C.distributor_id=D.distributor_id and C.box_id=D.box_id)) E 
+    //         group by E.distributor_id, E.box_id) F 
+    //         left join 
+    //         (select A.distributor_id, B.item_id as box_id, sum(B.qty) as sale_qty from 
+    //         (select * from distributor_sale where status = 'Approved') A 
+    //         inner join 
+    //         (select * from distributor_sale_items where type = 'Box') B 
+    //         on (A.id = B.distributor_sale_id) group by A.distributor_id, B.item_id) G 
+    //         on (F.distributor_id=G.distributor_id and F.box_id=G.box_id)) H 
+    //         left join 
+    //         (select * from distributor_master where status = 'Approved' and class = 'super stockist') I 
+    //         on (H.distributor_id=I.id) where distributor_name is not null) J 
+    //         left join 
+    //         (select * from box_master where status = 'Approved') K 
+    //         on (J.box_id=K.id)";
+    //     $query=$this->db->query($sql);
+    //     return $query->result();
+    // }
+
     function get_box_stock_for_distributor() {
-        $sql="select J.*, K.box_name from 
-            (select H.*, I.distributor_name from 
-            (select F.*, G.sale_qty, ifnull(F.tot_qty,0)-ifnull(G.sale_qty,0) as bal_qty from 
+        $sql="select J.distributor_id, J.distributor_name, K.short_name, sum(J.bal_qty) as bal_qty from 
+            (select H.distributor_id, H.box_id, H.tot_qty, H.sale_qty, H.bal_qty, I.distributor_name from 
+            (select F.distributor_id, F.box_id, F.tot_qty, G.sale_qty, ifnull(F.tot_qty,0)-ifnull(G.sale_qty,0) as bal_qty from 
             (select E.distributor_id, E.box_id, sum(tot_qty) as tot_qty from 
             (select C.distributor_id, C.box_id, ifnull(C.qty_in,0)-ifnull(D.qty_out,0) as tot_qty from 
             (select AA.distributor_id, AA.box_id, sum(AA.qty) as qty_in from 
@@ -399,7 +632,9 @@ class Dashboard_model extends CI_Model {
             on (H.distributor_id=I.id) where distributor_name is not null) J 
             left join 
             (select * from box_master where status = 'Approved') K 
-            on (J.box_id=K.id)";
+            on (J.box_id=K.id) 
+            group by J.distributor_id, J.distributor_name, K.short_name 
+            order by J.distributor_id, K.short_name";
         $query=$this->db->query($sql);
         return $query->result();
     }

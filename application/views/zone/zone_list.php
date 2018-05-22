@@ -53,7 +53,9 @@
 									<thead>
 										<tr>
 											<th width="65" style="text-align:center;">Sr. No.</th>
+											
 											<th>Zone</th>
+											<th>Distributor Type</th>
 											<th width="110">Creation Date</th>
 										</tr>
 									</thead>
@@ -62,6 +64,7 @@
 										<tr>
 											<td style="text-align:center;"><?php echo $i+1; ?></td>
 											<td><a href="<?php echo base_url().'index.php/zone/edit/'.$data[$i]->id; ?>"><?php echo $data[$i]->zone; ?></a></td>
+											<td><?php echo $data[$i]->distributor_type; ?></td>
 											<td>
 												<span style="display:none;">
                                                     <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>

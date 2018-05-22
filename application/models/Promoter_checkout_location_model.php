@@ -57,15 +57,11 @@ function get_dist_name($id) {
 }
 
 function get_data_qty($status='', $id=''){
-    
-
     $sql = "select * from sales_rep_distributor_opening_stock where sales_rep_loc_id='$id'";
     $query=$this->db->query($sql);
     return $query->result();
 }
 
-	
-	
 function update_checkout1(){
 	
 	$data4 = array(
@@ -76,11 +72,6 @@ function update_checkout1(){
 		$this->db->where('checkout_status', 'checkin') ;
 		$this->db->update('promoter_location', $data4);
 }
-	
-	
-	
-	
-	
 
 function save_data($id=''){
     $now=date('Y-m-d H:i:s');
@@ -103,13 +94,20 @@ function save_data($id=''){
         'modified_on' => $now,
     );
 
+    $orange_bar = ($this->input->post('orange_bar')=='')?0:$this->input->post('orange_bar');
+    $mint_bar = ($this->input->post('mint_bar')=='')?0:$this->input->post('mint_bar');
+    $butterscotch_bar = ($this->input->post('butterscotch_bar')=='')?0:$this->input->post('butterscotch_bar');
+    $chocopeanut_bar = ($this->input->post('chocopeanut_bar')=='')?0:$this->input->post('chocopeanut_bar');
+    $bambaiyachaat_bar = ($this->input->post('bambaiyachaat_bar')=='')?0:$this->input->post('bambaiyachaat_bar');
+    $mangoginger_bar = ($this->input->post('mangoginger_bar')=='')?0:$this->input->post('mangoginger_bar');
+
     $data1 = array(
-        'orange_bar' => $this->input->post('orange_bar'),
-        'mint_bar' => $this->input->post('mint_bar'),
-        'butterscotch_bar' => $this->input->post('butterscotch_bar'),
-        'chocopeanut_bar' => $this->input->post('chocopeanut_bar'),
-        'bambaiyachaat_bar' => $this->input->post('bambaiyachaat_bar'),
-        'mangoginger_bar' => $this->input->post('mangoginger_bar'),
+        'orange_bar' => $orange_bar,
+        'mint_bar' => $mint_bar,
+        'butterscotch_bar' => $butterscotch_bar,
+        'chocopeanut_bar' => $chocopeanut_bar,
+        'bambaiyachaat_bar' => $bambaiyachaat_bar,
+        'mangoginger_bar' => $mangoginger_bar,
         'type' => 'closing'
     );
 
@@ -121,13 +119,20 @@ function save_data($id=''){
     $this->db->where('id', $this->input->post('promoter_loc_id'));
     $this->db->update('promoter_location',$data2);
 
+    $orange_bar = ($this->input->post('orange_bar_opening')=='')?0:$this->input->post('orange_bar_opening');
+    $mint_bar = ($this->input->post('mint_bar_opening')=='')?0:$this->input->post('mint_bar_opening');
+    $butterscotch_bar = ($this->input->post('butterscotch_bar_opening')=='')?0:$this->input->post('butterscotch_bar_opening');
+    $chocopeanut_bar = ($this->input->post('chocopeanut_bar_opening')=='')?0:$this->input->post('chocopeanut_bar_opening');
+    $bambaiyachaat_bar = ($this->input->post('bambaiyachaat_bar_opening')=='')?0:$this->input->post('bambaiyachaat_bar_opening');
+    $mangoginger_bar = ($this->input->post('mangoginger_bar_opening')=='')?0:$this->input->post('mangoginger_bar_opening');
+    
     $data3 = array(
-        'orange_bar' => $this->input->post('orange_bar_opening'),
-        'mint_bar' => $this->input->post('mint_bar_opening'),
-        'butterscotch_bar' => $this->input->post('butterscotch_bar_opening'),
-        'chocopeanut_bar' => $this->input->post('chocopeanut_bar_opening'),
-        'bambaiyachaat_bar' => $this->input->post('bambaiyachaat_bar_opening'),
-        'mangoginger_bar' => $this->input->post('mangoginger_bar_opening'),
+        'orange_bar' => $orange_bar,
+        'mint_bar' => $mint_bar,
+        'butterscotch_bar' => $butterscotch_bar,
+        'chocopeanut_bar' => $chocopeanut_bar,
+        'bambaiyachaat_bar' => $bambaiyachaat_bar,
+        'mangoginger_bar' => $mangoginger_bar,
         'type' => 'opening'
         );
 

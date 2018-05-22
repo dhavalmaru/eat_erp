@@ -50,24 +50,40 @@
             <?php if($status=='pending_for_approval') { ?>
                 <form id="form_distributor_out_list" role="form" class="form-horizontal" method="post" action="<?php echo base_url().'index.php/sample_out/authorise'; ?>" target="_blank">
             <?php } else if($status=='pending_for_delivery') { ?>
-                <form id="form_distributor_out_list" role="form" class="form-horizontal" method="post" action="<?php echo base_url().'index.php/sample_out/set_delivery_status'; ?>">
+                <!-- <form id="form_distributor_out_list" role="form" class="form-horizontal" method="post" action="<?php //echo base_url().'index.php/sample_out/set_delivery_status'; ?>"> -->
+                    <form id="form_distributor_out_list" role="form" class="form-horizontal" method="post" action="<?php echo base_url().'index.php/sample_out/get_batch_details'; ?>" target="_blank">
             <?php } else if($status=='gp_issued') { ?>
-                <form id="form_distributor_out_list" role="form" class="form-horizontal" method="post" action="<?php echo base_url().'index.php/sample_out/set_delivery_status'; ?>">
+                <form id="form_distributor_out_list" role="form" class="form-horizontal" method="post" action="<?php echo base_url().'index.php/sample_out/set_delivery_status2'; ?>">
             <?php } else { ?>
                 <form id="form_distributor_out_list" role="form" class="form-horizontal" method="post" action="">
             <?php } ?>
     		<div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
 
     			<div class="heading-h3"> 
-    				<div class="heading-h3-heading mobile-head">	 <a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp;  Sample List  </div>						 
+    				<div class="heading-h3-heading mobile-head"> <a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp;  Sample List  </div>						 
     				<div class="heading-h3-heading mobile-head">
                         <div class="pull-right btn-margin"> 
-                            <?php $this->load->view('templates/download');?>    
+                            <?php $this->load->view('templates/download'); ?>
+                            <!-- <a class="btn btn-danger btn-padding dropdown-toggle" href="<?php //echo base_url().'index.php/export/generate_distributor_out_sku_details/'.$status; ?>"><i class="fa fa-download"></i> &nbsp;Download</a> -->
                         </div>
                         <div class="pull-right btn-margin" style="margin-left: 5px; <?php if(($access[0]->r_edit=='1' && ($status=='pending_for_delivery' || $status=='gp_issued')) || ($access[0]->r_approvals=='1' && $status=='pending_for_approval')) echo ''; else echo 'display: none;';?>">
-                            <a class="btn btn-success btn-block btn-padding" data-toggle="modal" href="#myModal">
-                                <span class="fa fa-shopping-cart"></span> <?php if($status=='pending_for_delivery') echo 'Select Delivery Person'; else if($status=='gp_issued') echo 'Select Delivery Status'; else if($status=='pending_for_approval') echo 'Authorise Records'; ?>
-                            </a>
+                            <!-- <a class="btn btn-success btn-block btn-padding" data-toggle="modal" href="#myModal">
+                                <span class="fa fa-shopping-cart"></span> <?php //if($status=='pending_for_delivery') echo 'Select Delivery Person'; else if($status=='gp_issued') echo 'Select Delivery Status'; else if($status=='pending_for_approval') echo 'Authorise Records'; ?>
+                            </a> -->
+
+                            <?php if($status=='pending_for_delivery') { ?>
+                                <button class="btn btn-success" type="submit">
+                                    <span class="fa fa-shopping-cart"></span> Select Delivery Person
+                                </button>
+                            <?php } else if($status=='gp_issued') { ?>
+                                <button class="btn btn-success btn-block btn-padding" type="button" onClick="get_batch_details();">
+                                    <span class="fa fa-shopping-cart"></span> Select Delivery Status
+                                </button>
+                            <?php } else if($status=='pending_for_approval') { ?>
+                                <button class="btn btn-success btn-block btn-padding" type="button" onClick="get_batch_details();">
+                                    <span class="fa fa-shopping-cart"></span> Authorise Records
+                                </button>
+                            <?php } ?>
                         </div>
                         <div class="pull-right btn-margin" style="<?php if($access[0]->r_insert=='0' || $status=='pending_for_delivery' || $status=='gp_issued' || $status=='delivered_not_complete' || $status=='pending_for_approval') echo 'display: none;';?>">
                             <a class="btn btn-success btn-block btn-padding" href="<?php echo base_url(); ?>index.php/sample_out/add">
@@ -319,6 +335,10 @@
         
 
     	<?php $this->load->view('templates/footer');?>
+        <script type="text/javascript">
+            var BASE_URL="<?php echo base_url()?>";
+        </script>
+        <script type="text/javascript" src="<?php echo base_url(); ?>js/validations.js"></script>
     	<script>
     	$(document).ready(function() {               
 
@@ -369,9 +389,74 @@
         });
 
         $('#btn_save').click(function(){
-            $('#myModal').modal('toggle');
-            blFlag = true;
+            if (!$("#form_distributor_out_list").valid()) {
+                return false;
+            } else {
+                $('#myModal').modal('toggle');
+                blFlag = true;
+            }
         });
+
+        var set_checkbox = function(elem){
+            var v = elem.checked?elem.value:'false';
+            var id = elem.id;
+            $('#input_'+id).val(v);
+        };
+
+        var get_batch_details = function() {
+            $('#myModal').modal('show');
+
+            // console.log('true');
+
+            // $.ajax({
+            //     url:BASE_URL+'index.php/Distributor_out/get_batch_details',
+            //     method:"post",
+            //     data:$('#form_distributor_out_list').serialize(),
+            //     dataType:"html",
+            //     async:false,
+            //     success: function(data){
+            //         $('#batch_details').html(data);
+
+            //         addMultiInputNamingRules('#form_distributor_out_list', 'input[name="batch_no[]"]', { required: true }, "");
+            //     },
+            //     error: function (response) {
+            //         var r = jQuery.parseJSON(response.responseText);
+            //         alert("Message: " + r.Message);
+            //         alert("StackTrace: " + r.StackTrace);
+            //         alert("ExceptionType: " + r.ExceptionType);
+            //     }
+            // });
+        }
+
+        var set_batch = function(elem){
+            var id = elem.id;
+            var index = id.substr(id.lastIndexOf('_')+1);
+
+            // console.log(index);
+
+            var batch_no = $('#batch_no_'+index).val();
+            var item_type = $('#item_type_'+index).val();
+            var item_id = $('#item_id_'+index).val();
+
+            var counter = $('.batch_no').length;
+
+            // console.log(batch_no);
+            // console.log(counter);
+
+            var check_item_type = '';
+            var check_item_id = '';
+
+            for(var i=0; i<counter; i++){
+                if(i!=index){
+                    check_item_type = $('#item_type_'+i).val();
+                    check_item_id = $('#item_id_'+i).val();
+
+                    if(check_item_type==item_type && check_item_id==item_id){
+                        $('#batch_no_'+i).val(batch_no);
+                    }
+                }
+            }
+        }
     	</script>
 <script>
 var table;

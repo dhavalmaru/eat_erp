@@ -20,8 +20,10 @@
             #map {
                 height: 100%;
             }
-			
-			
+			input:read-only { 
+                background-color: white!important;
+                color: #0aab4b!important;
+            }
         </style>
     </head>
     <body>
@@ -76,13 +78,28 @@
                                     <div class="col-md-12 col-sm-12 col-xs-12">
                                         <label class="col-md-2 col-sm-2 col-xs-12 control-label">Distributor Name <span class="asterisk_sign">*</span></label>
                                         <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <select name="distributor_id" id="distributor_id" class="form-control" style="<?php if(isset($data)) {if($data[0]->distributor_type=='Old') echo ''; else  echo 'display: none;';} ?>">
-                                                <option value="">Select</option>
-                                                <?php if(isset($distributor)) { for ($k=0; $k < count($distributor) ; $k++) { ?>
-                                                        <option value="<?php echo $distributor[$k]->id; ?>" <?php if(isset($data)) {if($distributor[$k]->id==$data[0]->distributor_id) {echo 'selected';}} else if(isset($distributor_id)) {if($distributor[$k]->id==$distributor_id) {echo 'selected';}} ?>><?php echo $distributor[$k]->distributor_name; ?></option>
-                                                <?php }} ?>
-                                            </select>
-                                            <input type="text" class="form-control" name="distributor_name" id="distributor_name" style="<?php if(isset($data)) {if($data[0]->distributor_type=='Old') echo 'display: none;';} else {echo 'display: none;';} ?>" placeholder="Distributor Name" value="<?php if(isset($data)) echo $data[0]->distributor_name;?>"/>
+                                          
+											
+											<?php if(isset($data)){?>
+											    <input type="text" class="form-control"  name="distributor_id" id="distributor_id" value="<?php if(isset($data)) echo $data[0]->distributor_name;?>" style="<?php if(isset($data)) {if($data[0]->distributor_type=='Old') echo ''; else  echo 'display: none;';} ?>" readonly >
+											
+													
+													<?php } else{?>
+										   <select name="distributor_id" id="distributor_id" class="form-control" style="<?php if(isset($data)) {if($data[0]->distributor_type=='Old') echo ''; else  echo 'display: none;';} ?>" onchange="get_closing_stock()">
+                                                 
+													
+													
+													
+													   <option value="">Select</option>
+                                                    <?php if(isset($distributor)) { for ($k=0; $k < count($distributor); $k++) { ?>
+                                                            <option value="<?php echo $distributor[$k]->id; ?>" ><?php echo $distributor[$k]->distributor_name; ?></option>
+                                                    <?php }}} ?>
+                                                </select>
+											
+											
+											
+											
+                                            <input type="text" class="form-control" name="distributor_name" id="distributor_name" style="<?php if(isset($data)) {if($data[0]->distributor_type=='Old') echo 'display: none;';} else {echo 'display: none;';} ?>" placeholder="Distributor Name" value="<?php if(isset($data)) echo $data[0]->distributor_name;?>" readonly />
                                         </div>
                                         <label class="col-md-2 col-sm-2 col-xs-12 control-label disstatus" style="display:none;">Status <span class="asterisk_sign">*</span></label>
                                         <div class="col-md-4 col-sm-4 col-xs-12 disstatus" style="display:none;">
@@ -96,6 +113,7 @@
                                         </div>
                                     </div>
                                 </div>
+								
                                 <div class="form-group">
                                     <div class="col-md-12 col-sm-12 col-xs-12">
                                         <label class="col-md-2 col-sm-2 col-xs-12 control-label">Remarks </label>
@@ -109,49 +127,73 @@
 
                                 <div class="form-group">
                                     <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">EAT Anytime Orange Bar </label>
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Orange Bar Closing Stock </label>
                                         <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="text" value="<?php if(isset($data1)) echo $data1[0]->orange_bar;?>" class="form-control" name="orange_bar" placeholder="Available Stock"></textarea>
+                                            <input type="text" class="form-control" id="orange_bar_closing" value="" placeholder="Closing Stock" readonly />
+                                        </div>
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Orange Bar </label>
+                                        <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <input type="text" value="<?php if(isset($data1[0]->orange_bar)) echo $data1[0]->orange_bar;?>" class="form-control" name="orange_bar" placeholder="Available Stock"/>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">EAT Anytime Mint Bar </label>
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Mint Bar Closing Stock </label>
                                         <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="text" value="<?php if(isset($data1)) echo $data1[0]->mint_bar;?>" class="form-control" name="mint_bar" placeholder="Available Stock"></textarea>
+                                            <input type="text" class="form-control" id="mint_bar_closing" value="" placeholder="Closing Stock" readonly />
+                                        </div>
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Mint Bar </label>
+                                        <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <input type="text" value="<?php if(isset($data1[0]->mint_bar)) echo $data1[0]->mint_bar;?>" class="form-control" name="mint_bar" placeholder="Available Stock" />
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">EAT Anytime Butterscotch Bar </label>
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Butterscotch Bar Closing Stock </label>
                                         <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="text" value="<?php if(isset($data1)) echo $data1[0]->butterscotch_bar;?>" class="form-control" name="butterscotch_bar" placeholder="Available Stock"></textarea>
+                                            <input type="text" class="form-control" id="butterscotch_bar_closing" value="" placeholder="Closing Stock" readonly />
+                                        </div>
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Butterscotch Bar </label>
+                                        <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <input type="text" value="<?php if(isset($data1[0]->butterscotch_bar)) echo $data1[0]->butterscotch_bar;?>" class="form-control" name="butterscotch_bar" placeholder="Available Stock" />
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">EAT Anytime Chocolate Peanut Butter Bar </label>
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Chocolate Peanut Butter Bar Closing Stock </label>
                                         <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="text" value="<?php if(isset($data1)) echo $data1[0]->chocopeanut_bar;?>" class="form-control" name="chocopeanut_bar" placeholder="Available Stock"></textarea>
+                                            <input type="text" class="form-control" id="chocopeanut_bar_closing" value="" placeholder="Closing Stock" readonly />
+                                        </div>
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Chocolate Peanut Butter Bar </label>
+                                        <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <input type="text" value="<?php if(isset($data1[0]->chocopeanut_bar)) echo $data1[0]->chocopeanut_bar;?>" class="form-control" name="chocopeanut_bar" placeholder="Available Stock" />
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">EAT Anytime Bambaiya Chaat Bar </label>
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Bambaiya Chaat Bar Closing Stock </label>
                                         <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="text" value="<?php if(isset($data1)) echo $data1[0]->bambaiyachaat_bar;?>" class="form-control" name="bambaiyachaat_bar" placeholder="Available Stock"></textarea>
+                                            <input type="text" class="form-control" id="bambaiyachaat_bar_closing" value="" placeholder="Closing Stock" readonly />
+                                        </div>
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Bambaiya Chaat Bar </label>
+                                        <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <input type="text" value="<?php if(isset($data1[0]->bambaiyachaat_bar)) echo $data1[0]->bambaiyachaat_bar;?>" class="form-control" name="bambaiyachaat_bar" placeholder="Available Stock" />
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">EAT Anytime Mango Ginger Bar </label>
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Mango Ginger Bar Closing Stock </label>
                                         <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="text" value="<?php if(isset($data1)) echo $data1[0]->mangoginger_bar;?>" class="form-control" name="mangoginger_bar" placeholder="Available Stock"></textarea>
+                                            <input type="text" class="form-control" id="mangoginger_bar_closing" value="" placeholder="Closing Stock" readonly />
+                                        </div>
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Mango Ginger Bar </label>
+                                        <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <input type="text" value="<?php if(isset($data1[0]->mangoginger_bar)) echo $data1[0]->mangoginger_bar;?>" class="form-control" name="mangoginger_bar" placeholder="Available Stock" />
                                         </div>
                                     </div>
                                 </div>
@@ -163,40 +205,40 @@
                         </div>
                         <div class="panel-footer">
                             <a href="<?php echo base_url(); ?>index.php/sales_rep_location" class="btn btn-danger" type="reset" id="reset">Cancel</a>
-                            <a data-toggle="modal" id="followup_anc" href="#myModal" class="btn btn-success pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Follow Up</a>
+                            <input type="submit" value="Save" id="Saver" name="srld" class="btn btn-success pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>"/>
+                            <a data-toggle="modal" id="followup_anc" href="#myModal" class="btn btn-success pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>margin-right: 2px;">Follow Up</a>
 							
 						
-                            <input type="submit" id="pl_ord" value="Place Order" name="srld" class="btn btn-success pull-right  " style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>margin-right: 15px;"/>
-                            <input type="submit" value="Save" id="Saver" name="srld" class="btn btn-success pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>margin-right: 15px;"/>
+                            <input type="submit" id="pl_ord" value="Place Order" name="srld" class="btn btn-success pull-right  " style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>margin-right: 2px;"/>
                         </div>
 
 
 
                         <!-- Modal -->
-            <div class="modal fade" id="myModal" role="dialog">
-                <div class="modal-dialog">
-                    <!-- Modal content-->
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            <h4 class="modal-title">Follow Up Date</h4>
-                        </div>
-                        <div class="modal-body">
-                                <label class="control-label">Follow Up Date<span class="asterisk_sign">*</span></label>
-                                <br/>
-                                <div class="">
-                                    <input type="text" class="form-control datepicker"  
-									name="followup_date" id="followup_date" placeholder="Follow Up Date" value="<?php if(isset($data)) echo (($data[0]->followup_date!=null && $data[0]->followup_date!='')?date('d/m/Y',strtotime($data[0]->followup_date)):date('d/m/Y')); else echo date('d/m/Y'); ?>"/>
+                        <div class="modal fade" id="myModal" role="dialog">
+                            <div class="modal-dialog">
+                                <!-- Modal content-->
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        <h4 class="modal-title">Follow Up Date</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                            <label class="control-label">Follow Up Date<span class="asterisk_sign">*</span></label>
+                                            <br/>
+                                            <div class="">
+                                                <input type="text" class="form-control datepicker"  
+            									name="followup_date" id="followup_date" placeholder="Follow Up Date" value="<?php if(isset($data)) echo (($data[0]->followup_date!=null && $data[0]->followup_date!='')?date('d/m/Y',strtotime($data[0]->followup_date)):date('d/m/Y')); else echo date('d/m/Y'); ?>"/>
+                                            </div>
+                                        
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                                        <input type="submit" id="btn_save" name="srld" class="btn btn-success pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>" value="Follow Up"/>
+                                    </div>
                                 </div>
-                            
+                            </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
-                            <input type="submit" id="btn_save" name="srld" class="btn btn-success pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>" value="Follow Up"/>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
 
                     </form>
@@ -247,6 +289,8 @@
 					
 					
 				}
+
+                get_closing_stock();
             });
 			
 			function geolocFail() {
@@ -256,12 +300,6 @@
 					document.getElementById("pl_ord").disabled = true;
 			}
 
-			
-			
-			
-			
-			
-			
             $('#distributor_type').change(function(){
                 distributor_type_change();
             });
@@ -288,9 +326,42 @@
                 $('#myModal').modal('toggle');
                 blFlag = true;
             });
-        </script>
 
-        
-        <!-- END SCRIPTS -->      
+            var get_closing_stock = function(){
+                var distributor_id = $('#distributor_id').val();
+                var date_of_visit = $('#date_of_visit').val();
+                
+                $.ajax({
+                    url:BASE_URL+'index.php/Sales_rep_location/get_closing_stock',
+                    method:"post",
+                    data:{distributor_id:distributor_id, date_of_visit:date_of_visit},
+                    dataType:"json",
+                    async:false,
+                    success: function(data){
+                        if(data.result==1){
+                            $('#orange_bar_closing').val(data.orange_bar);
+                            $('#mint_bar_closing').val(data.mint_bar);
+                            $('#butterscotch_bar_closing').val(data.butterscotch_bar);
+                            $('#chocopeanut_bar_closing').val(data.chocopeanut_bar);
+                            $('#bambaiyachaat_bar_closing').val(data.bambaiyachaat_bar);
+                            $('#mangoginger_bar_closing').val(data.mangoginger_bar);
+                        } else {
+                            $('#orange_bar_closing').val('');
+                            $('#mint_bar_closing').val('');
+                            $('#butterscotch_bar_closing').val('');
+                            $('#chocopeanut_bar_closing').val('');
+                            $('#bambaiyachaat_bar_closing').val('');
+                            $('#mangoginger_bar_closing').val('');
+                        }
+                    },
+                    error: function (response) {
+                        var r = jQuery.parseJSON(response.responseText);
+                        alert("Message: " + r.Message);
+                        alert("StackTrace: " + r.StackTrace);
+                        alert("ExceptionType: " + r.ExceptionType);
+                    }
+                });
+            }
+        </script>
     </body>
 </html>

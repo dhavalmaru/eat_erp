@@ -120,5 +120,10 @@ class Credit_debit_note extends CI_Controller{
         $this->credit_debit_note_model->save_data($id);
         redirect(base_url().'index.php/credit_debit_note');
     }
+        
+    public function view_credit_debit_note($id){
+        $this->credit_debit_note_model->view_credit_debit_note($id);
+    }
+
 }
 ?>

@@ -49,6 +49,8 @@ function get_data_qty($status='', $id=''){
     return $query->result();
 }
 
+
+
 function save_data($id='',$status=''){
     $now=date('Y-m-d H:i:s');
     $curusr=$this->session->userdata('session_id');
@@ -152,6 +154,21 @@ function get_location(){
             left join promoter_stores C on (A.distributor_id = C.id) 
             left join promoter_checkout D on (A.id = D.promoter_location_id) 
             where A.date_of_visit >= '$from_date' and A.date_of_visit <= '$to_date'";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_closing_stock(){
+    $distributor_id = $this->input->post('distributor_id');
+    $date_of_visit = formatdate($this->input->post('date_of_visit'));
+
+    // $distributor_id = 'd_240';
+    // $date_of_visit = formatdate('10/11/2017');
+
+    $sql = "select * from sales_rep_distributor_opening_stock where sales_rep_loc_id = (select max(id) from sales_rep_location 
+            where status = 'Approved' and distributor_id = '$distributor_id' and 
+            date_of_visit = (select max(date_of_visit) from sales_rep_location where status = 'Approved' and 
+                                distributor_id = '$distributor_id' and date_of_visit<'$date_of_visit'))";
     $query=$this->db->query($sql);
     return $query->result();
 }

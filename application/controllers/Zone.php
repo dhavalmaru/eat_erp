@@ -14,6 +14,7 @@ class Zone extends CI_Controller{
         $this->load->library('email');
         $this->load->helper('common_functions');
         $this->load->model('zone_model');
+        $this->load->model('distributor_type_model');
         $this->load->database();
     }
 
@@ -36,7 +37,7 @@ class Zone extends CI_Controller{
         if(count($result)>0) {
             if($result[0]->r_insert == 1) {
                 $data['access'] = $this->zone_model->get_access();
-
+				$data['type'] = $this->distributor_type_model->get_data('Approved');
                 load_view('zone/zone_details', $data);
             } else {
                 echo "Unauthorized access";
@@ -53,7 +54,7 @@ class Zone extends CI_Controller{
             if($result[0]->r_view == 1 || $result[0]->r_edit == 1) {
                 $data['access'] = $this->zone_model->get_access();
                 $data['data'] = $this->zone_model->get_data('', $id);
-
+				$data['type'] = $this->distributor_type_model->get_data('Approved');
                 load_view('zone/zone_details', $data);
             } else {
                 echo "Unauthorized access";
@@ -75,7 +76,11 @@ class Zone extends CI_Controller{
     }
 
     public function check_zone_availablity(){
-        $result = $this->zone_model->check_zone_availablity();
+		    $id = html_escape($this->input->post('id'));
+		    $zone = html_escape($this->input->post('zone'));
+		    $type_id = html_escape($this->input->post('type_id'));
+
+        $result = $this->zone_model->check_zone_availablity($id,$zone,$type_id);
         echo $result;
     }
 }

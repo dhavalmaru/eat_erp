@@ -7,19 +7,16 @@
 <title>Tax Invoice</title>
 <link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url().'css/fontawesome/font-awesome.min.css'; ?>"/>
 <style>
-@font-face {
-    font-family: "OpenSans-Regular";
-    src: url("<?php echo base_url().'/assets/invoice/'; ?>OpenSans-Regular.ttf") format("truetype");
-}
- 
-@media print{@page {size: portrait}}
-@media print {
-    .page-break { display: block; page-break-after: always; }
-}
-body { font-family: "verdana"; font-size:8px; font-weight:500; margin:0; line-height:11px;}
- 
+    @font-face {
+        font-family: "OpenSans-Regular";
+        src: url("<?php echo base_url().'/assets/invoice/'; ?>OpenSans-Regular.ttf") format("truetype");
+    }
+    @media print{@page {size: portrait}}
+    @media print {
+        .page-break { display: block; page-break-after: always; }
+    }
+    body { font-family: "verdana"; font-size:8px; font-weight:500; margin:0; line-height:11px;}
 </style>
-
 </head>
 
 <body style="margin: 1px;">
@@ -28,7 +25,7 @@ body { font-family: "verdana"; font-size:8px; font-weight:500; margin:0; line-he
         <center style="width:100%;display:inline-block;margin:0 auto;">
             <img src="<?php echo base_url().'/assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:150px;" />
             <p style="font-size:12px;line-height:18px;margin:0;margin-bottom:10px;">
-                B-505, Veena sur, Mahavir Nagar Kandivali-West,Mumbai - 67 
+                C/109, Hind Saurashtra Ind. Estate. 85/86, Andheri Kurla Road, Marol Naka, Andheri East. Mumbai 400059
                 <br /> +91 8268000456 
                 <br><a href="mailto:cs@eatanytime.in">cs@eatanytime.in</a><br>
                 GSTIN: 27AABCW7811R1ZN
@@ -82,7 +79,7 @@ body { font-family: "verdana"; font-size:8px; font-weight:500; margin:0; line-he
                                     <td>Invoice No: </td><td><?php if (isset($invoice_details[$inv_cnt]['invoice_no'])) echo $invoice_details[$inv_cnt]['invoice_no']; ?></td>
                                 </tr>
                                 <tr>
-                                    <td>Invoice Date: </td><td><?php if (isset($invoice_details[$inv_cnt]['date_of_processing'])) echo (($invoice_details[$inv_cnt]['date_of_processing']!=null && $invoice_details[$inv_cnt]['date_of_processing']!='')?date('d-M-y',strtotime($invoice_details[$inv_cnt]['date_of_processing'])):''); ?></td>
+                                    <td>Invoice Date: </td><td><?php if (isset($invoice_details[$inv_cnt]['invoice_date'])) echo (($invoice_details[$inv_cnt]['invoice_date']!=null && $invoice_details[$inv_cnt]['invoice_date']!='')?date('d-M-y',strtotime($invoice_details[$inv_cnt]['invoice_date'])):''); ?></td>
                                 </tr>
                                 <tr >
                                     <td>State: </td>
@@ -434,7 +431,7 @@ body { font-family: "verdana"; font-size:8px; font-weight:500; margin:0; line-he
             <td colspan="6" align="left" valign="top" style="padding:0;border-spacing: 0;">
                 <table width="100%" border="0" style="border-spacing: 0;">
                     <tr>
-                        <td width="60%" style="color:#808080;margin:0 auto;text-align:center;"   ><h1 style="padding:0; margin:0; font-size:20px;">Invoice</h1></td>
+                        <td width="60%" style="color:#808080;margin:0 auto;text-align:center;"   ><h1 style="padding:0; margin:0; font-size:20px;">Tax Invoice</h1></td>
                         <td width="2%">
                             <table style="width:115%;border-collapse: collapse;height: 30px;border-spacing: 0;">
                                 <tr><td style="border: 1px solid #666;width:100%;border-top:none;border-right:none;border-bottom:none;">&nbsp;<td></tr>
@@ -468,7 +465,7 @@ body { font-family: "verdana"; font-size:8px; font-weight:500; margin:0; line-he
                                     <td>Invoice No: </td><td><?php if (isset($invoice_details[$inv_cnt]['invoice_no'])) echo $invoice_details[$inv_cnt]['invoice_no']; ?></td>
                                 </tr>
                                 <tr>
-                                    <td>Invoice Date: </td><td><?php if (isset($invoice_details[$inv_cnt]['date_of_processing'])) echo (($invoice_details[$inv_cnt]['date_of_processing']!=null && $invoice_details[$inv_cnt]['date_of_processing']!='')?date('d-M-y',strtotime($invoice_details[$inv_cnt]['date_of_processing'])):''); ?></td>
+                                    <td>Invoice Date: </td><td><?php if (isset($invoice_details[$inv_cnt]['invoice_date'])) echo (($invoice_details[$inv_cnt]['invoice_date']!=null && $invoice_details[$inv_cnt]['invoice_date']!='')?date('d-M-y',strtotime($invoice_details[$inv_cnt]['invoice_date'])):''); ?></td>
                                 </tr>
                                 <tr >
                                     <td>State: </td>
@@ -825,7 +822,7 @@ body { font-family: "verdana"; font-size:8px; font-weight:500; margin:0; line-he
             <td colspan="6" align="left" valign="top" style="padding:0;border-spacing: 0;">
                 <table width="100%" border="0" style="border-spacing: 0;">
                     <tr>
-                        <td width="60%" style="color:#808080;margin:0 auto;text-align:center;"   ><h1 style="padding:0; margin:0; font-size:20px;">Invoice</h1></td>
+                        <td width="60%" style="color:#808080;margin:0 auto;text-align:center;"   ><h1 style="padding:0; margin:0; font-size:20px;">Tax Invoice</h1></td>
                         <td width="2%">
                             <table style="width:115%;border-collapse: collapse;height: 30px;border-spacing: 0;">
                                 <tr><td style="border: 1px solid #666;width:100%;border-top:none;border-right:none;border-bottom:none;">&nbsp;<td></tr>
@@ -859,7 +856,7 @@ body { font-family: "verdana"; font-size:8px; font-weight:500; margin:0; line-he
                                     <td>Invoice No: </td><td><?php if (isset($invoice_details[$inv_cnt]['invoice_no'])) echo $invoice_details[$inv_cnt]['invoice_no']; ?></td>
                                 </tr>
                                 <tr>
-                                    <td>Invoice Date: </td><td><?php if (isset($invoice_details[$inv_cnt]['date_of_processing'])) echo (($invoice_details[$inv_cnt]['date_of_processing']!=null && $invoice_details[$inv_cnt]['date_of_processing']!='')?date('d-M-y',strtotime($invoice_details[$inv_cnt]['date_of_processing'])):''); ?></td>
+                                    <td>Invoice Date: </td><td><?php if (isset($invoice_details[$inv_cnt]['invoice_date'])) echo (($invoice_details[$inv_cnt]['invoice_date']!=null && $invoice_details[$inv_cnt]['invoice_date']!='')?date('d-M-y',strtotime($invoice_details[$inv_cnt]['invoice_date'])):''); ?></td>
                                 </tr>
                                 <tr >
                                     <td>State: </td>

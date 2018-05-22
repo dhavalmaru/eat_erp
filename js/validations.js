@@ -229,11 +229,10 @@ $("#form_vendor_details").validate({
             numbersonly: true,
             minlength: 10,
             maxlength: 10
+        },
+        state: {
+            required: true
         }
-        // ,
-        // contact_person: {
-        //     required: true
-        // }
         // ,
         // tin_number: {
         //     required: true
@@ -358,6 +357,7 @@ $('#form_raw_material_details').submit(function() {
         return true;
     }
 });
+
 
 
 
@@ -635,6 +635,18 @@ $("#form_distributor_details").validate({
         state_code: {
             required: true
         },
+		 class: {
+            required: true
+        },
+		 type_id: {
+            required: true
+        },
+		 zone_id: {
+            required: true
+        },
+		 area_id: {
+            required: true
+        },
         'con_name[]': {
             required: true
         },
@@ -646,7 +658,8 @@ $("#form_distributor_details").validate({
         },
         'con_state_code[]': {
             required: true
-        }
+        },
+		
     },
 
     ignore: false,
@@ -770,13 +783,9 @@ $("#form_purchase_order_details").validate({
 $('#form_purchase_order_details').submit(function() {
     removeMultiInputNamingRules('#form_purchase_order_details', 'select[alt="raw_material[]"]');
     removeMultiInputNamingRules('#form_purchase_order_details', 'input[alt="qty[]"]');
-    removeMultiInputNamingRules('#form_purchase_order_details', 'input[alt="rate[]"]');
-    removeMultiInputNamingRules('#form_purchase_order_details', 'input[alt="cst[]"]');
 
     addMultiInputNamingRules('#form_purchase_order_details', 'select[name="raw_material[]"]', { required: true }, "");
     addMultiInputNamingRules('#form_purchase_order_details', 'input[name="qty[]"]', { required: true, number: true }, "");
-    addMultiInputNamingRules('#form_purchase_order_details', 'input[name="rate[]"]', { required: true, number: true }, "");
-    addMultiInputNamingRules('#form_purchase_order_details', 'input[name="cst[]"]', { required: true, number: true }, "");
     if (!$("#form_purchase_order_details").valid()) {
         return false;
     } else {
@@ -786,8 +795,6 @@ $('#form_purchase_order_details').submit(function() {
 
         removeMultiInputNamingRules('#form_purchase_order_details', 'select[alt="raw_material[]"]');
         removeMultiInputNamingRules('#form_purchase_order_details', 'input[alt="qty[]"]');
-        removeMultiInputNamingRules('#form_purchase_order_details', 'input[alt="rate[]"]');
-        removeMultiInputNamingRules('#form_purchase_order_details', 'input[alt="cst[]"]');
         
         return true;
     }
@@ -990,20 +997,78 @@ function check_raw_material() {
 
 
 
+// ----------------- BATCH MASTER FORM VALIDATION -------------------------------------
+$("#form_batch_master_details").validate({
+    rules: {
+        batch_no: {
+            required: true,
+            check_batch_id_availablity: true
+        }
+    },
+
+    ignore: false,
+
+    errorPlacement: function (error, element) {
+        var placement = $(element).data('error');
+        if (placement) {
+            $(placement).append(error);
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
+$.validator.addMethod("check_batch_id_availablity", function (value, element) {
+    var result = 1;
+
+    $.ajax({
+        url: BASE_URL+'index.php/Batch_processing/check_batch_id_availablity',
+        data: 'id='+$("#id").val()+'&batch_id_as_per_fssai='+$("#batch_no").val(),
+        type: "POST",
+        dataType: 'html',
+        global: false,
+        async: false,
+        success: function (data) {
+            result = parseInt(data);
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+        }
+    });
+
+    if (result) {
+        return false;
+    } else {
+        return true;
+    }
+}, 'Batch Id already in use.');
+
+
+
+
 // ----------------- BATCH PROCESSING DETAILS FORM VALIDATION -------------------------------------
 $("#form_batch_processing_details").validate({
     rules: {
-        batch_id_as_per_fssai: {
-            required: true,
-            check_batch_id_availablity: true
+        batch_no_id: {
+            required: true
         },
+        // batch_id_as_per_fssai: {
+        //     required: true,
+        //     check_batch_id_availablity: true
+        // },
         date_of_processing: {
             required: true
         },
+		
+		
         depot_id: {
             required: true
         },
         product_id: {
+            required: true
+        },
+		  no_of_batch: {
             required: true
         },
         qty_in_bar: {
@@ -1035,32 +1100,6 @@ $("#form_batch_processing_details").validate({
     }
 });
 
-$.validator.addMethod("check_batch_id_availablity", function (value, element) {
-    var result = 1;
-
-    $.ajax({
-        url: BASE_URL+'index.php/Batch_processing/check_batch_id_availablity',
-        data: 'id='+$("#id").val()+'&batch_id_as_per_fssai='+$("#batch_id_as_per_fssai").val(),
-        type: "POST",
-        dataType: 'html',
-        global: false,
-        async: false,
-        success: function (data) {
-            result = parseInt(data);
-        },
-        error: function (xhr, ajaxOptions, thrownError) {
-            alert(xhr.status);
-            alert(thrownError);
-        }
-    });
-
-    if (result) {
-        return false;
-    } else {
-        return true;
-    }
-}, 'Batch Id already in use.');
-
 $('#form_batch_processing_details').submit(function() {
     removeMultiInputNamingRules('#form_batch_processing_details', 'select[alt="raw_material_id[]"]');
     removeMultiInputNamingRules('#form_batch_processing_details', 'input[alt="qty[]"]');
@@ -1087,7 +1126,7 @@ function check_raw_material_availablity_for_batch_processing() {
 
     if($('.raw_material').length=='0'){
         var errors = {};
-        var name = $('#batch_id_as_per_fssai').attr('name');
+        var name = $('#batch_no_id').attr('name');
         errors[name] = "Please add atleast one raw material.";
         validator.showErrors(errors);
         valid = false;
@@ -1339,6 +1378,7 @@ function check_product_availablity_for_distributor_out() {
         var depot_id = $("#depot_id").val();
         var distributor_id = $("#distributor_id").val();
         var sales_rep_id = $("#sales_rep_id").val();
+        var ref_id = $("#ref_id").val();
         var module="distributor_out";
 
         $('.bar').each(function(){
@@ -1365,59 +1405,59 @@ function check_product_availablity_for_distributor_out() {
                 });
 
 
-                var result = 1;
+                // var result = 1;
 
-                $.ajax({
-                    url: BASE_URL+'index.php/Stock/check_bar_availablity_for_depot',
-                    data: 'id='+$("#id").val()+'&module='+module+'&depot_id='+$("#depot_id").val()+'&product_id='+bar,
-                    type: "POST",
-                    dataType: 'html',
-                    global: false,
-                    async: false,
-                    success: function (data) {
-                        result = parseInt(data);
-                    },
-                    error: function (xhr, ajaxOptions, thrownError) {
-                        alert(xhr.status);
-                        alert(thrownError);
-                    }
-                });
+                // $.ajax({
+                //     url: BASE_URL+'index.php/Stock/check_bar_availablity_for_depot',
+                //     data: 'id='+$("#id").val()+'&module='+module+'&depot_id='+depot_id+'&product_id='+bar,
+                //     type: "POST",
+                //     dataType: 'html',
+                //     global: false,
+                //     async: false,
+                //     success: function (data) {
+                //         result = parseInt(data);
+                //     },
+                //     error: function (xhr, ajaxOptions, thrownError) {
+                //         alert(xhr.status);
+                //         alert(thrownError);
+                //     }
+                // });
 
-                if (result) {
-                    var id = "bar_"+index;
-                    var errors = {};
-                    var name = $("#"+id).attr('name');
-                    errors[name] = "Bar not available in selected depot.";
-                    validator.showErrors(errors);
-                    valid = false;
-                }
+                // if (result) {
+                //     var id = "bar_"+index;
+                //     var errors = {};
+                //     var name = $("#"+id).attr('name');
+                //     errors[name] = "Bar not available in selected depot.";
+                //     validator.showErrors(errors);
+                //     valid = false;
+                // }
 
-                result = 1;
+                // result = 1;
 
-                $.ajax({
-                    url: BASE_URL+'index.php/Stock/check_bar_qty_availablity_for_depot',
-                    data: 'id='+$("#id").val()+'&module='+module+'&depot_id='+$("#depot_id").val()+'&product_id='+bar+'&qty='+qty,
-                    type: "POST",
-                    dataType: 'html',
-                    global: false,
-                    async: false,
-                    success: function (data) {
-                        result = parseInt(data);
-                    },
-                    error: function (xhr, ajaxOptions, thrownError) {
-                        alert(xhr.status);
-                        alert(thrownError);
-                    }
-                });
+                // $.ajax({
+                //     url: BASE_URL+'index.php/Stock/check_bar_qty_availablity_for_depot',
+                //     data: 'id='+$("#id").val()+'&module='+module+'&depot_id='+depot_id+'&product_id='+bar+'&qty='+qty+'&ref_id='+ref_id,
+                //     type: "POST",
+                //     dataType: 'html',
+                //     global: false,
+                //     async: false,
+                //     success: function (data) {
+                //         result = parseInt(data);
+                //     },
+                //     error: function (xhr, ajaxOptions, thrownError) {
+                //         alert(xhr.status);
+                //         alert(thrownError);
+                //     }
+                // });
 
-                if (result) {
-                    var id = "qty_"+index;
-                    var errors = {};
-                    var name = $("#"+id).attr('name');
-                    errors[name] = "Bar qty is not enough in selected depot.";
-                    validator.showErrors(errors);
-                    valid = false;
-                }
+                // if (result) {
+                //     var id = "qty_"+index;
+                //     var errors = {};
+                //     var name = $("#"+id).attr('name');
+                //     errors[name] = "Bar qty is not enough in selected depot.";
+                //     validator.showErrors(errors);
+                //     valid = false;
+                // }
             }
         });
 
@@ -1445,59 +1485,59 @@ function check_product_availablity_for_distributor_out() {
                 });
 
 
-                var result = 1;
+                // var result = 1;
 
-                $.ajax({
-                    url: BASE_URL+'index.php/Stock/check_box_availablity_for_depot',
-                    data: 'id='+$("#id").val()+'&module='+module+'&depot_id='+$("#depot_id").val()+'&box_id='+box,
-                    type: "POST",
-                    dataType: 'html',
-                    global: false,
-                    async: false,
-                    success: function (data) {
-                        result = parseInt(data);
-                    },
-                    error: function (xhr, ajaxOptions, thrownError) {
-                        alert(xhr.status);
-                        alert(thrownError);
-                    }
-                });
+                // $.ajax({
+                //     url: BASE_URL+'index.php/Stock/check_box_availablity_for_depot',
+                //     data: 'id='+$("#id").val()+'&module='+module+'&depot_id='+$("#depot_id").val()+'&box_id='+box,
+                //     type: "POST",
+                //     dataType: 'html',
+                //     global: false,
+                //     async: false,
+                //     success: function (data) {
+                //         result = parseInt(data);
+                //     },
+                //     error: function (xhr, ajaxOptions, thrownError) {
+                //         alert(xhr.status);
+                //         alert(thrownError);
+                //     }
+                // });
 
-                if (result) {
-                    var id = "bar_"+index;
-                    var errors = {};
-                    var name = $("#"+id).attr('name');
-                    errors[name] = "Box not available in selected depot.";
-                    validator.showErrors(errors);
-                    valid = false;
-                }
+                // if (result) {
+                //     var id = "bar_"+index;
+                //     var errors = {};
+                //     var name = $("#"+id).attr('name');
+                //     errors[name] = "Box not available in selected depot.";
+                //     validator.showErrors(errors);
+                //     valid = false;
+                // }
 
-                result = 1;
+                // result = 1;
 
-                $.ajax({
-                    url: BASE_URL+'index.php/Stock/check_box_qty_availablity_for_depot',
-                    data: 'id='+$("#id").val()+'&module='+module+'&depot_id='+$("#depot_id").val()+'&box_id='+box+'&qty='+qty,
-                    type: "POST",
-                    dataType: 'html',
-                    global: false,
-                    async: false,
-                    success: function (data) {
-                        result = parseInt(data);
-                    },
-                    error: function (xhr, ajaxOptions, thrownError) {
-                        alert(xhr.status);
-                        alert(thrownError);
-                    }
-                });
+                // $.ajax({
+                //     url: BASE_URL+'index.php/Stock/check_box_qty_availablity_for_depot',
+                //     data: 'id='+$("#id").val()+'&module='+module+'&depot_id='+$("#depot_id").val()+'&box_id='+box+'&qty='+qty+'&ref_id='+ref_id,
+                //     type: "POST",
+                //     dataType: 'html',
+                //     global: false,
+                //     async: false,
+                //     success: function (data) {
+                //         result = parseInt(data);
+                //     },
+                //     error: function (xhr, ajaxOptions, thrownError) {
+                //         alert(xhr.status);
+                //         alert(thrownError);
+                //     }
+                // });
 
-                if (result) {
-                    var id = "qty_"+index;
-                    var errors = {};
-                    var name = $("#"+id).attr('name');
-                    errors[name] = "Box qty is not enough in selected depot.";
-                    validator.showErrors(errors);
-                    valid = false;
-                }
+                // if (result) {
+                //     var id = "qty_"+index;
+                //     var errors = {};
+                //     var name = $("#"+id).attr('name');
+                //     errors[name] = "Box qty is not enough in selected depot.";
+                //     validator.showErrors(errors);
+                //     valid = false;
+                // }
             }
         });
     }
@@ -1657,13 +1697,27 @@ $('#form_distributor_in_details').submit(function() {
     removeMultiInputNamingRules('#form_distributor_in_details', 'select[alt="box[]"]');
     removeMultiInputNamingRules('#form_distributor_in_details', 'input[alt="qty[]"]');
     removeMultiInputNamingRules('#form_distributor_in_details', 'input[alt="sell_rate[]"]');
+    removeMultiInputNamingRules('#form_distributor_in_details', 'select[alt="batch_no[]"]');
 
+    removeMultiInputNamingRules('#form_distributor_in_details', 'select[alt="type_ex[]"]');
+    removeMultiInputNamingRules('#form_distributor_in_details', 'select[alt="bar_ex[]"]');
+    removeMultiInputNamingRules('#form_distributor_in_details', 'select[alt="box_ex[]"]');
+    removeMultiInputNamingRules('#form_distributor_in_details', 'input[alt="qty_ex[]"]');
+    removeMultiInputNamingRules('#form_distributor_in_details', 'input[alt="sell_rate_ex[]"]');
 
     addMultiInputNamingRules('#form_distributor_in_details', 'select[name="type[]"]', { required: true }, "");
     addMultiInputNamingRules('#form_distributor_in_details', 'select[name="bar[]"]', { required: true }, "");
     addMultiInputNamingRules('#form_distributor_in_details', 'select[name="box[]"]', { required: true }, "");
     addMultiInputNamingRules('#form_distributor_in_details', 'input[name="qty[]"]', { required: true }, "");
     addMultiInputNamingRules('#form_distributor_in_details', 'input[name="sell_rate[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_distributor_in_details', 'select[name="batch_no[]"]', { required: true }, "");
+
+    addMultiInputNamingRules('#form_distributor_in_details', 'select[name="type_ex[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_distributor_in_details', 'select[name="bar_ex[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_distributor_in_details', 'select[name="box_ex[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_distributor_in_details', 'input[name="qty_ex[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_distributor_in_details', 'input[name="sell_rate_ex[]"]', { required: true }, "");
+
     if (!$("#form_distributor_in_details").valid()) {
         return false;
     } else {
@@ -1676,7 +1730,14 @@ $('#form_distributor_in_details').submit(function() {
         removeMultiInputNamingRules('#form_distributor_in_details', 'select[alt="box[]"]');
         removeMultiInputNamingRules('#form_distributor_in_details', 'input[alt="qty[]"]');
         removeMultiInputNamingRules('#form_distributor_in_details', 'input[alt="sell_rate[]"]');
-        
+        removeMultiInputNamingRules('#form_distributor_in_details', 'select[alt="batch_no[]"]');
+            
+        removeMultiInputNamingRules('#form_distributor_in_details', 'select[alt="type_ex[]"]');
+        removeMultiInputNamingRules('#form_distributor_in_details', 'select[alt="bar_ex[]"]');
+        removeMultiInputNamingRules('#form_distributor_in_details', 'select[alt="box_ex[]"]');
+        removeMultiInputNamingRules('#form_distributor_in_details', 'input[alt="qty_ex[]"]');
+        removeMultiInputNamingRules('#form_distributor_in_details', 'input[alt="sell_rate_ex[]"]');
+
         return true;
     }
 });
@@ -1719,7 +1780,7 @@ function check_product_availablity_for_distributor_in() {
                             }
                         }
                     }
-                });
+                }); 
 
 
                 // var result = 1;
@@ -1962,59 +2023,59 @@ function check_product_availablity_for_distributor_sale() {
                 });
 
 
-                var result = 1;
+                //var result = 1;
 
-                $.ajax({
-                    url: BASE_URL+'index.php/Stock/check_bar_availablity_for_distributor',
-                    data: 'id='+$("#id").val()+'&module='+module+'&distributor_id='+$("#distributor_id").val()+'&product_id='+bar,
-                    type: "POST",
-                    dataType: 'html',
-                    global: false,
-                    async: false,
-                    success: function (data) {
-                        result = parseInt(data);
-                    },
-                    error: function (xhr, ajaxOptions, thrownError) {
-                        alert(xhr.status);
-                        alert(thrownError);
-                    }
-                });
+                // $.ajax({
+                //     url: BASE_URL+'index.php/Stock/check_bar_availablity_for_distributor',
+                //     data: 'id='+$("#id").val()+'&module='+module+'&distributor_id='+$("#distributor_id").val()+'&product_id='+bar,
+                //     type: "POST",
+                //     dataType: 'html',
+                //     global: false,
+                //     async: false,
+                //     success: function (data) {
+                //         result = parseInt(data);
+                //     },
+                //     error: function (xhr, ajaxOptions, thrownError) {
+                //         alert(xhr.status);
+                //         alert(thrownError);
+                //     }
+                // });
 
-                if (result) {
-                    var id = "bar_"+index;
-                    var errors = {};
-                    var name = $("#"+id).attr('name');
-                    errors[name] = "Bar not available in selected distributor.";
-                    validator.showErrors(errors);
-                    valid = false;
-                }
+                // if (result) {
+                //     var id = "bar_"+index;
+                //     var errors = {};
+                //     var name = $("#"+id).attr('name');
+                //     errors[name] = "Bar not available in selected distributor.";
+                //     validator.showErrors(errors);
+                //     valid = false;
+                // }
 
-                result = 1;
+                // result = 1;
 
-                $.ajax({
-                    url: BASE_URL+'index.php/Stock/check_bar_qty_availablity_for_distributor',
-                    data: 'id='+$("#id").val()+'&module='+module+'&distributor_id='+$("#distributor_id").val()+'&product_id='+bar+'&qty='+qty,
-                    type: "POST",
-                    dataType: 'html',
-                    global: false,
-                    async: false,
-                    success: function (data) {
-                        result = parseInt(data);
-                    },
-                    error: function (xhr, ajaxOptions, thrownError) {
-                        alert(xhr.status);
-                        alert(thrownError);
-                    }
-                });
+                // $.ajax({
+                //     url: BASE_URL+'index.php/Stock/check_bar_qty_availablity_for_distributor',
+                //     data: 'id='+$("#id").val()+'&module='+module+'&distributor_id='+$("#distributor_id").val()+'&product_id='+bar+'&qty='+qty,
+                //     type: "POST",
+                //     dataType: 'html',
+                //     global: false,
+                //     async: false,
+                //     success: function (data) {
+                //         result = parseInt(data);
+                //     },
+                //     error: function (xhr, ajaxOptions, thrownError) {
+                //         alert(xhr.status);
+                //         alert(thrownError);
+                //     }
+                // });
 
-                if (result) {
-                    var id = "qty_"+index;
-                    var errors = {};
-                    var name = $("#"+id).attr('name');
-                    errors[name] = "Bar qty is not enough in selected distributor.";
-                    validator.showErrors(errors);
-                    valid = false;
-                }
+                // if (result) {
+                //     var id = "qty_"+index;
+                //     var errors = {};
+                //     var name = $("#"+id).attr('name');
+                //     errors[name] = "Bar qty is not enough in selected distributor.";
+                //     validator.showErrors(errors);
+                //     valid = false;
+                // }
             }
         });
 
@@ -2041,59 +2102,59 @@ function check_product_availablity_for_distributor_sale() {
                     }
                 });
                 
-                var result = 1;
+                // var result = 1;
 
-                $.ajax({
-                    url: BASE_URL+'index.php/Stock/check_box_availablity_for_distributor',
-                    data: 'id='+$("#id").val()+'&module='+module+'&distributor_id='+$("#distributor_id").val()+'&box_id='+box,
-                    type: "POST",
-                    dataType: 'html',
-                    global: false,
-                    async: false,
-                    success: function (data) {
-                        result = parseInt(data);
-                    },
-                    error: function (xhr, ajaxOptions, thrownError) {
-                        alert(xhr.status);
-                        alert(thrownError);
-                    }
-                });
+                // $.ajax({
+                //     url: BASE_URL+'index.php/Stock/check_box_availablity_for_distributor',
+                //     data: 'id='+$("#id").val()+'&module='+module+'&distributor_id='+$("#distributor_id").val()+'&box_id='+box,
+                //     type: "POST",
+                //     dataType: 'html',
+                //     global: false,
+                //     async: false,
+                //     success: function (data) {
+                //         result = parseInt(data);
+                //     },
+                //     error: function (xhr, ajaxOptions, thrownError) {
+                //         alert(xhr.status);
+                //         alert(thrownError);
+                //     }
+                // });
 
-                if (result) {
-                    var id = "box_"+index;
-                    var errors = {};
-                    var name = $("#"+id).attr('name');
-                    errors[name] = "Box not available in selected distributor.";
-                    validator.showErrors(errors);
-                    valid = false;
-                }
+                // if (result) {
+                //     var id = "box_"+index;
+                //     var errors = {};
+                //     var name = $("#"+id).attr('name');
+                //     errors[name] = "Box not available in selected distributor.";
+                //     validator.showErrors(errors);
+                //     valid = false;
+                // }
 
-                result = 1;
+                // result = 1;
 
-                $.ajax({
-                    url: BASE_URL+'index.php/Stock/check_box_qty_availablity_for_distributor',
-                    data: 'id='+$("#id").val()+'&module='+module+'&distributor_id='+$("#distributor_id").val()+'&box_id='+box+'&qty='+qty,
-                    type: "POST",
-                    dataType: 'html',
-                    global: false,
-                    async: false,
-                    success: function (data) {
-                        result = parseInt(data);
-                    },
-                    error: function (xhr, ajaxOptions, thrownError) {
-                        alert(xhr.status);
-                        alert(thrownError);
-                    }
-                });
+                // $.ajax({
+                //     url: BASE_URL+'index.php/Stock/check_box_qty_availablity_for_distributor',
+                //     data: 'id='+$("#id").val()+'&module='+module+'&distributor_id='+$("#distributor_id").val()+'&box_id='+box+'&qty='+qty,
+                //     type: "POST",
+                //     dataType: 'html',
+                //     global: false,
+                //     async: false,
+                //     success: function (data) {
+                //         result = parseInt(data);
+                //     },
+                //     error: function (xhr, ajaxOptions, thrownError) {
+                //         alert(xhr.status);
+                //         alert(thrownError);
+                //     }
+                // });
 
-                if (result) {
-                    var id = "qty_"+index;
-                    var errors = {};
-                    var name = $("#"+id).attr('name');
-                    errors[name] = "Box qty is not enough in selected distributor.";
-                    validator.showErrors(errors);
-                    valid = false;
-                }
+                // if (result) {
+                //     var id = "qty_"+index;
+                //     var errors = {};
+                //     var name = $("#"+id).attr('name');
+                //     errors[name] = "Box qty is not enough in selected distributor.";
+                //     validator.showErrors(errors);
+                //     valid = false;
+                // }
             }
         });
     }
@@ -3483,8 +3544,12 @@ $("#form_credit_debit_note_details").validate({
         transaction: {
             required: true
         },
-        amount: {
-            required: true
+        amount_without_tax: {
+            required: true,
+            numbersonly: true
+        },
+        tax: {
+            numbersonly: true
         },
         remarks: {
             required: true
@@ -3739,6 +3804,81 @@ $('#form_zone_details').submit(function() {
         return true;
     }
 });
+
+
+
+// ----------------- Ingredients master FORM VALIDATION -------------------------------------
+$("#form_ingredients_master_details").validate({
+    rules: {
+        
+			total_batch_in_grams:{
+            required: true
+            
+			},
+			per_bar: {
+            required: true
+            
+			},
+			total_batch_bar: {
+            required: true
+            
+			},
+			product_id: {
+            required: true,
+            check_product_id_availablity: true
+        }
+    },
+
+    ignore: false,
+
+    errorPlacement: function (error, element) {
+        var placement = $(element).data('error');
+        if (placement) {
+            $(placement).append(error);
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
+$.validator.addMethod("check_product_id_availablity", function (value, element) {
+    var result = 1;
+
+    $.ajax({
+        url: BASE_URL+'index.php/ingredients_master/check_product_id_availablity',
+        data: 'id='+$("#id").val()+'&product_id='+$("#product_id").val(),
+        type: "POST",
+        dataType: 'html',
+        global: false,
+        async: false,
+        success: function (data) {
+            result = parseInt(data);
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+        }
+    });
+
+    if (result) {
+        return false;
+    } else {
+        return true;
+    }
+}, 'Product already in use.');
+
+$('#form_ingredients_master_details').submit(function() {
+    if (!$("#form_ingredients_master_details").valid()) {
+        return false;
+    } else {
+        return true;
+    }
+});
+
+
+
+
+
 
 
 
@@ -4413,3 +4553,360 @@ $('#form_ledger_details').submit(function() {
 
     // return valid;
 // }
+
+
+
+
+
+
+
+// ----------------- SALES REP Mapping DETAILS FORM VALIDATION -------------------------------------
+$("#form_sr_mapping").validate({
+    rules: {
+        // sales_rep_id1: {
+            // required: true,
+            
+        // },
+		 // sales_rep_id2: {
+            // required: true,
+            
+        // },
+        	class: {
+            required: true,
+        },
+        type_id: {
+            required: true,
+          
+        },
+		
+		 // area_id: {
+           // required: true,
+           
+      // },
+		zone_id: {
+            required: true,
+           
+        },
+		location_id: {
+            required: true,
+            check_mapping_availablity: true,
+        },
+       
+       reporting_manager_id: {
+            required: true,
+           
+        }
+       
+    },
+
+    ignore: false,
+
+    errorPlacement: function (error, element) {
+        var placement = $(element).data('error');
+        if (placement) {
+            $(placement).append(error);
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
+// $.validator.addMethod("check_sales_rep_availablity", function (value, element) {
+    // var result = 1;
+
+    // $.ajax({
+        // url: BASE_URL+'index.php/Sales_rep/check_sales_rep_availablity',
+        // data: 'id='+$("#id").val()+'&sales_rep_name='+$("#sales_rep_name").val(),
+        // type: "POST",
+        // dataType: 'html',
+        // global: false,
+        // async: false,
+        // success: function (data) {
+            // result = parseInt(data);
+        // },
+        // error: function (xhr, ajaxOptions, thrownError) {
+            // alert(xhr.status);
+            // alert(thrownError);
+        // }
+    // });
+
+    // if (result) {
+        // return false;
+    // } else {
+        // return true;
+    // }
+// }, 'Sales Mapping Name already in use.');
+
+
+
+
+$.validator.addMethod("check_mapping_availablity", function (value, element) {
+    var result = 1;
+
+	   var type_id = $('#type_id').val();
+
+	
+	  if(( type_id == '7') || (type_id == '4'))
+		{
+		$.ajax({
+        url: BASE_URL+'index.php/sr_mapping/check_mapping_availablity',
+        data: 'id='+$("#id").val()+'&type_id='+$("#type_id").val()+'&zone_id='+$("#zone_id").val()+'&area_id1='+$("#area_id1").val()+'&location_id='+$("#location_id").val(),
+        type: "POST",
+        dataType: 'html',
+        global: false,
+        async: false,
+        success: function (data) {
+            result = parseInt(data);
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+        }
+    });
+
+ 
+		}
+	else
+		{
+		   $.ajax({
+        url: BASE_URL+'index.php/sr_mapping/check_mapping_availablity',
+        data: 'id='+$("#id").val()+'&type_id='+$("#type_id").val()+'&zone_id='+$("#zone_id").val()+'&area_id='+$("#area_id").val()+'&location_id='+$("#location_id").val(),
+        type: "POST",
+        dataType: 'html',
+        global: false,
+        async: false,
+        success: function (data) {
+            result = parseInt(data);
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+        }
+    });
+		}
+
+    if (result) {
+        return false;
+    } else {
+        return true;
+    }
+}, 'Mapping already in use.');
+		
+	
+	
+
+$('#form_sr_mapping').submit(function() {
+    if (!$("#form_sr_mapping").valid()) {
+        return false;
+    } else {
+        return true;
+    }
+});
+
+
+
+
+
+
+// ----------------- DISTRIBUTOR OUT SKU DETAILS FORM VALIDATION -------------------------------------
+$("#form_distributor_out_sku_details").validate({
+    rules: {
+        sales_rep_id: {
+            required: true
+        }
+    },
+
+    ignore: ":not(:visible)",
+
+    errorPlacement: function (error, element) {
+        var placement = $(element).data('error');
+        if (placement) {
+            $(placement).append(error);
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
+$('#form_distributor_out_sku_details').submit(function() {
+    removeMultiInputNamingRules('#form_distributor_out_sku_details', '.batch_no_qty');
+    removeMultiInputNamingRules('#form_distributor_out_sku_details', '.batch_no_no');
+
+    addMultiInputNamingRules('#form_distributor_out_sku_details', '.batch_no_qty', { required: true }, "");
+    addMultiInputNamingRules('#form_distributor_out_sku_details', '.batch_no_no', { required: true }, "");
+    if (!$("#form_distributor_out_sku_details").valid()) {
+        return false;
+    } else {
+        if (check_product_availablity_for_sku_details()==false) {
+            return false;
+        }
+
+        removeMultiInputNamingRules('#form_distributor_out_sku_details', '.batch_no_qty');
+        removeMultiInputNamingRules('#form_distributor_out_sku_details', '.batch_no_no');
+        
+        return true;
+    }
+});
+
+function test_loop(){
+    $('.item_qty').each(function(){
+        var id = $(this).attr('id');
+        var index = id.substr(id.lastIndexOf('_')+1);
+        var qty = $(this).val();
+
+        console.log(id);
+
+        $('[id^=batch_no_qty_'+index+']').each(function(){
+            console.log($(this).attr('id'));
+        });
+    });
+}
+
+function check_product_availablity_for_sku_details() {
+    var validator = $("#form_distributor_out_sku_details").validate();
+    var valid = true;
+
+    $('.item_qty').each(function(){
+        var id = $(this).attr('id');
+        var index = id.substr(id.lastIndexOf('_')+1);
+        var qty = 0;
+        var batch_qty = 0;
+        var t_qty = 0;
+
+        t_qty = $(this).val();
+        if(!isNaN(t_qty) && t_qty!=''){
+            qty = parseInt(t_qty);
+        }
+
+        $('[id^=batch_no_qty_'+index+']').each(function(){
+            t_qty = $(this).val();
+            if(!isNaN(t_qty) && t_qty!=''){
+                batch_qty = batch_qty + parseInt(t_qty);
+            }
+        });
+
+        if(qty!=batch_qty){
+            var errors = {};
+            var name = $('#batch_no_qty_'+index+'_0').attr('name');
+            errors[name] = "Total no of qty does not match.";
+            validator.showErrors(errors);
+            valid = false;
+        }
+
+        var sales_id = $("#sales_id_"+index).val();
+        var sales_ref_id = $("#sales_ref_id_"+index).val();
+        var depot_id = $("#item_depot_"+index).val();
+        var item_type = $("#item_type_"+index).val();
+        var item_id = $("#item_id_"+index).val();
+        var module="distributor_out";
+
+        if(item_type=='Bar'){
+            var result = 1;
+
+            $.ajax({
+                url: BASE_URL+'index.php/Stock/check_bar_availablity_for_depot',
+                data: 'id='+sales_id+'&module='+module+'&depot_id='+depot_id+'&product_id='+item_id,
+                type: "POST",
+                dataType: 'html',
+                global: false,
+                async: false,
+                success: function (data) {
+                    result = parseInt(data);
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert(xhr.status);
+                    alert(thrownError);
+                }
+            });
+
+            if (result) {
+                var errors = {};
+                var name = $('#batch_no_qty_'+index+'_0').attr('name');
+                errors[name] = "Bar not available in selected depot.";
+                validator.showErrors(errors);
+                valid = false;
+            }
+
+            result = 1;
+
+            $.ajax({
+                url: BASE_URL+'index.php/Stock/check_bar_qty_availablity_for_depot',
+                data: 'id='+sales_id+'&module='+module+'&depot_id='+depot_id+'&product_id='+item_id+'&qty='+qty+'&ref_id='+sales_ref_id,
+                type: "POST",
+                dataType: 'html',
+                global: false,
+                async: false,
+                success: function (data) {
+                    result = parseInt(data);
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert(xhr.status);
+                    alert(thrownError);
+                }
+            });
+
+            if (result) {
+                var errors = {};
+                var name = $('#batch_no_qty_'+index+'_0').attr('name');
+                errors[name] = "Bar qty is not enough in selected depot. ";
+                validator.showErrors(errors);
+                valid = false;
+            }
+        } else {
+            var result = 1;
+
+            $.ajax({
+                url: BASE_URL+'index.php/Stock/check_box_availablity_for_depot',
+                data: 'id='+sales_id+'&module='+module+'&depot_id='+depot_id+'&box_id='+item_id,
+                type: "POST",
+                dataType: 'html',
+                global: false,
+                async: false,
+                success: function (data) {
+                    result = parseInt(data);
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert(xhr.status);
+                    alert(thrownError);
+                }
+            });
+
+            if (result) {
+                var errors = {};
+                var name = $('#batch_no_qty_'+index+'_0').attr('name');
+                errors[name] = "Box not available in selected depot.";
+                validator.showErrors(errors);
+                valid = false;
+            }
+
+            result = 1;
+
+            $.ajax({
+                url: BASE_URL+'index.php/Stock/check_box_qty_availablity_for_depot',
+                data: 'id='+sales_id+'&module='+module+'&depot_id='+depot_id+'&box_id='+item_id+'&qty='+qty+'&ref_id='+sales_ref_id,
+                type: "POST",
+                dataType: 'html',
+                global: false,
+                async: false,
+                success: function (data) {
+                    result = parseInt(data);
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert(xhr.status);
+                    alert(thrownError);
+                }
+            });
+
+            if (result) {
+                var errors = {};
+                var name = $('#batch_no_qty_'+index+'_0').attr('name');
+                errors[name] = "Box qty is not enough in selected depot.";
+                validator.showErrors(errors);
+                valid = false;
+            }
+        }
+        
+    });
+
+    return valid;
+}

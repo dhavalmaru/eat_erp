@@ -53,7 +53,10 @@
 									<thead>
 										<tr>
 											<th width="65" style="text-align:center;">Sr. No.</th>
-											<th  >Raw Material Name</th>
+											<th>Raw Material Name</th>
+											<th>HSN Code</th>
+											<th>Rate</th>
+											<th>Tax %</th>
 											<th width="110">Creation Date</th>
 										</tr>
 									</thead>
@@ -62,11 +65,15 @@
 										<tr>
 											<td style="text-align:center;"><?php echo $i+1; ?></td>
 											<td><a href="<?php echo base_url().'index.php/raw_material/edit/'.$data[$i]->id; ?>"><?php echo $data[$i]->rm_name; ?></a></td>
+											<td><?php echo $data[$i]->hsn_code; ?></td>
+											<td><?php echo $data[$i]->rate; ?></td>
+											<td><?php echo $data[$i]->tax_per; ?></td>
 											<td>
 												<span style="display:none;">
                                                     <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
                                                 </span>
-												<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
+												<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?>
+											</td>
 										</tr>
 										<?php } ?>
 									</tbody>

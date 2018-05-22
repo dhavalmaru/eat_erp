@@ -114,6 +114,7 @@
 											<th width="120" >Amount (In Rs)</th>
 											<th width="110">Creation Date</th>
 											<th width="110"> Status</th>
+											<th width="105" class="hide_col">View Receipt</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -130,13 +131,14 @@
 											<td><?php echo $data[$i]->depot_name; ?></td>
 											<td><?php echo $data[$i]->distributor_name; ?></td>
 											<td><?php echo $data[$i]->sales_rep_name; ?></td>
-											<td><?php echo format_money($data[$i]->amount,2); ?></td>
+											<td><?php echo format_money($data[$i]->final_amount,2); ?></td>
 											<td>
 												<span style="display:none;">
                                                     <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
                                                 </span>
 												<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
 											<td><?php echo $data[$i]->status; ?></td>
+											<td class="hide_col"><a href="<?php echo base_url().'index.php/distributor_in/view_sales_return_receipt/'.$data[$i]->id; ?>" target="_blank"><span class="fa fa-file-pdf-o" style="font-size:20px;"></span></a></td>
 										</tr>
 										<?php } ?>
 									</tbody>
@@ -164,21 +166,22 @@
 
 	    		if(url.includes('All')){
 	                $('.all').attr('class','active');
-	            }
-	            else if(url.includes('InActive')){
+	                $('.hide_col').show();
+	            } else if(url.includes('InActive')){
 	                $('.inactive').attr('class','active');
-	            }
-	            else if(url.includes('Approved')){
+	                $('.hide_col').hide();
+	            } else if(url.includes('Approved')){
 	                $('.approved').attr('class','active');
-	            }
-	            else if(url.includes('Pending')){
+	                $('.hide_col').show();
+	            } else if(url.includes('Pending')){
 	                $('.pending').attr('class','active');
-	            }
-	            else  if(url.includes('Rejected')){
+	                $('.hide_col').hide();
+	            } else  if(url.includes('Rejected')){
 	                $('.rejected').attr('class','active');
-	            } 
-	            else {
+	                $('.hide_col').hide();
+	            } else {
 	                $('.approved').attr('class','active');
+	                $('.hide_col').show();
 	            }
 	    	});
 		</script>

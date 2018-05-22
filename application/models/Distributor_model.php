@@ -70,11 +70,16 @@ function get_data_without_sample($status='', $id='', $class=''){
         }
     }
 
+    // $sql = "select A.*, B.sales_rep_name from 
+    //         (select * from distributor_master".$cond.") A 
+    //         left join 
+    //         (select * from sales_rep_master) B 
+    //         on (A.sales_rep_id=B.id) where A.distributor_name!='Sample' order by A.distributor_name asc";
     $sql = "select A.*, B.sales_rep_name from 
             (select * from distributor_master".$cond.") A 
             left join 
             (select * from sales_rep_master) B 
-            on (A.sales_rep_id=B.id) where A.distributor_name!='Sample' order by A.distributor_name asc";
+            on (A.sales_rep_id=B.id) where A.class!='sample' order by A.distributor_name asc";
     $query=$this->db->query($sql);
     return $query->result();
 }
@@ -102,11 +107,16 @@ function get_data_with_sample($status='', $id='', $class=''){
         }
     }
 
+    // $sql = "select A.*, B.sales_rep_name from 
+    //         (select * from distributor_master".$cond.") A 
+    //         left join 
+    //         (select * from sales_rep_master) B 
+    //         on (A.sales_rep_id=B.id) where A.distributor_name='Sample' order by A.distributor_name asc";
     $sql = "select A.*, B.sales_rep_name from 
             (select * from distributor_master".$cond.") A 
             left join 
             (select * from sales_rep_master) B 
-            on (A.sales_rep_id=B.id) where A.distributor_name='Sample' order by A.distributor_name asc";
+            on (A.sales_rep_id=B.id) where A.class='sample' order by A.id";
     $query=$this->db->query($sql);
     return $query->result();
 }
@@ -137,14 +147,14 @@ function get_distributor_data($status='', $id='', $class=''){
             ((select id, concat('d_', id) as d_id, distributor_name, address, city, pincode, state, country, email_id, mobile, 
                     tin_number, cst_number, contact_person, sales_rep_id, sell_out, send_invoice, credit_period, class, area_id, 
                     type_id, zone_id, location_id, status, remarks, created_by, created_on, modified_by, modified_on, approved_by, approved_on, 
-                    rejected_by, rejected_on, google_address, doc_document, document_name, state_code, gst_number 
+                    rejected_by, rejected_on, google_address, doc_document, document_name, state_code, gst_number, latitude, longitude,tally_name 
                 from distributor_master".$cond2.") 
               union all 
             (select id, concat('s_', id) as d_id, distributor_name, address, city, pincode, state, country, null as email_id, 
                     contact_no as mobile, vat_no as tin_number, null as cst_number, contact_person, sales_rep_id, 
                     margin as sell_out, null as send_invoice, null as credit_period, null as class, null as area_id, null as type_id, 
                     null as zone_id, null as location_id,'Pending' as status, remarks, created_by, created_on, modified_by, modified_on, 
-                    approved_by, approved_on, rejected_by, rejected_on, null as google_address, doc_document, document_name, state_code, gst_number 
+                    approved_by, approved_on, rejected_by, rejected_on, null as google_address, doc_document, document_name, state_code, gst_number, null as latitude, null as longitude, null as tally_name 
                 from sales_rep_distributors where status = 'Approved')) C ".$cond.") D 
             left join 
             (select * from sales_rep_master) E 
@@ -208,7 +218,10 @@ function save_data($id=''){
         'doc_document' => $this->input->post('doc_document'),
         'document_name' => $this->input->post('document_name'),
         'state_code' => $this->input->post('state_code'),
-        'gst_number' => $this->input->post('gst_number')
+        'gst_number' => $this->input->post('gst_number'),
+        'latitude' => $this->input->post('d_latitude'),
+        'longitude' => $this->input->post('d_longitude'),
+        'tally_name' => $this->input->post('tally_name')
     );
 
     if($id==''){

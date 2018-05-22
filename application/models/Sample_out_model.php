@@ -594,6 +594,11 @@ function save_data($id=''){
     
     $gate_pass_no = 'WHPL/'.$financial_year.'/gate_pass/'.strval($series);
 
+    $sample_distributor_id = $this->input->post('sample_distributor_id');
+    if($sample_distributor_id==""){
+        $sample_distributor_id = null;
+    }
+
     $data = array(
         'date_of_processing' => $date_of_processing,
         'invoice_no' => $this->input->post('invoice_no'),
@@ -623,7 +628,7 @@ function save_data($id=''){
         'state' => $this->input->post('state'),
         'country' => $this->input->post('country'),
         'discount' => format_number($this->input->post('discount'),2),
-        'sample_distributor_id' => $this->input->post('sample_distributor_id'),
+        'sample_distributor_id' => $sample_distributor_id,
         'delivery_status' => $delivery_status,
         'delivery_date' => $delivery_date,
         'sample_type' => $sample_type,
@@ -813,6 +818,126 @@ function save_data($id=''){
     // $logarray['cnt_name']='Payment';
     // $logarray['action']=$action;
     // $this->user_access_log_model->insertAccessLog($logarray);
+}
+
+function set_sku_batch(){
+    $check1=$this->input->post('check');
+    $delivery_status=$this->input->post('delivery_status');
+    $sales_rep_id=$this->input->post('sales_rep_id');
+    $status=$this->input->post('status');
+    $distributor_out_id=$this->input->post('distributor_out_id');
+    $sales_item_id=$this->input->post('sales_item_id');
+
+    if($distributor_out_id!=""){
+        $now=date('Y-m-d H:i:s');
+        $curusr=$this->session->userdata('session_id');
+
+        if($delivery_status=="Pending"){
+            if($status!="InActive"){
+                $status = "Approved";
+            }
+        }
+
+        if(isset($sales_rep_id) && $sales_rep_id!=''){
+            $sql = "update distributor_out set delivery_status = '$delivery_status', delivery_sales_rep_id = '$sales_rep_id', 
+                    status = '$status', modified_by = '$curusr', modified_on = '$now', gatepass_date = '$now'
+                    where id in (".$distributor_out_id.")";
+        } else {
+            $sql = "update distributor_out set delivery_status = '$delivery_status', status = '$status', 
+                    modified_by = '$curusr', modified_on = '$now' 
+                    where id in (".$distributor_out_id.")";
+        }
+        
+        $this->db->query($sql);
+
+        for($i=0; $i<count($sales_item_id); $i++){
+            $batch_no_qty=$this->input->post('batch_no_qty_'.$i);
+            $batch_no_no=$this->input->post('batch_no_no_'.$i);
+
+            $total_batch_no_qty = implode(", ", $batch_no_qty);
+            $total_batch_no_no = implode(", ", $batch_no_no);
+
+            if($sales_item_id[$i]!=''){
+                $item_id = $sales_item_id[$i];
+                $sql = "update distributor_out_items set batch_no = '$total_batch_no_no', batch_qty = '$total_batch_no_qty' 
+                        where id = '$item_id'";
+                $this->db->query($sql);
+            }
+            
+        }
+
+        if($delivery_status=='GP Issued'){
+            $this->tax_invoice_model->generate_gate_pass($distributor_out_id);
+        }
+    }
+}
+
+function get_sku_details(){
+    $check1=$this->input->post('check');
+
+    // $check1=['1'];
+
+    $check = array();
+    $j=0;
+
+    for($i=0; $i<count($check1); $i++){
+        if($check1[$i]!='false'){
+            $check[$j] = $check1[$i];
+            $j = $j + 1;
+        }
+    }
+
+    $distributor_out_id = implode(", ", $check);
+
+    $table = '';
+    $data = array();
+
+    if($distributor_out_id!=""){
+        $sql = "select O.* from 
+                (select M.*, N.location from 
+                (select K.*, L.sales_rep_name from 
+                (select I.*, J.depot_name, J.address as depot_address, J.city as depot_city, J.pincode as depot_pincode, 
+                    J.state as depot_state, J.state_code as depot_state_code, J.country as depot_country from 
+                (select G.*, H.distributor_name, H.sell_out, H.state as distributor_state, H.class, H.location_id from 
+                (select E.*, F.product_name from 
+                (select C.*, D.box_name from 
+                (select A.*, B.id as sales_item_id, B.type, B.item_id, B.qty, B.rate, B.sell_rate, B.amount as item_amt from 
+                (select * from distributor_out where id in (".$distributor_out_id.")) A 
+                left join 
+                (select * from distributor_out_items where distributor_out_id in (".$distributor_out_id.")) B 
+                on (A.id = B.distributor_out_id)) C 
+                left join 
+                (select * from box_master) D 
+                on (C.type = 'Box' and C.item_id = D.id)) E 
+                left join 
+                (select * from product_master) F 
+                on (E.type = 'Bar' and E.item_id = F.id)) G 
+                left join 
+                (select * from distributor_master) H 
+                on (G.distributor_id=H.id)) I 
+                left join 
+                (select * from depot_master) J 
+                on (I.depot_id=J.id)) K 
+                left join 
+                (select * from sales_rep_master) L 
+                on (K.sales_rep_id=L.id)) M 
+                left join 
+                (select * from location_master) N 
+                on (M.location_id=N.id)) O 
+                order by O.voucher_no";
+        $query = $this->db->query($sql);
+        $data = $query->result();
+    }
+
+    return $data;
+}
+
+function get_batch_details(){
+    $date = date("Y-m-d", strtotime("-6 months"));
+
+    $sql = "select * from batch_master where date_of_processing >= '$date' and status = 'Approved' and batch_no!=''";
+    $query = $this->db->query($sql);
+    return $query->result();
 }
 
 function set_delivery_status() {

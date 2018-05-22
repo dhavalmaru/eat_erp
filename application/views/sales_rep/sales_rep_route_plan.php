@@ -51,7 +51,7 @@
             <!-- PAGE CONTENT -->
 			   <?php $this->load->view('templates/menus');?>
               <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
-                   <div class="heading-h2"><a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp; <a href="<?php echo base_url().'index.php/sales_rep'; ?>" > Sales Representative List </a>  &nbsp; &#10095; &nbsp; Sales Representative Route Plan </div>
+                   <div class="heading-h2"><a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp; <a href="<?php echo base_url().'index.php/Reports/view_reports'; ?>" > Reports </a>  &nbsp; &#10095; &nbsp; Sales Representative Route Plan </div>
                 
                 
                 <!-- PAGE CONTENT WRAPPER -->
@@ -83,8 +83,8 @@
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <select name="sales_rep_id" id="sales_rep_id" class="form-control">
                                                     <option value="">Select</option>
-                                                    <?php if(isset($sales_rep)) { for ($k=0; $k < count($sales_rep) ; $k++) { ?>
-                                                            <option value="<?php echo $sales_rep[$k]->id; ?>" <?php if(isset($data)) { if($sales_rep[$k]->id==$data[0]->sales_rep_id) { echo 'selected'; } } ?>><?php echo $sales_rep[$k]->sales_rep_name; ?></option>
+                                                    <?php if(isset($sales_rep1)) { for ($k=0; $k < count($sales_rep1) ; $k++) { ?>
+                                                            <option value="<?php echo $sales_rep1[$k]->id; ?>" <?php if(isset($data)) { if($sales_rep1[$k]->id==$data[0]->sales_rep_id) { echo 'selected'; } } ?>><?php echo $sales_rep1[$k]->sales_rep_name; ?></option>
                                                     <?php }} ?>
                                                 </select>
                                             </div>

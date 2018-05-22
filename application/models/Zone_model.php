@@ -14,7 +14,7 @@ function get_access(){
     return $query->result();
 }
 
-function get_data($status='', $id=''){
+function get_data($status='', $id='', $zone_type=''){
     if($status!=""){
         $cond=" where status='".$status."'";
     } else {
@@ -29,7 +29,20 @@ function get_data($status='', $id=''){
         }
     }
 
-    $sql = "select * from zone_master".$cond." order by modified_on desc";
+    if($zone_type=="ss_stores"){
+        if($cond=="") {
+            $cond=" where (type_id='4' or type_id='7')";
+        } else {
+            $cond=$cond." and (type_id='4' or type_id='7')";
+        }
+    }
+
+    $sql = "select A.*, B.distributor_type from 
+            (select * from zone_master".$cond.") A 
+            left join 
+            (select * from distributor_type_master) B 
+            on (A.type_id=B.id) where A.status='Approved' order by A.modified_on desc";
+    // $sql = "select * from zone_master".$cond." order by modified_on desc";
     $query=$this->db->query($sql);
     return $query->result();
 }
@@ -41,6 +54,7 @@ function save_data($id=''){
     $data = array(
         'zone' => $this->input->post('zone'),
         'status' => $this->input->post('status'),
+        'type_id' => $this->input->post('type_id'),
         'remarks' => $this->input->post('remarks'),
         'modified_by' => $curusr,
         'modified_on' => $now
@@ -66,21 +80,45 @@ function save_data($id=''){
     $this->user_access_log_model->insertAccessLog($logarray);
 }
 
-function check_zone_availablity(){
-    $id=$this->input->post('id');
-    $zone=$this->input->post('zone');
+// function check_zone_availablity(){
+    // $id=$this->input->post('id');
+    // $zone=$this->input->post('zone');
+    // $type_id=$this->input->post('type_id');
 
-    // $id="";
+    ///$id="";
 
-    $query=$this->db->query("SELECT * FROM zone_master WHERE id!='".$id."' and zone='".$zone."'");
-    $result=$query->result();
+    // $query=$this->db->query("SELECT * FROM zone_master WHERE id!='".$id."' and zone='".$zone."' and type_id='".$type_id."'");
+    // $result=$query->result();
 
-    if (count($result)>0){
+    // if (count($result)>0){
+        // return 1;
+    // } else {
+        // return 0;
+    // }
+// }
+
+function check_zone_availablity($id, $zone, $type_id){
+    $this->db->select('*');
+    $this->db->where('id', $id);
+    $this->db->where('zone', $zone);
+    $this->db->where('type_id', $type_id);
+  
+
+    if(isset($id)){
+        if($id!=''){
+            $this->db->where('id != ', $id);
+        }
+    }
+
+    $this->db->from('zone_master');
+    $query = $this->db->get();
+    if( $query->num_rows() != 0 ){
         return 1;
-    } else {
+    }else{
         return 0;
     }
 }
+
 
 }
 ?>

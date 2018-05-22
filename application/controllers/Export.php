@@ -150,7 +150,6 @@ class Export extends CI_Controller {
 
             load_view('reports/download_report',$data);
         }
-        
     }
 
     public function generate_report($rep_id) {
@@ -196,30 +195,41 @@ class Export extends CI_Controller {
             $ssallocation=$this->input->post('ssallocation');
             $salesreturn=$this->input->post('salesreturn');
             $sample=$this->input->post('sample');
+            $credit_debit=$this->input->post('credit_debit');
+            $date_of_processing=$this->input->post('date_of_processing');
+            $date_of_accounting=$this->input->post('date_of_accounting');
             $invoicelevel=$this->input->post('invoicelevel');
-            // echo $sales;
-            if($invoicelevel=="") {
-                $this->export_model->generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sample);
+            $invoicelevelsalesreturn=$this->input->post('invoicelevelsalesreturn');
+            $invoicelevelsample=$this->input->post('invoicelevelsample');
+            // echo $invoicelevel;
+            // echo '<br>';
+            // echo $invoicelevelsalesreturn;
+            // echo '<br>';
+            // echo $invoicelevelsample;
+            $status_type='';
+            if($invoicelevel=="" || $invoicelevelsalesreturn=="" || $invoicelevelsample=="") {
+                $this->export_model->generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sample,$credit_debit,$status_type,$date_of_processing,$date_of_accounting);
+                // echo 'dop'.$date_of_processing.' doa'.$date_of_accounting;
             }
             else {
-                $this->export_model->generate_sale_invoice_report();
+                $this->export_model->generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $invoicelevelsample);
             }
         } else if($rep_id==19) {
             $this->export_model->generate_sample_expired_report();
         }
         
         $this->set_report_criteria($rep_id);
-
-        
     }
 
+    public function generate_distributor_out_sku_details($status) {
+        $this->export_model->generate_sale_invoice_sku_report('Sales','','','',$status);
+    }
 
     public function generate_ledger_report() {
         
         $result = $this->export_model->view_distributor_ledger_report();
 
         echo $result;
-    
     }
 
     public function getledgerreport() {

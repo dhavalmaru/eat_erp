@@ -91,7 +91,19 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Google Address</label>
                                             <div class="col-md-10 col-sm-10 col-xs-12">
-                                                <input type="text" class="form-control" name="google_address" id="google_address" placeholder="Google Address" value="<?php if(isset($data)) { echo  $data[0]->google_address; } ?>"/>
+                                                <input type="text" class="form-control" name="google_address" id="google_address"  onFocus="geolocate()" placeholder="Google Address" value="<?php if(isset($data)) { echo  $data[0]->google_address; } ?>"/>
+                                            </div>
+                                        </div>
+                                    </div>
+									<div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Latitude</label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control latitude" id="latitude" name="d_latitude" placeholder="Latitude" value="<?php if (isset($data)) { echo $data[0]->latitude; } ?>"/>
+                                            </div>
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Longitude</label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control longitude" id="longitude" name="d_longitude" placeholder="Longitude" value="<?php if (isset($data)) { echo $data[0]->longitude; } ?>"/>
                                             </div>
                                         </div>
                                     </div>
@@ -122,17 +134,7 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Sales Representative</label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="sales_rep_id" class="form-control">
-                                                    <option value="">Select</option>
-                                                    <?php if(isset($sales_rep)) { for ($k=0; $k < count($sales_rep) ; $k++) { ?>
-                                                            <option value="<?php echo $sales_rep[$k]->id; ?>" <?php if (isset($data)) { if($sales_rep[$k]->id==$data[0]->sales_rep_id) { echo 'selected'; } } ?>><?php echo $sales_rep[$k]->sales_rep_name; ?></option>
-                                                    <?php }} ?>
-                                                </select>
-                                            </div>
- 
+                                      
                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Margin On MRP (In %)<span class="asterisk_sign">*</span></label>
                                            <div class="col-md-4 col-sm-4 col-xs-12">
  
@@ -163,16 +165,48 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 control-label">Class <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4">
-                                                <select class="form-control" name="class">
+                                                <select class="form-control" name="class" id="classes">
                                                     <option value="">Select</option>
                                                     <option value="normal" <?php if(isset($data)) {if ($data[0]->class=='normal') echo 'selected';}?>>Normal</option>
                                                     <option value="super stockist" <?php if(isset($data)) {if ($data[0]->class=='super stockist') echo 'selected';}?>>Super stockist</option>
                                                     <option value="sample" <?php if(isset($data)) {if ($data[0]->class=='sample') echo 'selected';}?>>Sample</option>
                                                 </select>
                                             </div>
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Area</label>
+                                            </div>
+                                            </div>
+								
+                                        <div class="form-group" id="type_normal">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Type <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12" >
+                                                <select name="type_id" id="type_id" class="form-control">
+                                                    <option value="">Select</option>
+                                                    <?php if(isset($type)) { for ($k=0; $k < count($type) ; $k++) { ?>
+                                                            <option value="<?php echo $type[$k]->id; ?>" <?php if (isset($data)) { if($type[$k]->id==$data[0]->type_id) { echo 'selected'; } } ?>><?php echo $type[$k]->distributor_type; ?></option>
+                                                    <?php }} ?>
+                                                </select>
+                                            </div>
+                                            </div>
+                                            </div>
+									<div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Zone <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="area_id" class="form-control">
+                                                <select name="zone_id" id="zone_id" class="form-control">
+                                                    <option value="">Select</option>
+                                                    <?php if(isset($zone)) { for ($k=0; $k < count($zone) ; $k++) { ?>
+                                                            <option value="<?php echo $zone[$k]->id; ?>" <?php if (isset($data)) { if($zone[$k]->id==$data[0]->zone_id) { echo 'selected'; } } ?>><?php echo $zone[$k]->zone; ?></option>
+                                                    <?php }} ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+									
+										<div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Area <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <select name="area_id" id="area_id" class="form-control">
                                                     <option value="">Select</option>
                                                     <?php if(isset($area)) { for ($k=0; $k < count($area) ; $k++) { ?>
                                                             <option value="<?php echo $area[$k]->id; ?>" <?php if (isset($data)) { if($area[$k]->id==$data[0]->area_id) { echo 'selected'; } } ?>><?php echo $area[$k]->area; ?></option>
@@ -183,31 +217,9 @@
                                     </div>
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Type</label>
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Location <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="type_id" class="form-control">
-                                                    <option value="">Select</option>
-                                                    <?php if(isset($type)) { for ($k=0; $k < count($type) ; $k++) { ?>
-                                                            <option value="<?php echo $type[$k]->id; ?>" <?php if (isset($data)) { if($type[$k]->id==$data[0]->type_id) { echo 'selected'; } } ?>><?php echo $type[$k]->distributor_type; ?></option>
-                                                    <?php }} ?>
-                                                </select>
-                                            </div>
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Zone</label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="zone_id" class="form-control">
-                                                    <option value="">Select</option>
-                                                    <?php if(isset($zone)) { for ($k=0; $k < count($zone) ; $k++) { ?>
-                                                            <option value="<?php echo $zone[$k]->id; ?>" <?php if (isset($data)) { if($zone[$k]->id==$data[0]->zone_id) { echo 'selected'; } } ?>><?php echo $zone[$k]->zone; ?></option>
-                                                    <?php }} ?>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Location</label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="location_id" class="form-control">
+                                                <select name="location_id"  id="location_id"class="form-control">
                                                     <option value="">Select</option>
                                                     <?php if(isset($location)) { for ($k=0; $k < count($location) ; $k++) { ?>
                                                             <option value="<?php echo $location[$k]->id; ?>" <?php if (isset($data)) { if($location[$k]->id==$data[0]->location_id) { echo 'selected'; } } ?>><?php echo $location[$k]->location; ?></option>
@@ -227,6 +239,18 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            
+ 
+                                           <label class="col-md-2 col-sm-2 col-xs-12 control-label">Tally Name<span class="asterisk_sign"></span></label>
+                                           <div class="col-md-4 col-sm-4 col-xs-12">
+ 
+                                                <input type="text" class="form-control" name="tally_name" placeholder="Tally Name" value="<?php if (isset($data)) { echo $data[0]->tally_name; } ?>"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
 
                            			<div class="h-scroll">	
                                     <div class="table-stripped form-group" style="padding:15px;" >
@@ -428,6 +452,141 @@
         </script>
         <script type="text/javascript" src="<?php echo base_url(); ?>js/load_autocomplete.js"></script>
         <script type="text/javascript" src="<?php echo base_url(); ?>js/validations.js"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyATsgOOC1sMElGnhJq4wDvR2jnqgcCCamw&libraries=places&callback=initAutocomplete" async defer></script>
+		<script type='text/javascript'>
+
+
+ 
+    // City change
+    $('#type_id').change(function(){
+      var type_id = $(this).val();
+		//console.log(reporting_manager_id);
+      // AJAX request
+      $.ajax({
+        url:'<?=base_url()?>index.php/distributor/get_zone',
+        method: 'post',
+        data: {type_id: type_id},
+        dataType: 'json',
+        success: function(response){
+
+ 
+          $('#zone_id').find('option').not(':first').remove();
+      
+
+          // Add options
+		  // response = $.parseJSON(response);
+		  console.log(response);
+          $.each(response,function(index,data){
+             $('#zone_id').append('<option value="'+data['id']+'">'+data['zone']+'</option>');
+        
+          });
+        }
+     });
+   });
+       // City change
+    $('#zone_id').change(function(){
+      var zone_id = $(this).val();
+		//console.log(reporting_manager_id);
+      // AJAX request
+      $.ajax({
+        url:'<?=base_url()?>index.php/distributor/get_area',
+        method: 'post',
+        data: {zone_id: zone_id},
+        dataType: 'json',
+        success: function(response){
+
+ 
+          $('#area_id').find('option').not(':first').remove();
+      
+
+          // Add options
+		  // response = $.parseJSON(response);
+		  console.log(response);
+          $.each(response,function(index,data){
+             $('#area_id').append('<option value="'+data['id']+'">'+data['area']+'</option>');
+        
+          });
+        }
+     });
+   });
+   
+   
+ 
+   </script>	
+        <script type="text/javascript">
+		
+            var placeSearch, autocomplete;
+           var componentForm = {
+            street_number: 'short_name',
+            route: 'long_name',
+            locality: 'long_name',
+            administrative_area_level_1: 'short_name',
+            country: 'long_name',
+            postal_code: 'short_name'
+           };
+        function initAutocomplete() {
+                  // Create the autocomplete object, restricting the search to geographical
+                  // location types.
+                  autocomplete = new google.maps.places.Autocomplete(
+                     (document.getElementById('google_address')),
+                     {types: ['geocode']});
+                   google.maps.event.addListener(autocomplete, 'place_changed', function () {
+                    var place = autocomplete.getPlace();
+                    //document.getElementById('google_address').value = place.name;
+                    document.getElementById('latitude').value = place.geometry.location.lat();
+                    document.getElementById('longitude').value = place.geometry.location.lng();
+                    //alert("This function is working!");
+                    //alert(place.name);
+                   // alert(place.address_components[0].long_name);
+
+                });
+                  // When the user selects an address from the dropdown, populate the address
+                  // fields in the form.
+                  //autocomplete.addListener('place_changed', fillInAddress);
+           }
+
+                
+                function geolocate() {
+                  if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                      var geolocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                      };
+                      var circle = new google.maps.Circle({
+                        center: geolocation,
+                        radius: position.coords.accuracy
+                      });
+                      autocomplete.setBounds(circle.getBounds());
+                       
+                    });
+                    
+                  }
+                }
+        </script>
+		
+	<script>
+		// $(document).ready(function(){
+		// $("#type_sample").hide();
+		// $('#classes').on('change', function() {
+
+		// if ( this.value == 'normal')
+
+		// {
+
+			// $("#type_normal").show();
+			// $("#type_sample").hide();
+
+		// }
+		// else
+		// {
+			// $("#type_normal").hide();
+			// $("#type_sample").show();
+		// }
+		// });
+		// });
+	</script>
+
         <script type="text/javascript">
             $(document).ready(function(){
                 $('.delete_row').click(function(event){
@@ -559,6 +718,7 @@
                 });
             });
         </script>
-    <!-- END SCRIPTS -->      
+    <!-- END SCRIPTS -->    
+
     </body>
 </html>

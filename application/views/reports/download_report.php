@@ -8,11 +8,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <!-- END META SECTION -->
          <!-- CSS INCLUDE -->        
-         <link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>css/theme-blue.css"/>
-        <link href="<?php echo base_url() . 'js/jquery-ui-1.11.2/jquery-ui.min.css'; ?>" rel="stylesheet" type="text/css" />
-		<link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>css/user-details.css"/>
+        <link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>css/theme-blue.css"/>
+        <link rel="stylesheet" type="text/css" href="<?php echo base_url() . 'js/jquery-ui-1.11.2/jquery-ui.min.css'; ?>" />
+		    <link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>css/user-details.css"/>
         <!-- EOF CSS INCLUDE -->    
-		   <style type="text/css">
+		    <style type="text/css">
  body {background:none!important;}
 .bootstrap-select.btn-group .dropdown-menu li > a {
     cursor: pointer;
@@ -204,6 +204,8 @@ tfoot tr th:last-child {
                                                     <input type="checkbox" name="ssallocation" id="ssallocation" value="SS Allocation" checked> SS Allocation <br>
                                                     <input type="checkbox" name="salesreturn" id="salesreturn" value="Sales Return" checked> Sales Return <br>
                                                     <input type="checkbox" name="sample" id="sample" value="Sample & Product Expired" checked> Sample & Product Expired <br>
+												 <input type="checkbox" name="credit_debit" id="credit_debit" value="Credit Debit Note" checked> Credit Debit Note <br>
+												 
                                                 </div>
                                             </div>
                                         </div>
@@ -212,11 +214,24 @@ tfoot tr th:last-child {
                                                 
                                                 <div class="col-md-6 col-sm-6  col-xs-12">
                                                     <input type="checkbox" id="invoicelevel" value="Invoice Level" name="invoicelevel"> Invoice Level <br>
-                                                    
+                                                    <input type="checkbox" id="invoicelevelsalesreturn" value="Invoice Level Sales Return" name="invoicelevelsalesreturn"> Invoice Level Sales Return <br>
+                                                    <input type="checkbox" id="invoicelevelsample" value="Invoice Level Sample & Product Expired" name="invoicelevelsample"> Invoice Level Sample & Product Expired <br>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+
+                                    <div class="form-group" style="border-top:1px solid #ddd; border-bottom:none; <?php if($report_id !='18') echo 'display:none;';?>">
+                                         <div class="col-md-6  col-sm-6 col-xs-12">
+                                            <div class="">
+                                              <label class="col-md-4 col-sm-4 col-xs-12  control-label">Include</label>
+                                                <div class="col-md-8 col-sm-8  col-xs-12">
+                                              <input type="checkbox" name="date_of_processing" id="date_of_processing" value="Date Of Processing" checked> By Date Of Processing&nbsp;&nbsp;&nbsp;&nbsp;
+                         <input type="checkbox" name="date_of_accounting" id="date_of_accounting" value="Date Of Accounting" checked> By Date Of Accounting <br>
+                                            </div>
+                                            </div>
+                                          </div>
+                                        </div>
 
                                     <!-- <div class="form-group" style="border-top:1px solid #ddd; border-bottom:none; <?php //if($report_id !='16') echo 'display:none;';?>">
                                          <div class="col-md-6  col-sm-6 col-xs-12">
@@ -480,27 +495,44 @@ tfoot tr th:last-child {
         $(document).ready(function(){
 
           $('#invoicelevel').change(function() {
-            if($(this).is(":checked")) {
-              $('#sales').prop("checked",false);
-              $("#sales").attr("disabled", true);
-              $('#ssallocation').prop("checked",false);
-              $("#ssallocation").attr("disabled", true);
-              $('#salesreturn').prop("checked",false);
-              $("#salesreturn").attr("disabled", true);
-              $('#sample').prop("checked",false);
-              $("#sample").attr("disabled", true);
-            }
-            else {
-              $('#sales').prop("checked",true);
-              $("#sales").removeAttr("disabled");
-              $('#ssallocation').prop("checked",true);
-              $("#ssallocation").removeAttr("disabled");
-              $('#salesreturn').prop("checked",true);
-              $("#salesreturn").removeAttr("disabled");
-              $('#sample').prop("checked",true);
-              $("#sample").removeAttr("disabled");
-            }
+            set_invoicelevel_checkboxes($(this));
           });
+          $('#invoicelevelsalesreturn').change(function() {
+            set_invoicelevel_checkboxes($(this));
+          });
+          $('#invoicelevelsample').change(function() {
+            set_invoicelevel_checkboxes($(this));
+          });
+
+          $('#sales').change(function() {
+            set_skulevel_checkboxes($(this));
+          });
+          $('#ssallocation').change(function() {
+            set_skulevel_checkboxes($(this));
+          });
+          $('#salesreturn').change(function() {
+            set_skulevel_checkboxes($(this));
+          });
+          $('#sample').change(function() {
+            set_skulevel_checkboxes($(this));
+          });
+
+          var set_invoicelevel_checkboxes = function(elem){
+            if($('#invoicelevel').is(":checked") || $('#invoicelevelsalesreturn').is(":checked") || $('#invoicelevelsample').is(":checked")) {
+              $('#sales').removeAttr("checked");
+              $('#ssallocation').removeAttr("checked");
+              $('#salesreturn').removeAttr("checked");
+              $('#sample').removeAttr("checked");
+            }
+          }
+
+          var set_skulevel_checkboxes = function(elem){
+            if($('#invoicelevel').is(":checked") || $('#invoicelevelsalesreturn').is(":checked") || $('#invoicelevelsample').is(":checked")) {
+              $('#invoicelevel').removeAttr("checked");
+              $('#invoicelevelsalesreturn').removeAttr("checked");
+              $('#invoicelevelsample').removeAttr("checked");
+            }
+          }
 
         });
         </script>

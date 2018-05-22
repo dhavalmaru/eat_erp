@@ -39,25 +39,17 @@ class Distributor_out extends CI_Controller{
         // }
 
         $this->checkstatus('pending_for_delivery');
-		
-		
-}
+    }
 
-		 function select_validate($distributor_id)
-            {
-                 if($distributor_id=="amazon direct")
-                    {$this->form_validation->set_message('select_validate', 'order no should be in 333-7777777-7777777');
-                    return false;}
-                else 
-                    {   return true;    }
-            }
+    function select_validate($distributor_id){
+        if($distributor_id=="amazon direct"){
+            $this->form_validation->set_message('select_validate', 'order no should be in 333-7777777-7777777');
+            return false;
+        } else {
+            return true;
+        }
+    }
 
-	
-	
-	
-	
-	
-	
     public function get_data($status){
         // $status = 'Approved';
 
@@ -89,9 +81,17 @@ class Distributor_out extends CI_Controller{
                             .'</span>'.
                             $r[$i]->invoice_no,
 
+                            '<span style="display:none;">
+                            <input type="hidden" id="invoice_date_'.$i.'" name="invoice_date[]" value="'.$r[$i]->invoice_date.'" />'.
+                                (($r[$i]->invoice_date!=null && $r[$i]->invoice_date!='')?date('Ymd',strtotime($r[$i]->invoice_date)):'')
+                            .'</span>'.
+                            (($r[$i]->invoice_date!=null && $r[$i]->invoice_date!='')?date('d/m/Y',strtotime($r[$i]->invoice_date)):''),
+
                             $r[$i]->depot_name,
 
                             ((strtoupper(trim($r[$i]->distributor_name))=='DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='AMAZON DIRECT')? $r[$i]->distributor_name . '-' . $r[$i]->client_name : $r[$i]->distributor_name),
+
+                            $r[$i]->order_no,
 
                             $r[$i]->location,
 
@@ -148,9 +148,17 @@ class Distributor_out extends CI_Controller{
                             .'</span>'.
                             $r[$i]->invoice_no,
 
+                            '<span style="display:none;">
+                            <input type="hidden" id="invoice_date_'.$i.'" name="invoice_date[]" value="'.$r[$i]->invoice_date.'" />'.
+                                (($r[$i]->invoice_date!=null && $r[$i]->invoice_date!='')?date('Ymd',strtotime($r[$i]->invoice_date)):'')
+                            .'</span>'.
+                            (($r[$i]->invoice_date!=null && $r[$i]->invoice_date!='')?date('d/m/Y',strtotime($r[$i]->invoice_date)):''),
+
                             $r[$i]->depot_name,
 
                             ((strtoupper(trim($r[$i]->distributor_name))=='DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='AMAZON DIRECT')? $r[$i]->distributor_name . '-' . $r[$i]->client_name : $r[$i]->distributor_name),
+
+                            $r[$i]->order_no,
 
                             $r[$i]->location,
 
@@ -278,9 +286,8 @@ class Distributor_out extends CI_Controller{
                     else if (strtoupper(trim($count_data[$i]->status))=="INACTIVE")
                         $inactive=$inactive+1;
 					
-                    else if ((strtoupper(trim($count_data[$i]->status))=="PENDING" && 
-                                ($count_data[$i]->delivery_status==null || $count_data[$i]->delivery_status=='')) || 
-                            strtoupper(trim($count_data[$i]->status))=="REJECTED")
+                    else if (strtoupper(trim($count_data[$i]->status))=="PENDING" && 
+                                ($count_data[$i]->delivery_status==null || $count_data[$i]->delivery_status==''))
                         $pending=$pending+1;
 						
                     else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && strtoupper(trim($count_data[$i]->delivery_status))=="PENDING")
@@ -305,7 +312,9 @@ class Distributor_out extends CI_Controller{
             $data['all']=count($count_data);
             $data['status']=$status;
             $data['sales_rep'] = $this->sales_rep_model->get_data('Approved');
-
+		$query=$this->db->query("SELECT * FROM sales_rep_master WHERE sr_type='Merchandizer'");
+        $result=$query->result();
+        $data['sales_rep1']=$result;
             load_view('distributor_out/distributor_out_list', $data);
 
         } else {
@@ -372,6 +381,14 @@ class Distributor_out extends CI_Controller{
         if(count($result)>0) {
             if($result[0]->r_view == 1 || $result[0]->r_edit == 1) {
                 $data['access'] = $this->distributor_out_model->get_access();
+
+                $id = $this->distributor_out_model->get_pending_data($d_id);
+                if($id!=''){
+                    $d_id = substr($d_id, 0, strpos($d_id, "_")+1) . $id;
+                }
+
+                // echo $d_id;
+
                 $data['data'] = $this->distributor_out_model->get_distributor_out_data('', $d_id);
                 $data['depot'] = $this->depot_model->get_data('Approved');
                 $data['distributor'] = $this->distributor_model->get_data('Approved');
@@ -491,9 +508,53 @@ class Distributor_out extends CI_Controller{
         }
     }
 
+    public function set_sku_batch(){
+        $this->distributor_out_model->set_sku_batch();
+        $status=$this->input->post('status');
+        if($status=='InActive') {
+            redirect(base_url().'index.php/distributor_out');
+        }
+    }
+
     public function set_delivery_status2(){
         $this->distributor_out_model->set_delivery_status();
         redirect(base_url().'index.php/distributor_out/checkstatus/gp_issued');
+    }
+
+    public function get_batch_details(){
+        $result=$this->distributor_out_model->get_access();
+        if(count($result)>0) {
+            if($result[0]->r_view == 1 || $result[0]->r_edit == 1) {
+                $data['access'] = $this->distributor_out_model->get_access();
+                $data['data'] = $this->distributor_out_model->get_sku_details();
+                $data['batch_details'] = $this->distributor_out_model->get_batch_details();
+
+                $check1=$this->input->post('check');
+                $check = array();
+                $j=0;
+                for($i=0; $i<count($check1); $i++){
+                    if($check1[$i]!='false'){
+                        $check[$j] = $check1[$i];
+                        $j = $j + 1;
+                    }
+                }
+                $distributor_out_id = implode(", ", $check);
+                $data['distributor_out_id']=$distributor_out_id;
+
+                $query=$this->db->query("SELECT * FROM sales_rep_master WHERE sr_type='Merchandizer'");
+                $result=$query->result();
+                $data['sales_rep1']=$result;
+
+                // dump($data['data']);
+
+                load_view('distributor_out/distributor_out_sku_details', $data);
+            } else {
+                echo "Unauthorized access";
+            }
+        } else {
+            echo '<script>alert("You donot have access to this page.");</script>';
+            $this->load->view('login/main_page');
+        }
     }
 
     // public function view_payment_details($id){

@@ -70,18 +70,43 @@
 								</div>
                                 <div class="form-group" >
                                     <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">To Distributor <span class="asterisk_sign">*</span></label>
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Zone <span class="asterisk_sign">*</span></label>
                                         <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <select name="to_distributor_id" id="to_distributor_id" class="form-control">
+                                            <select name="zone_id" id="zone_id" class="form-control">
                                                 <option value="">Select</option>
-                                                <?php if(isset($super_stockist_distributor)) { for ($k=0; $k < count($super_stockist_distributor) ; $k++) { ?>
-                                                        <option value="<?php echo $super_stockist_distributor[$k]->id; ?>" <?php if(isset($data)) { if($super_stockist_distributor[$k]->id==$data[0]->to_distributor_id) { echo 'selected'; } } ?>><?php echo $super_stockist_distributor[$k]->distributor_name; ?></option>
+                                                <?php if(isset($zone)) { for ($k=0; $k < count($zone) ; $k++) { ?>
+                                                        <option value="<?php echo $zone[$k]->id; ?>" <?php if(isset($data)) { if($zone[$k]->id==$data[0]->zone_id) { echo 'selected'; } } ?>><?php echo $zone[$k]->zone; ?></option>
                                                 <?php }} ?>
                                             </select>
                                         </div>
-                                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#myModal" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Add Distributor</button>
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Relation <span class="asterisk_sign">*</span></label>
+                                        <div class="col-md-4 col-sm-4 col-xs-12">
+                                             <select name="store_id" id="store_id" class="form-control">
+                                                <option value="">Select</option>
+                                                <?php if(isset($store)) { for ($k=0; $k < count($store) ; $k++) { ?>
+                                                        <option value="<?php echo $store[$k]->store_id; ?>" <?php if(isset($data)) { if($store[$k]->store_id==$data[0]->store_id) { echo 'selected'; } } ?>><?php echo $store[$k]->store_name; ?></option>
+                                                <?php }} ?>
+                                            </select>
+                                        </div>
+                                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#myModal" style="display:none<?php //if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Add Distributor</button>
                                     </div>
                                 </div>
+								
+								 <input type="hidden" class="form-control" name="to_distributor_id" id="to_distributor_id" value="<?php if(isset($data)) echo $data[0]->to_distributor_id;?>"/>
+								
+								<div class="form-group" >
+                                    <div class="col-md-12 col-sm-12 col-xs-12">
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Location<span class="asterisk_sign">*</span></label>
+                                        <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <select name="location_id" id="location_id" class="form-control">
+                                                <option value="">Select</option>
+                                                <?php if(isset($location)) { for ($k=0; $k < count($location) ; $k++) { ?>
+                                                        <option value="<?php echo $location[$k]->location_id; ?>" <?php if(isset($data)) { if($location[$k]->location_id==$data[0]->location_id) { echo 'selected'; } } ?>><?php echo $location[$k]->location; ?></option>
+                                                <?php }} ?>
+                                            </select>
+                                        </div>
+                                        </div>
+                                    </div>
 
                                 <div class="h-scroll">	
                                     <div class="table-stripped form-group" style="padding:15px;" >
@@ -376,7 +401,112 @@
                 
                 addMultiInputNamingRules('#form_bar_to_box_details', 'select[name="box[]"]', { required: true }, "");
                 addMultiInputNamingRules('#form_bar_to_box_details', 'input[name="qty[]"]', { required: true }, "");
+
+                
             });
+
+            // $('#distributor_id').change(function(){
+            //     var distributor_id = $('#distributor_id').val();
+            //     var zone_id = '';
+            //     var type_id = '';
+
+            //     $.ajax({
+            //         url:'<?=base_url()?>index.php/distributor_sale/get_distributor_details',
+            //         method: 'post',
+            //         data: {distributor_id: distributor_id},
+            //         dataType: 'json',
+            //         async: false,
+            //         success: function(response){
+            //             $('#zone_id').find('option').not(':first').remove();
+
+            //             if(response.length>0){
+            //                 zone_id = response[0].zone_id;
+            //                 type_id = response[0].type_id;
+            //                 $('#sell_out').val(response[0].sell_out);
+            //             }
+            //         }
+            //     });
+
+            //     $.ajax({
+            //         url:'<?=base_url()?>index.php/distributor_sale/get_distributor_zone',
+            //         method: 'post',
+            //         data: {type_id: type_id},
+            //         dataType: 'json',
+            //         async: false,
+            //         success: function(response){
+            //             $('#zone_id').find('option').not(':first').remove();
+
+            //             // Add options
+            //             // response = $.parseJSON(response);
+            //             $.each(response,function(index,data){
+            //                 $('#zone_id').append('<option value="'+data['id']+'">'+data['zone']+'</option>');
+            //             });
+
+            //             $('#zone_id').val(zone_id);
+            //             $('#zone_id').change();
+            //         }
+            //     });
+            // });
+
+ 
+            // City change
+            $('#zone_id').change(function(){
+                var zone_id = $('#zone_id').val();
+                //console.log(reporting_manager_id);
+                // AJAX request
+                $.ajax({
+                    url:'<?=base_url()?>index.php/distributor_sale/get_store',
+                    method: 'post',
+                    data: {zone_id: zone_id},
+                    dataType: 'json',
+                    success: function(response){
+
+
+                        $('#store_id').find('option').not(':first').remove();
+
+
+                        // Add options
+                        // response = $.parseJSON(response);
+                        // console.log(response);
+                        $.each(response,function(index,data){
+                            $('#store_id').append('<option value="'+data['store_id']+'">'+data['store_name']+'</option>');
+
+                        });
+                    }
+                });
+            });
+
+
+
+            $('#store_id').change(function(){
+                var store_id = $('#store_id').val();
+                var zone_id = $('#zone_id').val();
+                //console.log(reporting_manager_id);
+                // AJAX request
+                $.ajax({
+                    url:'<?=base_url()?>index.php/distributor_sale/get_location_data',
+                    method: 'post',
+                    data: {store_id: store_id,zone_id:zone_id},
+                    dataType: 'json',
+                    success: function(response){
+
+
+                        $('#location_id').find('option').not(':first').remove();
+
+
+                        // Add options
+                        // response = $.parseJSON(response);
+                        // console.log(response);
+                        $.each(response,function(index,data){
+                            $('#location_id').append('<option value="'+data['location_id']+'">'+data['location']+'</option>');
+
+                        });
+                    }
+                });
+            });
+    
+
+            
 
             function show_item(elem){
                 var id = elem.attr('id');

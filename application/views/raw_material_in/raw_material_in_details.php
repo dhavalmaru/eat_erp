@@ -51,15 +51,17 @@
                                                 <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
                                                 <input type="text" class="form-control datepicker1" name="date_of_receipt" id="date_of_receipt" placeholder="Date Of Receipt" value="<?php if(isset($data)) echo (($data[0]->date_of_receipt!=null && $data[0]->date_of_receipt!='')?date('d/m/Y',strtotime($data[0]->date_of_receipt)):date('d/m/Y')); else echo date('d/m/Y'); ?>"/>
                                             </div>
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Vendor </label>
+									<label class="col-md-2 col-sm-2 col-xs-12 control-label">Vendor </label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="vendor_id" id="vendor_id" class="form-control">
-                                                    <option value="">Select</option>
+                                                <select name="vendor_id" id="vendor_id" class="form-control" 
+												>
+                                                    <option value="00">Select</option>
                                                     <?php if(isset($vendor)) { for ($k=0; $k < count($vendor); $k++) { ?>
                                                             <option value="<?php echo $vendor[$k]->id; ?>" <?php if(isset($data)) { if($vendor[$k]->id==$data[0]->vendor_id) { echo 'selected'; } } ?>><?php echo $vendor[$k]->vendor_name; ?></option>
                                                     <?php }} ?>
                                                 </select>
-                                                <!-- <input type="hidden" name="vendor_id" id="vendor_id" value="<?php //if(isset($data)) { echo  $data[0]->vendor_id; } ?>"/>
+												 <input type="hidden" id="vendor_state" name="vendor_state" value="" />
+                                                <!-- <input type="hidden" name="vendor_id" id="vendor_id" value="<?php if(isset($data)) { echo  $data[0]->vendor_id; } ?>"/>
                                                 <input type="text" class="form-control load_vendor" name="vendor" id="vendor" placeholder="Type To Select Vendor...." value="<?php //if(isset($data)) { echo  $data[0]->vendor_name; } ?>"/> -->
                                             </div>
 										</div>
@@ -79,12 +81,13 @@
                                             </div>
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Depot <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="depot_id" id="depot_id" class="form-control">
+                                                <select name="depot_id" id="depot_id" class="form-control" onchange="get_depot_details()">
                                                     <option value="">Select</option>
                                                     <?php if(isset($depot)) { for ($k=0; $k < count($depot) ; $k++) { ?>
                                                             <option value="<?php echo $depot[$k]->id; ?>" <?php if(isset($data)) { if($depot[$k]->id==$data[0]->depot_id) { echo 'selected'; } } ?>><?php echo $depot[$k]->depot_name; ?></option>
                                                     <?php }} ?>
                                                 </select>
+												 <input type="hidden" id="depot_state" name="depot_state" value="" />
                                                 <!-- <input type="hidden" name="depot_id" id="depot_id" value="<?php //if(isset($data)) { echo  $data[0]->depot_id; } ?>"/>
                                                 <input type="text" class="form-control load_depot" name="depot" id="depot" placeholder="Type To Select Depot...." value="<?php //if(isset($data)) { echo  $data[0]->depot_name; } ?>"/> -->
                                             </div>
@@ -95,20 +98,25 @@
 									
                                         <table class="table table-bordered" style="margin-bottom: 0px; ">
                                         <thead>
-                                            <tr>
-                                                <th width="350">Raw Material <span class="asterisk_sign">*</span></th>
-                                                <th width="150">Qty In Kg <span class="asterisk_sign">*</span></th>
-                                                <th width="150">Rate (In Rs) <span class="asterisk_sign">*</span></th>
-                                                <th width="150">Amount (In Rs) </th>
-                                                <th align="center" width="75">Action</th>
+                                                <tr>
+                                                <th width="300">Item <span class="asterisk_sign">*</span></th>
+                                                <th width="180">Qty In Kg <span class="asterisk_sign">*</span></th>
+												<th width="180">HSN Code </th>
+                                                <th width="180">Rate </th>
+                                                <th width="180">Amount (In Rs) </th>
+                                                <th width="180">CGST (In Rs) </th>
+												<th width="180">SGST (In Rs) </th>
+												<th width="180">IGST (In Rs) </th>
+                                                <th width="180">Total Amount (In Rs) </th>
+                                                <th style="width:60px; text-align:center;">Action </th>
                                             </tr>
                                         </thead>
                                         <tbody id="raw_material_details">
                                         <?php $i=0; if(isset($raw_material_stock)) {
                                                 for($i=0; $i<count($raw_material_stock); $i++) { ?>
-                                            <tr id="raw_material_<?php echo $i; ?>_row">
+                                            <tr id="box_<?php echo $i; ?>_row">
                                                 <td>
-                                                    <select name="raw_material[]" class="form-control raw_material" id="raw_material_<?php echo $i;?>">
+                                                    <select name="raw_material[]" class="form-control raw_material" id="raw_material_<?php echo $i;?>" onchange="get_raw_material_details(this);">
                                                         <option value="">Select</option>
                                                         <?php if(isset($raw_material)) { for ($k=0; $k < count($raw_material) ; $k++) { ?>
                                                                 <option value="<?php echo $raw_material[$k]->id; ?>" <?php if($raw_material[$k]->id==$raw_material_stock[$i]->raw_material_id) { echo 'selected'; } ?>><?php echo $raw_material[$k]->rm_name; ?></option>
@@ -116,46 +124,80 @@
                                                     </select>
                                                 </td>
                                                 <td>
-                                                    <input type="text" class="form-control qty" name="qty[]" id="qty_<?php echo $i; ?>" placeholder="Qty" value="<?php if (isset($raw_material_stock)) { echo format_money($raw_material_stock[$i]->qty,2); } ?>"/>
+                                                    <input type="text" class="form-control qty" name="qty[]" id="qty_<?php echo $i; ?>" placeholder="Qty" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->qty; } ?>" onchange="get_amount(this)" />
                                                 </td>
                                                 <td>
-                                                    <input type="text" class="form-control rate" name="rate[]" id="rate_<?php echo $i; ?>" placeholder="Rate" value="<?php if (isset($raw_material_stock)) { echo format_money($raw_material_stock[$i]->rate,2); } ?>" />
+                                                    <input type="text" class="form-control hsn_code" name="hsn_code[]" id="hsn_code_<?php echo $i; ?>" placeholder="HSN Code" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->hsn_code; } ?>" readonly />
                                                 </td>
                                                 <td>
-                                                    <input type="text" class="form-control amount" name="amount[]" id="amount_<?php echo $i; ?>" placeholder="Amount" value="<?php if (isset($raw_material_stock)) { echo format_money($raw_material_stock[$i]->amount,2); } ?>" readonly />
+                                                    <input type="text" class="form-control rate" name="rate[]" id="rate_<?php echo $i; ?>" placeholder="Rate" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->rate; } ?>" onchange="get_amount(this)" />
+                                                    <input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_<?php echo $i; ?>" placeholder="Tax %" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->tax_per; } ?>"  onchange="get_amount(this)" />
                                                 </td>
-                                              <td style="text-align:center; vertical-align: middle;">
-                                                    <a id="raw_material_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>
+                                                <td>
+                                                    <input type="text" class="form-control amount" name="amount[]" id="amount_<?php echo $i; ?>" placeholder="Amount" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->amount; } ?>"  readonly />
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control cgst_amt" name="cgst_amt[]" id="cgst_amt_<?php echo $i; ?>" placeholder="CGST Amount" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->cgst_amt; } ?>" readonly />
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control sgst_amt" name="sgst_amt[]" id="sgst_amt_<?php echo $i; ?>" placeholder="SGST Amount" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->sgst_amt; } ?>" readonly />
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control igst_amt" name="igst_amt[]" id="igst_amt_<?php echo $i; ?>" placeholder="IGST Amount" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->igst_amt; } ?>" readonly />
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control total_amt" name="total_amt[]" id="total_amt_<?php echo $i; ?>" placeholder="Total Amount" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->total_amt; } ?>" readonly />
+                                                    <input type="hidden" class="form-control tax_amt" name="tax_amt[]" id="tax_amt_<?php echo $i; ?>" placeholder="Tax Amount" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->tax_amt; } ?>" readonly />
+                                                </td>
+                                               <td style="text-align:center; vertical-align: middle;">
+                                                    <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"></span></a>
                                                 </td>
                                             </tr>
                                         <?php }} else { ?>
-                                            <tr id="raw_material_<?php echo $i; ?>_row">
+                                            <tr id="box_<?php echo $i; ?>_row">
                                                 <td>
-                                                    <select name="raw_material[]" class="form-control raw_material" id="raw_material_<?php echo $i;?>">
+                                                    <select name="raw_material[]" class="form-control raw_material" id="raw_material_<?php echo $i;?>" onchange="get_raw_material_details(this);">
                                                         <option value="">Select</option>
                                                         <?php if(isset($raw_material)) { for ($k=0; $k < count($raw_material) ; $k++) { ?>
                                                                 <option value="<?php echo $raw_material[$k]->id; ?>"><?php echo $raw_material[$k]->rm_name; ?></option>
                                                         <?php }} ?>
                                                     </select>
                                                 </td>
-                                                <td>
-                                                    <input type="text" class="form-control qty" name="qty[]" id="qty_<?php echo $i; ?>" placeholder="Qty" value=""/>
+                                             <td>
+                                                    <input type="text" class="form-control qty" name="qty[]" id="qty_<?php echo $i; ?>" placeholder="Qty" value="" onchange="get_amount(this)" />
                                                 </td>
                                                 <td>
-                                                    <input type="text" class="form-control rate" name="rate[]" id="rate_<?php echo $i; ?>" placeholder="Rate" value="" />
+                                                    <input type="text" class="form-control hsn_code" name="hsn_code[]" id="hsn_code_<?php echo $i; ?>" placeholder="HSN Code" value="" readonly />
                                                 </td>
-                                                <td >
+                                                <td>
+                                                    <input type="text" class="form-control rate" name="rate[]" id="rate_<?php echo $i; ?>" placeholder="Rate" value="" onchange="get_amount(this)" />
+                                                    <input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_<?php echo $i; ?>" placeholder="Tax %" value="" />
+                                                </td>
+                                                <td>
                                                     <input type="text" class="form-control amount" name="amount[]" id="amount_<?php echo $i; ?>" placeholder="Amount" value="" readonly />
                                                 </td>
+                                                <td>
+                                                    <input type="text" class="form-control cgst_amt" name="cgst_amt[]" id="cgst_amt_<?php echo $i; ?>" placeholder="CGST Amount" value="" readonly />
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control sgst_amt" name="sgst_amt[]" id="sgst_amt_<?php echo $i; ?>" placeholder="SGST Amount" value="" readonly />
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control igst_amt" name="igst_amt[]" id="igst_amt_<?php echo $i; ?>" placeholder="IGST Amount" value="" readonly />
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control total_amt" name="total_amt[]" id="total_amt_<?php echo $i; ?>" placeholder="Total Amount" value="" readonly />
+                                                    <input type="hidden" class="form-control tax_amt" name="tax_amt[]" id="tax_amt_<?php echo $i; ?>" placeholder="Tax Amount" value="" readonly />
+                                                </td>
                                                 <td style="text-align:center; vertical-align: middle;">
-                                                    <a id="raw_material_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>
+                                                    <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"></span></a>
                                                 </td>
                                             </tr>
                                         <?php } ?>
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <td colspan="5">
+                                                <td colspan="12">
                                                     <button type="button" class="btn btn-success" id="repeat-raw_material" >+</button>
                                                 </td>
                                             </tr>
@@ -163,7 +205,7 @@
                                         </table>
                                     </div>
 									</div>
-                                    <div class="form-group">
+                                    <!--<div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">VAT (In Rs) </label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
@@ -171,22 +213,26 @@
                                             </div>
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">CST (In Rs)</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="cst" id="cst" placeholder="CST" value="<?php if (isset($data)) { echo format_money($data[0]->cst,2); } ?>"/>
+                                                <input type="text" class="form-control" name="cgst_amt" id="cgst_amt" placeholder="CST" value="<?php if (isset($data)) { echo format_money($data[0]->cgst_amt,2); } ?>"/>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="form-group">
+                                    </div>-->
+                                    <!--<div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Excise (In Rs) </label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="excise" id="excise" placeholder="Excise" value="<?php if (isset($data)) { echo format_money($data[0]->excise,2); } ?>"/>
                                             </div>
+											
+											
+											
+											
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Final Amount (In Rs) <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="final_amount" id="final_amount" placeholder="Final Amount" value="<?php if (isset($data)) { echo format_money($data[0]->final_amount,2); } ?>" readonly />
+                                                <input type="text" class="form-control" name="final_amt" id="final_amount" placeholder="Final Amount" value="<?php if (isset($data)) { echo format_money($data[0]->final_amt,2); } ?>" readonly />
                                             </div>
                                         </div>
-                                    </div>
+                                    </div>-->
                                     <div class="form-group" style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <div style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
@@ -238,22 +284,80 @@
         <script type="text/javascript" src="<?php echo base_url(); ?>js/load_autocomplete.js"></script>
         <script type="text/javascript" src="<?php echo base_url(); ?>js/validations.js"></script>
         <script type="text/javascript">
+	
+			
+			  var newRow1;
+            $(document).ready(function(){ 
+                newRow1 = jQuery('<tr id="box row">' + 
+                                    '<td>' + 
+                                        '&nbsp;' + 
+                                    '</td>' + 
+                                    '<td>' + 
+                                        '&nbsp;' + 
+                                    '</td>' + 
+                                    '<td>' + 
+                                        '&nbsp;' + 
+                                    '</td>' + 
+                                    // '<td>' + 
+                                        // '&nbsp;' + 
+                                    // '</td>' + 
+                                    '<td>' + 
+                                        'Total' + 
+                                    '</td>' + 
+                                    '<td style="display: none;">' + 
+                                        '&nbsp;' + 
+                                    '</td>' + 
+                                    '<td>' + 
+                                        '<input type="text" class="form-control" name="total_amount" id="total_amount" placeholder="Total Amount" value="<?php if (isset($data)) { echo $data[0]->amt; } ?>" readonly />' + 
+                                    '</td>' + 
+                                    '<td>' + 
+                                        '<input type="text" class="form-control" name="cgst_amount" id="cgst_amount" placeholder="CGST Amount" value="<?php if (isset($data)) { echo $data[0]->cgst_amt; } ?>" readonly />' + 
+                                    '</td>' + 
+                                    '<td>' + 
+                                        '<input type="text" class="form-control" name="sgst_amount" id="sgst_amount" placeholder="SGST Amount" value="<?php if (isset($data)) { echo $data[0]->sgst_amt; } ?>" readonly />' + 
+                                    '</td>' + 
+                                    '<td>' + 
+                                        '<input type="text" class="form-control" name="igst_amount" id="igst_amount" placeholder="IGST Amount" value="<?php if (isset($data)) { echo $data[0]->igst_amt; } ?>" readonly />' + 
+                                    '</td>' + 
+                                    
+                                    '<td>' + 
+                                        '<input type="text" class="form-control" name="final_amount" id="final_amount" placeholder="Final Amount" value="<?php if(isset($data)) { echo $data[0]->final_amount; } ?>" readonly />' + 
+                                    '</td>' + 
+                                    '<td class="table_action" style="text-align:center;">' + 
+                                        '&nbsp;' + 
+                                    '</td>' + 
+                                '</tr>');
+
+                $('#raw_material_details').append(newRow1);
+					
+            });
+
+			
+			
+		
+			
+			
             $(document).ready(function(){
-                $(".qty").blur(function(){
-                    get_amount($(this));
-                });
-                $(".rate").blur(function(){
-                    get_amount($(this));
-                });
-                $("#vat").blur(function(){
-                    get_total();
-                });
-                $("#cst").blur(function(){
-                    get_total();
-                });
-                $("#excise").blur(function(){
-                    get_total();
-                });
+                // $(".qty").blur(function(){
+                    // get_amount($(this));
+                // });
+                // $(".rate").blur(function(){
+                    // get_amount($(this));
+                // });
+                // $("#vat").blur(function(){
+                    // get_total();
+                // });
+                // $("#cst").blur(function(){
+                    // get_total();
+                // });
+                // $("#excise").blur(function(){
+                    // get_total();
+                // });
+				
+				 // $(".box").change(function(){
+                    // get_box_details($(this));
+                // });
+				
                 $('.delete_row').click(function(event){
                     delete_row($(this));
                     get_total();
@@ -271,14 +375,61 @@
                 });
                 $(".datepicker1").datepicker({ maxDate: 0,changeMonth: true,yearRange:'-100:+0',changeYear: true });
                 
+				
+				
+				
+				
+				
                 addMultiInputNamingRules('#form_raw_material_in_details', 'select[name="raw_material[]"]', { required: true }, "");
                 addMultiInputNamingRules('#form_raw_material_in_details', 'input[name="qty[]"]', { required: true }, "");
                 addMultiInputNamingRules('#form_raw_material_in_details', 'input[name="rate[]"]', { required: true }, "");
             });
-
+			
+			var get_depot_details = function(){
+                $.ajax({
+                    url:BASE_URL+'index.php/Depot/get_data',
+                    method:"post",
+                    data:{id:$('#depot_id').val()},
+                    dataType:"json",
+                    async:false,
+                    success: function(data){
+                        if(data.result==1){
+                            $('#depot_state').val(data.state.trim().toUpperCase());
+                            set_total();
+                        }
+                    },
+                    error: function (response) {
+                        var r = jQuery.parseJSON(response.responseText);
+                        alert("Message: " + r.Message);
+                        alert("StackTrace: " + r.StackTrace);
+                        alert("ExceptionType: " + r.ExceptionType);
+                    }
+                });
+            }
+			
             function get_purchase_order_nos(){
                 var vendor_id = $('#vendor_id').val();
                 $("#purchase_order_id").html('<option value="">Select</option>');
+				
+				$.ajax({
+                    url:BASE_URL+'index.php/Vendor/get_data',
+                    method:"post",
+                    data:{id:$('#vendor_id').val()},
+                    dataType:"json",
+                    async:false,
+                    success: function(data){
+                        if(data.result==1){
+                            $('#vendor_state').val(data.state.trim().toUpperCase());
+                            set_total();
+                        }
+                    },
+                    error: function (response) {
+                        var r = jQuery.parseJSON(response.responseText);
+                        alert("Message: " + r.Message);
+                        alert("StackTrace: " + r.StackTrace);
+                        alert("ExceptionType: " + r.ExceptionType);
+                    }
+                });
 
                 $.ajax({
                     url:BASE_URL+'index.php/Purchase_order/get_purchase_order_nos',
@@ -322,6 +473,7 @@
                         if(data.result==1){
                             // $('#vendor_id').val(data.vendor_id);
                             $('#depot_id').val(data.depot_id);
+							get_depot_details();
                         }
                     },
                     error: function (response) {
@@ -346,7 +498,7 @@
 
                             var counter = $('.raw_material').length;
                             for(var i=0; i<data.item_id.length; i++){
-                                var newRow = jQuery('<tr id="raw_material_'+counter+'_row">'+
+                                var newRow = jQuery('<tr id="box_'+counter+'_row">'+
                                             '<td>'+
                                                 '<select name="raw_material[]" class="form-control raw_material" id="raw_material_'+counter+'">'+
                                                     '<option value="">Select</option>'+
@@ -355,35 +507,53 @@
                                                     '<?php }} ?>'+
                                                 '</select>'+
                                             '</td>'+
-                                            '<td>'+
-                                                '<input type="text" class="form-control qty" name="qty[]" id="qty_'+counter+'" placeholder="Qty" value="'+data.qty[i]+'"/>'+
-                                            '</td>'+
-                                            '<td>'+
-                                                '<input type="text" class="form-control rate" name="rate[]" id="rate_'+counter+'" placeholder="Rate" value="'+data.rate[i]+'" />'+
-                                                '<!-- <span id="rate_label_'+counter+'"></span> -->'+
-                                            '</td>'+
-                                            '<td>'+
-                                                '<input type="text" class="form-control amount" name="amount[]" id="amount_'+counter+'" placeholder="Amount" value="'+data.amount[i]+'" readonly />'+
-                                                '<!-- <span id="amount_label_'+counter+'"></span> -->'+
-                                            '</td>'+
-                                            '<td style="text-align:center; vertical-align: middle;">'+
-                                                '<a id="raw_material_'+counter+'_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>'+
-                                            '</td>'+
+                                           '<td>' + 
+                                            '<input type="text" class="form-control qty" name="qty[]" id="qty_'+counter+'" placeholder="Qty" value="' + data.qty[i] + '" onchange="get_amount(this)" />' + 
+                                        '</td>' + 
+                                        '<td>' + 
+                                            '<input type="text" class="form-control hsn_code" name="hsn_code[]" id="hsn_code_'+counter+'" placeholder="HSN Code" value="' + data.hsn_code[i] + '"  />' + 
+                                        '</td>' + 
+                                        '<td>' + 
+                                            '<input type="text" class="form-control rate" name="rate[]" id="rate_'+counter+'" placeholder="Rate" value="' + data.rate[i] + '"  />' + 
+                                            '<input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_'+counter+'" placeholder="Tax %" value="' + data.tax_per[i] + '"  />' + 
+                                        '</td>' + 
+                                        '<td>' + 
+                                            '<input type="text" class="form-control amount" name="amount[]" id="amount_'+counter+'" placeholder="Amount" value="' + data.amount[i] + '"  />' + 
+                                        '</td>' + 
+                                        '<td>' + 
+                                            '<input type="text" class="form-control cgst_amt" name="cgst_amt[]" id="cgst_amt_'+counter+'" placeholder="CGST Amount" value="' + data.cgst_amt[i] + '"  />' + 
+                                        '</td>' + 
+                                        '<td>' + 
+                                            '<input type="text" class="form-control sgst_amt" name="sgst_amt[]" id="sgst_amt_'+counter+'" placeholder="SGST Amount" value="' + data.sgst_amt[i] + '"  />' + 
+                                        '</td>' + 
+                                        '<td>' + 
+                                            '<input type="text" class="form-control igst_amt" name="igst_amt[]" id="igst_amt_'+counter+'" placeholder="IGST Amount" value="' + data.igst_amt[i] + '"  />' + 
+                                        '</td>' + 
+                                        '<td>' + 
+                                            '<input type="text" class="form-control total_amt" name="total_amt[]" id="total_amt_'+counter+'" placeholder="Total Amount" value="' + data.total_amt[i] + '"  />' + 
+                                            '<input type="hidden" class="form-control tax_amt" name="tax_amt[]" id="tax_amt_'+counter+'" placeholder="Tax Amount" value="' + data.tax_amt[i] + '"  />' + 
+                                        '</td>' + 
+                                        '<td style="text-align:center; vertical-align: middle;">' + 
+                                            '<a id="box_'+counter+'_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"></span></a>' + 
+                                        '</td>' + 
                                         '</tr>');
                                 $('#raw_material_details').append(newRow);
                                 $("#raw_material_"+counter).val(data.item_id[i]);
                                 counter++;
                             }
-
+							
+							
+							$('#raw_material_details').append(newRow1);
+					 
                             $('.format_number').keyup(function(){
                                 format_number(this);
                             });
-                            $(".qty").blur(function(){
-                                get_amount($(this));
-                            });
-                            $(".rate").blur(function(){
-                                get_amount($(this));
-                            });
+                            // $(".qty").blur(function(){
+                                // get_amount($(this));
+                            // });
+                            // $(".rate").blur(function(){
+                                // get_amount($(this));
+                            // });
                             $('.delete_row').click(function(event){
                                 delete_row($(this));
                                 get_total();
@@ -400,72 +570,311 @@
                     }
                 });
             }
+			
+			var set_total = function (){
+                var depot_state = $("#depot_state").val();
+                var vendor_state = $("#vendor_state").val();
+				
+                
+                $('.rate').each(function(){
+                    var elem = $(this);
+                    var id = elem.attr('id');
+                    var index = id.substr(id.lastIndexOf('_')+1);
+                    var qty = parseFloat(get_number($("#qty_"+index).val(),2));
+                    var rate = parseFloat(get_number($("#rate_"+index).val(),2));
+                    var tax_per = parseFloat(get_number($("#tax_per_"+index).val(),2));
 
-            function get_amount(elem){
-                var id = elem.attr('id');
-                var index = id.substr(id.lastIndexOf('_')+1);
-                var qty = parseFloat(get_number($("#qty_"+index).val(),2));
-                var rate = parseFloat(get_number($("#rate_"+index).val(),2));
-                var amount = qty*rate;
-                $("#amount_"+index).val(format_money(Math.round(amount*100)/100,2));
+                    if (isNaN(qty)) qty=0;
+                    if (isNaN(rate)) rate=0;
+                    if (isNaN(tax_per)) tax_per=0;
+
+                    var cgst = 0;
+                    var sgst = 0;
+                    var igst = 0;
+
+                    if(depot_state==vendor_state){
+                        cgst = tax_per/2;
+                        sgst = tax_per/2;
+                    } else {
+                        igst = tax_per;
+                    }
+
+                    if (isNaN(cgst)) cgst=0;
+                    if (isNaN(sgst)) sgst=0;
+                    if (isNaN(igst)) igst=0;
+
+                    var cgst_amt = (qty*((rate*cgst)/100)).toFixed(2);
+                    var sgst_amt = (qty*((rate*sgst)/100)).toFixed(2);
+                    var igst_amt = (qty*((rate*igst)/100)).toFixed(2);
+                    var tax_amt = parseFloat(cgst_amt,2)+parseFloat(sgst_amt,2)+parseFloat(igst_amt,2);
+                    
+                    if (isNaN(cgst_amt)) cgst_amt=0;
+                    if (isNaN(sgst_amt)) sgst_amt=0;
+                    if (isNaN(igst_amt)) igst_amt=0;
+                    if (isNaN(tax_amt)) tax_amt=0;
+
+                    var amount = (qty*rate).toFixed(2);
+                    var total_amt = parseFloat(amount,2) + parseFloat(tax_amt,2);
+
+                    $("#amount_"+index).val(amount);
+                    $("#cgst_amt_"+index).val(cgst_amt);
+                    $("#sgst_amt_"+index).val(sgst_amt);
+                    $("#igst_amt_"+index).val(igst_amt);
+                    $("#tax_amt_"+index).val(tax_amt);
+                    $("#total_amt_"+index).val(total_amt.toFixed(2));
+                });
 
                 get_total();
             }
+            function get_raw_material_details(elem){
+                var depot_state = $("#depot_state").val();
+                var vendor_state = $("#vendor_state").val();
+                var raw_material_id = elem.value;
+                var id = elem.id;
+                var index = id.substr(id.lastIndexOf('_')+1);
+                var qty = parseFloat(get_number($("#qty_"+index).val(),2));
+                var rate = 0;
+                var tax_per = 0;
+                var hsn_code = '';
 
-            function get_total(){
-                var total_amount = 0;
+                $.ajax({
+                    url:BASE_URL+'index.php/Raw_material/get_data',
+                    method:"post",
+                    data:{id:raw_material_id},
+                    dataType:"json",
+                    async:false,
+                    success: function(data){
+                        if(data.result==1){
+                            rate = parseFloat(data.rate);
+                            tax_per = parseFloat(data.tax_per);
+                            hsn_code = data.hsn_code;
+                        }
+                    },
+                    error: function (response) {
+                        var r = jQuery.parseJSON(response.responseText);
+                        alert("Message: " + r.Message);
+                        alert("StackTrace: " + r.StackTrace);
+                        alert("ExceptionType: " + r.ExceptionType);
+                    }
+                });
+
+                if (isNaN(qty)) qty=0;
+                if (isNaN(rate)) rate=0;
+                if (isNaN(tax_per)) tax_per=0;
+
+                var cgst = 0;
+                var sgst = 0;
+                var igst = 0;
+                
+                if(depot_state==vendor_state){
+                    cgst = tax_per/2;
+                    sgst = tax_per/2;
+                } else {
+                    igst = tax_per;
+                }
+
+                if (isNaN(cgst)) cgst=0;
+                if (isNaN(sgst)) sgst=0;
+                if (isNaN(igst)) igst=0;
+
+                var cgst_amt = (qty*((rate*cgst)/100)).toFixed(2);
+                var sgst_amt = (qty*((rate*sgst)/100)).toFixed(2);
+                var igst_amt = (qty*((rate*igst)/100)).toFixed(2);
+                var tax_amt = parseFloat(cgst_amt,2)+parseFloat(sgst_amt,2)+parseFloat(igst_amt,2);
+                
+                if (isNaN(cgst_amt)) cgst_amt=0;
+                if (isNaN(sgst_amt)) sgst_amt=0;
+                if (isNaN(igst_amt)) igst_amt=0;
+                if (isNaN(tax_amt)) tax_amt=0;
+
+                var amount = (qty*rate).toFixed(2);
+
+                var total_amt = parseFloat(amount,2) + parseFloat(tax_amt,2);
+
+                $("#rate_"+index).val(rate);
+                $("#tax_per_"+index).val(tax_per);
+                $("#hsn_code_"+index).val(hsn_code);
+                $("#amount_"+index).val(amount);
+                $("#cgst_amt_"+index).val(cgst_amt);
+                $("#sgst_amt_"+index).val(sgst_amt);
+                $("#igst_amt_"+index).val(igst_amt);
+                $("#tax_amt_"+index).val(tax_amt);
+                $("#total_amt_"+index).val(total_amt.toFixed(2));
+
+                get_total();
+            }
+        function get_amount(elem){
+                var depot_state = $("#depot_state").val();
+                var vendor_state = $("#vendor_state").val();
+                var id = elem.id;
+                var index = id.substr(id.lastIndexOf('_')+1);
+				
+                var qty = parseFloat(get_number($("#qty_"+index).val(),2));
+                var rate = parseFloat(get_number($("#rate_"+index).val(),2));
+                var tax_per = parseFloat(get_number($("#tax_per_"+index).val(),2));
+
+                if (isNaN(qty)) qty=0;
+                if (isNaN(rate)) rate=0;
+                if (isNaN(tax_per)) tax_per=0;
+
+                var cgst = 0;
+                var sgst = 0;
+                var igst = 0;
+                
+                if(depot_state==vendor_state){
+                    cgst = tax_per/2;
+                    sgst = tax_per/2;
+                } else {
+                    igst = tax_per;
+                }
+
+                if (isNaN(cgst)) cgst=0;
+                if (isNaN(sgst)) sgst=0;
+                if (isNaN(igst)) igst=0;
+
+                var cgst_amt = (qty*((rate*cgst)/100)).toFixed(2);
+                var sgst_amt = (qty*((rate*sgst)/100)).toFixed(2);
+                var igst_amt = (qty*((rate*igst)/100)).toFixed(2);
+                var tax_amt = parseFloat(cgst_amt,2)+parseFloat(sgst_amt,2)+parseFloat(igst_amt,2);
+				
+                if (isNaN(cgst_amt)) cgst_amt=0;
+                if (isNaN(sgst_amt)) sgst_amt=0;
+                if (isNaN(igst_amt)) igst_amt=0;
+                if (isNaN(tax_amt)) tax_amt=0;
+
+                var amount = (qty*rate).toFixed(2);
+                var total_amt = parseFloat(amount,2) + parseFloat(tax_amt,2);
+				
+                $("#amount_"+index).val(amount);
+                $("#cgst_amt_"+index).val(cgst_amt);
+                $("#sgst_amt_"+index).val(sgst_amt);
+                $("#igst_amt_"+index).val(igst_amt);
+                $("#tax_amt_"+index).val(tax_amt);
+                $("#total_amt_"+index).val(total_amt);
+
+                get_total();
+            }
+       
+       
+			function get_total(){
+                var total_amt = 0;
                 $('.amount').each(function(){
                     amount = parseFloat(get_number($(this).val(),2));
                     if (isNaN(amount)) amount=0;
-                    total_amount = total_amount + amount;
+                    total_amt = total_amt + amount;
+                });
+				
+				
+				 var cgst_amount = 0;
+				 $('.cgst_amt').each(function(){
+                    cgst_amt = parseFloat(get_number($(this).val(),2));
+                    if (isNaN(cgst_amt)) cgst_amt=0;
+                    cgst_amount = cgst_amount + cgst_amt;
+                });
+				
+				 var sgst_amount = 0;
+				 $('.sgst_amt').each(function(){
+                    sgst_amt = parseFloat(get_number($(this).val(),2));
+                    if (isNaN(sgst_amt)) sgst_amt=0;
+                    sgst_amount = sgst_amount + sgst_amt;
                 });
 
-                var vat = parseFloat(get_number($("#vat").val(),2));
-                var cst = parseFloat(get_number($("#cst").val(),2));
-                var excise = parseFloat(get_number($("#excise").val(),2));
-                total_amount = total_amount + vat + cst + excise;
+				 var igst_amount = 0;
+				 $('.igst_amt').each(function(){
+                    igst_amt = parseFloat(get_number($(this).val(),2));
+                    if (isNaN(igst_amt)) igst_amt=0;
+                    igst_amount = igst_amount + igst_amt;
+                });
+				
+				  var tax_amt=0;
+				  $('.tax_amt').each(function(){
+                    taxamt = parseFloat(get_number($(this).val(),2));
+                    if (isNaN(taxamt)) taxamt=0;
+                    tax_amt = tax_amt + taxamt;
+                });
 
-                $("#final_amount").val(format_money(Math.round(total_amount*100)/100,2));
+				
+				
+				var final_amt=0;
+				$('.final_amt').each(function(){
+                    finalamt = parseFloat(get_number($(this).val(),2));
+                    if (isNaN(finalamt)) finalamt=0;
+                    final_amt = final_amt + finalamt;
+                });
+
+                
+				 $("#final_amt").val(final_amt.toFixed(2));
+
+                // var excise = parseFloat(get_number($("#excise").val(),2));
+                final_amount = total_amt + cgst_amount + sgst_amount + igst_amount;
+
+                $("#final_amount").val(format_money(Math.round(final_amount*100)/100,2));
+				 $("#total_amount").val(format_money(Math.round(total_amt*100)/100,2));
+				  $("#cgst_amount").val(format_money(Math.round(cgst_amount*100)/100,2));
+				   $("#sgst_amount").val(format_money(Math.round(sgst_amount*100)/100,2));
+				    $("#igst_amount").val(format_money(Math.round(igst_amount*100)/100,2));
             }
-
-            jQuery(function(){
-                var counter = $('.raw_material').length;
+           
+		   jQuery(function(){
                 $('#repeat-raw_material').click(function(event){
+					var counter = $('.raw_material').length;
                     event.preventDefault();
-                    var newRow = jQuery('<tr id="raw_material_'+counter+'_row">'+
+                    var newRow = jQuery('<tr id="box_'+counter+'_row">'+
+					
+					
+					
+					
+					
                                             '<td>'+
-                                                '<select name="raw_material[]" class="form-control raw_material" id="raw_material_'+counter+'">'+
+                                                '<select name="raw_material[]" class="form-control raw_material" id="raw_material_'+counter+'" onchange="get_raw_material_details(this);">'+
                                                     '<option value="">Select</option>'+
                                                     '<?php if(isset($raw_material)) { for ($k=0; $k < count($raw_material) ; $k++) { ?>'+
                                                             '<option value="<?php echo $raw_material[$k]->id; ?>"><?php echo $raw_material[$k]->rm_name; ?></option>'+
                                                     '<?php }} ?>'+
                                                 '</select>'+
                                             '</td>'+
-                                            '<td>'+
-                                                '<input type="text" class="form-control qty" name="qty[]" id="qty_'+counter+'" placeholder="Qty" value=""/>'+
-                                            '</td>'+
-                                            '<td>'+
-                                                '<input type="text" class="form-control rate" name="rate[]" id="rate_'+counter+'" placeholder="Rate" value="" />'+
-                                                '<!-- <span id="rate_label_'+counter+'"></span> -->'+
-                                            '</td>'+
-                                            '<td>'+
-                                                '<input type="text" class="form-control amount" name="amount[]" id="amount_'+counter+'" placeholder="Amount" value="" readonly />'+
-                                                '<!-- <span id="amount_label_'+counter+'"></span> -->'+
-                                            '</td>'+
-                                            '<td style="text-align:center; vertical-align: middle;">'+
-                                                '<a id="raw_material_'+counter+'_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>'+
-                                            '</td>'+
+                                           '<td>' + 
+                                            '<input type="text" class="form-control qty" name="qty[]" id="qty_'+counter+'" placeholder="Qty" value="" onchange="get_amount(this)" />' + 
+                                        '</td>' + 
+                                        '<td>' + 
+                                            '<input type="text" class="form-control hsn_code" name="hsn_code[]" id="hsn_code_'+counter+'" placeholder="HSN Code" value="" readonly />' + 
+                                        '</td>' + 
+                                        '<td>' + 
+                                            '<input type="text" class="form-control rate" name="rate[]" id="rate_'+counter+'" placeholder="Rate" value=""  onchange="get_amount(this)" />' + 
+                                            '<input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_'+counter+'" placeholder="Tax %" value=""  />' + 
+                                        '</td>' + 
+                                        '<td>' + 
+                                            '<input type="text" class="form-control amount" name="amount[]" id="amount_'+counter+'" placeholder="Amount" value=""  />' + 
+                                        '</td>' + 
+                                        '<td>' + 
+                                            '<input type="text" class="form-control cgst_amt" name="cgst_amt[]" id="cgst_amt_'+counter+'" placeholder="CGST Amount" value="" readonly />' + 
+                                        '</td>' + 
+                                        '<td>' + 
+                                            '<input type="text" class="form-control sgst_amt" name="sgst_amt[]" id="sgst_amt_'+counter+'" placeholder="SGST Amount" value="" readonly />' + 
+                                        '</td>' + 
+                                        '<td>' + 
+                                            '<input type="text" class="form-control igst_amt" name="igst_amt[]" id="igst_amt_'+counter+'" placeholder="IGST Amount" value="" readonly />' + 
+                                        '</td>' + 
+                                        '<td>' + 
+                                            '<input type="text" class="form-control total_amt" name="total_amt[]" id="total_amt_'+counter+'" placeholder="Total Amount" value="" readonly />' + 
+                                            '<input type="hidden" class="form-control tax_amt" name="tax_amt[]" id="tax_amt_'+counter+'" placeholder="Tax Amount" value="" readonly />' + 
+                                        '</td>' + 
+                                        '<td style="text-align:center; vertical-align: middle;">' + 
+                                            '<a id="box_'+counter+'_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"></span></a>' + 
+                                        '</td>' + 
                                         '</tr>');
                     $('#raw_material_details').append(newRow);
+					 $('#raw_material_details').append(newRow1);
+					
                     $('.format_number').keyup(function(){
                         format_number(this);
                     });
-                    $(".qty").blur(function(){
-                        get_amount($(this));
-                    });
-                    $(".rate").blur(function(){
-                        get_amount($(this));
-                    });
+                    // $(".qty").blur(function(){
+                        // get_amount($(this));
+                    // });
+                    // $(".rate").blur(function(){
+                        // get_amount($(this));
+                    // });
                     $('.delete_row').click(function(event){
                         delete_row($(this));
                         get_total();

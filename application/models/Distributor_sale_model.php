@@ -64,16 +64,36 @@ function save_data($id=''){
         $due_date=formatdate($due_date);
     }
     
+	$to_distributor_id=$this->input->post('to_distributor_id');
+	$store_id=$this->input->post('store_id');
+	$zone_id=$this->input->post('zone_id');
+	$location_id=$this->input->post('location_id');
+	
+    $sql = "select * from store_master where store_id = '$store_id' and zone_id = '$zone_id' and location_id = '$location_id'";
+    $query=$this->db->query($sql);
+    $result = $query->result();
+    if(count($result)>0){
+        $to_distributor_id = $result[0]->id;
+    } else {
+        if($to_distributor_id=='') {
+            $to_distributor_id = null;
+        }
+    }
+	
     $data = array(
         'date_of_processing' => $date_of_processing,
         'distributor_id' => $this->input->post('distributor_id'),
         'amount' => format_number($this->input->post('total_amount'),2),
         'due_date' => $due_date,
         'status' => $this->input->post('status'),
+        'location_id' => $this->input->post('location_id'),
+        'zone_id' => $this->input->post('zone_id'),
+        'store_id' => $this->input->post('store_id'),
+        'status' => $this->input->post('status'),
         'remarks' => $this->input->post('remarks'),
         'modified_by' => $curusr,
         'modified_on' => $now,
-        'to_distributor_id' => $this->input->post('to_distributor_id')
+        'to_distributor_id' => $to_distributor_id
     );
 
     if($id==''){
@@ -129,8 +149,62 @@ function save_data($id=''){
     $this->user_access_log_model->insertAccessLog($logarray);
 }
 
-function get_super_stockist_distributor(){
-    $sql = "select * from super_stockist_distributor";
+function get_distributor_details($distributor_id){
+    $sql = "select * from distributor_master where id = '$distributor_id'";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_distributor_zone($type_id){
+    $sql = "select * from zone_master where type_id = '$type_id'";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_store($zone_id){
+    $sql = "Select E.store_id, E.store_name from(Select  A.*,D.store_name,D.id as did from 
+            (select * from store_master) A 
+            left join 
+            (select * from relationship_master)D
+            on (A.store_id=D.id))E
+             left join 
+            (select * from zone_master)F
+            on (E.zone_id=F.id)
+            where F.id='". $zone_id ."' group by E.store_id, E.store_name";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+
+// function get_location_data($postData){
+    // $sql = "Select  A.*,D.location from 
+            // (select * from store_master) A 
+            // left join 
+            // (select * from location_master)D
+            // on (A.location_id=D.id)
+            // where A.store_id='". $postData['store_id'] ."'";
+    // $query=$this->db->query($sql);
+    // return $query->result();
+// }
+function get_location_data($store_id,$zone_id){
+    $sql = "Select  A.*,D.location from 
+            (select * from store_master) A 
+            left join 
+            (select * from location_master) D 
+            on (A.location_id=D.id)
+            where A.store_id='".$store_id  ."' and  A.zone_id='". $zone_id ."' ";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_zone(){
+    $sql = "select * from zone_master";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_location(){
+    $sql = "select * from location_master";
     $query=$this->db->query($sql);
     return $query->result();
 }

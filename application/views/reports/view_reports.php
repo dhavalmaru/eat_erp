@@ -143,8 +143,16 @@ a { text-decoration:none;}
                                         <div class="panel panel-success">
                                             <div class="panel-body list-group">
                                                 <a href="<?php echo base_url() . 'index.php/export/set_report_criteria/13'?>" id="report_13" class="list-group-item-reports" <?php if(isset($rep_13)) {if($rep_13==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><span class="fa fa-external-link"></span> Sales Representative Location </a>
-                                            </div>
-                                        </div>
+                                          
+                                                <a href="<?php echo base_url() . 'index.php/sales_rep/sales_rep_route_plan'?>" id="report_20" class="list-group-item-reports" <?php /*if(isset($rep_20)) {if($rep_20==0) echo 'style="display: none;"';} else echo 'style="display: none;"';*/ ?>><span class="fa fa-external-link"></span> Sales Representative Route Plan </a>
+                                       
+										
+										
+                                                <a href="<?php echo base_url() . 'index.php/sales_rep/sales_rep_location'?>" id="report_21" class="list-group-item-reports" <?php /*if(isset($rep_21)) {if($rep_21==0) echo 'style="display: none;"';} else echo 'style="display: none;"';*/ ?>><span class="fa fa-external-link"></span> Promoters Location </a>
+                                       
+								
+									
+										
                                         <!-- END CONTACTS WITH CONTROLS -->
                                     </div>
 								</div>

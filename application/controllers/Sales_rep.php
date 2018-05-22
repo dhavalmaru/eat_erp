@@ -21,12 +21,72 @@ class Sales_rep extends CI_Controller{
 
     //index function
     public function index(){
+        // $result=$this->sales_rep_model->get_access();
+        // if(count($result)>0) {
+        //     $data['access']=$result;
+        //     $data['data'] = $this->sales_rep_model->get_data();
+
+        //     load_view('sales_rep/sales_rep_list', $data);
+        // } else {
+        //     echo '<script>alert("You donot have access to this page.");</script>';
+        //     $this->load->view('login/main_page');
+        // }
+        $this->checkstatus('salesrep');
+    }
+
+
+    public function checkstatus($status=''){
         $result=$this->sales_rep_model->get_access();
         if(count($result)>0) {
+
+            if($status=='salesrep') {
+                $status = 'Sales Representative';
+            }
+            else if ($status=='promoter') {
+                $status='Promoter';
+            }
+            else if ($status=='merchandiser') {
+                $status='merchandizer';
+            }
+
             $data['access']=$result;
-            $data['data'] = $this->sales_rep_model->get_data();
+            $data['data']=$this->sales_rep_model->get_data($status);
+
+            $count_data=$this->sales_rep_model->get_data('Approved');
+            $salesrep=0;
+            $promoter=0;
+            $merchandiser=0;
+            $inactive=0;
+
+            if (count($result)>0){
+                for($i=0;$i<count($count_data);$i++){
+                    if (strtoupper(trim($count_data[$i]->sr_type))=="SALES REPRESENTATIVE")
+                        $salesrep=$salesrep+1;
+                    else if (strtoupper(trim($count_data[$i]->sr_type))=="PROMOTER")
+                        $promoter=$promoter+1;
+                    else if (strtoupper(trim($count_data[$i]->sr_type))=="MERCHANDIZER")
+                        $merchandiser=$merchandiser+1;
+                    else if (strtoupper(trim($count_data[$i]->status))=="INACTIVE")
+                        $inactive=$inactive+1;
+                }
+            }
+
+            $count_data_inactive=$this->sales_rep_model->get_data_inactive();
+            if (count($result)>0){
+                for($i=0;$i<count($count_data_inactive);$i++){
+                    if (strtoupper(trim($count_data_inactive[$i]->status))=="INACTIVE")
+                        $inactive=$inactive+1;
+                }
+            }
+
+            $data['salesrep']=$salesrep;
+            $data['promoter']=$promoter;
+            $data['merchandiser']=$merchandiser;
+            $data['inactive']=$inactive;
+            $data['all']=count($count_data);
 
             load_view('sales_rep/sales_rep_list', $data);
+
         } else {
             echo '<script>alert("You donot have access to this page.");</script>';
             $this->load->view('login/main_page');
@@ -38,7 +98,7 @@ class Sales_rep extends CI_Controller{
         if(count($result)>0) {
             if($result[0]->r_insert == 1) {
                 $data['access'] = $this->sales_rep_model->get_access();
-
+				//$data['manager_data'] = $this->sales_rep_model->get_manager_data('','');
                 load_view('sales_rep/sales_rep_details', $data);
             } else {
                 echo "Unauthorized access";
@@ -55,7 +115,7 @@ class Sales_rep extends CI_Controller{
             if($result[0]->r_view == 1 || $result[0]->r_edit == 1) {
                 $data['access'] = $this->sales_rep_model->get_access();
                 $data['data'] = $this->sales_rep_model->get_data('', $id);
-
+				//$data['manager_data'] = $this->sales_rep_model->get_manager_data('', $id);
                 $docs=$this->document_model->edit_view_doc('', $id, 'Sales_Rep');
                 $data=array_merge($data, $docs);
 
@@ -88,7 +148,7 @@ class Sales_rep extends CI_Controller{
         $result=$this->sales_rep_model->get_access();
         if(count($result)>0) {
             $data['access'] = $result;
-            $data['sales_rep'] = $this->sales_rep_model->get_data('Approved');
+            $data['sales_rep1'] = $this->sales_rep_model->get_sales_rep_route('Approved');
             load_view('sales_rep/sales_rep_route_plan', $data);
 
         } else {
@@ -155,7 +215,7 @@ class Sales_rep extends CI_Controller{
         $table = '';
         $tr = '';
 
-        $product_data = $this->export_model->get_product_data($date, $date);
+        $product_data = $this->export_model->get_product_data();
         $product_th = '';
         $product_cnt = count($product_data);
         for($k=0; $k<count($product_data); $k++){
@@ -168,13 +228,14 @@ class Sales_rep extends CI_Controller{
         }
 
         $product_data = $this->export_model->get_sales_rep_order_data($date, $date);
-        $data = $this->sales_rep_model->get_sales_rep_details($date);
+
+        // $data = $this->sales_rep_model->get_sales_rep_details($date);
+        $data = $this->sales_rep_model->get_data('Approved');
         for($i=0; $i<count($data); $i++){
+            $tr = '';
 
-            $loc_data = $this->export_model->get_sales_rep_loc_data($data[$i]->sales_rep_id, $date, $date);
+            $loc_data = $this->export_model->get_sales_rep_loc_data($data[$i]->id, $date, $date);
             if(count($loc_data)>0){
-                $tr = '';
-
                 for($j=0; $j<count($loc_data); $j++){
                     $tr = $tr . '<tr>';
                     $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->date_of_visit.'</td>';
@@ -225,8 +286,61 @@ class Sales_rep extends CI_Controller{
 
                     $tr = $tr . '</tr>';
                 }
+            }
 
+            $loc_data = $this->export_model->get_sales_rep_direct_order_data($data[$i]->id, $date, $date);
+            if(count($loc_data)>0){
+                for($j=0; $j<count($loc_data); $j++){
+                    $tr = $tr . '<tr>';
+                    $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->date_of_processing.'</td>';
+                    $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->sales_rep_name.'</td>';
+                    $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->distributor_name.'</td>';
+                    $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->distributor_type.'</td>';
+                    $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->distributor_status.'</td>';
+                    $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->remarks.'</td>';
+                    $tr = $tr . '<td style="text-align:center;">'.$loc_data[$j]->modified_on.'</td>';
+                    $tr = $tr . '<td style="text-align:center;"></td>';
+                    $tr = $tr . '<td style="text-align:center;"></td>';
+                    $tr = $tr . '<td style="text-align:center;"></td>';
+                    $tr = $tr . '<td style="text-align:center;"></td>';
+                    $tr = $tr . '<td style="text-align:center;"></td>';
+                    $tr = $tr . '<td style="text-align:center;"></td>';
+                    $tr = $tr . '<td style="text-align:center;"></td>';
+                    $tr = $tr . '<td style="text-align:center;"></td>';
 
+                    $product_1_td = '<td style="text-align:center;"></td>';
+                    $product_2_td = '<td style="text-align:center;"></td>';
+                    $product_3_td = '<td style="text-align:center;"></td>';
+                    $product_4_td = '<td style="text-align:center;"></td>';
+                    $product_5_td = '<td style="text-align:center;"></td>';
+                    $product_6_td = '<td style="text-align:center;"></td>';
+
+                    for($k=0; $k<count($product_data); $k++){
+                        if($product_data[$k]->date_of_processing==$loc_data[$j]->date_of_processing && 
+                            $product_data[$k]->distributor_id==$loc_data[$j]->distributor_id){
+                                if($product_data[$k]->product_id == '1'){
+                                    $product_1_td = '<td style="text-align:center;">'.$product_data[$k]->qty.'</td>';
+                                } else if($product_data[$k]->product_id == '2'){
+                                    $product_2_td = '<td style="text-align:center;">'.$product_data[$k]->qty.'</td>';
+                                } else if($product_data[$k]->product_id == '3'){
+                                    $product_3_td = '<td style="text-align:center;">'.$product_data[$k]->qty.'</td>';
+                                } else if($product_data[$k]->product_id == '4'){
+                                    $product_4_td = '<td style="text-align:center;">'.$product_data[$k]->qty.'</td>';
+                                } else if($product_data[$k]->product_id == '5'){
+                                    $product_5_td = '<td style="text-align:center;">'.$product_data[$k]->qty.'</td>';
+                                } else if($product_data[$k]->product_id == '6'){
+                                    $product_6_td = '<td style="text-align:center;">'.$product_data[$k]->qty.'</td>';
+                                }
+                        }
+                    }
+                    
+                    $tr = $tr . $product_1_td . $product_2_td . $product_3_td . $product_4_td . $product_5_td . $product_6_td;
+
+                    $tr = $tr . '</tr>';
+                }
+            }
+
+            if($tr != ''){
                 $table = '<table border="1" style="border-collapse: collapse;">
                             <tr>
                                 <th style="text-align:center;">Date of Visit</th>
@@ -253,10 +367,10 @@ class Sales_rep extends CI_Controller{
                 $message = '<html><head></head><body>Hi,<br /><br />
                             Please find below '.$data[$i]->sales_rep_name.' Location For - '.$date.'. <br /><br />'.$table.'<br/>
                             <br />Thanks</body></html>';
-                // $to_email = $data[$i]->email_id.',rishit.sanghvi@otbconsulting.co.in,swapnil.darekar@otbconsulting.co.in';
+                $to_email = $data[$i]->email_id.',rishit.sanghvi@eatanytime.in,swapnil.darekar@eatanytime.in';
                 $bcc="dhaval.maru@otbconsulting.co.in";
                 // $to_email = 'dhaval.maru@otbconsulting.co.in,dhavalbright@gmail.com';
-                $to_email = 'dhaval.maru@otbconsulting.co.in';
+                // $to_email = 'dhaval.maru@otbconsulting.co.in';
                 $mailSent=send_email($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc);
 
                 echo $message;
@@ -264,7 +378,6 @@ class Sales_rep extends CI_Controller{
                 echo $mailSent;
                 echo '<br/><br/>';
             }
-
         }
     }
 
@@ -272,7 +385,7 @@ class Sales_rep extends CI_Controller{
         $result=$this->sales_rep_model->get_access();
         if(count($result)>0) {
             $data['access'] = $result;
-            $data['sales_rep'] = $this->sales_rep_model->get_data('Approved');
+            $data['sales_rep'] = $this->sales_rep_model->get_data_promoter('Approved');
             load_view('sales_rep/sales_rep_location', $data);
 
         } else {

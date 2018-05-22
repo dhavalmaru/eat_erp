@@ -48,9 +48,14 @@ class Login extends CI_Controller
             $logarray['action']='Logged in';
             $this->user_access_log_model->insertAccessLog($logarray);
 
+            $srtype=$result[0]->sr_type;
+
             if(isset($result[0]->sales_rep_id) && $result[0]->sales_rep_id<>""){
-                if(isset($result[0]->sr_type)=='Promoter') {
-                    redirect(base_url().'index.php/Dashboard_promoter');    
+                if($srtype==='Promoter') {
+                    redirect(base_url().'index.php/Dashboard_promoter/');    
+                }
+                else if($srtype=='Merchandizer') {
+                    redirect(base_url().'index.php/merchandiser_location');
                 }
                 else {
                     redirect(base_url().'index.php/Dashboard_sales_rep');

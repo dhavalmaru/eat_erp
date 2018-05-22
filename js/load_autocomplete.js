@@ -22,34 +22,47 @@ function loadFlag() {
 /**
 *getCity list autocomplete
 **/
-$(function() {
-  //autocomplete
-  $(".autocompleteCity").autocomplete({
+var autocomp_opt_city={
     source: BASE_URL+'index.php/Autocomplete/loadcity',
     focus: function(event, ui) {
-            // prevent autocomplete from updating the textbox
             event.preventDefault();
-            // manually update the textbox
             $(this).val(ui.item.label);
     },
     select: function(event, ui) {
-          	//console.log(event);
-          	//console.log(this);
-            // prevent autocomplete from updating the textbox
             event.preventDefault();
-            // manually update the textbox and hidden field
             $(this).val(ui.item.label);
 
             var id = this.id;
-
             $("#" + id + "_id").val(ui.item.id);
-            $("#state_id").val(ui.item.state_id);
+            
+            var state_id = 'state_id';
+            var index = '';
+            if(id.lastIndexOf('_')>0){
+                index = id.substr(id.lastIndexOf('_')+1);
+                state_id = 'con_state_'+index+'_id';
+            }
+            $("#"+state_id).val(ui.item.state_id);
     },
-    change: function (event, ui) { 
+    change: function(event, ui) {
             var id = this.id;
             $("#" + id + "_id").val('');
             var con_name = $(this).val();
             $(this).val('');
+
+            var state_id = 'state_id';
+            var state = 'state';
+            var country_id = 'country_id';
+            var country = 'country';
+            var state_code = 'state_code';
+            var index = '';
+            if(id.lastIndexOf('_')>0){
+                index = id.substr(id.lastIndexOf('_')+1);
+                state_id = 'con_state_'+index+'_id';
+                state = 'con_state_'+index;
+                country_id = 'con_country_'+index+'_id';
+                country = 'con_country_'+index;
+                state_code = 'con_state_code_'+index;
+            }
 
             if (con_name!="" && con_name!=null) {
               $.ajax({
@@ -58,23 +71,95 @@ $(function() {
                 data:{term : con_name},
                 dataType:"json",
                 success:function(responsdata){
-                  $("#"+id).val(responsdata[0].label);
-                  $("#" + id + "_id").val(responsdata[0].value);
+                    $("#"+id).val(responsdata[0].label);
+                    $("#" + id + "_id").val(responsdata[0].id);
+                    $("#"+state_id).val(responsdata[0].state_id);
+                }   
+              });
+            }
+
+            $.ajax({
+              method:"POST",
+              url:BASE_URL+'index.php/Autocomplete/getStateCountryByState',
+              data:{state_id : $("#"+state_id).val()},
+              dataType:"json",
+              success:function(responsdata){
+                $("#"+state).val(responsdata.state_name);
+                $("#"+country).val(responsdata.country_name);
+                $("#"+country_id).val(responsdata.country_id);
+                $("#"+state_code).val(responsdata.state_code);
+              }   
+            });
+    },
+    minLength:1
+};
+$(function() {
+  $(".autocompleteCity").autocomplete({
+    source: BASE_URL+'index.php/Autocomplete/loadcity',
+    focus: function(event, ui) {
+            event.preventDefault();
+            $(this).val(ui.item.label);
+    },
+    select: function(event, ui) {
+            event.preventDefault();
+            $(this).val(ui.item.label);
+
+            var id = this.id;
+            $("#" + id + "_id").val(ui.item.id);
+            
+            var state_id = 'state_id';
+            var index = '';
+            if(id.lastIndexOf('_')>0){
+                index = id.substr(id.lastIndexOf('_')+1);
+                state_id = 'con_state_'+index+'_id';
+            }
+            $("#"+state_id).val(ui.item.state_id);
+    },
+    change: function (event, ui) { 
+            var id = this.id;
+            $("#" + id + "_id").val('');
+            var con_name = $(this).val();
+            $(this).val('');
+
+            var state_id = 'state_id';
+            var state = 'state';
+            var country_id = 'country_id';
+            var country = 'country';
+            var state_code = 'state_code';
+            var index = '';
+            if(id.lastIndexOf('_')>0){
+                index = id.substr(id.lastIndexOf('_')+1);
+                state_id = 'con_state_'+index+'_id';
+                state = 'con_state_'+index;
+                country_id = 'con_country_'+index+'_id';
+                country = 'con_country_'+index;
+                state_code = 'con_state_code_'+index;
+            }
+
+            if (con_name!="" && con_name!=null) {
+              $.ajax({
+                method:"GET",
+                url:BASE_URL+'index.php/Autocomplete/loadcity',
+                data:{term : con_name},
+                dataType:"json",
+                success:function(responsdata){
+                    $("#"+id).val(responsdata[0].label);
+                    $("#"+id+"_id").val(responsdata[0].id);
+                    $("#"+state_id).val(responsdata[0].state_id);
                 }   
               });
             }
             
-            var state_id= $("#state_id").val();
            	$.ajax({
               method:"POST",
               url:BASE_URL+'index.php/Autocomplete/getStateCountryByState',
-              data:{state_id : state_id},
+              data:{state_id : $("#"+state_id).val()},
               dataType:"json",
               success:function(responsdata){
-                $("#state").val(responsdata.state_name);
-                $("#country").val(responsdata.country_name);
-                $("#country_id").val(responsdata.country_id);
-                $("#state_code").val(responsdata.state_code);
+                $("#"+state).val(responsdata.state_name);
+                $("#"+country).val(responsdata.country_name);
+                $("#"+country_id).val(responsdata.country_id);
+                $("#"+state_code).val(responsdata.state_code);
               }   
             });
     },
@@ -86,29 +171,18 @@ $(function() {
 /**
 *getCountry list autocomplete
 **/
-$(function(){
-  $(".loadcountrydropdown").autocomplete({
+var autocomp_opt_country={
     source: BASE_URL+'index.php/Autocomplete/loadcountry',
     focus: function(event, ui) {
-            // prevent autocomplete from updating the textbox
             event.preventDefault();
-            // manually update the textbox
             $(this).val(ui.item.label);
     },
     select: function(event, ui) {
-        //console.log(event);
-        //console.log(this);
-            // prevent autocomplete from updating the textbox
             event.preventDefault();
-            // manually update the textbox and hidden field
             $(this).val(ui.item.label);
 
             var id = this.id;
-
             $("#" + id + "_id").val(ui.item.id);
-            //var id1=id.substr(0, 9);
-           // $("#"+id1+"state_id").val(ui.item.state_id)
-
     },
     change: function(event, ui) {
             var id = this.id;
@@ -124,42 +198,26 @@ $(function(){
                 dataType:"json",
                 success:function(responsdata){
                   $("#"+id).val(responsdata[0].label);
-                  $("#" + id + "_id").val(responsdata[0].value);
+                  $("#" + id + "_id").val(responsdata[0].id);
                 }   
               });
             }
     },
     minLength:1
-  });
-});
-
-
-/**
-*getState list autocomplete
-**/
+};
 $(function(){
-  $(".loadstatedropdown").autocomplete({
-    source: BASE_URL+'index.php/Autocomplete/loadState',
+  $(".loadcountrydropdown").autocomplete({
+    source: BASE_URL+'index.php/Autocomplete/loadcountry',
     focus: function(event, ui) {
-            // prevent autocomplete from updating the textbox
             event.preventDefault();
-            // manually update the textbox
             $(this).val(ui.item.label);
     },
     select: function(event, ui) {
-        //console.log(event);
-        //console.log(this);
-            // prevent autocomplete from updating the textbox
             event.preventDefault();
-            // manually update the textbox and hidden field
             $(this).val(ui.item.label);
 
             var id = this.id;
-
             $("#" + id + "_id").val(ui.item.id);
-            //var id1=id.substr(0, 9);
-           // $("#"+id1+"state_id").val(ui.item.state_id)
-
     },
     change: function(event, ui) {
             var id = this.id;
@@ -170,17 +228,122 @@ $(function(){
             if (con_name!="" && con_name!=null) {
               $.ajax({
                 method:"GET",
-                url:BASE_URL+'index.php/Autocomplete/loadState',
+                url:BASE_URL+'index.php/Autocomplete/loadcountry',
                 data:{term : con_name},
                 dataType:"json",
                 success:function(responsdata){
                   $("#"+id).val(responsdata[0].label);
-                  $("#" + id + "_id").val(responsdata[0].value);
+                  $("#" + id + "_id").val(responsdata[0].id);
                 }   
               });
             }
     },
     minLength:1
+  });
+});
+
+
+
+
+/**
+*getstate list autocomplete
+**/
+var autocomp_opt_state={
+    source: BASE_URL+'index.php/Autocomplete/loadstate',
+    focus: function(event, ui) {
+            event.preventDefault();
+            $(this).val(ui.item.label);
+    },
+    select: function(event, ui) {
+            event.preventDefault();
+            $(this).val(ui.item.label);
+
+            var id = this.id;
+            $("#" + id + "_id").val(ui.item.id);
+    },
+    change: function(event, ui) {
+            var id = this.id;
+            $("#" + id + "_id").val('');
+            var con_name = $(this).val();
+            $(this).val('');
+
+            var country_id = 'country_id';
+            var country = 'country';
+            var state_code = 'state_code';
+            var index = '';
+            if(id.lastIndexOf('_')>0){
+                index = id.substr(id.lastIndexOf('_')+1);
+                country_id = 'con_country_'+index+'_id';
+                country = 'con_country_'+index;
+                state_code = 'con_state_code_'+index;
+            }
+
+            if (con_name!="" && con_name!=null) {
+              $.ajax({
+                method:"GET",
+                url:BASE_URL+'index.php/Autocomplete/loadstate',
+                data:{term : con_name},
+                dataType:"json",
+                success:function(responsdata){
+                    $("#"+id).val(responsdata[0].label);
+                    $("#" + id + "_id").val(responsdata[0].id);
+                    $("#"+country).val(responsdata[0].country_name);
+                    $("#"+country_id).val(responsdata[0].country_id);
+                    $("#"+state_code).val(responsdata[0].state_code);
+                }
+              });
+            }
+    },
+    minLength:1
+};
+$(function() {
+  $(".loadstatedropdown").autocomplete({
+    source: BASE_URL+'index.php/Autocomplete/loadstate',
+    focus: function(event, ui) {
+            event.preventDefault();
+            $(this).val(ui.item.label);
+    },
+    select: function(event, ui) {
+            event.preventDefault();
+            $(this).val(ui.item.label);
+
+            var id = this.id;
+            $("#" + id + "_id").val(ui.item.id);
+    },
+    change: function (event, ui) { 
+            var id = this.id;
+            $("#" + id + "_id").val('');
+            var con_name = $(this).val();
+            $(this).val('');
+
+            var country_id = 'country_id';
+            var country = 'country';
+            var state_code = 'state_code';
+            var index = '';
+            if(id.lastIndexOf('_')>0){
+                index = id.substr(id.lastIndexOf('_')+1);
+                country_id = 'con_country_'+index+'_id';
+                country = 'con_country_'+index;
+                state_code = 'con_state_code_'+index;
+            }
+
+            if (con_name!="" && con_name!=null) {
+              $.ajax({
+                method:"GET",
+                url:BASE_URL+'index.php/Autocomplete/loadstate',
+                data:{term : con_name},
+                dataType:"json",
+                success:function(responsdata){
+                    $("#"+id).val(responsdata[0].label);
+                    $("#"+id+"_id").val(responsdata[0].id);
+                    $("#"+country).val(responsdata[0].country_name);
+                    $("#"+country_id).val(responsdata[0].country_id);
+                    $("#"+state_code).val(responsdata[0].state_code);
+                }   
+              });
+            }
+    },
+    minLength: 1
   });
 });
 
@@ -192,25 +355,15 @@ $(function(){
   $(".load_vendor").autocomplete({
     source: BASE_URL+'index.php/Autocomplete/load_vendor',
     focus: function(event, ui) {
-            // prevent autocomplete from updating the textbox
             event.preventDefault();
-            // manually update the textbox
             $(this).val(ui.item.label);
     },
     select: function(event, ui) {
-        //console.log(event);
-        //console.log(this);
-            // prevent autocomplete from updating the textbox
             event.preventDefault();
-            // manually update the textbox and hidden field
             $(this).val(ui.item.label);
 
             var id = this.id;
-
             $("#" + id + "_id").val(ui.item.id);
-            //var id1=id.substr(0, 9);
-           // $("#"+id1+"state_id").val(ui.item.state_id)
-
     },
     change: function(event, ui) {
             var id = this.id;
@@ -243,25 +396,15 @@ $(function(){
   $(".load_distributor").autocomplete({
     source: BASE_URL+'index.php/Autocomplete/load_distributor',
     focus: function(event, ui) {
-            // prevent autocomplete from updating the textbox
             event.preventDefault();
-            // manually update the textbox
             $(this).val(ui.item.label);
     },
     select: function(event, ui) {
-        //console.log(event);
-        //console.log(this);
-            // prevent autocomplete from updating the textbox
             event.preventDefault();
-            // manually update the textbox and hidden field
             $(this).val(ui.item.label);
 
             var id = this.id;
-
             $("#" + id + "_id").val(ui.item.id);
-            //var id1=id.substr(0, 9);
-           // $("#"+id1+"state_id").val(ui.item.state_id)
-
     },
     change: function(event, ui) {
             var id = this.id;
@@ -294,25 +437,15 @@ $(function(){
   $(".load_sales_rep").autocomplete({
     source: BASE_URL+'index.php/Autocomplete/load_sales_rep',
     focus: function(event, ui) {
-            // prevent autocomplete from updating the textbox
             event.preventDefault();
-            // manually update the textbox
             $(this).val(ui.item.label);
     },
     select: function(event, ui) {
-        //console.log(event);
-        //console.log(this);
-            // prevent autocomplete from updating the textbox
             event.preventDefault();
-            // manually update the textbox and hidden field
             $(this).val(ui.item.label);
 
             var id = this.id;
-
             $("#" + id + "_id").val(ui.item.id);
-            //var id1=id.substr(0, 9);
-           // $("#"+id1+"state_id").val(ui.item.state_id)
-
     },
     change: function(event, ui) {
             var id = this.id;
@@ -344,25 +477,15 @@ $(function(){
 var autocomp_opt_raw_material={
     source: BASE_URL+'index.php/Autocomplete/load_raw_material',
     focus: function(event, ui) {
-            // prevent autocomplete from updating the textbox
             event.preventDefault();
-            // manually update the textbox
             $(this).val(ui.item.label);
     },
     select: function(event, ui) {
-        //console.log(event);
-        //console.log(this);
-            // prevent autocomplete from updating the textbox
             event.preventDefault();
-            // manually update the textbox and hidden field
             $(this).val(ui.item.label);
 
             var id = this.id;
-
             $("#" + id + "_id").val(ui.item.id);
-            //var id1=id.substr(0, 9);
-           // $("#"+id1+"state_id").val(ui.item.state_id)
-
     },
     change: function(event, ui) {
             var id = this.id;
@@ -389,25 +512,15 @@ $(function(){
   $(".load_raw_material").autocomplete({
     source: BASE_URL+'index.php/Autocomplete/load_raw_material',
     focus: function(event, ui) {
-            // prevent autocomplete from updating the textbox
             event.preventDefault();
-            // manually update the textbox
             $(this).val(ui.item.label);
     },
     select: function(event, ui) {
-        //console.log(event);
-        //console.log(this);
-            // prevent autocomplete from updating the textbox
             event.preventDefault();
-            // manually update the textbox and hidden field
             $(this).val(ui.item.label);
 
             var id = this.id;
-
             $("#" + id + "_id").val(ui.item.id);
-            //var id1=id.substr(0, 9);
-           // $("#"+id1+"state_id").val(ui.item.state_id)
-
     },
     change: function(event, ui) {
             var id = this.id;
@@ -440,25 +553,15 @@ $(function(){
   $(".load_product").autocomplete({
     source: BASE_URL+'index.php/Autocomplete/load_product',
     focus: function(event, ui) {
-            // prevent autocomplete from updating the textbox
             event.preventDefault();
-            // manually update the textbox
             $(this).val(ui.item.label);
     },
     select: function(event, ui) {
-        //console.log(event);
-        //console.log(this);
-            // prevent autocomplete from updating the textbox
             event.preventDefault();
-            // manually update the textbox and hidden field
             $(this).val(ui.item.label);
 
             var id = this.id;
-
             $("#" + id + "_id").val(ui.item.id);
-            //var id1=id.substr(0, 9);
-           // $("#"+id1+"state_id").val(ui.item.state_id)
-
     },
     change: function(event, ui) {
             var id = this.id;
@@ -491,25 +594,15 @@ $(function(){
   $(".load_depot").autocomplete({
     source: BASE_URL+'index.php/Autocomplete/load_depot',
     focus: function(event, ui) {
-            // prevent autocomplete from updating the textbox
             event.preventDefault();
-            // manually update the textbox
             $(this).val(ui.item.label);
     },
     select: function(event, ui) {
-        //console.log(event);
-        //console.log(this);
-            // prevent autocomplete from updating the textbox
             event.preventDefault();
-            // manually update the textbox and hidden field
             $(this).val(ui.item.label);
 
             var id = this.id;
-
             $("#" + id + "_id").val(ui.item.id);
-            //var id1=id.substr(0, 9);
-           // $("#"+id1+"state_id").val(ui.item.state_id)
-
     },
     change: function(event, ui) {
             var id = this.id;
@@ -542,25 +635,15 @@ $(function(){
   $(".load_batch").autocomplete({
     source: BASE_URL+'index.php/Autocomplete/load_batch',
     focus: function(event, ui) {
-            // prevent autocomplete from updating the textbox
             event.preventDefault();
-            // manually update the textbox
             $(this).val(ui.item.label);
     },
     select: function(event, ui) {
-        //console.log(event);
-        //console.log(this);
-            // prevent autocomplete from updating the textbox
             event.preventDefault();
-            // manually update the textbox and hidden field
             $(this).val(ui.item.label);
 
             var id = this.id;
-
             $("#" + id + "_id").val(ui.item.id);
-            //var id1=id.substr(0, 9);
-           // $("#"+id1+"state_id").val(ui.item.state_id)
-
     },
     change: function(event, ui) {
             var id = this.id;
@@ -592,24 +675,18 @@ $(function(){
 var autocomp_opt_document={
     source: BASE_URL+'index.php/documents/loadDocuments',
     focus: function(event, ui) {
-            // prevent autocomplete from updating the textbox
             event.preventDefault();
-            // manually update the textbox
             $(this).val(ui.item.label);
     },
     select: function(event, ui) {
-            // prevent autocomplete from updating the textbox
             event.preventDefault();
-            // manually update the textbox and hidden field
             $(this).val(ui.item.label);
             var id = this.id;
             $("#" + id + "_id").val(ui.item.value);
     },
     change: function(event, ui) {
             var id = this.id;
-            // $("#" + id + "_id").val('');
             var con_name = $(this).val();
-            // $(this).val('');
 
             if (con_name!="" && con_name!=null) {
               $.ajax({
@@ -635,28 +712,21 @@ var autocomp_opt_document={
 };
 
 $(function() {
-  //autocomplete
   $(".auto_document").autocomplete({
     source: BASE_URL+'index.php/documents/loadDocuments',
     focus: function(event, ui) {
-            // prevent autocomplete from updating the textbox
             event.preventDefault();
-            // manually update the textbox
             $(this).val(ui.item.label);
     },
     select: function(event, ui) {
-            // prevent autocomplete from updating the textbox
             event.preventDefault();
-            // manually update the textbox and hidden field
             $(this).val(ui.item.label);
             var id = this.id;
             $("#" + id + "_id").val(ui.item.value);
     },
     change: function(event, ui) {
             var id = this.id;
-            // $("#" + id + "_id").val('');
             var con_name = $(this).val();
-            // $(this).val('');
 
             if (con_name!="" && con_name!=null) {
               $.ajax({

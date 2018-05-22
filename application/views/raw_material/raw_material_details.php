@@ -31,54 +31,48 @@
 					    <div class="main-container">           
                          <div class="box-shadow">
                             <form id="form_raw_material_details" role="form" class="form-horizontal" method="post" action="<?php if (isset($data)) echo base_url(). 'index.php/raw_material/update/' . $data[0]->id; else echo base_url().'index.php/raw_material/save'; ?>">
-                              <div class="box-shadow-inside">
+                                <div class="box-shadow-inside">
                                 <div class="col-md-12 custom-padding" style="padding:0;" >
-                                 <div class="panel panel-default">
+                                <div class="panel panel-default">
 								
 								<div class="panel-body">
 									<div class="form-group"  >
 										<div class="col-md-12 col-sm-12 col-xs-12">
-											 <label class="col-md-2 col-sm-2 col-xs-12 control-label">Raw Material Name <span class="asterisk_sign">*</span></label>
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Raw Material Name <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
                                                 <input type="text" class="form-control" name="rm_name" id="rm_name" placeholder="Raw Material Name" value="<?php if(isset($data)) echo $data[0]->rm_name;?>"/>
                                             </div>
-                                            <div style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
-                                                <label class="col-md-2 col-sm-2 col-xs-12 control-label">Status <span class="asterisk_sign">*</span></label>
-                                                <div class="col-md-4 col-sm-4 col-xs-12">
-                                                    <select class="form-control" name="status">
-                                                        <option value="Approved" <?php if(isset($data)) {if ($data[0]->status=='Approved') echo 'selected';}?>>Active</option>
-                                                        <option value="InActive" <?php if(isset($data)) {if ($data[0]->status=='InActive') echo 'selected';}?>>InActive</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                
-									<!--piyu code-->
-									
-									<br><br>
-									<div class="form-group" >
-                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">HSN Code <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="hsn_code" id="hsn_code" placeholder="HSN Code" value="<?php if(isset($data)) { echo  $data[0]->hsn_code; } ?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+                                    <!--piyu code-->
+                                    <div class="form-group" >
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Rate (In Rs) <span class="asterisk_sign">*</span></label>
-                                              <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="rate" placeholder="Rate" value="<?php if (isset($data)) { echo $data[0]->rate; } ?>"/>
+                                            </div>
+                                           <label class="col-md-2 col-sm-2 col-xs-12 control-label">Tax % <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="tax_per" placeholder="Tax %" value="<?php if (isset($data)) { echo $data[0]->tax_per; } ?>"/>
                                             </div>
                                         </div>
                                     </div>
-							</div><!--form-grp-->
-									
-									
-									
-									
-									
-									
-									
-									
-									
+                                    <div class="form-group" style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Status <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <select class="form-control" name="status">
+                                                    <option value="Approved" <?php if(isset($data)) {if ($data[0]->status=='Approved') echo 'selected';}?>>Active</option>
+                                                    <option value="InActive" <?php if(isset($data)) {if ($data[0]->status=='InActive') echo 'selected';}?>>InActive</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Remarks </label>
@@ -87,11 +81,9 @@
                                             </div>
                                         </div>
                                     </div>
-									
                                 </div>
 								
                                 </div>
-								<br clear="all"/>
 								</div>
 								</div>
 								

@@ -88,6 +88,11 @@ class Distributor_in extends CI_Controller{
                 $data['box'] = $this->box_model->get_data('Approved');
                 $data['bar'] = $this->product_model->get_data('Approved');
 
+                $date = date("Y-m-d", strtotime("-6 months"));
+                $sql = "select * from batch_master where date_of_processing >= '$date' and status = 'Approved' and batch_no!=''";
+                $query = $this->db->query($sql);
+                $data['batch'] = $query->result();
+
                 load_view('distributor_in/distributor_in_details', $data);
             } else {
                 echo "Unauthorized access";
@@ -115,6 +120,15 @@ class Distributor_in extends CI_Controller{
                 $data['distributor_in_items'] = $this->distributor_in_model->get_distributor_in_items($id);
                 $data['distributor_in_items_ex'] = $this->distributor_in_model->get_distributor_in_items_ex($id);
 
+                $date = new DateTime($data['data'][0]->date_of_processing);
+                $date->modify('-6 month');
+                $date = $date->format('Y-m-d');
+                // echo $date;
+
+                $sql = "select * from batch_master where date_of_processing >= '$date' and status = 'Approved' and batch_no!=''";
+                $query = $this->db->query($sql);
+                $data['batch'] = $query->result();
+
                 load_view('distributor_in/distributor_in_details', $data);
             } else {
                 echo "Unauthorized access";
@@ -133,6 +147,18 @@ class Distributor_in extends CI_Controller{
     public function update($id){
         $this->distributor_in_model->save_data($id);
         redirect(base_url().'index.php/distributor_in');
+    }
+
+    public function view_sales_return_receipt($id){
+        $data['data'] = $this->distributor_in_model->get_data('', $id);
+        $data['distributor_in_items'] = $this->distributor_in_model->get_distributor_in_items_for_receipt($id);
+        $data['distributor_exchange_items'] = $this->distributor_in_model->get_distributor_out_items_for_exchange($id);
+
+        if(count($data['data'])>0){
+            $data['total_amount_in_words']=convert_number_to_words($data['data'][0]->final_amount) . ' Only';
+        }
+
+        load_view('invoice/sales_return_receipt', $data);
     }
     
     public function check_box_availablity(){

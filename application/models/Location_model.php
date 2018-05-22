@@ -14,7 +14,7 @@ function get_access(){
     return $query->result();
 }
 
-function get_data($status='', $id=''){
+function get_data($status='', $id='', $zone_type=''){
     if($status!=""){
         $cond=" where status='".$status."'";
     } else {
@@ -29,7 +29,27 @@ function get_data($status='', $id=''){
         }
     }
 
-    $sql = "select * from location_master".$cond." order by modified_on desc";
+    if($zone_type=="ss_stores"){
+        if($cond=="") {
+            $cond=" where (type_id='4' or type_id='7')";
+        } else {
+            $cond=$cond." and (type_id='4' or type_id='7')";
+        }
+    }
+
+	$sql = "Select  E.*,F.area from(Select  C.*,D.zone from(select A.*, B.distributor_type from 
+            (select * from location_master".$cond.") A 
+            left join 
+            (select * from distributor_type_master) B 
+            on (A.type_id=B.id))C
+			 left join 
+            (select * from zone_master)D
+			on (C.zone_id=D.id))E
+			 left join 
+			(select * from area_master)F
+			on (E.area_id=F.id)				
+			where E.status='Approved' order by E.modified_on desc";
+   // $sql = "select * from location_master".$cond." order by modified_on desc";
     $query=$this->db->query($sql);
     return $query->result();
 }
@@ -39,6 +59,9 @@ function save_data($id=''){
     $curusr=$this->session->userdata('session_id');
     
     $data = array(
+        'type_id' => $this->input->post('type_id'),
+        'area_id' => $this->input->post('area_id'),
+        'zone_id' => $this->input->post('zone_id'),
         'location' => $this->input->post('location'),
         'status' => $this->input->post('status'),
         'remarks' => $this->input->post('remarks'),
@@ -66,6 +89,17 @@ function save_data($id=''){
     $this->user_access_log_model->insertAccessLog($logarray);
 }
 
+  function get_area($postData){
+    $response = array();
+ 
+    // Select record
+    $this->db->select('id,area');
+    $this->db->where('zone_id', $postData['zone_id']);
+    $q = $this->db->get('area_master');
+    $response = $q->result_array();
+
+    return $response;
+  }
 function check_location_availablity(){
     $id=$this->input->post('id');
     $location=$this->input->post('location');

@@ -29,7 +29,7 @@ function get_data($status='', $id=''){
         }
     }
 
-    $sql = "select C.*, D.depot_name from 
+    $sql = "select C.*, D.depot_name, E.batch_no from 
             (select A.*, B.product_name from 
             (select * from batch_processing".$cond.") A 
             left join 
@@ -37,7 +37,10 @@ function get_data($status='', $id=''){
             on (A.product_id=B.id)) C 
             left join 
             (select * from depot_master) D 
-            on (C.depot_id=D.id) order by C.modified_on desc";
+            on (C.depot_id=D.id)
+            left join 
+            (select * from batch_master) E 
+            on (C.batch_no_id=E.id) order by C.modified_on desc";
     $query=$this->db->query($sql);
     return $query->result();
 }
@@ -52,7 +55,15 @@ function get_batch_raw_material($id){
     return $query->result();
 }
 
-function save_data($id=''){
+ function get_batch_images($id){
+    $query=$this->db->query("SELECT * FROM batch_images WHERE batch_processing_id = '$id'");
+               return $query->result();
+ }
+	  
+               
+
+
+function save_data($id='') {
     $now=date('Y-m-d H:i:s');
     $curusr=$this->session->userdata('session_id');
 
@@ -66,9 +77,13 @@ function save_data($id=''){
     
     $data = array(
         'batch_id_as_per_fssai' => $this->input->post('batch_id_as_per_fssai'),
+        'batch_no_id' => $this->input->post('batch_no_id'),
         'date_of_processing' => $date_of_processing,
         'depot_id' => $this->input->post('depot_id'),
+		'no_of_batch' => $this->input->post('no_of_batch'),
         'product_id' => $this->input->post('product_id'),
+     
+
         'qty_in_bar' => format_number($this->input->post('qty_in_bar'),2),
         'actual_wastage' => format_number($this->input->post('actual_wastage'),2),
         'wastage_percent' => format_number($this->input->post('wastage_percent'),2),
@@ -78,6 +93,7 @@ function save_data($id=''){
         'output_kg' => format_number($this->input->post('output_kg'),2),
         'avg_grams' => format_number($this->input->post('avg_grams'),2),
         'status' => $this->input->post('status'),
+
         'remarks' => $this->input->post('remarks'),
         'modified_by' => $curusr,
         'modified_on' => $now
@@ -96,7 +112,6 @@ function save_data($id=''){
         $action='Batch Processing Entry Modified.';
     }
 
-
     $this->db->where('batch_processing_id', $id);
     $this->db->delete('batch_raw_material');
 
@@ -113,14 +128,184 @@ function save_data($id=''){
             $this->db->insert('batch_raw_material', $data);
         }
     }
+	
+	if($id!="") {
+	   $this->db->where('batch_processing_id', $id);
+       $this->db->delete('batch_images');
+	}
+	
+	$title=$this->input->post('title[]');
+    $image_path=$this->input->post('image_path[]');
+	$receivable_doc=$this->input->post('receivable_doc[]');
+	
+    for ($k=0; $k<count($title); $k++) {
+        if(isset($title[$k]) and $title[$k]!="") {
+            $image='image_'.$k;
 
+            if(!empty($_FILES[$image]['name'])) {
+                $filePath='uploads/batch_doc/';
+                $upload_path = './' . $filePath;
+                if(!is_dir($upload_path)) {
+                    mkdir($upload_path, 0777, TRUE);
+                }
+
+                $fileName = $_FILES[$image]['name'];
+                $extension = '';
+                if(strrpos(".", $fileName)>0){
+                    $extension = substr($fileName, strrpos(".", $fileName)+1);
+                }
+                $fileName = 'doc_'.($k+1).$extension;
+
+                $confi['upload_path']=$upload_path;
+                $confi['allowed_types']='*';
+                $confi['file_name']=$fileName;
+                $confi['overwrite'] = TRUE;
+                $this->load->library('upload', $confi);
+                $this->upload->initialize($confi);
+                $extension="";
+
+                if($this->upload->do_upload($image)) {
+                    echo "Uploaded <br>";
+                } else {
+                    echo "Failed<br>";
+                    echo $this->upload->data();
+                }   
+
+                $upload_data=$this->upload->data();
+                $fileName=$upload_data['file_name'];
+                $extension=$upload_data['file_ext'];
+
+                $data = array(
+                            'batch_processing_id'=> $id,	
+                            'image' => $filePath.$fileName,
+                            'title' => $title[$k],
+                            'receivable_doc' =>$fileName
+                        );
+
+                $this->db->insert('batch_images', $data);
+            } else {
+                $data = array(
+                            'batch_processing_id'=> $id,    
+                            'image' => $image_path[$k],
+                            'title' => $title[$k],
+                            'receivable_doc' =>$receivable_doc[$k]
+                        );
+
+                $this->db->insert('batch_images', $data);
+            }
+        }
+    }
+
+            // for ($k=0; $k<count($title); $k++) {
+                // if(isset($docname[$k]) and $docname[$k]!="") {
+                // if(isset($title[$k]) and $title[$k]!="") {
+             
+
+                   
+                  // $filePath='uploads/distributor_receivables/';
+					// $upload_path = './' . $filePath;
+					// if(!is_dir($upload_path)) {
+					// mkdir($upload_path, 0777, TRUE);
+				// }
+
+                   
+
+                    // $confi['upload_path']=$upload_path;
+                    // $confi['allowed_types']='*';
+                    // $this->load->library('upload', $confi);
+                    // $this->upload->initialize($confi);
+                    // $extension="";
+
+                    // $file_nm='doc_'.$doccnt;
+
+                    // while (!isset($_FILES[$file_nm])) {
+                        // $doccnt = $doccnt + 1;
+                        // $file_nm = 'doc_'.$doccnt;
+                    // }
+
+                    // if(!empty($_FILES[$file_nm]['name'])) {
+                        // if($this->upload->do_upload($file_nm)) {
+                            // echo "Uploaded <br>";
+                        // } else {
+                            // echo "Failed<br>";
+                            // echo $this->upload->data();
+                        // }   
+
+                        // $upload_data=$this->upload->data();
+                        // $fileName=$upload_data['file_name'];
+                        // $extension=$upload_data['file_ext'];
+                            
+                        // $data = array(
+                         
+                            // 'title' => $title[$k],
+                          
+                          
+                            // 'doc_document' => $filePath.$fileName,
+                            // 'document_name' => $fileName
+                        // );
+                        // $this->db->insert('batch_images', $data);
+                    // } else {
+                        // if($file_path_count>=$k) {
+                            // $path=$file_path_db[$k]['docpath'];
+                            // $flnm=$file_path_db[$k]['docfilename'];
+                        // } else {
+                            // $path="";
+                            // $flnm="";
+                        // }
+
+                        // $data = array(
+                         // 'title' => $title[$k],
+                            // 'doc_document' => $docdocument[$k],
+                            // 'document_name' => $documentname[$k]
+                        // );
+                        // $this->db->insert('batch_images', $data);
+                    // }
+                // }
+
+                // $doccnt = $doccnt + 1;
+
+                // if($k!=count($docname)-1) {
+                    // $file_nm='doc_'.$doccnt;
+
+                    // while (!isset($_FILES[$file_nm])) {
+                        // $doccnt = $doccnt + 1;
+                        // $file_nm = 'doc_'.$doccnt;
+                    // }
+                // }
+            // }
 
     $logarray['table_id']=$id;
     $logarray['module_name']='Batch_Processing';
     $logarray['cnt_name']='Batch_Processing';
     $logarray['action']=$action;
     $this->user_access_log_model->insertAccessLog($logarray);
+
 }
+
+function get_batch_raw_material1($product_id){
+	     $product_id=$this->input->post('id');
+	   
+     $sql = 
+			"select C.rm_id,C.qty_per_batch, D.rm_name from (select A.*, B.ing_id,B.rm_id,B.qty_per_batch,B.rm_name from 
+			( select * from ingredients_master) A 
+            left join 
+            (select * from ingredients_details) B 
+            on (B.ing_id=A.id))C
+			 left join 
+            (select * from raw_material_master) D
+            on (C.rm_id=D.id)  where  C.product_id='$product_id'";
+			
+	// $sql = "select A.*, B.rm_name from 
+            // (select * from ingredients_details where ing_id = '$id') A 
+            // left join 
+            // (select * from raw_material_master) B 
+            // on (A.rm_id=B.id)";		
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+	
+
+	
 
 function check_batch_id_availablity(){
     $id=$this->input->post('id');

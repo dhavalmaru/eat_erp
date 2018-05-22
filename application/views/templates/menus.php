@@ -224,18 +224,28 @@
         <i class="menu--icon  fa fa-fw fa-indent"></i>
         <span class="menu--label">Masters</span>
       </label>	 
-      <ul class="sub_menu">
-        <li class="sub_menu--item" <?php if ($Vendors==0) echo 'style="display: none;"'; ?>>
-          <a href="<?php echo base_url().'index.php/Vendor'; ?>"   class="sub_menu--link"> Vendor</a>
-        </li>
-        <li class="sub_menu--item" <?php if ($Depot==0) echo 'style="display: none;"'; ?>>
-          <a href="<?php echo base_url().'index.php/Depot'; ?>" class="sub_menu--link">Depot</a>
-        </li>
-        <li class="sub_menu--item"  <?php if ($Raw_Material==0) echo 'style="display: none;"'; ?>>
+
+    
+      <ul class="sub_menu new-menu"> 
+          
+
+
+           <li class="menu--item  menu--item__has_sub_menu1 main-submenu-1"   > 
+              <span class="menu--label">Product</span>  
+            </li>
+        
+        <ul class="sub_menu menu--item__has_sub_menu-1">
+          <li class="sub_menu--item" <?php if ($Vendors==0) echo 'style="display: none;"'; ?>>
+            <a href="<?php echo base_url().'index.php/Vendor'; ?>"   class="sub_menu--link"> Vendor</a>
+          </li>
+          <li class="sub_menu--item" <?php if ($Depot==0) echo 'style="display: none;"'; ?>>
+            <a href="<?php echo base_url().'index.php/Depot'; ?>" class="sub_menu--link">Depot</a>
+          </li>
+          <li class="sub_menu--item"  <?php if ($Raw_Material==0) echo 'style="display: none;"'; ?>>
           <a href="<?php echo base_url().'index.php/Raw_material'; ?>" class="sub_menu--link"> Raw Material</a>
         </li>
-        <li class="sub_menu--item" <?php if ($Tax==0) echo 'style="display: none;"'; ?>>
-          <a href="<?php echo base_url().'index.php/Tax_master'; ?>" class="sub_menu--link">Tax</a>
+        <li class="sub_menu--item" <?php if ($Batch_Processing==0) echo 'style="display: none;"'; ?>>
+          <a href="<?php echo base_url().'index.php/Batch_master'; ?>"   class="sub_menu--link">  Batch Master</a>
         </li>
         <li class="sub_menu--item" <?php if ($Product==0) echo 'style="display: none;"'; ?>>
           <a href="<?php echo base_url().'index.php/Product'; ?>" class="sub_menu--link">Product</a>
@@ -243,34 +253,82 @@
         <li class="sub_menu--item" <?php if ($Box==0) echo 'style="display: none;"'; ?>>
           <a href="<?php echo base_url().'index.php/Box'; ?>" class="sub_menu--link">Box</a>
         </li>
+		<li class="sub_menu--item" <?php if ($Product==0) echo 'style="display: none;"'; ?>>
+          <a href="<?php echo base_url().'index.php/ingredients_master'; ?>" class="sub_menu--link">Ingredients Master</a>
+        </li>
+        </ul>
+
+
+        <li class="menu--item  menu--item__has_sub_menu1 main-submenu-2"   > 
+              <span class="menu--label">Sales</span>  
+            </li>
+        
+        <ul class="sub_menu menu--item__has_sub_menu-2"> 
+        <li class="sub_menu--item" <?php if ($Tax==0) echo 'style="display: none;"'; ?>>
+          <a href="<?php echo base_url().'index.php/Tax_master'; ?>" class="sub_menu--link">Tax</a>
+        </li>
         <li class="sub_menu--item" <?php if ($Sales_Rep==0) echo 'style="display: none;"'; ?>>
           <a href="<?php echo base_url().'index.php/Sales_rep'; ?>" class="sub_menu--link">Sales Representative</a>
         </li>
         <li class="sub_menu--item" <?php if ($Distributor==0) echo 'style="display: none;"'; ?>>
           <a href="<?php echo base_url().'index.php/Distributor'; ?>" class="sub_menu--link">Distributor</a>
         </li>
-        <li class="sub_menu--item" <?php if ($City_Master==0) echo 'style="display: none;"'; ?>>
-          <a href="<?php echo base_url().'index.php/City_master'; ?>" class="sub_menu--link"> City Master</a>
+        <li class="sub_menu--item" <?php if ($Distributor_Type==0) echo 'style="display: none;"'; ?>>
+          <a href="<?php echo base_url().'index.php/Distributor_type'; ?>" class="sub_menu--link">Distributor Type</a>
         </li>
-        <li  class="sub_menu--item" <?php if ($Bank_Master==0) echo 'style="display: none;"'; ?>>
-          <a href="<?php echo base_url().'index.php/Bank'; ?>" class="sub_menu--link">  Bank Master</a>
+		
+		  <li class="sub_menu--item" <?php if ($Zone==0) echo 'style="display: none;"'; ?>>
+          <a href="<?php echo base_url().'index.php/Zone'; ?>" class="sub_menu--link">Zone</a>
         </li>
+		
         <li class="sub_menu--item" <?php if ($Area==0) echo 'style="display: none;"'; ?>>
           <a href="<?php echo base_url().'index.php/Area'; ?>" class="sub_menu--link">Area</a>
         </li>
         <li class="sub_menu--item" <?php if ($Area==0) echo 'style="display: none;"'; ?>>
           <a href="<?php echo base_url().'index.php/Location'; ?>" class="sub_menu--link">Location</a>
         </li>
-        <li class="sub_menu--item" <?php if ($Distributor_Type==0) echo 'style="display: none;"'; ?>>
-          <a href="<?php echo base_url().'index.php/Distributor_type'; ?>" class="sub_menu--link">Distributor Type</a>
+      
+		<li class="sub_menu--item" <?php if ($Sales_Rep==0) echo 'style="display: none;"'; ?>>
+          <a href="<?php echo base_url().'index.php/Sr_mapping/'; ?>" class="sub_menu--link">SR Mapping</a>
         </li>
+		<li class="sub_menu--item" <?php if ($Distributor_Type==0) echo 'style="display: none;"'; ?>>
+          <a href="<?php echo base_url().'index.php/relationship'; ?>" class="sub_menu--link">Relationship Master</a>
+        </li>
+		
+		<li class="sub_menu--item" <?php if ($Distributor_Type==0) echo 'style="display: none;"'; ?>>
+          <a href="<?php echo base_url().'index.php/store'; ?>" class="sub_menu--link">Stores Master</a>
+        </li>
+		
+		
+		
+      </ul>
+
+        
+        <li class="menu--item  menu--item__has_sub_menu1 main-submenu-3"   > 
+              <span class="menu--label">Global</span>  
+            </li>
+        
+        <ul class="sub_menu menu--item__has_sub_menu-3"> 
+        <li class="sub_menu--item" <?php if ($City_Master==0) echo 'style="display: none;"'; ?>>
+          <a href="<?php echo base_url().'index.php/City_master'; ?>" class="sub_menu--link"> City Master</a>
+        </li>
+        <li  class="sub_menu--item" <?php if ($Bank_Master==0) echo 'style="display: none;"'; ?>>
+          <a href="<?php echo base_url().'index.php/Bank'; ?>" class="sub_menu--link">  Bank Master</a>
+        </li>
+        
+      </ul>
+
+<li class="menu--item  menu--item__has_sub_menu1 main-submenu-4"   > 
+              <span class="menu--label">Accounting</span>  
+            </li>
+        
+        <ul class="sub_menu menu--item__has_sub_menu-4"> 
         <li class="sub_menu--item" <?php if ($Vendors==0) echo 'style="display: none;"'; ?>>
           <a href="<?php echo base_url().'index.php/Vendor_type'; ?>"   class="sub_menu--link"> Vendor Type</a>
         </li>
-        <li class="sub_menu--item" <?php if ($Zone==0) echo 'style="display: none;"'; ?>>
-          <a href="<?php echo base_url().'index.php/Zone'; ?>" class="sub_menu--link">Zone</a>
-        </li>
+        
       </ul>
+    </ul>
     </li>
 
     <li class="menu--item  menu--item__has_sub_menu"  <?php if ($Transactions==0) echo 'style="display: none;"'; ?>>
@@ -315,6 +373,10 @@
         </li>
         <li  class="sub_menu--item"  <?php if ($Distributor_Sale==0) echo 'style="display: none;"'; ?>>
           <a  class="sub_menu--link" href="<?php echo base_url().'index.php/Distributor_sale'; ?>">Super Stockist Sale</a>
+        </li>
+		
+		  <li  class="sub_menu--item"  <?php if ($Distributor_Sale==0) echo 'style="display: none;"'; ?>>
+          <a  class="sub_menu--link" href="<?php echo base_url().'index.php/Distributor_sale_in'; ?>">Super Stockist Return</a>
         </li>
       </ul>
 	  
