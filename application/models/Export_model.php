@@ -633,7 +633,7 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
 
 
 
-function get_distributor_out_sku_details($from_date, $to_date, $status='', $date_of_processing, $date_of_accounting) {
+function get_distributor_out_sku_details($from_date, $to_date, $status='', $date_of_processing='', $date_of_accounting='') {
 
     // $sql = "select L.*, J.item_name, J.quantity, J.short_name from
 
@@ -932,7 +932,7 @@ function get_distributor_sale_sku_details($from_date, $to_date) {
 
 
 
-function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sample,$credit_debit='',$status_type='',$date_of_processing,$date_of_accounting) {
+function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sample,$credit_debit='',$status_type='',$date_of_processing='',$date_of_accounting='') {
 
     if($status_type==''){
         $from_date = formatdate($this->input->post('from_date'));

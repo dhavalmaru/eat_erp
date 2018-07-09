@@ -1115,7 +1115,6 @@
                 if (isNaN(qty)) qty=0;
                 if (isNaN(grams)) grams=0;
                 if (isNaN(rate)) rate=0;
-                if (isNaN(cost)) cost=0;
 
                 // var cst = parseFloat(get_number($("#cst").val(),2));
                 // var sell_rate = rate-((rate*sell_out)/100);
@@ -1199,7 +1198,6 @@
                 if (isNaN(qty)) qty=0;
                 if (isNaN(grams)) grams=0;
                 if (isNaN(rate)) rate=0;
-                if (isNaN(cost)) cost=0;
 
                 // var cst = parseFloat(get_number($("#cst").val(),2));
                 // var sell_rate = rate-((rate*sell_out)/100);
@@ -1283,7 +1281,6 @@
                 if (isNaN(qty)) qty=0;
                 if (isNaN(grams)) grams=0;
                 if (isNaN(rate)) rate=0;
-                if (isNaN(cost)) cost=0;
 
                 // var cst = parseFloat(get_number($("#cst").val(),2));
                 // var sell_rate = rate-((rate*sell_out)/100);

@@ -222,7 +222,7 @@ class Export extends CI_Controller {
     }
 
     public function generate_distributor_out_sku_details($status) {
-        $this->export_model->generate_sale_invoice_sku_report('Sales','','','',$status);
+        $this->export_model->generate_sale_invoice_sku_report('Sales','','','','',$status);
     }
 
     public function generate_ledger_report() {

@@ -176,7 +176,7 @@ function generate_tax_invoice_old($id) {
             $data['gate_pass_no']=$gate_pass_no;
             $data['date_of_processing']=$date_of_processing;
 
-            if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT'){
+            if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT'){
                 $data['distributor_name']=$client_name;
                 $data['address']=$client_address;
             } else {
@@ -250,7 +250,7 @@ function generate_tax_invoice_old($id) {
             $data['invoice_no']=$invoice_no;
             $data['date_of_processing']=$date_of_processing;
 
-            if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT'){
+            if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT'){
                 $data['distributor_name']=$client_name;
                 $data['address']=$client_address;
             } else {
@@ -486,7 +486,7 @@ function generate_gate_pass_old() {
                 $data['gate_pass_no']=$gate_pass_no;
                 $data['date_of_processing']=$date_of_processing;
 
-                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT'){
+                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT'){
                     $data['distributor_name']=$client_name;
                     $data['address']=$client_address;
                 } else {
@@ -753,6 +753,8 @@ function generate_gate_pass_old() {
     load_view('invoice/gate_pass_old', $final_data);
 }
 
+
+
 function generate_gate_pass_old_print() {
     $now=date('Y-m-d H:i:s');
     $curusr=$this->session->userdata('session_id');
@@ -972,7 +974,7 @@ function generate_gate_pass_old_print() {
                 $data['gate_pass_no']=$gate_pass_no;
                 $data['date_of_processing']=$date_of_processing;
 
-                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT'){
+                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT'){
                     $data['distributor_name']=$client_name;
                     $data['address']=$client_address;
                 } else {
@@ -1035,7 +1037,7 @@ function generate_gate_pass_old_print() {
                 $data['invoice_no']=$invoice_no;
                 $data['date_of_processing']=$date_of_processing;
 
-                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT'){
+                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT'){
                     $data['distributor_name']=$client_name;
                     $data['address']=$client_address;
                 } else {
@@ -1238,6 +1240,8 @@ function generate_gate_pass_old_print() {
     
     load_view('invoice/invoice-print', $final_data);
 }
+
+
 
 function view_gate_pass_old($distid) {
     $now=date('Y-m-d H:i:s');
@@ -1451,7 +1455,7 @@ function view_gate_pass_old($distid) {
                 $data['gate_pass_no']=$gate_pass_no;
                 $data['date_of_processing']=$date_of_processing;
 
-                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT'){
+                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT'){
                     $data['distributor_name']=$client_name;
                     $data['address']=$client_address;
                 } else {
@@ -1514,7 +1518,7 @@ function view_gate_pass_old($distid) {
                 $data['invoice_no']=$invoice_no;
                 $data['date_of_processing']=$date_of_processing;
 
-                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT'){
+                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT'){
                     $data['distributor_name']=$client_name;
                     $data['address']=$client_address;
                 } else {
@@ -1962,7 +1966,7 @@ function get_final_data($check, $sales_rep_id){
                 $data['gate_pass_no']=$gate_pass_no;
                 $data['date_of_processing']=$date_of_processing;
 
-                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT'){
+                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT'){
                     $data['distributor_name']=$client_name;
                     $data['address']=$client_address;
                     $data['state']=$client_state;
@@ -2011,15 +2015,7 @@ function get_final_data($check, $sales_rep_id){
                 $vou_cnt = $vou_cnt + 1;
 
             } else if ($send_invoice==1) {
-                $distributor_in_type = '';
-                $sql="select * from distributor_out where id='$id'";
-                $query=$this->db->query($sql);
-                $result=$query->result();
-                if(count($result)>0){
-                    $distributor_in_type = $result[0]->distributor_in_type;
-                }
-
-                if(($invoice_no==null || $invoice_no=='') && strtoupper($distributor_in_type)!='EXCHANGED'){
+                if($invoice_no==null || $invoice_no==''){
                     $sql="select * from series_master where type='Tax_Invoice'";
                     $query=$this->db->query($sql);
                     $result=$query->result();
@@ -2058,7 +2054,7 @@ function get_final_data($check, $sales_rep_id){
                 $data['invoice_no']=$invoice_no;
                 $data['date_of_processing']=$date_of_processing;
 
-                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT'){
+                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT'){
                     $data['distributor_name']=$client_name;
                     $data['address']=$client_address;
                     $data['state']=$client_state;
@@ -2395,6 +2391,7 @@ function generate_gate_pass($dist_out_id) {
                             );
                     $this->db->insert('gp_data',$data);
                 }
+
 
                 $final_data =  $this->get_final_data($check, $sales_rep_id);
 

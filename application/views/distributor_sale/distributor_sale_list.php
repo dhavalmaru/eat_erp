@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
     <head>        
@@ -24,6 +26,19 @@
 		  @media only screen and  (min-width:709px)  and (max-width:718px) { 			 
 			.heading-h3-heading .btn-margin{   }
 		   }
+             .alert
+             {
+              padding:5px;
+              border-radius:0px;
+             }
+             .alert-dismissable .close, .alert-dismissible .close
+             {
+                  position: relative;
+             top: -2px;
+             right: 0px;
+             color: #fff;
+             opacity: 1!important;
+             }
 		</style>	
     </head>
     <body>								
@@ -34,7 +49,7 @@
               <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
                 
                    <div class="heading-h3"> 
-                   <div class="heading-h3-heading mobile-head">	 <a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp;  Super Stockist Sale List  </div>						 
+                   <div class="heading-h3-heading mobile-head">	 <a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp;  Super Stockist Sale List <a class="btn btn-default-danger pull-right "  style="margin-right:8px!important;" href="<?php echo base_url('index.php/Distributor_sale/download_csv');?>" ><i class="fa fa-file-pdf-o "></i> Download Sample</a> </div>						 
 					  <div class="heading-h3-heading mobile-head">
 					  <div class="pull-right btn-margin">	
 								<?php $this->load->view('templates/download');?>	
@@ -43,10 +58,23 @@
 									<a class="btn btn-success " href="<?php echo base_url() . 'index.php/distributor_sale/add'; ?>">
 										<span class="fa fa-plus"></span> Add Super Stockist Sale Entry
 									</a>
+						
 								</div>
+								 <a class="btn btn-success" data-toggle="modal" href="#myModal">
+                                <span class="fa fa-file-excel-o"></span> Add Excel
+                            </a> 
+							
 				     </div>	      
-                </div>	
-                
+                </div>
+                 <div class="container">
+                     <?php if($this->session->flashdata('error')){?>
+                     <div class="alert alert-danger alert-dismissible fade in">
+                     <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                     <strong>Error On Line! </strong> 
+                     <?php echo rtrim($this->session->flashdata('error'),',');?></div>  
+                     <?php } ?>
+                 </div>
+                 
                       <!-- PAGE CONTENT WRAPPER -->
                    <div class="page-content-wrap">                
                     <div class="row">
@@ -95,13 +123,84 @@
                     </div>
                 </div>
                 <!-- END PAGE CONTENT WRAPPER -->
+				
+				     <div class="modal fade" id="myModal" role="dialog" style="">
+                <div class="modal-dialog">
+                    <!-- Modal content-->
+                    <div class="modal-content" style="">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">
+                               Add Bulk Entries Of Super Stockist
+                            </h4>
+                        </div>
+                        <form method="POST" action="<?php base_url();?>Distributor_sale/upload_file" class="form-horizontal excelform" enctype="multipart/form-data">
+                        <div class="modal-body">
+						 <div class="form-group">
+
+                                         <label class="col-md-4 col-sm-4 col-xs-12 control-label">Add Excel <span class="asterisk_sign"></span></label>
+                                     
+                                             <input type="file" class="fileinput btn btn-info btn-small  bar_image" name="upload" id="image" placeholder="image" value=""/>
+                         </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                            <!-- <button id="btn_save" class="btn btn-success pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</button> -->
+                            <input type="submit"  class="btn btn-success pull-right"  value="Save" />
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
             </div>            
             <!-- END PAGE CONTENT -->
         </div>
         <!-- END PAGE CONTAINER -->
 						
         <?php $this->load->view('templates/footer');?>
-		
+        <script type="text/javascript">
+                $(document).on('submit','form.excelform',function(){
+                    setTimeout(function(){ 
+                        document.location.reload();
+                    }, 1000);
+                });
+                /*var filename = '<?= $filename;?>';
+                $( document ).ready(function() {
+                    if(filename!='')
+                        $('#error_file').click();
+                });
+
+                $('#error_file').on('click',function(){
+                    setTimeout(function(){ window.open("<?=$url?>",'self'); }, 1000);*/
+                  
+        </script>
+		<script>
+
+		      var get_batch_details = function() {
+            $('#myModal').modal('show');
+
+            // console.log('true');
+
+            // $.ajax({
+            //     url:BASE_URL+'index.php/Distributor_out/get_batch_details',
+            //     method:"post",
+            //     data:$('#form_distributor_out_list').serialize(),
+            //     dataType:"html",
+            //     async:false,
+            //     success: function(data){
+            //         $('#batch_details').html(data);
+
+            //         addMultiInputNamingRules('#form_distributor_out_list', 'input[name="batch_no[]"]', { required: true }, "");
+            //     },
+            //     error: function (response) {
+            //         var r = jQuery.parseJSON(response.responseText);
+            //         alert("Message: " + r.Message);
+            //         alert("StackTrace: " + r.StackTrace);
+            //         alert("ExceptionType: " + r.ExceptionType);
+            //     }
+            // });
+		</script>
+    
     <!-- END SCRIPTS -->      
     </body>
 </html>

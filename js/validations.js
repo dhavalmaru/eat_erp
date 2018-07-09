@@ -4756,7 +4756,7 @@ function test_loop(){
 
         console.log(id);
 
-        $('[id^=batch_no_qty_'+index+']').each(function(){
+        $('[id^=batch_no_qty_'+index+'_]').each(function(){
             console.log($(this).attr('id'));
         });
     });
@@ -4778,7 +4778,7 @@ function check_product_availablity_for_sku_details() {
             qty = parseInt(t_qty);
         }
 
-        $('[id^=batch_no_qty_'+index+']').each(function(){
+        $('[id^=batch_no_qty_'+index+'_]').each(function(){
             t_qty = $(this).val();
             if(!isNaN(t_qty) && t_qty!=''){
                 batch_qty = batch_qty + parseInt(t_qty);

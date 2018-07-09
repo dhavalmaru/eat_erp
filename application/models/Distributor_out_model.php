@@ -465,20 +465,7 @@ function save_data($id=''){
             $action='Distributor Out Entry '.$status.'. Delivery Status: ' . $delivery_status;
         } else {
             if($id!='' || $ref_id!=''){
-                if($ref_id!=''){
-                    $check_id = $ref_id;
-                } else {
-                    $check_id = $id;
-                }
-                $distributor_in_type = '';
-                $sql="select * from distributor_out where id='$check_id'";
-                $query=$this->db->query($sql);
-                $result=$query->result();
-                if(count($result)>0){
-                    $distributor_in_type = $result[0]->distributor_in_type;
-                }
-
-                if(($invoice_no==null || $invoice_no=='') && strtoupper($distributor_in_type)!='EXCHANGED'){
+                if($invoice_no==null || $invoice_no==''){
                     $sql="select * from series_master where type='Tax_Invoice'";
                     $query=$this->db->query($sql);
                     $result=$query->result();
@@ -1032,16 +1019,7 @@ function approve_records() {
 
     if($status=='Approved'){
         for($i=0; $i<count($check); $i++){
-            $check_id = $check[$i];
-            $distributor_in_type = '';
-            $sql="select * from distributor_out where id='$check_id'";
-            $query=$this->db->query($sql);
-            $result=$query->result();
-            if(count($result)>0){
-                $distributor_in_type = $result[0]->distributor_in_type;
-            }
-
-            if(($invoice_no==null || $invoice_no=='') && strtoupper($distributor_in_type)!='EXCHANGED'){
+            if($invoice_no[$i]==null || $invoice_no[$i]==''){
                 $sql="select * from series_master where type='Tax_Invoice'";
                 $query=$this->db->query($sql);
                 $result=$query->result();

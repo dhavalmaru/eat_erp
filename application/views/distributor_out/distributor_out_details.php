@@ -733,8 +733,8 @@
                             //if(data.result==1){
                                 // console.log(data.state);
 								//alert($('#distributor_id').val());
-								if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550") {
-									alert($('#distributor_id').val());
+								if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550" && $('#distributor_id').val()!="622" && $('#distributor_id').val()!="626") {
+									// alert($('#distributor_id').val());
 									$('#state').val(data.state);
 									$('#state_code').val(data.state_code);
 								}
@@ -899,7 +899,7 @@
                     async:false,
                     success: function(data){
                         if(data.result==1){
-                            if(distributor_id==42 || distributor_id==214 || distributor_id==550){
+						if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626){
                                 $('#sell_out').val($("#discount").val());
                             } else {
                                 $('#sell_out').val(data.sell_out);
@@ -909,7 +909,7 @@
                                 $('#distributor_name').val(data.product_name);
                             }
 
-                            if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550") {
+                            if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550" && $('#distributor_id').val()!="622" && $('#distributor_id').val()!="626") {
 
                                 $('#state').val(data.state);
                                 $('#state_code').val(data.state_code);
@@ -970,7 +970,7 @@
                     }
                 });
 
-                if(distributor_id==42 || distributor_id==214 || distributor_id==550){
+                if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626){
                     $('.direct').show();
                 } else {
                     $('.direct').hide();

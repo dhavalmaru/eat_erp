@@ -119,7 +119,7 @@ class sr_mapping extends CI_Controller{
 				 $data['zone'] = $this->sr_mapping_model->get_zone($type_id);
 				$data['store'] = $this->sr_mapping_model->get_store($zone_id);
 					
-				$data['area'] = $this->sr_mapping_model->get_area($zone_id);	
+				$data['area'] = $this->sr_mapping_model->get_area($type_id, $zone_id);	
 					
 								
 					

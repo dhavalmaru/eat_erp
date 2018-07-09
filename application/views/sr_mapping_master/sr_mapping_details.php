@@ -89,7 +89,7 @@
                                                 <select name="zone_id" id="zone_id"class="form-control">
                                                     <option value="">Select</option>
                                                     <?php if(isset($zone)) { for ($k=0; $k < count($zone) ; $k++) { ?>
-                                                            <option value="<?php echo $zone[$k]->zone_id; ?>" <?php if (isset($data)) { if($zone[$k]->zone_id==$data[0]->zone_id) { echo 'selected'; } } ?>><?php echo $zone[$k]->zone; ?></option>
+                                                            <option value="<?php echo $zone[$k]->id; ?>" <?php if (isset($data)) { if($zone[$k]->id==$data[0]->zone_id) { echo 'selected'; } } ?>><?php echo $zone[$k]->zone; ?></option>
                                                     <?php }} ?>
                                                 </select>
                                             </div>
@@ -121,7 +121,7 @@
                                                 <select name="area_id" id="area_id" class="form-control">
                                                     <option value="">Select</option>
                                                     <?php if(isset($area)) { for ($k=0; $k < count($area) ; $k++) { ?>
-                                                            <option value="<?php echo $area[$k]->area_id; ?>" <?php if (isset($data)) { if($area[$k]->area_id==$data[0]->area_id) { echo 'selected'; } } ?>><?php echo $area[$k]->area; ?></option>
+                                                            <option value="<?php echo $area[$k]->id; ?>" <?php if (isset($data)) { if($area[$k]->id==$data[0]->area_id) { echo 'selected'; } } ?>><?php echo $area[$k]->area; ?></option>
                                                     <?php }} ?>
                                                 </select>
                                             </div>

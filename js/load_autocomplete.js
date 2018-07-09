@@ -120,7 +120,7 @@ $(function() {
             $("#" + id + "_id").val('');
             var con_name = $(this).val();
             $(this).val('');
-
+			
             var state_id = 'state_id';
             var state = 'state';
             var country_id = 'country_id';
@@ -146,6 +146,7 @@ $(function() {
                     $("#"+id).val(responsdata[0].label);
                     $("#"+id+"_id").val(responsdata[0].id);
                     $("#"+state_id).val(responsdata[0].state_id);
+					$("#"+state_code).val(responsdata[0].state_code);
                 }   
               });
             }
@@ -160,8 +161,10 @@ $(function() {
                 $("#"+country).val(responsdata.country_name);
                 $("#"+country_id).val(responsdata.country_id);
                 $("#"+state_code).val(responsdata.state_code);
+				get_sell_rate();
               }   
             });
+			
     },
     minLength: 1
   });
