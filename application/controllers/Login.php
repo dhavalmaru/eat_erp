@@ -35,6 +35,8 @@ class Login extends CI_Controller
                                 'session_id' => $result[0]->id,
                                 'user_name' => $result[0]->email_id,
                                 'login_name' => $result[0]->first_name . ' ' . $result[0]->last_name,
+                                'first_name' => $result[0]->first_name,
+                                'last_name' => $result[0]->last_name,
                                 'role_id' => $result[0]->role_id,
                                 'sales_rep_id' => $result[0]->sales_rep_id,
                                 'type' => $result[0]->sr_type

@@ -37,7 +37,7 @@
 
 
     			<div class="heading-h3"> 
-    				<div class="heading-h3-heading">	 <a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp; Distributor List  </div>	 
+    				<div class="heading-h3-heading">	 <a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp; Distributor/Retailer List  </div>	 
 
     				<div class="heading-h3-heading">
     					<div class="pull-right btn-margin">	
@@ -53,9 +53,9 @@
     			<div class="nav-contacts ng-scope" ui-view="@nav">
     				<div class="u-borderBottom u-bgColorBreadcrumb ng-scope">
     					<div class="container u-posRelative u-textRight">
-    						<div class="pull-left   btn-top" style="<?php if($access[0]->r_insert=='0') echo 'display: none;';?>">
+    						<div class="pull-left   btn-top" style="<?php if($access[0]->r_insert=='0') echo 'display: none;';?> margin-right: 10px;">
     							<a class="btn btn-success btn-block btn-padding" href="<?php echo base_url(); ?>index.php/Distributor/add">
-    								<span class="fa fa-plus"></span> Add Distributor
+    								<span class="fa fa-plus"></span> Add Distributor/Retailer
     							</a>
 
 
@@ -71,16 +71,16 @@
 
     						<ul class="m-nav--linetriangle" ng-swipe-left="app.onInnerSwipe($event);" ng-swipe-right="app.onInnerSwipe($event);">
     							<li class="all">
-    								<a  href="<?php echo base_url(); ?>index.php/Distributor/checkstatus">
-    									<span class="ng-binding">All</span>
-    									<span id="approved">  (<?php echo $all; ?>)  </span>
+    								<a  href="<?php echo base_url(); ?>index.php/Distributor/checkstatus/Approved">
+    									<span class="ng-binding">Distributor</span>
+    									<span id="approved">  (<?php echo $active; ?>)  </span>
     								</a>
     							</li>
 
     							<li class="approved" >
-    								<a  href="<?php echo base_url(); ?>index.php/Distributor/checkstatus/Approved">
-    									<span class="ng-binding">Approved</span>
-    									<span id="approved"> (<?php echo $active; ?>)</span>
+    								<a  href="<?php echo base_url(); ?>index.php/Distributor/checkstatus/Retailer">
+    									<span class="ng-binding">Retailer</span>
+    									<span id="approved"> (<?php echo $retailer; ?>)</span>
     								</a>
     							</li>
 
@@ -171,13 +171,14 @@
     		var url = window.location.href;
 
     		if(url.includes('Approved')){
-    			$('.approved').attr('class','active');
-    		}
-
-    		else  if(url.includes('InActive')){
+    			$('.all').attr('class','active');
+    		} else  if(url.includes('InActive')){
     			$('.inactive').attr('class','active');
-    		}
-    		else {
+    		} else  if(url.includes('Retailer')){
+                $('.approved').attr('class','active');
+            } else  if(url.includes('Pending')){
+                $('.pending').attr('class','active');
+            } else {
     			$('.all').attr('class','active');
     		} 
     		$('.ahrefall').click(function(){

@@ -49,9 +49,9 @@
                                             <div class="col-md-4">
                                                 <select class="form-control" name="class" id="classes">
                                                     <option value="">Select</option>
-                                                    <option value="normal" <?php if(isset($data)) {if ($data[0]->class=='normal') echo 'selected';}?>>Normal</option>
-                                                    <option value="super stockist" <?php if(isset($data)) {if ($data[0]->class=='super stockist') echo 'selected';}?>>Super stockist</option>
-                                                    <option value="sample" <?php if(isset($data)) {if ($data[0]->class=='sample') echo 'selected';}?>>Sample</option>
+                                                    <option value="Normal" <?php if(isset($data)) {if ($data[0]->class=='Normal') echo 'selected';}?>>Retailer</option>
+                                                    <option value="Super Stockist" <?php if(isset($data)) {if ($data[0]->class=='Super Stockist') echo 'selected';}?>>Super stockist</option>
+                                                    <option value="Sample" <?php if(isset($data)) {if ($data[0]->class=='Sample') echo 'selected';}?>>Sample</option>
                                                 </select>
                                             </div>
                                            
@@ -441,6 +441,29 @@
         }
      });
    });
+
+    $('#area_id').change(function(){
+        var area_id = $('#area_id').val();
+        var zone_id = $('#zone_id').val();
+        //console.log(reporting_manager_id);
+        // AJAX request
+        $.ajax({
+            url:'<?=base_url()?>index.php/sr_mapping/get_area_location',
+            method: 'post',
+            data: {area_id: area_id,zone_id:zone_id},
+            dataType: 'json',
+            success: function(response){
+                $('#location_id').find('option').not(':first').remove();
+
+                // Add options
+                // response = $.parseJSON(response);
+                // console.log(response);
+                $.each(response,function(index,data){
+                    $('#location_id').append('<option value="'+data['id']+'">'+data['location']+'</option>');
+                });
+            }
+        });
+    });
     
  
    </script>

@@ -115,7 +115,7 @@ class Sales_rep_order extends CI_Controller{
     //     redirect(base_url().'index.php/sales_rep_order');
     // }
     
-    public function get_data(){
+    public function get_distributor_data(){
         $id=$this->input->post('id');
         // $id=1;
 

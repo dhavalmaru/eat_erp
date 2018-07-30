@@ -137,7 +137,7 @@ function get_distributor_data($status='', $id='', $class=''){
     }
 
     if($class!=""){
-        $cond2=" where class='".$status."'";
+        $cond2=" where class='".$class."'";
     } else {
         $cond2="";
     }

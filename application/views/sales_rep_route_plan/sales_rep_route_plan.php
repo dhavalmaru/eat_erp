@@ -47,6 +47,32 @@
    .h-scroll { overflow-x:scroll;} .h-scroll .table-stripped{ width:806px!important;}
    .Route { margin: 10px auto 0!important; text-align: center; }
    }
+   
+   		.form-group
+			{
+				border-bottom:none!important;
+				background-color:white;
+			}
+			.panel {
+		   box-shadow: none;
+		   border:none!important; 
+		   border-top: none!important; 
+		  
+		}.submitLink {
+		  background-color: transparent;
+		  text-decoration: none;
+		  border: none;
+		  color: #428bca;
+		  cursor: pointer;
+		}
+		.panel-footer
+		{
+			background-color:#fff!important;
+		}
+		.heading-h2
+		{
+			display:none!important;
+		}
         </style>
     </head>
     <body>								
@@ -62,10 +88,10 @@
                 <div class="page-content-wrap">
                     <div class="row main-wrapper">
 					    <div class="main-container">           
-                         <div class="box-shadow">
+                    
 							
                             <form id="form_purchase_order_details" role="form" class="form-horizontal">
-                            <div class="box-shadow-inside">
+                            <div class="box-shadow-inside" style="margin-top: 120px;">
                             <div class="col-md-12 custom-padding" style="padding:0;" >
                                 <div class="panel panel-default">
 					     	    <div class="panel-body">
@@ -73,11 +99,11 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">From <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control datepicker" name="from_date" id="from_date" value="<?php echo date('d/m/Y')?>">
+                                                <input type="text" class="form-control datepicker" name="from_date" id="from_date" value="<?php echo date('d/m/Y')?>"style="background: url(<?php echo base_url(); ?>img/calendar-hover.png) 99% 50% no-repeat!important;"/>
                                             </div>
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">To <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control datepicker" name="to_date" id="to_date" value="<?php echo date('d/m/Y')?>">
+                                                <input type="text" class="form-control datepicker" name="to_date" id="to_date" value="<?php echo date('d/m/Y')?>"style="background: url(<?php echo base_url(); ?>img/calendar-hover.png) 99% 50% no-repeat!important;"/>
                                             </div>
                                         </div>
                                     </div>
@@ -86,7 +112,7 @@
                                              
                                             <div class="col-md-2 col-sm-2   col-xs-offset-4 col-md-offset-5 col-sm-offset-5  Route ">
                                                 <input type="hidden" class="form-control" name="sales_rep_id" id="sales_rep_id" value="<?php if(isset($sales_rep_id)) echo $sales_rep_id;?>"/>
-                                                <a class="btn btn-success btn-md" id="get_route_plan">
+                                                <a class="submitLink" id="get_route_plan">
                                                     Get Route Plan
                                                 </a>
                                             </div>
@@ -125,15 +151,18 @@
                                     </div>
 
                                 </div>
+								
+									<div class="panel-footer">
+									<a href="<?php echo base_url(); ?>index.php/sales_rep_route_plan" class="submitLink" type="reset" id="reset">Cancel</a>
+									</div>
+								
                                 </div>
 								<br clear="all"/>
 				            </div>
                             </div>
-                            <div class="panel-footer">
-								<a href="<?php echo base_url(); ?>index.php/sales_rep_route_plan" class="btn btn-danger" type="reset" id="reset">Cancel</a>
-                            </div>
+                          
 							</form>
-						</div>
+				
 						</div>
 						
                     </div>

@@ -42,6 +42,49 @@
         <![endif]-->
  
         <style>
+@media only screen and (max-width: 420px)
+.col-md-6 {
+    width: 50%!important;
+}
+		
+			.dropdown-selector-left {   display:block!important;  }
+		
+#contact1 {
+    width: 100px;
+    height: 100px;
+    text-align: center;
+    float: none;
+    margin: 15px auto;
+    display: block;
+    color: #fff!important;
+}.b-white {
+    border-color: #fff;
+}.thumbnail-wrapper.d32>* {
+    line-height: 93px!important;
+}.thumbnail-wrapper>* {
+    vertical-align: middle;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+}.text-center {
+    text-align: center!important;
+}.text-white {
+    color: #fff!important;
+}
+.thumbnail-wrapper.circular {
+ 
+  border-radius: 50%
+
+}	
+	.thumbnail-wrapper {
+    
+    overflow: hidden;
+  
+}	 
+
+
+	
+		
         .page-content page-overflow { height:auto!important;}
         .page-container .page-content .page-content-wrap { background:#fff;  margin:0px; width: auto!important; float: none;   }
         .dataTables_filter { border-bottom:0!important; }
@@ -91,10 +134,51 @@
             ul.topnav li { width:20%; text-align:center;  border-right:1px solid #eee; }
             ul.topnav li a {  border-bottom:none!important;     } 
         }
+	
         .radio-style { background: #fff; display: block; width:100%; position: relative; padding: 10px; top:-20px;  text-align: :center;}
         </style>
         <style type="text/css">
         
+		
+.btn-circle {
+  width: 49px;
+  height: 49px;
+  text-align: center;
+  padding: 5px 0;
+  font-size: 20px;
+  line-height: 2.00;
+  border-radius: 30px;
+}
+
+.btn-circle-micro {
+  width: 19px;
+  height: 19px;
+  text-align: center;
+  padding: 1px 0;
+  font-size: 13px;
+  line-height: 0.1;
+  border-radius: 30px;
+}
+
+.btn-circle-sm {
+  width: 35px;
+  height: 35px;
+  text-align: center;
+  padding: 2px 0;
+  font-size: 20px;
+  line-height: 1.65;
+  border-radius: 30px;
+}
+
+.btn-circle-lg {
+  width: 79px;
+  height: 79px;
+  text-align: center;
+  padding: 13px 0;
+  font-size: 30px;
+  line-height: 2.00;
+  border-radius: 70px;
+}
             .funkyradio label {
     /*min-width: 400px;*/
     width: 100%;
@@ -299,10 +383,14 @@
         <!-- START PAGE CONTAINER -->
         <div class="page-container page-navigation-top">            
             <!-- PAGE CONTENT -->
-            <?php $this->load->view('templates/menus');?>
+            <?php $this->load->view('templates/menus1');?>
             <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
-               <div class="heading-h2">   Dashboard    </div>
-                 <div class="container1">
+    
+		
+	
+							
+								
+                      <!--  <div class="container1">
                        <div class=" pull-right">
                             <div class="funkyradio">
                             <div class="funkyradio-success  ">
@@ -330,7 +418,7 @@
                         <div class="main_container">
                         <!-- page content -->
                         <div class=" " role="main">
-                        <!-- START WIDGETS -->
+                        <!-- START WIDGETS 
 
                                                            
                                     <div class="radio-style" style="display: none;">
@@ -342,48 +430,43 @@
                                     </div>
                                     
                                     </div>
-                                   
-                                
+                                   -->
+                               
+									
 
-                        <div class="row mobile-bg">
-                            <div class=" col-md-3 col-sm-6 col-xs-12 div-size">
-                                <div class="widget widget-blue  widget-item-icon widget-carousel animated flipInY">
-                                    <div class="owl-carousel  " id="owl-example">  
-                                        <div>    
-                                            <div class="widget-item-left">
-                                                <span class="fa fa-exchange  "></span>
-                                            </div>                             
-                                            <div class="widget-data">
-                                                <div class="widget-title">Total Sale</div>
-                                                <div class="widget-subtitle">(In Amount)</div>
-                                                <div class="widget-int"> &#8377; <span data-toggle="counter" id="total_amount"><?php if(isset($total_sale[0]->total_amount)) echo format_money(($total_sale[0]->total_amount),0) . ' Lacs';?></span></div>
-                                            </div>   
-                                        </div>
-                                        <div>  
-                                            <div class="widget-item-left">
-                                                <span class="fa fa-exchange"></span>
-                                            </div>                             
-                                            <div class="widget-data">
-                                                <div class="widget-title">Total Sale</div>
-                                                <div class="widget-subtitle">(In Bar)</div>
-                                                <div class="widget-int"> <span data-toggle="counter" id="total_bar"><?php if(isset($total_sale[0]->total_bar)) echo format_money($total_sale[0]->total_bar,0);?></span></div>
-                                            </div>  
-                                        </div>
-
-                                        <div>  
-                                            <div class="widget-item-left">
-                                                <span class="fa fa-exchange"></span>
-                                            </div>                             
-                                            <div class="widget-data">
-                                                <div class="widget-title">Total Sale</div>
-                                                <div class="widget-subtitle">(In Box)</div>
-                                                <div class="widget-int">   <span data-toggle="counter" id="total_box"><?php if(isset($total_sale[0]->total_box)) echo format_money($total_sale[0]->total_box,0);?></span></div>
-                                            </div> 
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class=" col-md-3 col-sm-6 col-xs-12 div-size">
+                        <div class="row mobile-bg" style="margin-top:200px;">
+						<h1 style="text-align:center"><?php if (isset($userdata['login_name'])) {echo $userdata['login_name'];} ?></h1></div>
+                         <div class=" col-md-12  col-xs-12 ">
+								<div class=" col-md-6  col-xs-6 " style="padding: 15px;">
+									<a href="<?php echo base_url()?>index.php/sales_rep_location/add"><div class="thumbnail-wrapper d32 circular b-white " id="contact1">
+											<div class="bg-master text-center text-white" style=" background: #00c0ef !important;text-align: center; -size:28pxalign-items:center;text-align: center;font-size:50px;"><span><i class="fa fa-map-marker"></i></span>
+											</div>  
+									</div><p style="text-align:center;font-size:21px">Visit</p></a>
+								</div>
+								
+								<div class=" col-md-6  col-xs-6 "style="padding: 15px;">
+									<a href="<?php echo base_url()?>index.php/Sales_rep_route_plan"><div class="thumbnail-wrapper d32 circular b-white " id="contact1">
+											<div class="bg-master text-center text-white" style=" background: #00a65a;text-align: center; -size:28pxalign-items:center;text-align: center;font-size:50px;"><span><i class="fa fa-globe"></i></span>
+											</div>  
+									</div><p style="text-align:center;font-size:21px">Route Plan</p>
+								</div>
+								
+								<div class=" col-md-6  col-xs-6 "style="padding: 15px;">
+									<a href="<?php echo base_url()?>index.php/sales_rep_distributor/add"><div class="thumbnail-wrapper d32 circular b-white " id="contact1">
+											<div class="bg-master text-center text-white" style=" background: #f39c12;text-align: center; -size:28pxalign-items:center;text-align: center;font-size:50px;"><span><i class="fa fa-group"></i></span>
+											</div>  
+									</div><p style="text-align:center;font-size:21px">Retailers</p>
+									
+								</div>
+								
+								<div class=" col-md-6  col-xs-6"style="padding: 15px;">
+									<a href="<?php echo base_url()?>index.php/sales_rep_order/add"><div class="thumbnail-wrapper d32 circular b-white " id="contact1">
+											<div class="bg-master text-center text-white" style=" background: #dd4b39;text-align: center; -size:28pxalign-items:center;text-align: center;font-size:50px;"><span><i class="fa fa-shopping-cart"></i></span>
+											</div>  
+									</div><p style="text-align:center;font-size:21px">Orders</p>
+								</div>
+								<!--
+                       <div class=" col-md-3 col-sm-6 col-xs-12 div-size">
                                 <div class="widget widget-info  widget-item-icon widget-carousel animated flipInY">
                                     <div class="owl-carousel  " id="owl-example">
                                         <div>
@@ -449,10 +532,13 @@
                                         <div class="widget-int" style="font-size: 25px;">  &#8377;  <span data-toggle="counter"><?php if(isset($target[0]->target)) echo format_money($target[0]->target,0);?></span></div>
                                     </div>                             
                                 </div>
-                            </div>
+                            </div>-->
+							
+								
+                        </div>
                         </div>
 
-                        <div class="heading-h2 row dashboard-heading"  >
+                       <!-- <div class="heading-h2 row dashboard-heading"  >
                             <div class="row  ">
                                 <div class="pull-right "> 
                                     <div class="col-md-6 col-sm-6 col-xs-6">
@@ -559,7 +645,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div>-->
 
                             <div class="row  margin-top" style="display:none;">
                                 <div class="x_panel">

@@ -40,7 +40,7 @@ class Distributor_sale extends CI_Controller{
         if(count($result)>0) {
             if($result[0]->r_insert == 1) {
                 $data['access'] = $this->distributor_sale_model->get_access();
-                $data['distributor'] = $this->distributor_model->get_data('Approved', '', 'super stockist');
+                $data['distributor'] = $this->distributor_model->get_data('Approved', '', 'Super Stockist');
                 $data['box'] = $this->box_model->get_data('Approved');
                 $data['bar'] = $this->product_model->get_data('Approved');
                 //$data['store'] = $this->distributor_sale_model->get_store();
@@ -711,7 +711,7 @@ class Distributor_sale extends CI_Controller{
             if($result[0]->r_view == 1 || $result[0]->r_edit == 1) {
                 $data['access'] = $this->distributor_sale_model->get_access();
                 $data['data'] = $this->distributor_sale_model->get_data('', $id);
-				$data['distributor'] = $this->distributor_model->get_data('Approved', '', 'super stockist');
+				$data['distributor'] = $this->distributor_model->get_data('Approved', '', 'Super Stockist');
                 $data['box'] = $this->box_model->get_data('Approved');
                 $data['bar'] = $this->product_model->get_data('Approved');
                 $data['distributor_sale_items'] = $this->distributor_sale_model->get_distributor_sale_items($id);

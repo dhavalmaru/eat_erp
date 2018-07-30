@@ -180,7 +180,8 @@
                                         echo base_url().'index.php/Dashboard_sales_rep';
                                       }
                                     } else {
-                                       if ($Dashboard==0) echo base_url().'index.php/Dashboard/Dashboardscreen';
+                                       if(!isset($Dashboard)) echo base_url().'index.php/Dashboard/Dashboardscreen';
+                                       else if ($Dashboard==0) echo base_url().'index.php/Dashboard/Dashboardscreen';
                                        else echo base_url().'index.php/Dashboard';
                                     }
                                     // echo base_url().'index.php/dashboard'; 
@@ -271,7 +272,7 @@
           <a href="<?php echo base_url().'index.php/Sales_rep'; ?>" class="sub_menu--link">Sales Representative</a>
         </li>
         <li class="sub_menu--item" <?php if ($Distributor==0) echo 'style="display: none;"'; ?>>
-          <a href="<?php echo base_url().'index.php/Distributor'; ?>" class="sub_menu--link">Distributor</a>
+          <a href="<?php echo base_url().'index.php/Distributor'; ?>" class="sub_menu--link">Distributor/Retailer</a>
         </li>
         <li class="sub_menu--item" <?php if ($Distributor_Type==0) echo 'style="display: none;"'; ?>>
           <a href="<?php echo base_url().'index.php/Distributor_type'; ?>" class="sub_menu--link">Distributor Type</a>
@@ -359,7 +360,10 @@
         <span class="menu--label">Sales</span>  
       </li>
       <ul class="sub_menu menu--item__has_sub_menu-2">
-       <li class="sub_menu--item"   <?php if ($Distributor_Out==0) echo 'style="display: none;"'; ?>>
+        <li class="sub_menu--item"   <?php if ($Distributor_Out==0) echo 'style="display: none;"'; ?>>
+          <a href="<?php echo base_url().'index.php/Order'; ?>"   class="sub_menu--link"> Secondary Sales </a>
+        </li>
+        <li class="sub_menu--item"   <?php if ($Distributor_Out==0) echo 'style="display: none;"'; ?>>
           <a href="<?php echo base_url().'index.php/Distributor_out'; ?>"   class="sub_menu--link"> Sales </a>
         </li>
         <li class="sub_menu--item"   <?php if ($Distributor_Out==0) echo 'style="display: none;"'; ?>>
@@ -374,8 +378,7 @@
         <li  class="sub_menu--item"  <?php if ($Distributor_Sale==0) echo 'style="display: none;"'; ?>>
           <a  class="sub_menu--link" href="<?php echo base_url().'index.php/Distributor_sale'; ?>">Super Stockist Sale</a>
         </li>
-		
-		  <li  class="sub_menu--item"  <?php if ($Distributor_Sale==0) echo 'style="display: none;"'; ?>>
+	      <li  class="sub_menu--item"  <?php if ($Distributor_Sale==0) echo 'style="display: none;"'; ?>>
           <a  class="sub_menu--link" href="<?php echo base_url().'index.php/Distributor_sale_in'; ?>">Super Stockist Return</a>
         </li>
       </ul>
@@ -473,7 +476,7 @@
     <li class="menu--item"  <?php if ($Sales_Rep_Location==0) echo 'style="display: none;"'; else if(isset($type) && $type=="Promoter") echo 'style="display:none;"'; ?>>
       <a href="<?php echo  base_url().'index.php/Sales_rep_location'; ?>" class="menu--link" title="">
         <i class="menu--icon  fa fa-fw fa-map-marker"></i>
-        <span class="menu--label">Location</span>
+        <span class="menu--label">Visit</span>
       </a>
     </li>
 
@@ -487,7 +490,7 @@
     <li class="menu--item"  <?php if ($Sales_Rep_Distributors==0) echo 'style="display: none;"'; ?>>
       <a href="<?php echo  base_url().'index.php/Sales_rep_distributor'; ?>" class="menu--link" title="">
         <i class="menu--icon  fa fa-fw fa-group"></i>
-        <span class="menu--label">Distributors</span>
+        <span class="menu--label">Retailers</span>
       </a>
     </li>
 

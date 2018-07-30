@@ -26,6 +26,31 @@
             @media screen and (max-width:800px) {
                .h-scroll { overflow-x:scroll;} .h-scroll .table-stripped{ width:806px!important;}
             }
+				.form-group
+			{
+				border-bottom:none!important;
+				background-color:white;
+			}
+			.panel {
+		   box-shadow: none;
+		   border:none!important; 
+		   border-top: none!important; 
+		  
+		}.submitLink {
+		  background-color: transparent;
+		  text-decoration: none;
+		  border: none;
+		  color: #428bca;
+		  cursor: pointer;
+		}
+		.panel-footer
+		{
+			background-color:#fff!important;
+		}
+		.heading-h2
+		{
+			display:none!important;
+		}
 		</style>
 		
 		<style>
@@ -94,9 +119,9 @@ only screen and (max-width: 760px),
                    <div class="page-content-wrap">
                       <div class="row main-wrapper">
 					    <div class="main-container">           
-                         <div class="box-shadow">	
+                      
                             <form id="form_sales_rep_order_details" role="form" class="form-horizontal" method="post" action="<?php if (isset($data)) echo base_url(). 'index.php/sales_rep_order/save/' . $data[0]->id; else echo base_url().'index.php/sales_rep_order/save'; ?>">
-                             <div class="box-shadow-inside">
+                            <div class="box-shadow-inside" style="margin-top: 120px;">
                                 <div class="col-md-12 custom-padding" style="padding:0;" >
                                  <div class="panel panel-default">
 								
@@ -106,7 +131,7 @@ only screen and (max-width: 760px),
 											<label class="col-md-2 col-sm-2 col-xs-12 control-label">Date <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
-                                                <input type="text" class="form-control datepicker1" name="date_of_processing" id="date_of_processing" placeholder="Date" value="<?php if(isset($data)) echo (($data[0]->date_of_processing!=null && $data[0]->date_of_processing!='')?date('d/m/Y',strtotime($data[0]->date_of_processing)):date('d/m/Y')); else echo date('d/m/Y'); ?>"/>
+                                                <input type="text" class="form-control datepicker1" name="date_of_processing" id="date_of_processing" placeholder="Date" value="<?php if(isset($data)) echo (($data[0]->date_of_processing!=null && $data[0]->date_of_processing!='')?date('l,d M',strtotime($data[0]->date_of_processing)):date('l,d M')); else echo date('d/m/Y'); ?>" style="background: url(<?php echo base_url(); ?>img/calendar-hover.png) 99% 50% no-repeat!important;"/>
                                             </div>
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Distributor <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
@@ -167,7 +192,7 @@ only screen and (max-width: 760px),
                                                     <div id="err_item_<?php echo $i;?>"></div>
                                                 </td>
                                                 <td>
-                                                    <input type="text" class="form-control qty" name="qty[]" id="qty_<?php echo $i; ?>" placeholder="Qty" value="<?php if (isset($sales_rep_order_items)) { echo $sales_rep_order_items[$i]->qty; } ?>"/>
+                                                    <input type="number" class="form-control qty" name="qty[]" id="qty_<?php echo $i; ?>" placeholder="Qty" value="<?php if (isset($sales_rep_order_items)) { echo $sales_rep_order_items[$i]->qty; } ?>"/>
                                                 </td>
                                                 <td style="display: none;">
                                                     <input type="text" class="form-control rate" name="rate[]" id="rate_<?php echo $i; ?>" placeholder="Rate" value="<?php if (isset($sales_rep_order_items)) { echo $sales_rep_order_items[$i]->rate; } ?>" readonly />
@@ -210,7 +235,7 @@ only screen and (max-width: 760px),
                                                     <div id="err_item_<?php echo $i;?>"></div>
                                                 </td>
                                                 <td>
-                                                    <input type="text" class="form-control qty" name="qty[]" id="qty_<?php echo $i; ?>" placeholder="Qty" value=""/>
+                                                    <input type="number" class="form-control qty" name="qty[]" id="qty_<?php echo $i; ?>" placeholder="Qty" value=""/>
                                                 </td>
                                                 <td style="display: none;">
                                                     <input type="text" class="form-control rate" name="rate[]" id="rate_<?php echo $i; ?>" placeholder="Rate" value="" readonly />
@@ -270,19 +295,19 @@ only screen and (max-width: 760px),
                                         </div>
                                     </div>
                                 </div>
-								
+								<div class="panel-footer">
+									<a href="<?php echo base_url(); ?>index.php/sales_rep_order" class="submitLink" type="reset" id="reset">Cancel</a>
+                                    <button class="submitLink pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;'; else if(substr($data[0]->id,0,1)=="d") echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</button>
+                                </div>
 					
                                 	 </div>
 									 			<br clear="all"/>
 								</div>
 							</div>
-                                <div class="panel-footer">
-									<a href="<?php echo base_url(); ?>index.php/sales_rep_order" class="btn btn-danger" type="reset" id="reset">Cancel</a>
-                                    <button class="btn btn-success pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;'; else if(substr($data[0]->id,0,1)=="d") echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</button>
-                                </div>
+                                
 							</form>
 							
-						 </div>
+						
 						</div>
 					</div>
 						
@@ -389,7 +414,7 @@ only screen and (max-width: 760px),
                 var sell_out = 0;
 
                 $.ajax({
-                    url:BASE_URL+'index.php/Sales_rep_order/get_data',
+                    url:BASE_URL+'index.php/Sales_rep_order/get_distributor_data',
                     method:"post",
                     data:{id:distributor_id},
                     dataType:"json",
@@ -601,7 +626,7 @@ only screen and (max-width: 760px),
                                                 '<div id="err_item_'+counter+'"></div>' + 
                                             '</td>' + 
                                             '<td>' + 
-                                                '<input type="text" class="form-control qty" name="qty[]" id="qty_'+counter+'" placeholder="Qty" value=""/>' + 
+                                                '<input type="number" class="form-control qty" name="qty[]" id="qty_'+counter+'" placeholder="Qty" value=""/>' + 
                                             '</td>' + 
                                             '<td style="display: none;">' + 
                                                 '<input type="text" class="form-control rate" name="rate[]" id="rate_'+counter+'" placeholder="Rate" value="" readonly />' + 

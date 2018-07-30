@@ -15,6 +15,14 @@ function get_access(){
     return $query->result();
 }
 
+
+  function get_invoice($distributor_id){
+   
+    $sql = "select invoice_no from distributor_out where distributor_id='".$distributor_id  ."'";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
 function get_data($status='', $id=''){
     if($status!=""){
         if($status=="Pending"){
@@ -185,11 +193,14 @@ function save_data($id=''){
         if($ref_id==""){
             $ref_id = null;
         }
+		
 
         $data = array(
             'date_of_transaction' => $date_of_transaction,
             'distributor_id' => $this->input->post('distributor_id'),
             'transaction' => $this->input->post('transaction'),
+            'invoice_no' => $this->input->post('invoice_no'),
+            'distributor_type' => $this->input->post('distributor_type'),
             'amount' => format_number($this->input->post('total_amount'),2),
             'tax' => format_number($this->input->post('tax'),2),
             'igst' => format_number($this->input->post('igst'),2),
@@ -274,6 +285,8 @@ function view_credit_debit_note($id) {
         $this->output->set_output($output);
     }
 }
+
+
 
 }
 ?>

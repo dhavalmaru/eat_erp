@@ -62,7 +62,20 @@
 
                                             </div>
 										</div>
-									</div>
+										</div>
+									
+									<div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Distributor Type <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <select class="form-control" name="distributor_type" id="distributor_type">
+                                                    <option value="Promotion" <?php if(isset($data)) {if ($data[0]->distributor_type=='Promotion') echo 'selected';}?>>Promotion</option>
+                                                    <option value="Invoice" <?php if(isset($data)) {if ($data[0]->distributor_type=='Invoice') echo 'selected';}?>>Invoice</option>
+                                                </select>
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Distributor <span class="asterisk_sign">*</span></label>
@@ -101,6 +114,24 @@
                                             
                                         </div>
                                     </div>
+									
+									<div class="form-group" id="invoice_no_div">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Invoice No. <span class="asterisk_sign"></span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <select name="invoice_no" id="invoice_no" class="form-control">
+                                                    <option value="">Select</option>
+													 <?php if(isset($invoice)) { for ($k=0; $k < count($invoice) ; $k++) { ?>
+                                                            <option value="<?php echo $invoice[$k]->invoice_no; ?>" <?php if (isset($data)) { if($invoice[$k]->invoice_no==$data[0]->invoice_no) { echo 'selected'; } } ?>><?php echo $invoice[$k]->invoice_no; ?></option>
+                                                    <?php }} ?>
+                                                </select>
+                                          
+                                                
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+									
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Amount (In Rs) <span class="asterisk_sign">*</span></label>
@@ -246,7 +277,7 @@
                     success: function(data){
                         if(data.result==1){
                             if(!isNaN($('#amount_without_tax').val()) && $('#amount_without_tax').val()!='' && !isNaN($('#tax').val()) && $('#tax').val()!=''){
-                                if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550") {
+                                // if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550") {
                                     var state = data.state;
                                     var state_code = data.state_code;
                                     if (state_code=='27')
@@ -271,7 +302,7 @@
                                         var total_amount = parseInt(amount)+parseInt(igst);
                                         $('#total_amount').val(total_amount);
                                     }
-                                }
+                                // }
                             }
                         }
                     },
@@ -283,6 +314,34 @@
                     }
                 });
             }
+			
+			
+			$('#distributor_id').change(function(){
+				  var distributor_id = $('#distributor_id').val();
+					//console.log(reporting_manager_id);
+				  // AJAX request
+				  $.ajax({
+					url:'<?=base_url()?>index.php/credit_debit_note/get_invoice',
+					method: 'post',
+					data: {distributor_id: distributor_id},
+					dataType: 'json',
+					success: function(response){
+
+			 
+					  $('#invoice_no').find('option').not(':first').remove();
+				  
+
+					  // Add options
+					  // response = $.parseJSON(response);
+					  // console.log(response);
+					  $.each(response,function(index,data){
+						 $('#invoice_no').append('<option value="'+data['invoice_no']+'">'+data['invoice_no']+'</option>');
+					
+					  });
+					}
+				 });
+			   });
+			
 
             function get_distributor_details(){
                 var distributor_id = $('#distributor_id').val();
@@ -309,7 +368,17 @@
                     });
                 }
             }
+
+    		$('#distributor_type').change(function(){	
+        		if($('#distributor_type').val()=='Invoice') {
+        			$('#invoice_no_div').show();
+        			$('#tax').val('5');
+        		} else {
+        			$('#invoice_no_div').hide();
+        			$('#tax').val('');
+        		}
+    		});
         </script>
-    <!-- END SCRIPTS -->      
+        <!-- END SCRIPTS -->      
     </body>
 </html>

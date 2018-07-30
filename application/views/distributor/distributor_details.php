@@ -10,8 +10,8 @@
         <link rel="icon" href="<?php echo base_url(); ?>favicon.ico" type="image/x-icon" />
         <!-- END META SECTION -->
         
-               <!-- CSS INCLUDE -->        
-         <link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>css/theme-blue.css"/>
+        <!-- CSS INCLUDE -->        
+        <link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>css/theme-blue.css"/>
         <link href="<?php echo base_url() . 'js/jquery-ui-1.11.2/jquery-ui.min.css'; ?>" rel="stylesheet" type="text/css" />
 		<link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>css/user-details.css"/>
         <!-- EOF CSS INCLUDE -->      
@@ -167,15 +167,15 @@
                                             <div class="col-md-4">
                                                 <select class="form-control" name="class" id="classes">
                                                     <option value="">Select</option>
-                                                    <option value="normal" <?php if(isset($data)) {if ($data[0]->class=='normal') echo 'selected';}?>>Normal</option>
-                                                    <option value="super stockist" <?php if(isset($data)) {if ($data[0]->class=='super stockist') echo 'selected';}?>>Super stockist</option>
-                                                    <option value="sample" <?php if(isset($data)) {if ($data[0]->class=='sample') echo 'selected';}?>>Sample</option>
+                                                    <option value="Normal" <?php if(isset($data)) {if ($data[0]->class=='Normal') echo 'selected';}?>>Retailer</option>
+                                                    <option value="Super Stockist" <?php if(isset($data)) {if ($data[0]->class=='Super Stockist') echo 'selected';}?>>Distributor</option>
+                                                    <option value="Sample" <?php if(isset($data)) {if ($data[0]->class=='Sample') echo 'selected';}?>>Sample</option>
                                                 </select>
                                             </div>
-                                            </div>
-                                            </div>
+                                        </div>
+                                    </div>
 								
-                                        <div class="form-group" id="type_normal">
+                                    <div class="form-group" id="type_normal">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Type <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12" >
@@ -186,8 +186,8 @@
                                                     <?php }} ?>
                                                 </select>
                                             </div>
-                                            </div>
-                                            </div>
+                                        </div>
+                                    </div>
 									<div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Zone <span class="asterisk_sign">*</span></label>
@@ -202,7 +202,7 @@
                                         </div>
                                     </div>
 									
-										<div class="form-group">
+									<div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Area <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">

@@ -14,6 +14,57 @@ function get_access(){
     return $query->result();
 }
 
+function get_distributors(){
+    $sales_rep_id = $this->session->userdata('sales_rep_id');
+    $sql = "select B.* from sr_mapping A inner join distributor_master B 
+            on (A.type_id = B.type_id and A.zone_id = B.zone_id and A.area_id = B.area_id) 
+            where (A.reporting_manager_id = '$sales_rep_id' or A.sales_rep_id1 = '$sales_rep_id' or A.sales_rep_id2 = '$sales_rep_id') 
+                and B.status = 'Approved' and B.class = 'super stockist'";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_zone(){
+    $sales_rep_id = $this->session->userdata('sales_rep_id');
+    $sql = "select distinct A.zone_id, B.zone from sr_mapping A left join zone_master B on (A.zone_id = B.id) 
+            where (A.reporting_manager_id = '$sales_rep_id' or A.sales_rep_id1 = '$sales_rep_id' or A.sales_rep_id2 = '$sales_rep_id') 
+                    and B.type_id = '3'";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_area($zone_id=''){
+    $cond = '';
+    if($zone_id!=''){
+        $cond = $cond . " and B.zone_id = '$zone_id'";
+    }
+    $sales_rep_id = $this->session->userdata('sales_rep_id');
+    $sql = "select distinct A.area_id, B.area from sr_mapping A left join area_master B on (A.area_id = B.id) 
+            where (A.reporting_manager_id = '$sales_rep_id' or A.sales_rep_id1 = '$sales_rep_id' or A.sales_rep_id2 = '$sales_rep_id') 
+                    and B.type_id = '3'" . $cond;
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_loc($zone_id='', $area_id=''){
+    $cond = '';
+    if($zone_id!=''){
+        $cond = $cond . " and zone_id = '$zone_id'";
+    }
+    if($area_id!=''){
+        $cond = $cond . " and area_id = '$area_id'";
+    }
+    $sql = "select * from location_master where status = 'Approved' and type_id = '3'" . $cond;
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_locations($zone_id='', $area_id=''){
+    $sql = "select * from location_master where status  = 'Approved' and type_id = '3' and zone_id = '$zone_id' and area_id = '$area_id'";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
 function get_data($status='', $id=''){
     if($status!=""){
         $cond=" where status='".$status."'";
@@ -68,7 +119,6 @@ function get_data($status='', $id=''){
     $query=$this->db->query($sql);
     return $query->result();
 }
-
 
 function get_data1($status='', $id=''){
     if($status!=""){
@@ -138,9 +188,6 @@ function get_data1($status='', $id=''){
     return $query->result();
 }
 
-
-
-
 function get_data2($status='', $id=''){
     // if($status!=""){
         // $cond=" where status='".$status."'";
@@ -198,8 +245,11 @@ function get_data2($status='', $id=''){
 			"SELECT  concat('d_',A.id) as id, A.sales_rep_id, A.distributor_name, A.address, A.city, A.pincode, A.state, 
             A.country, A.tin_number as vat_no, A.sell_out as margin, 
             null as doc_document, null as document_name, A.area_id, A.status, A.remarks, 
-            A.modified_by, A.modified_on FROM distributor_master A LEFT JOIN sr_mapping B ON (A.area_id = B.area_id and A.zone_id = B.zone_id and  A.type_id = B.type_id) where status='approved' and
-		(B.reporting_manager_id=".$sales_rep_id." OR B.sales_rep_id1=".$sales_rep_id." OR B.sales_rep_id2=".$sales_rep_id." )  order by A.distributor_name asc";
+            A.modified_by, A.modified_on FROM distributor_master A 
+            LEFT JOIN sr_mapping B ON (A.area_id = B.area_id and A.zone_id = B.zone_id and  A.type_id = B.type_id) 
+            where A.status='approved' and A.class='normal' and 
+		      (B.reporting_manager_id=".$sales_rep_id." OR B.sales_rep_id1=".$sales_rep_id." OR B.sales_rep_id2=".$sales_rep_id." )  
+              order by A.distributor_name asc";
 			
     $query=$this->db->query($sql);
     return $query->result();
@@ -213,14 +263,14 @@ function save_data($id=''){
     $data = array(
         'sales_rep_id' => $sales_rep_id,
         'distributor_name' => $this->input->post('distributor_name'),
-        'address' => $this->input->post('address'),
-        'city' => $this->input->post('city'),
-        'pincode' => $this->input->post('pincode'),
-        'state' => $this->input->post('state'),
-        'country' => $this->input->post('country'),
-        'vat_no' => $this->input->post('vat_no'),
-        'contact_person' => $this->input->post('contact_person'),
-        'contact_no' => $this->input->post('contact_no'),
+        // 'address' => $this->input->post('address'),
+        // 'city' => $this->input->post('city'),
+        // 'pincode' => $this->input->post('pincode'),
+        // 'state' => $this->input->post('state'),
+        // 'country' => $this->input->post('country'),
+        // 'vat_no' => $this->input->post('vat_no'),
+        // 'contact_person' => $this->input->post('contact_person'),
+        // 'contact_no' => $this->input->post('contact_no'),
         'margin' => $this->input->post('margin'),
         'doc_document' => $this->input->post('doc_document'),
         'document_name' => $this->input->post('document_name'),
@@ -228,8 +278,12 @@ function save_data($id=''){
         'remarks' => $this->input->post('remarks'),
         'modified_by' => $curusr,
         'modified_on' => $now,
-        'state_code' => $this->input->post('state_code'),
-        'gst_number' => $this->input->post('gst_number')
+        // 'state_code' => $this->input->post('state_code'),
+        'gst_number' => $this->input->post('gst_number'),
+        'zone_id' => $this->input->post('zone_id'),
+        'area_id' => $this->input->post('area_id'),
+        'location_id' => $this->input->post('location_id'),
+        'master_distributor_id' => $this->input->post('distributor_id')
     );
 
     if($id==''){

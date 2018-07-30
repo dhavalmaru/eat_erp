@@ -74,6 +74,10 @@ function save_data($id=''){
     } else {
         $date_of_visit=formatdate($date_of_visit);
     }
+    $area_id1 = $this->input->post('area_id1');
+    if($area_id1==''){
+        $area_id1 = 0;
+    }
     
     $data = array(
     
@@ -81,7 +85,7 @@ function save_data($id=''){
 
         'type_id' => $this->input->post('type_id'),
         'area_id' =>$this->input->post('area_id'),
-        'area_id1' =>$this->input->post('area_id1'),
+        'area_id1' =>$area_id1,
         'zone_id' => $this->input->post('zone_id'),
         'location_id' => $this->input->post('location_id'),
         'reporting_manager_id' => $this->input->post('reporting_manager_id'),
@@ -135,6 +139,12 @@ function save_data($id=''){
             (select * from location_master)D
             on (A.location_id=D.id)
             where A.store_id='".$area_id1  ."' and  A.zone_id='". $zone_id ."' ";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_area_location($area_id,$zone_id){
+    $sql = "Select A.* from location_master A where A.area_id='".$area_id."' and A.zone_id='". $zone_id ."'";
     $query=$this->db->query($sql);
     return $query->result();
 }

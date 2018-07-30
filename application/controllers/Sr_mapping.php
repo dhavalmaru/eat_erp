@@ -65,17 +65,21 @@ class sr_mapping extends CI_Controller{
 	
 	
 	
-  	 public function get_location(){ 
-   
-    $postData = $this->input->post();
-	
+    public function get_location(){ 
+        $postData = $this->input->post();
 		$area_id1 = $postData['area_id1'];
 		$zone_id = $postData['zone_id'];
-    $data = $this->sr_mapping_model->get_location($area_id1,$zone_id);
-    echo json_encode($data); 
+        $data = $this->sr_mapping_model->get_location($area_id1,$zone_id);
+        echo json_encode($data); 
     }
 	
-	
+	public function get_area_location(){ 
+        $postData = $this->input->post();
+        $area_id = $postData['area_id'];
+        $zone_id = $postData['zone_id'];
+        $data = $this->sr_mapping_model->get_area_location($area_id,$zone_id);
+        echo json_encode($data); 
+    }
 	
     public function add(){
         $result=$this->sr_mapping_model->get_access();
