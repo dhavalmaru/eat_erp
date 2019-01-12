@@ -1,106 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>        
-	<!-- META SECTION -->
-	<title>EAT ERP</title>            
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
+<head>
+	<meta charset="UTF-8">
+	<title>Eat-ERP</title>
+	<meta name="viewport" content="width=device-width,height=device-height, initial-scale=1  maximum-scale=1">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="HandheldFriendly" content="True">
+	
+	<link rel="shortcut icon" href="<?php echo base_url(); ?>img/favicon.png">
+	<link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/font-awesome.min.css">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/css/materialize.min.css" rel="stylesheet" />
+	<link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/fakeLoader.css">
+	<link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/slick.css">
+	<link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/slick-theme.css">
+	<link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/owl.carousel.css">
+	<link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/owl.theme.css">
+	<link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/owl.transitions.css">
+	<link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/style.css">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/font/material-design-icons/Material-Design-Icons.woff" rel="stylesheet">
 
-	<link rel="icon" href="<?php echo base_url(); ?>favicon.ico" type="image/x-icon" />
-	<!-- END META SECTION -->
-
-	<!-- CSS INCLUDE -->        
-	<link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>css/theme-blue.css"/>
-	<link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>mobile-menu/vendor-1437d0659c.css"/>
-	<link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url().'css/custome_vj_css.css'; ?>"/>    
-	<!-- EOF CSS INCLUDE -->    
-</head>
+	<style>
+	.beat_plan h4
+{
+	font-size:12px!important;	
+    display: inline;	
+}
+.app-pages {
+    margin-top: 50px;
+}
+.tabs .tab {
+    padding: 0px!important;
+}
+.wishlist .entry .s-title
+{
+	padding-top:0px;
+	padding-bottom:0px;
+}
+.row
+{
+	margin-bottom: 7px;
+	margin-top: 7px;
+}
+.button
+{
+	font-size:10px;
+}
+.wishlist .entry h6, .wishlist .cart-total h6 {
+    font-size: 11px;
+    display: inline;
+}
+	</style>
 <body>								
 	<!-- START PAGE CONTAINER -->
-	<div class="page-container page-navigation-top">            
-		<!-- PAGE CONTENT -->
-		<?php $this->load->view('templates/menus');?>
-		<div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
+	   <div id="loading"></div>
+		<div class="navbar">
+		 <?php $this->load->view('templates/header2');?>
+		</div>
 
-			<div class="heading-h3"> 
-				<div class="heading-h3-heading mobile-head">	 <a href="<?php echo base_url().'index.php/dashboard_sales_rep'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp; Distributor List  </div>						 
-				<div class="heading-h3-heading mobile-head">
-					<div class="pull-right btn-margin">	
-						<?php $this->load->view('templates/download');?>	
-					</div>	
-					<div class="pull-right btn-margin"  style="<?php if($access[0]->r_insert=='0') echo 'display: none;';?>">
-						<a class="btn btn-success  " href="<?php echo base_url() . 'index.php/sales_rep_distributor/add'; ?>">
-							<span class="fa fa-plus"></span> Add Distributor
-						</a>
-					</div>
-				</div>
-			</div>	 
-
-			<!-- PAGE CONTENT WRAPPER -->
-			<div class="page-content-wrap">                
-				<div class="row">
-					<div class="page-width">	
-						<div class="col-md-12">
-							<div class="panel panel-default">
-								<div class="panel-body">
-									<div class="table-responsive">
-										<table id="customers2" class="table datatable table-bordered" >
-											<thead>
-												<tr>
-													<th width="65" style="text-align:center;">Sr. No.</th>
-													<th>Distributor Name</th>
-													<th>Address</th>
-													<th>City</th>
-													<th>Area</th>
-													<th>Vat No</th>
-													<th>Contact Person</th>
-													<th>Contact No</th>
-													<th>Status</th>
-													<th width="65">Margin</th>
-													<th width="110">Created By</th>
-													<th width="110">Creation Date</th>
-												</tr>
-											</thead>
-											<tbody>
-												<?php for ($i=0; $i < count($data); $i++) { ?>
-												<tr>
-													<td style="text-align:center;"><?php echo $i+1; ?></td>
-													<td><a href="<?php echo base_url().'index.php/sales_rep_distributor/edit/'.$data[$i]->id; ?>"><?php echo $data[$i]->distributor_name; ?></a></td>
-													<td><?php echo $data[$i]->address; ?></td>
-													<td><?php echo $data[$i]->city; ?></td>
-													<td><?php echo $data[$i]->area; ?></td>
-													<td><?php echo $data[$i]->vat_no; ?></td>
-													<td><?php echo $data[$i]->contact_person; ?></td>
-													<td><?php echo $data[$i]->contact_no; ?></td>
-													<td><?php echo $data[$i]->status; ?></td>
-													<td><?php echo $data[$i]->margin; ?></td>
-													<td><?php echo $data[$i]->user_name; ?></td>
-													<td>
-														<span style="display:none;">
-	                                                        <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
-	                                                    </span>
-														<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
-												</tr>
-												<?php } ?>
-											</tbody>
-										</table>
-									</div>
-								</div>
-								<!-- END DEFAULT DATATABLE -->
-							</div>
+		<?php $this->load->view('templates/menu2');?>
+	
+	
+	
+	<div class="wishlist app-section app-pages">
+		<div class="container">
+			
+			<div class="entry shadow">
+			<div class="app-title">
+				<h4>Retailer List</h4>
+			</div>
+			
+				<?php for ($i=0; $i < count($data); $i++){
+				 $date1 = date('Y-m-d');
+				  $modified_on1 = date('Y-m-d', strtotime($data[$i]->modified_on));
+				
+					if($modified_on1== $date1)
+					{ ?>	
+				<div class="wishlist-title s-title">
+					<div class="row">
+						<div class="col s2">
+							<td style="text-align:center;"><?php echo $i+1; ?></td>
+						</div>
+						<div class="col s5">
+							<h5><?php echo $data[$i]->distributor_name; ?></h5>
+						</div>
+						
+						<div class="col s5">
+							<h6><?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></h6>
 						</div>
 					</div>
-				</div>
+					
+					
+					<div class="row">
+						<div class="col s5" style="text-align: right;">
+						
+						</div>
+		
+							<div class="col s2">
+								
+							</div>
+							<div class="col s5">
+								<a href="<?php echo base_url() . 'index.php/sales_rep_distributor/edit/'.$data[$i]->id; ?>" class="button shadow orange  lighten-1">View</a>
+							</div>
+					</div>
+					
+				</div><?php }} ?>
+				
+			
+				
 			</div>
-			<!-- END PAGE CONTENT WRAPPER -->
-		</div>            
+		</div>
+	</div>
+
+			<!-- PAGE CONTENT WRAPPER -->
+		<div class="fixed-action-btn click-to-toggle" style="bottom: 45px; right: 24px;">
+		  <a class="btn-floating  pink waves-effect waves-light" href="<?php echo base_url() . 'index.php/sales_rep_distributor/add'; ?>">
+			<i class="large material-icons">add</i>
+		  </a>
+
+		</div>
+						
 		<!-- END PAGE CONTENT -->
 	</div>
 	<!-- END PAGE CONTAINER -->
 
-	<?php $this->load->view('templates/footer');?>
-
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/js/materialize.min.js"></script>
+	<script src="<?php echo base_url(); ?>sales_rep/js/fakeLoader.min.js"></script>
+	<script src="<?php echo base_url(); ?>sales_rep/js/loading.js"></script>
+	<script src="<?php echo base_url(); ?>sales_rep/js/slick.min.js"></script>
+	<script src="<?php echo base_url(); ?>sales_rep/js/owl.carousel.min.js"></script>
+	<script src="<?php echo base_url(); ?>sales_rep/js/custom.js"></script>
+	
 	<!-- END SCRIPTS -->      
 </body>
 </html>

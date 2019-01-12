@@ -38,20 +38,24 @@
 								<div class="panel-body">
 								
 								
-								      <div class="form-group">
+								    <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Type</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12" >
-                                                <select name="type_id" id="type_id" class="form-control">
+                                                <select name="type_id" id="type_id" class="form-control select2">
                                                     <option value="">Select</option>
                                                     <?php if(isset($type)) { for ($k=0; $k < count($type) ; $k++) { ?>
                                                             <option value="<?php echo $type[$k]->id; ?>" <?php if (isset($data)) { if($type[$k]->id==$data[0]->type_id) { echo 'selected'; } } ?>><?php echo $type[$k]->distributor_type; ?></option>
                                                     <?php }} ?>
                                                 </select>
                                             </div>
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Zone</label>
+                                        </div>
+                                    </div>
+									<div class="form-group"  >
+										<div class="col-md-12 col-sm-12 col-xs-12">
+											<label class="col-md-2 col-sm-2 col-xs-12 control-label">Zone</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="zone_id" id="zone_id" class="form-control">
+                                                <select name="zone_id" id="zone_id" class="form-control select2">
                                                     <option value="">Select</option>
                                                     <?php if(isset($zone)) { for ($k=0; $k < count($zone) ; $k++) { ?>
                                                             <option value="<?php echo $zone[$k]->id; ?>" <?php if (isset($data)) { if($zone[$k]->id==$data[0]->zone_id) { echo 'selected'; } } ?>><?php echo $zone[$k]->zone; ?></option>
@@ -66,9 +70,13 @@
 										<div class="col-md-12 col-sm-12 col-xs-12">
 											 <label class="col-md-2 col-sm-2 col-xs-12 control-label">Area <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
+                                                <input type="hidden" class="form-control " name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
                                                 <input type="text" class="form-control" name="area" id="area" placeholder="Area" value="<?php if(isset($data)) echo $data[0]->area;?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group"  >
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <div style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
                                                 <label class="col-md-2 col-sm-2 col-xs-12 control-label">Status <span class="asterisk_sign">*</span></label>
                                                 <div class="col-md-4 col-sm-4 col-xs-12">

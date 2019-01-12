@@ -15,11 +15,18 @@
         <link href="<?php echo base_url() . 'js/jquery-ui-1.11.2/jquery-ui.min.css'; ?>" rel="stylesheet" type="text/css" />
 		<link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>css/user-details.css"/>
         <!-- EOF CSS INCLUDE -->     
-		
+		<style type="text/css">
+        input[readonly], input[disabled], select[disabled], textarea[disabled] {
+                background-color:transparent!important;
+                color: #0b385f !important; 
+                cursor: not-allowed !important;
+            }
+            
+        </style>
     </head>
     <body>								
       <!-- START PAGE CONTAINER -->
-         <div class="page-container page-navigation-top">            
+   <div class="page-container page-navigation-top">            
             <!-- PAGE CONTENT -->
 			   <?php $this->load->view('templates/menus');?>
               <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
@@ -40,7 +47,7 @@
 										<div class="col-md-12 col-sm-12 col-xs-12">
 											<label class="col-md-2 col-sm-2 col-xs-12 control-label">Type<span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="type_id"  id="type_id" class="form-control">
+                                                <select name="type_id"  id="type_id" class="form-control select2">
                                                     <option value="">Select</option>
                                                     <?php if(isset($type)) { for ($k=0; $k < count($type) ; $k++) { ?>
                                                             <option value="<?php echo $type[$k]->id; ?>" <?php if (isset($data)) { if($type[$k]->id==$data[0]->type_id) { echo 'selected'; } } ?>><?php echo $type[$k]->distributor_type; ?></option>
@@ -66,9 +73,10 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                    </div>
-                                </div>
-                                    <div class="form-group">
+										</div>
+									</div>
+                               
+                                <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Remarks </label>
                                             <div class="col-md-10 col-sm-10 col-xs-12">
@@ -76,8 +84,50 @@
                                             </div>
 
                                         </div>
+                                </div>
+								 <br>
+                                    <div class="h-scroll">  
+                                    <div class="table-stripped form-group" style="padding:15px;" >
+                                      <table class="table table-bordered" style="margin-bottom: 0px; ">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 450px">Category<span class="asterisk_sign">*</span></th>
+                                                    <th style="width: 450px ">Margin On MRP (In %)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="category_details">
+                                                <?php
+
+                                                for ($i=0; $i <count($category_detail) ; $i++) {
+                                                   $margin = '' ;
+                                                   if(isset($margin_detail))
+                                                   {
+                                                    if(count($margin_detail)>0)
+                                                    {
+                                                        if($category_detail[$i]->id==$margin_detail[$i]->category_id)
+                                                        {
+                                                            $margin = $margin_detail[$i]->margin;
+                                                        }
+                                                    }  
+                                                   }
+                                                    
+                                                ?>
+                                                   <tr>
+                                                         <td>
+                                                            <input type="text" class="form-control margin" name="category[]" id="category_<?=$i?>" value="<?=$category_detail[$i]->category_name?>" readonly/>
+                                                            <input type="hidden" class="form-control margin" name="category_id[]" id="category_id_<?=$i?>" value="<?=$category_detail[$i]->id?>" />
+                                                        
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" class="form-control margin" name="margin[]" id="margin_<?=$i?>" placeholder="Margin On MRP"  value="<?=$margin?>" onkeypress="return StopNonNumeric(this,event)"/>
+                                                        </td>
+                                                   </tr>
+                                                <?php }
+                                                ?>
+                                            </tbody>
+                                        </table>
                                     </div>
-									
+                                    </div>	
                                 </div>
 								
                                 </div>
@@ -99,7 +149,7 @@
             </div>
         <!-- END PAGE CONTAINER -->
 	   </div>	
-</div>	   
+	</div>	   
         <?php $this->load->view('templates/footer');?>
         <script type="text/javascript">
             var BASE_URL="<?php echo base_url()?>";

@@ -28,30 +28,99 @@ class Batch_processing extends CI_Controller{
     public function index(){
         $result=$this->batch_processing_model->get_access();
         if(count($result)>0) {
-            $data['access']=$result;
-            $data['data'] = $this->batch_processing_model->get_data();
-
-            load_view('batch_processing/batch_processing_list', $data);
+           $this->checkstatus('Approved');
         } else {
             echo '<script>alert("You donot have access to this page.");</script>';
             $this->load->view('login/main_page');
         }
     }
 
-	    // public function get_data(){
-        // $id=$this->input->post('id');
-       // $id=1;
 
-        // $result=$this->batch_processing_model->get_data('', $id);
-        // $data['result'] = 0;
-        // if(count($result)>0) {
-            // $data['result'] = 1;
-            // $data['product_id'] = $result[0]->product_id;
-            // $data['no_of_batch'] = $result[0]->no_of_batch;
-          
-        // }
+    public function checkstatus($status=''){
+        $result=$this->batch_processing_model->get_access();
+        if(count($result)>0) {
+            $data['access']=$result;
+            $data['data']=$this->batch_processing_model->get_data($status);
 
-        // echo json_encode($data);
+            $count_data=$this->batch_processing_model->get_data();
+            $approved=0;
+            $pending=0;
+            $rejected=0;
+            $inactive=0;
+
+            if (count($result)>0){
+                for($i=0;$i<count($count_data);$i++){
+                    if (strtoupper(trim($count_data[$i]->status))=="APPROVED")
+                        $approved=$approved+1;
+                    else if (strtoupper(trim($count_data[$i]->status))=="PENDING" || strtoupper(trim($count_data[$i]->status))=="DELETED")
+                        $pending=$pending+1;
+                    else if (strtoupper(trim($count_data[$i]->status))=="REJECTED")
+                        $rejected=$rejected+1;
+                    else if (strtoupper(trim($count_data[$i]->status))=="INACTIVE")
+                        $inactive=$inactive+1;
+                }
+            }
+
+            $data['approved']=$approved;
+            $data['pending']=$pending;
+            $data['rejected']=$rejected;
+            $data['inactive']=$inactive;
+            $data['status']=$status;
+            $data['all']=count($count_data);
+
+            load_view('batch_processing/batch_processing_list', $data);
+
+        } else {
+            echo '<script>alert("You donot have access to this page.");</script>';
+            $this->load->view('login/main_page');
+        }
+    }
+
+     public function get_data_ajax($status='')
+    {
+        $draw = intval($this->input->get("draw"));
+        $start = intval($this->input->get("start"));
+        $length = intval($this->input->get("length"));
+        $data=$this->batch_processing_model->get_data($status);
+        $records = array();
+        for ($i=0; $i < count($data); $i++) { 
+                $records[] =  array(
+                        $i+1,   
+  '<span style="display:none;">'.(($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('Ymd',strtotime($data[$i]->date_of_processing)):'').'</span>'.(($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('d/m/Y',strtotime($data[$i]->date_of_processing)):''),							
+                        '<a href="'.base_url().'index.php/batch_processing/edit/'.$data[$i]->id.'"><i class="fa fa-edit"></i></a>',
+                        '<a href="'.base_url().'index.php/batch_processing/view_batch_processing_receipt/'.$data[$i]->id.'" target="_blank"><span class="fa fa-file-pdf-o" style=""></span></a>',
+                        ''.$data[$i]->batch_no.'',
+                      
+                        ''.$data[$i]->depot_name.'',
+                        ''.$data[$i]->product_name.'',
+                        ''.format_money($data[$i]->qty_in_bar,2).'',
+                        ''.format_money($data[$i]->actual_wastage,2).''
+                    );
+      }
+
+      $output = array(
+                        "draw" => $draw,
+                        "recordsTotal" => count($data),
+                        "recordsFiltered" => count($data),
+                        "data" => $records
+                    );
+       echo json_encode($output); 
+    }
+
+    // public function get_data(){
+    // $id=$this->input->post('id');
+   // $id=1;
+
+    // $result=$this->batch_processing_model->get_data('', $id);
+    // $data['result'] = 0;
+    // if(count($result)>0) {
+        // $data['result'] = 1;
+        // $data['product_id'] = $result[0]->product_id;
+        // $data['no_of_batch'] = $result[0]->no_of_batch;
+      
+    // }
+
+    // echo json_encode($data);
     // }
     public function add(){
         $result=$this->batch_processing_model->get_access();
@@ -78,6 +147,7 @@ class Batch_processing extends CI_Controller{
         if(count($result)>0) {
             if($result[0]->r_view == 1 || $result[0]->r_edit == 1) {
                 $data['access'] = $this->batch_processing_model->get_access();
+                $id = $this->batch_processing_model->get_pending_data($id);
                 $data['data'] = $this->batch_processing_model->get_data('', $id);
                 $data['product'] = $this->product_model->get_data('Approved');
                 $data['depot'] = $this->depot_model->get_data('Approved');
@@ -133,7 +203,8 @@ class Batch_processing extends CI_Controller{
 
     public function update($id){
         $this->batch_processing_model->save_data($id);
-        redirect(base_url().'index.php/batch_processing');
+      //  redirect(base_url().'index.php/batch_processing');
+	    echo '<script>window.open("'.base_url().'index.php/batch_processing", "_parent")</script>';
     }
 
     public function check_batch_id_availablity(){

@@ -1,9 +1,9 @@
 <?php
-$to      = 'dhaval.maru@otbconsulting.co.in';
+$to      = 'dhaval.maru@pecanreams.com';
 $subject = 'Test';
 $message = 'hello';
-$headers = 'From: webmaster@eatanytime.in' . "\r\n" .
-    'Reply-To: webmaster@eatanytime.in' . "\r\n" .
+$headers = 'From: cs@eatanytime.co.in' . "\r\n" .
+    'Reply-To: cs@eatanytime.co.in' . "\r\n" .
     'X-Mailer: PHP/' . phpversion();
 
 mail($to, $subject, $message, $headers);

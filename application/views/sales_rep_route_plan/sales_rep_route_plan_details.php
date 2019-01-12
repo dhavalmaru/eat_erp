@@ -20,6 +20,31 @@
             #map {
                 height: 100%;
             }
+			.form-group
+			{
+				border-bottom:none!important;
+				background-color:white;
+			}
+			.panel {
+		   box-shadow: none;
+		   border:none!important; 
+		   border-top: none!important; 
+		  
+		}.submitLink {
+		  background-color: transparent;
+		  text-decoration: none;
+		  border: none;
+		  color: #428bca;
+		  cursor: pointer;
+		}
+		.panel-footer
+		{
+			background-color:#fff!important;
+		}
+		.heading-h2
+		{
+			display:none!important;
+		}
         </style>
     </head>
     <body>
@@ -35,7 +60,7 @@
         <div class="page-content-wrap">
             <div class="row main-wrapper">
                 <div class="main-container">           
-                    <div class="box-shadow">
+          
                     <form id="form_sales_rep_route_plan_details" role="form" class="form-horizontal" method="post" enctype="multipart/form-data" action="<?php if (isset($data)) echo base_url(). 'index.php/sales_rep_route_plan/save/' . $data[0]->id; else echo base_url().'index.php/sales_rep_route_plan/save'; ?>">
                         <div class="box-shadow-inside">
                         <div class="col-md-12 custom-padding" style="padding:0;" >
@@ -93,11 +118,11 @@
                         </div>
                         </div>
                         <div class="panel-footer">
-                            <a href="<?php echo base_url(); ?>index.php/sales_rep_route_plan" class="btn btn-danger" type="reset" id="reset">Cancel</a>
-                            <button class="btn btn-success pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</button>
+                            <a href="<?php echo base_url(); ?>index.php/sales_rep_route_plan" class="submitLink" type="reset" id="reset">Cancel</a>
+                            <button class="submitLink pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</button>
                         </div>
                     </form>
-                    </div>
+       
                 </div>
             </div>
         </div>

@@ -95,26 +95,13 @@ a { text-decoration:none;}
                                                <!-- <button class="btn btn-default" data-toggle="modal" data-target="#modal_large">Large</button> -->
                                             </div>
                                         </div>
-
-                                        <br><br><br>
-
-                                        <div class="" style="margin-top:60px;">
-                                            <h3 class="">Production</h3>
                                         </div>
-                                        <div class="panel panel-success">
-                                            <div class="panel-body list-group">
-                                                <a href="<?php echo base_url() . 'index.php/export/set_report_criteria/2'?>" id="report_2" class="list-group-item-reports" <?php if(isset($rep_2_view)) {if($rep_2_view==1) {if(isset($rep_2)) {if($rep_2==0) echo 'style="display: none;"';} else echo 'style="display: none;"';}  else echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><span class="fa fa-external-link"></span> Raw Material Stock </a>
-                                                <a href="<?php echo base_url() . 'index.php/export/set_report_criteria/3'?>" id="report_3" class="list-group-item-reports" <?php if(isset($rep_3_view)) {if($rep_3_view==1) {if(isset($rep_3)) {if($rep_3==0) echo 'style="display: none;"';} else echo 'style="display: none;"';}  else echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><span class="fa fa-external-link"></span> Production </a>
-                                                <a href="<?php echo base_url() . 'index.php/export/set_report_criteria/4'?>" id="report_4" class="list-group-item-reports" <?php if(isset($rep_4_view)) {if($rep_4_view==1) {if(isset($rep_4)) {if($rep_4==0) echo 'style="display: none;"';} else echo 'style="display: none;"';}  else echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><span class="fa fa-external-link"></span> Product Stock </a>
-                                                <a href="<?php echo base_url() . 'index.php/export/set_report_criteria/10'?>" id="report_10" class="list-group-item-reports" <?php if(isset($rep_10)) {if($rep_10==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><span class="fa fa-external-link"></span> Purchase Order </a>
-                                                <a href="<?php echo base_url() . 'index.php/export/set_report_criteria/11'?>" id="report_11" class="list-group-item-reports" <?php if(isset($rep_11)) {if($rep_11==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><span class="fa fa-external-link"></span> Production Data </a>
-                                                <a href="<?php echo base_url() . 'index.php/export/set_report_criteria/12'?>" id="report_12" class="list-group-item-reports" <?php if(isset($rep_12)) {if($rep_12==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><span class="fa fa-external-link"></span> Purchase Variance </a>
-                                            </div>
-                                        </div>
-                                        <!-- END CONTACTS WITH CONTROLS -->
-                                    </div>
 
-                                    <div class="col-md-4 col-sm-4 col-xs-12" <?php if(isset($rep_grp_2)) {if($rep_grp_2==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>>
+                                     
+
+                              
+
+                                    <div class="col-md-4 col-sm-4 col-xs-12" <?php if(isset($rep_grp_3)) {if($rep_grp_3==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>>
                                         <!-- CONTACTS WITH CONTROLS -->
                                         <div class="">
                                             <h3 class="">MIS</h3>         
@@ -129,13 +116,15 @@ a { text-decoration:none;}
                                                 <a style="display:none;" href="<?php echo base_url() . 'index.php/export/set_report_criteria/14'?>" id="report_14" class="list-group-item-reports" <?php if(isset($rep_14)) {if($rep_14==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><span class="fa fa-external-link"></span> Credit / Debit </a>
                                                 <a style="display:none;" href="<?php echo base_url() . 'index.php/export/set_report_criteria/16'?>" id="report_16" class="list-group-item-reports" <?php if(isset($rep_16)) {if($rep_16==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><span class="fa fa-external-link"></span> Ledger Report </a>
                                                 <a href="<?php echo base_url() . 'index.php/export/set_report_criteria/17'?>" id="report_17" class="list-group-item-reports" <?php if(isset($rep_17)) {if($rep_17==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><span class="fa fa-external-link"></span> Trial Balance Report </a>
+                                                <a href="<?php echo base_url() . 'index.php/export/set_report_criteria/20'?>" id="report_5" class="list-group-item-reports" <?php if(isset($rep_16)) {if($rep_16==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><span class="fa fa-external-link"></span> Ledger Balance </a>
+                                                <a href="<?php echo base_url() . 'index.php/export/set_report_criteria/21'?>" id="report_5" class="list-group-item-reports" <?php if(isset($rep_16)) {if($rep_16==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><span class="fa fa-external-link"></span> Upload Ledger Balance </a>
                                             </div>
                                         </div>
                                         <!-- END CONTACTS WITH CONTROLS -->
                                     </div>
 
 
-									<div class="col-md-4 col-sm-4 col-xs-12" <?php if(isset($rep_grp_2)) {if($rep_grp_2==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>>
+									<div class="col-md-4 col-sm-4 col-xs-12" <?php if(isset($rep_grp_4)) {if($rep_grp_4==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>>
                                         <!-- CONTACTS WITH CONTROLS -->
                                         <div class="">
                                             <h3 class="">Sales Monitoring</h3>         
@@ -144,11 +133,11 @@ a { text-decoration:none;}
                                             <div class="panel-body list-group">
                                                 <a href="<?php echo base_url() . 'index.php/export/set_report_criteria/13'?>" id="report_13" class="list-group-item-reports" <?php if(isset($rep_13)) {if($rep_13==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><span class="fa fa-external-link"></span> Sales Representative Location </a>
                                           
-                                                <a href="<?php echo base_url() . 'index.php/sales_rep/sales_rep_route_plan'?>" id="report_20" class="list-group-item-reports" <?php /*if(isset($rep_20)) {if($rep_20==0) echo 'style="display: none;"';} else echo 'style="display: none;"';*/ ?>><span class="fa fa-external-link"></span> Sales Representative Route Plan </a>
+                                                <a href="<?php echo base_url() . 'index.php/sales_rep/sales_rep_route_plan'?>" id="report_20" class="list-group-item-reports" <?php if(isset($rep_20)) {if($rep_20==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><span class="fa fa-external-link"></span> Sales Representative Route Plan </a>
                                        
 										
 										
-                                                <a href="<?php echo base_url() . 'index.php/sales_rep/sales_rep_location'?>" id="report_21" class="list-group-item-reports" <?php /*if(isset($rep_21)) {if($rep_21==0) echo 'style="display: none;"';} else echo 'style="display: none;"';*/ ?>><span class="fa fa-external-link"></span> Promoters Location </a>
+                                                <a href="<?php echo base_url() . 'index.php/sales_rep/sales_rep_location'?>" id="report_21" class="list-group-item-reports" <?php if(isset($rep_20)) {if($rep_20==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><span class="fa fa-external-link"></span>Promoters Location </a>
                                        
 								
 									
@@ -157,6 +146,26 @@ a { text-decoration:none;}
                                     </div>
 								</div>
 							</div>
+							</div>
+						<div class="row push-up-10" style="padding:10px;">
+							<div class="col-md-4 col-sm-4 col-xs-12" <?php if(isset($rep_grp_2)) {if($rep_grp_2==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>>
+                                        <div class="" style="margin-top:60px;">
+                                            <h3 class="">Production</h3>
+                                        </div>
+                                        <div class="panel panel-success">
+                                            <div class="panel-body list-group">
+                                                <a href="<?php echo base_url() . 'index.php/export/set_report_criteria/2'?>" id="report_2" class="list-group-item-reports" <?php if(isset($rep_2_view)) {if($rep_2_view==1) {if(isset($rep_2)) {if($rep_2==0) echo 'style="display: none;"';} else echo 'style="display: none;"';}  else echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><span class="fa fa-external-link"></span> Raw Material Stock </a>
+                                                <a href="<?php echo base_url() . 'index.php/export/set_report_criteria/3'?>" id="report_3" class="list-group-item-reports" <?php if(isset($rep_3_view)) {if($rep_3_view==1) {if(isset($rep_3)) {if($rep_3==0) echo 'style="display: none;"';} else echo 'style="display: none;"';}  else echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><span class="fa fa-external-link"></span> Production </a>
+                                                <a href="<?php echo base_url() . 'index.php/export/set_report_criteria/4'?>" id="report_4" class="list-group-item-reports" <?php if(isset($rep_4_view)) {if($rep_4_view==1) {if(isset($rep_4)) {if($rep_4==0) echo 'style="display: none;"';} else echo 'style="display: none;"';}  else echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><span class="fa fa-external-link"></span> Product Stock </a>
+                                                <a href="<?php echo base_url() . 'index.php/export/set_report_criteria/10'?>" id="report_10" class="list-group-item-reports" <?php if(isset($rep_10)) {if($rep_10==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><span class="fa fa-external-link"></span> Purchase Order </a>
+                                                <a href="<?php echo base_url() . 'index.php/export/set_report_criteria/11'?>" id="report_11" class="list-group-item-reports" <?php if(isset($rep_11)) {if($rep_11==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><span class="fa fa-external-link"></span> Production Data </a>
+                                                <!-- <a href="<?php //echo base_url() . 'index.php/export/set_report_criteria/12'?>" id="report_12" class="list-group-item-reports" <?php //if(isset($rep_12)) {if($rep_12==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><span class="fa fa-external-link"></span> Purchase Variance </a> -->
+                                            </div>
+                                        </div>
+                                        <!-- END CONTACTS WITH CONTROLS -->
+                                    </div>
+							
+							
 						 </div>
 						</div>
 					 </div>

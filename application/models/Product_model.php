@@ -52,7 +52,9 @@ function save_data($id=''){
         'modified_on' => $now,
         'hsn_code' => $this->input->post('hsn_code'),
         'hsn_name' => $this->input->post('hsn_name'),
-        'short_name' => $this->input->post('short_name')
+        'short_name' => $this->input->post('short_name'),
+        'category_id' => $this->input->post('category_id'),
+        'tax_percentage' => $this->input->post('tax_percentage')
     );
 
     if($id==''){

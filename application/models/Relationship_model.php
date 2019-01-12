@@ -10,7 +10,7 @@ function __Construct(){
 
 function get_access(){
     $role_id=$this->session->userdata('role_id');
-    $query=$this->db->query("SELECT * FROM user_role_options WHERE section = 'Distributor_Type' AND role_id='$role_id' AND (r_insert = 1 OR r_view = 1 OR r_edit=1 OR r_approvals = 1 OR r_export = 1)");
+    $query=$this->db->query("SELECT * FROM user_role_options WHERE section = 'Relationship_Master' AND role_id='$role_id' AND (r_insert = 1 OR r_view = 1 OR r_edit=1 OR r_approvals = 1 OR r_export = 1)");
     return $query->result();
 }
 
@@ -36,6 +36,12 @@ function get_data($status='', $id=''){
             on (A.type_id=B.id) where A.status='Approved' order by A.modified_on desc";
     $query=$this->db->query($sql);
     return $query->result();
+}
+
+public function getRelationship_margin($relationship_id)
+{
+    
+    return $this->db->select("*")->where("relationship_id",$relationship_id)->get('relationship_category_margin')->result();
 }
 
 function save_data($id=''){
@@ -64,9 +70,27 @@ function save_data($id=''){
         $action='Store Modified.';
     }
 
+    $margin=$this->input->post('margin[]');
+    $category=$this->input->post('category_id[]');
+    
+    $this->db->where('relationship_id', $id);
+    $this->db->delete('relationship_category_margin');
+
+    for ($j=0; $j<count($category); $j++) {
+        if(isset($category[$j]) && $category[$j]!="") {
+            $data = array(
+                        'relationship_id' => $id,
+                        'category_id' => $category[$j],
+                        'margin' => $margin[$j],
+                    );
+            $this->db->insert('relationship_category_margin', $data);
+        }
+    }
+
+
     $logarray['table_id']=$id;
-    $logarray['module_name']='Distributor_Type';
-    $logarray['cnt_name']='Distributor_Type';
+    $logarray['module_name']='Relationship_Master';
+    $logarray['cnt_name']='Relationship_Master';
     $logarray['action']=$action;
     $this->user_access_log_model->insertAccessLog($logarray);
 }

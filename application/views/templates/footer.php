@@ -113,7 +113,9 @@
 		
         <script type="text/javascript" src="<?php echo base_url(); ?>js/plugins/jquery/jquery.min.js"></script>
         <script type="text/javascript" src="<?php echo base_url(); ?>js/plugins/jquery/jquery-ui.min.js"></script>
+<!--<script type="text/javascript" src="<?php //echo base_url(); ?>js/jquery-ui-1.11.2/jquery-ui-timepicker-addon.js"></script>-->
         <script type="text/javascript" src="<?php echo base_url(); ?>js/plugins/bootstrap/bootstrap.min.js"></script>
+    
         <!-- END PLUGINS -->                
 
         <!-- THIS PAGE PLUGINS -->
@@ -144,8 +146,11 @@
         <!-- END TEMPLATE -->
 
  
-		<script src="<?php echo base_url('js/jquery-ui-1.11.2/jquery-ui.min.js'); ?>"></script>
+		<!--<script src="<?php //echo base_url('js/jquery-ui-1.11.2/jquery-ui.min1.js'); ?>"></script>-->
+	<script src="<?php echo base_url('js/jquery-ui-1.11.2/jquery-ui.min.js'); ?>"></script>
 		<script type="text/javascript" src="<?php echo base_url().'js/jquery.cookie.js';?>"></script>  
+		     <script type="text/javascript" src="<?php echo base_url(); ?>js/plugins/bootstrap/bootstrap-timepicker.min.js"></script>
+		     <script type="text/javascript" src="<?php echo base_url(); ?>build/js/bootstrap-datetimepicker.min.js"></script>
 		<script>
 		$(document).ready(function() {
 			$('#collapse_menu').click(function() {
@@ -311,7 +316,7 @@
             
         });
         </script>
-       <script src="<?php echo base_url(); ?>css/logout/popModal.js"></script>     
+    <script src="<?php echo base_url(); ?>css/logout/popModal.js"></script>     
    
 <script>
 $(function(){
@@ -533,4 +538,21 @@ $(function(){
 		    }
 		});
 	}); 
+	
+</script>
+<script type="text/javascript" src="<?php echo base_url().'css/select2/js/select2.full.min.js';?>"></script>     
+	<script>
+    		$(document).ready(function() 
+			{
+				 $('.select2').select2();
+    		
+            });
+			
+			
+    	</script>
+
+
+<script type="text/javascript">
+	var d_status = "<?php if(isset($data[0]->status)){ echo $data[0]->status;}?>";
+	
 </script>

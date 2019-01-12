@@ -62,6 +62,8 @@
                                                 <th width="65" align="center" style="<?php if($status!='pending_for_delivery' && $status!='gp_issued' && $status!='pending_for_approval') echo 'display: none;'; ?>">Select</th>
                                                 <th width="65" align="center">Sr. No.</th>
                                                 <th width="156">Date Of processing</th>
+                                                
+												<th width="105" style="text-align:center; <?php if($status=='pending_for_delivery') echo 'display: none;'; ?>">View Invoice</th>
 												<th width="130">Invoice No</th>
 												<th width="130">Voucher No</th>
 												<th width="140">Depot Name</th>
@@ -71,7 +73,7 @@
 												<th width="120" >Amount (In Rs)</th>
 												<th width="110" >Creation Date</th>
 												<th width="110" >Status</th>
-												<th width="105" style="text-align:center; <?php if($status=='pending_for_delivery') echo 'display: none;'; ?>">View Invoice</th>
+											
                                                 <th width="105" style="text-align:center; <?php if($status!='gp_issued') echo 'display: none;'; ?>">View GP</th>
 												<th width="50" style="display:none;">Resend Invoice</th>
 											</tr>
@@ -91,10 +93,12 @@
                                                     <?php if($status=='pending_for_delivery' || $status=='gp_issued' || $status=='pending_for_approval') { ?>
                                                         <?php echo (($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('d/m/Y',strtotime($data[$i]->date_of_processing)):''); ?>
                                                     <?php } else { ?>
-                                                        <a href="<?php echo base_url().'index.php/distributor_out/edit/'.$data[$i]->d_id; ?>"><?php echo (($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('d/m/Y',strtotime($data[$i]->date_of_processing)):''); ?></a>
+                                                      <?php echo (($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('d/m/Y',strtotime($data[$i]->date_of_processing)):''); ?>
                                                     <?php } ?>
                                                 </td>
-                                                <td>
+										
+                                                <td style="text-align:center; vertical-align: middle; <?php if($status=='pending_for_delivery') echo 'display: none;'; ?>"><?php //if (($data[$i]->invoice_no!=null && $data[$i]->invoice_no!='') || ($data[$i]->voucher_no!=null && $data[$i]->voucher_no!='')) { ?><a href="<?php if(strtotime($data[$i]->date_of_processing)<strtotime('2017-07-01')) echo base_url().'index.php/distributor_out/view_tax_invoice_old/'.$data[$i]->id; else echo base_url().'index.php/distributor_out/view_tax_invoice/'.$data[$i]->id; ?>" target="_blank">  <span class="fa fa-file-pdf-o"></span></a><?php //} ?></td>
+												<td>
                                                     <span style="display:none;">
                                                         <?php if(isset($data[$i]->invoice_no)) echo str_pad(substr($data[$i]->invoice_no, strrpos($data[$i]->invoice_no, "/")+1),10,"0",STR_PAD_LEFT); ?>
                                                     </span>
@@ -114,7 +118,7 @@
 												<td><?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
 												<td><?php echo $data[$i]->status; ?></td>
                                                 <!-- <td style="text-align:center; vertical-align: middle; <?php //if($status=='pending_for_delivery') echo 'display: none;'; ?>"><?php //if (($data[$i]->invoice_no!=null && $data[$i]->invoice_no!='') || ($data[$i]->voucher_no!=null && $data[$i]->voucher_no!='')) { ?><a href="<?php //if(strtotime($data[$i]->date_of_processing)<strtotime('2017-07-01')) echo base_url().'index.php/distributor_out/view_tax_invoice_old/'.$data[$i]->id; else echo base_url().'index.php/distributor_out/view_tax_invoice/'.$data[$i]->id; ?>" target="_blank">  <span class="fa fa-file-pdf-o"></span></a><?php //} ?></td> -->
-                                                <td style="text-align:center; vertical-align: middle; <?php if($status=='pending_for_delivery') echo 'display: none;'; ?>"><?php //if (($data[$i]->invoice_no!=null && $data[$i]->invoice_no!='') || ($data[$i]->voucher_no!=null && $data[$i]->voucher_no!='')) { ?><a href="<?php if(strtotime($data[$i]->date_of_processing)<strtotime('2017-07-01')) echo base_url().'index.php/distributor_out/view_tax_invoice_old/'.$data[$i]->id; else echo base_url().'index.php/distributor_out/view_tax_invoice/'.$data[$i]->id; ?>" target="_blank">  <span class="fa fa-file-pdf-o"></span></a><?php //} ?></td>
+                                                
                                                 <td style="text-align:center; vertical-align: middle; <?php if($status!='gp_issued') echo 'display: none;'; ?>"><a href="<?php if(strtotime($data[$i]->date_of_processing)<strtotime('2017-07-01')) echo base_url().'index.php/distributor_out/view_gate_pass_old/'.$data[$i]->id; else echo base_url().'index.php/distributor_out/view_gate_pass/'.$data[$i]->id; ?>" target="_blank">  <span class="fa fa-file-pdf-o"></span></a></td>
 												<td style="text-align:center; vertical-align: middle; display:none;"><a href="<?php //echo base_url().'index.php/distributor_out/view_payment_details/'.$data[$i]->id; ?>#"><span class="fa fa-eye">Resend Invoice</span></a></td>
 											</tr>

@@ -49,8 +49,7 @@ function get_user_role_options($id=''){
                             'Batch_Processing', 'Distributor_Out', 'Distributor_In', 'Depot_Transfer', 'Distributor_Transfer', 
                             'Bar_To_Box', 'Box_To_Bar', 'Distributor_Sale', 'User', 'User_Roles', 'Log', 'Reports',
                             'Sales_Rep_Route_Plan', 'Sales_Rep_Distributors', 'Sales_Rep_Orders', 'Sales_Rep_Payment_Receivables', 
-                            'Dashboard', 'Bank_Master', 'Area', 'Distributor_Type', 'Zone', 'Payment', 'Credit_Debit_Note', 'Sales_Rep_Target') 
-                            order by id");
+                            'Dashboard', 'Bank_Master', 'Area', 'Distributor_Type', 'Zone', 'Payment', 'Credit_Debit_Note', 'Sales_Rep_Target','Ingredient_Master','Location','Sr_Mapping','Relationship_Master','Store_Master','Vendor_Type','Batch_Master','Distributor_Sale_In')");
     $result=$query->result();
     $editoptions=array();
 
@@ -91,6 +90,14 @@ function get_user_role_options($id=''){
             else if ($result[$i]->section=="Payment") $num=32;
             else if ($result[$i]->section=="Credit_Debit_Note") $num=33;
             else if ($result[$i]->section=="Sales_Rep_Target") $num=34;
+            else if ($result[$i]->section=="Ingredient_Master") $num=35;
+            else if ($result[$i]->section=="Location") $num=36;
+            else if ($result[$i]->section=="Sr_Mapping") $num=37;
+            else if ($result[$i]->section=="Relationship_Master") $num=38;
+            else if ($result[$i]->section=="Store_Master") $num=39;
+            else if ($result[$i]->section=="Vendor_Type") $num=40;
+            else if ($result[$i]->section=="Batch_Master") $num=41;
+            else if ($result[$i]->section=="Distributor_Sale_In") $num=42;
             else $num=0;
 
             $editoptions[$num]=$result[$i];
@@ -109,7 +116,7 @@ function save_data($id=''){
                 'Batch_Processing', 'Distributor_Out', 'Distributor_In', 'Depot_Transfer', 'Distributor_Transfer', 
                 'Bar_To_Box', 'Box_To_Bar', 'Distributor_Sale', 'User', 'User_Roles', 'Log', 'Reports',
                 'Sales_Rep_Route_Plan', 'Sales_Rep_Distributors', 'Sales_Rep_Orders', 'Sales_Rep_Payment_Receivables', 
-                'Dashboard', 'Bank_Master', 'Area', 'Distributor_Type', 'Zone', 'Payment', 'Credit_Debit_Note', 'Sales_Rep_Target');
+                'Dashboard', 'Bank_Master', 'Area', 'Distributor_Type','Zone', 'Payment', 'Credit_Debit_Note','Sales_Rep_Target','Ingredient_Master','Location','Sr_Mapping','Relationship_Master','Store_Master','Vendor_Type','Batch_Master','Distributor_Sale_In');
     $vw=$this->input->post('view[]');
     $ins=$this->input->post('insert[]');
     $upd=$this->input->post('update[]');

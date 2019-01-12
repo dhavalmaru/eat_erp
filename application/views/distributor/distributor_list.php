@@ -37,7 +37,7 @@
 
 
     			<div class="heading-h3"> 
-    				<div class="heading-h3-heading">	 <a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp; Distributor List  </div>	 
+    				<div class="heading-h3-heading">	 <a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp; Distributor/Retailer List  </div>	 
 
     				<div class="heading-h3-heading">
     					<div class="pull-right btn-margin">	
@@ -55,7 +55,7 @@
     					<div class="container u-posRelative u-textRight">
     						<div class="pull-left   btn-top" style="<?php if($access[0]->r_insert=='0') echo 'display: none;';?>">
     							<a class="btn btn-success btn-block btn-padding" href="<?php echo base_url(); ?>index.php/Distributor/add">
-    								<span class="fa fa-plus"></span> Add Distributor
+    								<span class="fa fa-plus"></span> Add Distributor/Retailer
     							</a>
 
 
@@ -71,16 +71,16 @@
 
     						<ul class="m-nav--linetriangle" ng-swipe-left="app.onInnerSwipe($event);" ng-swipe-right="app.onInnerSwipe($event);">
     							<li class="all">
-    								<a  href="<?php echo base_url(); ?>index.php/Distributor/checkstatus">
-    									<span class="ng-binding">All</span>
-    									<span id="approved">  (<?php echo $all; ?>)  </span>
+    								<a  href="<?php echo base_url(); ?>index.php/Distributor/checkstatus/Approved">
+    									<span class="ng-binding">Distributor</span>
+    									<span id="approved">  (<?php echo $active; ?>)  </span>
     								</a>
     							</li>
 
     							<li class="approved" >
-    								<a  href="<?php echo base_url(); ?>index.php/Distributor/checkstatus/Approved">
-    									<span class="ng-binding">Approved</span>
-    									<span id="approved"> (<?php echo $active; ?>)</span>
+    								<a  href="<?php echo base_url(); ?>index.php/Distributor/checkstatus/Retailer">
+    									<span class="ng-binding">Retailer</span>
+    									<span id="approved"> (<?php echo $retailer; ?>)</span>
     								</a>
     							</li>
 
@@ -117,32 +117,36 @@
     											<thead>
     												<tr>
     													<th width="65"  style="text-align:center;" >Sr. No.</th>
+														<th width="65" style="text-align:center;">Edit</th>
+														<th width="80" style="">Action</th>
     													<th width=" ">Distributor Name</th>
     													<!--th width=" ">Sales Representative</th-->
                                                         <th width=" ">Location</th>
     													<th width=" ">Sell Out (In %)</th>
     													<th width=" ">Credit Period (In Days)</th>
     													<th width=" ">Status</th>
-    													<th width=" ">Creation Date</th>
-    													<th width=" ">Action</th>
+    													<!--<th width=" ">Creation Date</th>-->
+    													
     												</tr>
     											</thead>
     											<tbody>
     												<?php for ($i=0; $i < count($data); $i++) { ?>
     												<tr>
     													<td style="text-align:center;"><?php echo $i+1; ?></td>
-    													<td><a href="<?php echo base_url().'index.php/distributor/edit/'.$data[$i]->d_id; ?>"><?php echo $data[$i]->distributor_name; ?></a></td>
+														<td style="text-align:center; vertical-align: middle; "><a href="<?php echo base_url().'index.php/distributor/edit/'.$data[$i]->d_id; ?>"><i class="fa fa-edit"></i></a></td>
+														<td><a href="<?php echo base_url().'index.php/distributor/single_locations/'.$data[$i]->id; ?>">View Map</a></td>
+    													<td><?php echo $data[$i]->distributor_name; ?></td>
     													<!--td><?php //echo $data[$i]->sales_rep_name; ?></td-->
                                                         <td><?php echo $data[$i]->location; ?></td>
     													<td><?php echo $data[$i]->sell_out; ?></td>
     													<td><?php echo $data[$i]->credit_period; ?></td>
     													<td><?php echo ($data[$i]->status=='Approved')?'Active':$data[$i]->status; ?></td>
-    													<td>
+    													<!--<td>
                                                             <span style="display:none;">
-                                                                <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
+                                                                <?php// echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
                                                             </span>
-                                                            <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
-															<td><a href="<?php echo base_url().'index.php/distributor/single_locations/'.$data[$i]->id; ?>">View Map</a></td>
+                                                            <?php// echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>-->
+															
     												</tr>
     												<?php } ?>
     											</tbody>
@@ -171,13 +175,14 @@
     		var url = window.location.href;
 
     		if(url.includes('Approved')){
-    			$('.approved').attr('class','active');
-    		}
-
-    		else  if(url.includes('InActive')){
+    			$('.all').attr('class','active');
+    		} else  if(url.includes('InActive')){
     			$('.inactive').attr('class','active');
-    		}
-    		else {
+    		} else  if(url.includes('Retailer')){
+                $('.approved').attr('class','active');
+            } else  if(url.includes('Pending')){
+                $('.pending').attr('class','active');
+            } else {
     			$('.all').attr('class','active');
     		} 
     		$('.ahrefall').click(function(){

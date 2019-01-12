@@ -36,13 +36,17 @@
                                  <div class="panel panel-default">
 								
 								<div class="panel-body">
-									<div class="form-group"  >
+									<div class="form-group">
 										<div class="col-md-12 col-sm-12 col-xs-12">
 											 <label class="col-md-2 col-sm-2 col-xs-12 control-label">Distributor Type <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
                                                 <input type="text" class="form-control" name="distributor_type" id="distributor_type" placeholder="Distributor Type Name" value="<?php if(isset($data)) echo $data[0]->distributor_type;?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group"  >
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <div style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
                                                 <label class="col-md-2 col-sm-2 col-xs-12 control-label">Status <span class="asterisk_sign">*</span></label>
                                                 <div class="col-md-4 col-sm-4 col-xs-12">

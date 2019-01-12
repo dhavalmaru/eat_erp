@@ -50,10 +50,11 @@
 					    	<div class="panel panel-default">							 
 							  <div class="panel-body">
 								<div class="table-responsive">
-								<table id="customers2" class="table datatable table-bordered" >
+									<table id="customers2" class="table datatable table-bordered" >
 									<thead>
 										<tr>
 											<th width="65"  style="text-align:center;"  >Sr. No.</th>
+											<th width="65"  style="text-align:center;"  >Edit</th>
 											<th style=" " width=" ">Bank Name</th>
 											<th style=" " width=" ">Branch</th>
 											<th style=" " width=" ">Account Type</th>
@@ -66,9 +67,10 @@
 										<?php for($i=0; $i < count($data); $i++) { ?>
 										<tr id="trow_<?php echo $i;?>">
 											<td style=" text-align:center; "><?php if(isset($data)){ echo ($i+1) ;} else {echo '1';} ?></td>
+											<td style="text-align:center; vertical-align: middle; "><a href="<?php echo base_url().'index.php/Bank/edit/'.$data[$i]->id; ?>"><i class="fa fa-edit"></i></a></td>
 											<?php if(isset($access)) { if($access[0]->r_view == 1) { ?>
 												<td style="padding:5px;">
-														<a href="<?php echo base_url().'index.php/Bank/edit/'.$data[$i]->id; ?>"><?php echo $data[$i]->b_name; ?></a>
+														<?php echo $data[$i]->b_name; ?>
 												</td>
 											<?php }} ?>
 											<td style=" "><?php echo $data[$i]->b_branch; ?></td>

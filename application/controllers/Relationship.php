@@ -15,6 +15,7 @@ class relationship extends CI_Controller{
         $this->load->helper('common_functions');
         $this->load->model('relationship_model');
         $this->load->model('distributor_type_model');
+        $this->load->model('category_master_model','category');
         $this->load->database();
     }
 
@@ -38,7 +39,7 @@ class relationship extends CI_Controller{
             if($result[0]->r_insert == 1) {
                 $data['access'] = $this->relationship_model->get_access();
                 $data['type'] = $this->distributor_type_model->get_data('Approved');
-
+                $data['category_detail']=$this->category->getCategoryDetails();
                 load_view('relationship_master/store_rel_details', $data);
             } else {
                 echo "Unauthorized access";
@@ -56,6 +57,8 @@ class relationship extends CI_Controller{
                 $data['access'] = $this->relationship_model->get_access();
                 $data['data'] = $this->relationship_model->get_data('', $id);
                 $data['type'] = $this->distributor_type_model->get_data('Approved');
+                $data['category_detail']=$this->category->getCategoryDetails();
+                $data['margin_detail']=$this->relationship_model->getRelationship_margin($id);
                 load_view('relationship_master/store_rel_details', $data);
             } else {
                 echo "Unauthorized access";

@@ -79,6 +79,14 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="form-group" >
+                                      <div class="col-md-12 col-sm-12 col-xs-12">
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Depot Chalan Number<span class="asterisk_sign">*</span></label>
+                                        <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <input type="text" class="form-control" name="chalan_no" id="chalan_no" value="<?php if(isset($data)){ echo $data[0]->chalan_no;} ?>" />
+                                        </div>
+                                       </div>
+                                    </div>
 									<div class="h-scroll">	
                                        <div class="table-stripped form-group" style="padding:15px;" >
                                         <table class="table table-bordered" style="margin-bottom: 0px; ">
@@ -86,8 +94,9 @@
                                             <tr>
 
                                               <th  width="30%" >Type <span class="asterisk_sign">*</span></th>
-                                                <th  width="50%" >Item <span class="asterisk_sign">*</span></th>
+                                                <th  width="30%" >Item <span class="asterisk_sign">*</span></th>
                                                 <th width="14%" >Qty </th>
+                                                <th width="20%" >Batch</th>
                                                 <th width="6%" style="text-align:center; ">Action</th>
 
                                             </tr>
@@ -128,6 +137,15 @@
                                                 <td>
                                                     <input type="text" class="form-control format_number qty" name="qty[]" id="qty_<?php echo $i; ?>" placeholder="Qty" value="<?php if (isset($depot_transfer_items)) { echo format_money($depot_transfer_items[$i]->qty,2); } ?>"/>
                                                 </td>
+                                                <td >
+                                                    <select name="batch_no[]-<?php echo $i;?>" class="form-control batch_no" id="batch_no_<?php echo $i;?>" data-error="#err_batch_no_<?php echo $i;?>" style="<?php  if($depot_transfer_items[$i]->type=="Raw Material" ) echo "display: none"; else "display: block"?>">
+                                                        <option value="">Select</option>
+                                                        <?php if(isset($batch)) { for ($k=0; $k < count($batch); $k++) { ?>
+                                                                <option value="<?php echo $batch[$k]->id; ?>" <?php if($batch[$k]->id==$depot_transfer_items[$i]->batch_no) { echo 'selected'; } ?>><?php echo $batch[$k]->batch_no; ?></option>
+                                                        <?php }} ?>
+                                                    </select>
+                                                    <div id="err_batch_no_<?php echo $i;?>"></div>
+                                               </td> 
                                                <td style="text-align:center;     vertical-align: middle;">
                                                     <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>
                                                 </td>
@@ -165,6 +183,15 @@
                                                 </td>
                                                 <td>
                                                     <input type="text" class="form-control format_number qty" name="qty[]" id="qty_<?php echo $i; ?>" placeholder="Qty" value=""/>
+                                                </td>
+                                                 <td >
+                                                    <select name="batch_no[]-0" class="form-control batch_no" id="batch_no_<?php echo $i;?>" data-error="#err_batch_no_<?php echo $i;?>" style="display: none">
+                                                        <option value="">Select</option>
+                                                        <?php if(isset($batch)) { for ($k=0; $k < count($batch); $k++) { ?>
+                                                                <option value="<?php echo $batch[$k]->id; ?>" ><?php echo $batch[$k]->batch_no; ?></option>
+                                                        <?php }} ?>
+                                                    </select>
+                                                    <div id="err_batch_no_<?php echo $i;?>"></div>
                                                 </td>
                                               <td style="text-align:center;     vertical-align: middle;">
                                                     <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>
@@ -233,6 +260,7 @@
         <script type="text/javascript">
             $(document).ready(function(){
                 $(".type").change(function(){
+
                     show_item($(this));
                 });
                 $('.delete_row').click(function(event){
@@ -254,14 +282,22 @@
                     $("#raw_material_"+index).show();
                     $("#bar_"+index).hide();
                     $("#box_"+index).hide();
+                    $('#batch_no_'+index).hide();
                 } else if(elem.val()=="Bar"){
                     $("#raw_material_"+index).hide();
                     $("#bar_"+index).show();
                     $("#box_"+index).hide();
+                    $('#batch_no_'+index).show();
                 } else {
                     $("#raw_material_"+index).hide();
                     $("#box_"+index).show();
                     $("#bar_"+index).hide();
+                    if(elem.val()!=""){
+                        $('#batch_no_'+index).show();
+                       }
+                       else{
+                        $('#batch_no_'+index).hide();
+                       }
                 }
             }
 
@@ -302,6 +338,15 @@
                                             '<td>' + 
                                                 '<input type="text" class="form-control format_number qty" name="qty[]" id="qty_'+counter+'" placeholder="Qty" value=""/>' + 
                                             '</td>' + 
+                                            '<td >' + 
+                                                '<select name="batch_no[]-'+counter+'" class="form-control batch_no" id="batch_no_'+counter+'" data-error="#err_batch_no_'+counter+'" style="display: none">' + 
+                                                    '<option value="">Select</option>' + 
+                                                    '<?php if(isset($batch)) { for ($k=0; $k < count($batch); $k++) { ?>' + 
+                                                            '<option value="<?php echo $batch[$k]->id; ?>"><?php echo $batch[$k]->batch_no; ?></option>' + 
+                                                    '<?php }} ?>' + 
+                                                '</select>' + 
+                                                '<div id="err_batch_no_'+counter+'"></div>' + 
+                                            '</td>' +
                                             ' <td style="text-align:center;     vertical-align: middle;">' + 
                                                 '<a id="box_'+counter+'_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>' + 
                                             '</td>' + 

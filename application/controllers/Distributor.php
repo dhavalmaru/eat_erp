@@ -19,6 +19,7 @@ class Distributor extends CI_Controller{
         $this->load->model('distributor_type_model');
         $this->load->model('zone_model');
         $this->load->model('location_model');
+        $this->load->model('category_master_model','category');
         $this->load->database();
     }
 
@@ -34,35 +35,47 @@ class Distributor extends CI_Controller{
         //     echo "You donot have access to this page.";
         // }
 
-        $this->checkstatus();
+        $this->checkstatus('Approved');
     }
 
     public function checkstatus($status=''){
         $result=$this->distributor_model->get_access();
         if(count($result)>0) {
             $data['access']=$result;
-            $data['data']=$this->distributor_model->get_distributor_data($status);
+
+            if($status=='Approved'){
+                $data['data']=$this->distributor_model->get_distributor_data($status,'','super stockist');
+            } else if($status=='Retailer'){
+                $data['data']=$this->distributor_model->get_distributor_data('Approved','','normal');
+            } else {
+                $data['data']=$this->distributor_model->get_distributor_data($status);
+            }
 
             $count_data=$this->distributor_model->get_distributor_data();
             $active=0;
             $inactive=0;
             $pending=0;
+            $retailer=0;
 
             if (count($result)>0){
                 for($i=0;$i<count($count_data);$i++){
-                    if (strtoupper(trim($count_data[$i]->status))=="APPROVED")
+                    if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && strtoupper(trim($count_data[$i]->class))=="SUPER STOCKIST")
                         $active=$active+1;
                     else if (strtoupper(trim($count_data[$i]->status))=="INACTIVE")
                         $inactive=$inactive+1;
                     else if (strtoupper(trim($count_data[$i]->status))=="PENDING")
                         $pending=$pending+1;
+                    else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && strtoupper(trim($count_data[$i]->class))=="NORMAL")
+                        $retailer=$retailer+1;
                 }
             }
 
             $data['active']=$active;
             $data['inactive']=$inactive;
             $data['pending']=$pending;
+            $data['retailer']=$retailer;
             $data['all']=count($count_data);
+
 
             load_view('distributor/distributor_list', $data);
 
@@ -164,7 +177,7 @@ class Distributor extends CI_Controller{
                 $data['type'] = $this->distributor_type_model->get_data('Approved');
                 $data['zone'] = $this->zone_model->get_data('Approved');
                 $data['location'] = $this->location_model->get_data('Approved');
-
+                $data['category_detail']=$this->category->getCategoryDetails();
                 load_view('distributor/distributor_details', $data);
             } else {
                 echo "Unauthorized access";
@@ -190,8 +203,11 @@ class Distributor extends CI_Controller{
                     $id = substr($d_id, 2);
                     $data['distributor_contacts'] = $this->distributor_model->get_distributor_contacts($id);
                     $data['distributor_consignee'] = $this->distributor_model->get_distributor_consignee($id);
+                    // $data['margin_detail']=$this->distributor_model->getDistributor_margin($id);
                 }
 
+                // $data['category_detail']=$this->category->getCategoryDetails();
+                $data['category_detail']=$this->distributor_model->getDistributor_margin($id);
                 load_view('distributor/distributor_details', $data);
             } else {
                 echo "Unauthorized access";

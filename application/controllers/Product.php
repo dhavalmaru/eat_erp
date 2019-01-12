@@ -14,6 +14,7 @@ class Product extends CI_Controller{
         $this->load->library('email');
         $this->load->helper('common_functions');
         $this->load->model('product_model');
+        $this->load->model('category_master_model','category');
         $this->load->database();
     }
 
@@ -56,7 +57,7 @@ class Product extends CI_Controller{
         if(count($result)>0) {
             if($result[0]->r_insert == 1) {
                 $data['access'] = $this->product_model->get_access();
-
+                $data['category_detail']=$this->category->getCategoryDetails();
                 load_view('product/product_details', $data);
             } else {
                 echo "Unauthorized access";
@@ -73,6 +74,7 @@ class Product extends CI_Controller{
             if($result[0]->r_view == 1 || $result[0]->r_edit == 1) {
                 $data['access'] = $this->product_model->get_access();
                 $data['data'] = $this->product_model->get_data('', $id);
+                $data['category_detail']=$this->category->getCategoryDetails();
 
                 load_view('product/product_details', $data);
             } else {

@@ -4,7 +4,7 @@ if (! defined('BASEPATH')){exit('No Direct Script Access is allowed');}
 class Stock_model Extends CI_Model{
 
 function __Construct(){
-	parent :: __construct();
+    parent :: __construct();
     $this->load->helper('common_functions');
 }
 
@@ -42,6 +42,7 @@ function check_raw_material_qty_availablity(){
     $depot_id=$this->input->post('depot_id');
     $raw_material_id=$this->input->post('raw_material_id');
     $qty=floatval(format_number($this->input->post('qty')));
+    $ref_id=$this->input->post('ref_id');
 
     // $id=4;
     // $module="depot_transfer";
@@ -52,6 +53,10 @@ function check_raw_material_qty_availablity(){
     $batch_processing_cond="";
     if($module=="batch_processing"){
         $batch_processing_cond=" and id<>'$id'";
+
+        if($ref_id!=''){
+            $batch_processing_cond=$batch_processing_cond." and id<>'$ref_id'";
+        }
     }
     
     $depot_transfer_cond="";
@@ -62,11 +67,11 @@ function check_raw_material_qty_availablity(){
     $sql="select sum(A.tot_qty) as tot_qty_in from 
         (select sum(qty) as tot_qty from raw_material_stock 
         where raw_material_id = '$raw_material_id' and raw_material_in_id in (select distinct id from raw_material_in 
-            where status = 'Approved' and depot_id = '$depot_id') 
+            where status = 'Approved' and depot_id = '$depot_id' and date_of_receipt > '2018-10-22') 
         union all 
         select sum(qty) as tot_qty from depot_transfer_items 
         where item_id = '$raw_material_id' and type = 'Raw Material' and depot_transfer_id in (select distinct id from depot_transfer 
-            where status = 'Approved' and depot_in_id = '$depot_id'".$depot_transfer_cond.")) A";
+            where status = 'Approved' and depot_in_id = '$depot_id' and date_of_transfer > '2018-10-22'".$depot_transfer_cond.")) A";
     $query=$this->db->query($sql);
     $result=$query->result();
     if (count($result)>0){
@@ -78,11 +83,11 @@ function check_raw_material_qty_availablity(){
     $sql="select sum(A.tot_qty) as tot_qty_out from 
         (select sum(qty) as tot_qty from batch_raw_material 
         where raw_material_id = '$raw_material_id' and batch_processing_id in (select distinct id from batch_processing 
-            where status = 'Approved' and depot_id = '$depot_id'".$batch_processing_cond.") 
+            where status = 'Approved' and depot_id = '$depot_id' and date_of_processing > '2018-10-22'".$batch_processing_cond.") 
         union all 
         select sum(qty) as tot_qty from depot_transfer_items 
         where item_id = '$raw_material_id' and type = 'Raw Material' and depot_transfer_id in (select distinct id from depot_transfer 
-            where status = 'Approved' and depot_out_id = '$depot_id'".$depot_transfer_cond.")) A";
+            where status = 'Approved' and depot_out_id = '$depot_id' and date_of_transfer > '2018-10-22'".$depot_transfer_cond.")) A";
     $query=$this->db->query($sql);
     $result=$query->result();
     if (count($result)>0){
@@ -118,18 +123,18 @@ function check_bar_availablity_for_depot(){
     }
     
     $sql="select id from batch_processing 
-        where status = 'Approved' and depot_id = '$depot_id' and product_id = '$product_id' 
+        where status = 'Approved' and depot_id = '$depot_id' and product_id = '$product_id' and date_of_processing>'2018-09-21' 
         union all 
         select id from depot_transfer 
-        where status != 'InActive' and depot_in_id = '$depot_id' and 
+        where status = 'Approved' and depot_in_id = '$depot_id' and date_of_transfer>'2018-09-21' and 
         id in (select distinct depot_transfer_id from depot_transfer_items where type = 'Bar' and item_id = '$product_id') ".$depot_transfer_cond."
         union all 
         select id from distributor_in 
-        where status != 'InActive' and depot_id = '$depot_id' and 
+        where status = 'Approved' and depot_id = '$depot_id' and date_of_processing>'2018-09-21' and 
         id in (select distinct distributor_in_id from distributor_in_items where type = 'Bar' and item_id = '$product_id') ".$distributor_in_cond."
         union all 
         select id from box_to_bar 
-        where status != 'InActive' and depot_id = '$depot_id' and 
+        where status = 'Approved' and depot_id = '$depot_id' and date_of_processing>'2018-09-21' and 
         id in (select distinct box_to_bar_id from box_to_bar_qty where box_id in 
             (select distinct box_id from box_product where product_id = '$product_id')".$box_to_bar_cond.")";
     $query=$this->db->query($sql);
@@ -173,7 +178,7 @@ function check_bar_qty_availablity_for_depot(){
         $distributor_out_cond=" and id<>'$id'";
 
         if($ref_id!=''){
-            $distributor_out_cond=$distributor_out_cond." and ref_id<>'$ref_id'";
+            $distributor_out_cond=$distributor_out_cond." and id<>'$ref_id'";
         }
     }
     $bar_to_box_cond="";
@@ -183,20 +188,21 @@ function check_bar_qty_availablity_for_depot(){
     
     
     $sql="select sum(D.tot_qty) as tot_qty_in from 
-        (select sum(qty_in_bar) as tot_qty from batch_processing where status = 'Approved' and depot_id = '$depot_id' and product_id = '$product_id' 
+        (select sum(qty_in_bar) as tot_qty from batch_processing 
+        where status = 'Approved' and depot_id = '$depot_id' and product_id = '$product_id' and date_of_processing>'2018-09-21' 
         union all 
         select sum(qty) as tot_qty from depot_transfer_items 
         where item_id = '$product_id' and type = 'Bar' and depot_transfer_id in (select distinct id from depot_transfer 
-            where status != 'InActive' and depot_in_id = '$depot_id'".$depot_transfer_cond.") 
+            where status = 'Approved' and depot_in_id = '$depot_id' and date_of_transfer>'2018-09-21'".$depot_transfer_cond.") 
         union all 
         select sum(qty) as tot_qty from distributor_in_items 
         where item_id = '$product_id' and type = 'Bar' and distributor_in_id in (select distinct id from distributor_in 
-            where status != 'InActive' and depot_id = '$depot_id'".$distributor_in_cond.") 
+            where status = 'Approved' and depot_id = '$depot_id' and date_of_processing>'2018-09-21'".$distributor_in_cond.") 
         union all 
         select sum(tot_qty) as tot_qty from 
         (select A.box_id, B.product_id, ifnull(A.qty,0)*ifnull(B.qty,0) as tot_qty from 
         (select * from box_to_bar_qty where box_to_bar_id in (select distinct id from box_to_bar 
-            where status != 'InActive' and depot_id = '$depot_id'".$box_to_bar_cond.")) A 
+            where status = 'Approved' and depot_id = '$depot_id' and date_of_processing>'2018-09-21'".$box_to_bar_cond.")) A 
         left join 
         (select * from box_product where product_id = '$product_id') B 
         on (A.box_id = B.box_id)) C where C.product_id = '$product_id') D";
@@ -211,16 +217,16 @@ function check_bar_qty_availablity_for_depot(){
     $sql="select sum(D.tot_qty) as tot_qty_out from 
         (select sum(qty) as tot_qty from depot_transfer_items 
         where item_id = '$product_id' and type = 'Bar' and depot_transfer_id in (select distinct id from depot_transfer 
-            where status != 'InActive' and depot_out_id = '$depot_id'".$depot_transfer_cond.") 
+            where status = 'Approved' and depot_out_id = '$depot_id' and date_of_transfer>'2018-09-21'".$depot_transfer_cond.") 
         union all 
         select sum(qty) as tot_qty from distributor_out_items 
         where item_id = '$product_id' and type = 'Bar' and distributor_out_id in (select distinct id from distributor_out 
-            where status != 'InActive' and depot_id = '$depot_id'".$distributor_out_cond.") 
+            where status = 'Approved' and depot_id = '$depot_id' and date_of_processing>'2018-09-21'".$distributor_out_cond.") 
         union all 
         select sum(tot_qty) as tot_qty from 
         (select A.box_id, B.product_id, ifnull(A.qty,0)*ifnull(B.qty,0) as tot_qty from 
         (select * from bar_to_box_qty where bar_to_box_id in (select distinct id from bar_to_box 
-            where status != 'InActive' and depot_id = '$depot_id'".$bar_to_box_cond.")) A 
+            where status = 'Approved' and depot_id = '$depot_id' and date_of_processing>'2018-09-21'".$bar_to_box_cond.")) A 
         left join 
         (select * from box_product where product_id = '$product_id') B 
         on (A.box_id = B.box_id)) C where C.product_id = '$product_id') D";
@@ -266,15 +272,15 @@ function check_box_availablity_for_depot(){
     }
     
     $sql="select id from depot_transfer 
-        where status != 'InActive' and depot_in_id = '$depot_id' and 
+        where status = 'Approved' and depot_in_id = '$depot_id' and date_of_transfer>'2018-09-21' and 
         id in (select distinct depot_transfer_id from depot_transfer_items where type = 'Box' and item_id = '$box_id') ".$depot_transfer_cond." 
         union all 
         select id from distributor_in 
-        where status != 'InActive' and depot_id = '$depot_id' and 
+        where status = 'Approved' and depot_id = '$depot_id' and date_of_processing>'2018-09-21' and 
         id in (select distinct distributor_in_id from distributor_in_items where type = 'Box' and item_id = '$box_id') ".$distributor_in_cond." 
         union all 
         select id from bar_to_box 
-        where status != 'InActive' and depot_id = '$depot_id' and 
+        where status = 'Approved' and depot_id = '$depot_id' and date_of_processing>'2018-09-21' and 
         id in (select distinct bar_to_box_id from bar_to_box_qty where box_id = '$box_id') ".$bar_to_box_cond;
     $query=$this->db->query($sql);
     $result=$query->result();
@@ -316,7 +322,7 @@ function check_box_qty_availablity_for_depot(){
         $distributor_out_cond=" and id<>'$id'";
 
         if($ref_id!=''){
-            $distributor_out_cond=$distributor_out_cond." and ref_id<>'$ref_id'";
+            $distributor_out_cond=$distributor_out_cond." and id<>'$ref_id'";
         }
     }
     $bar_to_box_cond="";
@@ -328,14 +334,14 @@ function check_box_qty_availablity_for_depot(){
     $sql="select sum(A.tot_qty) as tot_qty_in from 
         (select sum(qty) as tot_qty from depot_transfer_items 
         where item_id = '$box_id' and type = 'Box' and depot_transfer_id in (select distinct id from depot_transfer 
-            where status != 'InActive' and depot_in_id = '$depot_id'".$depot_transfer_cond.") 
+            where status = 'Approved' and depot_in_id = '$depot_id' and date_of_transfer>'2018-09-21'".$depot_transfer_cond.") 
         union all 
         select sum(qty) as tot_qty from distributor_in_items 
         where item_id = '$box_id' and type = 'Box' and distributor_in_id in (select distinct id from distributor_in 
-            where status != 'InActive' and depot_id = '$depot_id'".$distributor_in_cond.") 
+            where status = 'Approved' and depot_id = '$depot_id' and date_of_processing>'2018-09-21'".$distributor_in_cond.") 
         union all 
         select sum(qty) as tot_qty from bar_to_box_qty where box_id = '$box_id' and bar_to_box_id in (select distinct id from bar_to_box 
-            where status != 'InActive' and depot_id = '$depot_id'".$bar_to_box_cond.")) A";
+            where status = 'Approved' and depot_id = '$depot_id' and date_of_processing>'2018-09-21'".$bar_to_box_cond.")) A";
     $query=$this->db->query($sql);
     $result=$query->result();
     if (count($result)>0){
@@ -347,14 +353,14 @@ function check_box_qty_availablity_for_depot(){
     $sql="select sum(D.tot_qty) as tot_qty_out from 
         (select sum(qty) as tot_qty from depot_transfer_items 
         where item_id = '$box_id' and type = 'Box' and depot_transfer_id in (select distinct id from depot_transfer 
-            where status != 'InActive' and depot_out_id = '$depot_id'".$depot_transfer_cond.") 
+            where status = 'Approved' and depot_out_id = '$depot_id' and date_of_transfer>'2018-09-21'".$depot_transfer_cond.") 
         union all 
         select sum(qty) as tot_qty from distributor_out_items 
         where item_id = '$box_id' and type = 'Box' and distributor_out_id in (select distinct id from distributor_out 
-            where status != 'InActive' and depot_id = '$depot_id'".$distributor_out_cond.") 
+            where status = 'Approved' and depot_id = '$depot_id' and date_of_processing>'2018-09-21'".$distributor_out_cond.") 
         union all 
         select sum(qty) as tot_qty from box_to_bar_qty where box_id = '$box_id' and box_to_bar_id in (select distinct id from box_to_bar 
-            where status != 'InActive' and depot_id = '$depot_id'".$box_to_bar_cond.")) D";
+            where status = 'Approved' and depot_id = '$depot_id' and date_of_processing>'2018-09-21'".$box_to_bar_cond.")) D";
     $query=$this->db->query($sql);
     $result=$query->result();
     if (count($result)>0){
@@ -386,11 +392,11 @@ function check_bar_availablity_for_distributor(){
     }
     
     $sql="select id from distributor_transfer 
-        where status != 'InActive' and distributor_in_id = '$distributor_id' and 
+        where status = 'Approved' and distributor_in_id = '$distributor_id' and date_of_transfer>'2018-09-21' and 
         id in (select distinct distributor_transfer_id from distributor_transfer_items where type = 'Bar' and item_id = '$product_id') ".$distributor_transfer_cond."
         union all 
         select id from distributor_out 
-        where status != 'InActive' and distributor_id = '$distributor_id' and 
+        where status = 'Approved' and distributor_id = '$distributor_id' and date_of_processing>'2018-09-21' and 
         id in (select distinct distributor_out_id from distributor_out_items where type = 'Bar' and item_id = '$product_id') ".$distributor_out_cond;
     $query=$this->db->query($sql);
     $result=$query->result();
@@ -435,11 +441,11 @@ function check_bar_qty_availablity_for_distributor(){
     $sql="select sum(D.tot_qty) as tot_qty_in from 
         (select sum(qty) as tot_qty from distributor_transfer_items 
         where item_id = '$product_id' and type = 'Bar' and distributor_transfer_id in (select distinct id from distributor_transfer 
-            where status != 'InActive' and distributor_in_id = '$distributor_id'".$distributor_transfer_cond.") 
+            where status = 'Approved' and distributor_in_id = '$distributor_id' and date_of_transfer>'2018-09-21'".$distributor_transfer_cond.") 
         union all 
         select sum(qty) as tot_qty from distributor_out_items 
         where item_id = '$product_id' and type = 'Bar' and distributor_out_id in (select distinct id from distributor_out 
-            where status != 'InActive' and distributor_id = '$distributor_id'".$distributor_out_cond.")) D";
+            where status = 'Approved' and distributor_id = '$distributor_id' and date_of_processing>'2018-09-21'".$distributor_out_cond.")) D";
     $query=$this->db->query($sql);
     $result=$query->result();
     if (count($result)>0){
@@ -451,15 +457,15 @@ function check_bar_qty_availablity_for_distributor(){
     $sql="select sum(D.tot_qty) as tot_qty_out from 
         (select sum(qty) as tot_qty from distributor_transfer_items 
         where item_id = '$product_id' and type = 'Bar' and distributor_transfer_id in (select distinct id from distributor_transfer 
-            where status != 'InActive' and distributor_out_id = '$distributor_id'".$distributor_transfer_cond.") 
+            where status = 'Approved' and distributor_out_id = '$distributor_id' and date_of_transfer>'2018-09-21'".$distributor_transfer_cond.") 
         union all 
         select sum(qty) as tot_qty from distributor_in_items 
         where item_id = '$product_id' and type = 'Bar' and distributor_in_id in (select distinct id from distributor_in 
-            where status != 'InActive' and distributor_id = '$distributor_id'".$distributor_in_cond.") 
+            where status = 'Approved' and distributor_id = '$distributor_id' and date_of_processing>'2018-09-21'".$distributor_in_cond.") 
         union all 
         select sum(qty) as tot_qty from distributor_sale_items 
         where item_id = '$product_id' and type = 'Bar' and distributor_sale_id in (select distinct id from distributor_sale 
-            where status != 'InActive' and distributor_id = '$distributor_id'".$distributor_sale_cond.")) D";
+            where status = 'Approved' and distributor_id = '$distributor_id' and date_of_processing>'2018-09-21'".$distributor_sale_cond.")) D";
     $query=$this->db->query($sql);
     $result=$query->result();
     if (count($result)>0){
@@ -491,12 +497,12 @@ function check_box_availablity_for_distributor(){
     }
     
     $sql="select id from distributor_transfer 
-        where status != 'InActive' and distributor_in_id = '$distributor_id' and 
+        where status = 'Approved' and distributor_in_id = '$distributor_id' and date_of_transfer>'2018-09-21' and 
         id in (select distinct distributor_transfer_id from distributor_transfer_items 
             where type = 'Box' and item_id = '$product_id') ".$distributor_transfer_cond."
         union all 
         select id from distributor_out 
-        where status != 'InActive' and distributor_id = '$distributor_id' and 
+        where status = 'Approved' and distributor_id = '$distributor_id' and date_of_processing>'2018-09-21' and 
         id in (select distinct distributor_out_id from distributor_out_items 
             where type = 'Box' and item_id = '$product_id') ".$distributor_out_cond;
     $query=$this->db->query($sql);
@@ -542,11 +548,11 @@ function check_box_qty_availablity_for_distributor(){
     $sql="select sum(D.tot_qty) as tot_qty_in from 
         (select sum(qty) as tot_qty from distributor_transfer_items 
         where item_id = '$product_id' and type = 'Box' and distributor_transfer_id in (select distinct id from distributor_transfer 
-            where status != 'InActive' and distributor_in_id = '$distributor_id'".$distributor_transfer_cond.") 
+            where status = 'Approved' and distributor_in_id = '$distributor_id' and date_of_transfer>'2018-09-21'".$distributor_transfer_cond.") 
         union all 
         select sum(qty) as tot_qty from distributor_out_items 
         where item_id = '$product_id' and type = 'Box' and distributor_out_id in (select distinct id from distributor_out 
-            where status != 'InActive' and distributor_id = '$distributor_id'".$distributor_out_cond.")) D";
+            where status = 'Approved' and distributor_id = '$distributor_id' and date_of_processing>'2018-09-21'".$distributor_out_cond.")) D";
     $query=$this->db->query($sql);
     $result=$query->result();
     if (count($result)>0){
@@ -558,15 +564,15 @@ function check_box_qty_availablity_for_distributor(){
     $sql="select sum(D.tot_qty) as tot_qty_out from 
         (select sum(qty) as tot_qty from distributor_transfer_items 
         where item_id = '$product_id' and type = 'Box' and distributor_transfer_id in (select distinct id from distributor_transfer 
-            where status != 'InActive' and distributor_out_id = '$distributor_id'".$distributor_transfer_cond.") 
+            where status = 'Approved' and distributor_out_id = '$distributor_id' and date_of_transfer>'2018-09-21'".$distributor_transfer_cond.") 
         union all 
         select sum(qty) as tot_qty from distributor_in_items 
         where item_id = '$product_id' and type = 'Box' and distributor_in_id in (select distinct id from distributor_in 
-            where status != 'InActive' and distributor_id = '$distributor_id'".$distributor_in_cond.") 
+            where status = 'Approved' and distributor_id = '$distributor_id' and date_of_processing>'2018-09-21'".$distributor_in_cond.") 
         union all 
         select sum(qty) as tot_qty from distributor_sale_items 
         where item_id = '$product_id' and type = 'Box' and distributor_sale_id in (select distinct id from distributor_sale 
-            where status != 'InActive' and distributor_id = '$distributor_id'".$distributor_sale_cond.")) D";
+            where status = 'Approved' and distributor_id = '$distributor_id' and date_of_processing>'2018-09-21'".$distributor_sale_cond.")) D";
     $query=$this->db->query($sql);
     $result=$query->result();
     if (count($result)>0){
@@ -609,23 +615,23 @@ function get_depot_bar_qty(){
         (select E.depot_id, E.product_id, sum(tot_qty) as tot_qty from 
         (select C.depot_id, C.product_id, ifnull(C.qty_in,0)-ifnull(D.qty_out,0) as tot_qty from 
         (select AA.depot_id, AA.product_id, sum(AA.qty) as qty_in from 
-        (select depot_id, product_id, qty_in_bar as qty from batch_processing where status = 'Approved' 
+        (select depot_id, product_id, qty_in_bar as qty from batch_processing where status = 'Approved' and date_of_processing>'2018-09-21' 
         union all 
         select A.depot_in_id as depot_id, B.item_id as product_id, B.qty from 
-        (select * from depot_transfer where status != 'InActive') A 
+        (select * from depot_transfer where status = 'Approved' and date_of_transfer>'2018-09-21') A 
         inner join 
         (select * from depot_transfer_items where type = 'Bar') B 
         on (A.id = B.depot_transfer_id) 
         union all 
         select A.depot_id, B.item_id as product_id, B.qty from 
-        (select * from distributor_in where status != 'InActive') A 
+        (select * from distributor_in where status = 'Approved' and date_of_processing>'2018-09-21') A 
         inner join 
         (select * from distributor_in_items where type = 'Bar') B 
         on (A.id = B.distributor_in_id) 
         union all 
         select C.depot_id, D.product_id, ifnull(C.qty,0)*ifnull(D.qty,0) as qty from 
         (select A.depot_id, B.box_id, B.qty from 
-        (select * from box_to_bar where status != 'InActive'".$box_to_bar_cond.") A 
+        (select * from box_to_bar where status = 'Approved' and date_of_processing>'2018-09-21'".$box_to_bar_cond.") A 
         inner join 
         (select * from box_to_bar_qty) B 
         on (A.id = B.box_to_bar_id)) C 
@@ -635,20 +641,20 @@ function get_depot_bar_qty(){
         left join 
         (select BB.depot_id, BB.product_id, sum(BB.qty) as qty_out from 
         (select A.depot_out_id as depot_id, B.item_id as product_id, B.qty from 
-        (select * from depot_transfer where status != 'InActive') A 
+        (select * from depot_transfer where status = 'Approved' and date_of_transfer>'2018-09-21') A 
         inner join 
         (select * from depot_transfer_items where type = 'Bar') B 
         on (A.id = B.depot_transfer_id) 
         union all 
         select A.depot_id, B.item_id as product_id, B.qty from 
-        (select * from distributor_out where status != 'InActive') A 
+        (select * from distributor_out where status = 'Approved' and date_of_processing>'2018-09-21') A 
         inner join 
         (select * from distributor_out_items where type = 'Bar') B 
         on (A.id = B.distributor_out_id) 
         union all 
         select C.depot_id, D.product_id, ifnull(C.qty,0)*ifnull(D.qty,0) as qty from 
         (select A.depot_id, B.box_id, B.qty from 
-        (select * from bar_to_box where status != 'InActive'".$bar_to_box_cond.") A 
+        (select * from bar_to_box where status = 'Approved' and date_of_processing>'2018-09-21'".$bar_to_box_cond.") A 
         inner join 
         (select * from bar_to_box_qty) B 
         on (A.id = B.bar_to_box_id)) C 
@@ -658,10 +664,10 @@ function get_depot_bar_qty(){
         on (C.depot_id=D.depot_id and C.product_id=D.product_id)) E 
         group by E.depot_id, E.product_id) F 
         left join 
-        (select * from depot_master where status != 'InActive') G 
+        (select * from depot_master) G 
         on (F.depot_id=G.id)) H 
         left join 
-        (select * from product_master where status != 'InActive') I 
+        (select * from product_master) I 
         on (H.product_id=I.id) where depot_id = '$depot_id'";
     $query=$this->db->query($sql);
     return $query->result();

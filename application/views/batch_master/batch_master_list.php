@@ -53,28 +53,31 @@
 									<thead>
 										<tr>
 											<th width="65" style="text-align:center;">Sr. No.</th>
+											<th width="65" style="text-align:center;">Edit</th>
 											<th>Batch No</th>
+											
 											<th>Date Of Processing</th>
-											<th>Creation Date</th>
+											<!--<th>Creation Date</th-->
 										</tr>
 									</thead>
 									<tbody>
 										<?php for ($i=0; $i < count($data); $i++) { ?>
 										<tr>
 											<td style="text-align:center;"><?php echo $i+1; ?></td>
-											<td><a href="<?php echo base_url().'index.php/batch_master/edit/'.$data[$i]->id; ?>"><?php echo $data[$i]->batch_no; ?></a></td>
+											<td style="text-align:center; vertical-align: middle; "><a href="<?php echo base_url().'index.php/batch_master/edit/'.$data[$i]->id; ?>"><i class="fa fa-edit"></i></a></td>
+											<td><?php echo $data[$i]->batch_no; ?></td>
 											<td>
                                                 <span style="display:none;">
                                                     <?php echo (($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('Ymd',strtotime($data[$i]->date_of_processing)):''); ?>
                                                 </span>
                                                 <?php echo (($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('d/m/Y',strtotime($data[$i]->date_of_processing)):''); ?>
                                             </td>
-											<td>
+										    <!--	<td>
 												<span style="display:none;">
-                                                    <?php echo (($data[$i]->updated_date!=null && $data[$i]->updated_date!='')?date('Ymd',strtotime($data[$i]->updated_date)):''); ?>
+                                                    <?php// echo (($data[$i]->updated_date!=null && $data[$i]->updated_date!='')?date('Ymd',strtotime($data[$i]->updated_date)):''); ?>
                                                 </span>
-												<?php echo (($data[$i]->updated_date!=null && $data[$i]->updated_date!='')?date('d/m/Y',strtotime($data[$i]->updated_date)):''); ?>
-											</td>
+												<?php// echo (($data[$i]->updated_date!=null && $data[$i]->updated_date!='')?date('d/m/Y',strtotime($data[$i]->updated_date)):''); ?>
+											</td>-->
 										</tr>
 										<?php } ?>
 									</tbody>

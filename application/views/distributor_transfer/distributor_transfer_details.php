@@ -52,9 +52,13 @@
                                                 <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
                                                 <input type="text" class="form-control datepicker1" name="date_of_transfer" id="date_of_transfer" placeholder="Date Of Transfer" value="<?php if(isset($data)) echo (($data[0]->date_of_transfer!=null && $data[0]->date_of_transfer!='')?date('d/m/Y',strtotime($data[0]->date_of_transfer)):date('d/m/Y')); else echo date('d/m/Y'); ?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group">
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Distributor Out <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="distributor_out_id" id="distributor_out_id" class="form-control">
+                                                <select name="distributor_out_id" id="distributor_out_id" class="form-control select2">
                                                     <option value="">Select</option>
                                                     <?php if(isset($distributor)) { for ($k=0; $k < count($distributor) ; $k++) { ?>
                                                             <option value="<?php echo $distributor[$k]->id; ?>" <?php if(isset($data)) { if($distributor[$k]->id==$data[0]->distributor_out_id) { echo 'selected'; } } ?>><?php echo $distributor[$k]->distributor_name; ?></option>
@@ -69,7 +73,7 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Distributor In <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="distributor_in_id" id="distributor_in_id" class="form-control">
+                                                <select name="distributor_in_id" id="distributor_in_id" class="form-control select2">
                                                     <option value="">Select</option>
                                                     <?php if(isset($distributor)) { for ($k=0; $k < count($distributor) ; $k++) { ?>
                                                             <option value="<?php echo $distributor[$k]->id; ?>" <?php if(isset($data)) { if($distributor[$k]->id==$data[0]->distributor_in_id) { echo 'selected'; } } ?>><?php echo $distributor[$k]->distributor_name; ?></option>
@@ -123,7 +127,7 @@
                                                 <td>
                                                     <input type="text" class="form-control format_number qty" name="qty[]" id="qty_<?php echo $i; ?>" placeholder="Qty" value="<?php if (isset($distributor_transfer_items)) { echo format_money($distributor_transfer_items[$i]->qty,2); } ?>"/>
                                                 </td>
-                                               <td style="text-align:center;     vertical-align: middle;">
+												<td style="text-align:center;     vertical-align: middle;">
                                                     <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>
                                                 </td>
                                             </tr>

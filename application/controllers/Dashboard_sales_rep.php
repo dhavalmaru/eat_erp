@@ -8,10 +8,21 @@ class Dashboard_sales_rep extends CI_Controller
 {
     public function __construct(){
         parent::__construct();
-      
+        $this->load->helper('url');
+        $this->load->helper('form');
+        $this->load->library('session');
+        $this->load->library('email');
         $this->load->helper('common_functions');
         $this->load->model('dashboard_sales_rep_model');
+        $this->load->model('sales_rep_distributor_model');
+        $this->load->model('sales_rep_order_model');
+		 $this->load->model('Sales_location_model');
+        $this->load->model('sales_rep_location_model');
         $this->load->model('sales_rep_payment_receivable_model');
+		$this->load->model('store_model');
+      //	$this->load->model('Sr_beat_plan_model');
+        $this->load->model('product_model');
+        $this->load->database();
     }
 
     //index function
@@ -20,19 +31,117 @@ class Dashboard_sales_rep extends CI_Controller
     }
 
     public function index(){
-        $result=$this->dashboard_sales_rep_model->get_access();
+		  $day = date('l');
+      
+          
+			 $this->checkstatus($day);
+			
+          
+
+            // load_view('dashboard/dashboard_sales_rep_details', $data);
+       
+    }
+	    public function checkstatus($frequency=''){
+
+        $day = $frequency;
+        $m = date('F');
+        $year = date('Y');
+        $get_alternate  = $this->get_alternate($day,$m,$year);
+        if($get_alternate)
+        {
+            $frequency = 'Alternate '.$day;
+        }
+        else
+        {
+            $frequency = 'Every '.$day;
+        }
+
+        $result=$this->Sales_location_model->get_access();
         if(count($result)>0) {
-            // $data['total_sale']=$this->dashboard_sales_rep_model->get_total_sale();
-            // $data['total_dist']=$this->dashboard_sales_rep_model->get_total_distributor();
-            $data['total_receivable']=$this->dashboard_sales_rep_model->get_total_receivable();
+            $data['access']=$result;
+            $data['data3']=$this->Sales_location_model->get_data('Approved','',$frequency);
+			//$data['data1'] = $this->Sales_location_model->get_data1();
+			  $data['total_receivable']=$this->dashboard_sales_rep_model->get_total_receivable();
             $data['target']=$this->dashboard_sales_rep_model->get_target();
             $data['payment_receivable']=$this->sales_rep_payment_receivable_model->get_data();
-            $data['sales_rep_id']=$this->session->userdata('sales_rep_id');
+			//$data['data1'] = $this->dashboard_sales_rep_model->get_data_dist();
+			$data['data2'] = $this->sales_rep_order_model->get_data();
+			$data['data1'] = $this->sales_rep_distributor_model->get_data();
+			  $data['sales_rep_id']=$this->session->userdata('sales_rep_id');
+			$data['checkstatus'] = $frequency;
 
-            load_view('dashboard/dashboard_sales_rep_details', $data);
+              load_view('dashboard/dashboard_sales_rep_details', $data);
+
         } else {
             echo '<script>alert("You donot have access to this page.");</script>';
             $this->load->view('login/main_page');
+        }
+    }
+	   public function get_lat_long(){
+        $id=$this->input->post('id');
+        $result=$this->Sales_location_model->get_lat_long($id);
+        $data['result'] = 0;
+        if(count($result)>0) {
+            $data['result'] = 1;
+            $data['google_address'] = $result[0]->google_address;
+            $data['latitude'] = $result[0]->latitude;
+            $data['longitude'] = $result[0]->longitude;
+           
+        }
+
+        echo json_encode($data);
+    }
+
+    public function locations($status='')
+    {
+        $result=$this->Sales_rep_route_plan_model->get_access();
+        if(count($result)>0) {
+            load_view_without_data('sales_rep_location/sales_rep_location_map');
+        } else {
+            echo '<script>alert("You donot have access to this page.");</script>';
+            $this->load->view('login/main_page');
+        }
+
+    }
+	
+    public function test_function()
+    {
+        $day = date('l');
+        $m = date('F');
+        $year = date('Y');
+        $set_days = '';
+
+        $get_alternate  = $this->get_alternate($day,$m,$year);
+        if($get_alternate)
+        {
+            $set_days = 'Alternate '.$day;
+        }
+        else
+        {
+            $set_days = 'Every '.$day;
+        }
+
+        echo $set_days;
+    }
+
+    public function get_alternate($day,$m,$year)
+    {
+        
+        $date1 = date('d-m-Y', strtotime('second '.$day.' of '.$m.' '.$year));
+        $date2 = date('d-m-Y', strtotime('fourth '.$day.' of '.$m.' '.$year));
+
+        $todaysdate = date('d-m-Y');
+        if($date1==$todaysdate) 
+        {
+            return true;
+        }
+        elseif($date2==$todaysdate)
+        {
+            return true;
+        }
+        else
+        {
+           return false;
         }
     }
 

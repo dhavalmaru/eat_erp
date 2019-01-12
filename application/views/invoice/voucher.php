@@ -77,15 +77,15 @@
             <td valign="top" align="center" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><?php echo $i+1; ?></td>
             <td valign="top" align="left" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><?php echo $voucher_details[$vou_cnt]['description'][$i]['description']; ?></td>
             <td width="130" valign="top" align="right" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><p style="margin:0; "><?php echo $voucher_details[$vou_cnt]['description'][$i]['grams']; ?></p></td>
-            <td valign="top" align="right" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><p style="margin:0; "><?php echo $voucher_details[$vou_cnt]['description'][$i]['qty']; ?></p></td>
-            <td valign="top" align="right" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><p style="margin:0; "><?php echo $voucher_details[$vou_cnt]['description'][$i]['rate']; ?></p></td>
-            <td valign="top" align="right" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><p style="margin:0; "><?php echo round($voucher_details[$vou_cnt]['description'][$i]['amount'],2); ?></p></td>
+            <td valign="top" align="right" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><p style="margin:0; "><?php echo format_money($voucher_details[$vou_cnt]['description'][$i]['qty'],2); ?></p></td>
+            <td valign="top" align="right" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><p style="margin:0; "><?php echo format_money($voucher_details[$vou_cnt]['description'][$i]['rate'],2); ?></p></td>
+            <td valign="top" align="right" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><p style="margin:0; "><?php echo format_money($voucher_details[$vou_cnt]['description'][$i]['amount'],2); ?></p></td>
         </tr>
         <?php }} ?>
         <tr>
             <td colspan="3" valign="top"> <p style="margin:0;"><span style=" font-size:13px; font-weight:500;" >Amount in Words: <?php if (isset($voucher_details[$vou_cnt]['total_amount_in_words'])) echo $voucher_details[$vou_cnt]['total_amount_in_words']; ?></span> </p> </td>
             <td colspan="2" valign="middle" align="right" style="font-size:12px; font-weight:500;"><p style="margin:0;"><span style=" font-size:13px; font-weight:500;" >Total</span></p></td>
-            <td  style=" font-size:12px; font-weight:500;" >  <span style="text-align:left; float:left"> &#8377; </span> <span style="text-align:right; float:right"><?php if (isset($voucher_details[$vou_cnt]['total_amount'])) echo $voucher_details[$vou_cnt]['total_amount']; ?></span> </td>
+            <td  style=" font-size:12px; font-weight:500;" >  <span style="text-align:left; float:left"> &#8377; </span> <span style="text-align:right; float:right"><?php if (isset($voucher_details[$vou_cnt]['total_amount'])) echo format_money ($voucher_details[$vou_cnt]['total_amount'],2); ?></span> </td>
         </tr>
         <tr>
             <td colspan="3" valign="middle" style="padding:0;">&nbsp;  </td>
@@ -140,13 +140,13 @@
         <tr valign="top" style="border: none;">
             <td valign="top" align="center" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><?php echo $i+1; ?></td>
             <td colspan="3" align="" valign="top" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><?php echo $voucher_details[$vou_cnt]['description'][$i]['description']; ?></td>
-            <td valign="top" align="right" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><p style="margin:0; "><?php echo round($voucher_details[$vou_cnt]['description'][$i]['amount'],2); ?></p></td>
+            <td valign="top" align="right" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><p style="margin:0; "><?php echo format_money($voucher_details[$vou_cnt]['description'][$i]['amount'],2); ?></p></td>
         </tr>
         <?php }} ?>
         <tr valign="top">
             <td valign="top" align="center">&nbsp; </td>
             <td colspan="3" align="" valign="top"><p style="margin:0;"><span style=" font-size:13px; font-weight:500;" >Total</span></p></td>
-            <td   valign="top" style=" font-size:12px; font-weight:500;" >  <span style="text-align:left; float:left"> &#8377; </span> <span style="text-align:right; float:right"><?php if (isset($voucher_details[$vou_cnt]['total_amount'])) echo $voucher_details[$vou_cnt]['total_amount']; ?></span> </td>
+            <td   valign="top" style=" font-size:12px; font-weight:500;" >  <span style="text-align:left; float:left"> &#8377; </span> <span style="text-align:right; float:right"><?php if (isset($voucher_details[$vou_cnt]['total_amount'])) echo format_money($voucher_details[$vou_cnt]['total_amount'],2); ?></span> </td>
         </tr>
         <tr>
             <td colspan="5">
@@ -167,7 +167,42 @@
             </td>
         </tr>
     </table>
+	
+	 <table class="user_data" border="0" width="925px" style="border-collapse:collapse;margin-top:20px;font-size:12px " class="table" cellspacing="10">
+					<tr valign="center" >
+						<td width="100%" align="center"><b>Created By:</b>
+						 <?php if(isset($voucher_details[$vou_cnt]['created_by'])) echo $voucher_details[$vou_cnt]['created_by']; ?>&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp
+						  <span style="<?php if(isset($voucher_details[$vou_cnt]['created_on'])) 
+						if(date("d-m-Y h:m:i", strtotime($voucher_details[$vou_cnt]['created_on'])) <> date("d-m-Y h:m:i", strtotime($voucher_details[$vou_cnt]['modified_on'])))
+						echo ' ';else echo 'display:none;';?>">
+						 <b> Modified By:</b>
+						  <?php if(isset($voucher_details[$vou_cnt]['modified_by'])) echo $voucher_details[$vou_cnt]['modified_by']; ?>  &nbsp &nbsp &nbsp  &nbsp &nbsp &nbsp &nbsp </span>
+						  <b> Approved By:</b>
+						  <?php if(isset($voucher_details[$vou_cnt]['approved_by'])) echo $voucher_details[$vou_cnt]['approved_by'];; ?>
+						  
+						  
+						</td>
+						  
+					</tr>
+					<tr valign="center" >
+					    <td width="100%" align="center"><b>Created On:</b>
+						    <?php if(isset($voucher_details[$vou_cnt]['created_on'])) echo date("d-m-Y h:m:i", strtotime($voucher_details[$vou_cnt]['created_on']))?> &nbsp &nbsp &nbsp &nbsp
+						<span style="<?php if(isset($voucher_details[$vou_cnt]['created_on'])) 
+							if(date("d-m-Y h:m:i", strtotime($voucher_details[$vou_cnt]['created_on'])) <> date("d-m-Y h:m:i", strtotime($voucher_details[$vou_cnt]['modified_on'])))
+						echo ' ';else echo 'display:none;';?>">
+						  <b> Modified On:</b>
+						     <?php if(isset($voucher_details[$vou_cnt]['modified_on'])) echo date("d-m-Y h:m:i", strtotime($voucher_details[$vou_cnt]['modified_on'])) ?>&nbsp &nbsp &nbsp &nbsp </span>
+						   <b> Approved On:</b>
+						    <?php if(isset($voucher_details[$vou_cnt]['approved_on']))echo date("d-m-Y h:m:i", strtotime($voucher_details[$vou_cnt]['approved_on'])) ?>
+						</td>
+					</tr>
+					
+					
+	</table>
+	
 </div>
+
+
 
 </body>
 </html>

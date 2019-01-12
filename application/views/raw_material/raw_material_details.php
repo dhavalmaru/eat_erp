@@ -43,6 +43,10 @@
                                                 <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
                                                 <input type="text" class="form-control" name="rm_name" id="rm_name" placeholder="Raw Material Name" value="<?php if(isset($data)) echo $data[0]->rm_name;?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group"  >
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">HSN Code <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="hsn_code" id="hsn_code" placeholder="HSN Code" value="<?php if(isset($data)) { echo  $data[0]->hsn_code; } ?>"/>
@@ -56,6 +60,10 @@
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="rate" placeholder="Rate" value="<?php if (isset($data)) { echo $data[0]->rate; } ?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group"  >
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Tax % <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="tax_per" placeholder="Tax %" value="<?php if (isset($data)) { echo $data[0]->tax_per; } ?>"/>

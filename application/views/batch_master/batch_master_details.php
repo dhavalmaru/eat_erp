@@ -48,12 +48,16 @@
                                                 <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
                                                 <input type="text" class="form-control datepicker" name="date_of_processing" id="date_of_processing" placeholder="Date" value="<?php if(isset($data)) echo (($data[0]->date_of_processing!=null && $data[0]->date_of_processing!='')?date('d/m/Y',strtotime($data[0]->date_of_processing)):date('d/m/Y')); else echo date('d/m/Y'); ?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+								<div class="form-group"  >
+									<div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Batch No <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="batch_no" id="batch_no" placeholder="Batch No" value="<?php if(isset($data)) echo $data[0]->batch_no;?>"/>
                                             </div>
-                                        </div>
                                     </div>
+                                </div>
                                     <!--piyu code-->
                                     
                                     <div class="form-group" style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">

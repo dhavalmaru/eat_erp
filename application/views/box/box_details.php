@@ -22,6 +22,20 @@
             input[readonly] {background-color: white !important; 
                             color: #0b385f !important; 
                             cursor: not-allowed !important;}
+		.form-control[disabled], .form-control[readonly]
+			{
+				border:none!important;
+				background-color:transparent!important;
+				box-shadow:none!important;
+			}
+		#total_amount,#total_grams
+			{
+				border:none!important;
+				background-color:transparent!important;
+				box-shadow:none!important;
+				font-size:14px;
+				font-weight:700;
+			}
 		</style>
 		
     </head>
@@ -51,6 +65,10 @@
                                                 <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) { echo  $data[0]->id; } ?>"/>
                                                 <input type="text" class="form-control" name="box_name" id="box_name" placeholder="Box Name" value="<?php if(isset($data)) { echo  $data[0]->box_name; } ?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group"  >
+										<div class="col-md-12 col-sm-12 col-xs-12">
 											<label class="col-md-2 col-sm-2 col-xs-12 control-label">Barcode <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="barcode" id="barcode" placeholder="Barcode" value="<?php if(isset($data)) { echo $data[0]->barcode; } ?>"/>
@@ -110,7 +128,7 @@
                                         <?php }} else { ?>
                                             <tr id="product_<?php echo $i; ?>_row">
                                                 <td>
-                                                    <select name="product[]" class="form-control product" id="product_<?php echo $i;?>">
+                                                    <select name="product[]" class="form-control select2 product" id="product_<?php echo $i;?>">
                                                         <option value="">Select</option>
                                                         <?php if(isset($product)) { for ($k=0; $k < count($product) ; $k++) { ?>
                                                                 <option value="<?php echo $product[$k]->id; ?>"><?php echo $product[$k]->product_name; ?></option>
@@ -151,6 +169,8 @@
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control format_number" name="total_grams" id="total_grams" placeholder="Total Grams" value="<?php if (isset($data)) { echo format_money($data[0]->grams,2); } ?>" readonly />
                                             </div>
+                                        
+								
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Total Amount (In Rs)</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control format_number" name="total_amount" id="total_amount" placeholder="Total Amount" value="<?php if (isset($data)) { echo format_money($data[0]->amount,2); } ?>" readonly />
@@ -163,6 +183,10 @@
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control format_number" name="box_rate" id="box_rate" placeholder="Box Rate" value="<?php if (isset($data)) { echo format_money($data[0]->rate,2); } ?>" />
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group"  >
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <div>
                                                 <label class="col-md-2 col-sm-2 col-xs-12 control-label">Box Cost (In Rs) <span class="asterisk_sign">*</span></label>
                                                 <div class="col-md-4 col-sm-4 col-xs-12">
@@ -177,9 +201,38 @@
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="hsn_code" id="hsn_code" placeholder="HSN Code" value="<?php if(isset($data)) { echo  $data[0]->hsn_code; } ?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group"  >
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">HSN Name <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="hsn_name" id="hsn_name" placeholder="HSN Name" value="<?php if(isset($data)) { echo $data[0]->hsn_name; } ?>"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Category<span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                               <select class="form-control" name="category_id" id="category_id">
+                                                <option value="" >Select</option>
+                                                 <?php 
+                                                 for ($i=0; $i <count($category_detail) ; $i++) { 
+                                                       $selected = '';
+                                                       if(isset($data)) {if ($category_detail[$i]->id==$data[0]->category_id){ $selected = 'selected';}}
+                                                        echo '<option value="'.$category_detail[$i]->id.'" '.$selected.'>'.$category_detail[$i]->category_name.'</option>';
+                                                      } ?>
+                                            </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Tax (In %) <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                               <input type="text" class="form-control tax_percent" name="tax_percentage" id="tax_percentage" placeholder="Tax Percent"   onkeypress="return StopNonNumeric(this,event)" value="<?php
+                                                                  if(isset($data[0]->tax_percentage)) { echo $data[0]->tax_percentage; } ?>"/>
                                             </div>
                                         </div>
                                     </div>
@@ -286,7 +339,8 @@
                 get_total();
             }
 
-            function get_amount(elem){
+            function get_amount(elem)
+			{
                 var id = elem.attr('id');
                 var index = id.substr(id.lastIndexOf('_')+1);
                 var qty = parseFloat(get_number($("#qty_"+index).val(),2));

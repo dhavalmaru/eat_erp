@@ -250,12 +250,16 @@
                 <td width="60" align="center" valign="middle" style="border-right:none;border-bottom:1px solid #666;">Total</td>
             </tr>
 
-            <?php if(isset($invoice_details[$inv_cnt]['description'])) { for($i=0; $i<count($invoice_details[$inv_cnt]['description']); $i++) { ?>
+            <?php if(isset($invoice_details[$inv_cnt]['description'])) { 
+                $total_gram = 0;
+                for($i=0; $i<count($invoice_details[$inv_cnt]['description']); $i++) { ?>
             <tr valign="top" style="border: none;">
                 <td valign="top" align="center" style="border-left:1px solid #666; border-top: none; border-bottom:none;border:none;border-right:1px solid #666; "><?php echo $i+1; ?></td>
                 <td valign="top" align="left" style="border-left:1px solid #666;  border-top: none; border-bottom:none;border:none;border-right:1px solid #666;"><?php echo $invoice_details[$inv_cnt]['description'][$i]['description']; ?></td>
                 <td width="130" valign="top" align="right" style="border-left:1px solid #666;  border-top: none; border-bottom:none;border:none;border-right:1px solid #666;"><p style="margin:0; "><?php echo $invoice_details[$inv_cnt]['description'][$i]['hsn_code']; ?></p></td>
-                <td width="130" valign="top" align="right" style="border-left:1px solid #666;  border-top: none; border-bottom:none;border:none;border-right:1px solid #666;"><p style="margin:0; "><?php echo $invoice_details[$inv_cnt]['description'][$i]['grams'] . 'gm'; ?></p></td>
+                <td width="130" valign="top" align="right" style="border-left:1px solid #666;  border-top: none; border-bottom:none;border:none;border-right:1px solid #666;"><p style="margin:0; "><?php
+                $total_gram = ($invoice_details[$inv_cnt]['description'][$i]['grams']*$invoice_details[$inv_cnt]['description'][$i]['qty']); 
+                 echo $invoice_details[$inv_cnt]['description'][$i]['grams'] . 'gm'; ?></p></td>
                 <td valign="top" align="right" style="border-left:1px solid #666; border-top: none; border-bottom:none;border:none;border-right:1px solid #666; "><p style="margin:0; "><?php echo $invoice_details[$inv_cnt]['description'][$i]['qty']; ?></p></td>
                 <td valign="top" align="right" style="border-left:1px solid #666; border-top: none; border-bottom:none;border:none;border-right:1px solid #666;"><p style="margin:0; "><?php echo $invoice_details[$inv_cnt]['description'][$i]['rate']; ?></p></td>
                 <td valign="top" align="right" style="border-left:1px solid #666; border-top: none; border-bottom:none;border:none;border-right:1px solid #666;"><p style="margin:0; "><?php echo $invoice_details[$inv_cnt]['description'][$i]['amount']; ?></p></td>
@@ -298,7 +302,7 @@
         </tr>
 
         <tr style="border-top: 1px solid #666;">
-            <td colspan="3" rowspan="8" valign="top" style="padding:0;">
+            <td colspan="3" rowspan="7" valign="top" style="padding:0;">
                 <p style="margin:0;text-align:center;font-size:22px;">
                     <span style="font-size:18px; font-weight:500; margin-top: 5px;display: block;" >Amount in words: <br/><br><br><br><br></span> 
                     <span style="line-height:25px;">
@@ -359,6 +363,15 @@
             </td>
         </tr>
         <tr> 
+            <?php
+             $total_gram = 0;
+                for($j=0; $j<count($invoice_details[$inv_cnt]['description']); $j++) {
+                        $total_gram = $total_gram+($invoice_details[$inv_cnt]['description'][$j]['grams']*$invoice_details[$inv_cnt]['description'][$j]['qty']);
+                    }
+            ?>
+            <td colspan="3" valign="middle" style="font-size:10px; font-weight:900;">
+                <p style="margin:0;"><span style="  font-size:10px; font-weight:900;" > Total weight in Kg  :-  <?=($total_gram/1000).'Kg';?></span></p>
+            </td>
             <td colspan="2" valign="middle" style="font-size:10px; font-weight:900;">
                 <p style="margin:0;"><span style="  font-size:10px; font-weight:900;" >GST Payable on Reverse Charge</span></p>
             </td>
@@ -641,7 +654,12 @@
                 <td width="60" align="center" valign="middle" style="border-right:none;border-bottom:1px solid #666;">Total</td>
             </tr>
 
-            <?php if(isset($invoice_details[$inv_cnt]['description'])) { for($i=0; $i<count($invoice_details[$inv_cnt]['description']); $i++) { ?>
+            <?php if(isset($invoice_details[$inv_cnt]['description'])) { 
+                $total_gram = 0;
+                for($i=0; $i<count($invoice_details[$inv_cnt]['description']); $i++) {
+                        $total_gram = $total_gram+($invoice_details[$inv_cnt]['description'][$i]['grams']*$invoice_details[$inv_cnt]['description'][$i]['qty']);
+
+                    ?>
             <tr valign="top" style="border: none;">
                 <td valign="top" align="center" style="border-left:1px solid #666; border-top: none; border-bottom:none;border:none;border-right:1px solid #666; "><?php echo $i+1; ?></td>
                 <td valign="top" align="left" style="border-left:1px solid #666;  border-top: none; border-bottom:none;border:none;border-right:1px solid #666;"><?php echo $invoice_details[$inv_cnt]['description'][$i]['description']; ?></td>
@@ -689,7 +707,7 @@
         </tr>
 
         <tr style="border-top: 1px solid #666;">
-            <td colspan="3" rowspan="8" valign="top" style="padding:0;">
+            <td colspan="3" rowspan="7" valign="top" style="padding:0;">
                 <p style="margin:0;text-align:center;line:height:20px;font-size:22px;">
                     <span style="font-size:18px; font-weight:500; margin-top: 5px;display: block;" >Amount in words: <br/><br><br><br><br></span> 
                     <span style="line-height:25px;">
@@ -750,6 +768,15 @@
             </td>
         </tr>
         <tr> 
+            <?php
+             $total_gram = 0;
+                for($j=0; $j<count($invoice_details[$inv_cnt]['description']); $j++) {
+                        $total_gram = $total_gram+($invoice_details[$inv_cnt]['description'][$j]['grams']*$invoice_details[$inv_cnt]['description'][$j]['qty']);
+                    }
+            ?>
+            <td colspan="3" valign="middle" style="font-size:10px; font-weight:900;">
+                <p style="margin:0;"><span style="  font-size:10px; font-weight:900;" > Total weight in Kg  :-  <?=($total_gram/1000).'Kg';?></span></p>
+            </td>
             <td colspan="2" valign="middle" style="font-size:10px; font-weight:900;">
                 <p style="margin:0;"><span style="  font-size:10px; font-weight:900;" >GST Payable on Reverse Charge</span></p>
             </td>
@@ -1080,7 +1107,7 @@
         </tr>
 
         <tr style="border-top: 1px solid #666;">
-            <td colspan="3" rowspan="8" valign="top" style="padding:0;">
+            <td colspan="3" rowspan="7" valign="top" style="padding:0;">
                 <p style="margin:0;text-align:center;line:height:20px;font-size:22px;">
                     <span style="font-size:18px; font-weight:500; margin-top: 5px;display: block;" >Amount in words: <br/><br><br><br><br></span> 
                     <span style="line-height:25px;">
@@ -1141,6 +1168,15 @@
             </td>
         </tr>
         <tr> 
+            <?php
+             $total_gram = 0;
+                for($j=0; $j<count($invoice_details[$inv_cnt]['description']); $j++) {
+                        $total_gram = $total_gram+($invoice_details[$inv_cnt]['description'][$j]['grams']*$invoice_details[$inv_cnt]['description'][$j]['qty']);
+                    }
+            ?>
+            <td colspan="3" valign="middle" style="font-size:10px; font-weight:900;">
+                <p style="margin:0;"><span style="  font-size:10px; font-weight:900;" > Total weight in Kg  :-  <?=($total_gram/1000).'Kg';?></span></p>
+            </td>
             <td colspan="2" valign="middle" style="font-size:10px; font-weight:900;">
                 <p style="margin:0;"><span style="  font-size:10px; font-weight:900;" >GST Payable on Reverse Charge</span></p>
             </td>

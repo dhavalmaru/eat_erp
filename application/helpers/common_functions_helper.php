@@ -24,6 +24,14 @@
         $user_data['Area'] = 0;
         $user_data['Distributor_Type'] = 0;
         $user_data['Zone'] = 0;
+        $user_data['Location'] = 0;
+        $user_data['Sr_Mapping'] = 0;
+        $user_data['Ingredient_Master'] = 0;
+        $user_data['Store_Master'] = 0;
+        $user_data['Relationship_Master'] = 0;
+        $user_data['Batch_Master'] = 0;
+        $user_data['Vendor_Type'] = 0;
+        $user_data['Distributor_Sale_In'] = 0;
 
         $user_data['Purchase_Order'] = 0;
         $user_data['Raw_Material_In'] = 0;
@@ -74,7 +82,7 @@
             $user_data['Tax']==0 && $user_data['Product']==0 && $user_data['Box']==0 && 
             $user_data['Sales_Rep']==0 && $user_data['Distributor']==0 && $user_data['City_Master']==0 && 
             $user_data['Bank_Master']==0 && $user_data['Area']==0 && $user_data['Distributor_Type']==0 && 
-            $user_data['Zone']==0) {
+            $user_data['Zone']==0&& $user_data['Location']==0 && $user_data['Ingredient_Master']==0 && $user_data['Store_Master']==0&& $user_data['Relationship_Master']==0&& $user_data['Sr_Mapping']==0&& $user_data['Vendor_Type']==0) {
             $user_data['Masters'] = 0;
         } else {
             $user_data['Masters'] = 1;
@@ -83,7 +91,7 @@
         if ($user_data['Raw_Material_In']==0 && $user_data['Batch_Processing']==0 && 
             $user_data['Distributor_Out']==0 && $user_data['Distributor_In']==0 && 
             $user_data['Purchase_Order']==0 && $user_data['Distributor_Sale']==0 && 
-            $user_data['Payment']==0 && $user_data['Credit_Debit_Note']==0) {
+            $user_data['Payment']==0 && $user_data['Credit_Debit_Note']==0 && $user_data['Batch_Master']==0&& $user_data['Distributor_Sale_In']==0 ) {
             $user_data['Transactions'] = 0;
         } else {
             $user_data['Transactions'] = 1;
@@ -187,6 +195,16 @@
         $user_data['Distributor_Type'] = 0;
         $user_data['Zone'] = 0;
 
+		
+		$user_data['Location'] = 0;
+        $user_data['Sr_Mapping'] = 0;
+        $user_data['Ingredient_Master'] = 0;
+        $user_data['Store_Master'] = 0;
+        $user_data['Relationship_Master'] = 0;
+        $user_data['Batch_Master'] = 0;
+        $user_data['Vendor_Type'] = 0;
+        $user_data['Distributor_Sale_In'] = 0;
+		
         $user_data['Purchase_Order'] = 0;
         $user_data['Raw_Material_In'] = 0;
         $user_data['Batch_Processing'] = 0;
@@ -235,16 +253,17 @@
             $user_data['Tax']==0 && $user_data['Product']==0 && $user_data['Box']==0 && 
             $user_data['Sales_Rep']==0 && $user_data['Distributor']==0 && $user_data['City_Master']==0 && 
             $user_data['Bank_Master']==0 && $user_data['Area']==0 && $user_data['Distributor_Type']==0 && 
-            $user_data['Zone']==0) {
+            $user_data['Zone']==0 && $user_data['Location']==0 && $user_data['Ingredient_Master']==0 && $user_data['Store_Master']==0&& $user_data['Relationship_Master']==0&& $user_data['Sr_Mapping']==0&& $user_data['Vendor_Type']==0)
+			{
             $user_data['Masters'] = 0;
-        } else {
+			} else {
             $user_data['Masters'] = 1;
         }
 
         if ($user_data['Raw_Material_In']==0 && $user_data['Batch_Processing']==0 && 
             $user_data['Distributor_Out']==0 && $user_data['Distributor_In']==0 && 
             $user_data['Purchase_Order']==0 && $user_data['Distributor_Sale']==0 && 
-            $user_data['Payment']==0 && $user_data['Credit_Debit_Note']==0) {
+            $user_data['Payment']==0 && $user_data['Credit_Debit_Note']==0 && $user_data['Batch_Master']==0&& $user_data['Distributor_Sale_In']==0 ){
             $user_data['Transactions'] = 0;
         } else {
             $user_data['Transactions'] = 1;
@@ -368,6 +387,44 @@
             $CI->email->message($message);
             $CI->email->set_mailtype("html");
             return $CI->email->send();
+
+        } catch (Exception $ex) {
+            
+        }
+    }
+
+    function send_email_new($from_email, $from_email_sender, $to_email, $subject, $message, $bcc='swapnil.darekar@otbconsulting.co.in',$cc='',$attachment='') {
+        try {
+            $CI =& get_instance();
+
+            $from_email = 'cs@eatanytime.co.in';
+
+            //configure email settings
+            $config['protocol'] = 'smtp';
+            // $config['smtp_host'] = 'smtp.rediffmailpro.com'; //smtp host name
+            $config['smtp_host'] = 'mail.eatanytime.co.in'; //smtp host name
+            $config['smtp_port'] = '587'; //smtp port number
+            $config['smtp_user'] = $from_email;
+            $config['smtp_pass'] = 'Customer@12345'; //$from_email password
+            $config['mailtype'] = 'html';
+            $config['charset'] = 'iso-8859-1';
+            $config['wordwrap'] = TRUE;
+            $config['newline'] = "\r\n"; //use double quotes
+            $CI->email->initialize($config);
+
+            //send mail
+            $CI->email->from($from_email, $from_email_sender);
+            $CI->email->to($to_email);
+            $CI->email->bcc($bcc);
+            if($cc!='')
+            $CI->email->cc($cc);
+            $CI->email->subject($subject);
+            $CI->email->message($message);
+            if($attachment!='')
+                $CI->email->attach($attachment);
+            $CI->email->set_mailtype("html");
+            return $CI->email->send();
+            $CI->email->print_debugger();
 
         } catch (Exception $ex) {
             

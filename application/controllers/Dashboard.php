@@ -51,8 +51,8 @@ class Dashboard extends CI_Controller
 
     public function stock(){
         $data['raw_material_details']=$this->dashboard_model->get_raw_material_stock();
-        // $data['product_details']=$this->dashboard_model->get_product_stock();
-        // $data['box_details']=$this->dashboard_model->get_box_stock();
+        $data['product_details1']=$this->dashboard_model->get_product_stock();
+        $data['box_details']=$this->dashboard_model->get_box_stock();
 
         // $data['product_details']=$this->dashboard_model->get_total_product_stock();
 

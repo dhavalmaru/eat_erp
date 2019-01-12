@@ -38,7 +38,7 @@ class Distributor_out extends CI_Controller{
         //     $this->load->view('login/main_page');
         // }
 
-        $this->checkstatus('pending_for_delivery');
+        $this->checkstatus('Approved');
     }
 
     function select_validate($distributor_id){
@@ -50,7 +50,8 @@ class Distributor_out extends CI_Controller{
         }
     }
 
-    public function get_data($status){
+    public function get_data($status)
+	{
         // $status = 'Approved';
 
         $draw = intval($this->input->get("draw"));
@@ -59,56 +60,36 @@ class Distributor_out extends CI_Controller{
         // $status = intval($this->input->get("status"));
 
         $r = $this->distributor_out_model->get_distributor_out_data1($status);
+		// echo "<pre>";
+		// print_r($r[0]);
+		// echo "</pre>";
+		// die();
         $data = array();
 
         for($i=0;$i<count($r);$i++){
             if($status=='pending_for_delivery' || $status=='gp_issued'){
-                $data[] = array(
-                            '<input type="checkbox" id="check_'.$i.'" class="check icheckbox" name="check_val[]" value="'.$r[$i]->id.'" onChange="set_checkbox(this);" />
-                            <input type="hidden" id="input_check_'.$i.'" name="check[]" value="false" />',
+                /*<input type="checkbox" id="check_'.$i.'" class="check icheckbox" name="check_val[]" value="'.$r[$i]->id.'" onChange="set_checkbox(this);" />
+                            <input type="hidden" id="input_check_'.$i.'" name="check[]" value="false" />*/
+                $com = '';
+                if($status=='pending_for_delivery')
+                {
+                    $ulr = '<a href="'.base_url('index.php/distributor_out/get_batch_details/'.$r[$i]->id).'" target="_blank">Delivery Person</a>
+                        &nbsp;
+                            
+                            <span class="fa fa-comments" onclick="get_delivery_comments(this);" style="cursor:pointer" id="'.$r[$i]->id.'"></span >
+                    ';
 
-                            $i+1,
+                }
+                else if($status=='gp_issued')
+                {
+                    $ulr = '<a href="javascript:void(0)" id="gp_issued_'.$i.'" onclick="get_batch_details(this);" data-distributor="'.$r[$i]->id.'" data-deliverystatus ="'.$r[$i]->delivery_status.'">Delivery Status</a>
+                    &nbsp;
+                            
+                            <span class="fa fa-comments" onclick="get_delivery_comments(this);" style="cursor:pointer" id="'.$r[$i]->id.'"></span >';
+                }
 
-                            '<span style="display:none;">
-                            <input type="hidden" id="date_of_processing_'.$i.'" name="date_of_processing[]" value="'.$r[$i]->date_of_processing.'" />'.
-                                (($r[$i]->date_of_processing!=null && $r[$i]->date_of_processing!='')?date('Ymd',strtotime($r[$i]->date_of_processing)):'')
-                            .'</span>'.
-                            (($r[$i]->date_of_processing!=null && $r[$i]->date_of_processing!='')?date('d/m/Y',strtotime($r[$i]->date_of_processing)):''),
-
-                            '<span style="display:none;">
-                            <input type="hidden" id="invoice_no_'.$i.'" name="invoice_no[]" value="'.$r[$i]->invoice_no.'" />'.
-                                (isset($r[$i]->invoice_no)?str_pad(substr($r[$i]->invoice_no, strrpos($r[$i]->invoice_no, "/")+1),10,"0",STR_PAD_LEFT):'')
-                            .'</span>'.
-                            $r[$i]->invoice_no,
-
-                            '<span style="display:none;">
-                            <input type="hidden" id="invoice_date_'.$i.'" name="invoice_date[]" value="'.$r[$i]->invoice_date.'" />'.
-                                (($r[$i]->invoice_date!=null && $r[$i]->invoice_date!='')?date('Ymd',strtotime($r[$i]->invoice_date)):'')
-                            .'</span>'.
-                            (($r[$i]->invoice_date!=null && $r[$i]->invoice_date!='')?date('d/m/Y',strtotime($r[$i]->invoice_date)):''),
-
-                            $r[$i]->depot_name,
-
-                            ((strtoupper(trim($r[$i]->distributor_name))=='DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='AMAZON DIRECT')? $r[$i]->distributor_name . '-' . $r[$i]->client_name : $r[$i]->distributor_name),
-
-                            $r[$i]->order_no,
-
-                            $r[$i]->location,
-
-                            $r[$i]->sales_rep_name,
-
-                            $r[$i]->invoice_amount,
-
-                            (($r[$i]->modified_on!=null && $r[$i]->modified_on!='')?date('d/m/Y',strtotime($r[$i]->modified_on)):''),
-
-                            (($r[$i]->status=="InActive")?"Cancelled":$r[$i]->status),
-
-                            '<input type="hidden" id="dlvery_status_'.$i.'" name="dlvery_status[]" value="'.$r[$i]->delivery_status.'" />'.
-                            $r[$i]->delivery_status,
-
-                            $r[$i]->del_person_name,
-
-                            ((($r[$i]->invoice_no!=null && $r[$i]->invoice_no!='') || ($r[$i]->voucher_no!=null && $r[$i]->voucher_no!=''))?
+                 /*
+                    ((($r[$i]->invoice_no!=null && $r[$i]->invoice_no!='') || ($r[$i]->voucher_no!=null && $r[$i]->voucher_no!=''))?
                                 '<a href="'.
                                             ((strtotime($r[$i]->date_of_processing)<strtotime('2017-07-01'))?
                                             base_url().'index.php/distributor_out/view_tax_invoice_old/'.$r[$i]->id:
@@ -118,6 +99,70 @@ class Distributor_out extends CI_Controller{
                                 </a>'
                                 :''),
 
+
+                                '<a href="'.($r[$i]->proof_of_delivery!=NULL?base_url('assets/uploads/delivery_proof').'/'.$r[$i]->proof_of_delivery:'javascript:void(0)').'" target="_blank"> 
+                                    '.($r[$i]->proof_of_delivery!=NULL?'<span class="fa fa-file-pdf-o" style="font-size:20px;"></span>':'').'
+                                </a>'
+
+                */
+
+                $data[] = array(
+                            $ulr,
+                            $i+1,
+
+                            '<span style="display:none;">
+                            <input type="hidden" id="date_of_processing_'.$i.'" name="date_of_processing[]" value="'.$r[$i]->date_of_processing.'" />'.
+                                (($r[$i]->date_of_processing!=null && $r[$i]->date_of_processing!='')?date('Ymd',strtotime($r[$i]->date_of_processing)):'')
+                            .'</span>'.
+                            (($r[$i]->date_of_processing!=null && $r[$i]->date_of_processing!='')?date('d/m/Y',strtotime($r[$i]->date_of_processing)):''),
+									  '<a href="'.base_url().'index.php/distributor_out/edit/'.$r[$i]->d_id.'" class=""><i class="fa fa-edit"></i></a>',
+							
+							  '<a href="'.($r[$i]->proof_of_delivery!=NULL?base_url('assets/uploads/delivery_proof').'/'.$r[$i]->proof_of_delivery:'javascript:void(0)').'" target="_blank"> 
+                                '.($r[$i]->proof_of_delivery!=NULL?'<span class="fa fa-file-pdf-o" style="font-size:20px;"></span>':'').'
+                            </a>',
+
+                            '<span style="display:none;">
+                            <input type="hidden" id="invoice_no_'.$i.'" name="invoice_no[]" value="'.$r[$i]->invoice_no.'" />'.
+                                (isset($r[$i]->invoice_no)?str_pad(substr($r[$i]->invoice_no, strrpos($r[$i]->invoice_no, "/")+1),10,"0",STR_PAD_LEFT):'')
+                            .'</span>'.
+                            ((($r[$i]->invoice_no!=null && $r[$i]->invoice_no!=''))?
+                                '<a href="'.
+                                            ((strtotime($r[$i]->date_of_processing)<strtotime('2017-07-01'))?
+                                            base_url().'index.php/distributor_out/view_tax_invoice_old/'.$r[$i]->id:
+                                            base_url().'index.php/distributor_out/view_tax_invoice/'.$r[$i]->id).
+                                        '" target="_blank"> 
+                                    '.$r[$i]->invoice_no.'
+                                </a>'
+                                :''),
+
+                            '<span style="display:none;">
+                            <input type="hidden" id="invoice_date_'.$i.'" name="invoice_date[]" value="'.$r[$i]->invoice_date.'" />'.
+                                (($r[$i]->invoice_date!=null && $r[$i]->invoice_date!='')?date('Ymd',strtotime($r[$i]->invoice_date)):'')
+                            .'</span>'.
+                            (($r[$i]->invoice_date!=null && $r[$i]->invoice_date!='')?date('d/m/Y',strtotime($r[$i]->invoice_date)):''),
+
+                           
+
+                            ((strtoupper(trim($r[$i]->distributor_name))=='DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='AMAZON DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='NYKAA DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED')? $r[$i]->distributor_name . '-' . $r[$i]->client_name : $r[$i]->distributor_name),
+
+                            $r[$i]->order_no,
+
+                            $r[$i]->location,
+
+                       
+
+                            $r[$i]->invoice_amount,
+
+                            // (($r[$i]->modified_on!=null && $r[$i]->modified_on!='')?date('d/m/Y',strtotime($r[$i]->modified_on)):''),
+
+                            // (($r[$i]->status=="InActive")?"Cancelled":$r[$i]->status),
+
+                            '<input type="hidden" id="dlvery_status_'.$i.'" name="dlvery_status[]" value="'.$r[$i]->delivery_status.'" />'.
+                            $r[$i]->delivery_status,
+
+                            // $r[$i]->del_person_name,
+							// 
+
                             '<a href="'.
                                         ((strtotime($r[$i]->date_of_processing)<strtotime('2017-07-01'))?
                                         base_url().'index.php/distributor_out/view_gate_pass_old/'.$r[$i]->id:
@@ -125,7 +170,9 @@ class Distributor_out extends CI_Controller{
                                     '" target="_blank">  <span class="fa fa-file-pdf-o" style="font-size:20px;"></span>
                             </a>',
 
-                            '<a href="#"><span class="fa fa-eye">Resend Invoice</span></a>'
+                            '<a href="#"><span class="fa fa-eye">Resend Invoice</span></a>',
+							$r[$i]->tracking_id
+							 
                         );
             } else {
                 $data[] = array(
@@ -138,52 +185,54 @@ class Distributor_out extends CI_Controller{
                             <input type="hidden" id="date_of_processing_'.$i.'" name="date_of_processing[]" value="'.$r[$i]->date_of_processing.'" />'.
                                 (($r[$i]->date_of_processing!=null && $r[$i]->date_of_processing!='')?date('Ymd',strtotime($r[$i]->date_of_processing)):'')
                             .'</span>'.
-                            '<a href="'.base_url().'index.php/distributor_out/edit/'.$r[$i]->d_id.'">'.
-                                (($r[$i]->date_of_processing!=null && $r[$i]->date_of_processing!='')?date('d/m/Y',strtotime($r[$i]->date_of_processing)):'').
-                            '</a>',
-
+                          
+                                (($r[$i]->date_of_processing!=null && $r[$i]->date_of_processing!='')?date('d/m/Y',strtotime($r[$i]->date_of_processing)):''),
+                           
+								  '<a href="'.base_url().'index.php/distributor_out/edit/'.$r[$i]->d_id.'" class=""><i class="fa fa-edit"></i></a>',
+								 '<a href="'.($r[$i]->proof_of_delivery!=NULL?base_url('assets/uploads/delivery_proof').'/'.$r[$i]->proof_of_delivery:'javascript:void(0)').'" target="_blank"> 
+                                '.($r[$i]->proof_of_delivery!=NULL?'<span class="fa fa-file-pdf-o" style="font-size:20px;"></span>':'').'
+                            </a>',
+								  
                             '<span style="display:none;">
                             <input type="hidden" id="invoice_no_'.$i.'" name="invoice_no[]" value="'.$r[$i]->invoice_no.'" />'.
                                 (isset($r[$i]->invoice_no)?str_pad(substr($r[$i]->invoice_no, strrpos($r[$i]->invoice_no, "/")+1),10,"0",STR_PAD_LEFT):'')
                             .'</span>'.
-                            $r[$i]->invoice_no,
-
+                            ((($r[$i]->invoice_no!=null && $r[$i]->invoice_no!=''))?
+                                '<a href="'.
+                                            ((strtotime($r[$i]->date_of_processing)<strtotime('2017-07-01'))?
+                                            base_url().'index.php/distributor_out/view_tax_invoice_old/'.$r[$i]->id:
+                                            base_url().'index.php/distributor_out/view_tax_invoice/'.$r[$i]->id).
+                                        '" target="_blank"> 
+                                    '.$r[$i]->invoice_no.'
+                                </a>'
+                                :''),
                             '<span style="display:none;">
                             <input type="hidden" id="invoice_date_'.$i.'" name="invoice_date[]" value="'.$r[$i]->invoice_date.'" />'.
                                 (($r[$i]->invoice_date!=null && $r[$i]->invoice_date!='')?date('Ymd',strtotime($r[$i]->invoice_date)):'')
                             .'</span>'.
                             (($r[$i]->invoice_date!=null && $r[$i]->invoice_date!='')?date('d/m/Y',strtotime($r[$i]->invoice_date)):''),
 
-                            $r[$i]->depot_name,
-
-                            ((strtoupper(trim($r[$i]->distributor_name))=='DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='AMAZON DIRECT')? $r[$i]->distributor_name . '-' . $r[$i]->client_name : $r[$i]->distributor_name),
+                          
+                            ((strtoupper(trim($r[$i]->distributor_name))=='DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='AMAZON DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='NYKAA DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED')? $r[$i]->distributor_name . '-' . $r[$i]->client_name : $r[$i]->distributor_name),
 
                             $r[$i]->order_no,
 
                             $r[$i]->location,
 
-                            $r[$i]->sales_rep_name,
+                          
 
                             $r[$i]->invoice_amount,
 
-                            (($r[$i]->modified_on!=null && $r[$i]->modified_on!='')?date('d/m/Y',strtotime($r[$i]->modified_on)):''),
+                            // (($r[$i]->modified_on!=null && $r[$i]->modified_on!='')?date('d/m/Y',strtotime($r[$i]->modified_on)):''),
 
-                            (($r[$i]->status=="InActive")?"Cancelled":$r[$i]->status),
+                            // (($r[$i]->status=="InActive")?"Cancelled":$r[$i]->status),
 
                             '<input type="hidden" id="dlvery_status_'.$i.'" name="dlvery_status[]" value="'.$r[$i]->delivery_status.'" />'.
                             $r[$i]->delivery_status,
 
-                            $r[$i]->del_person_name,
+                            // $r[$i]->del_person_name,
 
-                            ((($r[$i]->invoice_no!=null && $r[$i]->invoice_no!='') || ($r[$i]->voucher_no!=null && $r[$i]->voucher_no!=''))?
-                                '<a href="'.
-                                            ((strtotime($r[$i]->date_of_processing)<strtotime('2017-07-01'))?
-                                            base_url().'index.php/distributor_out/view_tax_invoice_old/'.$r[$i]->id:
-                                            base_url().'index.php/distributor_out/view_tax_invoice/'.$r[$i]->id).
-                                        '" target="_blank"> 
-                                    <span class="fa fa-file-pdf-o" style="font-size:20px;"></span>
-                                </a>'
-                                :''),
+                        
 
                             '<a href="'.
                                         ((strtotime($r[$i]->date_of_processing)<strtotime('2017-07-01'))?
@@ -192,7 +241,9 @@ class Distributor_out extends CI_Controller{
                                     '" target="_blank">  <span class="fa fa-file-pdf-o" style="font-size:20px;"></span>
                             </a>',
 
-                            '<a href="#"><span class="fa fa-eye">Resend Invoice</span></a>'
+                            '<a href="#"><span class="fa fa-eye">Resend Invoice</span></a>',
+                           $r[$i]->tracking_id
+
                         );
             }
         }
@@ -387,8 +438,6 @@ class Distributor_out extends CI_Controller{
                     $d_id = substr($d_id, 0, strpos($d_id, "_")+1) . $id;
                 }
 
-                // echo $d_id;
-
                 $data['data'] = $this->distributor_out_model->get_distributor_out_data('', $d_id);
                 $data['depot'] = $this->depot_model->get_data('Approved');
                 $data['distributor'] = $this->distributor_model->get_data('Approved');
@@ -434,7 +483,8 @@ class Distributor_out extends CI_Controller{
 
     public function update($id){
         $this->distributor_out_model->save_data($id);
-        redirect(base_url().'index.php/distributor_out/checkstatus/pending_for_delivery');
+       // redirect(base_url().'index.php/distributor_out/checkstatus/pending_for_delivery');
+	      echo '<script>window.open("'.base_url().'index.php/distributor_out/checkstatus/pending_for_delivery", "_parent")</script>';
     }
     
     public function check_box_availablity(){
@@ -521,15 +571,39 @@ class Distributor_out extends CI_Controller{
         redirect(base_url().'index.php/distributor_out/checkstatus/gp_issued');
     }
 
-    public function get_batch_details(){
+    public function check_file_name(){
+        $filename = $this->input->post('filename');
+        $check1=$this->input->post('check');
+        $check = array();
+        $j=0;
+
+        for($i=0; $i<count($check1); $i++){
+            if($check1[$i]!='false'){
+                $check[$j] = $check1[$i];
+                $j = $j + 1;
+            }
+        }
+
+        $distributor_out_id = $check1;
+
+        $result = $this->db->query("Select proof_of_delivery from distributor_out Where  proof_of_delivery='$filename'")->result();
+
+       if(count($result)==0)
+         echo 0;
+       else
+         echo 1;
+    }
+
+    public function get_batch_details($distributor_out_id){
         $result=$this->distributor_out_model->get_access();
         if(count($result)>0) {
             if($result[0]->r_view == 1 || $result[0]->r_edit == 1) {
                 $data['access'] = $this->distributor_out_model->get_access();
-                $data['data'] = $this->distributor_out_model->get_sku_details();
+                $data['data'] = $this->distributor_out_model->get_sku_details($distributor_out_id);
                 $data['batch_details'] = $this->distributor_out_model->get_batch_details();
 
-                $check1=$this->input->post('check');
+                /*$check1=$this->input->post('check');
+				$tracking_id=$this->input->post('tracking_id');
                 $check = array();
                 $j=0;
                 for($i=0; $i<count($check1); $i++){
@@ -538,7 +612,7 @@ class Distributor_out extends CI_Controller{
                         $j = $j + 1;
                     }
                 }
-                $distributor_out_id = implode(", ", $check);
+                $distributor_out_id = implode(", ", $check);*/
                 $data['distributor_out_id']=$distributor_out_id;
 
                 $query=$this->db->query("SELECT * FROM sales_rep_master WHERE sr_type='Merchandizer'");
@@ -630,6 +704,86 @@ class Distributor_out extends CI_Controller{
         $filepath = getcwd()."/assets/Tax_Invoice/";
         $filename ="mypdfName-".time()."-download.pdf";
         $m_pdf->Output($filepath.$filename, "F");
+    }
+
+    public function check_order_id_availablity() {
+		$result = $this->distributor_out_model->check_order_id_availablity();
+		echo $result;
+	}
+
+    public function get_product_percentage($product_id,$distributor_id) {
+        $result = $this->distributor_out_model->get_product_percentage($product_id,$distributor_id);
+
+        if(count($result)>0) {
+           echo json_encode($result[0]);
+        }
+        else{
+            echo 0;
+        }
+    }
+
+    public function get_product_details(){
+        $id=$this->input->post('id');
+        $distributor_id=$this->input->post('distributor_id');
+        // $id=1;
+
+        $result=$this->distributor_out_model->get_product_details('', $id, $distributor_id);
+        $data['result'] = 0;
+        if(count($result)>0) {
+            $data['result'] = 1;
+            $data['product_name'] = $result[0]->product_name;
+            $data['barcode'] = $result[0]->barcode;
+            $data['grams'] = $result[0]->grams;
+            $data['avg_grams'] = $result[0]->avg_grams;
+            $data['rate'] = $result[0]->rate;
+            $data['cost'] = $result[0]->cost;
+            $data['anticipated_wastage'] = $result[0]->anticipated_wastage;
+            $data['tax_percentage'] = $result[0]->tax_percentage;
+            $data['margin'] = $result[0]->margin;
+        }
+
+        echo json_encode($data);
+    }
+
+    public function get_box_details(){
+        $id=$this->input->post('id');
+        $distributor_id=$this->input->post('distributor_id');
+        // $id=1;
+
+        $result=$this->distributor_out_model->get_box_details('', $id, $distributor_id);
+        $data['result'] = 0;
+        if(count($result)>0) {
+            $data['result'] = 1;
+            $data['box_name'] = $result[0]->box_name;
+            $data['barcode'] = $result[0]->barcode;
+            $data['grams'] = $result[0]->grams;
+            $data['rate'] = $result[0]->rate;
+            $data['cost'] = $result[0]->cost;
+            $data['tax_percentage'] = $result[0]->tax_percentage;
+            $data['margin'] = $result[0]->margin;
+        }
+
+        echo json_encode($data);
+    }
+
+    public function get_comments()
+    {
+        $id=$this->input->post('id');
+        $result = $this->distributor_out_model->get_comments($id);
+        if(count($result)>0)
+        {
+            echo json_encode($result[0]);
+        }
+        else
+        {
+            echo 0;
+        }
+    }
+
+    public function add_comments()
+    {
+       $result = $this->distributor_out_model->save_comments();
+       redirect($_SERVER['HTTP_REFERER']); 
     }
 
 }

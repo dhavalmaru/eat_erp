@@ -19,18 +19,63 @@ class User extends CI_Controller{
     }
 
     //index function
-    public function index(){
+  
+		
+		  public function index(){
+        // $result=$this->sales_rep_model->get_access();
+        // if(count($result)>0) {
+        //     $data['access']=$result;
+        //     $data['data'] = $this->sales_rep_model->get_data();
+
+        //     load_view('sales_rep/sales_rep_list', $data);
+        // } else {
+        //     echo '<script>alert("You donot have access to this page.");</script>';
+        //     $this->load->view('login/main_page');
+        // }
+        $this->checkstatus('approved');
+    }
+		
+      
+
+	
+				
+
+    public function checkstatus($status=''){
         $result=$this->user_model->get_access();
         if(count($result)>0) {
             $data['access']=$result;
-            $data['data'] = $this->user_model->get_data();
+            $data['data']=$this->user_model->get_data($status);
 
-            load_view('user/user_list', $data);
+            $count_data=$this->user_model->get_data();
+            $approved=0;
+          
+            $inactive=0;
+
+            if (count($result)>0){
+                for($i=0;$i<count($count_data);$i++){
+                    if (strtoupper(trim($count_data[$i]->status))=="APPROVED")
+                        $approved=$approved+1;
+                  
+                    else if (strtoupper(trim($count_data[$i]->status))=="INACTIVE")
+                        $inactive=$inactive+1;
+                }
+            }
+
+            $data['approved']=$approved;
+           
+            $data['inactive']=$inactive;
+            $data['all']=count($count_data);
+
+         load_view('user/user_list', $data);
         } else {
             echo '<script>alert("You donot have access to this page.");</script>';
             $this->load->view('login/main_page');
         }
     }
+
+	
+	
+	
 
     public function add(){
         $result=$this->user_model->get_access();

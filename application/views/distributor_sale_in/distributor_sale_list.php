@@ -59,6 +59,7 @@
 									<thead>
 										<tr>
 										    <th width="58" style="text-align:center;"> Sr. No.</th>
+										    <th width="58" style="text-align:center;">Edit</th>
 											<th width="150"> Date Of processing</th>
 											<th> Distributor Name</th>
 											<th width="120"> Amount (In Rs) </th>
@@ -69,11 +70,12 @@
 										<?php for ($i=0; $i < count($data); $i++) { ?>
 										<tr>
 											<td style="text-align:center;"><?php echo $i+1; ?></td>
+											<td style="text-align:center; vertical-align: middle; "><a href="<?php echo base_url().'index.php/distributor_sale_in/edit/'.$data[$i]->id; ?>"><i class="fa fa-edit"></i></a></td>
 											<td>
                                                 <span style="display:none;">
                                                     <?php echo (($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('Ymd',strtotime($data[$i]->date_of_processing)):''); ?>
                                                 </span>
-                                                <a href="<?php echo base_url().'index.php/distributor_sale_in/edit/'.$data[$i]->id; ?>"><?php echo (($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('d/m/Y',strtotime($data[$i]->date_of_processing)):''); ?></a>
+                                              <?php echo (($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('d/m/Y',strtotime($data[$i]->date_of_processing)):''); ?>
                                             </td>
 											<td><?php echo $data[$i]->store_name; ?></td>
 											<td><?php echo format_money($data[$i]->amount,2); ?></td>

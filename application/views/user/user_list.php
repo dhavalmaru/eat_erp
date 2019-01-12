@@ -36,6 +36,37 @@
 								</div>
 				     </div>	      
                 </div>
+				   <div class="nav-contacts ng-scope" ui-view="@nav">
+    				<div class="u-borderBottom u-bgColorBreadcrumb ng-scope">
+    					<div class="container u-posRelative u-textRight">
+    						<ul class="m-nav--linetriangle" ng-swipe-left="app.onInnerSwipe($event);" ng-swipe-right="app.onInnerSwipe($event);">
+    							<!--<li class="all">
+    								<a  href="<?php //echo base_url(); ?>index.php/credit_debit_note/checkstatus/All">
+    									<span class="ng-binding">All</span>
+    									<span id="approved">  (<?php //echo $all; ?>)  </span>
+    								</a>
+    							</li>-->
+
+    							<li class="approved" >
+    								<a  href="<?php echo base_url(); ?>index.php/user/checkstatus/Approved">
+    									<span class="ng-binding">Active</span>
+    									<span id="approved"> (<?php echo $approved; ?>)</span>
+    								</a>
+    							</li>
+
+    						
+                                <li class="inactive">
+                                    <a  href="<?php echo base_url(); ?>index.php/user/checkstatus/InActive">
+                                        <span class="ng-binding">InActive</span>
+                                        <span id="approved"> (<?php echo $inactive; ?>) </span>
+                                    </a>
+                                </li>
+
+    						</ul>
+    						
+    					</div>
+    				</div>
+    			</div>
                 <!-- PAGE CONTENT WRAPPER -->
                   <div class="page-content-wrap">                
                     <div class="row">
@@ -48,24 +79,26 @@
 									<thead>
 										<tr>
 										<th width="65" style="text-align:center;" >Sr. No.</th>
-											<th  >Name</th>
-											<th >Email Id</th>
+										<th width="65" style="text-align:center;" >Edit</th>
+											<th>Name</th>
+											<th>Email Id</th>
 											<th width="110">Mobile No</th>
-											<th width="110">Creation Date</th>
+											<!--<th width="110">Creation Date</th>-->
 										</tr>
 									</thead>
 									<tbody>
 										<?php for ($i=0; $i < count($data); $i++) { ?>
 										<tr>
 											<td  style="text-align:center;"><?php echo $i+1; ?></td>
-											<td><a href="<?php echo base_url().'index.php/user/edit/'.$data[$i]->id; ?>"><?php echo $data[$i]->first_name . ' ' . $data[$i]->middle_name . ' ' . $data[$i]->last_name; ?></a></td>
+											<td style="text-align:center; vertical-align: middle; "><a href="<?php echo base_url().'index.php/user/edit/'.$data[$i]->id; ?>"><i class="fa fa-edit"></i></a></td>
+											<td><?php echo $data[$i]->first_name . ' ' . $data[$i]->middle_name . ' ' . $data[$i]->last_name; ?></td>
 											<td><?php echo $data[$i]->email_id; ?></td>
 											<td><?php echo $data[$i]->mobile; ?></td>
-											<td>
+											<!--<td>
 												<span style="display:none;">
-                                                    <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
+                                                    <?php// echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
                                                 </span>
-												<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
+												<?php //echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>-->
 										</tr>
 										<?php } ?>
 									</tbody>
@@ -87,6 +120,25 @@
         <!-- END PAGE CONTAINER -->
 						
         <?php $this->load->view('templates/footer');?>
+		<script>
+	    	$(document).ready(function() {
+	    		var url = window.location.href;
+
+	    		if(url.includes('All')){
+	                $('.all').attr('class','active');
+	            }
+	            else if(url.includes('InActive')){
+	                $('.inactive').attr('class','active');
+	            }
+	            else if(url.includes('Approved')){
+	                $('.approved').attr('class','active');
+	            }
+	          
+	            else {
+	                $('.approved').attr('class','active');
+	            }
+	    	});
+		</script>
 		
     <!-- END SCRIPTS -->      
     </body>

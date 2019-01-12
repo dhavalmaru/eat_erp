@@ -42,7 +42,7 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Zone</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="zone_id" id="zone_id" class="form-control">
+                                                <select name="zone_id" id="zone_id" class="form-control select2">
                                                     <option value="">Select</option>
                                                     <?php if(isset($zone)) { for ($k=0; $k < count($zone) ; $k++) { ?>
                                                             <option value="<?php echo $zone[$k]->id; ?>" <?php if (isset($data)) { if($zone[$k]->id==$data[0]->zone_id) { echo 'selected'; } } ?>><?php echo $zone[$k]->zone; ?></option>
@@ -55,12 +55,10 @@
 								
 									<div class="form-group"  >
 										<div class="col-md-12 col-sm-12 col-xs-12">
-										
-										 
-                                           
+									
 										 <label class="col-md-2 col-sm-2 col-xs-12 control-label"> Relation <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                              <select name="store_id" id="store_id" class="form-control">
+                                              <select name="store_id" id="store_id" class="form-control select2">
                                                     <option value="">Select</option>
                                                     <?php if(isset($store_rel)) { for ($k=0; $k < count($store_rel) ; $k++) { ?>
                                                             <option value="<?php echo $store_rel[$k]->id; ?>" <?php if (isset($data)) { if($store_rel[$k]->id==$data[0]->store_id) { echo 'selected'; } } ?>><?php echo $store_rel[$k]->store_name; ?></option>
@@ -68,14 +66,14 @@
                                                 </select>
                                              
                                             </div>
-                                            </div>
-                                          </div>
+                                        </div>
+                                    </div>
 											
 									<div class="form-group"  >
 										<div class="col-md-12 col-sm-12 col-xs-12">
 											  <label class="col-md-2 col-sm-2 col-xs-12 control-label">Location</label>
 										<div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="location_id" id="location_id" class="form-control">
+                                                <select name="location_id" id="location_id" class="form-control select2">
                                                     <option value="">Select</option>
                                                     <?php if(isset($location)) { for ($k=0; $k < count($location) ; $k++) { ?>
                                                             <option value="<?php echo $location[$k]->id; ?>" <?php if (isset($data)) { if($location[$k]->id==$data[0]->location_id) { echo 'selected'; } } ?>><?php echo $location[$k]->location; ?></option>

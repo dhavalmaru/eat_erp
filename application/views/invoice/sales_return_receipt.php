@@ -8,6 +8,11 @@
     font-family: "OpenSans-Regular";
     src: url("<?php echo base_url().'/assets/invoice/'; ?>OpenSans-Regular.ttf") format("truetype");
 }
+.user_data tr, .user_data td
+		{
+			border:none!important;
+			padding:5px!important;
+		}
 </style>
 </head>
 
@@ -31,7 +36,7 @@
             <td colspan="10" valign="top" style="line-height:20px; padding:0; border:0;"> 
                 <table width="100%"  border="0" cellspacing="0" cellpadding="5">
                     <tr style="border-bottom:1px solid #666;">
-                        <td width="39%" rowspan="2" style="line-height:20px; padding-top: 0px; padding-bottom: 0px;">
+                        <td width="39%" rowspan="3" style="line-height:20px; padding-top: 0px; padding-bottom: 0px;">
                             <p style="margin: 0px;">
                                 <span style=" font-size:13px; font-weight:500;" >Distributor Name</span>
                                 <br /> <?php if(isset($data[0]->distributor_name)) echo $data[0]->distributor_name; ?>
@@ -59,19 +64,37 @@
                       
                     </tr>
                     <tr style="border-bottom:0px solid #666;">
-                        <td valign="top" style="line-height:20px; border-bottom:0px solid #666; border-right:1px solid #666;  border-left:1px solid #666; padding-top: 0px; padding-bottom: 0px;">
+                        <td valign="top" style="line-height:20px; border-bottom:1px solid #666; border-right:1px solid #666;  border-left:1px solid #666; padding-top: 0px; padding-bottom: 0px;">
                             <p style="margin: 0px;"> <span style=" font-size:12px; font-weight:500;" >Location  </span> <br /> 
                             <?php if(isset($data[0]->depot_name)) echo $data[0]->depot_name; ?>
                             </p>
                         </td>
-                        <td  valign="top" style="line-height:20px; padding-top: 0px; padding-bottom: 0px;">
+                        <td  valign="top" style="line-height:20px; padding-top: 0px; border-bottom:1px solid #666; padding-bottom: 1px;">
                             <p style="margin: 0px;"> <span style=" font-size:12px; font-weight:500;" >Prepare By</span> <br /> 
                             <?php if(isset($data[0]->first_name)) echo $data[0]->first_name.' '.$data[0]->last_name; ?>
                             </p>
                         </td>
-						  <td width="30%" valign="top" style="line-height:20px; padding-top: 0px; padding-bottom: 0px;">
+						  <td width="30%" valign="top" style="line-height:20px; border-bottom:1px solid #666; padding-top: 0px; padding-bottom: 0px;">
                             <p style="margin: 0px;">  <span style=" font-size:12px; font-weight:500;" >Dated </span>  <br />
                             <?php echo (($data[0]->date_of_processing!=null && $data[0]->date_of_processing!='')?date('d/m/Y',strtotime($data[0]->date_of_processing)):''); ?>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr style="border-bottom:0px solid #666;">
+                        <td valign="top" style="line-height:20px; border-bottom:0px solid #666; border-right:1px solid #666;  border-left:1px solid #666; padding-top: 0px; padding-bottom: 0px;">
+                            <p style="margin: 0px;"> <span style=" font-size:12px; font-weight:500;" >Sales Type  </span> <br /> 
+                            <?=($data[0]->sales_type=='Invoice' || $data[0]->sales_type=='Adhoc'?$data[0]->sales_type:'Adhoc')?>
+                            </p>
+                        </td>
+                        <td  valign="top" style="line-height:20px; padding-top: 0px; padding-bottom: 0px;">
+                            <p style="margin: 0px;"> <span style=" font-size:12px; font-weight:500;" >
+                            <?=($data[0]->sales_type=='Invoice'?$data[0]->sales_type:'')?>
+                            </span> <br /> 
+                            <?=($data[0]->sales_type=='Invoice'?$data[0]->invoice_nos:'')?>
+                            </p>
+                        </td>
+                          <td width="30%" valign="top" style="line-height:20px; padding-top: 0px; padding-bottom: 0px;">
+                            <p style="margin: 0px;">  <span style=" font-size:12px; font-weight:500;" > </span>  <br />
                             </p>
                         </td>
                     </tr>
@@ -184,10 +207,38 @@
 
 		
     </table>
+	</div>
+	<table class="user_data" border="0" width="925px" style="border-collapse:collapse;margin-top:30px " class="table" cellspacing="10">
+					<tr valign="center" >
+						   <td style="font-weight:bold">Created By:</td>
+						   <td><?php if(isset($data[0]->createdby)) echo $data[0]->createdby; ?></td>
+						   
+						    <td style="font-weight:bold">Created On:</td>
+						    <td><?php if(isset($data[0]->created_on)) echo $data[0]->created_on?></td>
+						  
+						  
+					</tr>
+					<tr valign="center" >
+					    <td style="font-weight:bold">Modified By:</td>
+						   <td><?php if(isset($data[0]->modifiedby)) echo $data[0]->modifiedby; ?></td>
+						   <td style="font-weight:bold">Modified On:</td>
+						     <td><?php if(isset($data[0]->modified_on)) echo $data[0]->modified_on?></td>
+						   
+					</tr>
+					
+					<tr valign="center" >
+					  <td style="font-weight:bold">Approved By:</td>
+						   <td><?php if(isset($data[0]->approvedby)) echo $data[0]->approvedby; ?></td>
+						   <td style="font-weight:bold">Approved On:</td>
+						     <td><?php if(isset($data[0]->approved_on))echo $data[0]->approved_on ?>
+							</td>
+					</tr>
+	</table>
+	
 </div>
 <?php } ?>
 
-
+    
 
 
 </body>

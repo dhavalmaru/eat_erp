@@ -56,10 +56,10 @@
 								
 								
 									<div class="form-group" style="display:flex; border-top:1px solid #eee;" >
-									<div class="col-md-12 col-sm-12 col-xs-12">
+										<div class="col-md-12 col-sm-12 col-xs-12">
 											<label class="col-md-2 col-sm-2 col-xs-12 control-label">State Name <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                               <select class="form-control state_name" name="state_name" id="state_name" required >
+                                               <select class="form-control state_name select2" name="state_name" id="state_name" required >
 												    <option value=''>Select State</option>
                                                     <?php if(isset($state_list)){
                                                         foreach($state_list as $row){
@@ -82,6 +82,10 @@
                                                     }?>
                                                     </select>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group" style="display:flex; border-top:1px solid #eee;" >
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">City Name <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control city_name" name="city_name" placeholder="City Name" value="<?php if(isset($city_details)){ echo $city_details[0]->city_name; } ?>" required/>
@@ -89,7 +93,7 @@
 										</div>
 										
 										
-                                     </div>
+                                    </div>
                                     
                       
                                 

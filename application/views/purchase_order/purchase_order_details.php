@@ -18,9 +18,24 @@
         <!-- EOF CSS INCLUDE -->      
 		
 		<style>
-            input[readonly] {background-color: white !important; 
-                            color: #0b385f !important; 
-                            cursor: not-allowed !important;}
+             input[type=radio], input[type=checkbox] { margin: 8px 0px 0px;      vertical-align: text-bottom;}
+            th{text-align:center;}
+            .center{text-align:center;}
+            input[readonly], input[disabled], select[disabled], textarea[disabled] {
+                background-color: white !important; 
+                color: #0b385f !important; 
+                cursor: not-allowed !important;
+            }
+
+            
+				#total_amount
+			{
+				border:none!important;
+				background-color:transparent!important;
+				box-shadow:none!important;
+				font-size:14px;
+				font-weight:700;
+			}
 		</style>
 		
     </head>
@@ -42,18 +57,24 @@
                             <form id="form_purchase_order_details" role="form" class="form-horizontal" method="post" action="<?php if (isset($data)) echo base_url(). 'index.php/purchase_order/update/' . $data[0]->id; else echo base_url().'index.php/purchase_order/save'; ?>">
                               <div class="box-shadow-inside">
                                 <div class="col-md-12 custom-padding" style="padding:0;" >
-                                 <div class="panel panel-default">
+                                <div class="panel panel-default">
 							     	<div class="panel-body">
-									<div class="form-group"  >
+									<div class="form-group">
 										<div class="col-md-12 col-sm-12 col-xs-12">
 											<label class="col-md-2 col-sm-2 col-xs-12 control-label">Date <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
+                                                <input type="hidden" class="form-control" name="ref_id" id="ref_id" value="<?php if(isset($data)) echo $data[0]->ref_id;?>"/>
+                                                <input type="hidden" class="form-control" name="po_no" id="po_no" value="<?php if(isset($data)) echo $data[0]->po_no;?>"/>
                                                 <input type="text" class="form-control datepicker1" name="order_date" id="order_date" placeholder="Date" value="<?php if(isset($data)) echo (($data[0]->order_date!=null && $data[0]->order_date!='')?date('d/m/Y',strtotime($data[0]->order_date)):''); else echo date('d/m/Y'); ?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group">
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Vendor <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="vendor_id" id="vendor_id" class="form-control" onchange="get_vendor_details();">
+                                                <select name="vendor_id" id="vendor_id" class="form-control select2" onchange="get_vendor_details();">
                                                     <option value="00">Select</option>
                                                     <?php if(isset($vendor)) { for ($k=0; $k < count($vendor) ; $k++) { ?>
                                                             <option value="<?php echo $vendor[$k]->id; ?>" <?php if(isset($data)) { if($vendor[$k]->id==$data[0]->vendor_id) { echo 'selected'; } } ?>><?php echo $vendor[$k]->vendor_name; ?></option>
@@ -67,7 +88,7 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Depot <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="depot_id" id="depot_id" class="form-control" onchange="get_depot_details();">
+                                                <select name="depot_id" id="depot_id" class="form-control select2" onchange="get_depot_details();">
                                                     <option value="">Select</option>
                                                     <?php if(isset($depot)) { for ($k=0; $k < count($depot) ; $k++) { ?>
                                                             <option value="<?php echo $depot[$k]->id; ?>" <?php if(isset($data)) { if($depot[$k]->id==$data[0]->depot_id) { echo 'selected'; } } ?>><?php echo $depot[$k]->depot_name; ?></option>
@@ -82,7 +103,8 @@
                                         <table class="table table-bordered" style="margin-bottom: 0px; ">
                                         <thead>
                                             <tr>
-                                                <th width="300">Item <span class="asterisk_sign">*</span></th>
+                                                <th width="600">Item <span class="asterisk_sign">*</span></th>
+                                                <th width="600">Item Description <span class="asterisk_sign">*</span></th>
                                                 <th width="180">Qty In Kg <span class="asterisk_sign">*</span></th>
 												<th width="180">HSN Code </th>
                                                 <th width="180">Rate </th>
@@ -99,13 +121,16 @@
                                                 for($i=0; $i<count($purchase_order_items); $i++) { ?>
                                             <tr id="box_<?php echo $i; ?>_row">
                                                 <td>
-                                                    <select name="raw_material[]" class="form-control raw_material" id="raw_material_<?php echo $i;?>" data-error="#err_item_<?php echo $i;?>"  onChange="get_raw_material_details(this);">
+                                                    <select name="raw_material[]" class="form-control raw_material select2" id="raw_material_<?php echo $i;?>" data-error="#err_item_<?php echo $i;?>"  onChange="get_raw_material_details(this);">
                                                         <option value="">Select</option>
                                                         <?php if(isset($raw_material)) { for ($k=0; $k < count($raw_material) ; $k++) { ?>
                                                                 <option value="<?php echo $raw_material[$k]->id; ?>" <?php if($raw_material[$k]->id==$purchase_order_items[$i]->item_id) { echo 'selected'; } ?>><?php echo $raw_material[$k]->rm_name; ?></option>
                                                         <?php }} ?>
                                                     </select>
                                                     <div id="err_item_<?php echo $i;?>"></div>
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control" name="item_desc[]" id="item_desc_<?php echo $i; ?>" placeholder="Item Description" value="<?php if (isset($purchase_order_items)) { echo $purchase_order_items[$i]->item_desc; } ?>" />
                                                 </td>
                                                 <td>
                                                     <input type="text" class="form-control qty" name="qty[]" id="qty_<?php echo $i; ?>" placeholder="Qty" value="<?php if (isset($purchase_order_items)) { echo $purchase_order_items[$i]->qty; } ?>" onchange="get_amount(this)" />
@@ -141,13 +166,16 @@
                                         <?php }} else { ?>
                                             <tr id="box_<?php echo $i; ?>_row">
                                                 <td>
-                                                    <select name="raw_material[]" class="form-control raw_material" id="raw_material_<?php echo $i;?>" data-error="#err_item_<?php echo $i;?>"  onChange="get_raw_material_details(this);">
+                                                    <select name="raw_material[]" class="form-control raw_material select2" id="raw_material_<?php echo $i;?>" data-error="#err_item_<?php echo $i;?>"  onChange="get_raw_material_details(this);">
                                                         <option value="">Select</option>
                                                         <?php if(isset($raw_material)) { for ($k=0; $k < count($raw_material) ; $k++) { ?>
                                                                 <option value="<?php echo $raw_material[$k]->id; ?>"><?php echo $raw_material[$k]->rm_name; ?></option>
                                                         <?php }} ?>
                                                     </select>
                                                     <div id="err_item_<?php echo $i;?>"></div>
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control" name="item_desc[]" id="item_desc_<?php echo $i; ?>" placeholder="Item Description" value="" />
                                                 </td>
                                                 <td>
                                                     <input type="text" class="form-control qty" name="qty[]" id="qty_<?php echo $i; ?>" placeholder="Qty" value="" onchange="get_amount(this)" />
@@ -191,6 +219,18 @@
                                         </table>
                                     </div>
 									</div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Other Charges Description </label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                 <input type="text" class="form-control" name="other_charges" id="other_charges" placeholder="Other Charges" value="<?php if (isset($data[0]->other_charges)) { echo $data[0]->other_charges; } ?>"  />
+                                            </div>
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Other Charges Amount (In Rs) <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="other_charges_amount" id="other_charges_amount" placeholder="Other Charges Amount" value="<?php if (isset($data[0]->other_charges_amount)) { echo $data[0]->other_charges_amount; } ?>" onkeypress="return isNumberKey(event)" onchange="get_amount(this)"/>
+                                            </div>
+                                        </div>
+                                    </div>
 									
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
@@ -210,19 +250,26 @@
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="shipping_method" id="shipping_method" placeholder="Shipping Method" value="<?php if (isset($data)) { echo $data[0]->shipping_method; } ?>" />
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Shipping Term </label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="shipping_term" id="shipping_term" placeholder="Shipping Term" value="<?php if(isset($data)) { echo $data[0]->shipping_term; } ?>" />
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group" style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
+                                    <div class="form-group" style="display: none;">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <div style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
                                                 <label class="col-md-2 col-sm-2 col-xs-12 control-label">Status <span class="asterisk_sign">*</span></label>
                                                 <div class="col-md-4 col-sm-4 col-xs-12">
-                                                    <select class="form-control" name="status">
-                                                        <option value="Approved" <?php if(isset($data)) {if ($data[0]->status=='Approved') echo 'selected';}?>>Active</option>
+                                                   <select class="form-control" name="status">
+                                                        <option value="Pending" <?php if(isset($data)) {if ($data[0]->status=='Pending') echo 'selected';}?>>Pending</option>
+                                                        <option value="Deleted" <?php if(isset($data)) {if ($data[0]->status=='Deleted') echo 'selected';}?>>Deleted</option>
+                                                        <option value="Rejected" <?php if(isset($data)) {if ($data[0]->status=='Rejected') echo 'selected';}?>>Rejected</option>
+                                                        <option value="Approved" <?php if(isset($data)) {if ($data[0]->status=='Approved') echo 'selected';}?>>Approved</option>
                                                         <option value="InActive" <?php if(isset($data)) {if ($data[0]->status=='InActive') echo 'selected';}?>>InActive</option>
                                                     </select>
                                                 </div>
@@ -233,7 +280,7 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Remarks </label>
                                             <div class="col-md-10 col-sm-10 col-xs-12">
-                                                <textarea class="form-control" name="remarks"><?php if(isset($data)) echo $data[0]->remarks;?></textarea>
+                                                <textarea class="form-control" name="remarks" id="remarks"><?php if(isset($data)) echo $data[0]->remarks;?></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -242,9 +289,57 @@
 								<br clear="all"/>
 							  </div>
                                 </div>
-                                <div class="panel-footer">
+                                <!-- <div class="panel-footer">
 									<a href="<?php echo base_url(); ?>index.php/purchase_order" class="btn btn-danger" type="reset" id="reset">Cancel</a>
                                     <button class="btn btn-success pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</button>
+                                </div> -->
+                                  <?php
+                                if(isset($data[0]->po_status))
+                                        {
+                                            if($data[0]->po_status=='Raw Material IN' || $data[0]->po_status=='Closed' || $data[0]->po_status=='Advance')
+                                            {
+                                                $style="display:none";
+                                            }
+                                            else
+                                            {
+                                                $style="display:block";
+                                            }
+                                        }
+                                        else
+                                        {
+                                                $style="display:block";
+                                        }
+                                ?>
+
+                                <?php $curusr=$this->session->userdata('session_id'); ?>
+                                <?php 
+                                        if(isset($data[0]->status))
+                                        {
+                                         if(isset($access)) {
+                                            if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive'))
+                                                {
+                                                  if(isset($data[0]->status))
+                                                    {
+                                                         if($data[0]->status=='Deleted'){
+                                                            echo '<label class="col-xs-12 control-label" style="color:#cc2127!important">Note : If clicked on approve button this entry will be deleted permanently </label>';
+
+                                                         }    
+                                                    }     
+                                                }
+                                            }   
+                                        }
+                                ?>
+                                 <div class="panel-footer">
+                                    <a href="<?php echo base_url(); ?>index.php/Purchase_order" class="btn btn-danger btn-sm pull-right" type="reset" id="reset">Cancel</a>
+                                    <?php $curusr=$this->session->userdata('session_id'); ?>
+                                    <div style="<?=$style?>">
+                                        <input type="submit" class="btn btn-success btn-sm" id="btn_submit" name="btn_submit" value="Submit For Approval" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_edit=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || $data[0]->status=='InActive')) echo ''; else echo 'display: none;';} else if($access[0]->r_insert=='1') echo ''; else echo 'display: none;';} else echo 'display: none;'; ?>" />
+                                    <input type="submit" class="btn btn-danger btn-sm" id="btn_delete" name="btn_delete" value="Delete" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_delete=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved') && $data[0]->status!='InActive') echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+                                    <input type="submit" class="btn btn-success btn-sm" id="btn_approve" name="btn_approve" value="Approve" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+                                    <input type="submit" class="btn btn-danger btn-sm" id="btn_reject" name="btn_reject" value="Reject" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+                                    </div>
+                                    
+                                    <!-- <button class="btn btn-success pull-right" style="<?php //if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</button> -->
                                 </div>
 							</form>
 						</div>
@@ -264,7 +359,27 @@
         <script type="text/javascript" src="<?php echo base_url(); ?>js/load_autocomplete.js"></script>
         <script type="text/javascript" src="<?php echo base_url(); ?>js/validations.js"></script>
         <script type="text/javascript">
+            
             $(document).ready(function(){
+                if(!$('#btn_submit').is(':visible')){
+                    // $("input[type!='hidden']").attr("disabled", true);
+                    $('input[type="text"').attr("readonly", true);
+                    $('input[type="checkbox"]').attr("disabled", true);
+                    $('input[type="file"]').attr("disabled", true);
+                    $('input[type="radio"]').attr("disabled", true);
+                    $("select:visible").attr("disabled", true);
+                    $("textarea").attr("disabled", true);
+                    $(".datepicker").attr("disabled", true);
+
+                    $("#btn_approve").attr("disabled", false);
+                    $("#btn_reject").attr("disabled", false);
+                    $("#remarks").attr("disabled", false);
+
+                    $('tfoot').hide();
+                    $('.table_action').hide();
+                } else {
+                    $(".datepicker1").datepicker({ maxDate: 0,changeMonth: true,yearRange:'-100:+0',changeYear: true });
+                }
                 set_total();
             });
             var get_vendor_details = function(){
@@ -499,9 +614,15 @@
                     finalamt = parseFloat(get_number($(this).val(),2));
                     if (isNaN(finalamt)) finalamt=0;
                     final_amt = final_amt + finalamt;
-                });
+                });                
+                other_charges_amount = 0;
+                if($("#other_charges_amount").val()!='')
+                  {
+                    other_charges_amount = parseFloat(get_number($("#other_charges_amount").val(),2));
+                  }
 
-                $("#total_amount").val(final_amt.toFixed(2));
+                final_amt = (final_amt+other_charges_amount);
+                $("#total_amount").val(final_amt = final_amt.toFixed(2));
             }
 			$('#repeat-box').click(function(event){
 				var counter = $('.raw_material').length;
@@ -509,13 +630,16 @@
                 event.preventDefault();
                 var newRow = jQuery('<tr id="box_'+counter+'_row">' + 
                                         '<td>' + 
-                                            '<select name="raw_material[]" class="form-control raw_material" id="raw_material_'+counter+'" data-error="#err_item_'+counter+'"  onChange="get_raw_material_details(this);" >' + 
+                                            '<select name="raw_material[]" class="form-control raw_material select2" id="raw_material_'+counter+'" data-error="#err_item_'+counter+'"  onChange="get_raw_material_details(this);" >' + 
                                                 '<option value="">Select</option>' + 
                                                 '<?php if(isset($raw_material)) { for ($k=0; $k < count($raw_material) ; $k++) { ?>' + 
                                                         '<option value="<?php echo $raw_material[$k]->id; ?>"><?php echo $raw_material[$k]->rm_name; ?></option>' + 
                                                 '<?php }} ?>' + 
                                             '</select>' + 
                                             '<div id="err_item_'+counter+'"></div>' + 
+                                        '</td>' + 
+                                        '<td>' + 
+                                            '<input type="text" class="form-control" name="item_desc[]" id="item_desc_'+counter+'" placeholder="Item Description" value="" />' + 
                                         '</td>' + 
                                         '<td>' + 
                                             '<input type="text" class="form-control qty" name="qty[]" id="qty_'+counter+'" placeholder="Qty" value="" onchange="get_amount(this)" />' + 
@@ -548,7 +672,7 @@
                                         '</td>' + 
                                     '</tr>');
                 $('#box_details').append(newRow);
-
+               $('.select2').select2();
                 $('.format_number').keyup(function(){
                     format_number(this);
                 });
@@ -563,6 +687,14 @@
                 addMultiInputNamingRules('#form_purchase_order_details', 'select[name="raw_material[]"]', { required: true }, "");
                 addMultiInputNamingRules('#form_purchase_order_details', 'input[name="qty[]"]', { required: true, number: true }, "");
             });
+
+        function isNumberKey(evt){
+            var charCode = (evt.which) ? evt.which : event.keyCode
+            if (charCode > 31 && ((charCode < 48 || charCode > 57) && charCode!=46 ))
+                return false;
+            return true;
+        }
+
         </script>
     </body>
 </html>

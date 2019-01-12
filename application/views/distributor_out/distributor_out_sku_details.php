@@ -45,7 +45,7 @@
                     <div class="row main-wrapper">
                     <div class="main-container">
                     <div class="box-shadow">
-                        <form id="form_distributor_out_sku_details" role="form" class="form-horizontal" method="post" action="<?php echo base_url().'index.php/distributor_out/set_sku_batch'; ?>">
+                        <form id="form_distributor_out_sku_details" role="form" class="form-horizontal" method="post" action="<?php echo base_url().'index.php/distributor_out/set_sku_batch'; ?>" enctype="multipart/form-data">
                             <div class="box-shadow-inside">
                                 <div class="col-md-12 custom-padding" style="padding:0;" >
                                 <div class="panel panel-default">
@@ -74,6 +74,30 @@
                                                 </select>
                                             </div>
                                         </div>
+                                    </div>
+									<div class="form-group" >
+                                      <div class="col-md-12 col-sm-12 col-xs-12">
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Tracking Id<span class="asterisk_sign">*</span></label>
+                                        <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <input type="text" class="form-control" name="tracking_id" id="tracking_id" value="" />
+                                        </div>
+                                       </div>
+                                    </div>
+                                    <div class="form-group" >
+                                      <div class="col-md-12 col-sm-12 col-xs-12">
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Proof Of Dispatch<span class="asterisk_sign">*</span></label>
+                                        <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <input type="file" class="fileinput btn btn-info btn-small  bar_image" name="upload" id="image" placeholder="image" value=""/>
+                                        </div>
+                                       </div>
+                                    </div>
+                                    <div class="form-group" >
+                                      <div class="col-md-12 col-sm-12 col-xs-12">
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Date of dispatch<span class="asterisk_sign">*</span></label>
+                                        <div class="col-md-4 col-sm-4 col-xs-12">
+                                           <input type="text" class="form-control datepicker" name="date_of_dispatch" id="date_of_dispatch" placeholder="Date" value="<?php echo date('d/m/Y'); ?>"/>
+                                        </div>
+                                       </div>
                                     </div>
 
                                     <div class="form-group" >
@@ -137,7 +161,7 @@
                                                                 <?php echo $data[$i]->depot_name; ?>
                                                             </td>
                                                             <td>
-                                                                <?php echo ((strtoupper(trim($data[$i]->distributor_name))=='DIRECT' || strtoupper(trim($data[$i]->distributor_name))=='AMAZON DIRECT')? $data[$i]->distributor_name . '-' . $data[$i]->client_name : $data[$i]->distributor_name); ?>
+                                                                <?php echo ((strtoupper(trim($data[$i]->distributor_name))=='DIRECT' || strtoupper(trim($data[$i]->distributor_name))=='AMAZON DIRECT' || strtoupper(trim($data[$i]->distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($data[$i]->distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($data[$i]->distributor_name))=='NYKAA DIRECT' || strtoupper(trim($data[$i]->distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED')? $data[$i]->distributor_name . '-' . $data[$i]->client_name : $data[$i]->distributor_name); ?>
                                                             </td>
                                                             <td>
                                                                 <?php echo $data[$i]->location; ?>

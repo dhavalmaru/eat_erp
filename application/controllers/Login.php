@@ -12,6 +12,7 @@ class Login extends CI_Controller
         $this->load->helper('url');
         $this->load->helper('form');
         $this->load->library('session');
+		$this->load->helper('cookie');
         $this->load->library('email');
         $this->load->helper('common_functions');
         $this->load->model('dashboard_model');
@@ -20,16 +21,42 @@ class Login extends CI_Controller
 
     //index function
     public function index(){
-        $this->load->view('login/main_page');
+		
+		    
+		if(get_cookie('email')!=NULL || get_cookie('email')!='')
+		{
+			$this->check_credentials();
+		}
+		else
+		{
+			  $this->load->view('login/main_page');
+		}
+		//set_cookie('cookie_name','cookie_value','3600'); 
+      
+		
     }
 
     public function check_credentials() {
-        $uname=$this->input->post('email');
+
+       
+        
+		if(get_cookie('email')!=NULL || get_cookie('password')!='')
+		{
+			 $uname=get_cookie('email');
+             $upass=get_cookie('password');
+
+			 $query=$this->db->query("SELECT A.id,A.email_id,A.first_name,A.last_name,A.role_id,A.sales_rep_id,B.sr_type FROM user_master A left outer join sales_rep_master B on B.id=A.sales_rep_id WHERE A.email_id = '$uname' AND A.password = '$upass'");
+				$result=$query->result();
+			
+		}
+		else{
+		        $uname=$this->input->post('email');
         $upass=$this->input->post('password');
 
-        $query=$this->db->query("SELECT A.id,A.email_id,A.first_name,A.last_name,A.role_id,A.sales_rep_id,B.sr_type FROM user_master A left outer join sales_rep_master B on B.id=A.sales_rep_id WHERE A.email_id = '$uname' AND A.password = '$upass'");
-        $result=$query->result();
-        
+			$query=$this->db->query("SELECT A.id,A.email_id,A.first_name,A.last_name,A.role_id,A.sales_rep_id,B.sr_type FROM user_master A left outer join sales_rep_master B on B.id=A.sales_rep_id WHERE A.email_id = '$uname' AND A.password = '$upass'");
+				$result=$query->result();
+		}
+		
         if(count($result) > 0 ) {
             $sessiondata = array(
                                 'session_id' => $result[0]->id,
@@ -42,8 +69,11 @@ class Login extends CI_Controller
 
             $this->session->set_userdata($sessiondata);
 
+			set_cookie('email',$uname,'3600'); 
+			set_cookie('password',$upass,'3600');
+			
             $logarray['table_id']='1';
-            $logarray['module_name']='Login';
+            $logarray['user_name']='Login';
             $logarray['cnt_name']='Login';
             $logarray['action']='Logged in';
             $this->user_access_log_model->insertAccessLog($logarray);
@@ -79,6 +109,8 @@ class Login extends CI_Controller
 
     public function logout() {
         $this->session->sess_destroy();
+		delete_cookie('email'); 
+		delete_cookie('password'); 
         redirect();
     }
 
@@ -211,6 +243,25 @@ class Login extends CI_Controller
 
         echo 1;
     }
+	
+		public function chk_coockie() {
+		
+		
+			$cookie= array(
+ 
+			   'name'   => 'session_id',
+	 
+			   'value'  => 56,
+	 
+			   'expire' => '0',
+ 
+			);
+ 
+			$this->input->set_cookie($cookie);		
+			
+		 
+		}
 
 }
+	  
 ?>

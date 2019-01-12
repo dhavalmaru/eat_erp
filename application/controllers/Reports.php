@@ -56,11 +56,10 @@ class Reports extends CI_Controller
   //$data['rep_grp_5']=0;
         // $data['rep_grp_6']=0;
 
-        //if (isset($data['rep_1'])) {if ($data['rep_1']==1) {if (isset($data['rep_1_view'])) {if ($data['rep_1_view']==1) $data['rep_grp_1']=1;}}}
+        if (isset($data['rep_1'])) {if ($data['rep_1']==1) {if (isset($data['rep_1_view'])) {if ($data['rep_1_view']==1) $data['rep_grp_1']=1;}}}
      
 
         if (isset($data['rep_18'])) {if ($data['rep_18']==1) {if (isset($data['rep_18_view'])) {if ($data['rep_18_view']==1) $data['rep_grp_1']=1;}}}
-        if (isset($data['rep_15'])) {if ($data['rep_15']==1) {if (isset($data['rep_15_view'])) {if ($data['rep_15_view']==1) $data['rep_grp_1']=1;}}}
 		
 		
 
@@ -110,10 +109,9 @@ class Reports extends CI_Controller
       //  $data['rep_grp_5']=0;
         // $data['rep_grp_6']=0;
 
-        //if (isset($data['rep_1_view'])) {if ($data['rep_1_view']==1) $data['rep_grp_1']=1;}
+        if (isset($data['rep_1_view'])) {if ($data['rep_1_view']==1) $data['rep_grp_1']=1;}
 
         if (isset($data['rep_18_view'])) {if ($data['rep_18_view']==1) $data['rep_grp_1']=1;}
-        if (isset($data['rep_15_view'])) {if ($data['rep_15_view']==1) $data['rep_grp_1']=1;}
 
 		
 

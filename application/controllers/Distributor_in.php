@@ -19,6 +19,7 @@ class Distributor_in extends CI_Controller{
         $this->load->model('sales_rep_model');
         $this->load->model('distributor_model');
         $this->load->model('product_model');
+        $this->load->model('credit_debit_note_model');
         $this->load->database();
     }
 
@@ -38,11 +39,45 @@ class Distributor_in extends CI_Controller{
         $this->checkstatus('Approved');
     }
 
+    public function get_data($status='')
+    {
+       $draw = intval($this->input->get("draw"));
+       $start = intval($this->input->get("start"));
+       $length = intval($this->input->get("length"));
+       /*$data = $this->distributor_in_model->get_data($status);*/
+       $records = array();
+       $data=$this->distributor_in_model->get_data($status);;
+       for ($i=0; $i < count($data); $i++) { 
+                $records[] =  array(
+                        $i+1,
+						 (($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('d/m/Y',strtotime($data[$i]->date_of_processing)):''),
+                        '<a href="'.base_url().'index.php/distributor_in/edit/'.$data[$i]->id.'"><i class="fa fa-edit">',
+						 '<a class="hide_col" href="'.base_url().'index.php/distributor_in/view_sales_return_receipt/'.$data[$i]->id.'" target="_blank"><span class="fa fa-file-pdf-o" style="font-size:20px;"></span></a>',
+                  
+                       
+                        ''.$data[$i]->sales_return_no.'',
+                      
+                        ''.$data[$i]->distributor_name.'',
+                    
+                        ''.format_money($data[$i]->final_amount,2).'',
+                       );
+                       
+          }
+
+       $output = array(
+                        "draw" => $draw,
+                        "recordsTotal" => count($data),
+                        "recordsFiltered" => count($data),
+                        "data" => $records
+                    );
+       echo json_encode($output); 
+    }
+
     public function checkstatus($status=''){
         $result=$this->distributor_in_model->get_access();
         if(count($result)>0) {
             $data['access']=$result;
-            $data['data']=$this->distributor_in_model->get_data($status);
+            /*$data['data']=$this->distributor_in_model->get_data($status);*/
 
             $count_data=$this->distributor_in_model->get_data();
             $approved=0;
@@ -68,6 +103,7 @@ class Distributor_in extends CI_Controller{
             $data['rejected']=$rejected;
             $data['inactive']=$inactive;
             $data['all']=count($count_data);
+            $data['status']=$status;
 
             load_view('distributor_in/distributor_in_list', $data);
 
@@ -111,7 +147,7 @@ class Distributor_in extends CI_Controller{
 
                 $id = $this->distributor_in_model->get_pending_data($id);
                 
-                $data['data'] = $this->distributor_in_model->get_data('', $id);
+                $data['data'] = $result = $this->distributor_in_model->get_data('', $id);
                 $data['depot'] = $this->depot_model->get_data('Approved');
                 $data['distributor'] = $this->distributor_model->get_data('Approved');
                 $data['sales_rep'] = $this->sales_rep_model->get_data('Approved');
@@ -119,7 +155,14 @@ class Distributor_in extends CI_Controller{
                 $data['bar'] = $this->product_model->get_data('Approved');
                 $data['distributor_in_items'] = $this->distributor_in_model->get_distributor_in_items($id);
                 $data['distributor_in_items_ex'] = $this->distributor_in_model->get_distributor_in_items_ex($id);
-
+                if(count($result)>0)
+                {
+                    if($result[0]->sales_type=='Invoice')
+                    {
+                        $data['invoice_nos'] = $this->credit_debit_note_model->get_invoice($result[0]->distributor_id);
+                    }
+                }
+               
                 $date = new DateTime($data['data'][0]->date_of_processing);
                 $date->modify('-6 month');
                 $date = $date->format('Y-m-d');
@@ -146,7 +189,8 @@ class Distributor_in extends CI_Controller{
 
     public function update($id){
         $this->distributor_in_model->save_data($id);
-        redirect(base_url().'index.php/distributor_in');
+       // redirect(base_url().'index.php/distributor_in');
+		 echo '<script>window.open("'.base_url().'index.php/distributor_in", "_parent")</script>';
     }
 
     public function view_sales_return_receipt($id){
@@ -181,5 +225,28 @@ class Distributor_in extends CI_Controller{
         echo $result;
     }
 
+    public function get_product_percentage($product_id,$distributor_id)
+    {
+        $result = $this->distributor_in_model->get_product_percentage($product_id,$distributor_id);
+
+        if(count($result)>0) {
+           echo json_encode($result[0]);
+        }
+        else{
+            echo 0;
+        }
+    }
+
+    public function get_box_percentage($product_id,$distributor_id)
+    {
+        $result = $this->distributor_in_model->get_box_percentage($product_id,$distributor_id);
+
+        if(count($result)>0) {
+           echo json_encode($result[0]);
+        }
+        else{
+            echo 0;
+        }
+    }
 }
 ?>

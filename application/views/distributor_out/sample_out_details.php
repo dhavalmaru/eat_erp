@@ -21,12 +21,26 @@
 			input[type=radio], input[type=checkbox] { margin: 8px 0px 0px;      vertical-align: text-bottom;}
 			th{text-align:center;}
 			.center{text-align:center;}
-            input[readonly] {background-color: white !important; 
-                            color: #0b385f !important; 
-                            cursor: not-allowed !important;}
-			 @media screen and (max-width:800px) {   
-   .h-scroll { overflow-x:scroll;} .h-scroll .table-stripped{ width:806px!important;}
-  }
+            input[readonly], input[disabled], select[disabled], textarea[disabled], textarea[readonly] {
+                background-color: white !important; 
+                color: #0b385f !important; 
+                cursor: not-allowed !important;
+            }
+			@media screen and (max-width:800px) {   
+			.h-scroll { overflow-x:scroll;} .h-scroll .table-stripped{ width:806px!important;}
+				}
+  
+			.form-group
+			{
+				padding:4px 0px!important;
+			}
+			#box_details .form-control[disabled], #box_details .form-control[readonly]
+			{
+				border:none!important;
+				background-color:transparent!important;
+				box-shadow:none!important;
+			}
+  
 		</style>
 		
     </head>
@@ -34,10 +48,16 @@
          <!-- START PAGE CONTAINER -->
         <div class="page-container page-navigation-top">            
             <!-- PAGE CONTENT -->
-			   <?php $this->load->view('templates/menus');?>
+
+			<?php $this->load->view('templates/menus');?>
               <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
                    <div class="heading-h2"><a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp; <a href="<?php echo base_url().'index.php/sample_out'; ?>" >Sample List </a>  &nbsp; &#10095; &nbsp; Sample Details</div>
                 <!-- PAGE CONTENT WRAPPER -->
+                <?php
+                    /*echo "<br>";
+                    print_r($data);
+                    echo "</br>";*/
+                ?>
                    <div class="page-content-wrap">
                       <div class="row main-wrapper">
 					    <div class="main-container">           
@@ -55,8 +75,13 @@
                                                 <input type="hidden" class="form-control" name="d_id" id="d_id" value="<?php if(isset($data)) echo $data[0]->d_id;?>"/>
                                                 <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) {if(strrpos($data[0]->d_id, "d_") !== false) echo $data[0]->id;}?>"/>
                                                 <input type="hidden" name="invoice_no" id="invoice_no" value="<?php if(isset($data)) { echo $data[0]->invoice_no; } ?>"/>
+                                                <input type="hidden" name="voucher_no" id="voucher_no" value="<?php if(isset($data)) { echo $data[0]->voucher_no; } ?>"/>
                                                 <input type="text" class="form-control datepicker1" name="date_of_processing" id="date_of_processing" placeholder="Date" value="<?php if(isset($data)) echo (($data[0]->date_of_processing!=null && $data[0]->date_of_processing!='')?date('d/m/Y',strtotime($data[0]->date_of_processing)):date('d/m/Y')); else echo date('d/m/Y'); ?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group" >
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Depot <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <select name="depot_id" id="depot_id" class="form-control">
@@ -81,11 +106,16 @@
                                                     <?php }} ?>
                                                 </select>
                                                 <input type="hidden" name="sell_out" id="sell_out" value="<?php if(isset($data)) { echo $data[0]->sell_out; } ?>"/>
+                                                 <input type="hidden" class="form-control" name="ref_id" id="ref_id" value="<?php if(isset($data)) echo $data[0]->ref_id;?>"/>
                                                 <!-- <input type="hidden" name="state" id="state" value="<?php //if(isset($data)) { echo $data[0]->state; } ?>"/> -->
                                                 <input type="hidden" name="class" id="class" value="<?php if(isset($data)) { echo $data[0]->class; } ?>"/>
                                                 <!-- <input type="hidden" name="distributor_id" id="distributor_id" value="<?php //if(isset($data)) { echo $data[0]->distributor_id; } ?>"/>
                                                 <input type="text" class="form-control load_distributor" name="distributor" id="distributor" placeholder="Type To Select Distributor...." value="<?php //if(isset($data)) { echo $data[0]->distributor_name; } ?>"/> -->
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group" style="display:none;">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Distributor Name <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" readonly="true" class="form-control" id="distributor_name" placeholder="Distributor Name" value="<?php if(isset($data)) { echo $data[0]->distributor_name; } ?>"/>
@@ -97,7 +127,7 @@
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Sales Representative <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <select name="sales_rep_id" id="sales_rep_id" class="form-control">
-                                                    <option value="">Select</option>
+                                                    <option value="" >Select</option>
                                                     <?php if(isset($sales_rep)) { for ($k=0; $k < count($sales_rep) ; $k++) { ?>
                                                             <option value="<?php echo $sales_rep[$k]->id; ?>" <?php if(isset($data)) { if($sales_rep[$k]->id==$data[0]->sales_rep_id) { echo 'selected'; } } ?>><?php echo $sales_rep[$k]->sales_rep_name; ?></option>
                                                     <?php }} ?>
@@ -105,7 +135,11 @@
                                                 <!-- <input type="hidden" name="sales_rep_id" id="sales_rep_id" value="<?php //if(isset($data)) { echo $data[0]->sales_rep_id; } ?>"/>
                                                 <input type="text" class="form-control load_sales_rep" name="sales_rep" id="sales_rep" placeholder="Type To Select Sales Representative...." value="<?php //if(isset($data)) { echo $data[0]->sales_rep_name; } ?>"/> -->
                                             </div>
-                                            <div id="sample_distributor_div">
+                                        </div>
+                                    </div>
+									<div class="form-group" id="sample_distributor_div">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                         
                                                 <label class="col-md-2 col-sm-2 col-xs-12 control-label">Distributor <span class="asterisk_sign">*</span></label>
                                                 <div class="col-md-4 col-sm-4 col-xs-12">
                                                     <select name="sample_distributor_id" id="sample_distributor_id" class="form-control">
@@ -115,37 +149,49 @@
                                                         <?php }}} ?>
                                                     </select>
                                                 </div>
-                                            </div>
+                                            
                                         </div>
                                     </div>
                                     <div class="form-group" >
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Type *</label>
-                                        <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <select class="form-control" name="sample_type" id="sample_type">
+										<div class="col-md-12 col-sm-12 col-xs-12">
+											<label class="col-md-2 col-sm-2 col-xs-12 control-label">Type *</label>
+											<div class="col-md-4 col-sm-4 col-xs-12">
+												<select class="form-control" name="sample_type" id="sample_type">
                                                 <option value="">Select</option>
                                                 <option value="Gifting" <?php if(isset($data)) {if ($data[0]->sample_type=='Gifting') echo 'selected';}?>>Gifting</option>
                                                 <option value="Promoter" <?php if(isset($data)) {if ($data[0]->sample_type=='Promoter') echo 'selected';}?>>Promoter</option>
                                                 <option value="Blogger" <?php if(isset($data)) {if ($data[0]->sample_type=='Blogger') echo 'selected';}?>>Blogger</option>
-                                            </select>
-                                        </div>
-                                        <div id="gifting_div" style="<?php if(isset($data)) {if ($data[0]->sample_type=='Gifting') echo ''; else echo 'display: none;';} else echo 'display: none;'; ?>">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Gifting Remarks</label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" id="gifting_remarks" name="gifting_remarks" placeholder="Gifting Remarks" value="<?php if(isset($data)) { echo $data[0]->gifting_remarks; } ?>"/>
-                                            </div>
-                                        </div>
-                                        <div id="promoter_div" style="<?php if(isset($data)) {if ($data[0]->sample_type=='Promoter') echo ''; else echo 'display: none;';} else echo 'display: none;'; ?>">
+												</select>
+											</div>
+										</div>
+                                    </div>
+									<div id="gifting_div" style="<?php if(isset($data)) {if ($data[0]->sample_type=='Gifting') echo ''; else echo 'display: none;';} else echo 'display: none;'; ?>"  class="form-group">
+										<div class="col-md-12 col-sm-12 col-xs-12">
+										
+												<label class="col-md-2 col-sm-2 col-xs-12 control-label">Gifting Remarks</label>
+												<div class="col-md-4 col-sm-4 col-xs-12">
+													<input type="text" class="form-control" id="gifting_remarks" name="gifting_remarks" placeholder="Gifting Remarks" value="<?php if(isset($data)) { echo $data[0]->gifting_remarks; } ?>"/>
+												</div>
+										</div>
+										
+                                    </div>
+							
+									<div class="form-group" id="promoter_div" style="<?php if(isset($data)) {if ($data[0]->sample_type=='Promoter') echo ''; else echo 'display: none;';} else echo 'display: none;'; ?>">
+										<div class="col-md-12 col-sm-12 col-xs-12">
+                                      
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Promoter Sales Representative </label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <select name="promoter_sales_rep_id" id="promoter_sales_rep_id" class="form-control">
                                                     <option value="">Select</option>
-                                                    <?php if(isset($sales_rep)) { for ($k=0; $k < count($sales_rep) ; $k++) { ?>
-                                                            <option value="<?php echo $sales_rep[$k]->id; ?>" <?php if(isset($data)) { if($sales_rep[$k]->id==$data[0]->promoter_sales_rep_id) { echo 'selected'; } } ?>><?php echo $sales_rep[$k]->sales_rep_name; ?></option>
+                                                    <?php if(isset($promoter)) { for ($k=0; $k < count($promoter) ; $k++) { ?>
+                                                            <option value="<?php echo $promoter[$k]->id; ?>" <?php if(isset($data)) { if($promoter[$k]->id==$data[0]->promoter_sales_rep_id) { echo 'selected'; } } ?>><?php echo $promoter[$k]->sales_rep_name; ?></option>
                                                     <?php }} ?>
                                                 </select>
                                             </div>
+                                       
                                         </div>
                                     </div>
+									
                                     <div id="blogger_div" style="<?php if(isset($data)) {if ($data[0]->sample_type=='Blogger') echo ''; else echo 'display: none;';} else echo 'display: none;'; ?>">
                                         <div class="form-group">
                                             <div class="col-md-12 col-sm-12 col-xs-12">
@@ -153,6 +199,10 @@
                                                 <div class="col-md-4 col-sm-4 col-xs-12">
                                                     <input type="text" class="form-control" name="blogger_name" id="blogger_name" placeholder="Blogger Name" value="<?php if (isset($data)) { echo $data[0]->blogger_name; } ?>" />
                                                 </div>
+											</div>
+                                        </div>
+										<div class="form-group">
+                                            <div class="col-md-12 col-sm-12 col-xs-12">
                                                 <label class="col-md-2 col-sm-2 col-xs-12 control-label">Blgger Address</label>
                                                 <div class="col-md-4 col-sm-4 col-xs-12">
                                                     <input type="text" class="form-control" name="blogger_address" id="blogger_address" placeholder="Blogger Address" value="<?php if(isset($data)) echo $data[0]->blogger_address;?>"/>
@@ -165,6 +215,10 @@
                                                 <div class="col-md-4 col-sm-4 col-xs-12">
                                                     <input type="text" class="form-control" name="blogger_phone_no" id="blogger_phone_no" placeholder="Blogger Phone No" value="<?php if (isset($data)) { echo $data[0]->blogger_phone_no; } ?>" />
                                                 </div>
+                                            </div>
+                                        </div>
+										<div class="form-group">
+                                            <div class="col-md-12 col-sm-12 col-xs-12">
                                                 <label class="col-md-2 col-sm-2 col-xs-12 control-label">Blgger Email Id </label>
                                                 <div class="col-md-4 col-sm-4 col-xs-12">
                                                     <input type="text" class="form-control" name="blogger_email_id" id="blogger_email_id" placeholder="Blogger Email Id" value="<?php if(isset($data)) echo $data[0]->blogger_email_id;?>"/>
@@ -174,11 +228,15 @@
                                     </div>
 
                                     <div class="form-group direct">
-                                         <div class="col-md-12 col-sm-12 col-xs-12">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Name </label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="client_name" id="client_name" placeholder="Name" value="<?php if (isset($data)) { echo $data[0]->client_name; } ?>" />
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group direct">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Address</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="address" id="address" placeholder="Address" value="<?php if(isset($data)) echo $data[0]->address;?>"/>
@@ -186,12 +244,16 @@
                                         </div>
                                     </div>
                                     <div class="form-group direct">
-                                         <div class="col-md-12 col-sm-12 col-xs-12">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">City</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="hidden" name="city_id" id="city_id" />
                                                 <input type="text" class="form-control autocompleteCity" name="city" id ="city" placeholder="City" value="<?php if(isset($data)) { echo  $data[0]->city; } ?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group direct">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Pincode</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="pincode" placeholder="Pincode" value="<?php if (isset($data)) { echo $data[0]->pincode; } ?>"/>
@@ -199,12 +261,16 @@
                                         </div>
                                     </div>
                                     <div class="form-group direct">
-                                         <div class="col-md-12 col-sm-12 col-xs-12">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">State</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="hidden" name="state_id" id="state_id" />
                                                 <input type="text" class="form-control loadstatedropdown" name="state" id="state" placeholder="State" value="<?php if(isset($data)) { echo  $data[0]->state; } ?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group direct">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Country</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="hidden" name="country_id" id="country_id">
@@ -217,16 +283,21 @@
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="discount" id="discount" placeholder="Discount" value="<?php if(isset($data)) { echo $data[0]->discount; } ?>" />
                                             </div>
-                                        </div>
                                     </div>
+                                   
+                                   
                                     <div class="form-group" style="display:none;">
-                                          <div class="col-md-12 col-sm-12 col-xs-12">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Tax <span class="asterisk_sign">*</span></label>
-                                           <div class="col-md-4  col-sm-4 col-xs-12 option-line-height">
+											<div class="col-md-4  col-sm-4 col-xs-12 option-line-height">
                                                 <input type="radio" name="tax"  value="vat" id="tax_vat" data-error="#err_tax" <?php if (isset($data)) { if($data[0]->tax=='vat') echo 'checked'; } ?>/>&nbsp;&nbsp;Vat&nbsp;&nbsp;&nbsp;
                                                 <input type="radio" name="tax"  value="cst" id="tax_cst" data-error="#err_tax" <?php if (isset($data)) { if($data[0]->tax=='cst') echo 'checked'; } ?>/>&nbsp;&nbsp;Cst
                                                 <div id="err_tax"></div>
                                             </div>
+                                        </div>
+									</div>
+									<div class="form-group" style="display:none;">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Tax (In %) <span class="asterisk_sign">*</span></label>
                                              <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="tax_per" id="tax_per" placeholder="Tax" value="<?php if (isset($data)) { echo $data[0]->tax_per; } ?>" readonly />
@@ -234,7 +305,7 @@
                                         </div>
                                     </div>
                                 	<div class="h-scroll">	
-                                       <div class="table-stripped form-group" style="padding:15px;margin-top:93px;" >
+                                       <div class="table-stripped form-group" style="padding:15px;" >
                                         <table class="table table-bordered" style="margin-bottom: 0px; ">
                                         <thead>
                                             <tr>
@@ -290,7 +361,18 @@
                                                     <input type="text" class="form-control amount" name="amount[]" id="amount_<?php echo $i; ?>" placeholder="Amount" value="<?php if (isset($distributor_out_items)) { echo $distributor_out_items[$i]->amount; } ?>" readonly />
                                                 </td>
                                                  <td style="text-align:center;     vertical-align: middle;">
-                                                    <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>
+                                                     <?php  
+                                                     $style = '';
+                                                        if(isset($data[0]->freezed)){
+                                                            if($data[0]->freezed==1){
+                                                                $style =  'display: none;';
+                                                            }
+                                                        }else
+                                                            {
+                                                                 $style =  'display: block;';
+                                                            }
+                                                    ?>
+                                                    <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  style="<?=$style?>"></span></a>
                                                 </td>
                                             </tr>
                                         <?php }} else { ?>
@@ -333,7 +415,17 @@
                                                     <input type="text" class="form-control amount" name="amount[]" id="amount_<?php echo $i; ?>" placeholder="Amount" value="" readonly />
                                                 </td>
                                                   <td style="text-align:center;     vertical-align: middle;">
-                                                    <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>
+                                                    <?php  
+                                                    if(isset($data[0]->freezed)){
+                                                        if($data[0]->freezed==1){
+                                                            $style =  'display: none;';
+                                                        }
+                                                    }else
+                                                        {
+                                                             $style =  'display: block;';
+                                                        }?>
+                                                    <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#" style="<?=$style?>"><span class="fa trash fa-trash-o"  ></span></a>
+                                                   
                                                 </td>
                                             </tr>
                                         <?php } ?>
@@ -361,24 +453,32 @@
                                         </div>
                                     </div>
                                     <div class="form-group" style="display: none;">
-                                         <div class="col-md-12 col-sm-12 col-xs-12">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Tax Amount (In Rs)</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
 
                                                 <input type="text" class="form-control" name="tax_amount" id="tax_amount" placeholder="Tax Amount" value="<?php if (isset($data)) { echo $data[0]->tax_amount; } ?>" readonly />
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group" style="display: none;">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Final Amount (In Rs) <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="final_amount" id="final_amount" placeholder="Final Amount" value="<?php if(isset($data)) { echo $data[0]->final_amount; } ?>" readonly />
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                         <div class="col-md-12 col-sm-12 col-xs-12">
+                                    <div class="form-group" style="display: none;">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Order No </label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="order_no" id="order_no" placeholder="Order No" value="<?php if (isset($data)) { echo $data[0]->order_no; } ?>" />
                                             </div>
+                                         </div>
+                                    </div>
+									<div class="form-group" style="display: none;">
+                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Order Date </label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control datepicker" name="order_date" id="order_date" placeholder="Order Date" value="<?php if(isset($data)) { echo (($data[0]->order_date!=null && $data[0]->order_date!='')?date('d/m/Y',strtotime($data[0]->order_date)):''); } ?>" />
@@ -386,11 +486,15 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                         <div class="col-md-12 col-sm-12 col-xs-12">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Supplier Ref </label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="supplier_ref" id="supplier_ref" placeholder="Supplier Ref" value="<?php if (isset($data)) { echo $data[0]->supplier_ref; } ?>" />
                                             </div>
+										</div>
+                                    </div>
+									<div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Dispatch Doc No </label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="despatch_doc_no" id="despatch_doc_no" placeholder="Dispatch Doc No" value="<?php if(isset($data)) { echo $data[0]->despatch_doc_no; } ?>" />
@@ -398,11 +502,16 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                         <div class="col-md-12 col-sm-12 col-xs-12">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Dispatch Through </label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="despatch_through" id="despatch_through" placeholder="Dispatch Through" value="<?php if (isset($data)) { echo $data[0]->despatch_through; } ?>" />
                                             </div>
+                                        </div>
+                                    </div>
+											
+									<div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Destination </label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="destination" id="destination" placeholder="Destination" value="<?php if(isset($data)) { echo $data[0]->destination; } ?>" />
@@ -469,6 +578,10 @@
                                                     <option value="Cancelled" <?php if(isset($data)) {if ($data[0]->delivery_status=='Cancelled') echo 'selected';}?>>Cancelled</option>
                                                 </select>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Delivery Date *</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" disabled="true" class="form-control datepicker" name="delivery_date" id="delivery_date" placeholder="Delivery Date" value="<?php if(isset($data)) echo (($data[0]->delivery_date!=null && $data[0]->delivery_date!='')?date('d/m/Y',strtotime($data[0]->delivery_date)):date('d/m/Y')); ?>" />
@@ -491,7 +604,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div>
+                                            <div style="display: none;">
                                                 <label class="col-md-2 col-sm-2 col-xs-12 control-label">Status <span class="asterisk_sign">*</span></label>
                                                 <div class="col-md-4 col-sm-4 col-xs-12">
                                                     <select class="form-control" name="status">
@@ -518,9 +631,50 @@
 									 			<br clear="all"/>
 								</div>
 							</div>
+                                <?php $curusr=$this->session->userdata('session_id'); ?>
+                                <?php 
+                                        if(isset($data[0]->status))
+                                        {
+                                         if(isset($access)) {
+                                            if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive'))
+                                                {
+                                                  if(isset($data[0]->status))
+                                                    {
+                                                         if($data[0]->status=='Deleted'){
+                                                            echo '<label class="col-xs-12 control-label" style="color:#cc2127!important">Note : If clicked on approve button this entry will be deleted permanently </label>';
+
+                                                         }    
+                                                    }     
+                                                }
+                                            }   
+                                        }
+                                ?>
                                 <div class="panel-footer">
-									<a href="<?php echo base_url(); ?>index.php/sample_out" class="btn btn-danger" type="reset" id="reset">Cancel</a>
-                                    <button class="btn btn-success pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</button>
+                                    
+									<a href="<?php echo base_url(); ?>index.php/sample_out" class="btn btn-danger pull-right" type="reset" id="reset">Cancel</a>
+                                 
+                                    <input type="submit" class="btn btn-success btn-sm" id="btn_submit" name="btn_submit" value="Submit For Approval"
+
+                                    style="<?php 
+                                    if(isset($access)) {
+                                        if(isset($data)) {
+                                            if($data[0]->freezed)
+                                            {
+                                                echo 'display: none;';
+                                            }else
+                                            {
+                                             if($access[0]->r_edit=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || $data[0]->status=='InActive' || ($data[0]->depot_name=='' && $data[0]->status=='Pending'))) echo ''; else echo 'display: none;';
+                                            }
+                                        } else if($access[0]->r_insert=='1') echo ''; else echo 'display: none;'; ?>" />
+                                    <?php } ?>
+                                    <?php if(isset($data) && $data[0]->freezed!=1) { ?>
+                                    <input type="submit" class="btn btn-danger btn-sm" id="btn_delete" name="btn_delete" value="Delete" style="<?php if(isset($access) ) {
+                                        if(isset($data)) {if($access[0]->r_delete=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || ($data[0]->depot_name=='' && $data[0]->status=='Pending')) && $data[0]->status!='InActive') echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+
+                                   <?php } ?>
+
+                                    <input type="submit" class="btn btn-success btn-sm" id="btn_approve" name="btn_approve" value="Approve" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive' && $data[0]->depot_name!='')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+                                    <input type="submit" class="btn btn-danger btn-sm" id="btn_reject" name="btn_reject" value="Reject" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive' && $data[0]->depot_name!='')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
                                 </div>
 							</form>
 							
@@ -543,6 +697,25 @@
         <script type="text/javascript" src="<?php echo base_url(); ?>js/validations.js"></script>
         <script type="text/javascript">
             $(document).ready(function(){
+                if(!$('#btn_submit').is(':visible')){
+                    // $("input[type!='hidden']").attr("disabled", true);
+                    $('input[type="text"').attr("readonly", true);
+                    $('input[type="checkbox"]').attr("disabled", true);
+                    $('input[type="file"]').attr("disabled", true);
+                    $('input[type="radio"]').attr("disabled", true);
+                    $("select:visible").attr("disabled", true);
+                    $("textarea").attr("readonly", true);
+                    $(".datepicker").attr("disabled", true);
+
+                    $("#btn_approve").attr("disabled", false);
+                    $("#btn_reject").attr("disabled", false);
+                    $("#remarks").attr("disabled", false);
+
+                    $('tfoot').hide();
+                    $('.table_action').hide();
+                } else {
+                    $(".datepicker1").datepicker({ maxDate: 0,changeMonth: true,yearRange:'-100:+0',changeYear: true });
+                }
                 $(".type").change(function(){
                     show_item($(this));
                 });
@@ -670,7 +843,7 @@
 
                             $('#state').val(data.state);
                             $('#class').val(data.class);
-                            $('#sales_rep_id').val(data.sales_rep_id);
+                            //$('#sales_rep_id').val(data.sales_rep_id);
 
                             var credit_period = data.credit_period;
                             if (credit_period==null || isNaN(credit_period)) credit_period=1;

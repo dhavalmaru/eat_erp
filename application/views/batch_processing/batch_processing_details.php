@@ -61,62 +61,73 @@
                                 <div class="col-md-12 custom-padding" style="padding:0;" >
                                  <div class="panel panel-default">
 							     	<div class="panel-body">
-									<div class="form-group"  >
-										<div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Batch No <span class="asterisk_sign">*</span></label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="batch_no_id" id="batch_no_id" class="form-control" onChange="set_batch_no();">
-                                                    <option value="">Select</option>
+										<div class="form-group" >
+											<div class="col-md-12 col-sm-12 col-xs-12">
+												<label class="col-md-2 col-sm-2 col-xs-12 control-label">Batch No <span class="asterisk_sign">*</span></label>
+												<div class="col-md-4 col-sm-4 col-xs-12">
+													<select name="batch_no_id" id="batch_no_id" class="form-control select2" onChange="set_batch_no();">
+														<option value="">Select</option>
                                                     <?php if(isset($batch_no)) { for ($k=0; $k < count($batch_no) ; $k++) { ?>
                                                             <option value="<?php echo $batch_no[$k]->id; ?>" <?php if(isset($data)) { if($batch_no[$k]->id==$data[0]->batch_no_id) { echo 'selected'; } } ?>><?php echo $batch_no[$k]->batch_no; ?></option>
                                                     <?php }} ?>
-                                                </select>
+													</select>
                                                 <!-- <input type="hidden" name="depot_id" id="depot_id" value="<?php //if(isset($data)) { echo  $data[0]->depot_id; } ?>"/>
                                                 <input type="text" class="form-control load_depot" name="depot" id="depot" placeholder="Type To Select Depot...." value="<?php //if(isset($data)) { echo  $data[0]->depot_name; } ?>"/> -->
-                                            </div>
-
-
-											<label class="col-md-2 col-sm-2 col-xs-12 control-label" style="display: none;">Batch Id <span class="asterisk_sign">*</span></label>
-                                          <div class="col-md-4 col-sm-4 col-xs-12" style="display: none;">
-                                                <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
-                                                <input type="text" class="form-control" name="batch_id_as_per_fssai" id="batch_id_as_per_fssai" placeholder="Batch Id" value="<?php if(isset($data)) { echo  $data[0]->batch_id_as_per_fssai; } ?>"/>
-                                            </div>
-											  <label class="col-md-2 col-sm-2 col-xs-12 control-label">Date Of Processing <span class="asterisk_sign">*</span></label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control datepicker1" name="date_of_processing" id="date_of_processing" placeholder="Date Of Processing" value="<?php if(isset($data)) echo (($data[0]->date_of_processing!=null && $data[0]->date_of_processing!='')?date('d/m/Y',strtotime($data[0]->date_of_processing)):date('d/m/Y')); else echo date('d/m/Y'); ?>"/>
-                                            </div>
+												</div>
+											</div>
 										</div>
-									</div>
+										<div class="form-group" style="display: none;">
+											<div class="col-md-12 col-sm-12 col-xs-12">
 
-                                    <div class="form-group">
-                                        <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Depot <span class="asterisk_sign">*</span></label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="depot_id" id="depot_id" class="form-control">
-                                                    <option value="">Select</option>
+												<label class="col-md-2 col-sm-2 col-xs-12 control-label" style="display: none;">Batch Id <span class="asterisk_sign">*</span></label>
+												<div class="col-md-4 col-sm-4 col-xs-12" style="display: none;">
+													<input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
+													<input type="hidden" class="form-control" name="ref_id" id="ref_id" value="<?php if(isset($data)) echo $data[0]->ref_id;?>"/>
+													<input type="text" class="form-control" name="batch_id_as_per_fssai" id="batch_id_as_per_fssai" placeholder="Batch Id" value="<?php if(isset($data)) { echo  $data[0]->batch_id_as_per_fssai; } ?>"/>
+												</div>
+											</div>
+										</div>
+										<div class="form-group"  >
+											<div class="col-md-12 col-sm-12 col-xs-12">
+												<label class="col-md-2 col-sm-2 col-xs-12 control-label">Date Of Processing <span class="asterisk_sign">*</span></label>
+												<div class="col-md-4 col-sm-4 col-xs-12">
+													<input type="text" class="form-control datepicker1" name="date_of_processing" id="date_of_processing" placeholder="Date Of Processing" value="<?php if(isset($data)) echo (($data[0]->date_of_processing!=null && $data[0]->date_of_processing!='')?date('d/m/Y',strtotime($data[0]->date_of_processing)):date('d/m/Y')); else echo date('d/m/Y'); ?>"/>
+												</div>
+											</div>
+										</div>
+
+										<div class="form-group">
+											<div class="col-md-12 col-sm-12 col-xs-12">
+												<label class="col-md-2 col-sm-2 col-xs-12 control-label">Depot <span class="asterisk_sign">*</span></label>
+												<div class="col-md-4 col-sm-4 col-xs-12">
+													<select name="depot_id" id="depot_id" class="form-control select2">
+														<option value="">Select</option>
                                                     <?php if(isset($depot)) { for ($k=0; $k < count($depot) ; $k++) { ?>
                                                             <option value="<?php echo $depot[$k]->id; ?>" <?php if(isset($data)) { if($depot[$k]->id==$data[0]->depot_id) { echo 'selected'; } } ?>><?php echo $depot[$k]->depot_name; ?></option>
                                                     <?php }} ?>
-                                                </select>
+													</select>
                                                 <!-- <input type="hidden" name="depot_id" id="depot_id" value="<?php //if(isset($data)) { echo  $data[0]->depot_id; } ?>"/>
                                                 <input type="text" class="form-control load_depot" name="depot" id="depot" placeholder="Type To Select Depot...." value="<?php //if(isset($data)) { echo  $data[0]->depot_name; } ?>"/> -->
-                                            </div>
-											
-											<label class="col-md-2 col-sm-2 col-xs-12 control-label">No.of Batches <span class="asterisk_sign">*</span></label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="no_of_batch" id="no_of_batch" placeholder="No.of Batches" value="<?php if (isset($data)) { echo $data[0]->no_of_batch; } ?>"/>
-                                            </div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group">
+											<div class="col-md-12 col-sm-12 col-xs-12">
+												<label class="col-md-2 col-sm-2 col-xs-12 control-label">No.of Batches <span class="asterisk_sign">*</span></label>
+												<div class="col-md-4 col-sm-4 col-xs-12">
+													<input type="text" class="form-control" name="no_of_batch" id="no_of_batch" placeholder="No.of Batches" value="<?php if (isset($data)) { echo $data[0]->no_of_batch; } ?>"/>
+												</div>
 											
 											
                                            
-                                        </div>
-                                    </div>
+											</div>
+										</div>
 									
 									    <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                              <label class="col-md-2 col-sm-2 col-xs-12 control-label">Product <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="product_id" id="product_id" class="form-control">
+                                                <select name="product_id" id="product_id" class="form-control select2">
                                                     <option value="">Select</option>
                                                     <?php if(isset($product)) { for ($k=0; $k < count($product); $k++) { ?>
                                                             <option value="<?php echo $product[$k]->id; ?>" <?php if(isset($data)) { if($product[$k]->id==$data[0]->product_id) { echo 'selected'; } } ?>><?php echo $product[$k]->product_name; ?></option>
@@ -146,7 +157,7 @@
                                                     for($i=0; $i<count($raw_material_stock); $i++) { ?>
                                                 <tr id="raw_material_<?php echo $i; ?>_row">
                                                     <td>
-                                                        <select name="raw_material_id[]" class="form-control raw_material" id="raw_material_<?php echo $i;?>">
+                                                        <select name="raw_material_id[]" class="form-control raw_material select2" id="raw_material_<?php echo $i;?>">
                                                             <option value="">Select</option>
                                                             <?php if(isset($raw_material)) { for ($k=0; $k < count($raw_material) ; $k++) { ?>
                                                                     <option value="<?php echo $raw_material[$k]->id; ?>" <?php if($raw_material[$k]->id==$raw_material_stock[$i]->raw_material_id) { echo 'selected'; } ?>><?php echo $raw_material[$k]->rm_name; ?></option>
@@ -163,7 +174,7 @@
                                             <?php }} else { ?>
                                                 <tr id="raw_material_<?php echo $i; ?>_row">
                                                     <td>
-                                                        <select name="raw_material_id[]" class="form-control raw_material" id="raw_material_<?php echo $i;?>">
+                                                        <select name="raw_material_id[]" class="form-control raw_material select2" id="raw_material_<?php echo $i;?>">
                                                             <option value="">Select</option>
                                                             <?php if(isset($raw_material)) { for ($k=0; $k < count($raw_material) ; $k++) { ?>
                                                                     <option value="<?php echo $raw_material[$k]->id; ?>"><?php echo $raw_material[$k]->rm_name; ?></option>
@@ -196,6 +207,10 @@
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="total_kg" id="total_kg" placeholder="Total Kg" value="<?php if (isset($data)) { echo $data[0]->total_kg; } ?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Output (In Kg) <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="output_kg" id="output_kg" placeholder="Output Kg" value="<?php if (isset($data)) { echo $data[0]->output_kg; } ?>"/>
@@ -217,6 +232,10 @@
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="avg_grams" id="avg_grams" placeholder="Avg Grams In Bar" value="<?php if (isset($data)) { echo $data[0]->avg_grams; } ?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Actual Wastage (In Kg)<span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control format_number" name="actual_wastage" id="actual_wastage" placeholder="Actual Wastage" value="<?php if (isset($data)) { echo $data[0]->actual_wastage; } ?>"/>
@@ -229,6 +248,10 @@
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control format_number" name="wastage_percent" id="wastage_percent" placeholder="Wastage Percent" value="<?php if (isset($data)) { echo $data[0]->wastage_percent; } ?>"/>
                                             </div>
+                                        </div>
+									</div>
+									<div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Anticipated Wastage (In %) <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control format_number" name="anticipated_wastage" id="anticipated_wastage" placeholder="Anticipated Wastage" value="<?php if (isset($data)) { echo $data[0]->anticipated_wastage; } ?>"/>
@@ -241,7 +264,7 @@
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control format_number" name="wastage_variance" id="wastage_variance" placeholder="Wastage Variance" value="<?php if (isset($data)) { echo $data[0]->wastage_variance; } ?>"/>
                                             </div>
-                                            <div style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
+                                            <!-- <div style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
                                                 <label class="col-md-2 col-sm-2 col-xs-12 control-label">Status <span class="asterisk_sign">*</span></label>
                                                 <div class="col-md-4 col-sm-4 col-xs-12">
                                                     <select class="form-control" name="status">
@@ -249,10 +272,25 @@
                                                         <option value="InActive" <?php if(isset($data)) {if ($data[0]->status=='InActive') echo 'selected';}?>>InActive</option>
                                                     </select>
                                                 </div>
+                                            </div> -->
+                                        </div>
+                                    </div>
+									 <div class="form-group" style="display: none;">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <div style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
+                                                <label class="col-md-2 col-sm-2 col-xs-12 control-label">Status <span class="asterisk_sign">*</span></label>
+                                                <div class="col-md-4 col-sm-4 col-xs-12">
+                                                   <select class="form-control" name="status">
+                                                        <option value="Pending" <?php if(isset($data)) {if ($data[0]->status=='Pending') echo 'selected';}?>>Pending</option>
+                                                        <option value="Deleted" <?php if(isset($data)) {if ($data[0]->status=='Deleted') echo 'selected';}?>>Deleted</option>
+                                                        <option value="Rejected" <?php if(isset($data)) {if ($data[0]->status=='Rejected') echo 'selected';}?>>Rejected</option>
+                                                        <option value="Approved" <?php if(isset($data)) {if ($data[0]->status=='Approved') echo 'selected';}?>>Approved</option>
+                                                        <option value="InActive" <?php if(isset($data)) {if ($data[0]->status=='InActive') echo 'selected';}?>>InActive</option>
+                                                    </select>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-									
 									
                                 	<div class="h-scroll">	
                                         <div class="table-stripped form-group" style="padding:15px;">
@@ -329,9 +367,31 @@
 										<br clear="all"/>
 									</div>
 								</div>
-                                <div class="panel-footer print_hide">
-									<a href="<?php echo base_url(); ?>index.php/batch_processing" class="btn btn-danger" type="reset" id="reset">Cancel</a>
-                                    <button class="btn btn-success pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</button>
+                                <?php $curusr=$this->session->userdata('session_id'); ?>
+                                <?php 
+                                        if(isset($data[0]->status))
+                                        {
+                                         if(isset($access)) {
+                                            if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive'))
+                                                {
+                                                  if(isset($data[0]->status))
+                                                    {
+                                                         if($data[0]->status=='Deleted'){
+                                                            echo '<label class="col-xs-12 control-label" style="color:#cc2127!important">Note : If clicked on approve button this entry will be deleted permanently </label>';
+
+                                                         }    
+                                                    }     
+                                                }
+                                            }   
+                                        }
+                                ?>
+                                <div class="panel-footer">
+                                    <a href="<?php echo base_url(); ?>index.php/batch_processing" class="btn btn-danger btn-sm pull-right" type="reset" id="reset">Cancel</a>
+                                    <?php $curusr=$this->session->userdata('session_id'); ?>
+                                    <input type="submit" class="btn btn-success btn-sm" id="btn_submit" name="btn_submit" value="Submit For Approval" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_edit=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || $data[0]->status=='InActive')) echo ''; else echo 'display: none;';} else if($access[0]->r_insert=='1') echo ''; else echo 'display: none;';} else echo 'display: none;'; ?>" />
+                                    <input type="submit" class="btn btn-danger btn-sm" id="btn_delete" name="btn_delete" value="Delete" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_delete=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved') && $data[0]->status!='InActive') echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+                                    <input type="submit" class="btn btn-success btn-sm" id="btn_approve" name="btn_approve" value="Approve" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+                                    <input type="submit" class="btn btn-danger btn-sm" id="btn_reject" name="btn_reject" value="Reject" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
                                 </div>
 							</form>
 							
@@ -511,7 +571,7 @@
 						 console.log(parsejson.rm_name);
 						newRow += '<tr id="raw_material_'+counter+'_row">'+
                                             '<td>'+
-                                                '<select name="raw_material_id[]" class="form-control raw_material" id="raw_material_'+counter+'">'+
+                                                '<select name="raw_material_id[]" class="form-control raw_material select2" id="raw_material_'+counter+'">'+
                                                     '<option value="'+parsejson.rm_id+'">'+parsejson.rm_name+'</option>'+
                                                 '</select>'+
                                             '</td>'+
@@ -528,6 +588,7 @@
 					console.log(newRow);
 					
 					 $('#raw_material_details').append(newRow);
+					 $('.select2').select2();
 					
               
                  

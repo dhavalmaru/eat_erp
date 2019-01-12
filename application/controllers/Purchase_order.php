@@ -25,16 +25,53 @@ class Purchase_order extends CI_Controller{
     public function index(){
         $result=$this->purchase_order_model->get_access();
         if(count($result)>0) {
-            $data['access']=$result;
-            $data['data'] = $this->purchase_order_model->get_data();
-
-            load_view('purchase_order/purchase_order_list', $data);
+            $this->checkstatus('Approved');
         } else {
             echo '<script>alert("You donot have access to this page.");</script>';
             $this->load->view('login/main_page');
         }
     }
 
+    public function checkstatus($status=''){
+        $result=$this->purchase_order_model->get_access();
+        if(count($result)>0) {
+            $data['access']=$result;
+            /*$data['data']=$this->purchase_order_model->get_data($status);*/
+
+            $count_data=$this->purchase_order_model->get_data();
+            $approved=0;
+            $pending=0;
+            $rejected=0;
+            $inactive=0;
+
+            if (count($result)>0){
+                for($i=0;$i<count($count_data);$i++){
+                    if (strtoupper(trim($count_data[$i]->status))=="APPROVED")
+                        $approved=$approved+1;
+                    else if (strtoupper(trim($count_data[$i]->status))=="PENDING" || strtoupper(trim($count_data[$i]->status))=="DELETED")
+                        $pending=$pending+1;
+                    else if (strtoupper(trim($count_data[$i]->status))=="REJECTED")
+                        $rejected=$rejected+1;
+                    else if (strtoupper(trim($count_data[$i]->status))=="INACTIVE")
+                        $inactive=$inactive+1;
+                }
+            }
+
+            $data['approved']=$approved;
+            $data['pending']=$pending;
+            $data['rejected']=$rejected;
+            $data['inactive']=$inactive;
+            $data['status']=$status;
+            $data['all']=count($count_data);
+
+            load_view('purchase_order/purchase_order_list', $data);
+
+        } else {
+            echo '<script>alert("You donot have access to this page.");</script>';
+            $this->load->view('login/main_page');
+        }
+    }
+    
     public function get_data(){
         $id=$this->input->post('id');
         // $id=1;
@@ -76,6 +113,34 @@ class Purchase_order extends CI_Controller{
         echo json_encode($data);
     }
 
+    public function get_raw_material_in_items(){
+        $id=$this->input->post('id');
+        // $id=1;
+
+        $result=$this->purchase_order_model->get_raw_material_in_items($id);
+        $data['result'] = 0;
+        if(count($result)>0) {
+            $data['result'] = 1;
+            for($i=0; $i<count($result); $i++){
+                $data['item_id'][$i] = $result[$i]->raw_material_id;
+                $data['qty'][$i] = $result[$i]->qty;
+                $data['hsn_code'][$i] = $result[$i]->hsn_code;
+                $data['rate'][$i] = $result[$i]->rate;
+                $data['tax_per'][$i] = $result[$i]->tax_per;
+                $data['amount'][$i] = $result[$i]->amount;
+                $data['cgst_amt'][$i] = $result[$i]->cgst_amt;
+                $data['sgst_amt'][$i] = $result[$i]->sgst_amt;
+                $data['igst_amt'][$i] = $result[$i]->igst_amt;
+                $data['tax_amt'][$i] = $result[$i]->tax_amt;
+                $data['total_amt'][$i] = $result[$i]->total_amt;
+                $data['other_charges_amount'][$i] = $result[$i]->other_charges_amt;
+                
+            }
+        }
+
+        echo json_encode($data);
+    }
+
     public function get_purchase_order_nos(){
         $vendor_id=$this->input->post('vendor_id');
         // $vendor_id=3;
@@ -87,6 +152,7 @@ class Purchase_order extends CI_Controller{
             for($i=0; $i<count($result); $i++){
                 $data['order_date'][$i] = (($result[$i]->order_date!=null && $result[$i]->order_date!='')?date('d/m/Y',strtotime($result[$i]->order_date)):'');
                 $data['id'][$i] = $result[$i]->id;
+                $data['po_no'][$i] = $result[$i]->po_no;
             }
         }
 
@@ -117,6 +183,7 @@ class Purchase_order extends CI_Controller{
         if(count($result)>0) {
             if($result[0]->r_view == 1 || $result[0]->r_edit == 1) {
                 $data['access'] = $this->purchase_order_model->get_access();
+                $id = $this->purchase_order_model->get_pending_data($id);
                 $data['data'] = $this->purchase_order_model->get_data('', $id);
                 $data['depot'] = $this->depot_model->get_data('Approved');
                 $data['vendor'] = $this->vendor_model->get_data('Approved');
@@ -133,9 +200,52 @@ class Purchase_order extends CI_Controller{
         }
     }
 
+    public function get_data_ajax($status='')
+    {
+        $draw = intval($this->input->get("draw"));
+        $start = intval($this->input->get("start"));
+        $length = intval($this->input->get("length"));
+        $data=$this->purchase_order_model->get_data($status);
+        $records = array();
+        for ($i=0; $i < count($data); $i++) { 
+                $records[] =  array(
+                        $i+1,                       
+                        '<span style="display:none;">'.(($data[$i]->order_date!=null && $data[$i]->order_date!='')?date('Ymd',strtotime($data[$i]->order_date)):'').'</span>'.(($data[$i]->order_date!=null && $data[$i]->order_date!='')?date('d/m/Y',strtotime($data[$i]->order_date)):''),
+                        '<a href="'.base_url().'index.php/purchase_order/edit/'.$data[$i]->id.'"><i class="fa fa-edit"></i></a>',
+                        ''.($data[$i]->po_no!=null?'<a href="'.base_url().'index.php/purchase_order/view_purchase_order/'.$data[$i]->id.'" target="_blank"> <span class="fa fa-file-pdf-o"></span></a>':'').'',
+                        ''.$data[$i]->vendor_name.'',
+                        ''.$data[$i]->depot_name.'',
+                        ''.format_money($data[$i]->amount,2).'',
+                        '<a href="'.base_url().'index.php/purchase_order/view_payment_details/'.$data[$i]->id.'"><span class="fa fa-eye"  ></span></a>',
+                        ''.($data[$i]->po_no!=null?'<a href="'.base_url().'index.php/purchase_order/send_email/'.$data[$i]->id.'"><span class="fa fa-paper-plane-o"></span></a>':'').''
+                    );
+      }
+
+      $output = array(
+                        "draw" => $draw,
+                        "recordsTotal" => count($data),
+                        "recordsFiltered" => count($data),
+                        "data" => $records
+                    );
+       echo json_encode($output); 
+    }
+
     public function save(){
         $this->purchase_order_model->save_data();
         redirect(base_url().'index.php/purchase_order');
+    }
+
+    public function get_po_status()
+    {
+       $id = $this->input->post('id');
+
+       $result = $this->db->select('po_status,other_charges_amount,other_charges')->where('id',$id)->get('purchase_order')->result();
+
+       if(count($result)>0)
+         echo  json_encode($result[0]);
+       else
+        return 0;
+
     }
 
     public function update($id){
@@ -213,7 +323,7 @@ class Purchase_order extends CI_Controller{
         $result=$this->purchase_order_model->get_access();
         if(count($result)>0) {
             if($result[0]->r_view == 1 || $result[0]->r_edit == 1) {
-                $this->purchase_order_model->generate_purchase_order($id);
+                $this->purchase_order_model->generate_purchase_order_file($id);
             } else {
                 echo "Unauthorized access";
             }
@@ -223,9 +333,9 @@ class Purchase_order extends CI_Controller{
         }
     }
 
-    public function view_po(){
-        $id=$this->input->post('id');
-        $id=$this->encryption->decrypt($id);
+    public function view_po($id){
+        /*$id=$this->input->post('id');
+        $id=$this->encryption->decrypt($id);*/
         $this->purchase_order_model->generate_purchase_order($id);
     }
 

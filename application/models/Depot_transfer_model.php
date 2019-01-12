@@ -64,6 +64,7 @@ function save_data($id=''){
         'date_of_transfer' => $date_of_transfer,
         'depot_out_id' => $this->input->post('depot_out_id'),
         'depot_in_id' => $this->input->post('depot_in_id'),
+        'chalan_no' => $this->input->post('chalan_no'),
         'status' => $this->input->post('status'),
         'remarks' => $this->input->post('remarks'),
         'modified_by' => $curusr,
@@ -91,6 +92,7 @@ function save_data($id=''){
     $bar=$this->input->post('bar[]');
     $box=$this->input->post('box[]');
     $qty=$this->input->post('qty[]');
+    $batch_no=$this->input->post('batch_no[]'); 
 
     for ($k=0; $k<count($type); $k++) {
         if(isset($type[$k]) and $type[$k]!="") {
@@ -105,8 +107,10 @@ function save_data($id=''){
                         'depot_transfer_id' => $id,
                         'type' => $type[$k],
                         'item_id' => $item_id,
-                        'qty' => format_number($qty[$k],2)
+                        'qty' => format_number($qty[$k],2),
+                        'batch_no' => $batch_no[$k],
                     );
+            
             $this->db->insert('depot_transfer_items', $data);
         }
     }

@@ -36,8 +36,13 @@ class Sales_rep_location extends CI_Controller{
         $result=$this->sales_rep_location_model->get_access();
         if(count($result)>0) {
             if($result[0]->r_insert == 1) {
+                // echo $this->session->userdata('sales_rep_id');
+                
                 $data['access'] = $this->sales_rep_location_model->get_access();
                 $data['distributor'] = $this->sales_rep_distributor_model->get_data2('Approved');
+                $data['zone'] = $this->sales_rep_location_model->get_zone();
+                $data['area'] = $this->sales_rep_location_model->get_area();
+                $data['location'] = $this->sales_rep_location_model->get_locations();
 
                 load_view('sales_rep_location/sales_rep_location_details', $data);
             } else {
@@ -56,7 +61,16 @@ class Sales_rep_location extends CI_Controller{
                 $data['access'] = $result;
                 $data['data'] = $this->sales_rep_location_model->get_data('', $id);
                 $data['data1'] = $this->sales_rep_location_model->get_data_qty('', $id);
-                $data['distributor1'] = $this->sales_rep_distributor_model->get_data2('Approved');
+                $data['distributor'] = $this->sales_rep_distributor_model->get_data2('Approved');
+                $data['zone'] = $this->sales_rep_location_model->get_zone();
+
+                if(count($data['data'])>0){
+                    $zone_id = $data['data'][0]->zone_id;
+                    $area_id = $data['data'][0]->area_id;
+                }
+                
+                $data['area'] = $this->sales_rep_location_model->get_area($zone_id);
+                $data['location'] = $this->sales_rep_location_model->get_locations($zone_id, $area_id);
 
                 load_view('sales_rep_location/sales_rep_location_details', $data);
             } else {
@@ -94,13 +108,24 @@ class Sales_rep_location extends CI_Controller{
         if($this->input->post('srld') == "Place Order") {
             if($this->input->post('distributor_type')=="Old"){
                 $id = $this->input->post('distributor_id');
-                redirect(base_url().'index.php/Sales_rep_order/add_order/'.$id);
+                redirect(base_url().'index.php/sales_rep_order/add_order/'.$id);
             } else {
                 $result=$this->sales_rep_distributor_model->get_access();
                 if(count($result)>0) {
                     if($result[0]->r_view == 1 || $result[0]->r_edit == 1) {
+                        $zone_id = $this->input->post('zone_id');
+                        $area_id = $this->input->post('area_id');
+
+                        $data['zone'] = $this->sales_rep_location_model->get_zone();
+                        $data['area'] = $this->sales_rep_location_model->get_area($zone_id);
+                        $data['location'] = $this->sales_rep_location_model->get_locations($zone_id, $area_id);
+
                         $data['access'] = $result;
+                        $data['distributor'] = $this->sales_rep_location_model->get_distributors($zone_id, $area_id);
                         $data['distributor_name'] = $this->input->post('distributor_name');
+                        $data['zone_id'] = $this->input->post('zone_id');
+                        $data['area_id'] = $this->input->post('area_id');
+                        $data['location_id'] = $this->input->post('location_id');
                         load_view('sales_rep_distributor/sales_rep_distributor_details', $data);
                     }
                 } 
@@ -115,6 +140,33 @@ class Sales_rep_location extends CI_Controller{
     public function check_date_of_visit(){
         $result = $this->sales_rep_location_model->check_date_of_visit();
         echo $result;
+    }
+
+    public function get_area(){ 
+        $postData = $this->input->post();
+        $zone_id = $postData['zone_id'];
+        $data = $this->sales_rep_location_model->get_area($zone_id);
+
+        $area = '<option value="">Select</option>';
+        for($i=0; $i<count($data); $i++){
+            $area = $area . '<option value="'.$data[$i]->area_id.'">'.$data[$i]->area.'</option>';
+        }
+
+        echo $area; 
+    }
+
+    public function get_locations(){ 
+        $postData = $this->input->post();
+        $zone_id = $postData['zone_id'];
+        $area_id = $postData['area_id'];
+        $data = $this->sales_rep_location_model->get_locations($zone_id, $area_id);
+
+        $location = '<option value="">Select</option>';
+        for($i=0; $i<count($data); $i++){
+            $location = $location . '<option value="'.$data[$i]->id.'">'.$data[$i]->location.'</option>';
+        }
+
+        echo $location;
     }
 
     public function get_location(){
@@ -140,22 +192,24 @@ class Sales_rep_location extends CI_Controller{
     }
 
     public function get_closing_stock(){
-        $data['result'] = 0;
-        $query=$this->sales_rep_location_model->get_closing_stock();
-        if(count($query)>0) {
-            // for($i=0; $i<count($query); $i++){
-                $i=0;
-                $data['result'] = 1;
-                $data['id'] = $query[$i]->id;
-                $data['orange_bar'] = $query[$i]->orange_bar;
-                $data['mint_bar'] = $query[$i]->mint_bar;
-                $data['butterscotch_bar'] = $query[$i]->butterscotch_bar;
-                $data['chocopeanut_bar'] = $query[$i]->chocopeanut_bar;
-                $data['bambaiyachaat_bar'] = $query[$i]->bambaiyachaat_bar;
-                $data['mangoginger_bar'] = $query[$i]->mangoginger_bar;
-                $data['sales_rep_loc_id'] = $query[$i]->sales_rep_loc_id;
-            // }
-        }
+        // $data['result'] = 0;
+        // $query=$this->sales_rep_location_model->get_closing_stock();
+        // if(count($query)>0) {
+        //     // for($i=0; $i<count($query); $i++){
+        //         $i=0;
+        //         $data['result'] = 1;
+        //         $data['id'] = $query[$i]->id;
+        //         $data['orange_bar'] = $query[$i]->orange_bar;
+        //         $data['mint_bar'] = $query[$i]->mint_bar;
+        //         $data['butterscotch_bar'] = $query[$i]->butterscotch_bar;
+        //         $data['chocopeanut_bar'] = $query[$i]->chocopeanut_bar;
+        //         $data['bambaiyachaat_bar'] = $query[$i]->bambaiyachaat_bar;
+        //         $data['mangoginger_bar'] = $query[$i]->mangoginger_bar;
+        //         $data['sales_rep_loc_id'] = $query[$i]->sales_rep_loc_id;
+        //     // }
+        // }
+
+        $data = $this->sales_rep_location_model->get_closing_stock();
 
         echo json_encode($data);
     }

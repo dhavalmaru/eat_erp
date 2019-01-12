@@ -28,6 +28,11 @@
     .payment_details table td { padding:4px;}
     .payment_details table th { font-size:15px; background:#f1f1f1; padding:8px 5px;}
     .payment_details h1 { padding:3px; margin:0; font-size:20px; padding:10px; background:#f1f1f1; margin-bottom:5px}
+	.user_data td
+{
+	padding:5px!important;
+	
+}
 </style>
 </head>
 
@@ -85,7 +90,37 @@
                 </table>
             </div>
         </div>
+	 <table class="user_data" border="0" width="100%" style="border-collapse:collapse;margin-top:15px;font-size:12px " class="table" cellspacing="10">
+					<tr valign="center" >
+						  <td width="100%" align="center"><b>Created By:</b>
+						 <?php if(isset($data[0]->createdby)) echo $data[0]->createdby; ?>&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp
+						  <span style="<?php if(isset($data[0]->created_on)) 
+						if($data[0]->created_on <> $data[0]->modified_on)
+						echo ' ';else echo 'display:none;';?>">
+						 <b> Modified By:</b>
+						  <?php if(isset($data[0]->modifiedby)) echo $data[0]->modifiedby; ?>  &nbsp &nbsp &nbsp  &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp </span>
+						  <b> Approved By:</b>
+						  <?php if(isset($data[0]->approvedby)) echo $data[0]->approvedby; ?></td>
+						  
+					</tr>
+					<tr valign="center" >
+					      <td width="100%" align="center"><b>Created On:</b>
+						    <?php if(isset($data[0]->created_on)) echo date("d-m-Y h:m:i", strtotime($data[0]->created_on)) ?>&nbsp &nbsp &nbsp &nbsp
+							<span style="<?php if(isset($data[0]->created_on)) 
+						if($data[0]->created_on <> $data[0]->modified_on)
+						echo ' ';else echo 'display:none;';?>">
+						  <b> Modified On:</b>
+						     <?php if(isset($data[0]->modified_on)) echo date("d-m-Y h:m:i", strtotime($data[0]->modified_on)) ?>&nbsp &nbsp &nbsp &nbsp </span>
+						   <b> Approved On:</b>
+						    <?php if(isset($data[0]->approved_on))echo  date("d-m-Y h:m:i", strtotime($data[0]->approved_on)) ?>
+							</td>
+					</tr>
+					
+					
+	</table>
+
     </div>
+	
     <?php } ?>
 </body>
 </html>

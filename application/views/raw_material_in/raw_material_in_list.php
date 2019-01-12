@@ -46,6 +46,53 @@
 				     </div>	      
                    </div>	
                 
+
+             	<div class="nav-contacts ng-scope" ui-view="@nav">
+    				<div class="u-borderBottom u-bgColorBreadcrumb ng-scope">
+    					<div class="container u-posRelative u-textRight">
+    						
+
+    						<ul class="m-nav--linetriangle" ng-swipe-left="app.onInnerSwipe($event);" ng-swipe-right="app.onInnerSwipe($event);">
+    							<!--<li class="all">
+    								<a  href="<?php //echo base_url(); ?>index.php/raw_material_in/checkstatus/All">
+    									<span class="ng-binding">All</span>
+    									<span id="approved">  (<?php //echo $all; ?>)  </span>
+    								</a>
+    							</li>-->
+
+    							<li class="approved" >
+    								<a  href="<?php echo base_url(); ?>index.php/raw_material_in/checkstatus/Approved">
+    									<span class="ng-binding">Approved</span>
+    									<span id="approved"> (<?php echo $approved; ?>)</span>
+    								</a>
+    							</li>
+
+    							<li class="pending">
+    								<a  href="<?php echo base_url(); ?>index.php/raw_material_in/checkstatus/Pending">
+    									<span class="ng-binding">Pending</span>
+    									<span id="approved"> (<?php echo $pending; ?>) </span>
+    								</a>
+    							</li>
+
+                                <li class="rejected">
+                                    <a  href="<?php echo base_url(); ?>index.php/raw_material_in/checkstatus/Rejected">
+                                        <span class="ng-binding">Rejected</span>
+                                        <span id="approved"> (<?php echo $rejected; ?>) </span>
+                                    </a>
+                                </li>
+
+                                <li class="inactive">
+                                    <a  href="<?php echo base_url(); ?>index.php/raw_material_in/checkstatus/InActive">
+                                        <span class="ng-binding">InActive</span>
+                                        <span id="approved"> (<?php echo $inactive; ?>) </span>
+                                    </a>
+                                </li>
+
+    						</ul>
+    						
+    					</div>
+    				</div>
+			    </div>
                 <!-- PAGE CONTENT WRAPPER -->
                   <div class="page-content-wrap">                
                     <div class="row">
@@ -54,37 +101,23 @@
 						  <div class="panel panel-default">
 							<div class="panel-body">
 								<div class="table-responsive">
-								<table id="customers2" class="table datatable table-bordered"  >
+								<table id="customers10" class="table datatable table-bordered" width="100%" >
 									<thead>
 										<tr>
 										  <th width="65" style="text-align:center;" >Sr. No.</th>
-											<th width="130">Date Of Receipt</th>
+										  <th width="90">Date Of Receipt</th>
+											<th style="text-align:center;" width="65">Edit</th>
+											 <th width="65" style="text-align:center;">Receipt</th>
+											
 											<th >Vendor Name</th>
 											<th >Depot Name</th>
 											<th width="120">Amount (In Rs) </th>
-											<th width="110">Creation Date</th>
+										<!--	<th width="110">Creation Date</th>-->
+                                           
 										</tr>
 									</thead>
 									<tbody>
-										<?php for ($i=0; $i < count($data); $i++) { ?>
-										<tr>
-											<td style="text-align:center;"><?php echo $i+1; ?></td>
-											<td>
-                                                <span style="display:none;">
-                                                    <?php echo (($data[$i]->date_of_receipt!=null && $data[$i]->date_of_receipt!='')?date('Ymd',strtotime($data[$i]->date_of_receipt)):''); ?>
-                                                </span>
-                                                <a href="<?php echo base_url().'index.php/raw_material_in/edit/'.$data[$i]->id; ?>"><?php echo (($data[$i]->date_of_receipt!=null && $data[$i]->date_of_receipt!='')?date('d/m/Y',strtotime($data[$i]->date_of_receipt)):''); ?></a>
-                                            </td>
-											<td><?php echo $data[$i]->vendor_name; ?></td>
-											<td><?php echo $data[$i]->depot_name; ?></td>
-											<td><?php echo format_money($data[$i]->final_amount,2); ?></td>
-											<td>
-												<span style="display:none;">
-                                                    <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
-                                                </span>
-												<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
-										</tr>
-										<?php } ?>
+										
 									</tbody>
 								</table>
 								</div>
@@ -105,7 +138,134 @@
         <!-- END PAGE CONTAINER -->
 						
         <?php $this->load->view('templates/footer');?>
-		
+		<script type="text/javascript">
+         var BASE_URL="<?php echo base_url()?>";
+        </script>
     <!-- END SCRIPTS -->      
+        <script type="text/javascript">
+        $(document).ready(function() {
+            var url = window.location.href;
+            if(url.includes('All')){
+                $('.all').attr('class','active');
+            }
+            else  if(url.includes('InActive')){
+                $('.inactive').attr('class','active');
+            }
+            else  if(url.includes('Approved')){
+                $('.approved').attr('class','active');
+            }
+            else  if(url.includes('Pending')){
+                // console.log('pending');
+                $('.pending').attr('class','active');
+            }else  if(url.includes('Rejected')){
+                // console.log('pending');
+                $('.rejected').attr('class','active');
+            }
+            else {
+                $('.approved').attr('class','active');
+            }
+            $('.ahrefall').click(function(){
+                alert(window.location.href );
+            });
+        });
+    </script>
+    <script>
+            var table;
+            var status = '<?php echo $status; ?>';
+            $(document).ready(function() {
+                
+                var len=10;
+						columnDefs = 	[
+											{ className: "dt-body-center", targets: [ 0, 2, 3 ] }
+										];
+                table =  $('#customers10');
+                var tableOptions = {
+                    'bPaginate': true,
+                    'columnDefs': columnDefs,
+                    'iDisplayLength': len,
+                    aLengthMenu: [
+                        [10,25, 50, 100, 200, -1],
+                        [10,25, 50, 100, 200, "All"]
+                    ],
+                    "ajax": {
+                        url : BASE_URL+'index.php/Raw_material_in/get_data_ajax/'+status,
+                        // data: {status: status},
+                        type : 'GET'
+                    },
+                    'bDeferRender': true,
+                    'bProcessing': true
+                };
+                table.DataTable(tableOptions);
+                
+                $("#csv").click(function(){
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = false;
+                    table.DataTable(tableOptions);
+                    table.tableExport({type:'csv',escape:'false'});
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = true;
+                    table.DataTable(tableOptions);
+                });
+                
+                $("#xls").click(function(){
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = false;
+                    table.DataTable(tableOptions);
+                    table.tableExport({type:'excel',escape:'false'});
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = true;
+                    table.DataTable(tableOptions);
+                });
+
+
+
+                $("#txt").click(function(){
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = false;
+                    table.DataTable(tableOptions);
+                    table.tableExport({type:'txt',escape:'false'});
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = true;
+                    table.DataTable(tableOptions);
+                });
+                $("#doc").click(function(){
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = false;
+                    table.DataTable(tableOptions);
+                    table.tableExport({type:'doc',escape:'false'});
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = true;
+                    table.DataTable(tableOptions);
+                });
+                $("#powerpoint").click(function(){
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = false;
+                    table.DataTable(tableOptions);
+                    table.tableExport({type:'powerpoint',escape:'false'});
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = true;
+                    table.DataTable(tableOptions);
+                });
+                $("#png").click(function(){
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = false;
+                    table.DataTable(tableOptions);
+                    table.tableExport({type:'png',escape:'false'});
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = true;
+                    table.DataTable(tableOptions);
+                });
+
+                   $("#pdf").click(function(){
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = false;
+                    table.DataTable(tableOptions);
+                    table.tableExport({type:'pdf',escape:'false'});
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = true;
+                    table.DataTable(tableOptions);
+                });
+               });
+    </script>
     </body>
 </html>

@@ -45,7 +45,7 @@
                     <label for="txt_username" class="control-label">Username</label>
                 </div>
                 <div class="col-lg-8 col-sm-8">
-                    <input class="form-control" id="txt_username" name="txt_username" placeholder="Username" type="text" value="<?php echo set_value('txt_username'); ?>" />
+                    <input class="form-control" id="txt_username" name="txt_username" placeholder="Username" type="email" value="<?php echo set_value('txt_username'); ?>" />
                     <span class="text-danger"><?php echo form_error('txt_username'); ?></span>
                 </div>
                 </div>

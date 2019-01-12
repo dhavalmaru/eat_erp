@@ -22,7 +22,13 @@
                             color: #0b385f !important; 
                             cursor: not-allowed !important;}
 							
- 
+			#box_details .form-control[disabled], #box_details .form-control[readonly],#bar_details .form-control[disabled], #bar_details .form-control[readonly]
+			{
+				border:none!important;
+				background-color:transparent!important;
+				box-shadow:none!important;
+			
+			}
 		</style>
 		
     </head>
@@ -54,9 +60,13 @@
                                                 <input type="text" class="form-control datepicker1" name="date_of_processing" id="date_of_processing" placeholder="Date Of Processing" value="<?php if(isset($data)) echo (($data[0]->date_of_processing!=null && $data[0]->date_of_processing!='')?date('d/m/Y',strtotime($data[0]->date_of_processing)):date('d/m/Y')); else echo date('d/m/Y'); ?>"/>
                                                 <input type="hidden" class="form-control" name="id" id="id" placeholder="Id" value="<?php if (isset($data)) { echo $data[0]->id; } ?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group">
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Depot <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="depot_id" id="depot_id" class="form-control">
+                                                <select name="depot_id" id="depot_id" class="form-control select2">
                                                     <option value="">Select</option>
                                                     <?php if(isset($depot)) { for ($k=0; $k < count($depot) ; $k++) { ?>
                                                             <option value="<?php echo $depot[$k]->id; ?>" <?php if(isset($data)) { if($depot[$k]->id==$data[0]->depot_id) { echo 'selected'; } } ?>><?php echo $depot[$k]->depot_name; ?></option>
@@ -94,6 +104,7 @@
                                                 <th style="display:none;">Grams</th>
                                                 <th style="display:none;">Rate (In Rs) </th>
                                                 <th style="display:none;">Amount (In Rs)</th>
+                                                <th width="20%" >Batch</th>
                                                  <th style="text-align:center; width:75px; ">Action</th>
                                             </tr>
                                         </thead>
@@ -102,7 +113,7 @@
                                                 for($i=0; $i<count($box_to_bars); $i++) { ?>
                                             <tr id="box_<?php echo $i; ?>_row">
                                                 <td>
-                                                    <select name="box[]" class="form-control box" id="box_<?php echo $i;?>">
+                                                    <select name="box[]" class="form-control box select2" id="box_<?php echo $i;?>">
                                                         <option value="">Select</option>
                                                         <?php if(isset($box)) { for ($k=0; $k < count($box) ; $k++) { ?>
                                                                 <option value="<?php echo $box[$k]->id; ?>" <?php if($box[$k]->id==$box_to_bars[$i]->box_id) { echo 'selected'; } ?>><?php echo $box[$k]->box_name; ?></option>
@@ -121,6 +132,15 @@
                                                 <td style="display:none;">
                                                     <input type="text" class="form-control format_number amount" name="amount[]" id="amount_<?php echo $i; ?>" placeholder="Amount" value="<?php if (isset($box_to_bars)) { echo format_money($box_to_bars[$i]->amount,2); } ?>" readonly />
                                                 </td>
+                                                <td >
+                                                    <select name="batch_no[]" class="form-control batch_no" id="batch_no_<?php echo $i;?>" data-error="#err_batch_no_<?php echo $i;?>" >
+                                                        <option value="">Select</option>
+                                                        <?php if(isset($batch)) { for ($k=0; $k < count($batch); $k++) {   ?>
+                                                                <option value="<?php echo $batch[$k]->id; ?>" <?php if($batch[$k]->id==$box_to_bars[$i]->batch_no) { echo 'selected'; }?> ><?php echo $batch[$k]->batch_no; ?></option>
+                                                        <?php }} ?>
+                                                    </select>
+                                                    <div id="err_batch_no_<?php echo $i;?>"></div>
+                                               </td> 
                                                  <td style="text-align:center;     vertical-align: middle;">
                                                     <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>
                                                 </td>
@@ -128,7 +148,7 @@
                                         <?php }} else { ?>
                                             <tr id="box_<?php echo $i; ?>_row">
                                                 <td>
-                                                    <select name="box[]" class="form-control box" id="box_<?php echo $i;?>">
+                                                    <select name="box[]" class="form-control box select2" id="box_<?php echo $i;?>">
                                                         <option value="">Select</option>
                                                         <?php if(isset($box)) { for ($k=0; $k < count($box) ; $k++) { ?>
                                                                 <option value="<?php echo $box[$k]->id; ?>"><?php echo $box[$k]->box_name; ?></option>
@@ -147,6 +167,15 @@
                                                 <td style="display:none;">
                                                     <input type="text" class="form-control format_number amount" name="amount[]" id="amount_<?php echo $i; ?>" placeholder="Amount" value="" readonly />
                                                 </td>
+                                                <td >
+                                                    <select name="batch_no[]" class="form-control batch_no" id="batch_no_<?php echo $i;?>"  data-error="#err_batch_no_<?php echo $i;?>">
+                                                        <option value="">Select</option>
+                                                        <?php if(isset($batch)) { for ($k=0; $k < count($batch); $k++) { ?>
+                                                                <option value="<?php echo $batch[$k]->id; ?>" ><?php echo $batch[$k]->batch_no; ?></option>
+                                                        <?php }} ?>
+                                                    </select>
+                                                    <div id="err_batch_no_<?php echo $i;?>"></div>
+                                               </td>
                                                 <td style="text-align:center;     vertical-align: middle;">
                                                     <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>
                                                 </td>
@@ -250,6 +279,7 @@
 
                 get_bar_details();
                 get_total();
+				
             });
 
             function get_bar_details(){
@@ -481,7 +511,7 @@
                     event.preventDefault();
                     var newRow = jQuery('<tr id="box_'+counter+'_row">'+
                                             '<td>'+
-                                                '<select name="box[]" class="form-control box" id="box_'+counter+'">'+
+                                                '<select name="box[]" class="form-control box select2" id="box_'+counter+'">'+
                                                     '<option value="">Select</option>'+
                                                     '<?php if(isset($box)) { for ($k=0; $k < count($box) ; $k++) { ?>'+
                                                             '<option value="<?php echo $box[$k]->id; ?>"><?php echo $box[$k]->box_name; ?></option>'+
@@ -503,11 +533,21 @@
                                                 '<input type="text" class="form-control format_number amount" name="amount[]" id="amount_'+counter+'" placeholder="Amount" value="" readonly />'+
                                                 '<!-- <span id="amount_label_'+counter+'"></span> -->'+
                                             '</td>'+
+                                           '<td >' + 
+                                            '<select name="batch_no[]" class="form-control batch_no" id="batch_no_'+counter+'" data-error="#err_batch_no_'+counter+'" >' + 
+                                                '<option value="">Select</option>' + 
+                                                '<?php if(isset($batch)) { for ($k=0; $k < count($batch); $k++) { ?>' + 
+                                                        '<option value="<?php echo $batch[$k]->id; ?>"><?php echo $batch[$k]->batch_no; ?></option>' + 
+                                                '<?php }} ?>' + 
+                                            '</select>' + 
+                                            '<div id="err_batch_no_'+counter+'"></div>' + 
+                                        '</td>' +
                                             ' <td style="text-align:center;     vertical-align: middle;">'+
                                                 '<a id="box_'+counter+'_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>'+
                                             '</td>'+
                                         '</tr>');
                     $('#box_details').append(newRow);
+                    $('.select2').select2();
                     $('.format_number').keyup(function(){
                         format_number(this);
                     });

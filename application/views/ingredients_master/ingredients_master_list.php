@@ -31,7 +31,7 @@
               <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
                 
                    <div class="heading-h3"> 
-                   <div class="heading-h3-heading mobile-head">	 <a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp;  Ingredients Master List  </div>						 
+						<div class="heading-h3-heading mobile-head">	 <a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  	</a> &nbsp; &#10095; &nbsp;  Ingredients Master List  </div>						 
 					  <div class="heading-h3-heading  mobile-head">
 					  <div class="pull-right btn-margin">	
 								<?php $this->load->view('templates/download');?>	
@@ -42,7 +42,7 @@
 									</a>
 								</div>
 				     </div>	      
-                </div>	
+					</div>	
                 
                    <div class="page-content-wrap">                
                     <div class="row">
@@ -56,26 +56,28 @@
 									<thead>
 										<tr>
 									        <th width="65" style="text-align:center;" >Sr. No.</th>
-											<th width="175" >Product Name</th>
+									        <th width="65" style="text-align:center;" >Edit</th>
+											<th width="300" >Product Name</th>
 											<th width="80">Total Batch Bar</th>
-											<th width="150">Per Bar</th>
-											<th width="150">Total Batch in Gram</th>
-											<th width="100">Creation Date</th>
+											<th width="80">Per Bar</th>
+											<th width="80">Total Batch in Gram</th>
+											<!--<th width="100">Creation Date</th>-->
 										</tr>
 									</thead>
 									<tbody>
 										<?php for ($i=0; $i < count($data); $i++) { ?>
 										<tr>
 											<td  style="text-align:center;"><?php echo $i+1; ?></td>
-											<td><a href="<?php echo base_url().'index.php/ingredients_master/edit/'.$data[$i]->id; ?>"><?php echo $data[$i]->product_name; ?></a></td>
+											<td style="text-align:center; vertical-align: middle; "><a href="<?php echo base_url().'index.php/ingredients_master/edit/'.$data[$i]->id; ?>"><i class="fa fa-edit"></i></a></td>
+											<td><?php echo $data[$i]->product_name; ?></td>
 											<td><?php echo $data[$i]->total_batch_bar ; ?></td>
 											<td><?php echo $data[$i]->per_bar; ?></td>
 											<td><?php echo $data[$i]->total_batch_in_grams; ?></td>
-											<td>
+											<!--<td>
 												<span style="display:none;">
-                                                    <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
+                                                    <?php //echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
                                                 </span>
-												<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
+												<?php// echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>-->
 										</tr>
 										<?php } ?>
 									</tbody>

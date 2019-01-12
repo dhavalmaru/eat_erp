@@ -55,6 +55,7 @@
 									<thead>
 										<tr>
 											<th width="65" style="text-align:center;" >Sr. No.</th>
+											<th width="65" style="text-align:center;" >Edit</th>
 											<th >Role</th>
 											<th >Description</th>
 											<th >Created By</th>
@@ -64,7 +65,8 @@
 										<?php for ($i=0; $i < count($data) ; $i++) { ?>
 										<tr>
 											<td style="text-align:center;" > <?php echo $i+1; ?></td>
-											<td><a onclick="<?php if($data[$i]->created_by=='0' && $userdata['role_id']!='0') echo "return confirm('You cant edit global roles. Do you want to copy this role?')"?>" href="<?php if($data[$i]->created_by==0 && $userdata['role_id']!='0') echo base_url().'index.php/user_roles/copy/'.$data[$i]->id; else echo base_url().'index.php/user_roles/edit/'.$data[$i]->id; ?>"><?php echo $data[$i]->role_name; ?></a></td>
+											<td style="text-align:center; vertical-align: middle; "><a onclick="<?php if($data[$i]->created_by=='0' && $userdata['role_id']!='0') echo "return confirm('You cant edit global roles. Do you want to copy this role?')"?>" href="<?php if($data[$i]->created_by==0 && $userdata['role_id']!='0') echo base_url().'index.php/user_roles/copy/'.$data[$i]->id; else echo base_url().'index.php/user_roles/edit/'.$data[$i]->id; ?>" ><i class="fa fa-edit"></i></a></td>
+											<td><?php echo $data[$i]->role_name; ?></td>
 											<td><?php echo $data[$i]->description; ?></td>
 											<td><?php echo $data[$i]->user_role_by; ?></td>
 										</tr>

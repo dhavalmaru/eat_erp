@@ -40,6 +40,43 @@ class Sample_out extends CI_Controller{
         $this->checkstatus('pending_for_delivery');
     }
 
+    public function get_data($status='')
+    {
+        $draw = intval($this->input->get("draw"));
+        $start = intval($this->input->get("start"));
+        $length = intval($this->input->get("length"));
+        $data=$this->sample_out_model->get_distributor_out_data1($status);
+        $records = array();
+        for ($i=0; $i < count($data); $i++) { 
+                $records[] =  array(
+                        '<input type="checkbox" id="check_<?php echo $i; ?>" class="check icheckbox" name="check[]" value="'.$data[$i]->id.'" />',
+                        $i+1,                       
+                        '<span style="display:none;">'.(($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('Ymd',strtotime($data[$i]->date_of_processing)):'').'</span>'.(($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('d/m/Y',strtotime($data[$i]->date_of_processing)):''),
+                        '<a href="'.base_url().'index.php/sample_out/edit/'.$data[$i]->d_id.'" class=""><i class="fa fa-edit"></i></a>',
+                        ''.(($data[$i]->invoice_no!=null && $data[$i]->invoice_no!='') || ($data[$i]->voucher_no!=null && $data[$i]->voucher_no!='')?'<a href="'.base_url().'index.php/sample_out/view_tax_invoice/'.$data[$i]->id.'" target="_blank">  <span class="fa fa-file-pdf-o">':'').'',
+                        '<span style="display:none;">'.(isset($data[$i]->voucher_no)?str_pad(substr($data[$i]->voucher_no, strrpos($data[$i]->voucher_no, "/")+1),10,"0",STR_PAD_LEFT):'').'</span>'.$data[$i]->voucher_no.'',
+                   
+                        ''.$data[$i]->distributor_name.'',
+                        ''.$data[$i]->location.'',
+               
+                        ''.format_money($data[$i]->final_amount,2).'',
+                      
+                   
+                        ''.$data[$i]->delivery_status.'<input type="hidden" id="dlvery_status_'.$i.'" name="dlvery_status[]" value="'.$data[$i]->delivery_status.'" />',
+               
+                        /*''.(($data[$i]->invoice_no!=null && $data[$i]->invoice_no!='') || ($data[$i]->voucher_no!=null && $data[$i]->voucher_no!='')?'<a href="'.base_url().'index.php/sample_out/view_tax_invoice/'.$data[$i]->id.'" target="_blank"><span class="fa fa-file-pdf-o"></span></a>':'').'',*/
+                    );
+      }
+
+      $output = array(
+                        "draw" => $draw,
+                        "recordsTotal" => count($data),
+                        "recordsFiltered" => count($data),
+                        "data" => $records
+                    );
+       echo json_encode($output); 
+    }
+
     public function checkstatus($status=''){
         $result=$this->sample_out_model->get_access();
         if(count($result)>0) {
@@ -47,7 +84,7 @@ class Sample_out extends CI_Controller{
 			if($status=='All') {
 				$status='';
 			}
-            $data['data']=$this->sample_out_model->get_distributor_out_data1($status);
+            /*$data['data']=$this->sample_out_model->get_distributor_out_data1($status);*/
 
             $count_data=$this->sample_out_model->get_distributor_out_data1();
             $active=0;
@@ -58,27 +95,40 @@ class Sample_out extends CI_Controller{
             $gp_issued=0;
             $delivered_not_complete=0;
 
-            if (count($result)>0){
+       if (count($result)>0){
                 for($i=0;$i<count($count_data);$i++){
                     if (strtoupper(trim($count_data[$i]->status))=="APPROVED")
                         $active=$active+1;
+						
 
-                    
-                    if (strtoupper(trim($count_data[$i]->status))=="PENDING" && (strtoupper(trim($count_data[$i]->delivery_status))=="GP ISSUED" || strtoupper(trim($count_data[$i]->delivery_status))=="DELIVERED NOT COMPLETE" || strtoupper(trim($count_data[$i]->delivery_status))=="DELIVERED"))
+                    if ((strtoupper(trim($count_data[$i]->status))=="PENDING" && 
+                        (strtoupper(trim($count_data[$i]->delivery_status))=="PENDING" || 
+                            strtoupper(trim($count_data[$i]->delivery_status))=="GP ISSUED" || 
+                            strtoupper(trim($count_data[$i]->delivery_status))=="DELIVERED NOT COMPLETE" || 
+                            strtoupper(trim($count_data[$i]->delivery_status))=="DELIVERED")) || 
+                        strtoupper(trim($count_data[$i]->status))=="DELETED")
                         $pending_for_approval=$pending_for_approval+1;
-                    else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && (strtoupper(trim($count_data[$i]->delivery_status))=="DELIVERED" || $count_data[$i]->delivery_status==null))
+						
+                    else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && 
+                                (strtoupper(trim($count_data[$i]->delivery_status))=="DELIVERED" || $count_data[$i]->delivery_status==null))
                         // $active=$active+1;
                         $active=$active;
                     else if (strtoupper(trim($count_data[$i]->status))=="INACTIVE")
                         $inactive=$inactive+1;
-                    else if (strtoupper(trim($count_data[$i]->status))=="PENDING")
+					
+                    else if (strtoupper(trim($count_data[$i]->status))=="PENDING" && 
+                                ($count_data[$i]->delivery_status==null || $count_data[$i]->delivery_status==''))
                         $pending=$pending+1;
-                    else if ((strtoupper(trim($count_data[$i]->status))=="APPROVED" || strtoupper(trim($count_data[$i]->status))=="REJECTED") && strtoupper(trim($count_data[$i]->delivery_status))=="PENDING")
+						
+                    else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && strtoupper(trim($count_data[$i]->delivery_status))=="PENDING")
                         $pending_for_delivery=$pending_for_delivery+1;
-                    else if ((strtoupper(trim($count_data[$i]->status))=="APPROVED" || strtoupper(trim($count_data[$i]->status))=="REJECTED") && strtoupper(trim($count_data[$i]->delivery_status))=="GP ISSUED")
+					
+                    else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && strtoupper(trim($count_data[$i]->delivery_status))=="GP ISSUED")
                         $gp_issued=$gp_issued+1;
-                    else if ((strtoupper(trim($count_data[$i]->status))=="APPROVED" || strtoupper(trim($count_data[$i]->status))=="REJECTED") && strtoupper(trim($count_data[$i]->delivery_status))=="DELIVERED NOT COMPLETE")
+					
+                    else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && strtoupper(trim($count_data[$i]->delivery_status))=="DELIVERED NOT COMPLETE")
                         $delivered_not_complete=$delivered_not_complete+1;
+					
                 }
             }
 
@@ -109,7 +159,10 @@ class Sample_out extends CI_Controller{
                 $data['depot'] = $this->depot_model->get_data('Approved');
                 $data['distributor'] = $this->distributor_model->get_data_with_sample('Approved');
                 $data['distributor1'] = $this->distributor_model->get_data_without_sample('Approved');
-                $data['sales_rep'] = $this->sales_rep_model->get_data_dist('Approved');
+                $where = array('status'=>'Approved','sr_type'=>'Sales Representative');
+                $data['sales_rep'] = $this->db->select('*')->where($where)->get('sales_rep_master')->result();//$this->sales_rep_model->get_data_dist('Approved','','Sales Representative');
+                $where1 = array('status'=>'Approved','sr_type'=>'Promoter');
+                $data['promoter'] = $this->db->select('*')->where($where1)->get('sales_rep_master')->result();
                 $data['box'] = $this->box_model->get_data('Approved');
                 $data['bar'] = $this->product_model->get_data('Approved');
                 $data['bank'] = $this->bank_model->get_data('Approved');
@@ -133,13 +186,15 @@ class Sample_out extends CI_Controller{
                 $data['depot'] = $this->depot_model->get_data('Approved');
                 $data['distributor'] = $this->distributor_model->get_data_with_sample('Approved');
                 $data['distributor1'] = $this->distributor_model->get_data_without_sample('Approved');
-                $data['sales_rep'] = $this->sales_rep_model->get_data_dist('Approved');
+                $where = array('status'=>'Approved','sr_type'=>'Sales Representative');
+                $data['sales_rep'] = $this->db->select('*')->where($where)->get('sales_rep_master')->result();//$this->sales_rep_model->get_data_dist('Approved','','Sales Representative');
+                $where1 = array('status'=>'Approved','sr_type'=>'Promoter');
+                $data['promoter'] = $this->db->select('*')->where($where1)->get('sales_rep_master')->result();
                 $data['box'] = $this->box_model->get_data('Approved');
                 $data['bar'] = $this->product_model->get_data('Approved');
                 $data['distributor_out_items'] = $this->sample_out_model->get_distributor_out_items($d_id);
                 $data['bank'] = $this->bank_model->get_data('Approved');
                 // $data['distributor_payment_details'] = $this->sample_out_model->get_distributor_payment_details($id);
-
                 load_view('distributor_out/sample_out_details', $data);
             } else {
                 echo "Unauthorized access";
@@ -152,12 +207,13 @@ class Sample_out extends CI_Controller{
 
     public function save(){
         $this->sample_out_model->save_data();
-        redirect(base_url().'index.php/distributor_out/checkstatus/pending_for_delivery');
+        redirect(base_url().'index.php/sample_out/checkstatus/pending_for_approval');
     }
 
     public function update($id){
         $this->sample_out_model->save_data($id);
-        redirect(base_url().'index.php/distributor_out/checkstatus/pending_for_delivery');
+        // redirect(base_url().'index.php/sample_out/checkstatus/pending_for_delivery');
+		 echo '<script>window.open("'.base_url().'index.php/sample_out/checkstatus/pending_for_delivery", "_parent")</script>';
     }
     
     public function check_box_availablity(){

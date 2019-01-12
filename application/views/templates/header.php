@@ -17,6 +17,15 @@
 		<style>
 			.tile {padding: 0px;
 				   min-height: 77px;}
+			.fa
+				{
+					font-size:20px!important;
+				}		
+			i
+				{
+					font-size:20px!important;
+				}	
+			
 		</style>
 		
     </head>

@@ -12,12 +12,12 @@
             <!-- CSS INCLUDE -->        
         <link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>css/theme-blue.css"/>
         <link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>mobile-menu/vendor-1437d0659c.css"/>
-		<!--[if lt IE 9]>
+        <!--[if lt IE 9]>
 <script src="dist/html5shiv.js"></script>
 <![endif]-->
         <!-- EOF CSS INCLUDE -->                                      
-		<style>
-	.page-content page-overflow { height:auto!important;}
+        <style>
+    .page-content page-overflow { height:auto!important;}
 .page-container .page-content .page-content-wrap { background:#fff;  margin:0px; width: auto!important; float: none;   }
 .dataTables_filter { border-bottom:0!important; }
 .heading-h2 { background:#eee; line-height: 25px; padding:7px 22px;   text-transform: uppercase; font-weight: 600; display: block;  margin-top: 61px; border-bottom:1px solid #d7d7d7; font-size:14px;  }
@@ -30,7 +30,7 @@ font-family: Montserrat-Black; font-weight: 100;float: left;     width: 45%;
 .main-container {margin:20px 12px; } 
 h2 { font-weight:100!important;  font-size:18px!important; padding:0; }
 .col-md-12 {}
-.full-width-devider {  display:inline-block;padding: 15px 25px; box-shadow: rgba(0, 0, 0, 0.2) 0px 6px 32px -4px; background:#fff; width:100%;  margin-bottom:15px;   	}
+.full-width-devider {  display:inline-block;padding: 15px 25px; box-shadow: rgba(0, 0, 0, 0.2) 0px 6px 32px -4px; background:#fff; width:100%;  margin-bottom:15px;     }
 .dropdown-toggle{
 background: none !important;
 color: #53ad53 !important;
@@ -128,18 +128,18 @@ font-weight:500;
 
 ul.topnav li { width:20%; text-align:center;  border-right:1px solid #eee; }
 ul.topnav li a {  border-bottom:none!important;     } 
-	}
+    }
 
  
      </style>
                      
-		 
+         
     </head>
-    <body>								
+    <body>                              
         <!-- START PAGE CONTAINER -->
         <div class="page-container page-navigation-top">            
             <!-- PAGE CONTENT -->
-			   <?php $this->load->view('templates/menus');?>
+               <?php $this->load->view('templates/menus');?>
               <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
                 
              
@@ -151,8 +151,8 @@ ul.topnav li a {  border-bottom:none!important;     }
                       <div class="main-container">
                         <?php if(isset($raw_material_details)){?>
                          
-                         	  <div class="full-width" style="">
-							 <div class="full-width-devider" style="">
+                              <div class="full-width" style="">
+                             <div class="full-width-devider" style="">
                             <div class="col-md-12" style="">
                                 
                                 <!-- START WIDGET MESSAGES -->
@@ -200,8 +200,8 @@ ul.topnav li a {  border-bottom:none!important;     }
                                     </div>
                                 </div>
                             </div>
-							</div>
-				        <?php }?>
+                            </div>
+                        <?php }?>
 
                         <?php if(isset($product_details)){?>
                             <div class="full-width-devider" style="">
@@ -250,60 +250,15 @@ ul.topnav li a {  border-bottom:none!important;     }
                             </div>
                         <?php }?>
                         
-                        <?php //if(isset($product_details)){?>
-                            <!-- <div class="full-width-devider" style="">
+                        <?php if(isset($product_details1)){?>
+                            <div class="full-width-devider" style="">
                             <div class="col-md-12">
                                 <h2 style="float:left; margin-bottom: 0;">Product Stock Details</h2>
                                 <div class="btn-group pull-right">
                                     <button class="btn btn-success dropdown-toggle" data-toggle="dropdown"><i class="fa fa-bars"></i> Export Data</button>
                                     <ul class="dropdown-menu">
-                                        <li><a href="#" onClick ="$('#customers3').tableExport({type:'csv',escape:'false'});"><img src='<?php //echo base_url(); ?>img/icons/csv.png' width="24"/> CSV</a></li>
-                                        <li><a href="#" onClick ="$('#customers3').tableExport({type:'excel',escape:'false'});"><img src='<?php //echo base_url(); ?>img/icons/xls.png' width="24"/> XLS</a></li>
-                                    </ul>
-                                </div>
-                                <div class="panel panel-default">
-                                    <div class="panel-body panel-body-table" style="margin-top: 0;">
-                                        <div class="table-responsive">
-                                            <table class="table table-bordered table-striped" id="customers3">
-                                                <thead>
-                                                    <tr>
-                                                        <th style="padding:5px;" width="5%">Sr no</th>
-                                                        <th style="padding:5px;" width="15%">Depot</th>
-                                                        <th style="padding:5px;" width="10%">Product</th>
-                                                        <th style="padding:5px;" width="10%">Quantity</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                <?php //if(isset($product_details)){
-                                                    // $i=0;
-                                                    // foreach($product_details as $row){
-                                                    //     echo ' <tr style="word-break: break-word;">
-                                                    //     <td style="padding:5px;" width="5%"><strong>'.($i+1).'</strong></td>
-                                                    //     <td style="padding:5px;" width="15%"><strong>'.$product_details[$i]->depot_name.'</strong></td>
-                                                    //     <td style="padding:5px;" width="15%"><strong>'.$product_details[$i]->product_name.'</strong></td>
-                                                    //     <td style="padding:5px;" width="10%"><strong>'.format_money($product_details[$i]->tot_qty,2).'</strong></td>
-                                                    //     </tr> ';
-                                                    //     $i++;
-                                                    // }
-                                                //}?>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            </div> -->
-                        <?php //}?>
-
-                        <?php //if(isset($box_details)){?>
-                            <!-- <div class="full-width-devider" style="">
-                            <div class="col-md-12">
-                                <h2 style="float:left; margin-bottom: 0;">Box Stock Details</h2>
-                                <div class="btn-group pull-right">
-                                    <button class="btn btn-success dropdown-toggle" data-toggle="dropdown"><i class="fa fa-bars"></i> Export Data</button>
-                                    <ul class="dropdown-menu">
-                                        <li><a href="#" onClick ="$('#customers4').tableExport({type:'csv',escape:'false'});"><img src='<?php //echo base_url(); ?>img/icons/csv.png' width="24"/> CSV</a></li>
-                                        <li><a href="#" onClick ="$('#customers4').tableExport({type:'excel',escape:'false'});"><img src='<?php //echo base_url(); ?>img/icons/xls.png' width="24"/> XLS</a></li>
+                                        <li><a href="#" onClick ="$('#customers4').tableExport({type:'csv',escape:'false'});"><img src='<?php echo base_url(); ?>img/icons/csv.png' width="24"/> CSV</a></li>
+                                        <li><a href="#" onClick ="$('#customers4').tableExport({type:'excel',escape:'false'});"><img src='<?php echo base_url(); ?>img/icons/xls.png' width="24"/> XLS</a></li>
                                     </ul>
                                 </div>
                                 <div class="panel panel-default">
@@ -314,31 +269,76 @@ ul.topnav li a {  border-bottom:none!important;     }
                                                     <tr>
                                                         <th style="padding:5px;" width="5%">Sr no</th>
                                                         <th style="padding:5px;" width="15%">Depot</th>
-                                                        <th style="padding:5px;" width="10%">Box</th>
+                                                        <th style="padding:5px;" width="10%">Product</th>
                                                         <th style="padding:5px;" width="10%">Quantity</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                <?php //if(isset($box_details)){
-                                                    // $i=0;
-                                                    // foreach($box_details as $row){
-                                                    //     echo ' <tr style="word-break: break-word;">
-                                                    //     <td style="padding:5px;" width="5%"><strong>'.($i+1).'</strong></td>
-                                                    //     <td style="padding:5px;" width="15%"><strong>'.$box_details[$i]->depot_name.'</strong></td>
-                                                    //     <td style="padding:5px;" width="15%"><strong>'.$box_details[$i]->box_name.'</strong></td>
-                                                    //     <td style="padding:5px;" width="10%"><strong>'.format_money($box_details[$i]->tot_qty,2).'</strong></td>
-                                                    //     </tr> ';
-                                                    //     $i++;
-                                                    // }
-                                                //}?>
+                                                <?php if(isset($product_details1)){
+                                                    $i=0;
+                                                    foreach($product_details1 as $row){
+                                                        echo ' <tr style="word-break: break-word;">
+                                                        <td style="padding:5px;" width="5%"><strong>'.($i+1).'</strong></td>
+                                                        <td style="padding:5px;" width="15%"><strong>'.$product_details1[$i]->depot_name.'</strong></td>
+                                                        <td style="padding:5px;" width="15%"><strong>'.$product_details1[$i]->product_name.'</strong></td>
+                                                        <td style="padding:5px;" width="10%"><strong>'.format_money($product_details1[$i]->tot_qty,2).'</strong></td>
+                                                        </tr> ';
+                                                        $i++;
+                                                    }
+                                                }?>
                                                 </tbody>
                                             </table>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            </div> -->
-                        <?php //}?>
+                            </div>
+                        <?php } ?>
+
+                        <?php if(isset($box_details)){?>
+                            <div class="full-width-devider" style="">
+                            <div class="col-md-12">
+                                <h2 style="float:left; margin-bottom: 0;">Box Stock Details</h2>
+                                <div class="btn-group pull-right">
+                                    <button class="btn btn-success dropdown-toggle" data-toggle="dropdown"><i class="fa fa-bars"></i> Export Data</button>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="#" onClick ="$('#customers5').tableExport({type:'csv',escape:'false'});"><img src='<?php echo base_url(); ?>img/icons/csv.png' width="24"/> CSV</a></li>
+                                        <li><a href="#" onClick ="$('#customers5').tableExport({type:'excel',escape:'false'});"><img src='<?php echo base_url(); ?>img/icons/xls.png' width="24"/> XLS</a></li>
+                                    </ul>
+                                </div>
+                                <div class="panel panel-default">
+                                    <div class="panel-body panel-body-table" style="margin-top: 0;">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-striped" id="customers5">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="padding:5px;" width="5%">Sr no</th>
+                                                        <th style="padding:5px;" width="15%">Depot</th>
+                                                        <th style="padding:5px;" width="10%">Box</th>
+                                                        <th style="padding:5px;" width="10%">Quantity</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                <?php if(isset($box_details)){
+                                                    $i=0;
+                                                    foreach($box_details as $row){
+                                                        echo ' <tr style="word-break: break-word;">
+                                                        <td style="padding:5px;" width="5%"><strong>'.($i+1).'</strong></td>
+                                                        <td style="padding:5px;" width="15%"><strong>'.$box_details[$i]->depot_name.'</strong></td>
+                                                        <td style="padding:5px;" width="15%"><strong>'.$box_details[$i]->box_name.'</strong></td>
+                                                        <td style="padding:5px;" width="10%"><strong>'.format_money($box_details[$i]->tot_qty,2).'</strong></td>
+                                                        </tr> ';
+                                                        $i++;
+                                                    }
+                                                }?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                        <?php } ?>
 
 
 
@@ -349,14 +349,14 @@ ul.topnav li a {  border-bottom:none!important;     }
                                 <div class="btn-group pull-right">
                                     <button class="btn btn-success dropdown-toggle" data-toggle="dropdown"><i class="fa fa-bars"></i> Export Data</button>
                                     <ul class="dropdown-menu">
-                                        <li><a href="#" onClick ="$('#customers3').tableExport({type:'csv',escape:'false'});"><img src='<?php echo base_url(); ?>img/icons/csv.png' width="24"/> CSV</a></li>
-                                        <li><a href="#" onClick ="$('#customers3').tableExport({type:'excel',escape:'false'});"><img src='<?php echo base_url(); ?>img/icons/xls.png' width="24"/> XLS</a></li>
+                                        <li><a href="#" onClick ="$('#customers6').tableExport({type:'csv',escape:'false'});"><img src='<?php echo base_url(); ?>img/icons/csv.png' width="24"/> CSV</a></li>
+                                        <li><a href="#" onClick ="$('#customers6').tableExport({type:'excel',escape:'false'});"><img src='<?php echo base_url(); ?>img/icons/xls.png' width="24"/> XLS</a></li>
                                     </ul>
                                 </div>
                                 <div class="panel panel-default">
                                     <div class="panel-body panel-body-table" style="margin-top: 0;">
                                         <div class="table-responsive">
-                                            <table class="table table-bordered table-striped" id="customers3">
+                                            <table class="table table-bordered table-striped" id="customers6">
                                                 <thead>
                                                     <tr>
                                                         <th>Distributor</th>
@@ -447,14 +447,14 @@ ul.topnav li a {  border-bottom:none!important;     }
                                 <div class="btn-group pull-right">
                                     <button class="btn btn-success dropdown-toggle" data-toggle="dropdown"><i class="fa fa-bars"></i> Export Data</button>
                                     <ul class="dropdown-menu">
-                                        <li><a href="#" onClick ="$('#customers3').tableExport({type:'csv',escape:'false'});"><img src='<?php echo base_url(); ?>img/icons/csv.png' width="24"/> CSV</a></li>
-                                        <li><a href="#" onClick ="$('#customers3').tableExport({type:'excel',escape:'false'});"><img src='<?php echo base_url(); ?>img/icons/xls.png' width="24"/> XLS</a></li>
+                                        <li><a href="#" onClick ="$('#customers7').tableExport({type:'csv',escape:'false'});"><img src='<?php echo base_url(); ?>img/icons/csv.png' width="24"/> CSV</a></li>
+                                        <li><a href="#" onClick ="$('#customers7').tableExport({type:'excel',escape:'false'});"><img src='<?php echo base_url(); ?>img/icons/xls.png' width="24"/> XLS</a></li>
                                     </ul>
                                 </div>
                                 <div class="panel panel-default">
                                     <div class="panel-body panel-body-table" style="margin-top: 0;">
                                         <div class="table-responsive">
-                                            <table class="table table-bordered table-striped" id="customers3">
+                                            <table class="table table-bordered table-striped" id="customers7">
                                                 <thead>
                                                     <tr>
                                                         <th>Distributor</th>
@@ -536,15 +536,15 @@ ul.topnav li a {  border-bottom:none!important;     }
                             </div> -->
                         <?php //} ?>
                     </div>
-					</div>
                     </div>
-				  </div>
+                    </div>
+                  </div>
                 <!-- END PAGE CONTENT WRAPPER -->
              </div>            
             <!-- END PAGE CONTENT -->
         </div>
         <!-- END PAGE CONTAINER -->
-						
+                        
         <?php $this->load->view('templates/footer');?>
 
     <!-- END SCRIPTS -->      

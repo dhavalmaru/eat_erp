@@ -23,6 +23,11 @@
         .modal-body-inside { padding:10px; }
         @media print{@page {size: portrait}}
         /*.modal-body-inside table { font-size: 14px; }*/
+		.user_data tr, .user_data td
+		{
+			border:none!important;
+			padding:5px!important;
+		}
     </style>
 </head>
 
@@ -111,6 +116,23 @@
                 </p>
             </td> -->
         </tr>
+		
+		  <tr style="border:none;">
+            <td width="17%" style="border:none;"><p>Reference Invoice No.</p></td>
+            <td width="3%" style="border:none;">:</td>
+            <td width="80%" style="border:none;" colspan="3">
+                <p><b> <?php if(isset($credit_debit_note[0]->invoice_no)) echo $credit_debit_note[0]->invoice_no; ?> </b></p>
+            </td>
+            <!-- <td width="22%" style="border:none;"><p>Warehouse GSTIN</p></td>
+            <td width="4%" style="border:none;">:</td>
+            <td width="14%" style="border:none;">
+                <p>
+                    <b> 
+                        <?php //if(isset($grn_details[0]['gst_id'])) echo $grn_details[0]['gst_id']; ?>
+                    </b>
+                </p>
+            </td> -->
+        </tr>
         <tr>
             <td colspan="6" height="10" style="border:none;">&nbsp;</td>
         </tr>
@@ -125,7 +147,7 @@
                     <?php if(isset($credit_debit_note[0]->remarks)) echo $credit_debit_note[0]->remarks; ?>
                 </p>
             </td>
-            <td colspan="3" align="center" valign="top" style="border-right:none;border-bottom:none; "><p><b>Rs.<?php if(isset($credit_debit_note[0]->amount_without_tax)) echo round($credit_debit_note[0]->amount_without_tax,2); else echo round($credit_debit_note[0]->amount,2); ?></b></p></td>
+            <td colspan="3" align="center" valign="top" style="border-right:none;border-bottom:none; "><p><b>Rs.<?php if(isset($credit_debit_note[0]->amount_without_tax)) echo format_money($credit_debit_note[0]->amount_without_tax,2); else echo round($credit_debit_note[0]->amount,2); ?></b></p></td>
         </tr>
         <tr valign="top"  style="border:none; ">
             <td colspan="3"   style="border:none; " >
@@ -133,7 +155,7 @@
                     CGST @ <?php echo ($credit_debit_note[0]->tax/2).'%'; ?>
                 </p>
             </td>
-            <td colspan="3" align="center" valign="top" style="border-right:none;border-top:none; border-bottom:none;"><p><b>Rs.<?php if(isset($credit_debit_note[0]->cgst)) echo round($credit_debit_note[0]->cgst,2); else echo '0';?></b></p></td>
+            <td colspan="3" align="center" valign="top" style="border-right:none;border-top:none; border-bottom:none;"><p><b>Rs.<?php if(isset($credit_debit_note[0]->cgst)) echo format_money($credit_debit_note[0]->cgst,2); else echo '0';?></b></p></td>
         </tr>
         <tr valign="top"  style="border:none; ">
             <td colspan="3"   style="border:none; " >
@@ -141,7 +163,7 @@
                     SGST @ <?php echo ($credit_debit_note[0]->tax/2).'%'; ?>
                 </p>
             </td>
-            <td colspan="3" align="center" valign="top" style="border-right:none;border-top:none;border-bottom:none; "><p><b>Rs.<?php if(isset($credit_debit_note[0]->sgst)) echo round($credit_debit_note[0]->sgst,2); else echo '0';?></b></p></td>
+            <td colspan="3" align="center" valign="top" style="border-right:none;border-top:none;border-bottom:none; "><p><b>Rs.<?php if(isset($credit_debit_note[0]->sgst)) echo format_money($credit_debit_note[0]->sgst,2); else echo '0';?></b></p></td>
         </tr>
         <tr valign="top"  style="border:none; ">
             <td colspan="3"   style="border:none; " >
@@ -149,7 +171,7 @@
                     IGST @ <?php echo ($credit_debit_note[0]->tax/1).'%';?>
                 </p>
             </td>
-            <td colspan="3" align="center" valign="top" style="border-right:none;border-top:none; "><p><b>Rs.<?php if(isset($credit_debit_note[0]->igst)) echo round($credit_debit_note[0]->igst,2); else echo '0'; ?></b></p></td>
+            <td colspan="3" align="center" valign="top" style="border-right:none;border-top:none; "><p><b>Rs.<?php if(isset($credit_debit_note[0]->igst)) echo format_money($credit_debit_note[0]->igst,2); else echo '0'; ?></b></p></td>
         </tr>
         <tr valign="top"  style="border:none; ">
             <td colspan="3"   style="border-left: none; " >
@@ -157,7 +179,7 @@
                     Total Amount
                 </p>
             </td>
-            <td colspan="3" align="center" valign="top" style="border-right:none;border-top:none; "><p><b>Rs.<?php if(isset($credit_debit_note[0]->amount)) echo round($credit_debit_note[0]->amount,2); ?></b></p></td>
+            <td colspan="3" align="center" valign="top" style="border-right:none;border-top:none; "><p><b>Rs.<?php if(isset($credit_debit_note[0]->amount)) echo format_money($credit_debit_note[0]->amount,2); ?></b></p></td>
         </tr>
         <tr>
             <td  style="border:none; border-right:1px solid #999;" colspan="3"><p><b> Amount (in words) </b></p></td>
@@ -179,10 +201,37 @@
             <!-- <td colspan="2" style="border:none;"> &nbsp; </td>
             <td valign="bottom" colspan="2" style="border:none; text-align:center "><p> <b>Authorised Signatory</b></p></td> -->
         </tr>
-        <!-- <tr valign="bottom" >
-            <td colspan="6" style="border:none;">&nbsp;   </td>
-        </tr> -->
+        
     </table>
+    <table class="user_data" border="0" width="100%" style="border-collapse:collapse;margin-top:20px;font-size:12px " class="table" cellspacing="10">
+					<tr valign="center" >
+						  <td width="100%" align="center"><b>Created By:</b>
+						 <?php if(isset($credit_debit_note[0]->createdby)) echo $credit_debit_note[0]->createdby; ?>&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp
+						 <span style="<?php if(isset($credit_debit_note[0]->created_on)) 
+							if(date("d-m-Y h:m:i", strtotime($credit_debit_note[0]->created_on)) <> date("d-m-Y h:m:i", strtotime($credit_debit_note[0]->modified_on)))
+						echo ' '; else echo 'display:none;';?>"><b> Modified By:</b>
+						  <?php if(isset($credit_debit_note[0]->modifiedby)) echo $credit_debit_note[0]->modifiedby; ?>  &nbsp &nbsp &nbsp  &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp </span>
+						  <b> Approved By:</b>
+						  <?php if(isset($credit_debit_note[0]->approvedby)) echo $credit_debit_note[0]->approvedby; ?></td>
+						  
+					</tr>
+					<tr valign="center" >
+					      <td width="100%" align="center"><b>Created On:</b>
+						    <?php if(isset($credit_debit_note[0]->created_on)) echo date("d-m-Y h:m:i", strtotime($credit_debit_note[0]->created_on)) ?>&nbsp &nbsp &nbsp &nbsp
+							
+								 <span style="<?php if(isset($credit_debit_note[0]->created_on)) 
+						if(date("d-m-Y h:m:i", strtotime($credit_debit_note[0]->created_on)) <> date("d-m-Y h:m:i", strtotime($credit_debit_note[0]->modified_on)))
+						echo ' '; else echo 'display:none;';?>">
+						  <b> Modified On:</b>
+						     <?php if(isset($credit_debit_note[0]->modified_on)) echo date("d-m-Y h:m:i", strtotime($credit_debit_note[0]->modified_on)) ?>&nbsp &nbsp &nbsp &nbsp </span>
+						   <b> Approved On:</b>
+						    <?php if(isset($credit_debit_note[0]->approved_on))echo  date("d-m-Y h:m:i", strtotime($credit_debit_note[0]->approved_on)) ?>
+							</td>
+					</tr>
+					
+					
+	</table>
+
 </div>
 </body>
 </html>

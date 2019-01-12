@@ -93,7 +93,7 @@ function save_data($id=''){
     $grams=$this->input->post('grams[]');
     $rate=$this->input->post('rate[]');
     $amount=$this->input->post('amount[]');
-
+    $batch_no=$this->input->post('batch_no[]');
     for ($k=0; $k<count($box_id); $k++) {
         if(isset($box_id[$k]) and $box_id[$k]!="") {
             $data = array(
@@ -102,7 +102,8 @@ function save_data($id=''){
                         'qty' => format_number($qty[$k],2),
                         'grams' => format_number($grams[$k],2),
                         'rate' => format_number($rate[$k],2),
-                        'amount' => format_number($amount[$k],2)
+                        'amount' => format_number($amount[$k],2),
+                        'batch_no' => $batch_no[$k]
                     );
             $this->db->insert('box_to_bar_qty', $data);
         }

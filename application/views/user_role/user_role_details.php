@@ -603,9 +603,8 @@
      															</div> 
      															<div class="panel panel-success">
      																<div class="panel-body list-group" id="friendslist-1">
-																	<label class="list-group-item-reports" <?php if(isset($rep_18_view)) {if($rep_18_view==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>> <input type="checkbox" id="group1_a" name="report[]" value="18" <?php if(isset($rep_18)) {if($rep_18==1) echo 'checked';} ?> />Sales Report</label>
-     																<label class="list-group-item-reports" <?php if(isset($rep_15_view)) {if($rep_15_view==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>> <input type="checkbox" id="group1_b" name="report[]" value="15" <?php if(isset($rep_15)) {if($rep_15==1) echo 'checked';} ?> /> Promoter Sales </label>
-     																	
+     																	<label class="list-group-item-reports" <?php if(isset($rep_1_view)) {if($rep_1_view==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>> <input type="checkbox" id="group1_a" name="report[]" value="1" <?php if(isset($rep_1)) {if($rep_1==1) echo 'checked';} ?> /> Sale Invoice </label>
+     																	<label class="list-group-item-reports" <?php if(isset($rep_18_view)) {if($rep_18_view==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>> <input type="checkbox" id="group1_b" name="report[]" value="18" <?php if(isset($rep_18)) {if($rep_18==1) echo 'checked';} ?> />Promoter Sales</label>
      																
      																</div>
      															</div>

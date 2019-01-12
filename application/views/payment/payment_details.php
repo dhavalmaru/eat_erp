@@ -27,6 +27,21 @@
             @media screen and (max-width:806px) {   
                 .h-scroll { overflow-x:scroll;} .h-scroll .table-stripped{ width:805px!important;}
             }
+			#box_details .form-control[disabled], #box_details .form-control[readonly],#bar_details .form-control[disabled], #bar_details .form-control[readonly]
+			{
+				border:none!important;
+				background-color:transparent!important;
+				box-shadow:none!important;
+			
+			}
+			#total_amount
+			{
+				border:none!important;
+				background-color:transparent!important;
+				box-shadow:none!important;
+				font-size:14px;
+				font-weight:700;
+			}
 		</style>
 		
     </head>
@@ -53,13 +68,17 @@
 										<div class="col-md-12 col-sm-12 col-xs-12">
 											<label class="col-md-2 col-sm-2 col-xs-12 control-label">Date Of Deposit <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
+                                                <input type="hidden" class="form-control " name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
                                                 <input type="hidden" class="form-control" name="ref_id" id="ref_id" value="<?php if(isset($data)) echo $data[0]->ref_id;?>"/>
                                                 <input type="text" class="form-control datepicker1" name="date_of_deposit" id="date_of_deposit" placeholder="Date" value="<?php if(isset($data)) echo (($data[0]->date_of_deposit!=null && $data[0]->date_of_deposit!='')?date('d/m/Y',strtotime($data[0]->date_of_deposit)):''); ?>"/>
                                             </div>
+                                        </div>
+									</div>
+									<div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Bank <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="bank_id" id="bank_id" class="form-control">
+                                                <select name="bank_id" id="bank_id" class="form-control select2">
                                                     <option value="">Select</option>
                                                     <?php if(isset($bank)) { for ($k=0; $k < count($bank) ; $k++) { ?>
                                                             <option value="<?php echo $bank[$k]->id; ?>" <?php if(isset($data)) { if($bank[$k]->id==$data[0]->bank_id) { echo 'selected'; } } ?>><?php echo $bank[$k]->b_name; ?></option>
@@ -87,13 +106,13 @@
                                         <table class="table table-bordered" style="margin-bottom: 0px; ">
                                         <thead>
                                             <tr>
-                                                <th style="width: 130px">Distributor Name <span class="asterisk_sign">*</span></th>
-                                                <th style="width: 300px">Outstanding Amount <span class="asterisk_sign">*</span></th>
-                                                <th style="width: 300px">Invoice No <span class="asterisk_sign">*</span></th>
-                                                <th style="width: 300px">Name <span class="asterisk_sign">*</span></th>
-                                                <th style="width: 300px">Amount <span class="asterisk_sign">*</span></th>
+                                                <th style="width: 900px">Distributor Name <span class="asterisk_sign">*</span></th>
+                                                <th style="width: 150px">Outstanding Amount <span class="asterisk_sign">*</span></th>
+                                                <th style="width: 400px">Invoice No <span class="asterisk_sign">*</span></th>
+                                                <th style="width: 300px;display:none">Name <span class="asterisk_sign">*</span></th>
+                                                <th style="width: 150px">Amount <span class="asterisk_sign">*</span></th>
                                                 <th style="width: 200px" class="ref_no_ref" id="ref_no_header">Ref No <span class="asterisk_sign">*</span></th>
-                                                <th style="width: 200px" class="chq_ref">Bank Name <span class="asterisk_sign">*</span></th>
+                                                <th style="width: 240px" class="chq_ref">Bank Name <span class="asterisk_sign">*</span></th>
                                                 <th style="width: 200px" class="chq_ref">Bank City <span class="asterisk_sign">*</span></th>
                                                 <!-- <th>Payment Date <span class="asterisk_sign">*</span></th> -->
                                                 <th style="width: 200px">Payment Amount (In Rs)  <span class="asterisk_sign">*</span></th>
@@ -105,7 +124,7 @@
                                                 for($i=0; $i<count($payment_items); $i++) { ?>
                                             <tr id="box_<?php echo $i; ?>_row">
                                                 <td>
-                                                    <select name="distributor_id[]" class="form-control distributor" id="distributor_<?php echo $i;?>">
+                                                    <select name="distributor_id[]" class="form-control distributor select2" id="distributor_<?php echo $i;?>">
                                                         <option value="">Select</option>
                                                         <?php if(isset($distributor)) { for ($k=0; $k < count($distributor) ; $k++) { ?>
                                                                 <option value="<?php echo $distributor[$k]->id; ?>" <?php if($distributor[$k]->id==$payment_items[$i]->distributor_id) { echo 'selected'; } ?>><?php echo $distributor[$k]->distributor_name; ?></option>
@@ -121,8 +140,8 @@
                                                         <option value="On Account">On Account</option>
                                                     </select>
                                                 </td>
-                                                <td>
-                                                    <input type="text" class="form-control client_name" name="client_name[]" id="client_name_<?php echo $i; ?>" placeholder="Client Name" value="" readonly />
+                                                <td style="display:none">
+                                                    <input type="text" class="form-control client_name" name="client_name[]" id="client_name_<?php echo $i; ?>" placeholder="Client Name" value="" readonly  />
                                                 </td>
                                                 <td>
                                                     <input type="text" class="form-control final_amount" name="final_amount[]" id="final_amount_<?php echo $i; ?>" placeholder="Final Amount" value="" readonly />
@@ -149,7 +168,7 @@
                                         <?php }} else { ?>
                                             <tr id="box_<?php echo $i; ?>_row">
                                                 <td>
-                                                    <select name="distributor_id[]" class="form-control distributor" id="distributor_<?php echo $i;?>">
+                                                    <select name="distributor_id[]" class="form-control distributor select2" id="distributor_<?php echo $i;?>">
                                                         <option value="">Select</option>
                                                         <?php if(isset($distributor)) { for ($k=0; $k < count($distributor) ; $k++) { ?>
                                                                 <option value="<?php echo $distributor[$k]->id; ?>"><?php echo $distributor[$k]->distributor_name; ?></option>
@@ -165,7 +184,7 @@
                                                         <option value="On Account">On Account</option>
                                                     </select>
                                                 </td>
-                                                <td>
+                                                <td style="display:none">
                                                     <input type="text" class="form-control client_name" name="client_name[]" id="client_name_<?php echo $i; ?>" placeholder="Client Name" value="" readonly />
                                                 </td>
                                                 <td>
@@ -209,7 +228,7 @@
                                         <thead>
                                             <tr>
                                                 <th style="width: 200px">2000 </th>
-                                                <th style="width: 200px">1000 </th>
+                                                <!-- <th style="width: 200px">1000 </th> -->
                                                 <th style="width: 200px">500 </th>
                                                 <th style="width: 200px">100 </th>
                                                 <th style="width: 200px">50 </th>
@@ -222,31 +241,42 @@
                                         <tbody>
                                             <tr>
                                                 <td>
-                                                    <input type="text" class="form-control" name="denomination_2000" placeholder="" value="<?php if (isset($denomination[0])) { echo $denomination[0]->denomination_2000; } ?>"/>
+                                                    <input type="text" class="form-control" name="denomination_2000" id="denomination_2000" placeholder="" value="<?php if (isset($denomination[0])) { echo $denomination[0]->denomination_2000; } ?>"/>
                                                 </td>
-                                                <td>
+                                                <!-- <td>
                                                     <input type="text" class="form-control" name="denomination_1000" placeholder="" value="<?php if (isset($denomination[0])) { echo $denomination[0]->denomination_1000; } ?>"/>
+                                                </td> -->
+                                                <td>
+                                                    <input type="text" class="form-control" name="denomination_500" id="denomination_500" placeholder="" value="<?php if (isset($denomination[0])) { echo $denomination[0]->denomination_500; } ?>"/>
                                                 </td>
                                                 <td>
-                                                    <input type="text" class="form-control" name="denomination_500" placeholder="" value="<?php if (isset($denomination[0])) { echo $denomination[0]->denomination_500; } ?>"/>
+                                                    <input type="text" class="form-control" name="denomination_100" id="denomination_100" placeholder="" value="<?php if (isset($denomination[0])) { echo $denomination[0]->denomination_100; } ?>"/>
                                                 </td>
                                                 <td>
-                                                    <input type="text" class="form-control" name="denomination_100" placeholder="" value="<?php if (isset($denomination[0])) { echo $denomination[0]->denomination_100; } ?>"/>
+                                                    <input type="text" class="form-control" name="denomination_50" 
+                                                    id="denomination_50"
+                                                    placeholder="" value="<?php if (isset($denomination[0])) { echo $denomination[0]->denomination_50; } ?>"/>
                                                 </td>
                                                 <td>
-                                                    <input type="text" class="form-control" name="denomination_50" placeholder="" value="<?php if (isset($denomination[0])) { echo $denomination[0]->denomination_50; } ?>"/>
+                                                    <input type="text" class="form-control" name="denomination_20" 
+                                                    id="denomination_20"
+                                                    placeholder="" value="<?php if (isset($denomination[0])) { echo $denomination[0]->denomination_20; } ?>"/>
                                                 </td>
                                                 <td>
-                                                    <input type="text" class="form-control" name="denomination_20" placeholder="" value="<?php if (isset($denomination[0])) { echo $denomination[0]->denomination_20; } ?>"/>
+                                                    <input type="text" class="form-control" name="denomination_10"
+                                                    id="denomination_10"
+                                                    placeholder="" value="<?php if (isset($denomination[0])) { echo $denomination[0]->denomination_10; } ?>"/>
                                                 </td>
                                                 <td>
-                                                    <input type="text" class="form-control" name="denomination_10" placeholder="" value="<?php if (isset($denomination[0])) { echo $denomination[0]->denomination_10; } ?>"/>
+                                                    <input type="text" class="form-control" name="denomination_other"
+                                                    id="denomination_other"
+
+                                                    placeholder="" value="<?php if (isset($denomination[0])) { echo $denomination[0]->denomination_other; } ?>"/>
                                                 </td>
                                                 <td>
-                                                    <input type="text" class="form-control" name="denomination_other" placeholder="" value="<?php if (isset($denomination[0])) { echo $denomination[0]->denomination_other; } ?>"/>
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control" name="denomination_other_amount" placeholder="" value="<?php if (isset($denomination[0])) { echo $denomination[0]->denomination_other_amount; } ?>"/>
+                                                    <input type="text" class="form-control" name="denomination_other_amount"
+                                                    id="denomination_other_amount"
+                                                    placeholder="" value="<?php if (isset($denomination[0])) { echo $denomination[0]->denomination_other_amount; } ?>"/>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -297,6 +327,24 @@
                                 <br clear="all"/>
         						</div>
         						</div>
+                                <?php $curusr=$this->session->userdata('session_id'); ?>
+                                <?php 
+                                        if(isset($data[0]->status))
+                                        {
+                                         if(isset($access)) {
+                                            if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive'))
+                                                {
+                                                  if(isset($data[0]->status))
+                                                    {
+                                                         if($data[0]->status=='Deleted'){
+                                                            echo '<label class="col-xs-12 control-label" style="color:#cc2127!important">Note : If clicked on approve button this entry will be deleted permanently </label>';
+
+                                                         }    
+                                                    }     
+                                                }
+                                            }   
+                                        }
+                                ?>
                                 <div class="panel-footer">
 									<a href="<?php echo base_url(); ?>index.php/payment" class="btn btn-danger btn-sm pull-right" type="reset" id="reset">Cancel</a>
                                     <?php $curusr=$this->session->userdata('session_id'); ?>
@@ -534,7 +582,7 @@
                     event.preventDefault();
                     var newRow = jQuery('<tr id="box_'+counter+'_row">' + 
                                             '<td>' + 
-                                                '<select name="distributor_id[]" class="form-control distributor" id="distributor_'+counter+'">' + 
+                                                '<select name="distributor_id[]" class="form-control distributor select2" id="distributor_'+counter+'">' + 
                                                     '<option value="">Select</option>' + 
                                                     '<?php if(isset($distributor)) { for ($k=0; $k < count($distributor) ; $k++) { ?>' + 
                                                             '<option value="<?php echo $distributor[$k]->id; ?>"><?php echo $distributor[$k]->distributor_name; ?></option>' + 
@@ -550,7 +598,7 @@
                                                     '<option value="On Account">On Account</option>' + 
                                                 '</select>' + 
                                             '</td>' + 
-                                            '<td>' + 
+                                            '<td style="display:none">' + 
                                                 '<input type="text" class="form-control client_name" name="client_name[]" id="client_name_'+counter+'" placeholder="Client Name" value="" readonly />' + 
                                             '</td>' + 
                                             '<td>' + 
@@ -594,6 +642,7 @@
                         get_invoice_details($(this));
                     });
                     $('#payment_mode').change();
+                    $('.select2').select2();
 
                     counter++;
                 });

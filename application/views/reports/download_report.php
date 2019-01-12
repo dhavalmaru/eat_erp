@@ -98,7 +98,16 @@ tfoot tr th:last-child {
              <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
                 
                       
-                   <div class="heading-h2"><a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp; <a href="<?php echo base_url().'index.php/Reports/view_reports'; ?>" >  Report List  </a>   &nbsp; &#10095; &nbsp; Report Details   </div>               
+                   <div class="heading-h2"><a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp; <a href="<?php echo base_url().'index.php/Reports/view_reports'; ?>" >  Report List  </a>   &nbsp; &#10095; &nbsp; Report Details   </div>
+
+                  <div class="container">
+                      <?php if($this->session->flashdata('error')){?>
+                      <div class="alert alert-info alert-dismissible fade in">
+                        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                        <?php echo rtrim($this->session->flashdata('error'),',');?>
+                      </div>  
+                      <?php } ?>
+                  </div>
                 
                 <!-- PAGE CONTENT WRAPPER -->
                  <div class="page-content-wrap" >
@@ -119,13 +128,13 @@ tfoot tr th:last-child {
 									<a style="display:none;" class="pull-right" href="<?php echo base_url() . '/assets/reports_sample/' . (isset($sample_report_name)?$sample_report_name:'') ;?>" target="_blank"> <span class="btn btn-danger pull-right btn-sm "><span class="fa fa-file-pdf-o"> </span>  View Sample </span>  </a>
                                 </div>
 								
-								 <div class="panel-body panel-body-open text1" id="accOneColOne" style="width:100%; ">    
-									<div class="form-group" style="border-top:1px solid #ddd; <?php if($report_type!='Owner Level') echo 'display:none;';?>">
+								 <div class="panel-body panel-body-open text1" id="accOneColOne" style="width:100%; ">
+									                 <div class="form-group" style="border-top:1px solid #ddd; <?php if($report_type!='Owner Level') echo 'display:none;';?>">
                                         <div class="col-md-6  col-sm-6 col-xs-12">
                                             <div class="">
                                                 <label class="col-md-5 col-sm-5 col-xs-12 control-label">Select Owner</label>
                                                 <div class="col-md-7 col-sm-7 col-xs-12">
-                                                    <select class="form-control" name="owner" id="owner">
+                                                    <select class="form-control select2" name="owner" id="owner">
                                                         <option value="">Select Owner</option>
                                                         <?php for ($i=0; $i < count($owner) ; $i++) { ?>
                                                             <option value="<?php echo $owner[$i]->pr_client_id; ?>"><?php echo $owner[$i]->owner_name; ?></option>
@@ -142,7 +151,7 @@ tfoot tr th:last-child {
                                             <div class="">
                                                 <label class="col-md-4 col-sm-4 col-xs-12  control-label">Select Distributor</label>
                                                 <div class="col-md-6 col-sm-6  col-xs-12">
-                                                    <select class="form-control" name="distributor_id" id="distributor_id">
+                                                    <select class="form-control select2" name="distributor_id" id="distributor_id">
                                                         <option value="">Select Distributor </option>
                                                         <?php if(isset($distributor)){
 	                                                        	foreach($distributor as $row){
@@ -180,7 +189,7 @@ tfoot tr th:last-child {
                                             <div class="">
                                                 <label class="col-md-4 col-sm-4 col-xs-12  control-label">Select Sales Representative</label>
                                                 <div class="col-md-6 col-sm-6  col-xs-12">
-                                                    <select class="form-control" name="salesrep_id" id="salesrep_id">
+                                                    <select class="form-control select2" name="salesrep_id" id="salesrep_id">
                                                         <option value="">Select </option>
                                                         <?php if(isset($salesrep)){
 	                                                        	foreach($salesrep as $row){
@@ -189,6 +198,18 @@ tfoot tr th:last-child {
                                                         	} 
                                                     	?>
                                                     </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" style="border-top:1px solid #ddd; border-bottom:none; <?php if($report_id !='21') echo 'display:none;';?>">
+                                         <div class="col-md-6  col-sm-6 col-xs-12">
+                                            <div class="">
+                                                <label class="col-md-4 col-sm-4 col-xs-12  control-label">Include</label>
+                                                <div class="col-md-6 col-sm-6  col-xs-12">
+                                                    <input type="checkbox" name="includes_zero" id="includes_zero" > 0 Closing Balance <br>
+                                                   
                                                 </div>
                                             </div>
                                         </div>
@@ -257,7 +278,7 @@ tfoot tr th:last-child {
 											<div class="">
 												<label class="col-md-4 col-sm-4 col-xs-12 control-label">Property Name</label>
 												<div class="col-md-8 col-sm-8 col-xs-12">
-													<select  class="form-control" id="property" name="property">
+													<select  class="form-control select2" id="property" name="property">
 														<option value="">Select Property</option>
 														<?php for($i=0; $i<count($purchase_data); $i++) { ?>
 														<option value="<?php echo $purchase_data[$i]->txn_id; ?>"><?php echo $purchase_data[$i]->p_property_name; ?></option>
@@ -270,7 +291,7 @@ tfoot tr th:last-child {
 											<div class="">
 												<label id="sub_property_label" class="col-md-4 col-sm-4 col-xs-12 control-label">Sub Property Name</label>
 												<div class="col-md-8 col-sm-8 col-xs-12">
-													<select id="sub_property" class="form-control" name="sub_property">
+													<select id="sub_property select2" class="form-control" name="sub_property">
 														<option value="">Select Sub Property</option>
 													</select>
 												</div>
@@ -318,7 +339,9 @@ tfoot tr th:last-child {
 									<div class="row" style="text-align:center; margin:15px 0;">
                                     	<input type="submit" name="download" class="btn btn-danger" value="Download Report" />
                                         <!--<span class="fa fa-download"> </span>-->
-
+                                      <a class="btn btn-success" data-toggle="modal" href="#myModal" style="<?php if($report_id !='21') echo 'display:none;';?>">
+                                          <span class="fa fa-file-excel-o"></span> Upload Tally Report
+                                      </a>    
 
                                       <input type="button" id="view_report" class="btn btn-danger" value="View Report" style="<?php if($report_id !='5') echo 'display:none;';?>" />
                                       <input type="button" id="print_report" class="btn btn-danger" value="Print Report" style="<?php if($report_id !='5') echo 'display:none;';?>" />
@@ -363,6 +386,33 @@ tfoot tr th:last-child {
             <!-- END PAGE CONTENT -->
         </div>
         <!-- END PAGE CONTAINER -->
+
+        <div class="modal fade" id="myModal" role="dialog" style="">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content" style="">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">
+                           Upload Tally Report
+                        </h4>
+                    </div>
+                    <form method="POST" action="<?php echo base_url();?>index.php/Export/upload_file" class="form-horizontal excelform" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <div class="form-group">
+                          <label class="col-md-4 col-sm-4 col-xs-12 control-label">Add Excel <span class="asterisk_sign"></span></label>
+                          <input type="file" class="fileinput btn btn-info btn-small  bar_image" name="upload" id="image" placeholder="image" value=""/>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                        <!-- <button id="btn_save" class="btn btn-success pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</button> -->
+                        <input type="submit"  class="btn btn-success pull-right"  value="Save" />
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
 						
         <?php $this->load->view('templates/footer');?>
         <script type="text/javascript">

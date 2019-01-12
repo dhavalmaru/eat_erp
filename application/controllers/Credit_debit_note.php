@@ -33,7 +33,14 @@ class Credit_debit_note extends CI_Controller{
 
         $this->checkstatus('Approved');
     }
-
+    
+	public function get_invoice() { 
+        $postData = $this->input->post();
+    	$distributor_id = $postData['distributor_id'];
+        $data = $this->credit_debit_note_model->get_invoice($distributor_id);
+        echo json_encode($data); 
+	}
+	
     public function checkstatus($status=''){
         $result=$this->credit_debit_note_model->get_access();
         if(count($result)>0) {
@@ -100,6 +107,8 @@ class Credit_debit_note extends CI_Controller{
                 
                 $data['data'] = $this->credit_debit_note_model->get_data('', $id);
                 $data['distributor'] = $this->distributor_model->get_data('Approved');
+				$distributor_id=$data['data'][0]->distributor_id;
+				$data['invoice'] = $this->credit_debit_note_model->get_invoice($distributor_id);
 
                 load_view('credit_debit_note/credit_debit_note_details', $data);
             } else {
@@ -118,7 +127,10 @@ class Credit_debit_note extends CI_Controller{
 
     public function update($id){
         $this->credit_debit_note_model->save_data($id);
-        redirect(base_url().'index.php/credit_debit_note');
+        // echo 'Approved';
+
+        echo '<script>window.open("'.base_url().'index.php/credit_debit_note", "_parent")</script>';
+        // redirect(base_url().'index.php/credit_debit_note');
     }
         
     public function view_credit_debit_note($id){

@@ -26,6 +26,22 @@
 			 @media screen and (max-width:806px) {   
 			   .h-scroll { overflow-x:scroll;} .h-scroll .table-stripped{ width:805px!important;}
 			  }
+			  .form-group
+			{
+				padding:4px 0px!important;
+			}
+			#box_details .form-control[disabled], #box_details .form-control[readonly]
+			{
+				border:none!important;
+				background-color:transparent!important;
+				box-shadow:none!important;
+			}
+			#total_amount
+			{
+				border:none!important;
+				background-color:transparent!important;
+				box-shadow:none!important;
+			}
 		</style>
 		
     </head>
@@ -47,16 +63,20 @@
                            <div class="col-md-12 custom-padding" style="padding:0;" >
                              <div class="panel panel-default">								
 						     	<div class="panel-body">
-							    <div class="form-group" >
-									<div class="col-md-12 col-sm-12 col-xs-12">
-										<label class="col-md-2 col-sm-2 col-xs-12 control-label">Date <span class="asterisk_sign">*</span></label>
-                                        <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
-                                            <input type="text" class="form-control datepicker1" name="date_of_processing" id="date_of_processing" placeholder="Date" value="<?php if(isset($data)) echo (($data[0]->date_of_processing!=null && $data[0]->date_of_processing!='')?date('d/m/Y',strtotime($data[0]->date_of_processing)):date('d/m/Y')); else echo date('d/m/Y'); ?>"/>
-                                        </div>
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Distributor <span class="asterisk_sign">*</span></label>
-                                        <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <select name="distributor_id" id="distributor_id" class="form-control">
+									<div class="form-group" >
+										<div class="col-md-12 col-sm-12 col-xs-12">
+											<label class="col-md-2 col-sm-2 col-xs-12 control-label">Date <span class="asterisk_sign">*</span></label>
+											<div class="col-md-4 col-sm-4 col-xs-12">
+												<input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
+												<input type="text" class="form-control datepicker1" name="date_of_processing" id="date_of_processing" placeholder="Date" value="<?php if(isset($data)) echo (($data[0]->date_of_processing!=null && $data[0]->date_of_processing!='')?date('d/m/Y',strtotime($data[0]->date_of_processing)):date('d/m/Y')); else echo date('d/m/Y'); ?>"/>
+											</div>
+										</div>
+									</div>
+									<div class="form-group" >
+										<div class="col-md-12 col-sm-12 col-xs-12">
+											<label class="col-md-2 col-sm-2 col-xs-12 control-label">Distributor <span class="asterisk_sign">*</span></label>
+											<div class="col-md-4 col-sm-4 col-xs-12">
+                                            <select name="distributor_id" id="distributor_id" class="form-control select2">
                                                 <option value="">Select</option>
                                                 <?php if(isset($distributor)) { for ($k=0; $k < count($distributor) ; $k++) { ?>
                                                         <option value="<?php echo $distributor[$k]->id; ?>" <?php if(isset($data)) { if($distributor[$k]->id==$data[0]->distributor_id) { echo 'selected'; } } ?>><?php echo $distributor[$k]->distributor_name; ?></option>
@@ -65,48 +85,52 @@
                                             <input type="hidden" name="sell_out" id="sell_out" value="<?php if(isset($data)) { echo $data[0]->sell_out; } ?>"/>
                                             <!-- <input type="hidden" name="distributor_id" id="distributor_id" value="<?php //if(isset($data)) { echo $data[0]->distributor_id; } ?>"/>
                                             <input type="text" class="form-control load_distributor" name="distributor" id="distributor" placeholder="Type To Select Distributor...." value="<?php //if(isset($data)) { echo $data[0]->distributor_name; } ?>"/> -->
-                                        </div>
+											</div>
+										</div>
 									</div>
-								</div>
-                                <div class="form-group" >
-                                    <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Zone <span class="asterisk_sign">*</span></label>
-                                        <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <select name="zone_id" id="zone_id" class="form-control">
-                                                <option value="">Select</option>
-                                                <?php if(isset($zone)) { for ($k=0; $k < count($zone) ; $k++) { ?>
+									<div class="form-group" >
+										<div class="col-md-12 col-sm-12 col-xs-12">
+											<label class="col-md-2 col-sm-2 col-xs-12 control-label">Zone <span class="asterisk_sign">*</span></label>
+												<div class="col-md-4 col-sm-4 col-xs-12">
+													<select name="zone_id" id="zone_id" class="form-control select2">
+														<option value="">Select</option>
+														<?php if(isset($zone)) { for ($k=0; $k < count($zone) ; $k++) { ?>
                                                         <option value="<?php echo $zone[$k]->id; ?>" <?php if(isset($data)) { if($zone[$k]->id==$data[0]->zone_id) { echo 'selected'; } } ?>><?php echo $zone[$k]->zone; ?></option>
-                                                <?php }} ?>
-                                            </select>
-                                        </div>
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Relation <span class="asterisk_sign">*</span></label>
-                                        <div class="col-md-4 col-sm-4 col-xs-12">
-                                             <select name="store_id" id="store_id" class="form-control">
+														<?php }} ?>
+													</select>
+												</div>
+										</div>
+									</div>
+									<div class="form-group" >
+										<div class="col-md-12 col-sm-12 col-xs-12">
+											<label class="col-md-2 col-sm-2 col-xs-12 control-label">Relation <span class="asterisk_sign">*</span></label>
+											<div class="col-md-4 col-sm-4 col-xs-12">
+												<select name="store_id" id="store_id" class="form-control select2">
                                                 <option value="">Select</option>
                                                 <?php if(isset($store)) { for ($k=0; $k < count($store) ; $k++) { ?>
                                                         <option value="<?php echo $store[$k]->store_id; ?>" <?php if(isset($data)) { if($store[$k]->store_id==$data[0]->store_id) { echo 'selected'; } } ?>><?php echo $store[$k]->store_name; ?></option>
                                                 <?php }} ?>
-                                            </select>
-                                        </div>
+												</select>
+											</div>
                                         <button type="button" class="btn btn-info" data-toggle="modal" data-target="#myModal" style="display:none<?php //if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Add Distributor</button>
-                                    </div>
-                                </div>
+										</div>
+									</div>
 								
 								 <input type="hidden" class="form-control" name="to_distributor_id" id="to_distributor_id" value="<?php if(isset($data)) echo $data[0]->to_distributor_id;?>"/>
 								
-								<div class="form-group" >
-                                    <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Location<span class="asterisk_sign">*</span></label>
-                                        <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <select name="location_id" id="location_id" class="form-control">
+									<div class="form-group" >
+										<div class="col-md-12 col-sm-12 col-xs-12">
+											<label class="col-md-2 col-sm-2 col-xs-12 control-label">Location <span class="asterisk_sign">*</span></label>
+											<div class="col-md-4 col-sm-4 col-xs-12">
+                                            <select name="location_id" id="location_id" class="form-control select2">
                                                 <option value="">Select</option>
                                                 <?php if(isset($location)) { for ($k=0; $k < count($location) ; $k++) { ?>
                                                         <option value="<?php echo $location[$k]->location_id; ?>" <?php if(isset($data)) { if($location[$k]->location_id==$data[0]->location_id) { echo 'selected'; } } ?>><?php echo $location[$k]->location; ?></option>
                                                 <?php }} ?>
                                             </select>
+											</div>
                                         </div>
-                                        </div>
-                                    </div>
+									</div>
 
                                 <div class="h-scroll">	
                                     <div class="table-stripped form-group" style="padding:15px;" >
@@ -223,39 +247,40 @@
                                     </table>
                                     </div>
 								</div>
-                                <div class="form-group">
-                                    <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Total Amount (In Rs) <span class="asterisk_sign">*</span></label>
-                                        <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="text" class="form-control" name="total_amount" id="total_amount" placeholder="Total Amount" value="<?php if (isset($data)) { echo $data[0]->amount; } ?>" readonly />
-                                        </div>
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Due Date <span class="asterisk_sign">*</span></label>
-                                        <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="text" class="form-control datepicker" name="due_date" id="due_date" placeholder="Due Date" value="<?php if(isset($data)) { echo (($data[0]->due_date!=null && $data[0]->due_date!='')?date('d/m/Y',strtotime($data[0]->due_date)):''); } ?>"/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group" style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
-                                    <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <div style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Status <span class="asterisk_sign">*</span></label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select class="form-control" name="status">
+									<div class="form-group">
+										<div class="col-md-12 col-sm-12 col-xs-12">
+											<label class="col-md-2 col-sm-2 col-xs-12 control-label">Total Amount (In Rs) <span class="asterisk_sign">*</span></label>
+											<div class="col-md-4 col-sm-4 col-xs-12">
+												<input type="text" class="form-control" name="total_amount" id="total_amount" placeholder="Total Amount" value="<?php if (isset($data)) { echo $data[0]->amount; } ?>" readonly />
+											</div>
+                                      
+											<label class="col-md-2 col-sm-2 col-xs-12 control-label">Due Date <span class="asterisk_sign">*</span></label>
+											<div class="col-md-4 col-sm-4 col-xs-12">
+												<input type="text" class="form-control datepicker" name="due_date" id="due_date" placeholder="Due Date" value="<?php if(isset($data)) { echo (($data[0]->due_date!=null && $data[0]->due_date!='')?date('d/m/Y',strtotime($data[0]->due_date)):''); } ?>"/>
+											</div>
+										</div>
+									</div>
+									<div class="form-group" style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
+										<div class="col-md-12 col-sm-12 col-xs-12">
+											<div style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
+												<label class="col-md-2 col-sm-2 col-xs-12 control-label">Status <span class="asterisk_sign">*</span></label>
+												<div class="col-md-4 col-sm-4 col-xs-12">
+													<select class="form-control" name="status">
                                                     <option value="Approved" <?php if(isset($data)) {if ($data[0]->status=='Approved') echo 'selected';}?>>Active</option>
                                                     <option value="InActive" <?php if(isset($data)) {if ($data[0]->status=='InActive') echo 'selected';}?>>InActive</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Remarks </label>
-                                        <div class="col-md-10 col-sm-10 col-xs-12">
-                                            <textarea class="form-control" name="remarks"><?php if(isset($data)) echo $data[0]->remarks;?></textarea>
-                                        </div>
-                                    </div>
-                                </div>
+													</select>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="form-group">
+										<div class="col-md-12 col-sm-12 col-xs-12">
+												<label class="col-md-2 col-sm-2 col-xs-12 control-label">Remarks </label>
+											<div class="col-md-10 col-sm-10 col-xs-12">
+												<textarea class="form-control" name="remarks"><?php if(isset($data)) echo $data[0]->remarks;?></textarea>
+											</div>
+										</div>
+									</div>
                             </div>
                             </div>
 							<br clear="all"/>
@@ -311,7 +336,7 @@
                                         <input type="text" class="form-control" name="super_stockist_distributor_location[]" id="super_stockist_distributor_location_<?php echo $i; ?>" placeholder="Location" value="<?php if (isset($super_stockist_distributor)) { echo $super_stockist_distributor[$i]->distributor_location; } ?>" />
                                     </td>
                                     <td>
-                                        <select name="super_stockist_distributor_type[]" class="form-control" id="super_stockist_distributor_type_<?php echo $i;?>">
+                                        <select name="super_stockist_distributor_type[]" class="form-control select2" id="super_stockist_distributor_type_<?php echo $i;?>">
                                             <option value="">Select</option>
                                             <option value="Ecommerce" <?php if($super_stockist_distributor[$i]->distributor_type=="Ecommerce") { echo 'selected'; } ?>>Ecommerce</option>
                                             <option value="General Trade" <?php if($super_stockist_distributor[$i]->distributor_type=="General Trade") { echo 'selected'; } ?>>General Trade</option>
@@ -403,107 +428,64 @@
                 addMultiInputNamingRules('#form_bar_to_box_details', 'input[name="qty[]"]', { required: true }, "");
 
                 
-            });
-
-            // $('#distributor_id').change(function(){
-            //     var distributor_id = $('#distributor_id').val();
-            //     var zone_id = '';
-            //     var type_id = '';
-
-            //     $.ajax({
-            //         url:'<?=base_url()?>index.php/distributor_sale/get_distributor_details',
-            //         method: 'post',
-            //         data: {distributor_id: distributor_id},
-            //         dataType: 'json',
-            //         async: false,
-            //         success: function(response){
-            //             $('#zone_id').find('option').not(':first').remove();
-
-            //             if(response.length>0){
-            //                 zone_id = response[0].zone_id;
-            //                 type_id = response[0].type_id;
-            //                 $('#sell_out').val(response[0].sell_out);
-            //             }
-            //         }
-            //     });
-
-            //     $.ajax({
-            //         url:'<?=base_url()?>index.php/distributor_sale/get_distributor_zone',
-            //         method: 'post',
-            //         data: {type_id: type_id},
-            //         dataType: 'json',
-            //         async: false,
-            //         success: function(response){
-            //             $('#zone_id').find('option').not(':first').remove();
-
-            //             // Add options
-            //             // response = $.parseJSON(response);
-            //             $.each(response,function(index,data){
-            //                 $('#zone_id').append('<option value="'+data['id']+'">'+data['zone']+'</option>');
-            //             });
-
-            //             $('#zone_id').val(zone_id);
-            //             $('#zone_id').change();
-            //         }
-            //     });
-            // });
+});
 
  
-            // City change
-            $('#zone_id').change(function(){
-                var zone_id = $('#zone_id').val();
-                //console.log(reporting_manager_id);
-                // AJAX request
-                $.ajax({
-                    url:'<?=base_url()?>index.php/distributor_sale/get_store',
-                    method: 'post',
-                    data: {zone_id: zone_id},
-                    dataType: 'json',
-                    success: function(response){
+    // City change
+    $('#zone_id').change(function(){
+      var zone_id = $('#zone_id').val();
+        //console.log(reporting_manager_id);
+      // AJAX request
+      $.ajax({
+        url:'<?=base_url()?>index.php/distributor_sale/get_store',
+        method: 'post',
+        data: {zone_id: zone_id},
+        dataType: 'json',
+        success: function(response){
 
+ 
+          $('#store_id').find('option').not(':first').remove();
+      
 
-                        $('#store_id').find('option').not(':first').remove();
+          // Add options
+          // response = $.parseJSON(response);
+          // console.log(response);
+          $.each(response,function(index,data){
+             $('#store_id').append('<option value="'+data['store_id']+'">'+data['store_name']+'</option>');
+        
+          });
+        }
+     });
+   });
+    
+	
+	
+ $('#store_id').change(function(){
+      var store_id = $('#store_id').val();
+      var zone_id = $('#zone_id').val();
+        //console.log(reporting_manager_id);
+      // AJAX request
+      $.ajax({
+        url:'<?=base_url()?>index.php/distributor_sale/get_location_data',
+        method: 'post',
+        data: {store_id: store_id,zone_id:zone_id},
+        dataType: 'json',
+        success: function(response){
 
+ 
+          $('#location_id').find('option').not(':first').remove();
+      
 
-                        // Add options
-                        // response = $.parseJSON(response);
-                        // console.log(response);
-                        $.each(response,function(index,data){
-                            $('#store_id').append('<option value="'+data['store_id']+'">'+data['store_name']+'</option>');
-
-                        });
-                    }
-                });
-            });
-
-
-
-            $('#store_id').change(function(){
-                var store_id = $('#store_id').val();
-                var zone_id = $('#zone_id').val();
-                //console.log(reporting_manager_id);
-                // AJAX request
-                $.ajax({
-                    url:'<?=base_url()?>index.php/distributor_sale/get_location_data',
-                    method: 'post',
-                    data: {store_id: store_id,zone_id:zone_id},
-                    dataType: 'json',
-                    success: function(response){
-
-
-                        $('#location_id').find('option').not(':first').remove();
-
-
-                        // Add options
-                        // response = $.parseJSON(response);
-                        // console.log(response);
-                        $.each(response,function(index,data){
-                            $('#location_id').append('<option value="'+data['location_id']+'">'+data['location']+'</option>');
-
-                        });
-                    }
-                });
-            });
+          // Add options
+          // response = $.parseJSON(response);
+          // console.log(response);
+          $.each(response,function(index,data){
+             $('#location_id').append('<option value="'+data['id']+'">'+data['location']+'</option>');
+        
+          });
+        }
+     });
+   });
     
 
             

@@ -44,6 +44,11 @@
                                                 <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
                                                 <input type="text" class="form-control" name="depot_name" id="depot_name" placeholder="Depot Name" value="<?php if(isset($data)) echo $data[0]->depot_name;?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+											
+									<div class="form-group"  >
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Address</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="address" id="address" placeholder="Address" value="<?php if(isset($data)) echo $data[0]->address;?>"/>
@@ -57,6 +62,11 @@
                                                 <input type="hidden" name="city_id" id="city_id" />
                                                 <input type="text" class="form-control autocompleteCity" name="city" id ="city" placeholder="City" value="<?php if(isset($data)) { echo  $data[0]->city; } ?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group"  >
+										<div class="col-md-12 col-sm-12 col-xs-12">
+											
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Pincode</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="pincode" placeholder="Pincode" value="<?php if (isset($data)) { echo $data[0]->pincode; } ?>"/>
@@ -71,6 +81,11 @@
                                                 <input type="hidden" name="state_code" id="state_code" value="<?php if(isset($data)) { echo  $data[0]->state_code; } ?>" />
                                                 <input type="text" class="form-control loadstatedropdown" name="state" id="state" placeholder="State" value="<?php if(isset($data)) { echo  $data[0]->state; } ?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+											
+									<div class="form-group"  >
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Country</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="hidden" name="country_id" id="country_id">
@@ -84,6 +99,10 @@
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="d_email_id" placeholder="Email Id" value="<?php if (isset($data)) { echo $data[0]->email_id; } ?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group"  >
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Mobile <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="d_mobile" placeholder="Mobile" value="<?php if (isset($data)) { echo $data[0]->mobile; } ?>"/>

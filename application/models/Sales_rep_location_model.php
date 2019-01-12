@@ -38,7 +38,7 @@ function get_data($status='', $id=''){
         }
     }
 
-    $sql = "select * from sales_rep_location".$cond." order by modified_on desc";
+    $sql = "select * , id as mid,distributor_id as store_id from sales_rep_location".$cond."  order by modified_on desc";
     $query=$this->db->query($sql);
     return $query->result();
 }
@@ -49,10 +49,9 @@ function get_data_qty($status='', $id=''){
     return $query->result();
 }
 
-
-
 function save_data($id='',$status=''){
     $now=date('Y-m-d H:i:s');
+    $now1=date('Y-m-d');
     $curusr=$this->session->userdata('session_id');
     $sales_rep_id=$this->session->userdata('sales_rep_id');
     $date_of_visit=$this->input->post('date_of_visit');
@@ -70,7 +69,7 @@ function save_data($id='',$status=''){
 
     $data = array(
         'sales_rep_id' => $sales_rep_id,
-        'date_of_visit' => $date_of_visit,
+        'date_of_visit' => $now1,
         'distributor_type' => $this->input->post('distributor_type'),
         'distributor_id' => $this->input->post('distributor_id'),
         'distributor_name' => $this->input->post('distributor_name'),
@@ -81,16 +80,19 @@ function save_data($id='',$status=''){
         'remarks' => $this->input->post('remarks'),
         'modified_by' => $curusr,
         'modified_on' => $now,
-        'followup_date' => $followup_date
+        'followup_date' => $followup_date,
+        'zone_id' => $this->input->post('zone_id'),
+        'area_id' => $this->input->post('area_id'),
+        'location_id' => $this->input->post('location_id')
     );
 
     $data1 = array(
-        'orange_bar' => $this->input->post('orange_bar'),
-        'mint_bar' => $this->input->post('mint_bar'),
-        'butterscotch_bar' => $this->input->post('butterscotch_bar'),
-        'chocopeanut_bar' => $this->input->post('chocopeanut_bar'),
-        'bambaiyachaat_bar' => $this->input->post('bambaiyachaat_bar'),
-        'mangoginger_bar' => $this->input->post('mangoginger_bar'),
+        'orange_bar' => (($this->input->post('orange_bar')=='')?'0':$this->input->post('orange_bar')),
+        'mint_bar' => (($this->input->post('mint_bar')=='')?'0':$this->input->post('mint_bar')),
+        'butterscotch_bar' => (($this->input->post('butterscotch_bar')=='')?'0':$this->input->post('butterscotch_bar')),
+        'chocopeanut_bar' => (($this->input->post('chocopeanut_bar')=='')?'0':$this->input->post('chocopeanut_bar')),
+        'bambaiyachaat_bar' => (($this->input->post('bambaiyachaat_bar')=='')?'0':$this->input->post('bambaiyachaat_bar')),
+        'mangoginger_bar' => (($this->input->post('mangoginger_bar')=='')?'0':$this->input->post('mangoginger_bar'))
     );
 
     if($id==''){
@@ -158,6 +160,56 @@ function get_location(){
     return $query->result();
 }
 
+function get_zone(){
+    $sales_rep_id = $this->session->userdata('sales_rep_id');
+    $sql = "select distinct A.zone_id, B.zone from sr_mapping A left join zone_master B on (A.zone_id = B.id) 
+            where (A.reporting_manager_id = '$sales_rep_id' or A.sales_rep_id1 = '$sales_rep_id' or A.sales_rep_id2 = '$sales_rep_id') 
+                    and B.type_id = '3'";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_area($zone_id=''){
+    $cond = '';
+    if($zone_id!=''){
+        $cond = $cond . " and B.zone_id = '$zone_id'";
+    }
+    $sales_rep_id = $this->session->userdata('sales_rep_id');
+    $sql = "select distinct A.area_id, B.area from sr_mapping A left join area_master B on (A.area_id = B.id) 
+            where (A.reporting_manager_id = '$sales_rep_id' or A.sales_rep_id1 = '$sales_rep_id' or A.sales_rep_id2 = '$sales_rep_id') 
+                    and B.type_id = '3'" . $cond;
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_locations($zone_id='', $area_id=''){
+    $cond = '';
+    if($zone_id!=''){
+        $cond = $cond . " and zone_id = '$zone_id'";
+    }
+    if($area_id!=''){
+        $cond = $cond . " and area_id = '$area_id'";
+    }
+    $sql = "select * from location_master where status = 'Approved' and type_id = '3'" . $cond;
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_distributors($zone_id='', $area_id=''){
+    $cond = '';
+    if($zone_id!=''){
+        $cond = $cond . " and zone_id = '$zone_id'";
+    }
+    if($area_id!=''){
+        $cond = $cond . " and area_id = '$area_id'";
+    }
+
+    $sales_rep_id = $this->session->userdata('sales_rep_id');
+    $sql = "select * from distributor_master where status = 'approved' and class = 'super stockist'" . $cond;
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
 function get_closing_stock(){
     $distributor_id = $this->input->post('distributor_id');
     $date_of_visit = formatdate($this->input->post('date_of_visit'));
@@ -170,7 +222,44 @@ function get_closing_stock(){
             date_of_visit = (select max(date_of_visit) from sales_rep_location where status = 'Approved' and 
                                 distributor_id = '$distributor_id' and date_of_visit<'$date_of_visit'))";
     $query=$this->db->query($sql);
-    return $query->result();
+    $data['opening_stock'] = $query->result();
+
+    // $zone_details = '<option value="">Select</option>';
+    // $sql = "select distinct A.zone_id, B.zone from sr_mapping A left join zone_master B on (A.zone_id = B.id) 
+    //         where A.status = 'Approved' and (A.reporting_manager_id = '$distributor_id' or 
+    //             A.sales_rep_id1 = '$distributor_id' or A.sales_rep_id2 = '$distributor_id')";
+    // $query=$this->db->query($sql);
+    // $result = $query->result();
+    // for($i=0; $i<count($result); $i++){
+    //     $zone_details = $zone_details . '<option value="'.$result[$i]->zone_id.'">'.$result[$i]->zone.'</option>';
+    // }
+
+    // $area_details = '<option value="">Select</option>';
+    // $sql = "select distinct A.area_id, B.area from sr_mapping A left join area_master B on (A.area_id = B.id) 
+    //         where A.status = 'Approved' and (A.reporting_manager_id = '$distributor_id' or 
+    //             A.sales_rep_id1 = '$distributor_id' or A.sales_rep_id2 = '$distributor_id')";
+    // $query=$this->db->query($sql);
+    // $result = $query->result();
+    // for($i=0; $i<count($result); $i++){
+    //     $area_details = $area_details . '<option value="'.$result[$i]->area_id.'">'.$result[$i]->area.'</option>';
+    // }
+
+    // $location_details = '<option value="">Select</option>';
+    // $sql = "select distinct A.location_id, B.location from sr_mapping A left join location_master B on (A.location_id = B.id) 
+    //         where A.status = 'Approved' and (A.reporting_manager_id = '$distributor_id' or 
+    //             A.sales_rep_id1 = '$distributor_id' or A.sales_rep_id2 = '$distributor_id')";
+    // $query=$this->db->query($sql);
+    // $result = $query->result();
+    // for($i=0; $i<count($result); $i++){
+    //     $location_details = $location_details . '<option value="'.$result[$i]->location_id.'">'.$result[$i]->location.'</option>';
+    // }
+
+    // $data['zone'] = $zone_details;
+    // $data['area'] = $area_details;
+    // $data['location'] = $location_details;
+    // $data['result'] = 1;
+
+    return $data;
 }
 
 }
