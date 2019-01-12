@@ -147,14 +147,16 @@ function get_distributor_data($status='', $id='', $class=''){
             ((select id, concat('d_', id) as d_id, distributor_name, address, city, pincode, state, country, email_id, mobile, 
                     tin_number, cst_number, contact_person, sales_rep_id, sell_out, send_invoice, credit_period, class, area_id, 
                     type_id, zone_id, location_id, status, remarks, created_by, created_on, modified_by, modified_on, approved_by, approved_on, 
-                    rejected_by, rejected_on, google_address, doc_document, document_name, state_code, gst_number, latitude, longitude,tally_name 
+                    rejected_by, rejected_on, google_address, doc_document, document_name, state_code, gst_number, latitude, longitude,tally_name, 
+                    master_distributor_id 
                 from distributor_master".$cond2.") 
               union all 
             (select id, concat('s_', id) as d_id, distributor_name, address, city, pincode, state, country, null as email_id, 
                     contact_no as mobile, vat_no as tin_number, null as cst_number, contact_person, sales_rep_id, 
-                    margin as sell_out, null as send_invoice, null as credit_period, null as class, null as area_id, null as type_id, 
-                    null as zone_id, null as location_id,'Pending' as status, remarks, created_by, created_on, modified_by, modified_on, 
-                    approved_by, approved_on, rejected_by, rejected_on, null as google_address, doc_document, document_name, state_code, gst_number, null as latitude, null as longitude, null as tally_name 
+                    margin as sell_out, null as send_invoice, null as credit_period, null as class, area_id, null as type_id, 
+                    zone_id, location_id,'Pending' as status, remarks, created_by, created_on, modified_by, modified_on, 
+                    approved_by, approved_on, rejected_by, rejected_on, null as google_address, doc_document, document_name, 
+                    state_code, gst_number, null as latitude, null as longitude, null as tally_name, master_distributor_id 
                 from sales_rep_distributors where status = 'Approved')) C ".$cond.") D 
             left join 
             (select * from sales_rep_master) E 
@@ -221,7 +223,8 @@ function save_data($id=''){
         'gst_number' => $this->input->post('gst_number'),
         'latitude' => $this->input->post('d_latitude'),
         'longitude' => $this->input->post('d_longitude'),
-        'tally_name' => $this->input->post('tally_name')
+        'tally_name' => $this->input->post('tally_name'),
+        'master_distributor_id' => $this->input->post('master_distributor_id')
     );
 
     if($id==''){
@@ -314,6 +317,23 @@ function save_data($id=''){
     }
 
     $this->db->where('distributor_id', $id);
+    $this->db->delete('distributor_category_margin');
+
+    $margin=$this->input->post('margin[]');
+    $category=$this->input->post('category_id[]');
+
+    for ($j=0; $j<count($category); $j++) {
+        if(isset($category[$j]) and $category[$j]!="") {
+            $data = array(
+                        'distributor_id' => $id,
+                        'category_id' => $category[$j],
+                        'margin' => $margin[$j],
+                    );
+            $this->db->insert('distributor_category_margin', $data);
+        }
+    }
+
+    $this->db->where('distributor_id', $id);
     $this->db->delete('distributor_contacts');
 
     $contact_person=$this->input->post('contact_person[]');
@@ -332,9 +352,9 @@ function save_data($id=''){
         }
     }
 
-    $this->db->where('distributor_id', $id);
-    $this->db->delete('distributor_consignee');
-
+    /*$this->db->where('distributor_id', $id);
+    $this->db->delete('distributor_consignee');*/
+    $con_id=$this->input->post('con_id[]');
     $con_name=$this->input->post('con_name[]');
     $con_address=$this->input->post('con_address[]');
     $con_city=$this->input->post('con_city[]');
@@ -346,7 +366,8 @@ function save_data($id=''){
 
     for ($k=0; $k<count($con_name); $k++) {
         if(isset($con_name[$k]) and $con_name[$k]!="") {
-            $data = array(
+
+             $data = array(
                         'distributor_id' => $id,
                         'con_name' => $con_name[$k],
                         'con_address' => $con_address[$k],
@@ -357,7 +378,18 @@ function save_data($id=''){
                         'con_state_code' => $con_state_code[$k],
                         'con_gst_number' => $con_gst_number[$k]
                     );
-            $this->db->insert('distributor_consignee', $data);
+
+             if($con_id[$k]!="")
+             {
+                $this->db->where('id',$con_id[$k])->update('distributor_consignee', $data);
+             }
+             else
+            {
+
+                $this->db->insert('distributor_consignee', $data);
+            }
+            
+            
         }
     }
 
@@ -376,6 +408,11 @@ function save_data($id=''){
     $logarray['cnt_name']='Distributor';
     $logarray['action']=$action;
     $this->user_access_log_model->insertAccessLog($logarray);
+}
+
+public function getDistributor_margin($distributor_id) {
+    $sql = "select A.*, B.margin from category_master A left join distributor_category_margin B on (A.id = B.category_id and B.distributor_id = '$distributor_id')";
+    return $this->db->query($sql)->result();
 }
 
 function check_distributor_availablity(){

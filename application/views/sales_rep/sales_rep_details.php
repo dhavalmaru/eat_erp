@@ -42,13 +42,17 @@
                                 <div class="col-md-12 custom-padding" style="padding:0;" >
                                  <div class="panel panel-default">								
 								   <div class="panel-body">
-									  <div class="form-group"  >
+									<div class="form-group"  >
 										<div class="col-md-12 col-sm-12 col-xs-12">
 											<label class="col-md-2 col-sm-2 col-xs-12 control-label">Sales Representative Name <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
                                                 <input type="text" class="form-control" name="sales_rep_name" id="sales_rep_name" placeholder="Sales Representative Name" value="<?php if(isset($data)) echo $data[0]->sales_rep_name;?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group"  >
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Pan No <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="pan_no" id="pan_no" placeholder="Pan No" value="<?php if(isset($data)) echo $data[0]->pan_no;?>"/>
@@ -61,6 +65,10 @@
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="email_id" placeholder="Email Id" value="<?php if (isset($data)) { echo $data[0]->email_id; } ?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group"  >
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Mobile <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="mobile" placeholder="Mobile" value="<?php if (isset($data)) { echo $data[0]->mobile; } ?>"/>
@@ -75,6 +83,10 @@
                                                 <input type="radio" name="kyc_done" class="icheckbox" value="0" id="kyc_no" data-error="#err_kyc" <?php if (isset($data)) { if($data[0]->kyc_done=='0') echo 'checked'; } ?>/>&nbsp;&nbsp;No
                                                 <div id="err_kyc"></div>
                                             </div>
+                                        </div>
+									</div>
+									<div class="form-group"  >
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Territory</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="teritory" placeholder="Teritory" value="<?php if (isset($data)) { echo $data[0]->teritory; } ?>"/>

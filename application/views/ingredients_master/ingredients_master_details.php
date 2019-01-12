@@ -63,7 +63,7 @@
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Product <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
-                                                <select name="product_id" id="product_id" class="form-control">
+                                                <select name="product_id" id="product_id" class="form-control select2">
                                                  
 													<?php if(isset($data)){?>
 													<option value="<?php echo $data[0]->product_id; ?>" selected>
@@ -99,7 +99,7 @@
                                                 for($i=0; $i<count($raw_material_stock); $i++) { ?>
                                             <tr id="raw_material_<?php echo $i; ?>_row">
                                                 <td>
-                                                    <select name="raw_material_id[]" class="form-control raw_material" id="raw_material_<?php echo $i;?>">
+                                                    <select name="raw_material_id[]" class="form-control raw_material select2 " id="raw_material_<?php echo $i;?>">
                                                         <option value="">Select</option>
                                                         <?php if(isset($raw_material)) { for ($k=0; $k < count($raw_material) ; $k++) { ?>
                                                                 <option value="<?php echo $raw_material[$k]->id; ?>" <?php if($raw_material[$k]->id==$raw_material_stock[$i]->rm_id) { echo 'selected'; } ?>><?php echo $raw_material[$k]->rm_name; ?></option>
@@ -116,7 +116,7 @@
                                         <?php }} else { ?>
                                             <tr id="raw_material_<?php echo $i; ?>_row">
                                                 <td>
-                                                    <select name="raw_material_id[]" class="form-control raw_material" id="raw_material_<?php echo $i;?>">
+                                                    <select name="raw_material_id[]" class="form-control raw_material select2" id="raw_material_<?php echo $i;?>">
                                                         <option value="">Select</option>
                                                         <?php if(isset($raw_material)) { for ($k=0; $k < count($raw_material) ; $k++) { ?>
                                                                 <option value="<?php echo $raw_material[$k]->id; ?>"><?php echo $raw_material[$k]->rm_name; ?></option>
@@ -293,7 +293,7 @@
                     event.preventDefault();
                     var newRow = jQuery('<tr id="raw_material_'+counter+'_row">'+
                                             '<td>'+
-                                                '<select name="raw_material_id[]" class="form-control raw_material" id="raw_material_'+counter+'">'+
+                                                '<select name="raw_material_id[]" class="form-control raw_material select2" id="raw_material_'+counter+'">'+
                                                     '<option value="">Select</option>'+
                                                     '<?php if(isset($raw_material)) { for ($k=0; $k < count($raw_material) ; $k++) { ?>'+
                                                             '<option value="<?php echo $raw_material[$k]->id; ?>"><?php echo $raw_material[$k]->rm_name; ?></option>'+
@@ -314,6 +314,9 @@
                     $(".qty").blur(function(){
                         get_wastage();
                     });
+					$(".select2").select2();
+                      
+               
                     $('.delete_row').click(function(event){
                         delete_row($(this));
                         get_wastage();

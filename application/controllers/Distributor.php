@@ -19,10 +19,10 @@ class Distributor extends CI_Controller{
         $this->load->model('distributor_type_model');
         $this->load->model('zone_model');
         $this->load->model('location_model');
+        $this->load->model('category_master_model','category');
         $this->load->database();
     }
 
-    //index function
     public function index(){
         // $result=$this->distributor_model->get_access();
         // if(count($result)>0) {
@@ -43,9 +43,9 @@ class Distributor extends CI_Controller{
             $data['access']=$result;
 
             if($status=='Approved'){
-                $data['data']=$this->distributor_model->get_distributor_data($status,'','Super Stockist');
+                $data['data']=$this->distributor_model->get_distributor_data($status,'','super stockist');
             } else if($status=='Retailer'){
-                $data['data']=$this->distributor_model->get_distributor_data('Approved','','Normal');
+                $data['data']=$this->distributor_model->get_distributor_data('Approved','','normal');
             } else {
                 $data['data']=$this->distributor_model->get_distributor_data($status);
             }
@@ -75,6 +75,7 @@ class Distributor extends CI_Controller{
             $data['retailer']=$retailer;
             $data['all']=count($count_data);
 
+
             load_view('distributor/distributor_list', $data);
 
         } else {
@@ -95,7 +96,7 @@ class Distributor extends CI_Controller{
         }
     }
 	
-	    public function single_locations($status=''){
+    public function single_locations($status=''){
         $result=$this->distributor_model->get_access();
         if(count($result)>0) {
             
@@ -106,7 +107,6 @@ class Distributor extends CI_Controller{
             $this->load->view('login/main_page');
         }
     }
-
 
     public function get_data(){
         $id=$this->input->post('id');
@@ -147,7 +147,7 @@ class Distributor extends CI_Controller{
         }
     }
 	
-	 public function get_distributor_single_locations(){
+    public function get_distributor_single_locations(){
         $id=$this->input->post('id');
         // $id=1;
 
@@ -164,7 +164,6 @@ class Distributor extends CI_Controller{
         echo json_encode($data);
     }
 	
-
     public function add(){
         $result=$this->distributor_model->get_access();
         if(count($result)>0) {
@@ -175,7 +174,7 @@ class Distributor extends CI_Controller{
                 $data['type'] = $this->distributor_type_model->get_data('Approved');
                 $data['zone'] = $this->zone_model->get_data('Approved');
                 $data['location'] = $this->location_model->get_data('Approved');
-
+                $data['category_detail']=$this->category->getCategoryDetails();
                 load_view('distributor/distributor_details', $data);
             } else {
                 echo "Unauthorized access";
@@ -201,8 +200,11 @@ class Distributor extends CI_Controller{
                     $id = substr($d_id, 2);
                     $data['distributor_contacts'] = $this->distributor_model->get_distributor_contacts($id);
                     $data['distributor_consignee'] = $this->distributor_model->get_distributor_consignee($id);
+                    // $data['margin_detail']=$this->distributor_model->getDistributor_margin($id);
                 }
 
+                // $data['category_detail']=$this->category->getCategoryDetails();
+                $data['category_detail']=$this->distributor_model->getDistributor_margin($id);
                 load_view('distributor/distributor_details', $data);
             } else {
                 echo "Unauthorized access";
@@ -228,20 +230,16 @@ class Distributor extends CI_Controller{
         echo $result;
     }
 
-	public function get_zone(){ 
-   
-    $postData = $this->input->post();
-
-    $data = $this->area_model->get_zone($postData);
-    echo json_encode($data); 
+	public function get_zone(){
+        $postData = $this->input->post();
+        $data = $this->area_model->get_zone($postData);
+        echo json_encode($data); 
 	}
 
 	public function get_area(){ 
-   
-    $postData = $this->input->post();
-
-    $data = $this->location_model->get_area($postData);
-    echo json_encode($data); 
+        $postData = $this->input->post();
+        $data = $this->location_model->get_area($postData);
+        echo json_encode($data); 
 	}
 	
     public function get_shipping_state() {

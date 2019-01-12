@@ -45,6 +45,11 @@
                                                 <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
                                                 <input type="text" class="form-control" name="product_name" id="product_name" placeholder="Product Name" value="<?php if(isset($data)) echo $data[0]->product_name;?>"/>
                                             </div>
+                                          
+										</div>
+                                    </div>
+									<div class="form-group"  >
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                              <label class="col-md-2 col-sm-2 col-xs-12 control-label">Barcode</label>
                                              <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="barcode" placeholder="Barcode" value="<?php if(isset($data)) echo $data[0]->barcode;?>"/>
@@ -57,6 +62,10 @@
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="hsn_code" id="hsn_code" placeholder="HSN Code" value="<?php if(isset($data)) { echo  $data[0]->hsn_code; } ?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group"  >
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">HSN Name <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="hsn_name" id="hsn_name" placeholder="HSN Name" value="<?php if(isset($data)) { echo $data[0]->hsn_name; } ?>"/>
@@ -69,6 +78,10 @@
                                              <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="grams" placeholder="Disclosed Grams" value="<?php if (isset($data)) { echo $data[0]->grams; } ?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group" >
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                              <label class="col-md-2 col-sm-2 col-xs-12 control-label">Avg Grams In Bar <span class="asterisk_sign">*</span></label>
                                              <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="avg_grams" placeholder="Avg Grams In Bar" value="<?php if (isset($data)) { echo $data[0]->avg_grams; } ?>"/>
@@ -82,6 +95,10 @@
                                               <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="rate" placeholder="Rate" value="<?php if (isset($data)) { echo $data[0]->rate; } ?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group"  >
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Anticipated Wastage (In %)<span class="asterisk_sign">*</span></label>
                                               <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="anticipated_wastage" placeholder="Anticipated Wastage" value="<?php if (isset($data)) { echo $data[0]->anticipated_wastage; } ?>"/>
@@ -94,6 +111,10 @@
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                <input type="text" class="form-control" name="cost" placeholder="Cost" value="<?php if (isset($data)) { echo $data[0]->cost; } ?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group"  >
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Short Name <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                <input type="text" class="form-control" name="short_name" placeholder="Short Name" value="<?php if (isset($data)) { echo $data[0]->short_name; } ?>"/>
@@ -101,16 +122,41 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Category<span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                               <select class="form-control" name="category_id" id="category_id">
+                                                <option value="" >Select</option>
+                                                 <?php 
+                                                 for ($i=0; $i <count($category_detail) ; $i++) { 
+                                                       $selected = '';
+                                                       if(isset($data)) {if ($category_detail[$i]->id==$data[0]->category_id){ $selected = 'selected';}}
+                                                        echo '<option value="'.$category_detail[$i]->id.'" '.$selected.'>'.$category_detail[$i]->category_name.'</option>';
+                                                      } ?>
+                                            </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Tax (In %) <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                               <input type="text" class="form-control tax_percent" name="tax_percentage" id="tax_percentage" placeholder="Tax Percent"   onkeypress="return StopNonNumeric(this,event)" value="<?php
+                                                                  if(isset($data[0]->tax_percentage)) { echo $data[0]->tax_percentage; } ?>"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
                                             <div style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
                                                  <label class="col-md-2 col-sm-2 col-xs-12 control-label">Status <span class="asterisk_sign">*</span></label>
                                                  <div class="col-md-4 col-sm-4 col-xs-12">
-                                                    <select class="form-control" name="status">
+                                                    <select class="form-control select2" name="status">
                                                         <option value="Approved" <?php if(isset($data)) {if ($data[0]->status=='Approved') echo 'selected';}?>>Active</option>
                                                         <option value="InActive" <?php if(isset($data)) {if ($data[0]->status=='InActive') echo 'selected';}?>>InActive</option>
                                                     </select>
                                                 </div>
                                             </div>
-                                        </div>
+                                    </div>
                                     </div>
 									
 									 <div class="form-group">
@@ -121,7 +167,6 @@
                                             </div>
                                         </div>
                                     </div>
-									
                                 </div>
                                   </div>
 									<br clear="all"/>

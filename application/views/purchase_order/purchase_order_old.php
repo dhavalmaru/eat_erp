@@ -111,7 +111,7 @@
       <td valign="top" align="left" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><?php echo $items[$i]->rm_name; ?></td>
       <td width="130" valign="top" align="right" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><p style="margin:0; "><?php echo $items[$i]->qty; ?></p></td>
       <td valign="top" align="right" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><p style="margin:0; "><?php echo $items[$i]->rate; ?></p></td>
-      <td valign="top" align="right" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><p style="margin:0; "><?php echo $items[$i]->cst; ?></p></td>
+      <td valign="top" align="right" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><p style="margin:0; "><?php echo $items[$i]->tax_per; ?></p></td>
       <td valign="top" align="right" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><p style="margin:0; "><?php echo round($items[$i]->amount,2); ?></p></td>
     </tr>
   <?php }} ?>
@@ -143,6 +143,9 @@
     <td colspan="3" valign="top" style="padding:0;">&nbsp;</td>
     <td colspan="2" valign="top" style="font-size:14px; font-weight:500;"> TOTAL</td>
     <td style=" font-size:14px; font-weight:500;"   >  <span style="text-align:left; float:left"> &#8377; </span> <span style="text-align:right; float:right"><?php if (isset($total_amount)) echo round($total_amount,2); ?></span> </td>
+  </tr>
+  <tr>
+      <td colspan="6" valign="top" style="font-size:14px; font-weight:500;"> Remarks: <?php if (isset($remarks)) echo $remarks; ?></td>
   </tr>
   <tr>
     <td colspan="3" valign="middle" style="padding:0;">

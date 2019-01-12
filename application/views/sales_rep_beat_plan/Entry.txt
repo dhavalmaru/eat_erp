@@ -1,0 +1,7 @@
+Chandans store				Swapnil Darekar	Every Friday	1	17/08/2018
+3	Agrawal super market				Swapnil Darekar	Every Friday	2	17/08/2018
+4	AShu Enterprize				Swapnil Darekar	Every Friday	3	17/08/2018
+5	Classic Medico				Swapnil Darekar	Every Friday	4	17/08/2018
+6	Helpline Medical				Swapnil Darekar	Every Friday	5	17/08/2018
+7	P&G Medico				Swapnil Darekar	Every Friday	6	17/08/2018
+8	Food village				Swapnil Darekar	Every Friday	7	17/08/2018

@@ -19,7 +19,7 @@ class Sales_rep_order extends CI_Controller{
         $this->load->database();
     }
 
-    //index function
+    /*index function
     public function index(){
         $result=$this->sales_rep_order_model->get_access();
         if(count($result)>0) {
@@ -31,8 +31,57 @@ class Sales_rep_order extends CI_Controller{
             echo '<script>alert("You donot have access to this page.");</script>';
             $this->load->view('login/main_page');
         }
-    }
+    }*/
+	public function index(){
+        // $result=$this->distributor_model->get_access();
+        // if(count($result)>0) {
+        //     $data['access']=$result;
+        //     $data['data'] = $this->distributor_model->get_data();
 
+        //     load_view('distributor/distributor_list', $data);
+        // } else {
+        //     echo "You donot have access to this page.";
+        // }
+
+        $this->checkstatus();
+    }
+	
+	
+	 public function checkstatus($status=''){
+        $result=$this->sales_rep_order_model->get_access();
+        if(count($result)>0) {
+            $data['access']=$result;
+            $data['data']=$this->sales_rep_order_model->get_data($status);
+
+            $count_data=$this->sales_rep_order_model->get_data();
+            $active=0;
+            $inactive=0;
+            $pending=0;
+
+            if (count($result)>0){
+                for($i=0;$i<count($count_data);$i++){
+                    if (strtoupper(trim($count_data[$i]->status))=="APPROVED")
+                        $active=$active+1;
+                    else if (strtoupper(trim($count_data[$i]->status))=="INACTIVE")
+                        $inactive=$inactive+1;
+                    else if (strtoupper(trim($count_data[$i]->status))=="PENDING")
+                        $pending=$pending+1;
+                }
+            }
+
+			$data['active']=$active;
+            $data['pending']=$pending;
+            $data['all']=count($count_data);
+
+            // echo json_encode($data);
+
+            load_view('sales_rep_order/sales_rep_order_list', $data);
+
+        } else {
+            echo '<script>alert("You donot have access to this page.");</script>';
+            $this->load->view('login/main_page');
+        }
+	 }
     public function add(){
         $result=$this->sales_rep_order_model->get_access();
         if(count($result)>0) {
@@ -62,7 +111,7 @@ class Sales_rep_order extends CI_Controller{
                 $data['bar'] = $this->product_model->get_data('Approved');
                 $data['data'] = $this->sales_rep_order_model->get_data('', $id);
                 $data['sales_rep_order_items'] = $this->sales_rep_order_model->get_sales_rep_order_items($id);
-                
+
                 load_view('sales_rep_order/sales_rep_order_details', $data);
             } else {
                 echo "Unauthorized access";

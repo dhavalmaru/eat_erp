@@ -15,15 +15,15 @@ function get_access(){
     return $query->result();
 }
 
-
-  function get_invoice($distributor_id){
-   
-    $sql = "select invoice_no from distributor_out where distributor_id='".$distributor_id  ."'";
+function get_invoice($distributor_id){
+    $sql = "select invoice_no from distributor_out where distributor_id='".$distributor_id  ."' and invoice_no <> ''";
     $query=$this->db->query($sql);
     return $query->result();
 }
 
 function get_data($status='', $id=''){
+
+
     if($status!=""){
         if($status=="Pending"){
             $cond=" where status='Pending' or status='Deleted'";
@@ -46,7 +46,9 @@ function get_data($status='', $id=''){
             (select * from credit_debit_note".$cond.") A 
             left join 
             (select * from distributor_master) B 
-            on (A.distributor_id=B.id) order by A.modified_on desc";
+            on (A.distributor_id=B.id)
+            Where A.remarks!='Adjusted through Ledger Balance'
+            order by A.modified_on desc";
     $query=$this->db->query($sql);
     return $query->result();
 }
@@ -148,13 +150,45 @@ function save_data($id=''){
                 }
 
                 if($ref_id!=null && $ref_id!=''){
-                    $sql = "Update credit_debit_note A, credit_debit_note B 
+                    $modified_approved_date = NULL;
+                    $get_modified_approved_date_result = $this->db->select('modified_approved_date')->where('id',$id)->get('credit_debit_note')->result();
+
+                    if(count($get_modified_approved_date_result)>0){
+                       $modified_approved_date = $get_modified_approved_date_result[0]->modified_approved_date;
+                        
+                        if($modified_approved_date!=null && $modified_approved_date!=""){
+                            $modified_approved_date = date("Y-m-d");
+                        } else {
+                            $modified_approved_date = NULL;
+                        }
+                    } else {
+                       $modified_approved_date = NULL;
+                    }
+
+                    if($modified_approved_date!=null && $modified_approved_date!=""){
+                        $sql = "Update credit_debit_note A, credit_debit_note B 
                             Set A.date_of_transaction=B.date_of_transaction, A.distributor_id=B.distributor_id, 
                                 A.transaction=B.transaction, A.amount=B.amount, A.status='$status', A.remarks='$remarks', 
                                 A.modified_by=B.modified_by, A.modified_on=B.modified_on, 
-                                A.approved_by='$curusr', A.approved_on='$now', 
-                                A.ref_no='$ref_no', A.ref_date='$ref_date' 
+                                A.approved_by='$curusr', A.approved_on='$now', A.ref_no='$ref_no', 
+                                A.ref_date='$ref_date', A.modified_approved_date='$modified_approved_date', 
+                                A.amount_without_tax=B.amount_without_tax, A.tax=B.tax, 
+                                A.igst=B.igst, A.cgst=B.cgst, A.sgst=B.sgst, A.distributor_type=B.distributor_type, 
+                                A.invoice_no=B.invoice_no, A.freezed=B.freezed 
                             WHERE A.id = '$ref_id' and B.id = '$id'";
+                    } else {
+                        $sql = "Update credit_debit_note A, credit_debit_note B 
+                            Set A.date_of_transaction=B.date_of_transaction, A.distributor_id=B.distributor_id, 
+                                A.transaction=B.transaction, A.amount=B.amount, A.status='$status', A.remarks='$remarks', 
+                                A.modified_by=B.modified_by, A.modified_on=B.modified_on, 
+                                A.approved_by='$curusr', A.approved_on='$now', A.ref_no='$ref_no', 
+                                A.ref_date='$ref_date', A.modified_approved_date=NULL, 
+                                A.amount_without_tax=B.amount_without_tax, A.tax=B.tax, 
+                                A.igst=B.igst, A.cgst=B.cgst, A.sgst=B.sgst, A.distributor_type=B.distributor_type, 
+                                A.invoice_no=B.invoice_no, A.freezed=B.freezed 
+                            WHERE A.id = '$ref_id' and B.id = '$id'";
+                    }
+                    
                     $this->db->query($sql);
 
                     $sql = "Delete from credit_debit_note where id = '$id'";
@@ -170,6 +204,10 @@ function save_data($id=''){
                     $this->db->query($sql);
                 }
                 $action='Credit_debit_note Entry '.$status.'.';
+
+                echo '<script>var win=window.open("'.base_url().'index.php/credit_debit_note/view_credit_debit_note/'.$id.'");
+                    win.print();
+                    </script>';
             }
         }
     } else {
@@ -208,13 +246,21 @@ function save_data($id=''){
             'sgst' => format_number($this->input->post('sgst'),2),
             'amount_without_tax' => format_number($this->input->post('amount_without_tax'),2),
             'status' => $status,
-            'remarks' => $this->input->post('remarks'),
+            'remarks' => str_replace("'", "", $this->input->post('remarks')),
             'modified_by' => $curusr,
             'modified_on' => $now,
             'ref_id' => $ref_id,
             'ref_no' => $this->input->post('ref_no'),
             'ref_date' => $ref_date
         );
+
+        $date_p=strtotime($date_of_transaction);
+        $current_d=strtotime($now);
+
+        if($ref_id!=null && $ref_id!="")
+        {
+            $data['modified_approved_date']=$now;
+        }
 
         if($id==''){
             $data['created_by']=$curusr;
@@ -229,7 +275,7 @@ function save_data($id=''){
             $action='Credit_debit_note Entry Modified.';
         }
     }
-
+    
     $logarray['table_id']=$id;
     $logarray['module_name']='Credit_debit_note';
     $logarray['cnt_name']='Credit_debit_note';
@@ -241,7 +287,14 @@ function view_credit_debit_note($id) {
     $now=date('Y-m-d H:i:s');
     $curusr=$this->session->userdata('session_id');
 
-    $sql = "select * from credit_debit_note where id = '$id'";
+    $sql = "select A.*, concat(B.first_name, ' ', B.last_name) as createdby, 
+                concat(C.first_name, ' ', C.last_name) as modifiedby, 
+                concat(D.first_name, ' ', D.last_name) as approvedby 
+            from credit_debit_note A 
+            left join user_master B on(A.created_by=B.id) 
+            left join user_master C on(A.modified_by=C.id) 
+            left join user_master D on(A.approved_by=D.id) 
+            where A.id = '$id'";
     $query=$this->db->query($sql);
     $query_result=$query->result();
     if(count($query_result)>0){
@@ -285,8 +338,5 @@ function view_credit_debit_note($id) {
         $this->output->set_output($output);
     }
 }
-
-
-
 }
 ?>

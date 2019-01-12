@@ -1,88 +1,197 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>        
-	<!-- META SECTION -->
-	<title>EAT ERP</title>            
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
+<head>
+	<meta charset="UTF-8">
+	<title>Eat-ERP</title>
+	<meta name="viewport" content="width=device-width,height=device-height, initial-scale=1  maximum-scale=1">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta name="HandheldFriendly" content="True">
+	
+	<link rel="shortcut icon" href="<?php echo base_url(); ?>img/favicon.png">
+	<link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/font-awesome.min.css">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/css/materialize.min.css" rel="stylesheet" />
+	<link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/fakeLoader.css">
+	<link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/slick.css">
+	<link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/slick-theme.css">
+	<link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/owl.carousel.css">
+	<link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/owl.theme.css">
+	<link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/owl.transitions.css">
+	<link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/style.css">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/font/material-design-icons/Material-Design-Icons.woff" rel="stylesheet">
 
-	<link rel="icon" href="<?php echo base_url(); ?>favicon.ico" type="image/x-icon" />
-	<!-- END META SECTION -->
+<style>
+.tabs .tab a:hover, .tabs .tab a.active
+{
+	  color: #ffffff!important;
+}
+.tabs a 
+{
+	  color: #ffffff!important;
+}
+.tabs .indicator
+{
+	background-color:#ffffff!important; 
 
-	<!-- CSS INCLUDE -->        
-	<link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>css/theme-blue.css"/>
-	<link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>mobile-menu/vendor-1437d0659c.css"/>
-	<link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url().'css/custome_vj_css.css'; ?>"/>    
-	<!-- EOF CSS INCLUDE -->    
-</head>
+}
+.tabs
+{
+	height:auto!important;
+	background-color: #1861b1;
+}
+.beat_plan h4
+{
+	font-size:12px!important;	
+    display: inline;	
+}
+.app-pages {
+    margin-top: 100px;
+}
+.tabs .tab {
+    padding: 0px!important;
+}
+.wishlist .entry .s-title
+{
+	padding-top:0px;
+	padding-bottom:0px;
+}
+.row
+{
+	margin-bottom: 7px;
+	margin-top: 7px;
+}
+.button
+{
+	font-size:10px;
+}
+</style>
 <body>								
 	<!-- START PAGE CONTAINER -->
-	<div class="page-container page-navigation-top">            
-		<!-- PAGE CONTENT -->
-		<?php $this->load->view('templates/menus');?>
-		<div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
-			<div class="heading-h3"> 
-				<div class="heading-h3-heading mobile-head">	 <a href="<?php echo base_url().'index.php/dashboard_sales_rep'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp; Location List  </div>						 
-				<div class="heading-h3-heading mobile-head">
-					<div class="pull-right btn-margin">	
-						<?php $this->load->view('templates/download');?>	
-					</div>	
-					<div class="pull-right btn-margin"  style="<?php if($access[0]->r_insert=='0') echo 'display: none;';?>">
-						<a class="btn btn-success  " href="<?php echo base_url() . 'index.php/merchandiser_location/add'; ?>">
-							<span class="fa fa-plus"></span> Add Location
-						</a>
-					</div>
-				</div>	      
-			</div>	 
+	
+		<div class="navbar">
+		 <?php $this->load->view('templates/header2');?>
+		 <ul class="tabs">
+					  		<?php $explode =  explode(" ",$checkstatus);
+									$checkstatus  = $explode[1];
+					  		
+					  		 ?>
+							<li class="tab"><a class="<?php if($checkstatus=='Monday') echo 'active'; ?>" href="<?php echo base_url(); ?>index.php/merchandiser_location/checkstatus/Monday" target="_self">Mon</a></li>
+
+							<li class="tab"><a class="<?php if($checkstatus=='Tuesday') echo 'active'; ?>" href="<?php echo base_url(); ?>index.php/merchandiser_location/checkstatus/Tuesday" target="_self">Tue</a></li>
+							
+							<li class="tab"><a class="<?php if($checkstatus=='Wednesday') echo 'active'; ?>"href="<?php echo base_url(); ?>index.php/merchandiser_location/checkstatus/Wednesday" target="_self">Wed</a></li>
+							
+							<li class="tab"><a class="<?php if($checkstatus=='Thursday') echo 'active'; ?>" href="<?php echo base_url(); ?>index.php/merchandiser_location/checkstatus/Thursday" target="_self">Thu</a></li>
+							
+							<li class="tab"><a class="<?php if($checkstatus=='Friday') echo 'active'; ?>" href="<?php echo base_url(); ?>index.php/merchandiser_location/checkstatus/Friday" target="_self">Fri</a></li>
+							
+							<li class="tab"><a class="<?php if($checkstatus=='Saturday') echo 'active'; ?>"  href="<?php echo base_url(); ?>index.php/merchandiser_location/checkstatus/Saturday" target="_self">Sat</a></li>
+						  </ul>
+		</div>
+
+		<?php $this->load->view('templates/menu2');?>
+	
+
+        
+	
+	<div class="wishlist app-section app-pages">
+		<div class="container">
+			
+			<div class="entry shadow">
+			<div class="app-title">
+				<h4>Visit List</h4>
+			</div>
+			<?php $counter=0;?>
+		
+						
+						  
+								
+							<?php 
+						
+							for ($i=0; $i <count($data); $i++)
+							 {
+									 
+								?>
+							
+								<div class="col s12">
+										<div class="wishlist-title s-title beat_plan">
+											<div class="row">
+												<div class="col s1">
+													<h4><?php echo $data[$i]->sequence;?></h4>
+												</div>
+											
+												<div class="col s2">
+													<a href="<?php echo base_url().'index.php/merchandiser_location/locations/'.$data[$i]->id; ?> "class=""><i class="fa fa-map-marker"></i></a>
+												</div>
+												<div class="col s5">
+													<h5><?php echo $data[$i]->store_name.' - ( '.$data[$i]->location.' )'; ?></h5>
+												</div>
+												
+												<div class="col s4">
+												
+												<?php 
+												$dist= $data[$i]->dist_id;
+												$date= $data[$i]->date_of_visit;
+												
+												if($dist==null && $date==null){
+
+													$url = base_url().'index.php/merchandiser_location/add/'.$data[$i]->bit_plan_id;
+												?>
+												<a href="<?=($checkstatus==$current_day)?$url:'javascript:void(0)'?>" class="button shadow orange  lighten-1" <>Check In</a>
+												
+												<?php
+											
+												}
+												
+													else
+												{
+													
+												?>
+													
+												<a href="<?php echo base_url().'index.php/merchandiser_location/edit/'.$data[$i]->bit_plan_id;?>"class="button shadow orange  lighten-1">Edit</a>
+												<?php
+												
+												}?>
+												</div>
+											</div>
+											
+									
+											
+										</div>
+								
+									</div>
+							<?php 
+							}?>
+							
+						
+			</div>
+		</div>
+	</div>
 
 			<!-- PAGE CONTENT WRAPPER -->
-			<div class="page-content-wrap">                
-				<div class="row">
-					<div class="page-width">	
-						<div class="col-md-12">
-							<div class="panel panel-default">
-								<div class="panel-body">
-									<div class="table-responsive">
-										<table id="customers2" class="table datatable table-bordered" >
-											<thead>
-												<tr>
-													<th width="65" style="text-align:center;">Sr. No.</th>
-													<th>Date</th>
-													<th>Distributor Name</th>
-												</tr>
-											</thead>
-											<tbody>
-												<?php for ($i=0; $i < count($data); $i++) { ?>
-												<tr>
-													<td style="text-align:center;"><?php echo $i+1; ?></td>
-													<td>
-		                                                <span style="display:none;">
-		                                                    <?php echo (($data[$i]->date_of_visit!=null && $data[$i]->date_of_visit!='')?date('Ymd',strtotime($data[$i]->date_of_visit)):''); ?>
-		                                                </span>
-		                                                <a href="<?php echo base_url().'index.php/merchandiser_location/edit/'.$data[$i]->mid; ?>"><?php echo (($data[$i]->date_of_visit!=null && $data[$i]->date_of_visit!='')?date('d/m/Y',strtotime($data[$i]->date_of_visit)):''); ?></a>
-		                                            </td>
-													<td><?php echo $data[$i]->store_name; ?></td>
-												</tr>
-												<?php } ?>
-											</tbody>
-										</table>
-									</div>
-								</div>
-								<!-- END DEFAULT DATATABLE -->
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<!-- END PAGE CONTENT WRAPPER -->
-		</div>            
+		
+				
+
+				
 		<!-- END PAGE CONTENT -->
 	</div>
 	<!-- END PAGE CONTAINER -->
-
-	<?php $this->load->view('templates/footer');?>
-
+	
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/js/materialize.min.js"></script>
+	<script src="<?php echo base_url(); ?>sales_rep/js/fakeLoader.min.js"></script>
+	<script src="<?php echo base_url(); ?>sales_rep/js/loading.js"></script>
+	<script src="<?php echo base_url(); ?>sales_rep/js/slick.min.js"></script>
+	<script src="<?php echo base_url(); ?>sales_rep/js/owl.carousel.min.js"></script>
+	<script src="<?php echo base_url(); ?>sales_rep/js/custom.js"></script>
+	
+	<script>
+		$('ul.tab').tabs({
+			swipeable: true,
+			responsiveThreshold: Infinity,
+			});
+	</script>
+	
 	<!-- END SCRIPTS -->      
 </body>
 </html>

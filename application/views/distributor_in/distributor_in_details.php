@@ -55,6 +55,28 @@
                     display: inline-flex;
                 }
             }
+			.form-group
+			{
+				padding:4px 0px!important;
+			}
+			#box_details .form-control[disabled], #box_details .form-control[readonly]
+			{
+				border:none!important;
+				background-color:transparent!important;
+				box-shadow:none!important;
+			}
+			#box_details_ex .form-control[disabled], #box_details_ex .form-control[readonly]
+			{
+				border:none!important;
+				background-color:transparent!important;
+				box-shadow:none!important;
+			}
+			#tax_per
+			{
+				border:none!important;
+				background-color:transparent!important;
+				box-shadow:none!important;
+			}
 		</style>
     </head>
     <body>								
@@ -63,9 +85,7 @@
             <!-- PAGE CONTENT -->
 			   <?php $this->load->view('templates/menus');?>
               <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
-                   <div class="heading-h2"><a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp; <a href="<?php echo base_url().'index.php/distributor_in'; ?>" >Distributor In List </a>  &nbsp; &#10095; &nbsp; Distributor In Details</div>
-       
-                
+                   <div class="heading-h2"><a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp; <a href="<?php echo base_url().'index.php/distributor_in'; ?>" >Distributor In List </a>  &nbsp; &#10095; &nbsp; Distributor In Details</div>             
                 <!-- PAGE CONTENT WRAPPER -->
                      <div class="page-content-wrap">
                       <div class="row main-wrapper">
@@ -86,6 +106,10 @@
                                                 <input type="hidden" class="form-control" name="sales_return_no" id="sales_return_no" value="<?php if(isset($data)) echo $data[0]->sales_return_no;?>"/>
                                                 <input type="text" class="form-control datepicker1" name="date_of_processing" id="date_of_processing" placeholder="Date" value="<?php if(isset($data)) echo (($data[0]->date_of_processing!=null && $data[0]->date_of_processing!='')?date('d/m/Y',strtotime($data[0]->date_of_processing)):date('d/m/Y')); else echo date('d/m/Y'); ?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group" >
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Distributor <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <select name="distributor_id" id="distributor_id" class="form-control">
@@ -115,6 +139,10 @@
                                                 <!-- <input type="hidden" name="depot_id" id="depot_id" value="<?php //if(isset($data)) { echo $data[0]->depot_id; } ?>"/>
                                                 <input type="text" class="form-control load_depot" name="depot" id="depot" placeholder="Type To Select Depot...." value="<?php //if(isset($data)) { echo $data[0]->depot_name; } ?>"/> -->
                                             </div>
+                                        </div>
+									</div>
+									<div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Sales Representative <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <select name="sales_rep_id" id="sales_rep_id" class="form-control">
@@ -137,16 +165,59 @@
                                                 <input type="radio" name="tax" disabled="true" class="" value="cst" id="tax_cst" data-error="#err_tax" <?php if (isset($data)) { if($data[0]->tax=='cst') echo 'checked'; } ?>/>&nbsp;&nbsp;Cst
                                                 <div id="err_tax"></div>
                                             </div>
-                                          <label class="col-md-2 col-sm-2 col-xs-12 control-label">Tax (In %) <span class="asterisk_sign">*</span></label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="tax_per" id="tax_per" placeholder="Tax Percent" value="<?php if (isset($data)) { echo $data[0]->cst; } ?>" readonly />
-                                                <input type="hidden" class="form-control" name="cgst" id="cgst" placeholder="cgst" value="<?php if (isset($data)) { echo $data[0]->cgst; } ?>" readonly />
-                                                <input type="hidden" class="form-control" name="sgst" id="sgst" placeholder="sgst" value="<?php if (isset($data)) { echo $data[0]->sgst; } ?>" readonly />
-                                                <input type="hidden" class="form-control" name="igst" id="igst" placeholder="igst" value="<?php if (isset($data)) { echo $data[0]->igst; } ?>" readonly />
-                                                <!-- <input type="text" class="form-control" name="cst" id="cst" placeholder="Tax" value="<?php //if (isset($data)) { echo $data[0]->cst; } ?>" readonly /> -->
+                                           <div style="display: none">
+                                                <label class="col-md-2 col-sm-2 col-xs-12 control-label">Tax (In %) <span class="asterisk_sign">*</span></label>
+                                                <div class="col-md-4 col-sm-4 col-xs-12">
+                                                    <input type="text" class="form-control" name="tax_per" id="tax_per" placeholder="Tax Percent" value="<?php if (isset($data)) { echo $data[0]->cst; } ?>" readonly />
+                                                    <input type="hidden" class="form-control" name="cgst" id="cgst" placeholder="cgst" value="<?php if (isset($data)) { echo $data[0]->cgst; } ?>" readonly />
+                                                    <input type="hidden" class="form-control" name="sgst" id="sgst" placeholder="sgst" value="<?php if (isset($data)) { echo $data[0]->sgst; } ?>" readonly />
+                                                    <input type="hidden" class="form-control" name="igst" id="igst" placeholder="igst" value="<?php if (isset($data)) { echo $data[0]->igst; } ?>" readonly />
+                                                    <!-- <input type="text" class="form-control" name="cst" id="cst" placeholder="Tax" value="<?php //if (isset($data)) { echo $data[0]->cst; } ?>" readonly /> -->
+                                                </div>
+                                           </div>     
+                                            
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                           <label class="col-md-2 col-sm-2 col-xs-12 control-label">Sales Type <span class="asterisk_sign">*</span></label>
+                                             <div class="col-md-4 col-sm-4 col-xs-12 option-line-height">
+                                                <input type="radio" name="sales_type" class="sales_type" value="Adhoc" id="stype_adhoc" data-error="#err_type" <?php if (isset($data[0]->sales_type)) { if($data[0]->sales_type=='Adhoc') echo 'checked'; } ?>/>&nbsp;&nbsp;Adhoc&nbsp;&nbsp;&nbsp;
+                                                <input type="radio" name="sales_type"  class="sales_type" value="Invoice" id="stype_invoice" data-error="#err_type" <?php if (isset($data[0]->sales_type)) { if($data[0]->sales_type=='Invoice') echo 'checked'; } ?>/>&nbsp;&nbsp;Invoice
+                                                <div id="err_type"></div>
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="form-group" id="invoice_no_div" style="<?php if (isset($data)) { if($data[0]->sales_type=='Invoice'){echo 'display: block'; }else{
+                                        echo 'display: none';
+                                    } }
+                                        else { echo 'display: none'; }
+                                    ?>">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Invoice No. <span class="asterisk_sign"></span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <select name="invoice_no" id="invoice_no" class="form-control">
+                                                    <?php
+                                                     if(isset($invoice_nos))
+                                                     {
+                                                        for ($j=0; $j <count($invoice_nos) ; $j++) { 
+                                                            if($data[0]->invoice_nos==$invoice_nos[$j]->invoice_no)
+                                                            {
+                                                               echo "<option value=".$invoice_nos[$j]->invoice_no." selected>".$invoice_nos[$j]->invoice_no."</option>";
+                                                            }
+                                                            else
+                                                            {
+                                                               echo "<option value=".$invoice_nos[$j]->invoice_no.">".$invoice_nos[$j]->invoice_no."</option>"; 
+                                                            }
+                                                        }
+                                                     }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <!-- <label class="col-md-2 col-sm-2 col-xs-12 control-label">Total Amount (In Rs) <span class="asterisk_sign">*</span></label>
@@ -195,7 +266,7 @@
                                                 <th>Total Amount (In Rs)</th>
                                                 <th style="display:none;">Cost Total Amount (In Rs)</th>
                                                 <th style="width: 100px">Batch</th>
-                                                <th style="text-align:center;" class="print_hide">Action</th>
+                                                <th style="text-align:center;" class="print_hide table_action">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody id="box_details">
@@ -231,6 +302,11 @@
                                                     <input type="text" class="form-control rate" name="rate[]" id="rate_<?php echo $i; ?>" placeholder="Rate" value="<?php if (isset($distributor_in_items)) { echo $distributor_in_items[$i]->rate; } ?>" readonly />
                                                 </td>
                                                 <td>
+                                                    <input type="hidden" class="form-control" name="cgst[]" id="cgst_<?php echo $i; ?>" placeholder="cgst" value="0" readonly />
+                                                    <input type="hidden" class="form-control" name="sgst[]" id="sgst_<?php echo $i; ?>" placeholder="sgst" value="0" readonly />
+                                                    <input type="hidden" class="form-control" name="igst[]" id="igst_<?php echo $i; ?>" placeholder="igst" value="0" readonly />
+                                                    <input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_<?php echo $i; ?>" placeholder="tax_per" value="<?php if (isset($distributor_in_items)) { echo $distributor_in_items[$i]->tax_percentage; } ?>"/>
+                                                    <input type="hidden" class="form-control sell_margin" name="sell_margin[]" id="sell_margin_<?php echo $i; ?>" placeholder="Sell Margin" value="<?php if (isset($distributor_in_items)) { echo $distributor_in_items[$i]->margin_per; } ?>"/>
                                                     <input type="text" class="form-control sell_rate" name="sell_rate[]" id="sell_rate_<?php echo $i; ?>" placeholder="Sell Rate" value="<?php if (isset($distributor_in_items)) { echo $distributor_in_items[$i]->sell_rate; } ?>"/>
                                                 </td>
                                                 <td style="display:none;">
@@ -273,8 +349,19 @@
                                                     <div id="err_batch_no_<?php echo $i;?>"></div>
                                                 </td>
 
-                                                <td style="text-align:center; vertical-align: middle;" class="print_hide">
-                                                    <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>
+                                                <td style="text-align:center; vertical-align: middle;" class="print_hide table_action">
+                                                     <?php  
+                                                        $style = '';
+                                                        if(isset($data[0]->freezed)){
+                                                            if($data[0]->freezed==1){
+                                                                $style =  'display: none;';
+                                                            }
+                                                        }else
+                                                            {
+                                                                 $style =  'display: block;';
+                                                            }
+                                                    ?>
+                                                    <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  style="<?=$style?>"></span></a>
                                                 </td>
                                             </tr>
                                         <?php }} else { ?>
@@ -308,6 +395,12 @@
                                                     <input type="text" class="form-control rate" name="rate[]" id="rate_<?php echo $i; ?>" placeholder="Rate" value="" readonly />
                                                 </td>
                                                 <td>
+                                                    <input type="hidden" class="form-control" name="cgst[]" id="cgst_<?php echo $i; ?>" placeholder="cgst" value="0" readonly />
+                                                    <input type="hidden" class="form-control" name="sgst[]" id="sgst_<?php echo $i; ?>" placeholder="sgst" value="0" readonly />
+                                                    <input type="hidden" class="form-control" name="igst[]" id="igst_<?php echo $i; ?>" placeholder="igst" value="0" readonly />
+                                                    <input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_<?php echo $i; ?>" placeholder="tax_per" value="0"/>
+                                                    <input type="hidden" class="form-control sell_margin" name="sell_margin[]" id="sell_margin_<?php echo $i; ?>" placeholder="Sell Margin" value="0"/>
+                                                    
                                                     <input type="text" class="form-control sell_rate" name="sell_rate[]" id="sell_rate_<?php echo $i; ?>" placeholder="Sell Rate" value=""/>
                                                 </td>
                                                 <td style="display: none;">
@@ -350,8 +443,18 @@
                                                     <div id="err_batch_no_<?php echo $i;?>"></div>
                                                 </td>
 
-                                                <td style="text-align:center; vertical-align: middle;" class="print_hide">
-                                                    <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>
+                                                <td style="text-align:center; vertical-align: middle;" class="print_hide table_action">
+                                                    <?php  
+                                                        if(isset($data[0]->freezed)){
+                                                            if($data[0]->freezed==1){
+                                                                $style =  'display: none;';
+                                                            }
+                                                        }else
+                                                            {
+                                                                 $style =  'display: block;';
+                                                            }
+                                                    ?>
+                                                    <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  style="<?=$style?>"></span></a>
                                                 </td>
                                             </tr>
                                         <?php } ?>
@@ -367,13 +470,9 @@
                                     </div>
 									</div>
 
-
-
-
-
                                     <div class="h-scroll exc_table" style="display:none;">  
-                                        <h2 style="padding:20px;padding-bottom:0px;">Stock Out</h2>
-                                       <div class="table-stripped form-group" style="padding:15px;" >
+                                    <h2 style="padding:20px;padding-bottom:0px;">Stock Out</h2>
+                                    <div class="table-stripped form-group" style="padding:15px;" >
                                         <table class="table table-bordered" style="margin-bottom: 0px; ">
                                         <thead>
                                             <tr>
@@ -392,7 +491,8 @@
                                                 <!-- <th>VAT (In Rs)</th> -->
                                                 <th>Total Amount (In Rs)</th>
                                                 <th style="display: none;">Cost Total Amount (In Rs)</th>
-                                                <th style="text-align:center;" class="print_hide">Action</th>
+                                                <th style="width: 100px">Batch</th>
+                                                <th style="text-align:center;" class="print_hide table_action">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody id="box_details_ex">
@@ -400,7 +500,7 @@
                                                 for($i=0; $i<count($distributor_in_items_ex); $i++) { ?>
                                             <tr id="box_ex_<?php echo $i; ?>_row">
                                                 <td>
-                                                    <select name="type_ex[]" class="form-control type" id="type_ex_<?php echo $i;?>">
+                                                    <select name="type_ex[]" class="form-control type_ex" id="type_ex_<?php echo $i;?>">
                                                         <option value="">Select</option>
                                                         <option value="Bar" <?php if($distributor_in_items_ex[$i]->type=="Bar") { echo 'selected'; } ?>>Bar</option>
                                                         <option value="Box" <?php if($distributor_in_items_ex[$i]->type=="Box") { echo 'selected'; } ?>>Box</option>
@@ -428,6 +528,12 @@
                                                     <input type="text" class="form-control rate_ex" name="rate_ex[]" id="rate_ex_<?php echo $i; ?>" placeholder="Rate" value="<?php if (isset($distributor_in_items_ex)) { echo $distributor_in_items_ex[$i]->rate; } ?>" readonly />
                                                 </td>
                                                 <td>
+                                                     <input type="hidden" class="form-control" name="cgst[]" id="cgst_ex_<?php echo $i; ?>" placeholder="cgst" value="0" readonly />
+                                                    <input type="hidden" class="form-control" name="sgst[]" id="sgst_ex_<?php echo $i; ?>" placeholder="sgst" value="0" readonly />
+                                                    <input type="hidden" class="form-control" name="igst[]" id="igst_ex_<?php echo $i; ?>" placeholder="igst" value="0" readonly />
+                                                    <input type="hidden" class="form-control tax_per" name="tax_per_ex[]" id="tax_per_ex_<?php echo $i; ?>" placeholder="tax_per" value="<?php if (isset($distributor_in_items_ex)) { echo $distributor_in_items_ex[$i]->tax_percentage; } ?>"/>
+                                                    <input type="hidden" class="form-control sell_margin" name="sell_margin_ex[]" id="sell_margin_ex_<?php echo $i; ?>" placeholder="Sell Margin" value="<?php if (isset($distributor_in_items_ex)) { echo $distributor_in_items_ex[$i]->margin_per; } ?>"/>
+
                                                     <input type="text" class="form-control sell_rate_ex" name="sell_rate_ex[]" id="sell_rate_ex_<?php echo $i; ?>" placeholder="Sell Rate" value="<?php if (isset($distributor_in_items_ex)) { echo $distributor_in_items_ex[$i]->sell_rate; } ?>"/>
                                                 </td>
                                                 <td style="display: none;">
@@ -460,9 +566,29 @@
                                                 <td style="display: none;">
                                                     <input type="text" class="form-control cost_total_amt_ex" name="cost_total_amt_ex[]" id="cost_total_amt_ex_<?php echo $i; ?>" placeholder="Total Amount" value="<?php if (isset($distributor_in_items_ex)) { echo $distributor_in_items_ex[$i]->cost_amount; } ?>" readonly />
                                                 </td>
+                                                 <td>
+                                                    <select name="batch_no_ex[]" class="form-control batch_no_ex" id="batch_no_ex_<?php echo $i;?>" data-error="#err_batch_no_<?php echo $i;?>">
+                                                        <option value="">Select</option>
+                                                        <?php if(isset($batch)) { for ($k=0; $k < count($batch); $k++) { ?>
+                                                                <option value="<?php echo $batch[$k]->id; ?>" <?php if($batch[$k]->id==$distributor_in_items_ex[$i]->batch_no_ex) { echo 'selected'; } ?>><?php echo $batch[$k]->batch_no; ?></option>
+                                                        <?php }} ?>
+                                                    </select>
+                                                    <div id="err_batch_no_<?php echo $i;?>"></div>
+                                                </td>
 
-                                                <td style="text-align:center; vertical-align: middle;" class="print_hide">
-                                                    <a id="box_ex_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>
+                                                <td style="text-align:center; vertical-align: middle;" class="print_hide table_action">
+                                                    <?php  
+                                                        $style = '';
+                                                        if(isset($data[0]->freezed)){
+                                                            if($data[0]->freezed==1){
+                                                                $style =  'display: none;';
+                                                            }
+                                                        }else
+                                                            {
+                                                                 $style =  'display: block;';
+                                                            }
+                                                    ?>
+                                                    <a id="box_ex_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  style="<?=$style?>"></span></a>
                                                 </td>
                                             </tr>
                                         <?php }} else { ?>
@@ -496,6 +622,11 @@
                                                     <input type="text" class="form-control rate_ex" name="rate_ex[]" id="rate_ex_<?php echo $i; ?>" placeholder="Rate" value="" readonly />
                                                 </td>
                                                 <td>
+                                                    <input type="hidden" class="form-control" name="cgst[]" id="cgst_ex_<?php echo $i; ?>" placeholder="cgst" value="0" readonly />
+                                                    <input type="hidden" class="form-control" name="sgst[]" id="sgst_ex_<?php echo $i; ?>" placeholder="sgst" value="0" readonly />
+                                                    <input type="hidden" class="form-control" name="igst[]" id="igst_ex_<?php echo $i; ?>" placeholder="igst" value="0" readonly />
+                                                    <input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_ex_<?php echo $i; ?>" placeholder="tax_per" value="0"/>
+                                                    <input type="hidden" class="form-control sell_margin" name="sell_margin_ex[]" id="sell_margin_ex_<?php echo $i; ?>" placeholder="Sell Margin" value="0"/>
                                                     <input type="text" class="form-control sell_rate_ex" name="sell_rate_ex[]" id="sell_rate_ex_<?php echo $i; ?>" placeholder="Sell Rate" value=""/>
                                                 </td>
                                                 <td style="display: none;">
@@ -528,8 +659,28 @@
                                                 <td style="display: none;">
                                                     <input type="text" class="form-control cost_total_amt_ex" name="cost_total_amt_ex[]" id="cost_total_amt_ex_<?php echo $i; ?>" placeholder="Total Amount" value="" readonly />
                                                 </td>
-                                                <td style="text-align:center; vertical-align: middle;" class="print_hide">
-                                                    <a id="box_ex_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>
+                                                <td>
+                                                    <select name="batch_no_ex[]" class="form-control batch_no_ex" id="batch_no_ex_<?php echo $i;?>" data-error="#err_batch_no_<?php echo $i;?>">
+                                                        <option value="">Select</option>
+                                                        <?php if(isset($batch)) { for ($k=0; $k < count($batch); $k++) { ?>
+                                                                <option value="<?php echo $batch[$k]->id; ?>"><?php echo $batch[$k]->batch_no; ?></option>
+                                                        <?php }} ?>
+                                                    </select>
+                                                    <div id="err_batch_no_<?php echo $i;?>"></div>
+                                                </td>
+                                                <td style="text-align:center; vertical-align: middle;" class="print_hide table_action">
+                                                    <?php  
+                                                            $style = '';
+                                                            if(isset($data[0]->freezed)){
+                                                                if($data[0]->freezed==1){
+                                                                    $style =  'display: none;';
+                                                                }
+                                                            }else
+                                                            {
+                                                                 $style =  'display: block;';
+                                                            }
+                                                        ?>
+                                                    <a id="box_ex_<?php echo $i; ?>_row_delete" class="delete_row" href="#" style="<?=$style?>"><span class="fa trash fa-trash-o"  ></span></a>
                                                 </td>
                                             </tr>
                                         <?php } ?>
@@ -545,7 +696,15 @@
                                     </div>
                                     </div>
 
-
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                          
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Round Off <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="round_off_amount" id="round_off_amount" placeholder="Round Off Amount" value="<?php if (isset($data)) { echo $data[0]->round_off_amount; } ?>" readonly />
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <!-- <label class="col-md-2 col-sm-2 col-xs-12 control-label">Total Amount (In Rs) <span class="asterisk_sign">*</span></label>
@@ -603,10 +762,23 @@
                                 <?php $curusr=$this->session->userdata('session_id'); ?>
                                 <div class="panel-footer print_hide">
                                     <a href="<?php echo base_url(); ?>index.php/distributor_in" class="btn btn-danger btn-sm pull-right" type="reset" id="reset">Cancel</a>
-                                    <input type="submit" class="btn btn-success btn-sm" id="btn_submit" name="btn_submit" value="Submit For Approval" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_edit=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || $data[0]->status=='InActive')) echo ''; else echo 'display: none;';} else if($access[0]->r_insert=='1') echo ''; else echo 'display: none;';} else echo 'display: none;'; ?>" />
-                                    <input type="submit" class="btn btn-danger btn-sm" id="btn_delete" name="btn_delete" value="Delete" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_delete=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved') && $data[0]->status!='InActive') echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
-                                    <input type="submit" class="btn btn-success btn-sm" id="btn_approve" name="btn_approve" value="Approve" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
-                                    <input type="submit" class="btn btn-danger btn-sm" id="btn_reject" name="btn_reject" value="Reject" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+
+                                   <input type="submit" class="btn btn-success btn-sm" id="btn_submit" name="btn_submit" value="Submit For Approval" style="<?php if(isset($access)) {
+                                    if(isset($data)) {
+                                        if($data[0]->freezed)
+                                            {
+                                                echo 'display: none;';
+                                            }else
+                                            {
+                                              if($access[0]->r_edit=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || $data[0]->status=='InActive')) echo ''; else echo 'display: none;';
+                                            }
+                                        
+                                        } else if($access[0]->r_insert=='1') echo ''; else echo 'display: none;';} else echo 'display: none;'; 
+                                    ?>" />
+                                    <input type="submit" class="btn btn-danger btn-sm" id="btn_delete" name="btn_delete" value="Delete" style="<?php if(isset($access)) {if(isset($data) && $data[0]->freezed!=1) {if($access[0]->r_delete=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved') && $data[0]->status!='InActive') echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+                                    <input type="submit" class="btn btn-success btn-sm" id="btn_approve" name="btn_approve" value="Approve" style="<?php if(isset($access)) {if(isset($data) && $data[0]->freezed!=1) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+                                    <input type="submit" class="btn btn-danger btn-sm" id="btn_reject" name="btn_reject" value="Reject" style="<?php if(isset($access)) {if(isset($data) && $data[0]->freezed!=1) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+                                    
                                 </div>
 							</form>
 							
@@ -627,98 +799,6 @@
         <script type="text/javascript" src="<?php echo base_url(); ?>js/load_autocomplete.js"></script>
         <script type="text/javascript" src="<?php echo base_url(); ?>js/validations.js"></script>
         <script type="text/javascript">
-            $(document).ready(function(){
-                if(!$('#btn_submit').is(':visible')){
-                    // $("input[type!='hidden']").attr("disabled", true);
-                    $('input[type="text"').attr("readonly", true);
-                    $('input[type="checkbox"]').attr("disabled", true);
-                    $("select:visible").attr("disabled", true);
-                    $("textarea").attr("disabled", true);
-
-                    $("#btn_approve").attr("disabled", false);
-                    $("#btn_reject").attr("disabled", false);
-                    $("#remarks").attr("disabled", false);
-                } else {
-                    $(".datepicker1").datepicker({ maxDate: 0,changeMonth: true,yearRange:'-100:+0',changeYear: true });
-                }
-
-                $(".type").change(function(){
-                    show_item($(this));
-                });
-                $(".type_ex").change(function(){
-                    show_item_ex($(this));
-                });
-                $(".bar").change(function(){
-                    get_bar_details($(this));
-                });
-                $(".bar_ex").change(function(){
-                    get_bar_details_ex($(this));
-                });
-                $(".box").change(function(){
-                    get_box_details($(this));
-                });
-                $(".box_ex").change(function(){
-                    get_box_details_ex($(this));
-                });
-                $(".qty").blur(function(){
-                    get_amount($(this));
-                });
-                $(".qty_ex").blur(function(){
-                    get_amount_ex($(this));
-                });
-                $(".sell_rate").blur(function(){
-                    get_amount($(this));
-                });
-                $(".sell_rate_ex").blur(function(){
-                    get_amount_ex($(this));
-                });
-                $('.delete_row').click(function(event){
-                    delete_row($(this));
-                    get_total();
-                });
-                // $('#distributor_id').click(function(event){
-                //     get_distributor_details();
-                // });
-                $('#distributor_id').on('change', function(event){
-                    get_distributor_details($('#distributor_id').val());
-                });
-                $('#depot_id').on('change', function(event){
-                    get_depot_details($('#depot_id').val());
-                    get_distributor_details($('#distributor_id').val());
-                });
-                $('input[type=radio][name=tax]').on('change', function() {
-                    switch($(this).val()) {
-                        case 'gst':
-                            $('#tax_per').val(5);
-                            break;
-                        case 'vat':
-                            $('#cst').val(6);
-                            break;
-                        case 'cst':
-                            $('#cst').val(2);
-                            break;
-                    }
-
-                    get_sell_rate();
-                });
-                
-                
-                addMultiInputNamingRules('#form_distributor_in_details', 'select[name="type[]"]', { required: true }, "");
-                addMultiInputNamingRules('#form_distributor_in_details', 'select[name="bar[]"]', { required: true }, "");
-                addMultiInputNamingRules('#form_distributor_in_details', 'select[name="box[]"]', { required: true }, "");
-                addMultiInputNamingRules('#form_distributor_in_details', 'input[name="qty[]"]', { required: true }, "");
-                addMultiInputNamingRules('#form_distributor_in_details', 'input[name="sell_rate[]"]', { required: true }, "");
-                addMultiInputNamingRules('#form_distributor_in_details', 'input[name="batch_no[]"]', { required: true }, "");
-
-                addMultiInputNamingRules('#form_distributor_in_details', 'select[name="type_ex[]"]', { required: true }, "");
-                addMultiInputNamingRules('#form_distributor_in_details', 'select[name="bar_ex[]"]', { required: true }, "");
-                addMultiInputNamingRules('#form_distributor_in_details', 'select[name="box_ex[]"]', { required: true }, "");
-                addMultiInputNamingRules('#form_distributor_in_details', 'input[name="qty_ex[]"]', { required: true }, "");
-                addMultiInputNamingRules('#form_distributor_in_details', 'input[name="sell_rate_ex[]"]', { required: true }, "");
-
-                get_distributor_details($('#distributor_id').val());
-            });
-
             function show_item(elem){
                 var id = elem.attr('id');
                 var index = id.substr(id.lastIndexOf('_')+1);
@@ -845,14 +925,13 @@
             }
 
             function get_sell_rate(){
-                var tax_per = parseFloat(get_number($("#tax_per").val(),2));
+                /*var tax_per = parseFloat(get_number($("#tax_per").val(),2));*/
                 var depot_state = $("#depot_state").val();
                 var state = $("#state").val();
-
                 // console.log(depot_state);
                 // console.log(state);
 
-                var cgst = 0;
+                /*var cgst = 0;
                 var sgst = 0;
                 var igst = 0;
                 if(depot_state==state){
@@ -863,20 +942,35 @@
                 }
                 $("#cgst").val(cgst);
                 $("#sgst").val(sgst);
-                $("#igst").val(igst);
+                $("#igst").val(igst);*/
 
                 $('.rate').each(function(){
                     var elem = $(this);
                     var id = elem.attr('id');
                     var index = id.substr(id.lastIndexOf('_')+1);
-                    var sell_out = parseFloat(get_number($("#sell_out").val(),2));
+                    var sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
                     var qty = parseFloat(get_number($("#qty_"+index).val(),2));
                     var rate = parseFloat(get_number($("#rate_"+index).val(),2));
+                    var cgst = 0;
+                    var sgst = 0;
+                    var igst = 0;
+                    var tax_per = parseFloat(get_number($("#tax_per_"+index).val(),2));
+                   
+                    if(depot_state==state){
+                        cgst = parseFloat(tax_per/2,2);
+                        sgst = parseFloat(tax_per/2,2);
+                    } else {
+                        igst = tax_per;
+                    }
+                    $("#cgst_"+index).val(cgst);
+                    $("#sgst_"+index).val(sgst);
+                    $("#igst_"+index).val(igst);
+
 
                     if (isNaN(qty)) qty=0;
                     if (isNaN(rate)) rate=0;
                     if (isNaN(sell_out)) sell_out=0;
-
+                   
                     // var cst = parseFloat(get_number($("#cst").val(),2));
                     // var sell_rate = rate-((rate*sell_out)/100);
                     // sell_rate = sell_rate/(100+cst)*100;
@@ -886,6 +980,7 @@
 
                     var sell_rate = rate-((rate*sell_out)/100);
                     sell_rate = sell_rate/(100+tax_per)*100;
+
                     if (isNaN(sell_rate)) sell_rate=0;
 
                     if (isNaN(cgst)) cgst=0;
@@ -923,10 +1018,10 @@
             }
 
             function get_sell_rate_ex(){
-                var tax_per = parseFloat(get_number($("#tax_per").val(),2));
+                /*var tax_per = parseFloat(get_number($("#tax_per").val(),2));*/
                 var depot_state = $("#depot_state").val();
                 var state = $("#state").val();
-                var cgst = 0;
+               /* var cgst = 0;
                 var sgst = 0;
                 var igst = 0;
                 if(depot_state==state){
@@ -937,15 +1032,28 @@
                 }
                 $("#cgst").val(cgst);
                 $("#sgst").val(sgst);
-                $("#igst").val(igst);
+                $("#igst").val(igst);*/
 
-                $('.rate').each(function(){
+                $('.rate_ex').each(function(){
                     var elem = $(this);
                     var id = elem.attr('id');
                     var index = id.substr(id.lastIndexOf('_')+1);
-                    var sell_out = parseFloat(get_number($("#sell_out").val(),2));
+                    var sell_out = parseFloat(get_number($("#sell_margin_ex_"+index).val(),2));
                     var qty = parseFloat(get_number($("#qty_ex_"+index).val(),2));
                     var rate = parseFloat(get_number($("#rate_ex_"+index).val(),2));
+                    var cgst = 0;
+                    var sgst = 0;
+                    var igst = 0;
+                    var tax_per = parseFloat(get_number($("#tax_per_ex_"+index).val(),2));
+                    if(depot_state==state){
+                        cgst = parseFloat(tax_per/2,2);
+                        sgst = parseFloat(tax_per/2,2);
+                    } else {
+                        igst = tax_per;
+                    }
+                    $("#cgst_ex_"+index).val(cgst);
+                    $("#sgst_ex_"+index).val(sgst);
+                    $("#igst_ex_"+index).val(igst);  
 
                     if (isNaN(qty)) qty=0;
                     if (isNaN(rate)) rate=0;
@@ -1001,7 +1109,7 @@
                 var id = elem.attr('id');
                 var index = id.substr(id.lastIndexOf('_')+1);
                 var qty = parseFloat(get_number($("#qty_"+index).val(),2));
-                var sell_out = parseFloat(get_number($("#sell_out").val(),2));
+                var sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
                 if (isNaN(sell_out)) sell_out=0;
                 var grams_in_bar = 0;
                 var rate = 0;
@@ -1037,10 +1145,10 @@
                 // var sell_rate = rate-((rate*sell_out)/100);
                 // sell_rate = sell_rate/(100+cst)*100;
 
-                var tax_per = parseFloat(get_number($("#tax_per").val(),2));
-                var cgst = $("#cgst").val();
-                var sgst = $("#sgst").val();
-                var igst = $("#igst").val();
+                var tax_per = parseFloat(get_number($("#tax_per_"+index).val(),2));
+                var cgst = $("#cgst_"+index).val();
+                var sgst = $("#sgst_"+index).val();
+                var igst = $("#igst_"+index).val();
 
                 var sell_rate = rate-((rate*sell_out)/100);
                 sell_rate = sell_rate/(100+tax_per)*100;
@@ -1085,7 +1193,7 @@
                 var id = elem.attr('id');
                 var index = id.substr(id.lastIndexOf('_')+1);
                 var qty = parseFloat(get_number($("#qty_ex_"+index).val(),2));
-                var sell_out = parseFloat(get_number($("#sell_out").val(),2));
+                var sell_out = parseFloat(get_number($("#sell_margin_ex_"+index).val(),2));
                 if (isNaN(sell_out)) sell_out=0;
                 var grams_in_bar = 0;
                 var rate = 0;
@@ -1120,10 +1228,10 @@
                 // var sell_rate = rate-((rate*sell_out)/100);
                 // sell_rate = sell_rate/(100+cst)*100;
 
-                var tax_per = parseFloat(get_number($("#tax_per").val(),2));
-                var cgst = $("#cgst").val();
-                var sgst = $("#sgst").val();
-                var igst = $("#igst").val();
+                var tax_per = parseFloat(get_number($("#tax_per_ex_"+index).val(),2));
+                var cgst = $("#cgst_ex_"+index).val();
+                var sgst = $("#sgst_ex_"+index).val();
+                var igst = $("#igst_ex_"+index).val();
 
                 var sell_rate = rate-((rate*sell_out)/100);
                 sell_rate = sell_rate/(100+tax_per)*100;
@@ -1168,7 +1276,7 @@
                 var id = elem.attr('id');
                 var index = id.substr(id.lastIndexOf('_')+1);
                 var qty = parseFloat(get_number($("#qty_"+index).val(),2));
-                var sell_out = parseFloat(get_number($("#sell_out").val(),2));
+                var sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
                 if (isNaN(sell_out)) sell_out=0;
                 var grams_in_bar = 0;
                 var rate = 0;
@@ -1203,10 +1311,10 @@
                 // var sell_rate = rate-((rate*sell_out)/100);
                 // sell_rate = sell_rate/(100+cst)*100;
 
-                var tax_per = parseFloat(get_number($("#tax_per").val(),2));
-                var cgst = $("#cgst").val();
-                var sgst = $("#sgst").val();
-                var igst = $("#igst").val();
+                var tax_per = parseFloat(get_number($("#tax_per_"+index).val(),2));
+                var cgst = $("#cgst_"+index).val();
+                var sgst = $("#sgst_"+index).val();
+                var igst = $("#igst_"+index).val();
 
                 var sell_rate = rate-((rate*sell_out)/100);
                 sell_rate = sell_rate/(100+tax_per)*100;
@@ -1246,12 +1354,156 @@
                 get_total();
             }
 
+            function get_product_detail(elem) {
+                /*alert('entered');*/
+                var box_id = elem.val();
+                var id = elem.attr('id');
+                var index = id.substr(id.lastIndexOf('_')+1);
+                var box = box_id;
+                var distributor_id = $("#distributor_id").val();  
+                if(distributor_id!="")
+                {
+                  $.ajax({
+                    url:BASE_URL+'index.php/Distributor_in/get_product_percentage/'+box+'/'+distributor_id,
+                    method:"GET",
+                    dataType:"json",
+                    async:false,
+                    success: function(data){
+                        if(data!=0)
+                        {
+                            var obj = data;
+                            var margin = parseFloat(obj.margin);
+                            /*alert(margin);*/
+                            $('#sell_margin_'+index).val(margin);
+                            var tax_percentage = parseFloat(obj.tax_percentage);
+                            $('#tax_per_'+index).val(tax_percentage); 
+                        }
+                        
+                    },
+                    error: function (response) {
+                        var r = jQuery.parseJSON(response.responseText);
+                        alert("Message: " + r.Message);
+                        alert("StackTrace: " + r.StackTrace);
+                        alert("ExceptionType: " + r.ExceptionType);
+                    }
+                });  
+                }  
+            }
+
+            function get_product_box_detail(elem) {
+                /*alert('entered');*/
+                var box_id = elem.val();
+                var id = elem.attr('id');
+                var index = id.substr(id.lastIndexOf('_')+1);
+                var box = box_id;
+                var distributor_id = $("#distributor_id").val();  
+                if(distributor_id!="")
+                {
+                  $.ajax({
+                    url:BASE_URL+'index.php/Distributor_in/get_box_percentage/'+box+'/'+distributor_id,
+                    method:"GET",
+                    dataType:"json",
+                    async:false,
+                    success: function(data){
+                        if(data!=0)
+                        {
+                            var obj = data;
+                            var margin = parseFloat(obj.margin);
+                            /*alert(margin);*/
+                            $('#sell_margin_'+index).val(margin);
+                            var tax_percentage = parseFloat(obj.tax_percentage);
+                            $('#tax_per_'+index).val(tax_percentage); 
+                        }
+                        
+                    },
+                    error: function (response) {
+                        var r = jQuery.parseJSON(response.responseText);
+                        alert("Message: " + r.Message);
+                        alert("StackTrace: " + r.StackTrace);
+                        alert("ExceptionType: " + r.ExceptionType);
+                    }
+                });  
+                }  
+            }
+
+            function get_product_detail_ex(elem) {
+                /*alert('entered');*/
+                var box_id = elem.val();
+                var id = elem.attr('id');
+                var index = id.substr(id.lastIndexOf('_')+1);
+                var box = box_id;
+                var distributor_id = $("#distributor_id").val();  
+                if(distributor_id!="")
+                {
+                  $.ajax({
+                    url:BASE_URL+'index.php/Distributor_in/get_product_percentage/'+box+'/'+distributor_id,
+                    method:"GET",
+                    dataType:"json",
+                    async:false,
+                    success: function(data){
+                        if(data!=0)
+                        {
+                            var obj = data;
+                            var margin = parseFloat(obj.margin);
+                            /*alert(margin);*/
+                            $('#sell_margin_ex_'+index).val(margin);
+                            var tax_percentage = parseFloat(obj.tax_percentage);
+                            $('#tax_per_ex_'+index).val(tax_percentage);  
+                        }
+                        
+                    },
+                    error: function (response) {
+                        var r = jQuery.parseJSON(response.responseText);
+                        alert("Message: " + r.Message);
+                        alert("StackTrace: " + r.StackTrace);
+                        alert("ExceptionType: " + r.ExceptionType);
+                    }
+                });  
+                }  
+            }
+
+            function get_product_box_detail_ex(elem) {
+                /*alert('entered');*/
+                var box_id = elem.val();
+                var id = elem.attr('id');
+                var index = id.substr(id.lastIndexOf('_')+1);
+                var box = box_id;
+                var distributor_id = $("#distributor_id").val();  
+                if(distributor_id!="")
+                {
+                  $.ajax({
+                    url:BASE_URL+'index.php/Distributor_in/get_box_percentage/'+box+'/'+distributor_id,
+                    method:"GET",
+                    dataType:"json",
+                    async:false,
+                    success: function(data){
+                        if(data!=0)
+                        {
+                            var obj = data;
+                            var margin = parseFloat(obj.margin);
+                            /*alert(margin);*/
+                            $('#sell_margin_ex_'+index).val(margin);
+                            var tax_percentage = parseFloat(obj.tax_percentage);
+                            $('#tax_per_ex_'+index).val(tax_percentage);  
+                        }
+                        
+                    },
+                    error: function (response) {
+                        var r = jQuery.parseJSON(response.responseText);
+                        alert("Message: " + r.Message);
+                        alert("StackTrace: " + r.StackTrace);
+                        alert("ExceptionType: " + r.ExceptionType);
+                    }
+                });  
+                }  
+            }
+
             function get_box_details_ex(elem){
                 var box_id = elem.val();
                 var id = elem.attr('id');
                 var index = id.substr(id.lastIndexOf('_')+1);
                 var qty = parseFloat(get_number($("#qty_ex_"+index).val(),2));
-                var sell_out = parseFloat(get_number($("#sell_out").val(),2));
+                var sell_out = parseFloat(get_number($("#sell_margin_ex_"+index).val(),2));
                 if (isNaN(sell_out)) sell_out=0;
                 var grams_in_bar = 0;
                 var rate = 0;
@@ -1286,10 +1538,10 @@
                 // var sell_rate = rate-((rate*sell_out)/100);
                 // sell_rate = sell_rate/(100+cst)*100;
 
-                var tax_per = parseFloat(get_number($("#tax_per").val(),2));
-                var cgst = $("#cgst").val();
-                var sgst = $("#sgst").val();
-                var igst = $("#igst").val();
+                var tax_per = parseFloat(get_number($("#tax_per_"+index).val(),2));
+                var cgst = $("#cgst_ex_"+index).val();
+                var sgst = $("#sgst_ex_"+index).val();
+                var igst = $("#igst_ex_"+index).val();
 
                 var sell_rate = rate-((rate*sell_out)/100);
                 sell_rate = sell_rate/(100+tax_per)*100;
@@ -1349,10 +1601,10 @@
 
                 // $("#cost_total_amt_"+index).val((cost_amount).toFixed(2));
 
-                var tax_per = parseFloat(get_number($("#tax_per").val(),2));
-                var cgst = parseFloat(get_number($("#cgst").val(),2));
-                var sgst = parseFloat(get_number($("#sgst").val(),2));
-                var igst = parseFloat(get_number($("#igst").val(),2));
+                var tax_per = parseFloat(get_number($("#tax_per_"+index).val(),2));
+                var cgst = parseFloat(get_number($("#cgst_"+index).val(),2));
+                var sgst = parseFloat(get_number($("#sgst_"+index).val(),2));
+                var igst = parseFloat(get_number($("#igst_"+index).val(),2));
                 var amount = qty*sell_rate;
                 var cost_amount = qty*cost_rate;
                 var cgst_amt = parseFloat((amount*cgst)/100);
@@ -1395,10 +1647,10 @@
 
                 // $("#cost_total_amt_ex_"+index).val((cost_amount).toFixed(2));
 
-                var tax_per = parseFloat(get_number($("#tax_per").val(),2));
-                var cgst = parseFloat(get_number($("#cgst").val(),2));
-                var sgst = parseFloat(get_number($("#sgst").val(),2));
-                var igst = parseFloat(get_number($("#igst").val(),2));
+                var tax_per = parseFloat(get_number($("#tax_per_ex_"+index).val(),2));
+                var cgst = parseFloat(get_number($("#cgst_ex_"+index).val(),2));
+                var sgst = parseFloat(get_number($("#sgst_ex_"+index).val(),2));
+                var igst = parseFloat(get_number($("#igst_ex_"+index).val(),2));
                 var amount = qty*sell_rate;
                 var cost_amount = qty*cost_rate;
                 var cgst_amt = parseFloat((amount*cgst)/100);
@@ -1505,6 +1757,11 @@
                 // $("#tax_amount").val(Math.round(vat_amt*100)/100);
                 // $("#final_amount").val(Math.round(tot_amt*100)/100);
                 // $("#cost_final_amount").val(Math.round(cost_tot_amt*100)/100);
+
+                var round_off_amt = final_amt.toFixed(0) - final_amt.toFixed(2);
+
+                $("#round_off_amount").val(round_off_amt.toFixed(2));
+                $("#round_off_amount").val(round_off_amt.toFixed(2));
 
                 $("#total_amount").val(total_amount.toFixed(2));
                 $("#cgst_amount").val(cgst_amt.toFixed(2));
@@ -1680,12 +1937,12 @@
                 });
                 $.each($('.tax_amt'), function(i, item) {
                     var amount =  $('#amount_'+i).val();
-                    var tax_per = parseFloat($('#tax_per').val());
-                    var cgst = parseFloat($('#cgst').val());
+                    var tax_per = parseFloat($('#tax_per_'+i).val());
+                    var cgst = parseFloat($('#cgst_'+i).val());
                     var cgst_amt = parseFloat(amount*cgst/100);
-                    var sgst = parseFloat($('#sgst').val());
+                    var sgst = parseFloat($('#sgst_'+i).val());
                     var sgst_amt = parseFloat(amount*sgst/100);
-                    var igst = parseFloat($('#igst').val());
+                    var igst = parseFloat($('#igst_'+i).val());
                     var igst_amt = parseFloat(amount*igst/100);
                     var tax_amt = parseFloat(amount*tax_per/100);
                     // var tax_amt = cgst_amt+sgst_amt+igst_amt;
@@ -1741,7 +1998,7 @@
 
                 $.each($('.cgst_amt_ex'), function(i, item) {
                     var amount =  $('#amount_ex_'+i).val();
-                    var cgst = parseFloat($('#cgst').val());
+                    var cgst = parseFloat($('#cgst_'+i).val());
                     var cgst_amt = parseFloat(amount*cgst/100);
                     if(cgst_amt==0 || isNaN(cgst_amt)) {
                         $('#cgst_amt_ex_'+i).val(0);    
@@ -1753,7 +2010,7 @@
                 });
                 $.each($('.sgst_amt_ex'), function(i, item) {
                     var amount =  $('#amount_ex_'+i).val();
-                    var sgst = parseFloat($('#sgst').val());
+                    var sgst = parseFloat($('#sgst_'+i).val());
                     var sgst_amt = parseFloat(amount*sgst/100);
                     if(sgst_amt==0 || isNaN(sgst_amt)) {
                         $('#sgst_amt_ex_'+i).val(0);    
@@ -1765,7 +2022,7 @@
                 });
                 $.each($('.igst_amt_ex'), function(i, item) {
                     var amount =  $('#amount_ex_'+i).val();
-                    var igst = parseFloat($('#igst').val());
+                    var igst = parseFloat($('#igst_'+i).val());
                     var igst_amt = parseFloat(amount*igst/100);
                     if(igst_amt==0 || isNaN(igst_amt)) {
                         $('#igst_amt_ex_'+i).val(0);    
@@ -1777,12 +2034,12 @@
                 });
                 $.each($('.tax_amt_ex'), function(i, item) {
                     var amount =  $('#amount_ex_'+i).val();
-                    var tax_per = parseFloat($('#tax_per').val());
-                    var cgst = parseFloat($('#cgst').val());
+                    var tax_per = parseFloat($('#tax_per_'+i).val());
+                    var cgst = parseFloat($('#cgst_'+i).val());
                     var cgst_amt = parseFloat(amount*cgst/100);
-                    var sgst = parseFloat($('#sgst').val());
+                    var sgst = parseFloat($('#sgst_'+i).val());
                     var sgst_amt = parseFloat(amount*sgst/100);
-                    var igst = parseFloat($('#igst').val());
+                    var igst = parseFloat($('#igst_'+i).val());
                     var igst_amt = parseFloat(amount*igst/100);
                     var tax_amt = parseFloat(amount*tax_per/100);
                     // var tax_amt = cgst_amt+sgst_amt+igst_amt;
@@ -1875,7 +2132,7 @@
                                             '<td style="text-align:center;">' + 
                                                 '&nbsp;' + 
                                             '</td>' + 
-                                            '<td style="text-align:center;" class="print_hide">' + 
+                                            '<td style="text-align:center;" class="print_hide table_action">' + 
                                                 '&nbsp;' + 
                                             '</td>' + 
                                         '</tr>');
@@ -1925,7 +2182,7 @@
                                             '<td style="display: none;">' + 
                                                 '<input type="text" class="form-control" name="cost_final_amount_ex" id="cost_final_amount_ex" placeholder="Cost Final Amount" value="<?php if(isset($data)) { echo $data[0]->final_cost_amount; } ?>" readonly />' + 
                                             '</td>' + 
-                                            '<td style="text-align:center;" class="print_hide">' + 
+                                            '<td style="text-align:center;" class="print_hide table_action">' + 
                                                 '&nbsp;' + 
                                             '</td>' + 
                                         '</tr>');
@@ -1963,6 +2220,12 @@
                                                 '<input type="text" class="form-control rate" name="rate[]" id="rate_'+counter+'" placeholder="Rate" value="" readonly />' + 
                                             '</td>' + 
                                             '<td>' + 
+                                                '<input type="hidden" class="form-control" name="cgst[]" id="cgst_'+counter+'" placeholder="cgst" value="0" readonly />' + 
+                                                '<input type="hidden" class="form-control" name="sgst[]" id="sgst_'+counter+'" placeholder="sgst" value="0" readonly />' + 
+                                                '<input type="hidden" class="form-control" name="igst[]" id="igst_'+counter+'" placeholder="igst" value="0" readonly />' + 
+                                                '<input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_'+counter+'" placeholder="tax_per" value="0"/>' + 
+                                                '<input type="hidden" class="form-control sell_margin" name="sell_margin[]" id="sell_margin_'+counter+'" placeholder="Sell Margin" value="0"/>' + 
+                                                
                                                 '<input type="text" class="form-control sell_rate" name="sell_rate[]" id="sell_rate_'+counter+'" placeholder="Sell Rate" value=""/>' + 
                                             '</td>' + 
                                             '<td style="display: none;">' + 
@@ -2004,7 +2267,7 @@
                                                 '</select>' + 
                                                 '<div id="err_batch_no_'+counter+'"></div>' + 
                                             '</td>' + 
-                                            '<td style="text-align:center;" class="print_hide">' + 
+                                            '<td style="text-align:center;" class="print_hide table_action">' + 
                                                 '<a id="box_'+counter+'_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>' + 
                                             '</td>' + 
                                         '</tr>');
@@ -2018,9 +2281,13 @@
                     });
                     $(".bar").change(function(){
                         get_bar_details($(this));
+                        get_product_detail($(this));
+                        get_sell_rate();
                     });
                     $(".box").change(function(){
                         get_box_details($(this));
+                        get_product_box_detail($(this));
+                        get_sell_rate();
                     });
                     $(".qty").blur(function(){
                         get_amount($(this));
@@ -2069,7 +2336,13 @@
                                             '<td class="print_hide">' + 
                                                 '<input type="text" class="form-control rate_ex" name="rate_ex[]" id="rate_ex_'+counter+'" placeholder="Rate" value="" readonly />' + 
                                             '</td>' + 
-                                            '<td>' + 
+                                            '<td>' +
+                                                '<input type="hidden" class="form-control" name="cgst[]" id="cgst_ex_'+counter+'" placeholder="cgst" value="0" readonly />' + 
+                                                '<input type="hidden" class="form-control" name="sgst[]" id="sgst_ex_'+counter+'" placeholder="sgst" value="0" readonly />' + 
+                                                '<input type="hidden" class="form-control" name="igst[]" id="igst_ex_'+counter+'" placeholder="igst" value="0" readonly />' + 
+                                                '<input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_ex_'+counter+'" placeholder="tax_per" value="0"/>' + 
+                                                '<input type="hidden" class="form-control sell_margin" name="sell_margin[]" id="sell_margin_ex_'+counter+'" placeholder="Sell Margin" value="0"/>' + 
+                                                 
                                                 '<input type="text" class="form-control sell_rate_ex" name="sell_rate_ex[]" id="sell_rate_ex_'+counter+'" placeholder="Sell Rate" value=""/>' + 
                                             '</td>' + 
                                             '<td style="display: none;">' + 
@@ -2102,7 +2375,16 @@
                                             '<td style="display: none;">' + 
                                                 '<input type="text" class="form-control cost_total_amt_ex" name="cost_total_amt_ex[]" id="cost_total_amt_ex_'+counter+'" placeholder="Cost Total Amount" value="" readonly />' + 
                                             '</td>' + 
-                                            '<td style="text-align:center;" class="print_hide">' + 
+                                            '<td>' + 
+                                                '<select name="batch_no_ex[]" class="form-control batch_no_ex" id="batch_no_ex_'+counter+'" data-error="#err_batch_no_ex'+counter+'">' + 
+                                                    '<option value="">Select</option>' + 
+                                                    '<?php if(isset($batch)) { for ($k=0; $k < count($batch); $k++) { ?>' + 
+                                                            '<option value="<?php echo $batch[$k]->id; ?>"><?php echo $batch[$k]->batch_no; ?></option>' + 
+                                                    '<?php }} ?>' + 
+                                                '</select>' + 
+                                                '<div id="err_batch_no_ex'+counter+'"></div>' + 
+                                            '</td>' + 
+                                            '<td style="text-align:center;" class="print_hide table_action">' + 
                                                 '<a id="box_ex_'+counter+'_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>' + 
                                             '</td>' + 
                                         '</tr>');
@@ -2114,11 +2396,10 @@
                     $(".type_ex").change(function(){
                         show_item_ex($(this));
                     });
-                    $(".bar_ex").change(function(){
-                        get_bar_details_ex($(this));
-                    });
                     $(".box_ex").change(function(){
                         get_box_details_ex($(this));
+                        get_product_box_detail_ex($(this));
+                        get_sell_rate_ex();
                     });
                     $(".qty_ex").blur(function(){
                         get_amount_ex($(this));
@@ -2136,23 +2417,236 @@
                     counter++;
                 });
             });
+    
+            $('.sales_type').on('change',function(){
+                if($(this).val()=='Invoice'){
+                    $('#invoice_no_div').show();
+                    var distributor_id = $('#distributor_id').val();
+                     $.ajax({
+                                url:BASE_URL+'index.php/credit_debit_note/get_invoice',
+                                method: 'post',
+                                data: {distributor_id: distributor_id},
+                                dataType: 'json',
+                                success: function(response){
+                                  $('#invoice_no').empty();
+                                  $('#invoice_no').append('<option value="">Select</option>');
+                                  $.each(response,function(index,data){
+                                     $('#invoice_no').append('<option value="'+data['invoice_no']+'">'+data['invoice_no']+'</option>');
+                                  });
+                                }
+                            });
+                }
+                else
+                {
+                    $('#invoice_no').empty();
+                    $('#invoice_no_div').hide();
+                }
+                 
+            });
 
+            $('#distributor_id').change(function(){
+                if($('input[name="sales_type"]:checked').val()=='Invoice')
+                {
+                  var distributor_id = $('#distributor_id').val();
+                  $.ajax({
+                    url:BASE_URL+'index.php/credit_debit_note/get_invoice',
+                    method: 'post',
+                    data: {distributor_id: distributor_id},
+                    dataType: 'json',
+                    success: function(response){
+                      $('#invoice_no').empty();
+                      $('#invoice_no').append('<option value="">Select</option>');
+                      $.each(response,function(index,data){
+                         $('#invoice_no').append('<option value="'+data['invoice_no']+'">'+data['invoice_no']+'</option>');
+                      });
+                    }
+                 });
+                }
 
-    // $('#savedata').click(function(){
-    //     var in_amt=$('#final_amount').val();
-    //     var out_amt=$('#final_amount_ex').val();
+                $(".bar").each(function(){
+                        if($(this).val()!="")
+                        {
+                            get_product_detail($(this));   
+                            get_bar_details($(this));
+                            get_box_details($(this));
+                            get_sell_rate();
+                        }
+                });
+               
 
-    //     if(in_amt!="" && out_amt!="") {
-    //         if(in_amt==out_amt) {
-    //            $('#form_distributor_in_details').submit();
-    //            // alert("Total");
-    //         }
-    //         else {
-    //             alert("Total amounts does not match");
-    //         }
-    //     }
-    // });
+                $(".box").each(function(){
+                    if($(this).val()!="")
+                    {
+                        get_product_box_detail_ex($(this));
+                        get_bar_details_ex($(this));
+                        get_box_details_ex($(this));
+                        get_sell_rate_ex();
+                    }
+                });
+
+                
+            });
+            
+            $(document).ready(function(){
+                if(!$('#btn_submit').is(':visible')){
+                    // $("input[type!='hidden']").attr("disabled", true);
+                    $('input[type="text"').attr("readonly", true);
+                    $('input[type="checkbox"]').attr("disabled", true);
+                    $('input[type="radio"]').attr("disabled", true);
+                    $("select:visible").attr("disabled", true);
+                    $("textarea").attr("disabled", true);
+                    $(".datepicker").attr("disabled", true);
+
+                    $("#btn_approve").attr("disabled", false);
+                    $("#btn_reject").attr("disabled", false);
+                    $("#remarks").attr("disabled", false);
+
+                    $('tfoot').hide();
+                    $('.table_action').hide();
+                } else {
+                    $(".datepicker1").datepicker({ maxDate: 0,changeMonth: true,yearRange:'-100:+0',changeYear: true });
+                }
+
+                $(".type").change(function(){
+                    show_item($(this));
+                    $(".bar").each(function(){
+                        if($(this).val()!="")
+                        {
+                            get_product_detail($(this));   
+                            get_bar_details($(this));
+                            get_box_details($(this));
+                            get_sell_rate();
+                        }
+                    });
+                   
+
+                    $(".box").each(function(){
+                        if($(this).val()!="")
+                        {
+                            get_product_box_detail_ex($(this));
+                            get_bar_details_ex($(this));
+                            get_box_details_ex($(this));
+                            get_sell_rate_ex();
+                        }
+                    });
+                });
+                $(".type_ex").change(function(){
+                    show_item_ex($(this));
+                });
+                $(".bar").change(function(){
+                    get_bar_details($(this));
+                    get_product_detail($(this));
+                    get_sell_rate();
+                });
+                $(".bar_ex").change(function(){
+                    get_bar_details_ex($(this));
+                    get_product_detail_ex($(this));
+                    get_sell_rate_ex();
+                });
+                $(".box").change(function(){
+                    get_box_details($(this));
+                    get_product_box_detail($(this));
+                    get_sell_rate();
+                });
+                $(".box_ex").change(function(){
+                    get_box_details_ex($(this));
+                    get_product_box_detail_ex($(this));
+                    get_sell_rate_ex();
+                });
+                $(".qty").blur(function(){
+                    get_amount($(this));
+                });
+                $(".qty_ex").blur(function(){
+                    get_amount_ex($(this));
+                });
+                $(".sell_rate").blur(function(){
+                    get_amount($(this));
+                });
+                $(".sell_rate_ex").blur(function(){
+                    get_amount_ex($(this));
+                });
+                $('.delete_row').click(function(event){
+                    delete_row($(this));
+                    get_total();
+                });
+                // $('#distributor_id').click(function(event){
+                //     get_distributor_details();
+                // });
+                $('#distributor_id').on('change', function(event){
+                    get_distributor_details($('#distributor_id').val());
+                });
+                $('#depot_id').on('change', function(event){
+                    get_depot_details($('#depot_id').val());
+                    get_distributor_details($('#distributor_id').val());
+                     $(".bar").each(function(){
+                        if($(this).val()!="")
+                        {
+                            get_product_detail($(this));   
+                            get_bar_details($(this));
+                            get_box_details($(this));
+                            get_sell_rate();
+                        }
+                    });
+                   
+
+                    $(".box").each(function(){
+                        if($(this).val()!="")
+                        {
+                            get_product_box_detail_ex($(this));
+                            get_bar_details_ex($(this));
+                            get_box_details_ex($(this));
+                            get_sell_rate_ex();
+                        }
+                    });
+                });
+                $('input[type=radio][name=tax]').on('change', function() {
+                    switch($(this).val()) {
+                        case 'gst':
+                            $('#tax_per').val(5);
+                            break;
+                        case 'vat':
+                            $('#cst').val(6);
+                            break;
+                        case 'cst':
+                            $('#cst').val(2);
+                            break;
+                    }
+
+                    get_sell_rate();
+                });
+                
+                
+                addMultiInputNamingRules('#form_distributor_in_details', 'select[name="type[]"]', { required: true }, "");
+                addMultiInputNamingRules('#form_distributor_in_details', 'select[name="bar[]"]', { required: true }, "");
+                addMultiInputNamingRules('#form_distributor_in_details', 'select[name="box[]"]', { required: true }, "");
+                addMultiInputNamingRules('#form_distributor_in_details', 'input[name="qty[]"]', { required: true }, "");
+                addMultiInputNamingRules('#form_distributor_in_details', 'input[name="sell_rate[]"]', { required: true }, "");
+                addMultiInputNamingRules('#form_distributor_in_details', 'input[name="batch_no[]"]', { required: true }, "");
+
+                addMultiInputNamingRules('#form_distributor_in_details', 'select[name="type_ex[]"]', { required: true }, "");
+                addMultiInputNamingRules('#form_distributor_in_details', 'select[name="bar_ex[]"]', { required: true }, "");
+                addMultiInputNamingRules('#form_distributor_in_details', 'select[name="box_ex[]"]', { required: true }, "");
+                addMultiInputNamingRules('#form_distributor_in_details', 'input[name="qty_ex[]"]', { required: true }, "");
+                addMultiInputNamingRules('#form_distributor_in_details', 'input[name="sell_rate_ex[]"]', { required: true }, "");
+
+                get_distributor_details($('#distributor_id').val());
+            });
+            
+            
+            // $('#savedata').click(function(){
+            //     var in_amt=$('#final_amount').val();
+            //     var out_amt=$('#final_amount_ex').val();
+
+            //     if(in_amt!="" && out_amt!="") {
+            //         if(in_amt==out_amt) {
+            //            $('#form_distributor_in_details').submit();
+            //            // alert("Total");
+            //         }
+            //         else {
+            //             alert("Total amounts does not match");
+            //         }
+            //     }
+            // });
         </script>
-    <!-- END SCRIPTS -->      
     </body>
 </html>

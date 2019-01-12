@@ -48,6 +48,7 @@
 											<thead>
 												<tr>
 													<th width="65" style="text-align:center;">Sr. No.</th>
+													<th width="65" style="Edit">Sr. No.</th>
 													<th>Class</th>
 													<th>Type</th>
 													<th>Zone</th>
@@ -58,16 +59,17 @@
 													<th>Reporting Manager</th>
 													<th>Sales Rep 1</th>
 													<th>Sales Rep 2</th>
-													<th width="110">Creation Date</th>
+													<!--<th width="110">Creation Date</th>-->
 												</tr>
 											</thead>
 											<tbody>
 												<?php for ($i=0; $i < count($data); $i++) { ?>
 												<tr>
 													<td style="text-align:center;"><?php echo $i+1; ?></td>
+													<td style="text-align:center; vertical-align: middle; "><a href="<?php echo base_url().'index.php/sr_mapping/edit/'.$data[$i]->id; ?>"><i class="fa fa-edit"></i></a></td>
 													<td>
 		                                               
-		                                                <a href="<?php echo base_url().'index.php/sr_mapping/edit/'.$data[$i]->id; ?>"><?php echo $data[$i]->class; ?></a>
+		                                               <?php echo $data[$i]->class; ?>
 		                                            </td>
 													
 												
@@ -93,11 +95,11 @@
 													<td><?php echo $data[$i]->salesrepname; ?></td>
 													<td><?php echo $data[$i]->salesrepname1; ?></td>
 													
-													<td>
+													<!--<td>
 														<span style="display:none;">
-	                                                        <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
+	                                                        <?php //echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
 	                                                    </span>
-														<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
+														<?php //echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>-->
 												</tr>
 												<?php } ?>
 											</tbody>

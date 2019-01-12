@@ -15,6 +15,7 @@ class Box extends CI_Controller{
         $this->load->helper('common_functions');
         $this->load->model('box_model');
         $this->load->model('product_model');
+        $this->load->model('category_master_model','category');
         $this->load->database();
     }
 
@@ -74,6 +75,7 @@ class Box extends CI_Controller{
             if($result[0]->r_insert == 1) {
                 $data['access'] = $this->box_model->get_access();
                 $data['product'] = $this->product_model->get_data('Approved');
+                $data['category_detail']=$this->category->getCategoryDetails();
 
                 load_view('box/box_details', $data);
             } else {
@@ -93,7 +95,7 @@ class Box extends CI_Controller{
                 $data['product'] = $this->product_model->get_data('Approved');
                 $data['data'] = $this->box_model->get_data('', $id);
                 $data['box_products'] = $this->box_model->get_box_product($id);
-
+                $data['category_detail']=$this->category->getCategoryDetails();
                 load_view('box/box_details', $data);
             } else {
                 echo "Unauthorized access";

@@ -20,7 +20,7 @@ function get_pending_data($id=''){
         $id = substr($id, strpos($id, "_")+1);
     }
 
-    $query=$this->db->query("SELECT * FROM distributor_out WHERE ref_id = '$id' and status!='InActive'");
+    $query=$this->db->query("SELECT * FROM distributor_out WHERE ref_id = '$id' and status!='InActive' and  status!='Rejected'");
     $result=$query->result();
     if (count($result)>0){
         $id = $result[0]->id;
@@ -58,7 +58,7 @@ function get_data($status='', $id=''){
             G.vehicle_number, G.cgst, G.sgst, G.igst, G.cgst_amount, G.sgst_amount, G.igst_amount, G.reverse_charge, 
             G.shipping_address, G.distributor_consignee_id, G.con_name, G.con_address, G.con_city, G.con_pincode, 
             G.con_state, G.con_country, G.con_state_code, G.con_gst_number, G.state_code, G.round_off_amount, G.invoice_amount, G.ref_id, 
-            G.invoice_date,G.gatepass_date from 
+            G.invoice_date,G.gatepass_date,G.freezed from 
             (select E.*, F.sales_rep_name from 
             (select C.*, D.depot_name, D.address as depot_address, D.city as depot_city, D.pincode as depot_pincode, 
                 D.state as depot_state, D.state_code as depot_state_code, D.country as depot_country from 
@@ -146,7 +146,7 @@ function get_distributor_out_data1($status='', $id=''){
             I.final_amount,  I.status, I.created_on, I.modified_by, I.modified_on, I.class,
             I.client_name, I.depot_name,
             I.distributor_name, I.sales_rep_name, I.user_name, I.sample_distributor_id, I.delivery_status, I.location, 
-            J.sales_rep_name as del_person_name, I.invoice_amount, I.invoice_date,I.order_no from 
+            J.sales_rep_name as del_person_name, I.invoice_amount, I.invoice_date,I.order_no,I.tracking_id,I.proof_of_delivery from 
             (select G.*, concat(ifnull(H.first_name,''),' ',ifnull(H.last_name,'')) as user_name from 
             (select E.*, F.sales_rep_name from 
             (select Q.*, D.depot_name from 
@@ -176,13 +176,13 @@ function get_distributor_out_data1($status='', $id=''){
 
             select concat('s_',C.id) as d_id, null as id, C.date_of_processing, null as invoice_no, null as voucher_no, null as gate_pass_no, 
             replace(C.distributor_id,'d_','') as distributor_id, C.created_by as sales_rep_id, 
-            C.amount as final_amount, 'Pending' as status, C.created_on, C.modified_by, C.modified_on, null as class,
+            C.amount as final_amount, 'Pending' as status, C.created_on, C.modified_by, C.modified_on, null as class,null as tracking_id,
             null as client_name, null as depot_name, 
             C.distributor_name, 
             concat(ifnull(D.first_name,''),' ',ifnull(D.last_name,'')) as sales_rep_name, 
             concat(ifnull(D.first_name,''),' ',ifnull(D.last_name,'')) as user_name, 
             null as sample_distributor_id, null as delivery_status, C.location, null as del_person_name, C.amount as invoice_amount, 
-            null as invoice_date,null as order_no from 
+            null as invoice_date,null as order_no,null as proof_of_delivery from 
             (select A.*, B.distributor_name, B.state, B.sell_out, B.contact_person, B.contact_no, B.area, B.location from 
             (select * from sales_rep_orders where status = 'Approved') A 
             left join 
@@ -251,7 +251,7 @@ function get_distributor_out_data($status='', $id=''){
             G.shipping_address, G.distributor_consignee_id, G.con_name, G.con_address, G.con_city, G.con_pincode, G.con_state,
             G.con_country, G.con_state_code, G.con_gst_number, G.state_code, G.sample_type, G.gifting_remarks, 
             G.promoter_sales_rep_id, G.blogger_name, G.blogger_address, G.blogger_phone_no, G.blogger_email_id, 
-            G.round_off_amount, G.invoice_amount, G.ref_id, G.invoice_date from 
+            G.round_off_amount, G.invoice_amount, G.ref_id, G.invoice_date,G.freezed,G.distributor_in_type,G.basis_of_sales,G.email_from,G.email_approved_by,G.email_date_time from 
             (select E.*, F.sales_rep_name from 
             (select Q.*, D.depot_name, D.state as depot_state from 
             (select C.*, P.location from 
@@ -291,7 +291,7 @@ function get_distributor_out_data($status='', $id=''){
             null as con_country, null as con_state_code, null as con_gst_number, null as state_code, null as sample_type, 
             null as gifting_remarks, null as promoter_sales_rep_id, null as blogger_name, null as blogger_address, 
             null as blogger_phone_no, null as blogger_email_id, null as round_off_amount, null as invoice_amount, null as ref_id, 
-            null as invoice_date from 
+            null as invoice_date,null as freezed,null as distributor_in_type,null as basis_of_sales,null as email_from,null as email_approved_by,null as email_date_time from 
             (select A.*, B.distributor_name, B.state, B.sell_out, B.contact_person, B.contact_no, B.area, B.location from 
             (select * from sales_rep_orders where status = 'Approved') A 
             left join 
@@ -431,6 +431,16 @@ function save_data($id=''){
     } else {
         $order_date=formatdate($order_date);
     }
+	
+	$email_date_time=$this->input->post('email_date_time');
+    if($email_date_time==''){
+        $email_date_time=NULL;
+    } else {
+        $email_date_time= date('Y-m-d H:i:s',strtotime($email_date_time));
+    }
+	
+	
+	
 
     $invoice_date=$this->input->post('invoice_date');
     if($invoice_date==''){
@@ -454,7 +464,8 @@ function save_data($id=''){
 
         $ref_id = $this->input->post('ref_id');
         $invoice_no = $this->input->post('invoice_no');
-
+        $distributor_in_type = $this->input->post('distributor_in_type');
+        
         $remarks = $this->input->post('remarks');
 
         if($status == 'Rejected'){
@@ -465,7 +476,7 @@ function save_data($id=''){
             $action='Distributor Out Entry '.$status.'. Delivery Status: ' . $delivery_status;
         } else {
             if($id!='' || $ref_id!=''){
-                if($invoice_no==null || $invoice_no==''){
+                if(($invoice_no==null || $invoice_no=='' ) && $distributor_in_type!='exchanged'){
                     $sql="select * from series_master where type='Tax_Invoice'";
                     $query=$this->db->query($sql);
                     $result=$query->result();
@@ -499,7 +510,30 @@ function save_data($id=''){
                 }
 
                 if($ref_id!=null && $ref_id!=''){
-                    $sql = "Update distributor_out A, distributor_out B 
+
+                   $modified_approved_date = NULL;
+                   $get_modified_approved_date_result = $this->db->select('modified_approved_date')->where('id',$id)->get('distributor_out')->result();
+
+                    if(count($get_modified_approved_date_result)>0)
+                    {
+                       $modified_approved_date = $get_modified_approved_date_result[0]->modified_approved_date;
+                        
+                        if($modified_approved_date!=null && $modified_approved_date!="")
+                        {
+                            $modified_approved_date = date("Y-m-d");
+                        }else
+                        {
+                            $modified_approved_date = NULL;
+                        }
+                    }
+                    else
+                    {
+                       $modified_approved_date = NULL;
+                    }
+                    
+                    if($modified_approved_date!=null && $modified_approved_date!=null)
+                    {
+                        $sql = "Update distributor_out A, distributor_out B 
                             Set A.date_of_processing=B.date_of_processing, A.depot_id=B.depot_id, A.distributor_id=B.distributor_id,
                                 A.sales_rep_id=B.sales_rep_id, A.amount=B.amount, A.tax=B.tax, A.tax_per=B.tax_per, 
                                 A.tax_amount=B.tax_amount, A.final_amount=B.final_amount, A.due_date=B.due_date, 
@@ -521,8 +555,38 @@ function save_data($id=''){
                                 A.sample_type = B.sample_type, A.gifting_remarks = B.gifting_remarks, A.promoter_sales_rep_id = B.promoter_sales_rep_id, 
                                 A.blogger_name = B.blogger_name, A.blogger_address = B.blogger_address, A.blogger_phone_no = B.blogger_phone_no, 
                                 A.blogger_email_id = B.blogger_email_id, A.round_off_amount = B.round_off_amount, A.invoice_amount = B.invoice_amount, 
-                                A.invoice_date = '$invoice_date' 
+                                A.invoice_date = '$invoice_date',A.modified_approved_date='$modified_approved_date'
                             WHERE A.id = '$ref_id' and B.id = '$id'";
+                    }
+                    else
+                    {
+                        $sql = "Update distributor_out A, distributor_out B 
+                            Set A.date_of_processing=B.date_of_processing, A.depot_id=B.depot_id, A.distributor_id=B.distributor_id,
+                                A.sales_rep_id=B.sales_rep_id, A.amount=B.amount, A.tax=B.tax, A.tax_per=B.tax_per, 
+                                A.tax_amount=B.tax_amount, A.final_amount=B.final_amount, A.due_date=B.due_date, 
+                                A.order_no=B.order_no, A.order_date=B.order_date, A.supplier_ref=B.supplier_ref, 
+                                A.despatch_doc_no=B.despatch_doc_no, A.despatch_through=B.despatch_through, A.destination=B.destination, 
+                                A.status='$status', A.remarks='$remarks', 
+                                A.modified_by=B.modified_by, A.modified_on=B.modified_on, 
+                                A.approved_by='$curusr', A.approved_on='$now', A.invoice_no = '$invoice_no', 
+                                A.client_name=B.client_name, A.address=B.address, A.city=B.city, 
+                                A.pincode=B.pincode, A.state=B.state, A.country=B.country, 
+                                A.discount=B.discount, A.sample_distributor_id=B.sample_distributor_id, A.delivery_status=B.delivery_status, 
+                                A.delivery_date=B.delivery_date, A.receivable_doc=B.receivable_doc, A.transport_type=B.transport_type, 
+                                A.vehicle_number = B.vehicle_number, A.cgst = B.cgst, A.sgst = B.sgst, A.igst = B.igst, 
+                                A.cgst_amount = B.cgst_amount, A.sgst_amount = B.sgst_amount, A.igst_amount = B.igst_amount, 
+                                A.reverse_charge = B.reverse_charge, A.shipping_address = B.shipping_address, A.distributor_consignee_id = B.distributor_consignee_id, 
+                                A.con_name = B.con_name, A.con_address = B.con_address, A.con_city = B.con_city, 
+                                A.con_pincode = B.con_pincode, A.con_state = B.con_state, A.con_country = B.con_country, 
+                                A.con_state_code = B.con_state_code, A.con_gst_number = B.con_gst_number, A.state_code = B.state_code, 
+                                A.sample_type = B.sample_type, A.gifting_remarks = B.gifting_remarks, A.promoter_sales_rep_id = B.promoter_sales_rep_id, 
+                                A.blogger_name = B.blogger_name, A.blogger_address = B.blogger_address, A.blogger_phone_no = B.blogger_phone_no, 
+                                A.blogger_email_id = B.blogger_email_id, A.round_off_amount = B.round_off_amount, A.invoice_amount = B.invoice_amount, 
+                                A.invoice_date = '$invoice_date',A.modified_approved_date=NULL
+                            WHERE A.id = '$ref_id' and B.id = '$id'";
+                    }
+
+                    
                     $this->db->query($sql);
 
                     $sql = "Delete from distributor_out where id = '$id'";
@@ -544,6 +608,10 @@ function save_data($id=''){
                 }
 
                 $this->set_ledger($id);
+
+                echo '<script>var win= window.open("'.base_url().'index.php/distributor_out/view_tax_invoice/'.$id.'");
+                win.print();
+                </script>';
                 
                 $action='Distributor Out Entry '.$status.'. Delivery Status: ' . $delivery_status;
             }
@@ -686,8 +754,23 @@ function save_data($id=''){
             'round_off_amount' => format_number($this->input->post('round_off_amount'),2),
             'invoice_amount' => format_number($this->input->post('invoice_amount'),2),
             'ref_id' => $ref_id,
-            'invoice_date' => $invoice_date
+            'invoice_date' => $invoice_date,
+            'email_date_time' => $email_date_time,
+          
+              'basis_of_sales' => $this->input->post('basis_of_sales'),
+              'email_from' => $this->input->post('email_from'),
+              'email_approved_by' => $this->input->post('email_approved_by'),
+          
+            // 'tracking_id' => $this->input->post('tracking_id')
+			
+		
         );
+
+        if($ref_id!=null && $ref_id!="")
+        {
+            $data['modified_approved_date']=$now;
+        }
+
 
         if($id==''){
             $data['created_by']=$curusr;
@@ -700,6 +783,23 @@ function save_data($id=''){
             $this->db->where('id', $id);
             $this->db->update('distributor_out',$data);
             $action='Distributor Out Entry Modified. Delivery Status: ' . $delivery_status;
+
+            if($status=='InActive')
+            {
+               $result = $this->db->select('distributor_po_id')->where('id',$id)->get('distributor_out')->result();
+               
+                $delivery_status = 'Cancelled';
+                $remarks = $this->input->post('remarks');
+                $remarks =$remarks.' , Deleted From Sales';
+                if(count($result)>0)
+                {
+                    $po_id = $result[0]->distributor_po_id;
+                    $sql1 = "update distributor_po set delivery_status = '$delivery_status', 
+                        modified_by = '$curusr', modified_on = '$now',delivery_remarks='$remarks'
+                        where id in (".$po_id.")";
+                    $this->db->query($sql1);
+                }
+            }
         }
 
         $this->db->where('distributor_out_id', $id);
@@ -710,6 +810,8 @@ function save_data($id=''){
         $box=$this->input->post('box[]');
         $qty=$this->input->post('qty[]');
         $sell_rate=$this->input->post('sell_rate[]');
+        $sell_margin=$this->input->post('sell_margin[]');
+        $tax_per=$this->input->post('tax_per[]');
         $grams=$this->input->post('grams[]');
         $rate=$this->input->post('rate[]');
         $amount=$this->input->post('amount[]');
@@ -739,7 +841,9 @@ function save_data($id=''){
                             'sgst_amt' => format_number($sgst_amt[$k],2),
                             'igst_amt' => format_number($igst_amt[$k],2),
                             'tax_amt' => format_number($tax_amt[$k],2),
-                            'total_amt' => format_number($total_amt[$k],2)
+                            'total_amt' => format_number($total_amt[$k],2),
+                            'margin_per' => $sell_margin[$k],
+                            'tax_percentage' => $tax_per[$k]
                         );
                 $this->db->insert('distributor_out_items', $data);
             }
@@ -815,6 +919,28 @@ function set_delivery_status() {
     $delivery_status=$this->input->post('delivery_status');
     $sales_rep_id=$this->input->post('sales_rep_id');
     $status=$this->input->post('status');
+    $person_receiving=$this->input->post('person_receving');
+   
+    $proof_of_delivery = '';
+
+    if(!empty($_FILES["upload"]['name']))
+    {
+        $path=FCPATH.'assets/uploads/delivery_proof/';
+        $config = array(
+        'upload_path' => $path,
+        'allowed_types' => "*",
+        'overwrite' => TRUE
+        );
+        $proof_of_delivery = str_replace(' ', "_", $_FILES["upload"]['name']);
+        $config['file_name'] = $proof_of_delivery;
+
+        $this->load->library('upload', $config);
+        if(!$this->upload->do_upload('upload'))
+        { 
+             $this->upload->display_errors();
+
+        }
+    }
 
     $check = array();
     $j=0;
@@ -826,7 +952,7 @@ function set_delivery_status() {
         }
     }
 
-    $distributor_out_id = implode(", ", $check);
+    $distributor_out_id = $check1;//implode(", ", $check);
 
     if($distributor_out_id!=""){
         $now=date('Y-m-d H:i:s');
@@ -844,8 +970,25 @@ function set_delivery_status() {
                     where id in (".$distributor_out_id.")";
         } else {
             $sql = "update distributor_out set delivery_status = '$delivery_status', status = '$status', 
-                    modified_by = '$curusr', modified_on = '$now' 
+                    modified_by = '$curusr', modified_on = '$now',person_receiving='$person_receiving',proof_of_delivery='$proof_of_delivery'
                     where id in (".$distributor_out_id.")";
+            $result = $this->db->select('distributor_po_id')->where('id',$distributor_out_id)->get('distributor_out')->result();
+            /* echo $this->db->last_query();*/
+
+            if($delivery_status=='Delivered Not Complete')
+            {
+                $delivery_status = 'Delivered';
+            }
+
+            if(count($result)>0)
+            {
+                $po_id = $result[0]->distributor_po_id;
+                $sql1 = "update distributor_po set delivery_status = '$delivery_status', 
+                    modified_by = '$curusr', modified_on = '$now'
+                    where id in (".$po_id.")";
+                $this->db->query($sql1);
+                /*echo $this->db->last_query();*/
+            }
         }
         
         $this->db->query($sql);
@@ -854,6 +997,7 @@ function set_delivery_status() {
             $this->tax_invoice_model->generate_gate_pass($distributor_out_id);
         }
     }
+
 }
 
 function set_sku_batch(){
@@ -863,7 +1007,37 @@ function set_sku_batch(){
     $status=$this->input->post('status');
     $distributor_out_id=$this->input->post('distributor_out_id');
     $sales_item_id=$this->input->post('sales_item_id');
+    $tracking_id=$this->input->post('tracking_id');
+    $date_of_dispatch=$this->input->post('date_of_dispatch');
 
+    if($date_of_dispatch==''){
+        $date_of_dispatch=NULL;
+    } else {
+        $date_of_dispatch=formatdate($date_of_dispatch);
+    }
+
+    $proof_of_dispatch = '';
+
+    if(!empty($_FILES["upload"]['name']))
+    {
+        $path=FCPATH.'assets/uploads/dispatch_proof/';
+        $config = array(
+        'upload_path' => $path,
+        'allowed_types' => "*",
+        'overwrite' => TRUE
+        );
+        $proof_of_dispatch = time().'_'.str_replace(' ', "_", $_FILES["upload"]['name']);
+        $config['file_name'] = $proof_of_dispatch;
+
+        $this->load->library('upload', $config);
+        if(!$this->upload->do_upload('upload'))
+        { 
+             $this->upload->display_errors();
+
+        }
+    }
+    
+    
     if($distributor_out_id!=""){
         $now=date('Y-m-d H:i:s');
         $curusr=$this->session->userdata('session_id');
@@ -874,17 +1048,22 @@ function set_sku_batch(){
             }
         }
 
+
         if(isset($sales_rep_id) && $sales_rep_id!=''){
+            
+
             $sql = "update distributor_out set delivery_status = '$delivery_status', delivery_sales_rep_id = '$sales_rep_id', 
-                    status = '$status', modified_by = '$curusr', modified_on = '$now', gatepass_date = '$now'
+                    status = '$status',tracking_id='$tracking_id', modified_by = '$curusr', modified_on = '$now', gatepass_date = '$now',date_of_dispatch='$date_of_dispatch',proof_of_dispatch='$proof_of_dispatch'
                     where id in (".$distributor_out_id.")";
         } else {
+
             $sql = "update distributor_out set delivery_status = '$delivery_status', status = '$status', 
-                    modified_by = '$curusr', modified_on = '$now' 
+                    modified_by = '$curusr',tracking_id='$tracking_id', modified_on = '$now' 
                     where id in (".$distributor_out_id.")";
         }
         
         $this->db->query($sql);
+
 
         for($i=0; $i<count($sales_item_id); $i++){
             $batch_no_qty=$this->input->post('batch_no_qty_'.$i);
@@ -908,9 +1087,9 @@ function set_sku_batch(){
     }
 }
 
-function get_sku_details(){
-    $check1=$this->input->post('check');
-
+function get_sku_details($distributor_out_id){
+    /*$check1=$this->input->post('check');
+    $tracking_id=$this->input->post('tracking_id');
     // $check1=['1'];
 
     $check = array();
@@ -926,7 +1105,7 @@ function get_sku_details(){
     $distributor_out_id = implode(", ", $check);
 
     $table = '';
-    $data = array();
+    $data = array();*/
 
     if($distributor_out_id!=""){
         $sql = "select O.* from 
@@ -1230,6 +1409,186 @@ function reject_records() {
         $this->db->query($sql);
     }
 }
+
+function check_order_id_availablity(){
+    $id=$this->input->post('id');
+    $order_no=$this->input->post('order_no');
+    $ref_id=$this->input->post('ref_id');
+
+    // $id="";
+
+    $query=$this->db->query("select * from distributor_out where id!='".$id."' and order_no='".$order_no."' and id!='".$ref_id."'");
+    $result=$query->result();
+
+    if (count($result)>0){
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+
+public function get_product_percentage($product_id,$distributor_id)
+{
+    $sql = "SELECT B.margin,A.category_id,A.tax_percentage from
+            (Select category_id,tax_percentage from product_master Where id=$product_id ) A
+            Left JOIN
+            (SELECT * from distributor_category_margin ) B
+            on A.category_id=B.category_id
+            Where B.distributor_id=$distributor_id";
+    $result = $this->db->query($sql)->result();
+
+    return $result;
+
+}
+
+public function get_product_details($status='', $id='', $distributor_id=''){
+    if($status!=""){
+        $cond=" where A.status='".$status."'";
+    } else {
+        $cond="";
+    }
+
+    if($id!=""){
+        if($cond=="") {
+            $cond=" where A.id='".$id."'";
+        } else {
+            $cond=$cond." and A.id='".$id."'";
+        }
+    }
+
+    $cond2 = '';
+
+    if($distributor_id!=""){
+        /*if($cond=="") {
+            $cond=" where (B.distributor_id='".$distributor_id."' or B.distributor_id is null)";
+        } else {
+            $cond=$cond." and (B.distributor_id='".$distributor_id."' or B.distributor_id is null)";
+        }*/
+
+        $cond2 = " and (B.distributor_id='".$distributor_id."' or B.distributor_id is null)";
+    } else {
+        /*if($cond=="") {
+            $cond=" where B.distributor_id is null";
+        } else {
+            $cond=$cond." and B.distributor_id is null";
+        }*/
+
+        $cond2 = " and (B.distributor_id is null)";
+    }
+
+    $sql = "select A.*, B.margin from product_master A left join distributor_category_margin B 
+            on(A.category_id=B.category_id ".$cond2.") 
+            ".$cond." order by A.product_name";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+public function get_distributor_box_details($status='', $id='', $distributor_id=''){
+    if($status!=""){
+        $cond=" where A.status='".$status."'";
+    } else {
+        $cond="";
+    }
+
+    if($id!=""){
+        if($cond=="") {
+            $cond=" where A.id='".$id."'";
+        } else {
+            $cond=$cond." and A.id='".$id."'";
+        }
+    }
+
+    $cond2 = '';
+
+    if($distributor_id!=""){
+        /*if($cond=="") {
+            $cond=" where (B.distributor_id='".$distributor_id."' or B.distributor_id is null)";
+        } else {
+            $cond=$cond." and (B.distributor_id='".$distributor_id."' or B.distributor_id is null)";
+        }*/
+        $cond2 = " and (B.distributor_id='".$distributor_id."' or B.distributor_id is null)";
+
+    } else {
+        $cond2 = " and (B.distributor_id is null)";
+        /*if($cond=="") {
+            $cond=" where B.distributor_id is null";
+        } else {
+            $cond=$cond." and B.distributor_id is null";
+        }*/
+    }
+
+    $sql = "select A.*, B.margin from box_master A left join distributor_category_margin B 
+            on(A.category_id=B.category_id ".$cond2.") 
+            ".$cond." order by A.box_name";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+public function get_box_details($status='', $id='', $distributor_id=''){
+    if($status!=""){
+        $cond=" where A.status='".$status."'";
+    } else {
+        $cond="";
+    }
+
+    if($id!=""){
+        if($cond=="") {
+            $cond=" where A.id='".$id."'";
+        } else {
+            $cond=$cond." and A.id='".$id."'";
+        }
+    }
+
+    $cond2 = '';
+
+    if($distributor_id!=""){
+        /*if($cond=="") {
+            $cond=" where (B.distributor_id='".$distributor_id."' or B.distributor_id is null)";
+        } else {
+            $cond=$cond." and (B.distributor_id='".$distributor_id."' or B.distributor_id is null)";
+        }*/
+        $cond2 = " and (B.distributor_id='".$distributor_id."' or B.distributor_id is null)";
+
+    } else {
+        $cond2 = " and (B.distributor_id is null)";
+        /*if($cond=="") {
+            $cond=" where B.distributor_id is null";
+        } else {
+            $cond=$cond." and B.distributor_id is null";
+        }*/
+    }
+
+    $sql = "select A.*, B.margin from box_master A left join distributor_category_margin B 
+            on(A.category_id=B.category_id ".$cond2.") 
+            ".$cond." order by A.box_name";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+
+public function get_comments($id)
+{
+    $result = $this->db->select('comments')->where('id',$id)->get('distributor_out')->result();
+    return $result;
+}
+
+public function save_comments()
+{
+   $id=$this->input->post('delivery_comments_id');
+   echo $delivery_comments=$this->input->post('delivery_comments');
+  
+
+   if($delivery_comments!="")
+   {
+     $data = array( 
+        'comments' => $delivery_comments
+        );
+      $this->db->where('id', $id);
+      $this->db->update('distributor_out',$data);
+   }
+}
+
 
 }
 ?>

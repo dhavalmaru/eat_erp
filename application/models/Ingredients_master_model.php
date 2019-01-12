@@ -10,7 +10,7 @@ function __Construct(){
 
 function get_access(){
     $role_id=$this->session->userdata('role_id');
-    $query=$this->db->query("SELECT * FROM user_role_options WHERE section = 'Batch_Processing' AND role_id='$role_id' AND (r_insert = 1 OR r_view = 1 OR r_edit=1 OR r_approvals = 1 OR r_export = 1)");
+    $query=$this->db->query("SELECT * FROM user_role_options WHERE section = 'Ingredient_Master' AND role_id='$role_id' AND (r_insert = 1 OR r_view = 1 OR r_edit=1 OR r_approvals = 1 OR r_export = 1)");
     return $query->result();
 }
 
@@ -106,8 +106,8 @@ function save_data($id=''){
 
 
     $logarray['table_id']=$id;
-    $logarray['module_name']='Ingredients_Master';
-    $logarray['cnt_name']='Ingredients_Master';
+    $logarray['module_name']='Ingredient_Master';
+    $logarray['cnt_name']='Ingredient_Master';
     $logarray['action']=$action;
     $this->user_access_log_model->insertAccessLog($logarray);
 }

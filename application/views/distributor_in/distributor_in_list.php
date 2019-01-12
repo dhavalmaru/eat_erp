@@ -24,6 +24,10 @@
 		  	@media only screen and  (min-width:709px)  and (max-width:718px) { 			 
 				.heading-h3-heading .btn-margin{   }
 		   	}
+			.dt-body-center
+			{
+				text-align:center;
+			}
 		</style>	
     </head>
     <body>								
@@ -102,45 +106,25 @@
 					      <div class="panel panel-default">		
 							<div class="panel-body">
 								<div class="table-responsive">
-								<table id="customers2" class="table datatable table-bordered"  >
+								<table id="customers10" class="table datatable table-bordered" width="100%" >
 									<thead>
 										<tr>
 											<th width="58" style="text-align:center;">Sr. No.</th>
+										
 											<th width="150" >Date Of processing</th>
-											<th width="250">Sales Return No</th>
-											<th width="250">Depot Name</th>
-											<th width="250"  >Distributor Name</th>
-											<th width="250" >Sales Representative Name</th>
-											<th width="120" >Amount (In Rs)</th>
-											<th width="110">Creation Date</th>
-											<th width="110"> Status</th>
+											<th width="58" style="text-align:center;">Edit</th>
 											<th width="105" class="hide_col">View Receipt</th>
+											<th width="250">Sales Return No</th>
+									
+											<th width="250"  >Distributor Name</th>
+								
+											<th width="120" >Amount (In Rs)</th>
+										
+											
 										</tr>
 									</thead>
 									<tbody>
-										<?php for ($i=0; $i < count($data); $i++) { ?>
-										<tr>
-											<td style="text-align:center;"><?php echo $i+1; ?></td>
-											<td>
-                                                <span style="display:none;">
-                                                    <?php echo (($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('Ymd',strtotime($data[$i]->date_of_processing)):''); ?>
-                                                </span>
-                                                <a href="<?php echo base_url().'index.php/distributor_in/edit/'.$data[$i]->id; ?>"><?php echo (($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('d/m/Y',strtotime($data[$i]->date_of_processing)):''); ?></a>
-                                            </td>
-											<td><?php echo $data[$i]->sales_return_no; ?></td>
-											<td><?php echo $data[$i]->depot_name; ?></td>
-											<td><?php echo $data[$i]->distributor_name; ?></td>
-											<td><?php echo $data[$i]->sales_rep_name; ?></td>
-											<td><?php echo format_money($data[$i]->final_amount,2); ?></td>
-											<td>
-												<span style="display:none;">
-                                                    <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
-                                                </span>
-												<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
-											<td><?php echo $data[$i]->status; ?></td>
-											<td class="hide_col"><a href="<?php echo base_url().'index.php/distributor_in/view_sales_return_receipt/'.$data[$i]->id; ?>" target="_blank"><span class="fa fa-file-pdf-o" style="font-size:20px;"></span></a></td>
-										</tr>
-										<?php } ?>
+										
 									</tbody>
 								</table>
 								</div>
@@ -161,9 +145,12 @@
 						
         <?php $this->load->view('templates/footer');?>
 		<script>
+			var url = window.location.href;
 	    	$(document).ready(function() {
-	    		var url = window.location.href;
+	    		hide_url(url);
+	    	});
 
+	    	function hide_url(url) {
 	    		if(url.includes('All')){
 	                $('.all').attr('class','active');
 	                $('.hide_col').show();
@@ -183,8 +170,165 @@
 	                $('.approved').attr('class','active');
 	                $('.hide_col').show();
 	            }
-	    	});
+	    	}
 		</script>
+		<script type="text/javascript">
+            var BASE_URL="<?php echo base_url()?>";
+        </script>
+		<script>
+	        var table;
+	        var status = '<?php echo $status; ?>';
+	        var len = 10;
+
+	        if(url.includes('All')){
+	                $('.all').attr('class','active');
+	               	columnDefs = [        
+                                    {
+                                        "targets": [3],
+                                        "visible": true
+                                    },
+									 { className: "dt-body-center", targets: [ 0, 2, 3 ] }
+                                ];
+	            } else if(url.includes('InActive')){
+	                columnDefs = [        
+                                   
+									{
+                                        "targets": [3],
+                                        "visible": false
+                                       
+                                    },
+									 { className: "dt-body-center", targets: [ 0, 2, 3 ] }
+                                ];
+	            } else if(url.includes('Approved')){
+	               columnDefs = [        
+                                    {
+                                        "targets": [3],
+                                        "visible": true
+                                    },
+									  { className: "dt-body-center", targets: [ 0, 2, 3 ] }
+									 
+                                ];
+	            } else if(url.includes('Pending')){
+	                 columnDefs = [        
+                                    
+									{
+                                        "targets": [3],
+                                        "visible": false
+                                       
+                                    },
+									 { className: "dt-body-center", targets: [ 0, 2, 3 ] }
+                                ];
+	            } else  if(url.includes('Rejected')){
+	                 columnDefs = [        
+                                    
+									{
+                                        "targets": [3],
+                                        "visible": false
+                                       
+                                    },
+									 { className: "dt-body-center", targets: [ 0, 2, 3 ] }
+                                ];
+	            } else {
+	                $('.approved').attr('class','active');
+	                columnDefs = [        
+                                    {
+                                        "targets": [3],
+                                        "visible": true
+                                    },
+									 { className: "dt-body-center", targets: [ 0, 2, 3 ] }
+                                ];
+	            }
+	    	$(document).ready(function() {
+            
+	            table =  $('#customers10');
+	            var tableOptions = {
+	                'bPaginate': true,
+	                "columnDefs": columnDefs,
+	                'iDisplayLength': len,
+	                aLengthMenu: [
+	                    [10,25, 50, 100, 200, -1],
+	                    [10,25, 50, 100, 200, "All"]
+	                ],
+	                 "ajax": {
+	                    url : BASE_URL+'index.php/Distributor_in/get_data/'+status,
+	                    type : 'GET'
+	                },
+	                
+	                'bDeferRender': true,
+	                'bProcessing': true
+	            };
+	            table.DataTable(tableOptions);
+	            
+	            $("#csv").click(function(){
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = false;
+	                table.DataTable(tableOptions);
+	                table.tableExport({type:'csv',escape:'false'});
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = true;
+	                table.DataTable(tableOptions);
+	            });
+	            
+	            $("#xls").click(function(){
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = false;
+	                table.DataTable(tableOptions);
+	                table.tableExport({type:'excel',escape:'false'});
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = true;
+	                table.DataTable(tableOptions);
+	            });
+
+
+
+	            $("#txt").click(function(){
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = false;
+	                table.DataTable(tableOptions);
+	                table.tableExport({type:'txt',escape:'false'});
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = true;
+	                table.DataTable(tableOptions);
+	            });
+	            $("#doc").click(function(){
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = false;
+	                table.DataTable(tableOptions);
+	                table.tableExport({type:'doc',escape:'false'});
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = true;
+	                table.DataTable(tableOptions);
+	            });
+	            $("#powerpoint").click(function(){
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = false;
+	                table.DataTable(tableOptions);
+	                table.tableExport({type:'powerpoint',escape:'false'});
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = true;
+	                table.DataTable(tableOptions);
+	            });
+	            $("#png").click(function(){
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = false;
+	                table.DataTable(tableOptions);
+	                table.tableExport({type:'png',escape:'false'});
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = true;
+	                table.DataTable(tableOptions);
+	            });
+
+	               $("#pdf").click(function(){
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = false;
+	                table.DataTable(tableOptions);
+	                table.tableExport({type:'pdf',escape:'false'});
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = true;
+	                table.DataTable(tableOptions);
+	            });
+           });
+        </script>
     <!-- END SCRIPTS -->      
     </body>
 </html>

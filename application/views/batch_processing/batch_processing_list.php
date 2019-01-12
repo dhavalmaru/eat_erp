@@ -43,7 +43,53 @@
 								</div>
 				     </div>	      
                 </div>	
-                
+                   
+                   <div class="nav-contacts ng-scope" ui-view="@nav">
+    				<div class="u-borderBottom u-bgColorBreadcrumb ng-scope">
+    					<div class="container u-posRelative u-textRight">
+    						
+
+    						<ul class="m-nav--linetriangle" ng-swipe-left="app.onInnerSwipe($event);" ng-swipe-right="app.onInnerSwipe($event);">
+    							<!--<li class="all">
+    								<a  href="<?php //echo base_url(); ?>index.php/batch_processing/checkstatus/All">
+    									<span class="ng-binding">All</span>
+    									<span id="approved">  (<?php //echo $all; ?>)  </span>
+    								</a>
+    							</li>-->
+
+    							<li class="approved" >
+    								<a  href="<?php echo base_url(); ?>index.php/batch_processing/checkstatus/Approved">
+    									<span class="ng-binding">Approved</span>
+    									<span id="approved"> (<?php echo $approved; ?>)</span>
+    								</a>
+    							</li>
+
+    							<li class="pending">
+    								<a  href="<?php echo base_url(); ?>index.php/batch_processing/checkstatus/Pending">
+    									<span class="ng-binding">Pending</span>
+    									<span id="approved"> (<?php echo $pending; ?>) </span>
+    								</a>
+    							</li>
+
+                                <li class="rejected">
+                                    <a  href="<?php echo base_url(); ?>index.php/batch_processing/checkstatus/Rejected">
+                                        <span class="ng-binding">Rejected</span>
+                                        <span id="approved"> (<?php echo $rejected; ?>) </span>
+                                    </a>
+                                </li>
+
+                                <li class="inactive">
+                                    <a  href="<?php echo base_url(); ?>index.php/batch_processing/checkstatus/InActive">
+                                        <span class="ng-binding">InActive</span>
+                                        <span id="approved"> (<?php echo $inactive; ?>) </span>
+                                    </a>
+                                </li>
+
+    						</ul>
+    						
+    					</div>
+    				</div>
+			    </div>
                    <div class="page-content-wrap">                
                     <div class="row">
 					  <div class="page-width">	
@@ -52,44 +98,24 @@
 							 
 							<div class="panel-body">
 								<div class="table-responsive">
-								<table id="customers2" class="table datatable table-bordered" >
+								<table id="customers10" class="table datatable table-bordered" width="100%">
 									<thead>
 										<tr>
 									        <th width="65" style="text-align:center;" >Sr. No.</th>
-											<th  width="145" >Batch Id As Per Fssai</th>
-											<th width="135">Date Of processing</th>
-											<th  width="175">Depot Name</th>
+											<th width="90">Date Of processing</th>
+									        <th width="65" >Edit</th>
+											<th width="65">View Receipt</th>
+											<th  width="90" >Batch Id As Per Fssai</th>
+										
+											<th  width="145">Depot Name</th>
 											<th width="175" >Product Name</th>
 											<th width="80">Qty In Bar</th>
-											<th width="150">Actual Wastage (In Kg)</th>
-											<th width="100">Creation Date</th>
-											<th width="105">View Receipt</th>
+											<th width="100">Actual Wastage (In Kg)</th>
+										<!--	<th width="100">Creation Date</th>-->
+											
 										</tr>
 									</thead>
 									<tbody>
-										<?php for ($i=0; $i < count($data); $i++) { ?>
-										<tr>
-											<td  style="text-align:center;"><?php echo $i+1; ?></td>
-											<td><a href="<?php echo base_url().'index.php/batch_processing/edit/'.$data[$i]->id; ?>"><?php echo $data[$i]->batch_no; ?></a></td>
-											<td>
-                                                <span style="display:none;">
-                                                    <?php echo (($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('Ymd',strtotime($data[$i]->date_of_processing)):''); ?>
-                                                </span>
-                                                <?php echo (($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('d/m/Y',strtotime($data[$i]->date_of_processing)):''); ?>
-                                            </td>
-											<td><?php echo $data[$i]->depot_name; ?></td>
-											<td><?php echo $data[$i]->product_name; ?></td>
-											<td><?php echo format_money($data[$i]->qty_in_bar,2); ?></td>
-											<td><?php echo format_money($data[$i]->actual_wastage,2); ?></td>
-											<td>
-												<span style="display:none;">
-                                                    <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
-                                                </span>
-												<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?>
-											</td>
-											<td><a href="<?php echo base_url().'index.php/batch_processing/view_batch_processing_receipt/'.$data[$i]->id; ?>" target="_blank"><span class="fa fa-file-pdf-o" style="font-size:20px;"></span></a></td>
-										</tr>
-										<?php } ?>
 									</tbody>
 								</table>
 								</div>
@@ -110,7 +136,134 @@
         <!-- END PAGE CONTAINER -->
 						
         <?php $this->load->view('templates/footer');?>
-		
-    <!-- END SCRIPTS -->      
+		<script type="text/javascript">
+         var BASE_URL="<?php echo base_url()?>";
+        </script>
+        <!-- END SCRIPTS -->      
+    	<script type="text/javascript">
+        $(document).ready(function() { 
+            var url = window.location.href;
+            if(url.includes('All')){
+                $('.all').attr('class','active');
+            }
+            else  if(url.includes('InActive')){
+                $('.inactive').attr('class','active');
+            }
+            else  if(url.includes('Approved')){
+                $('.approved').attr('class','active');
+            }
+            else  if(url.includes('Pending')){
+                // console.log('pending');
+                $('.pending').attr('class','active');
+            }else  if(url.includes('Rejected')){
+                // console.log('pending');
+                $('.rejected').attr('class','active');
+            }
+            else {
+                $('.approved').attr('class','active');
+            }
+            $('.ahrefall').click(function(){
+                alert(window.location.href );
+            });
+        });
+    </script>
+    <script>
+            var table;
+            var status = '<?php echo $status; ?>';
+            $(document).ready(function() {
+                
+                var len=10;
+				columnDefs = [
+								{ className: "dt-body-center", targets: [ 0, 2, 3 ] }
+							 ];
+                table =  $('#customers10');
+                var tableOptions = {
+                    'bPaginate': true,
+                    'iDisplayLength': len,
+                    'columnDefs': columnDefs,
+                    aLengthMenu: [
+                        [10,25, 50, 100, 200, -1],
+                        [10,25, 50, 100, 200, "All"]
+                    ],
+                    "ajax": {
+                        url : BASE_URL+'index.php/Batch_processing/get_data_ajax/'+status,
+                        // data: {status: status},
+                        type : 'GET'
+                    },
+                    'bDeferRender': true,
+                    'bProcessing': true
+                };
+                table.DataTable(tableOptions);
+                
+                $("#csv").click(function(){
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = false;
+                    table.DataTable(tableOptions);
+                    table.tableExport({type:'csv',escape:'false'});
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = true;
+                    table.DataTable(tableOptions);
+                });
+                
+                $("#xls").click(function(){
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = false;
+                    table.DataTable(tableOptions);
+                    table.tableExport({type:'excel',escape:'false'});
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = true;
+                    table.DataTable(tableOptions);
+                });
+
+
+
+                $("#txt").click(function(){
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = false;
+                    table.DataTable(tableOptions);
+                    table.tableExport({type:'txt',escape:'false'});
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = true;
+                    table.DataTable(tableOptions);
+                });
+                $("#doc").click(function(){
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = false;
+                    table.DataTable(tableOptions);
+                    table.tableExport({type:'doc',escape:'false'});
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = true;
+                    table.DataTable(tableOptions);
+                });
+                $("#powerpoint").click(function(){
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = false;
+                    table.DataTable(tableOptions);
+                    table.tableExport({type:'powerpoint',escape:'false'});
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = true;
+                    table.DataTable(tableOptions);
+                });
+                $("#png").click(function(){
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = false;
+                    table.DataTable(tableOptions);
+                    table.tableExport({type:'png',escape:'false'});
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = true;
+                    table.DataTable(tableOptions);
+                });
+
+                   $("#pdf").click(function(){
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = false;
+                    table.DataTable(tableOptions);
+                    table.tableExport({type:'pdf',escape:'false'});
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = true;
+                    table.DataTable(tableOptions);
+                });
+               });
+    </script>
     </body>
 </html>

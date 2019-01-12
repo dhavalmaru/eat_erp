@@ -27,6 +27,16 @@
             @media screen and (max-width:806px) {   
                 .h-scroll { overflow-x:scroll;} .h-scroll .table-stripped{ width:805px!important;}
             }
+			.form-group
+			{
+				padding:4px 0px!important;
+			}
+				#total_outstanding1,#igst1,#cgst1,#sgst1,#total_amount1
+			{
+			
+				font-size:14px;
+				font-weight:700;
+			}
 		</style>
 		
     </head>
@@ -80,7 +90,7 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Distributor <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="distributor_id" id="distributor_id" class="form-control">
+                                                <select name="distributor_id" id="distributor_id" class="form-control select2">
                                                     <option value="">Select</option>
                                                     <?php if(isset($distributor)) { for ($k=0; $k < count($distributor) ; $k++) { ?>
                                                             <option value="<?php echo $distributor[$k]->id; ?>" <?php if(isset($data)) { if($distributor[$k]->id==$data[0]->distributor_id) { echo 'selected'; } } ?>><?php echo $distributor[$k]->distributor_name; ?></option>
@@ -92,13 +102,10 @@
                                                 <input type="text" class="form-control load_distributor" name="distributor" id="distributor" placeholder="Type To Select Distributor...." value="<?php //if(isset($data)) { echo $data[0]->distributor_name; } ?>"/> -->
                                             </div>
                                             
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Total Outstanding (In Rs) <span class="asterisk_sign">*</span></label>
+                                  
+                                            <label class="col-md-6 col-sm-6 col-xs-12 control-label">Total Outstanding (In Rs) <span class="asterisk_sign">*</span>: &nbsp  <span id="total_outstanding1"> </span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="total_outstanding" id="total_outstanding" placeholder="Total Outstanding" value="" readonly />
+                                                <input type="hidden" class="form-control" name="total_outstanding" id="total_outstanding" placeholder="Total Outstanding" value="" readonly />
                                             </div>
                                         </div>
                                     </div>
@@ -150,33 +157,21 @@
                                     </div>
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">IGST (In Rs) <span class="asterisk_sign">*</span></label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="igst" id="igst" placeholder="IGST" value="<?php if(isset($data)) echo $data[0]->igst;?>" readonly />
+                                            <div id="igst_div">
+                                            <label class="col-md-3 col-sm-3 col-xs-12 control-label" >IGST (In Rs)<span class="asterisk_sign">*</span> : &nbsp  <span id="igst1"> <?php if(isset($data)) echo $data[0]->igst;?></span></label>
+                                            <input type="hidden" class="form-control" name="igst" id="igst" placeholder="IGST" value="<?php if(isset($data)) echo $data[0]->igst;?>" readonly />
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">CGST (In Rs) <span class="asterisk_sign">*</span></label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="cgst" id="cgst" placeholder="CGST" value="<?php if(isset($data)) echo $data[0]->cgst;?>" readonly />
+                                            <div id="cgst_div">
+                                            <label class="col-md-3 col-sm-3 col-xs-12 control-label" id="">CGST (In Rs)<span class="asterisk_sign">*</span>: &nbsp <span id="cgst1"> <?php if(isset($data)) echo $data[0]->cgst;?></span></label>
+                                            <input type="hidden" class="form-control" name="cgst" id="cgst" placeholder="CGST" value="<?php if(isset($data)) echo $data[0]->cgst;?>" readonly />
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">SGST (In Rs) <span class="asterisk_sign">*</span></label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="sgst" id="sgst" placeholder="SGST" value="<?php if(isset($data)) echo $data[0]->sgst;?>" readonly />
+                                            <div id="sgst_div">
+                                            <label class="col-md-3 col-sm-3 col-xs-12 control-label" id="">SGST (In Rs)<span class="asterisk_sign">*</span>: &nbsp <span id="sgst1"> <?php if(isset($data)) echo $data[0]->sgst;?></span></label>
+                                            <input type="hidden" class="form-control" name="sgst" id="sgst" placeholder="SGST" value="<?php if(isset($data)) echo $data[0]->sgst;?>" readonly />
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Total Amount (In Rs) <span class="asterisk_sign">*</span></label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="total_amount" id="total_amount" placeholder="Total Amount" value="<?php if(isset($data)) echo $data[0]->amount;?>" readonly />
+                                            <div>
+                                            <label class="col-md-3 col-sm-3 col-xs-12 control-label" id="">Total Amount (In Rs)<span class="asterisk_sign">*</span>: &nbsp <span id="total_amount1"> <?php if(isset($data)) echo $data[0]->amount;?></span></label>
+                                            <input type="hidden" class="form-control" name="total_amount" id="total_amount" placeholder="Total Amount" value="<?php if(isset($data)) echo $data[0]->amount;?>" readonly />
                                             </div>
                                         </div>
                                     </div>
@@ -209,6 +204,24 @@
 						        <br clear="all"/>
 				            </div>
 							</div>
+                             <?php $curusr=$this->session->userdata('session_id'); ?>
+                                <?php 
+                                        if(isset($data[0]->status))
+                                        {
+                                         if(isset($access)) {
+                                            if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive'))
+                                                {
+                                                  if(isset($data[0]->status))
+                                                    {
+                                                         if($data[0]->status=='Deleted'){
+                                                            echo '<label class="col-xs-12 control-label" style="color:#cc2127!important">Note : If clicked on approve button this entry will be deleted permanently </label>';
+
+                                                         }    
+                                                    }     
+                                                }
+                                            }   
+                                        }
+                                ?>
                                 <div class="panel-footer">
 									<a href="<?php echo base_url(); ?>index.php/credit_debit_note" class="btn btn-danger btn-sm pull-right" type="reset" id="reset">Cancel</a>
                                     <?php $curusr=$this->session->userdata('session_id'); ?>
@@ -250,20 +263,25 @@
 
                 $("#distributor_id").change(function(){
                     get_distributor_details();
+					// get_distributor_details1();
                     get_tax();
+                    // get_tax1();
                 });
 
                 $("#amount_without_tax").change(function(){
                     get_tax();
+                    // get_tax1();
                 });
 
                 $("#tax").change(function(){
                     get_tax();
+					// get_tax1();
                 });
 
                 $(".datepicker1").datepicker({ maxDate: 0,changeMonth: true,yearRange:'-100:+0',changeYear: true });
 
                 get_distributor_details();
+                // get_distributor_details1();
             });
 
 
@@ -276,34 +294,53 @@
                     async:false,
                     success: function(data){
                         if(data.result==1){
-                            if(!isNaN($('#amount_without_tax').val()) && $('#amount_without_tax').val()!='' && !isNaN($('#tax').val()) && $('#tax').val()!=''){
+                            // if(!isNaN($('#amount_without_tax').val()) && $('#amount_without_tax').val()!='' && !isNaN($('#tax').val()) && $('#tax').val()!=''){
                                 // if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550") {
+                                    var tax = 0;
+                                    var amount = 0;
+
+                                    if($('#amount_without_tax').val()!=''){
+                                        amount = get_number($('#amount_without_tax').val());
+                                    }
+                                    if($('#tax').val()!=''){
+                                        tax = get_number($('#tax').val());
+                                    }
+
                                     var state = data.state;
                                     var state_code = data.state_code;
                                     if (state_code=='27')
                                     {
                                         $('#igst').val("0");
-                                        var tax = $('#tax').val();
-                                        var amount = $('#amount_without_tax').val();
-                                        cgst=(tax/2)*amount/100;
-                                        sgst=(tax/2)*amount/100;
+                                        $('#igst_div').hide();
+                                        $('#cgst_div').show();
+                                        $('#sgst_div').show();
+                                        cgst=Math.round(((tax/2)*amount/100)*100)/100;
+                                        sgst=Math.round(((tax/2)*amount/100)*100)/100;
                                         $('#cgst').val(cgst);
                                         $('#sgst').val(sgst);
-                                        var total_amount = parseInt(amount)+parseInt(cgst)+parseInt(sgst);
+                                        var total_amount = Math.round((amount+cgst+sgst)*100)/100;
                                         $('#total_amount').val(total_amount);
-                                    }
-                                    else {
+                                        $('#igst1').text("0");
+                                        $('#cgst1').text(cgst);
+                                        $('#sgst1').text(sgst);
+                                        $('#total_amount1').text(total_amount);
+                                    } else {
+                                        $('#igst_div').show();
+                                        $('#cgst_div').hide();
+                                        $('#sgst_div').hide();
                                         $('#cgst').val('0');
                                         $('#sgst').val('0');
-                                        var tax = $('#tax').val();
-                                        var amount = $('#amount_without_tax').val();
-                                        igst=tax*amount/100;
+                                        igst=Math.round((tax*amount/100)*100)/100;
                                         $('#igst').val(igst);
-                                        var total_amount = parseInt(amount)+parseInt(igst);
+                                        var total_amount = Math.round((amount+igst)*100)/100;
                                         $('#total_amount').val(total_amount);
+                                        $('#cgst1').text('0');
+                                        $('#sgst1').text('0');
+                                        $('#igst1').text(igst);
+                                        $('#total_amount1').text(total_amount);
                                     }
                                 // }
-                            }
+                            // }
                         }
                     },
                     error: function (response) {
@@ -314,6 +351,54 @@
                     }
                 });
             }
+			
+            // function get_tax1(){
+            //     $.ajax({
+            //         url:BASE_URL+'index.php/Distributor/get_data',
+            //         method:"post",
+            //         data:{id:$('#distributor_id').val()},
+            //         dataType:"json",
+            //         async:false,
+            //         success: function(data){
+            //             if(data.result==1){
+            //                 if(!isNaN($('#amount_without_tax').val()) && $('#amount_without_tax').val()!='' && !isNaN($('#tax').val()) && $('#tax').val()!=''){
+            //                     // if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550") {
+            //                         var state = data.state;
+            //                         var state_code = data.state_code;
+            //                         if (state_code=='27')
+            //                         {
+            //                             $('#igst1').text("0");
+            //                             var tax = $('#tax').val();
+            //                             var amount = $('#amount_without_tax').val();
+            //                             cgst=(tax/2)*amount/100;
+            //                             sgst=(tax/2)*amount/100;
+            //                             $('#cgst1').text(cgst);
+            //                             $('#sgst1').text(sgst);
+            //                             var total_amount = parseInt(amount)+parseInt(cgst)+parseInt(sgst);
+            //                             $('#total_amount1').text(total_amount);
+            //                         }
+            //                         else {
+            //                             $('#cgst1').text('IGST (In Rs)0');
+            //                             $('#sgst1').text('0');
+            //                             var tax = $('#tax').val();
+            //                             var amount = $('#amount_without_tax').val();
+            //                             igst=tax*amount/100;
+            //                             $('#igst1').text(igst);
+            //                             var total_amount = parseInt(amount)+parseInt(igst);
+            //                             $('#total_amount1').val(total_amount);
+            //                         }
+            //                     // }
+            //                 }
+            //             }
+            //         },
+            //         error: function (response) {
+            //             var r = jQuery.parseJSON(response.responseText);
+            //             alert("Message: " + r.Message);
+            //             alert("StackTrace: " + r.StackTrace);
+            //             alert("ExceptionType: " + r.ExceptionType);
+            //         }
+            //     });
+            // }
 			
 			
 			$('#distributor_id').change(function(){
@@ -357,6 +442,7 @@
                         success: function(data){
                             if(data.result==1){
                                 $('#total_outstanding').val(data.total_outstanding);
+                                $('#total_outstanding1').text(data.total_outstanding);
                             }
                         },
                         error: function (response) {
@@ -368,6 +454,32 @@
                     });
                 }
             }
+			
+            // function get_distributor_details1(){
+            //     var distributor_id = $('#distributor_id').val();
+            //     var module = 'credit_debit_note';
+
+            //     if(distributor_id!=''){
+            //         $.ajax({
+            //             url:BASE_URL+'index.php/Payment/get_total_outstanding',
+            //             method:"post",
+            //             data:'id='+$("#id").val()+'&distributor_id='+distributor_id+'&module='+module,
+            //             dataType:"json",
+            //             async:false,
+            //             success: function(data){
+            //                 if(data.result==1){
+            //                     $('#total_outstanding1').text(data.total_outstanding);
+            //                 }
+            //             },
+            //             error: function (response) {
+            //                 var r = jQuery.parseJSON(response.responseText);
+            //                 alert("Message: " + r.Message);
+            //                 alert("StackTrace: " + r.StackTrace);
+            //                 alert("ExceptionType: " + r.ExceptionType);
+            //             }
+            //         });
+            //     }
+            // }
 
     		$('#distributor_type').change(function(){	
         		if($('#distributor_type').val()=='Invoice') {

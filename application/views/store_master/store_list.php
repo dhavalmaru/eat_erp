@@ -53,28 +53,37 @@
 									<thead>
 										<tr>
 											<th width="65" style="text-align:center;">Sr. No.</th>
+											<th width="65" style="text-align:center;">Edit</th>
+											<th width="90" style="">Action</th>
+										
+										
 											<th>Relation</th>
 											<th>Zone</th>
 											<th>Location</th>
-											<th width="110">Creation Date</th>
-											<th>Action</th>
+											<th>Category</th>
+											<!--<th width="110">Creation Date</th>-->
+											
 										</tr>
 									</thead>
 									<tbody>
 										<?php for ($i=0; $i < count($data); $i++) { ?>
 										<tr>
 											<td style="text-align:center;"><?php echo $i+1; ?></td>
-											<td><a href="<?php echo base_url().'index.php/store/edit/'.$data[$i]->id; ?>"><?php echo $data[$i]->store_name; ?></a></td>
+											
+											<td style="text-align:center; vertical-align: middle; "><a href="<?php echo base_url().'index.php/store/edit/'.$data[$i]->id; ?>"><i class="fa fa-edit"></i></a></td>
+											<td><a href="<?php echo base_url().'index.php/store/locations/'.$data[$i]->id; ?>">View Map</a></td>
+											<td><?php echo $data[$i]->store_name; ?></td>
 											
 											<td><?php echo $data[$i]->zone; ?></td>
 											<td><?php echo $data[$i]->location; ?></td>
-											<td>
+											<td><?php echo $data[$i]->category; ?></td>
+											<!--<td>
 												<span style="display:none;">
-                                                    <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
+                                                    <?php //echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
                                                 </span>
-												<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
+												<?php// echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>-->
 												
-												<td><a href="<?php echo base_url().'index.php/store/locations/'.$data[$i]->id; ?>">View Map</a></td>
+												
 										</tr>
 											
 										<?php } ?>
@@ -100,25 +109,7 @@
 						
         <?php $this->load->view('templates/footer');?>
 		
-		  <script> function initialize() {
-    console.log('hi');
-  var myOptions = {
-      zoom: 4,
-      center: new google.maps.LatLng(locations[0], locations[1]),
-      mapTypeId: google.maps.MapTypeId.ROADMAP
-  }
-  map = new google.maps.Map(document.getElementById("map"), myOptions);
-    for (var i = 0, ln = locations.length; i < ln; i += 2) {
-      var marker = new google.maps.Marker({
-          position: new google.maps.LatLng(locations[i], locations[i + 1]),
-          map: map,
-          title: "Fast marker"
-      });
-    }
-}
-
-google.maps.event.addDomListener(window, 'load', initialize);
-	 </script>	
+	
     <!-- END SCRIPTS -->      
     </body>
 </html>

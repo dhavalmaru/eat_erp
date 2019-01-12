@@ -18,9 +18,9 @@ function get_access(){
 function get_data($status='', $id=''){
     if($status!=""){
         if($status=="Pending"){
-            $cond=" where status='Pending' or status='Deleted'";
+            $cond=" where A.status='Pending' or A.status='Deleted'";
         } else{
-            $cond=" where status='".$status."'";
+            $cond=" where A.status='".$status."'";
         }
     } else {
         $cond="";
@@ -28,15 +28,21 @@ function get_data($status='', $id=''){
 
     if($id!=""){
         if($cond=="") {
-            $cond=" where id='".$id."'";
+            $cond=" where A.id='".$id."'";
         } else {
-            $cond=$cond." and id='".$id."'";
+            $cond=$cond." and A.id='".$id."'";
         }
     }
 
     $sql = "select E.*, F.distributor_name from 
             (select C.*, D.b_name, D.b_branch from 
-            (select * from payment_details".$cond.") C 
+            (select A.*, concat(B.first_name, ' ', B.last_name) as createdby, 
+                concat(C.first_name, ' ', C.last_name) as modifiedby, 
+                concat(D.first_name, ' ', D.last_name) as approvedby 
+            from payment_details A 
+            left join user_master B on(A.created_by=B.id) 
+            left join user_master C on(A.modified_by=C.id) 
+            left join user_master D on(A.approved_by=D.id) ".$cond.") C 
             left join 
             (select * from bank_master) D 
             on (C.bank_id=D.id)) E 
@@ -92,7 +98,10 @@ function get_total_outstanding($id, $distributor_id, $module){
                 where status = 'Approved' ".$payment_cond.") group by distributor_id 
             union all 
             select distributor_id, sum(case when transaction = 'Debit Note' then (amount*-1) else amount end) as paid_amount from credit_debit_note 
-                where status = 'Approved' and distributor_id = '$distributor_id' ".$credit_debit_note_cond." group by distributor_id) B 
+                where status = 'Approved' and distributor_id = '$distributor_id' ".$credit_debit_note_cond." group by distributor_id 
+            union all 
+            select distributor_id, sum(final_amount) as paid_amount from distributor_in 
+                where status = 'Approved' and distributor_id = '$distributor_id' group by distributor_id) B 
             group by B.distributor_id) C 
             on (A.distributor_id=C.distributor_id) 
             group by A.distributor_id";
@@ -163,12 +172,47 @@ function save_data($id=''){
         } else {
             if($id!='' || $ref_id!=''){
                 if($ref_id!=null && $ref_id!=''){
-                    $sql = "Update payment_details A, payment_details B 
+
+                    $modified_approved_date = NULL;
+                    $get_modified_approved_date_result = $this->db->select('modified_approved_date')->where('id',$id)->get('payment_details')->result();
+
+                    if(count($get_modified_approved_date_result)>0)
+                    {
+                       $modified_approved_date = $get_modified_approved_date_result[0]->modified_approved_date;
+                        
+                        if($modified_approved_date!=null && $modified_approved_date!="")
+                        {
+                            $modified_approved_date = date("Y-m-d");
+                        }else
+                        {
+                            $modified_approved_date = NULL;
+                        }
+                    }
+                    else
+                    {
+                       $modified_approved_date = NULL;
+                    }
+
+                    if($modified_approved_date!=null && $modified_approved_date!=null)
+                    {
+                        $sql = "Update payment_details A, payment_details B 
                             Set A.date_of_deposit=B.date_of_deposit, A.bank_id=B.bank_id, A.payment_mode=B.payment_mode,
                                 A.total_amount=B.total_amount, A.status='$status', A.remarks='$remarks', 
                                 A.modified_by=B.modified_by, A.modified_on=B.modified_on, 
-                                A.approved_by='$curusr', A.approved_on='$now' 
+                                A.approved_by='$curusr', A.approved_on='$now',A.modified_approved_date='$modified_approved_date'
                             WHERE A.id = '$ref_id' and B.id = '$id'";
+                    }
+                    else
+                    {
+                         $sql = "Update payment_details A, payment_details B 
+                            Set A.date_of_deposit=B.date_of_deposit, A.bank_id=B.bank_id, A.payment_mode=B.payment_mode,
+                                A.total_amount=B.total_amount, A.status='$status', A.remarks='$remarks', 
+                                A.modified_by=B.modified_by, A.modified_on=B.modified_on, 
+                                A.approved_by='$curusr', A.approved_on='$now',A.modified_approved_date=NULL
+
+                            WHERE A.id = '$ref_id' and B.id = '$id'";
+                    }
+                   
                     $this->db->query($sql);
 
                     $sql = "Delete from payment_details where id = '$id'";
@@ -195,6 +239,10 @@ function save_data($id=''){
                 }
 
                 $action='Payment Entry '.$status.'.';
+				 echo '<script>
+				 var win = window.open("'.base_url().'index.php/payment/view_payment_slip/'.$id.'");
+				 win.print();
+				</script>';
             }
         }
     } else {
@@ -230,6 +278,16 @@ function save_data($id=''){
             'modified_on' => $now,
             'ref_id' => $ref_id
         );
+
+
+        $date_p=strtotime($date_of_deposit);
+        $current_d=strtotime($now);
+
+        if($ref_id!=null && $ref_id!="")
+        {
+            $data['modified_approved_date']=$now;
+        }
+
 
         if($id==''){
             $data['created_by']=$curusr;
@@ -278,19 +336,22 @@ function save_data($id=''){
 
         $this->db->where('payment_id', $id);
         $this->db->delete('payment_slip_denomination');
-        $data = array(
-            'payment_id' => $id,
-            'denomination_2000' => $this->input->post('denomination_2000'),
-            'denomination_1000' => $this->input->post('denomination_1000'),
-            'denomination_500' => $this->input->post('denomination_500'),
-            'denomination_100' => $this->input->post('denomination_100'),
-            'denomination_50' => $this->input->post('denomination_50'),
-            'denomination_20' => $this->input->post('denomination_20'),
-            'denomination_10' => $this->input->post('denomination_10'),
-            'denomination_other' => $this->input->post('denomination_other'),
-            'denomination_other_amount' => $this->input->post('denomination_other_amount')
-        );
-        $this->db->insert('payment_slip_denomination',$data);
+
+        if($this->input->post('payment_mode')=='Cash'){
+            $data = array(
+                'payment_id' => $id,
+                'denomination_2000' => ($this->input->post('denomination_2000')=='')?null:$this->input->post('denomination_2000'),
+                'denomination_1000' => ($this->input->post('denomination_1000')=='')?null:$this->input->post('denomination_1000'),
+                'denomination_500' => ($this->input->post('denomination_500')=='')?null:$this->input->post('denomination_500'),
+                'denomination_100' => ($this->input->post('denomination_100')=='')?null:$this->input->post('denomination_100'),
+                'denomination_50' => ($this->input->post('denomination_50')=='')?null:$this->input->post('denomination_50'),
+                'denomination_20' => ($this->input->post('denomination_20')=='')?null:$this->input->post('denomination_20'),
+                'denomination_10' => ($this->input->post('denomination_10')=='')?null:$this->input->post('denomination_10'),
+                'denomination_other' => ($this->input->post('denomination_other')=='')?null:$this->input->post('denomination_other'),
+                'denomination_other_amount' => ($this->input->post('denomination_other_amount')=='')?null:$this->input->post('denomination_other_amount')
+            );
+            $this->db->insert('payment_slip_denomination',$data);
+        }
     }
 
     $logarray['table_id']=$id;
@@ -312,6 +373,12 @@ function generate_payment_slip($id) {
         $total_amount=floatval($result[0]->total_amount);
         $b_name=$result[0]->b_name;
         $b_branch=$result[0]->b_branch;
+        $createdby=$result[0]->createdby;
+        $modifiedby=$result[0]->modifiedby;
+        $approvedby=$result[0]->approvedby;
+        $approved_on=$result[0]->approved_on;
+        $modified_on=$result[0]->modified_on;
+        $created_on=$result[0]->created_on;
     } else {
         $date_of_deposit=null;
         $total_amount=0;
@@ -323,6 +390,12 @@ function generate_payment_slip($id) {
     $data['total_amount_in_words']=convert_number_to_words($total_amount) . ' Only';
     $data['b_name']=$b_name;
     $data['b_branch']=$b_branch;
+    $data['createdby']=$createdby;
+    $data['modifiedby']=$modifiedby;
+    $data['approvedby']=$approvedby;
+    $data['approved_on']=$approved_on;
+    $data['modified_on']=$modified_on;
+    $data['created_on']=$created_on;
 
     if(isset($date_of_deposit) && $date_of_deposit!=''){
         $y1=substr($date_of_deposit, 0, 1);

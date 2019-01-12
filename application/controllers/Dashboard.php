@@ -16,24 +16,40 @@ class Dashboard extends CI_Controller
 
     //index function
     public function index(){
-        $result=$this->dashboard_model->get_access();
-        if(count($result)>0) {
-            $data['total_sale']=$this->dashboard_model->get_total_sale();
-            $data['total_dist']=$this->dashboard_model->get_total_distributor();
-            $data['total_stock']=$this->dashboard_model->get_total_stock();
-            $data['total_receivable']=$this->dashboard_model->get_total_receivable();
+        $role_id=$this->session->userdata('role_id');
 
-            load_view('dashboard/dashboard_new', $data);
+        if($role_id==10){
+            redirect(base_url().'index.php/Dashboard/production');
         } else {
-            echo '<script>alert("You donot have access to this page.");</script>';
-            $this->load->view('login/main_page');
+            $result=$this->dashboard_model->get_access();
+            if(count($result)>0) {
+                $data['total_sale']=$this->dashboard_model->get_total_sale();
+                $data['total_dist']=$this->dashboard_model->get_total_distributor();
+                $data['total_stock']=$this->dashboard_model->get_total_stock();
+                $data['total_receivable']=$this->dashboard_model->get_total_receivable();
+
+                load_view('dashboard/dashboard_new', $data);
+            } else {
+                echo '<script>alert("You donot have access to this page.");</script>';
+                $this->load->view('login/main_page');
+            }
         }
     }
 
     public function dashboardscreen(){
-        
-        load_view_without_data('dashboard/dashboard_screen');
-        
+        $role_id=$this->session->userdata('role_id');
+
+        if($role_id==10){
+            redirect(base_url().'index.php/Dashboard/production');
+        } else {
+            load_view_without_data('dashboard/dashboard_screen');
+        }
+    }
+
+    public function production(){
+        $data['pre_production']=$this->dashboard_model->get_notifications('Pre Production');
+        $data['post_production']=$this->dashboard_model->get_notifications('Post Production');
+        load_view('dashboard/production', $data);
     }
 
     // public function stock(){
@@ -51,8 +67,8 @@ class Dashboard extends CI_Controller
 
     public function stock(){
         $data['raw_material_details']=$this->dashboard_model->get_raw_material_stock();
-        // $data['product_details']=$this->dashboard_model->get_product_stock();
-        // $data['box_details']=$this->dashboard_model->get_box_stock();
+        $data['product_details1']=$this->dashboard_model->get_product_stock();
+        $data['box_details']=$this->dashboard_model->get_box_stock();
 
         // $data['product_details']=$this->dashboard_model->get_total_product_stock();
 

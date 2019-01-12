@@ -52,14 +52,16 @@ class Order extends CI_Controller{
                         <input type="hidden" id="input_check_'.$i.'" name="check[]" value="false" />',
 
                         $i+1,
+						 '<a href="'.base_url().'index.php/order/edit/'.$r[$i]->id.'"  class=""><i style="vertical:middle;text-align:center" class="fa fa-edit"></i></a>',
 
                         '<span style="display:none;">
                         <input type="hidden" id="date_of_processing_'.$i.'" name="date_of_processing[]" value="'.$r[$i]->date_of_processing.'" />'.
                             (($r[$i]->date_of_processing!=null && $r[$i]->date_of_processing!='')?date('Ymd',strtotime($r[$i]->date_of_processing)):'')
                         .'</span>'.
-                        '<a href="'.base_url().'index.php/order/edit/'.$r[$i]->id.'">'.
-                            (($r[$i]->date_of_processing!=null && $r[$i]->date_of_processing!='')?date('d/m/Y',strtotime($r[$i]->date_of_processing)):'').
-                        '</a>',
+                       
+                            (($r[$i]->date_of_processing!=null && $r[$i]->date_of_processing!='')?date('d/m/Y',strtotime($r[$i]->date_of_processing)):''),
+                       
+						
 
                         $r[$i]->id,
 

@@ -93,6 +93,7 @@ class Sales_rep extends CI_Controller{
         }
     }
 
+
     public function add(){
         $result=$this->sales_rep_model->get_access();
         if(count($result)>0) {
@@ -394,5 +395,283 @@ class Sales_rep extends CI_Controller{
         }
     }
 
+    public function change_admin_sequence($id='')
+    {
+        $day = date('l');
+        $m = date('F');
+        $year = date('Y');
+        $frequency = '';
+
+        $get_alternate  = $this->get_alternate($day,$m,$year);
+        if($get_alternate)
+        {
+            $frequency = 'Alternate '.$day;
+        }
+        else
+        {
+            $frequency = 'Every '.$day;
+        }
+
+       
+        $result=$this->sales_rep_model->get_access();    
+        if(count($result)>0) {
+            $data['access']=$result;
+           
+            $sales_rep = $this->db->query("select * from sales_rep_master where sr_type='Sales Representative' and status='Approved' order by sales_rep_name desc")->result();
+            if($id!="")
+            {
+
+             $sql ="select G.*,H.date_of_visit,H.id as mid , H.remarks,H.followup_date from (select E.*,F.sales_rep_name from(select C.* from (select A.*,B.distributor_name ,B.distributor_name as store_name ,B.google_address,B.latitude,B.longitude from 
+                    (select * ,id as bit_plan_id from  sales_rep_beat_plan Where frequency='$frequency' and sales_rep_id=$id) A 
+                    left join 
+                    (Select Distinct C.* FROM(
+                        Select B.* from (
+                            Select concat('d_',A.id) as id , A.distributor_name ,A.google_address,A.latitude,A.longitude,'' as gst_number,'' as margin,'' as doc_document,' ' as document_name FROM
+                            (Select * from distributor_master )A
+                            LEFT JOIN sr_mapping B ON (A.area_id = B.area_id and A.zone_id = B.zone_id and  A.type_id = B.type_id) 
+                            Where A.status='approved' and A.class='normal'
+                        ) B
+                        Union 
+                        (
+                            Select concat('s_',A.id) as id , A.distributor_name ,'' as google_address,A.latitude,A.longitude,A.gst_number,A.margin,A.doc_document,A.document_name FROM
+                            (Select * from sales_rep_distributors )A
+                        )            
+                        ) C 
+                    ) B 
+                    on (A.store_id=B.id COLLATE utf8_unicode_ci))C)E
+                     left join 
+                    (select * from sales_rep_master where sr_type='Sales Representative' order by sales_rep_name desc ) F 
+                    on (E.sales_rep_id=F.id))G
+                    left join
+                    (select * from sales_rep_location 
+                    Where date(date_of_visit)=date(now())) H
+                    on(G.store_id=H.distributor_id)
+                    order by G.sequence asc,G.modified_on Desc
+                    ";
+                $detailed_beat_plan = $this->db->query($sql)->result_array();
+
+                $sql ="select G.* from (select E.*,F.sales_rep_name from(select C.* from (select A.*,B.distributor_name ,B.distributor_name as store_name ,B.google_address,B.latitude,B.longitude from 
+                    (select * ,id as bit_plan_id from  admin_sales_rep_beat_plan Where frequency='$frequency' and sales_rep_id=$id) A 
+                    left join 
+                    (Select C.* FROM(
+                        Select concat('d_',A.id) as id , A.distributor_name ,A.google_address,A.latitude,A.longitude FROM
+                        (Select * from distributor_master  )A
+                        LEFT JOIN sr_mapping B ON (A.area_id = B.area_id and A.zone_id = B.zone_id and  A.type_id = B.type_id) 
+                        Where A.status='approved' and A.class='normal'
+                        ) C GROUP BY id, distributor_name ,google_address,latitude,longitude
+                    ) B 
+                    on (A.store_id=B.id COLLATE utf8_unicode_ci))C)E
+                     left join 
+                    (select * from sales_rep_master where sr_type='Sales Representative' order by sales_rep_name desc ) F 
+                    on (E.sales_rep_id=F.id))G
+                    order by G.sequence asc,G.modified_on Desc
+                    ";
+                $admin_merchendizer_beat_plan = $this->db->query($sql)->result_array(); 
+
+
+                $data['beat_plan']=$detailed_beat_plan;
+                $data['admin_beat_plan']=$admin_merchendizer_beat_plan;
+                $data['sales_rep_id']=$id;        
+            }
+            else
+            {
+              $data['beat_plan']=[];
+              $data['admin_beat_plan']=[];  
+              $data['sales_rep_id']='';
+            }
+            $data['sales_rep']=$sales_rep; 
+            $data['frequency']=$frequency;
+          
+            load_view('sales_rep/edit_beat_plan', $data);
+
+        }  else {
+            echo '<script>alert("You donot have access to this page.");</script>';
+            $this->load->view('login/main_page');
+        }       
+    }
+    
+
+    public function get_alternate($day,$m,$year)
+    {
+        
+        $date1 = date('d-m-Y', strtotime('second '.$day.' of '.$m.' '.$year));
+        $date2 = date('d-m-Y', strtotime('fourth '.$day.' of '.$m.' '.$year));
+
+        $todaysdate = date('d-m-Y');
+        if($date1==$todaysdate) 
+        {
+            return true;
+        }
+        elseif($date2==$todaysdate)
+        {
+            return true;
+        }
+        else
+        {
+           return false;
+        }
+    }
+
+
+    public function save_changesequence()
+    {
+       $ispermanent = $this->input->post('ispermenant');
+       $resultb= $this->sales_rep_model->change_sequence($ispermanent);
+
+       $id = $this->input->post('sales_rep_id');
+       $this->change_admin_sequence($id);
+    }
+
+    public function sales_rep_not_mapped($status='')
+    {
+       $result = $this->db->query('Select DISTINCT sales_rep_id from sales_rep_beat_plan')->result();
+
+        $sales_rep_id = array();
+        foreach ($result as $data) {
+            $sales_rep_id[]=$data->sales_rep_id;
+        }
+
+       $sales_rep_id =  implode(" ,", $sales_rep_id);
+
+      
+
+       if(count($result)>0)
+        {
+            $result = $this->db->query("Select * from sales_rep_master Where  status='Approved' and sr_type='Sales Representative' and   id NOT IN($sales_rep_id)")->result();
+        } else
+        {
+           $result = $this->db->query("Select * from sales_rep_master Where  status='Approved' and sr_type='Sales Representative'")->result();
+        }
+
+       $this->db->last_query();
+       $template_path=$this->config->item('template_path');
+       $file = $template_path.'sales_rep.xls';
+       $this->load->library('excel');
+       $objPHPExcel = PHPExcel_IOFactory::load($file);
+       $objPHPExcel->setActiveSheetIndex(0);
+       $row = 3;
+       foreach($result  as $dist)
+        {
+           $objPHPExcel->getActiveSheet()->setCellValue('A'.$row,$dist->sales_rep_name);
+           $row = $row+1;
+        }
+
+        if(count($result)>0)
+        {
+            $filename='sales_rep_not_mapped.xls';
+            header('Content-Type: application/vnd.ms-excel');
+            header('Content-Disposition: attachment;filename="'.$filename.'"');
+            header('Cache-Control: max-age=0');
+            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+            $objWriter->save('php://output');
+        }
+    }
+
+    public function retailer_not_mapped($status='')
+    {
+      $sqlqueries = "Select A.distributor_name,A.id from 
+                        (select * from distributor_master where class='normal') A 
+                        left join 
+                        (select * from sales_rep_master) B 
+                        on (A.sales_rep_id=B.id) GROUP BY  A.distributor_name order by A.distributor_name asc";
+    $result = $this->db->query($sqlqueries)->result();                        
+        $sales_rep_id = array();
+        foreach ($result as $data) {
+            $sales_rep_id[]=$data->id;
+        }
+
+       $sales_rep_id =  implode(" ,", $sales_rep_id);
+
+       if(count($result)>0)
+        {
+            $result = $this->db->query("SELECT * from distributor_master Where status='Approved' and   id NOT IN($sales_rep_id)")->result();
+        } else
+        {
+          $result = $this->db->query("SELECT * from distributor_master Where status='Approved'")->result();
+           $this->db->last_query(); 
+        }
+
+       
+       $template_path=$this->config->item('template_path');
+       $file = $template_path.'sales_rep.xls';
+       $this->load->library('excel');
+       $objPHPExcel = PHPExcel_IOFactory::load($file);
+       $objPHPExcel->setActiveSheetIndex(0);
+       $row = 3;
+       foreach($result  as $dist)
+        {
+           $objPHPExcel->getActiveSheet()->setCellValue('B'.$row,$dist->distributor_name);
+           $row = $row+1;
+        }
+
+        if(count($result)>0)
+        {
+            $filename='sales_rep_not_mapped.xls';
+            header('Content-Type: application/vnd.ms-excel');
+            header('Content-Disposition: attachment;filename="'.$filename.'"');
+            header('Cache-Control: max-age=0');
+            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+            $objWriter->save('php://output');
+        }
+    }
+
+    public function zone_not_mapped($status='')
+    {
+        $result = $this->db->query('Select DISTINCT zone_id from sales_rep_beat_plan')->result();
+
+        $zone_id = array();
+        $count=count($result);
+        if($count>2)
+        {
+        foreach ($result as $data) {
+            $zone_id[]=$data->zone_id;
+                
+        }
+        
+        $zone_id =  implode(",", $zone_id);
+        }
+        else
+        {
+        foreach ($result as $data) {
+            $zone_id=$data->zone_id;
+                
+        }
+                    
+       
+        }
+
+      // $zone_id =  implode(" ,", $zone_id);
+       if(count($result)>0)
+        {
+            $result = $this->db->query("select * from zone_master Where status='Approved' and id NOT IN($zone_id)")->result();
+        }
+        else
+        {
+            $result = $this->db->query("select * from zone_master Where status='Approved'")->result();
+        }
+
+       
+       $template_path=$this->config->item('template_path');
+       $file = $template_path.'zone.xls';
+       $this->load->library('excel');
+       $objPHPExcel = PHPExcel_IOFactory::load($file);
+       $objPHPExcel->setActiveSheetIndex(0);
+       $row = 3;
+       foreach($result  as $dist)
+        {
+           $objPHPExcel->getActiveSheet()->setCellValue('A'.$row,$dist->zone);
+           $row = $row+1;
+        }
+
+        if(count($result)>0)
+        {
+            $filename='zone.xls';
+            header('Content-Type: application/vnd.ms-excel');
+            header('Content-Disposition: attachment;filename="'.$filename.'"');
+            header('Cache-Control: max-age=0');
+            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+            $objWriter->save('php://output');
+        }
+    }
 }
 ?>

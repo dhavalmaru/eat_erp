@@ -104,43 +104,49 @@
 									<thead>
 										<tr>
 										    <th width="58" style="text-align:center;"> Sr. No.</th>
+										 
 											<th width="125">Date Of Transaction</th>
-											<th width="300">Distributor Name</th>
-											<th width="300">Transaction</th>
-											<th width="110">Amount (In Rs) </th>
-											<th width="100">Creation Date</th>
-											<th width="110">Remarks</th>
-											<th width="110">Status</th>
-											<th width="110">View Credit Debit Note</th>
+											<th width="58" style="text-align:center;"> Edit </th>
+											<th width="80">View Credit Debit Note</th>
+											<th width="340">Distributor Name</th>
+											<th width="110">Transaction</th>
+											<th width="50">Amount (In Rs) </th>
+											<!--<th width="100">Creation Date</th>-->
+											<th width="300">Remarks</th>
+											<!--<th width="110">Status</th>-->
+										
 										</tr>
 									</thead>
 									<tbody>
 										<?php for ($i=0; $i < count($data); $i++) { ?>
 										<tr>
 											<td style="text-align:center;"><?php echo $i+1; ?></td>
+											
 											<td>
                                                 <span style="display:none;">
                                                     <?php echo (($data[$i]->date_of_transaction!=null && $data[$i]->date_of_transaction!='')?date('Ymd',strtotime($data[$i]->date_of_transaction)):''); ?>
                                                 </span>
-                                                <a href="<?php echo base_url().'index.php/credit_debit_note/edit/'.$data[$i]->id; ?>"><?php echo (($data[$i]->date_of_transaction!=null && $data[$i]->date_of_transaction!='')?date('d/m/Y',strtotime($data[$i]->date_of_transaction)):''); ?></a>
+                                              <?php echo (($data[$i]->date_of_transaction!=null && $data[$i]->date_of_transaction!='')?date('d/m/Y',strtotime($data[$i]->date_of_transaction)):''); ?>
                                             </td>
-											<td><?php echo $data[$i]->distributor_name; ?></td>
-											<td><?php echo $data[$i]->transaction; ?></td>
-											<td><?php echo format_money($data[$i]->amount,2); ?></td>
-											<td>
-												<span style="display:none;">
-                                                    <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
-                                                </span>
-												<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
-											<td><?php echo $data[$i]->remarks; ?></td>
-											<td><?php echo $data[$i]->status; ?></td>
-											<td>
+											<td style="text-align:center; vertical-align: middle; "><a href="<?php echo base_url().'index.php/credit_debit_note/edit/'.$data[$i]->id; ?>"><i class="fa fa-edit"></i></a></td>
+											<td style="font-size:20px;text-align:center; vertical-align: middle;">
 												<?php if($data[$i]->ref_no!=null && $data[$i]->ref_no!=''){ ?>
 													<a href="<?php echo base_url().'index.php/credit_debit_note/view_credit_debit_note/'.$data[$i]->id; ?>" target="_blank"> 
-					                                    <span class="fa fa-file-pdf-o" style="font-size:20px;"></span>
+					                                    <span class="fa fa-file-pdf-o" style="font-size:20px;text-align:center"></span>
 					                                </a>
 												<?php } ?>
 											</td>
+											<td><?php echo $data[$i]->distributor_name; ?></td>
+											<td><?php echo $data[$i]->transaction; ?></td>
+											<td><?php echo format_money($data[$i]->amount,2); ?></td>
+											<!--<td>
+												<span style="display:none;">
+                                                    <?php//echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
+                                                </span>
+												<?php// echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>-->
+											<td><?php echo $data[$i]->remarks; ?></td>
+											<!--<td><?php //echo $data[$i]->status; ?></td>-->
+										
 										</tr>
 										<?php } ?>
 									</tbody>

@@ -60,30 +60,32 @@
 									<thead>
 										<tr>
 											<th width="65" style="text-align:center;">Sr. No.</th>
+											<th width="65" style="text-align:center;">Edit</th>
 											<th>Box Name</th>
 											<th>Short Name</th>
 											<th width="150">Barcode</th>
 											<th width="80">Grams</th>
-											<th width="105">Rate (In Rs)</th>
-											<th width="105">Cost (In Rs)</th>
-											<th width="115">Creation Date</th>
+											<th width="80">Rate (In Rs)</th>
+											<th width="80">Cost (In Rs)</th>
+											<!--<th width="115">Creation Date</th>-->
 										</tr>
 									</thead>
 									<tbody>
 										<?php for ($i=0; $i < count($data); $i++) { ?>
 										<tr>
 											<td style="text-align:center;"><?php echo $i+1; ?></td>
-											<td><a href="<?php echo base_url().'index.php/box/edit/'.$data[$i]->id; ?>"><?php echo $data[$i]->box_name; ?></a></td>
+											<td style="text-align:center; vertical-align: middle; "><a href="<?php echo base_url().'index.php/box/edit/'.$data[$i]->id; ?>"><i class="fa fa-edit"></i></a></td>
+											<td><?php echo $data[$i]->box_name; ?></td>
 											<td><?php echo $data[$i]->short_name; ?></td>
 											<td><?php echo $data[$i]->barcode; ?></td>
 											<td><?php echo format_money($data[$i]->grams,2); ?></td>
 											<td><?php echo format_money($data[$i]->rate,2); ?></td>
 											<td><?php echo format_money($data[$i]->cost,2); ?></td>
-											<td>
+											<!--<td>
 												<span style="display:none;">
-                                                    <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
+                                                    <?php //echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
                                                 </span>
-												<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
+												<?php //echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td-->
 										</tr>
 										<?php } ?>
 									</tbody>

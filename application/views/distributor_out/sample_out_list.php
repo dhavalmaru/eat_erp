@@ -39,6 +39,14 @@
 		    background-color: #eee;
 		    padding-bottom:50px!important;
 		}}
+		#customers10
+		{
+			width:100%!important;
+		}
+		.dt-body-center
+		{
+			text-align:center;
+		}
 		</style>	
     </head>
     <body>
@@ -80,9 +88,9 @@
                                     <span class="fa fa-shopping-cart"></span> Select Delivery Status
                                 </button>
                             <?php } else if($status=='pending_for_approval') { ?>
-                                <button class="btn btn-success btn-block btn-padding" type="button" onClick="get_batch_details();">
+                                <!-- <button class="btn btn-success btn-block btn-padding" type="button" onClick="get_batch_details();">
                                     <span class="fa fa-shopping-cart"></span> Authorise Records
-                                </button>
+                                </button> -->
                             <?php } ?>
                         </div>
                         <div class="pull-right btn-margin" style="<?php if($access[0]->r_insert=='0' || $status=='pending_for_delivery' || $status=='gp_issued' || $status=='delivered_not_complete' || $status=='pending_for_approval') echo 'display: none;';?>">
@@ -176,64 +184,26 @@
     										<table id="customers10" class="table datatable table-bordered"  >
     											<thead>
     												<tr>
-                                                        <th width="65" align="center" style="<?php if($status!='pending_for_delivery' && $status!='gp_issued' && $status!='pending_for_approval') echo 'display: none;'; ?>">Select</th>
-                                                        <th width="65" align="center">Sr. No.</th>
-    													<th width="156">Date Of processing</th>
-    													<th width="130">Voucher No</th>
-    													<th width="140">Depot Name</th>
-    													<th width="140">Distributor Name</th>
+                                                   <th width="50" align="center" style="<?php if($status!='pending_for_delivery' && $status!='gp_issued' ) echo 'display: none;'; ?>">Select</th> 
+                                                        <th width="50" style="text-align:center; "align="center">Sr. No.</th>
+    													<th width="100">Date Of processing</th>
+    													<th width="50" style="text-align:center; ">Edit</th>
+														<th width="50" style="text-align:center; <?php if($status=='pending_for_delivery') echo 'display: none;'; ?>">View Voucher</th>
+    													<th width="150">Voucher No</th>
+    													
+    													<th width="120">Distributor Name</th>
                                                         <th width="140">Location</th>
-    													<th width="220" >Sales Representative Name</th>
+    										
     													<th width="120" >Amount (In Rs)</th>
-    													<th width="110" >Creation Date</th>
-														<th width="110" >Status</th>
+    									
+												
                                                         <th width="110" >Delivery Status</th>
-                                                        <th width="110" >Delivery Person</th>
-    													<th width="105" style="text-align:center; <?php if($status=='pending_for_delivery') echo 'display: none;'; ?>">View Voucher</th>
-                                                        <th width="105" style="text-align:center; display:none;">View GP</th>
-    													<th width="50" style="display:none;">Resend Invoice</th>
+                                              
+                                                        <!-- <th width="105" style="text-align:center; display:none;">View GP</th>
+    													<th width="50" style="display:none;">Resend Invoice</th> -->
     												</tr>
     											</thead>
     											<tbody>
-    												<?php for ($i=0; $i < count($data); $i++) { ?>
-    												<tr>
-    													<td style="text-align:center; <?php if($status!='pending_for_delivery' && $status!='gp_issued' && $status!='pending_for_approval') echo 'display: none;'; ?>">
-                                                            <input type="checkbox" id="check_<?php echo $i; ?>" class="check icheckbox" name="check[]" value="<?php echo $data[$i]->id; ?>" />
-                                                        </td>
-                                                        <td  style="text-align:center;"><?php echo $i+1; ?></td>
-    													<td>
-                                                            <span style="display:none;">
-                                                                <?php echo (($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('Ymd',strtotime($data[$i]->date_of_processing)):''); ?>
-                                                            </span>
-                                                            <?php //if($status=='pending_for_delivery' || $status=='gp_issued' || $status=='pending_for_approval') { ?>
-                                                            <?php //echo (($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('d/m/Y',strtotime($data[$i]->date_of_processing)):''); ?>
-                                                            <?php //} else { ?>
-                                                            <a href="<?php echo base_url().'index.php/sample_out/edit/'.$data[$i]->d_id; ?>"><?php echo (($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('d/m/Y',strtotime($data[$i]->date_of_processing)):''); ?></a>
-                                                            <?php //} ?>
-                                                        </td>
-    													<td>
-                                                            <span style="display:none;">
-                                                                <?php if(isset($data[$i]->voucher_no)) echo str_pad(substr($data[$i]->voucher_no, strrpos($data[$i]->voucher_no, "/")+1),10,"0",STR_PAD_LEFT); ?>
-                                                            </span>
-                                                            <?php echo $data[$i]->voucher_no; ?>
-                                                        </td>
-    													<td><?php echo $data[$i]->depot_name; ?></td>
-    													<td><?php echo $data[$i]->distributor_name; ?></td>
-                                                        <td><?php echo $data[$i]->location; ?></td>
-    													<td><?php echo $data[$i]->sales_rep_name; ?></td>
-    													<td><?php echo format_money($data[$i]->final_amount,2); ?></td>
-    													<td><?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
-														<td><?php echo $data[$i]->status; ?></td>
-                                                        <td>
-                                                            <?php echo $data[$i]->delivery_status; ?>
-                                                            <input type="hidden" id="dlvery_status_<?php echo $i; ?>" name="dlvery_status[]" value="<?php echo $data[$i]->delivery_status; ?>" />
-                                                        </td>
-                                                        <td><?php echo $data[$i]->del_person_name; ?></td>
-    													<td style="text-align:center; vertical-align: middle; <?php if($status=='pending_for_delivery') echo 'display: none;'; ?>"><?php if (($data[$i]->invoice_no!=null && $data[$i]->invoice_no!='') || ($data[$i]->voucher_no!=null && $data[$i]->voucher_no!='')) { ?><a href="<?php echo base_url().'index.php/sample_out/view_tax_invoice/'.$data[$i]->id; ?>" target="_blank">  <span class="fa fa-file-pdf-o"></span></a><?php } ?></td>
-                                                        <td style="text-align:center; vertical-align: middle; display:none;"><a href="<?php echo base_url().'index.php/sample_out/view_gate_pass/'.$data[$i]->id; ?>" target="_blank">  <span class="fa fa-file-pdf-o"></span></a></td>
-    													<td style="text-align:center; vertical-align: middle; display:none;"><a href="<?php //echo base_url().'index.php/distributor_out/view_payment_details/'.$data[$i]->id; ?>#"><span class="fa fa-eye">Resend Invoice</span></a></td>
-    												</tr>
-    												<?php } ?>
     											</tbody>
     										</table>
     									</div>
@@ -458,93 +428,145 @@
             }
         }
     	</script>
-<script>
-var table;
-        $(document).ready(function() {
-            
-            var len=<?php if($status=='pending_for_delivery' || $status=='gp_issued') echo '-1';else echo '10';?>;
-            table =  $('#customers10');
-            var tableOptions = {
-                'bPaginate': true,
-                'iDisplayLength': len,
-                aLengthMenu: [
-                    [10,25, 50, 100, 200, -1],
-                    [10,25, 50, 100, 200, "All"]
-                ],
-                'bDeferRender': true,
-                'bProcessing': true
-            };
-            table.DataTable(tableOptions);
-            
-            $("#csv").click(function(){
-                table.DataTable().destroy();
-                tableOptions.bPaginate = false;
+        <script>
+            var table;
+            var status = '<?php echo $status; ?>';
+            $(document).ready(function() {
+                
+                var len=10;
+               if(status =='gp_issued') {
+                    columnDefs = [        
+                                    {
+                                        "targets": [0],
+                                        "visible": true,
+                                        "searchable": true
+                                    },
+								
+                                      { "width": "10%", "targets": 8 },
+									    { className: "dt-body-center", targets: [ 3,4 ] }
+                                ];
+                }
+
+                else if(status!='pending_for_delivery') {
+                    columnDefs = [        
+                                    {
+                                        "targets": [0],
+                                        "visible": false,
+                                        "searchable": false
+                                    },
+								
+                                      { "width": "10%", "targets": 8 },
+									    { className: "dt-body-center", targets: [ 3,4 ] }
+                                ];
+                }
+				else
+				{
+					    columnDefs = [        
+                                    {
+                                        "targets": [0],
+                                        "visible": true,
+                                        "searchable": true
+                                    },
+										{
+                                        "targets": [4],
+                                        "visible": false,
+                                        "searchable": false
+                                    },
+                                      { "width": "10%", "targets": 8 },
+									    { className: "dt-body-center", targets: [ 3,4 ] }
+                                ];
+					
+				}
+
+
+                table =  $('#customers10');
+                var tableOptions = {
+                    "columnDefs": columnDefs,
+                    'bPaginate': true,
+                    'iDisplayLength': len,
+                    aLengthMenu: [
+                        [10,25, 50, 100, 200, -1],
+                        [10,25, 50, 100, 200, "All"]
+                    ],
+                    "ajax": {
+                        url : BASE_URL+'index.php/Sample_out/get_data/'+status,
+                        // data: {status: status},
+                        type : 'GET'
+                    },
+                    'bDeferRender': true,
+                    'bProcessing': true
+                };
                 table.DataTable(tableOptions);
-                table.tableExport({type:'csv',escape:'false'});
-                table.DataTable().destroy();
-                tableOptions.bPaginate = true;
-                table.DataTable(tableOptions);
-            });
-            
-            $("#xls").click(function(){
-                table.DataTable().destroy();
-                tableOptions.bPaginate = false;
-                table.DataTable(tableOptions);
-                table.tableExport({type:'excel',escape:'false'});
-                table.DataTable().destroy();
-                tableOptions.bPaginate = true;
-                table.DataTable(tableOptions);
-            });
+                
+                $("#csv").click(function(){
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = false;
+                    table.DataTable(tableOptions);
+                    table.tableExport({type:'csv',escape:'false'});
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = true;
+                    table.DataTable(tableOptions);
+                });
+                
+                $("#xls").click(function(){
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = false;
+                    table.DataTable(tableOptions);
+                    table.tableExport({type:'excel',escape:'false'});
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = true;
+                    table.DataTable(tableOptions);
+                });
 
 
 
-            $("#txt").click(function(){
-                table.DataTable().destroy();
-                tableOptions.bPaginate = false;
-                table.DataTable(tableOptions);
-                table.tableExport({type:'txt',escape:'false'});
-                table.DataTable().destroy();
-                tableOptions.bPaginate = true;
-                table.DataTable(tableOptions);
-            });
-            $("#doc").click(function(){
-                table.DataTable().destroy();
-                tableOptions.bPaginate = false;
-                table.DataTable(tableOptions);
-                table.tableExport({type:'doc',escape:'false'});
-                table.DataTable().destroy();
-                tableOptions.bPaginate = true;
-                table.DataTable(tableOptions);
-            });
-            $("#powerpoint").click(function(){
-                table.DataTable().destroy();
-                tableOptions.bPaginate = false;
-                table.DataTable(tableOptions);
-                table.tableExport({type:'powerpoint',escape:'false'});
-                table.DataTable().destroy();
-                tableOptions.bPaginate = true;
-                table.DataTable(tableOptions);
-            });
-            $("#png").click(function(){
-                table.DataTable().destroy();
-                tableOptions.bPaginate = false;
-                table.DataTable(tableOptions);
-                table.tableExport({type:'png',escape:'false'});
-                table.DataTable().destroy();
-                tableOptions.bPaginate = true;
-                table.DataTable(tableOptions);
-            });
+                $("#txt").click(function(){
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = false;
+                    table.DataTable(tableOptions);
+                    table.tableExport({type:'txt',escape:'false'});
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = true;
+                    table.DataTable(tableOptions);
+                });
+                $("#doc").click(function(){
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = false;
+                    table.DataTable(tableOptions);
+                    table.tableExport({type:'doc',escape:'false'});
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = true;
+                    table.DataTable(tableOptions);
+                });
+                $("#powerpoint").click(function(){
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = false;
+                    table.DataTable(tableOptions);
+                    table.tableExport({type:'powerpoint',escape:'false'});
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = true;
+                    table.DataTable(tableOptions);
+                });
+                $("#png").click(function(){
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = false;
+                    table.DataTable(tableOptions);
+                    table.tableExport({type:'png',escape:'false'});
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = true;
+                    table.DataTable(tableOptions);
+                });
 
-               $("#pdf").click(function(){
-                table.DataTable().destroy();
-                tableOptions.bPaginate = false;
-                table.DataTable(tableOptions);
-                table.tableExport({type:'pdf',escape:'false'});
-                table.DataTable().destroy();
-                tableOptions.bPaginate = true;
-                table.DataTable(tableOptions);
-            });
-           });
+                   $("#pdf").click(function(){
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = false;
+                    table.DataTable(tableOptions);
+                    table.tableExport({type:'pdf',escape:'false'});
+                    table.DataTable().destroy();
+                    tableOptions.bPaginate = true;
+                    table.DataTable(tableOptions);
+                });
+               });
         </script>
     	<!-- END SCRIPTS -->      
     </body>

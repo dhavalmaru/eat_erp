@@ -58,6 +58,22 @@ function get_data($status='', $id=''){
     return $query->result();
 }
 
+function get_pending_data($id=''){
+    if(strpos($id, "_")!==false){
+        $id = substr($id, strpos($id, "_")+1);
+    }
+
+    $query=$this->db->query("SELECT * FROM distributor_out WHERE ref_id = '$id' and status!='InActive' and  status!='Rejected'");
+    $result=$query->result();
+    if (count($result)>0){
+        $id = $result[0]->id;
+    } else {
+        $id = '';
+    }
+
+    return $id;
+}
+
 function get_distributor_out_data1($status='', $id=''){
     if($status!=""){
         // if ($status=="Approved"){
@@ -81,9 +97,10 @@ function get_distributor_out_data1($status='', $id=''){
             // $cond=" where status='Approved' and (delivery_status='Delivered' or delivery_status is null or delivery_status = '') and (distributor_id='1' or distributor_id='189')";
             $cond=" where status='Approved' and (distributor_id='1' or distributor_id='189')";
         } else if ($status=="pending"){
-            $cond=" where status='Pending' and (delivery_status='Pending' or delivery_status is null or delivery_status = '') and (distributor_id='1' or distributor_id='189')";
+            $cond=" where status='Pending' and ( delivery_status is null or delivery_status = '') and (distributor_id='1' or distributor_id='189')";
         } else if ($status=="pending_for_approval"){
-            $cond=" where status='Pending' and (delivery_status='GP Issued' or delivery_status='Delivered Not Complete' or delivery_status='Delivered') and (distributor_id='1' or distributor_id='189')";
+            $cond=" where ((status='Pending' and (delivery_status='Pending' or delivery_status='GP Issued' or delivery_status='Delivered Not Complete' or delivery_status='Delivered')) or status='Deleted') and 
+                (distributor_id='1' or distributor_id='189')";
         } else if ($status=="pending_for_delivery"){
             $cond=" where (status='Approved' or status='Rejected') and delivery_status='Pending' and (distributor_id='1' or distributor_id='189')";
         } else if ($status=="gp_issued"){
@@ -122,10 +139,10 @@ function get_distributor_out_data1($status='', $id=''){
             (select Q.*, D.depot_name from 
             (select C.*, P.location from 
             (select A.*, B.distributor_name, B.sell_out, B.state as distributor_state,B.location_id, B.class from 
-            (select * from distributor_out) A 
+            (select *,Case When sample_distributor_id IS NOT NULL THEN sample_distributor_id else distributor_id end as dist_id  from distributor_out) A 
             left join 
             (select * from distributor_master) B 
-            on (A.distributor_id=B.id)) C 
+            on (A.dist_id=B.id)) C 
             left join 
             (select * from location_master) P 
             on (C.location_id=P.id)) Q 
@@ -348,7 +365,7 @@ function get_distributor_out_data($status='', $id=''){
             concat(ifnull(H.first_name,''),' ',ifnull(H.last_name,'')) as user_name, 
             G.sample_distributor_id, G.delivery_status, G.delivery_date, G.receivable_doc, G.location, G.sample_type, 
             G.gifting_remarks, G.promoter_sales_rep_id, G.blogger_name, G.blogger_address, G.blogger_phone_no, 
-            G.blogger_email_id from 
+            G.blogger_email_id,G.freezed,G.ref_id from 
             (select E.*, F.sales_rep_name from 
             (select Q.*, D.depot_name from 
             (select C.*, P.location from 
@@ -383,7 +400,7 @@ function get_distributor_out_data($status='', $id=''){
             concat(ifnull(D.first_name,''),' ',ifnull(D.last_name,'')) as user_name, 
             null as sample_distributor_id, null as delivery_status, null as delivery_date, null as receivable_doc,C.location, 
             null as sample_type, null as gifting_remarks, null as promoter_sales_rep_id, null as blogger_name, 
-            null as blogger_address, null as blogger_phone_no, null as blogger_email_id  from 
+            null as blogger_address, null as blogger_phone_no, null as blogger_email_id,null as freezed,null as ref_id  from 
             (select A.*, B.distributor_name, B.state, B.sell_out, B.contact_person, B.contact_no, B.area, B.location from 
             (select * from sales_rep_orders where status = 'Approved') A 
             left join 
@@ -548,58 +565,220 @@ function save_data($id=''){
         $blogger_email_id = $this->input->post('blogger_email_id');
     }
 
-    $sql="select * from series_master where type='Voucher'";
-    $query=$this->db->query($sql);
-    $result=$query->result();
-    if(count($result)>0){
-        $series=intval($result[0]->series)+1;
-
-        $sql="update series_master set series = '$series' where type = 'Voucher'";
-        $this->db->query($sql);
-    } else {
-        $series=1;
-
-        $sql="insert into series_master (type, series) values ('Voucher', '$series')";
-        $this->db->query($sql);
-    }
-
-    if (isset($date_of_processing)){
-        $financial_year=calculateFiscalYearForDate($date_of_processing);
-    } else {
-        $financial_year="";
-    }
+    $ref_id = $this->input->post('ref_id');
+    $invoice_no = $this->input->post('invoice_no');
+    $voucher_no = $this->input->post('voucher_no');
     
-    $voucher_no = 'WHPL/'.$financial_year.'/voucher/'.strval($series);
-
-    $sql="select * from series_master where type='Gate_Pass'";
-    $query=$this->db->query($sql);
-    $result=$query->result();
-    if(count($result)>0){
-        $series=intval($result[0]->series)+1;
-
-        $sql="update series_master set series = '$series' where type = 'Gate_Pass'";
-        $this->db->query($sql);
-    } else {
-        $series=1;
-
-        $sql="insert into series_master (type, series) values ('Gate_Pass', '$series')";
-        $this->db->query($sql);
-    }
-
-    if (isset($date_of_processing)){
-        $financial_year=calculateFiscalYearForDate($date_of_processing);
-    } else {
-        $financial_year="";
-    }
-    
-    $gate_pass_no = 'WHPL/'.$financial_year.'/gate_pass/'.strval($series);
-
     $sample_distributor_id = $this->input->post('sample_distributor_id');
     if($sample_distributor_id==""){
         $sample_distributor_id = null;
-    }
+    }   
 
-    $data = array(
+
+    if($this->input->post('btn_approve')!=null || $this->input->post('btn_reject')!=null)
+    {
+        if($this->input->post('btn_approve')!=null){
+            if($this->input->post('status')=="Deleted"){
+                $status = 'InActive';
+            } else {
+                $status = 'Approved';
+            }
+        } else {
+            $status = 'Rejected';
+        }
+
+       
+
+        $remarks = $this->input->post('remarks');
+
+        if($status == 'Rejected'){
+            $sql = "Update distributor_out Set status='$status', remarks='$remarks', approved_by='$curusr', approved_on='$now', 
+                            rejected_by='$curusr', rejected_on='$now' where id = '$id'";
+            $this->db->query($sql);
+
+            $action='Distributor Out Entry '.$status.'. Delivery Status: ' . $delivery_status;
+        } else {
+            if($id!='' || $ref_id!=''){
+                if($voucher_no==null || $voucher_no=='')
+                {
+                    $sql="select * from series_master where type='Voucher'";
+                    $query=$this->db->query($sql);
+                    $result=$query->result();
+                    if(count($result)>0){
+                        $series=intval($result[0]->series)+1;
+
+                        $sql="update series_master set series = '$series' where type = 'Voucher'";
+                        $this->db->query($sql);
+                    } else {
+                        $series=1;
+
+                        $sql="insert into series_master (type, series) values ('Voucher', '$series')";
+                        $this->db->query($sql);
+                    }
+
+                    if (isset($date_of_processing)){
+                        $financial_year=calculateFiscalYearForDate($date_of_processing);
+                    } else {
+                        $financial_year="";
+                    }
+                    
+                    $voucher_no = 'WHPL/'.$financial_year.'/voucher/'.strval($series);
+
+                    $sql="select * from series_master where type='Gate_Pass'";
+                    $query=$this->db->query($sql);
+                    $result=$query->result();
+                    if(count($result)>0){
+                        $series=intval($result[0]->series)+1;
+
+                        $sql="update series_master set series = '$series' where type = 'Gate_Pass'";
+                        $this->db->query($sql);
+                    } else {
+                        $series=1;
+
+                        $sql="insert into series_master (type, series) values ('Gate_Pass', '$series')";
+                        $this->db->query($sql);
+                    }
+
+                    if (isset($date_of_processing)){
+                        $financial_year=calculateFiscalYearForDate($date_of_processing);
+                    } else {
+                        $financial_year="";
+                    }
+                    
+                    $gate_pass_no = 'WHPL/'.$financial_year.'/gate_pass/'.strval($series);                  
+                }
+
+                if($ref_id!=null && $ref_id!=''){
+
+                    $modified_approved_date = NULL;
+                    $get_modified_approved_date_result = $this->db->select('modified_approved_date')->where('id',$id)->get('distributor_out')->result();
+
+                    if(count($get_modified_approved_date_result)>0)
+                    {
+                       $modified_approved_date = $get_modified_approved_date_result[0]->modified_approved_date;
+                        
+                        if($modified_approved_date!=null && $modified_approved_date!="")
+                        {
+                            $modified_approved_date = date("Y-m-d");
+                        }else
+                        {
+                            $modified_approved_date = NULL;
+                        }
+                    }
+                    else
+                    {
+                       $modified_approved_date = NULL;
+                    }
+
+                    if($modified_approved_date!=null && $modified_approved_date!=null)
+                    {
+                        $sql = "Update distributor_out A, distributor_out B 
+                            Set A.date_of_processing=B.date_of_processing, A.depot_id=B.depot_id, A.distributor_id=B.distributor_id,
+                                A.sales_rep_id=B.sales_rep_id, A.amount=B.amount, A.tax=B.tax, A.tax_per=B.tax_per, 
+                                A.tax_amount=B.tax_amount, A.final_amount=B.final_amount, A.due_date=B.due_date, 
+                                A.order_no=B.order_no, A.order_date=B.order_date, A.supplier_ref=B.supplier_ref, 
+                                A.despatch_doc_no=B.despatch_doc_no, A.despatch_through=B.despatch_through, A.destination=B.destination, 
+                                A.status='$status', A.remarks='$remarks', 
+                                A.modified_by=B.modified_by, A.modified_on=B.modified_on, 
+                                A.approved_by='$curusr', A.approved_on='$now', A.invoice_no =  B.invoice_no , 
+                                  A.voucher_no = '$voucher_no',
+                                A.client_name=B.client_name, A.address=B.address, A.city=B.city, 
+                                A.pincode=B.pincode, A.state=B.state, A.country=B.country, 
+                                A.discount=B.discount, A.sample_distributor_id=B.sample_distributor_id, A.delivery_status=B.delivery_status, 
+                                A.delivery_date=B.delivery_date, A.receivable_doc=B.receivable_doc, A.transport_type=B.transport_type, 
+                                A.vehicle_number = B.vehicle_number, A.cgst = B.cgst, A.sgst = B.sgst, A.igst = B.igst, 
+                                A.cgst_amount = B.cgst_amount, A.sgst_amount = B.sgst_amount, A.igst_amount = B.igst_amount, 
+                                A.reverse_charge = B.reverse_charge, A.shipping_address = B.shipping_address, A.distributor_consignee_id = B.distributor_consignee_id, 
+                                A.con_name = B.con_name, A.con_address = B.con_address, A.con_city = B.con_city, 
+                                A.con_pincode = B.con_pincode, A.con_state = B.con_state, A.con_country = B.con_country, 
+                                A.con_state_code = B.con_state_code, A.con_gst_number = B.con_gst_number, A.state_code = B.state_code, 
+                                A.sample_type = B.sample_type, A.gifting_remarks = B.gifting_remarks, A.promoter_sales_rep_id = B.promoter_sales_rep_id, 
+                                A.blogger_name = B.blogger_name, A.blogger_address = B.blogger_address, A.blogger_phone_no = B.blogger_phone_no, 
+                                A.blogger_email_id = B.blogger_email_id, A.round_off_amount = B.round_off_amount, A.invoice_amount = B.invoice_amount,
+                                    A.gate_pass_no=B.gate_pass_no,A.modified_approved_date='$modified_approved_date'
+                            WHERE A.id = '$ref_id' and B.id = '$id'";
+                    }else
+                    {
+                        $sql = "Update distributor_out A, distributor_out B 
+                            Set A.date_of_processing=B.date_of_processing, A.depot_id=B.depot_id, A.distributor_id=B.distributor_id,
+                                A.sales_rep_id=B.sales_rep_id, A.amount=B.amount, A.tax=B.tax, A.tax_per=B.tax_per, 
+                                A.tax_amount=B.tax_amount, A.final_amount=B.final_amount, A.due_date=B.due_date, 
+                                A.order_no=B.order_no, A.order_date=B.order_date, A.supplier_ref=B.supplier_ref, 
+                                A.despatch_doc_no=B.despatch_doc_no, A.despatch_through=B.despatch_through, A.destination=B.destination, 
+                                A.status='$status', A.remarks='$remarks', 
+                                A.modified_by=B.modified_by, A.modified_on=B.modified_on, 
+                                A.approved_by='$curusr', A.approved_on='$now', A.invoice_no =  B.invoice_no , 
+                                  A.voucher_no = '$voucher_no',
+                                A.client_name=B.client_name, A.address=B.address, A.city=B.city, 
+                                A.pincode=B.pincode, A.state=B.state, A.country=B.country, 
+                                A.discount=B.discount, A.sample_distributor_id=B.sample_distributor_id, A.delivery_status=B.delivery_status, 
+                                A.delivery_date=B.delivery_date, A.receivable_doc=B.receivable_doc, A.transport_type=B.transport_type, 
+                                A.vehicle_number = B.vehicle_number, A.cgst = B.cgst, A.sgst = B.sgst, A.igst = B.igst, 
+                                A.cgst_amount = B.cgst_amount, A.sgst_amount = B.sgst_amount, A.igst_amount = B.igst_amount, 
+                                A.reverse_charge = B.reverse_charge, A.shipping_address = B.shipping_address, A.distributor_consignee_id = B.distributor_consignee_id, 
+                                A.con_name = B.con_name, A.con_address = B.con_address, A.con_city = B.con_city, 
+                                A.con_pincode = B.con_pincode, A.con_state = B.con_state, A.con_country = B.con_country, 
+                                A.con_state_code = B.con_state_code, A.con_gst_number = B.con_gst_number, A.state_code = B.state_code, 
+                                A.sample_type = B.sample_type, A.gifting_remarks = B.gifting_remarks, A.promoter_sales_rep_id = B.promoter_sales_rep_id, 
+                                A.blogger_name = B.blogger_name, A.blogger_address = B.blogger_address, A.blogger_phone_no = B.blogger_phone_no, 
+                                A.blogger_email_id = B.blogger_email_id, A.round_off_amount = B.round_off_amount, A.invoice_amount = B.invoice_amount,
+                                    A.gate_pass_no=B.gate_pass_no,A.modified_approved_date=NULL
+                            WHERE A.id = '$ref_id' and B.id = '$id'";
+
+                    }
+                    
+                    $this->db->query($sql);
+
+                    $sql = "Delete from distributor_out where id = '$id'";
+                    $this->db->query($sql);
+
+                    $sql = "Delete from distributor_out_items WHERE distributor_out_id = '$ref_id'";
+                    $this->db->query($sql);
+
+                    $sql = "Update distributor_out_items set distributor_out_id='$ref_id' WHERE distributor_out_id = '$id'";
+                    $this->db->query($sql);
+
+                    $id = $ref_id;
+                } else {
+                    $sql = "Update distributor_out A 
+                            Set A.status='$status',A.remarks='$remarks', A.approved_by='$curusr',A.approved_on='$now', 
+                                A.voucher_no = '$voucher_no',A.gate_pass_no ='$gate_pass_no' 
+                            WHERE A.id = '$id'";
+                    $this->db->query($sql);
+                }
+                
+                $action='Distributor Out Entry '.$status.'. Delivery Status: ' . $delivery_status;
+					echo '<script>var win= window.open("'.base_url().'index.php/sample_out/view_tax_invoice/'.$id.'");
+                    win.print();
+                    </script>';
+            }
+        }
+        
+    }
+    else
+    {
+        if($this->input->post('btn_delete')!=null){
+            if($this->input->post('status')=="Approved"){
+                $status = 'Deleted';
+            } else {
+                $status = 'InActive';
+            }
+        } else {
+            $status = 'Pending';
+        }
+
+        if($this->input->post('status')=="Approved"){
+            $ref_id = $id;
+            $id = '';
+        } else {
+            $ref_id = $this->input->post('ref_id');
+        }
+
+        if($ref_id==""){
+            $ref_id = null;
+        }
+
+        $data = array(
         'date_of_processing' => $date_of_processing,
         'invoice_no' => $this->input->post('invoice_no'),
         'depot_id' => $this->input->post('depot_id'),
@@ -617,7 +796,7 @@ function save_data($id=''){
         'despatch_doc_no' => $this->input->post('despatch_doc_no'),
         'despatch_through' => $this->input->post('despatch_through'),
         'destination' => $this->input->post('destination'),
-        'status' => $this->input->post('status'),
+        'status' => $status,
         'remarks' => $this->input->post('remarks'),
         'modified_by' => $curusr,
         'modified_on' => $now,
@@ -639,8 +818,16 @@ function save_data($id=''){
         'blogger_phone_no' => $blogger_phone_no,
         'blogger_email_id' => $blogger_email_id,
         'voucher_no' => $voucher_no,
-        'gate_pass_no' => $gate_pass_no
+        'ref_id' => $ref_id
     );
+
+    $date_p=strtotime($date_of_processing);
+    $current_d=strtotime($now);
+
+    if($ref_id!=null && $ref_id!="")
+    {
+        $data['modified_approved_date']=$now;
+    }
 
     if($id==''){
         $data['created_by']=$curusr;
@@ -701,8 +888,6 @@ function save_data($id=''){
     $logarray['cnt_name']='Distributor_Out';
     $logarray['action']=$action;
     $this->user_access_log_model->insertAccessLog($logarray);
-
-
     
 
     $receivable_doc=$this->input->post('receivable_doc');
@@ -748,76 +933,8 @@ function save_data($id=''){
         $this->db->where('id', $id);
         $this->db->update('distributor_out', $data);
     }
+    }
 
-    // $invoice_no = $this->tax_invoice_model->generate_tax_invoice($id);
-
-
-
-    // $payment_mode=$this->input->post('payment_mode');
-
-    // if(isset($payment_mode) and $payment_mode!="") {
-    //     $payment_id=$this->input->post('payment_id');
-    //     $ref_no=$this->input->post('ref_no');
-    //     // $invoice_no=$this->input->post('invoice_no');
-    //     // $payment_date=$this->input->post('payment_date[]');
-    //     $payment_amount=$this->input->post('payment_amount');
-    //     $date_of_payment=$this->input->post('date_of_payment');
-    //     if($date_of_payment==''){
-    //         $date_of_payment=NULL;
-    //     } else {
-    //         $date_of_payment=formatdate($date_of_payment);
-    //     }
-    //     $d_date=$this->input->post('deposit_date');
-    //     if($d_date==''){
-    //         $d_date=NULL;
-    //     } else {
-    //         $d_date=formatdate($d_date);
-    //     }
-
-    //     $data = array(
-    //         'distributor_out_id' => $id,
-    //         'date_of_payment' => $date_of_payment,
-    //         'bank_id' => $this->input->post('bank_id'),
-    //         'distributor_id' => $this->input->post('distributor_id'),
-    //         'total_amount' => format_number($this->input->post('payment_amount'),2),
-    //         'status' => $this->input->post('status'),
-    //         'remarks' => $this->input->post('remarks'),
-    //         'modified_by' => $curusr,
-    //         'modified_on' => $now
-    //     );
-
-    //     if($payment_id=='' || $payment_id==null){
-    //         $data['created_by']=$curusr;
-    //         $data['created_on']=$now;
-
-    //         $this->db->insert('payment_details',$data);
-    //         $payment_id=$this->db->insert_id();
-    //         $action='Payment Entry Created.';
-    //     } else {
-    //         $this->db->where('id', $payment_id);
-    //         $this->db->update('payment_details',$data);
-    //         $action='Payment Entry Modified.';
-    //     }
-
-    //     $this->db->where('payment_id', $payment_id);
-    //     $this->db->delete('payment_details_items');
-        
-    //     $data = array(
-    //                 'payment_id' => $payment_id,
-    //                 'payment_mode' => $payment_mode,
-    //                 'ref_no' => $ref_no,
-    //                 'invoice_no' => $invoice_no,
-    //                 'payment_amount' => format_number($payment_amount,2),
-    //                 'deposit_date' => $d_date
-    //             );
-    //     $this->db->insert('payment_details_items', $data);
-    // }
-
-    // $logarray['table_id']=$payment_id;
-    // $logarray['module_name']='Payment';
-    // $logarray['cnt_name']='Payment';
-    // $logarray['action']=$action;
-    // $this->user_access_log_model->insertAccessLog($logarray);
 }
 
 function set_sku_batch(){

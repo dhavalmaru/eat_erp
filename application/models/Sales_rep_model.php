@@ -90,9 +90,11 @@ function get_data_inactive($status='', $id=''){
     return $query->result();
 }
 
-function get_data_dist($status='', $id=''){
+function get_data_dist($status='', $id='' , $type=''){
     if($status!=""){
         $cond=" where status='".$status."' and (sr_type is null or sr_type!='Promoter')";
+        //$cond=" where status='".$status."' and sr_type='$type'";
+
     } else {
         $cond="";
     }
@@ -104,6 +106,14 @@ function get_data_dist($status='', $id=''){
             $cond=$cond." and id='".$id."' and (sr_type is null or sr_type!='Promoter')";
         }
     }
+
+    /*if($id!=""){
+        if($cond=="") {
+            $cond=" where id='".$id."' and sr_type='Sales Representative'";
+        } else {
+            $cond=$cond." and id='".$id."' and sr_type='Sales Representative'";
+        }
+    }*/
 
     $sql = "select * from sales_rep_master".$cond." order by modified_on desc";
     $query=$this->db->query($sql);
@@ -129,6 +139,48 @@ function get_data_promoter($status='', $id=''){
     $query=$this->db->query($sql);
     return $query->result();
 }
+
+function get_data_merchandizer($status='', $id=''){
+    if($status!=""){
+        $cond=" where status='".$status."'";
+    } else {
+        $cond="";
+    }
+
+    if($id!=""){
+        if($cond=="") {
+            $cond=" where id='".$id."'";
+        } else {
+            $cond=$cond." and id='".$id."'";
+        }
+    }
+
+    $sql = "Select * from sales_rep_master where sr_type='Merchandizer' and `status`='Approved' order by modified_on desc";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_data_salesrep($status='', $id=''){
+    if($status!=""){
+        $cond=" where status='".$status."'";
+    } else {
+        $cond="";
+    }
+
+    if($id!=""){
+        if($cond=="") {
+            $cond=" where id='".$id."'";
+        } else {
+            $cond=$cond." and id='".$id."'";
+        }
+    }
+
+    $sql = "Select * from sales_rep_master where sr_type='Sales Representative' and `status`='Approved' order by modified_on desc";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+
 
 function save_data($id=''){
     $now=date('Y-m-d H:i:s');

@@ -73,6 +73,10 @@
                 }
             }
             #customers10 {width: 100% !important;}
+			.dt-body-center
+			{
+				text-align:center;
+			}
 		</style>	
     </head>
     <body>
@@ -144,13 +148,13 @@
                             </button> -->
 
                             <?php if($status=='pending_for_delivery') { ?>
-                                <button class="btn btn-success" type="submit">
+                                <!-- <button class="btn btn-success" type="submit">
                                     <span class="fa fa-shopping-cart"></span> Select Delivery Person
-                                </button>
+                                </button> -->
                             <?php } else if($status=='gp_issued') { ?>
-                                <button class="btn btn-success btn-block btn-padding" type="button" onClick="get_batch_details();">
+                                <!-- <button class="btn btn-success btn-block btn-padding" type="button" onClick="get_batch_details();">
                                     <span class="fa fa-shopping-cart"></span> Select Delivery Status
-                                </button>
+                                </button> -->
                             <?php } else if($status=='pending_for_approval') { ?>
                                 <button class="btn btn-success btn-block btn-padding" type="button" onClick="get_batch_details();">
                                     <span class="fa fa-shopping-cart"></span> Authorise Records
@@ -265,24 +269,27 @@
     										<table id="customers10" class="table datatable table-bordered">
     											<thead>
     												<tr>
-                                                        <th width="65" align="center" style="<?php //if($status!='pending_for_delivery' && $status!='gp_issued' && $status!='pending_for_approval') echo 'display: none;'; ?>">Select</th>
-                                                        <th width="65" align="center">Sr. No.</th>
-                                                        <th width="156">Date Of processing</th>
-    													<th width="130">Invoice No</th>
-                                                        <th width="130">Invoice Date</th>
-    													<th width="140">Depot Name</th>
-    													<th width="140">Distributor Name</th>
+                                                        <th width="50" align="center" style="<?php //if($status!='pending_for_delivery' && $status!='gp_issued' && $status!='pending_for_approval') echo 'display: none;'; ?>">Select</th>
+                                                        <th width="50" style="text-align:center;">Sr. No.</th>
+                                                        <th width="80">Date Of processing</th>
+    													<th style="text-align:center" width="50">Edit </th>
+														<th width="50" style="text-align:center;">Proof of Delivery</th>
+    													<th width="135">Invoice No</th>
+                                                        <th width="80">Invoice Date</th>
+
+    													<th width="150">Distributor Name</th>
                                                         <th width="140">PO No</th>
                                                         <th width="140">Location</th>
-    													<th width="220" >Sales Representative Name</th>
-    													<th width="120" >Amount (In Rs)</th>
-    													<th width="110" >Creation Date</th>
-														<th width="110" >Status</th>
+    											
+    													<th width="70" >Amount (In Rs)</th>
                                                         <th width="110" >Delivery Status</th>
-                                                        <th width="110" >Delivery Person</th>
-    													<th width="105" style="text-align:center;">View Invoice</th>
-                                                        <th width="105" style="text-align:center; <?php //if($status!='gp_issued') echo 'display: none;'; ?>">View GP</th>
+                                                     
+                                                      
+    													
+                                                        <th width="50" style="text-align:center; <?php //if($status!='gp_issued') echo 'display: none;'; ?>">View GP</th>
     													<th width="50" style="display:none;">Resend Invoice</th>
+    													<th width="50" style=" <?php //if($status!='gp_issued') echo 'display: none;'; ?>">Tracking Id</th>
+														
     												</tr>
     											</thead>
     											<tbody>
@@ -301,6 +308,7 @@
     		<!-- END PAGE CONTENT -->
 
             <!-- Modal -->
+            </form>
             <div class="modal fade" id="myModal" role="dialog" style="<?php if($status=='pending_for_delivery') {echo 'padding-top:0px;';} ?>">
                 <div class="modal-dialog">
                     <!-- Modal content-->
@@ -317,7 +325,9 @@
                                 } ?>
                             </h4>
                         </div>
-                        <div class="modal-body">
+                        <form id="form_distributor_out_model" role="form" class="form-horizontal" method="post" action="<?php echo base_url().'index.php/distributor_out/set_delivery_status2'; ?>" enctype="multipart/form-data" >
+                          <div class="modal-body">
+                       
                             <?php if($access[0]->r_approvals=='1' && $status=='pending_for_approval'){ ?>
                                 <label class="control-label">Authorisation <span class="asterisk_sign">*</span></label>
                                 <br/>
@@ -359,7 +369,17 @@
                                         <option value="Pending">Return To HO</option>
                                     </select>
                                 </div>
-
+                                <br/>
+                                <label class="control-label">Person Receiving </label>
+                                <div class="">
+                                   <input type="text" class="form-control" name="person_receving" id="person_receving" value="" />
+                                </div>
+                                <br/>
+                                <label class="control-label">Proof of Delivery</label>
+                                <div class="">
+                                  <input type="file" class="fileinput btn btn-info btn-small  bar_image" name="upload" id="image" placeholder="image" value="" />
+                                </div>
+                                <input type="hidden" name="check" id="check">
                                 <label class="control-label" style="display: none;">Status <span class="asterisk_sign">*</span></label>
                                 <div class="">
                                     <select name="status" id="status" class="form-control" style="display: none;">
@@ -369,19 +389,47 @@
                                     </select>
                                 </div>
                             <?php } ?>
+                            
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
-                            <button id="btn_save" class="btn btn-success pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</button>
+
+                            <input type="submit" class="btn btn-success pull-right"  style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>" value="Save">
+                            <!-- <button id="btn_save" class="btn btn-success pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</button> -->
                         </div>
+                        </form>
                     </div>
                 </div>
             </div>
-            </form>
     	</div>
     	<!-- END PAGE CONTAINER -->
 
-        
+        <div class="modal fade" id="delivery_comments" role="dialog">
+                <div class="modal-dialog">
+                    <!-- Modal content-->
+                    <form id="form_distributor_po_comments" role="form" class="form-horizontal" method="post" action="<?php echo base_url().'index.php/distributor_out/add_comments'; ?>">
+                         <div class="modal-content" >
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                 <h4 class="modal-title">Delivery Comments</h4>
+                            </div>
+                            <div class="modal-body">
+                                <br/>
+                                <div class="">
+                                    <label class="control-label">Comments </label>
+                                    <textarea name="delivery_comments" id="delivery_comments" class="form-control"></textarea>
+                                    <input type="hidden" id="delivery_comments_id" name="delivery_comments_id" >
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                                <button id="btn_comment_save" class="btn btn-success pull-right"  >Save</button>
+                            </div>
+                        </div>
+                    </form>
+                    
+                </div>
+            </div>
 
 	<?php $this->load->view('templates/footer');?>
     <script type="text/javascript">
@@ -422,7 +470,7 @@
                 $('.delivered_not_complete').attr('class','active');
             } 
             else {
-                $('.delivery').attr('class','active');
+                $('.approved').attr('class','active');
             }
     		$('.ahrefall').click(function(){
     			alert(window.location.href );
@@ -436,6 +484,33 @@
                 blFlag = false;
             }
         });
+
+
+        var get_delivery_comments = function(elem) {
+            /*alert("hii");*/
+            var id = elem.id;
+            /*$('#delivery_comments').modal('show');*/
+            $.ajax({
+                        url:BASE_URL+'index.php/distributor_out/get_comments',
+                        method:"post",
+                        data:{id:id},
+                        dataType:"json",
+                        async:false,
+                        success: function(data){
+                            $('#delivery_comments_id').val(id);
+                            $('textarea#delivery_comments').val(data.comments);
+                            $('#delivery_comments').modal('show');
+
+                        },
+                        error: function (response) {
+                            var r = jQuery.parseJSON(response.responseText);
+                            alert("Message: " + r.Message);
+                            alert("StackTrace: " + r.StackTrace);
+                            alert("ExceptionType: " + r.ExceptionType);
+                        }
+                    });
+        }
+
 
         // $('#btn_save').click(function(){
         //     $('#myModal').modal('toggle');
@@ -465,7 +540,10 @@
             $('#input_'+id).val(v);
         };
 
-        var get_batch_details = function() {
+        var get_batch_details = function(elem) {
+            var id = elem.id;
+            var distributor_id = elem.getAttribute('data-distributor');
+            $('#check').val(distributor_id)
             $('#myModal').modal('show');
 
             // console.log('true');
@@ -543,10 +621,17 @@
                 if(status == 'gp_issued') {
                     columnDefs = [        
                                     {
-                                        "targets": [17],
+                                        "targets": [13],
                                         "visible": false,
                                         "searchable": false
-                                    }
+                                    },
+									 {
+                                        "targets": [14],
+                                        "visible": true,
+                                        "searchable": true
+                                    },
+									{ "width": "10%", "targets": 8 },
+									{ className: "dt-body-center", targets: [ 3, 4,12,13 ] }
                                 ];
                 } else if(status == 'pending_for_approval') {
                     columnDefs = [    
@@ -556,28 +641,42 @@
                                         "searchable": false
                                     },       
                                     {
-                                        "targets": [16],
+                                        "targets": [12],
                                         "visible": false,
                                         "searchable": false
                                     }, 
                                     {
-                                        "targets": [17],
+                                        "targets": [13],
                                         "visible": false,
                                         "searchable": false
-                                    }
+                                    },
+									{
+                                        "targets": [14],
+                                        "visible": false,
+                                        "searchable": false
+                                    },
+									  { "width": "10%", "targets": 8 },
+									{ className: "dt-body-center", targets: [ 3,4,12,13 ] }
                                 ];
                 } else {
                     columnDefs = [      
                                     {
-                                        "targets": [16],
+                                        "targets": [12],
                                         "visible": false,
                                         "searchable": false
                                     },
                                     {
-                                        "targets": [17],
+                                        "targets": [13],
                                         "visible": false,
                                         "searchable": false
-                                    }
+                                    },
+										{
+                                        "targets": [14],
+                                        "visible": false,
+                                        "searchable": false
+                                    },
+									  { "width": "10%", "targets": 8 },
+									{ className: "dt-body-center", targets: [ 3, 4 ,12,13] }
                                 ];
                 }
             } else {
@@ -589,16 +688,24 @@
                                         // "data": null,
                                         // "defaultContent": '<input type="hidden" id="input_check_0" name="check[]" value="false" />'
                                     },
+									
                                     {
-                                        "targets": [16],
+                                        "targets": [12],
                                         "visible": false,
                                         "searchable": false
                                     },
                                     {
-                                        "targets": [17],
+                                        "targets": [13],
                                         "visible": false,
                                         "searchable": false
-                                    }
+                                    },
+									{
+                                        "targets": [14],
+                                        "visible": false,
+                                        "searchable": false
+                                    },
+									  { "width": "10%", "targets": 8 },
+									   { className: "dt-body-center", targets: [ 3, 4,12,13 ] }
                                 ];
             }
 
@@ -751,6 +858,47 @@
         function closeNav() {
             document.getElementById("mySidenav").style.width = "0";
         }
+
+        $('#image').change(function () {
+
+            var ext = $(this).val().split('.').pop().toLowerCase();
+            if($.inArray(ext, ['pdf','png','jpg','jpeg']) == -1) {
+                alert('This is not an allowed file type.');
+                    this.value = '';
+            }
+            else
+            {
+                /*alert($(this).val().replace(/C:\\fakepath\\/i, ''));*/
+                var filename = $(this).val().replace(/C:\\fakepath\\/i, '');
+                var check = $('#check').val();
+                $.ajax({
+                            url:BASE_URL+'index.php/Distributor_out/check_file_name',
+                            type : 'POST',
+                            data:{check:check,filename:filename},
+                            dataType:"json",
+                            success:function(data){
+                                if(data==1)
+                                {
+                                   $('#image').val(''); 
+                                   $('.file-input-name').text('');
+                                    alert('Image Already Exsist');
+                                }
+                               
+                            }
+
+                        })
+            }
+            /*var ext = this.value.match(/\.(.+)$/)[1];
+            switch (ext) {
+                case 'jpg':
+                case 'jpeg':
+                case 'png':
+                case 'pdf':
+                default:
+                    alert('This is not an allowed file type.');
+                    this.value = '';
+            }*/
+        });
     </script>
 	<!-- END SCRIPTS -->      
     </body>

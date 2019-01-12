@@ -176,7 +176,7 @@ function generate_tax_invoice_old($id) {
             $data['gate_pass_no']=$gate_pass_no;
             $data['date_of_processing']=$date_of_processing;
 
-            if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT'){
+            if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED'){
                 $data['distributor_name']=$client_name;
                 $data['address']=$client_address;
             } else {
@@ -250,7 +250,7 @@ function generate_tax_invoice_old($id) {
             $data['invoice_no']=$invoice_no;
             $data['date_of_processing']=$date_of_processing;
 
-            if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT'){
+            if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED'){
                 $data['distributor_name']=$client_name;
                 $data['address']=$client_address;
             } else {
@@ -486,7 +486,7 @@ function generate_gate_pass_old() {
                 $data['gate_pass_no']=$gate_pass_no;
                 $data['date_of_processing']=$date_of_processing;
 
-                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT'){
+                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED'){
                     $data['distributor_name']=$client_name;
                     $data['address']=$client_address;
                 } else {
@@ -549,7 +549,7 @@ function generate_gate_pass_old() {
                 $data['invoice_no']=$invoice_no;
                 $data['date_of_processing']=$date_of_processing;
 
-                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT'){
+                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED'){
                     $data['distributor_name']=$client_name;
                     $data['address']=$client_address;
                 } else {
@@ -974,7 +974,7 @@ function generate_gate_pass_old_print() {
                 $data['gate_pass_no']=$gate_pass_no;
                 $data['date_of_processing']=$date_of_processing;
 
-                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT'){
+                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED'){
                     $data['distributor_name']=$client_name;
                     $data['address']=$client_address;
                 } else {
@@ -1037,7 +1037,7 @@ function generate_gate_pass_old_print() {
                 $data['invoice_no']=$invoice_no;
                 $data['date_of_processing']=$date_of_processing;
 
-                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT'){
+                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED'){
                     $data['distributor_name']=$client_name;
                     $data['address']=$client_address;
                 } else {
@@ -1455,7 +1455,7 @@ function view_gate_pass_old($distid) {
                 $data['gate_pass_no']=$gate_pass_no;
                 $data['date_of_processing']=$date_of_processing;
 
-                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT'){
+                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED'){
                     $data['distributor_name']=$client_name;
                     $data['address']=$client_address;
                 } else {
@@ -1518,7 +1518,7 @@ function view_gate_pass_old($distid) {
                 $data['invoice_no']=$invoice_no;
                 $data['date_of_processing']=$date_of_processing;
 
-                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT'){
+                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED'){
                     $data['distributor_name']=$client_name;
                     $data['address']=$client_address;
                 } else {
@@ -1686,6 +1686,13 @@ function get_final_data($check, $sales_rep_id){
             $tax_amount=$result[0]->tax_amount;
             $total_amount_with_tax=$result[0]->final_amount;
             $created_by=$result[0]->user_name;
+			$modified_by=$result[0]->user_name;
+            $approved_by=$result[0]->approved_by;
+			
+          
+            $modified_on=$result[0]->modified_on;
+            $created_on=$result[0]->created_on;
+            $approved_on=$result[0]->approved_on;
             $sample_distributor_id=$result[0]->sample_distributor_id;
             $client_name=$result[0]->client_name;
             $client_address = get_address($result[0]->address, "", $result[0]->city, $result[0]->pincode, $result[0]->state, $result[0]->country);
@@ -1716,6 +1723,7 @@ function get_final_data($check, $sales_rep_id){
             $round_off_amount=$result[0]->round_off_amount;
             $invoice_amount=$result[0]->invoice_amount;
             $invoice_date=$result[0]->invoice_date;
+            $sales_rep_name = $result[0]->sales_rep_name;
 
             if($gate_pass_no==null || $gate_pass_no==''){
                 if (isset($date_of_processing)){
@@ -1747,6 +1755,12 @@ function get_final_data($check, $sales_rep_id){
             $tax_amount=0;
             $total_amount_with_tax=0;
             $created_by=null;
+            $modified_by=null;
+          
+            $approved_by=null;
+            $modified_on=null;
+            $created_on=null;
+            $approved_on=null;
             $sample_distributor_id=null;
             $client_name=null;
             $client_address = null;
@@ -1777,6 +1791,8 @@ function get_final_data($check, $sales_rep_id){
             $invoice_amount = 0;
             $invoice_date = null;
         }
+
+
         $data['total_amount']=round($total_amount,2);
 		$data['gatepass_date']=$gatepass_date;
         $data['order_no']=$order_no;
@@ -1790,6 +1806,11 @@ function get_final_data($check, $sales_rep_id){
         $total_amount_with_tax=round($total_amount_with_tax,0);
         $data['total_amount_with_tax']=$total_amount_with_tax;
         $data['created_by']=$created_by;
+        $data['modified_by']=$modified_by;
+        $data['approved_by']=$approved_by;
+		$data['created_on']=$created_on;
+        $data['modified_on']=$modified_on;
+        $data['approved_on']=$approved_on;
         $data['depot_name']=$depot_name;
         $data['depot_address']=$depot_address;
         $data['depot_state']=$depot_state;
@@ -1833,8 +1854,11 @@ function get_final_data($check, $sales_rep_id){
         $data['con_state_code']=$con_state_code;
         $data['con_gst_number']=$con_gst_number;
 
+     
         $result = $this->distributor_model->get_data('', $distributor_id);
+        
         if(count($result)>0){
+
             $send_invoice = $result[0]->send_invoice;
             $class = $result[0]->class;
             $distributor_name=$result[0]->distributor_name;
@@ -1843,7 +1867,7 @@ function get_final_data($check, $sales_rep_id){
             $mobile=$result[0]->mobile;
             $tin_number=$result[0]->tin_number;
             $cst_number=$result[0]->cst_number;
-            $sales_rep_name=$result[0]->sales_rep_name;
+            $sales_rep_name=$sales_rep_name;
             $state_code=$result[0]->state_code;
             $gst_number=$result[0]->gst_number;
 
@@ -1966,7 +1990,7 @@ function get_final_data($check, $sales_rep_id){
                 $data['gate_pass_no']=$gate_pass_no;
                 $data['date_of_processing']=$date_of_processing;
 
-                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT'){
+                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED'){
                     $data['distributor_name']=$client_name;
                     $data['address']=$client_address;
                     $data['state']=$client_state;
@@ -2054,7 +2078,7 @@ function get_final_data($check, $sales_rep_id){
                 $data['invoice_no']=$invoice_no;
                 $data['date_of_processing']=$date_of_processing;
 
-                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT'){
+                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED'){
                     $data['distributor_name']=$client_name;
                     $data['address']=$client_address;
                     $data['state']=$client_state;
@@ -2229,7 +2253,7 @@ function get_final_data($check, $sales_rep_id){
                 $result2=$query->result_array();
                 if(count($result2)>0){
                     $batch_no = '';
-                    for($j=0; $j<count($result2); $j++){
+                    for($j=0; $j<count($total_batch_no); $j++){
                         $batch_no = $batch_no . $result2[$j]['batch_no'] . ', ';
                         // echo $batch_no;
                         // echo '<br/>';

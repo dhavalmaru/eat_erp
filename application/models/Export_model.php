@@ -42,6 +42,15 @@ function get_access(){
 
 function get_distributor_out_details($from_date, $to_date) {
 
+
+    /*$ddateofprocess="";
+
+    if( $date_of_processing != '' && $date_of_accounting=='') {
+        $ddateofprocess = "date_of_processing>='$from_date' and date_of_processing<='$to_date' ";
+    } else {
+        $ddateofprocess = "invoice_date>='$from_date' and invoice_date<='$to_date' ";
+    }*/
+
     // $sql = "select L.*, M.area from 
 
     //         (select I.*, K.location from 
@@ -104,7 +113,7 @@ function get_distributor_out_details($from_date, $to_date) {
 
 
 
-    $sql = "select N.*, O.zone as dist_zone from 
+    $sql = "Select * from (select N.*, O.zone as dist_zone from 
 
             (select L.*, M.area from 
 
@@ -126,7 +135,7 @@ function get_distributor_out_details($from_date, $to_date) {
 
                 from distributor_out where (status='Approved' or status='InActive') and 
 
-                        invoice_date>='$from_date' and invoice_date<='$to_date') C 
+                        invoice_date>='$from_date' and invoice_date<='$to_date' ) C 
 
             left join 
 
@@ -172,19 +181,35 @@ function get_distributor_out_details($from_date, $to_date) {
 
             where N.class!='sample' or N.class is null 
 
-            order by N.invoice_date desc";
+            order by N.invoice_date desc)A
+            Left join
+            (
+            SELECT sum(sgst_amt) as sgst_amt,sum(igst_amt) as igst_amt ,sum(cgst_amt) as cgst_amt,tax_percentage ,sum(total_amt)-(sum(sgst_amt)+sum(cgst_amt)+sum(igst_amt)) as amt_exc_tax,sum(total_amt) as total_amt,distributor_out_id
+            from distributor_out_items  GROUP BY distributor_out_id,tax_percentage
+            ) B on (A.id=B.distributor_out_id)";
 
     $query=$this->db->query($sql);
 
     $result=$query->result();
 
+    $this->db->last_query();
+
     return $result;
 
 }
 
-function get_sample_expired_details($from_date, $to_date) {
+function get_sample_expired_details($from_date, $to_date,$date_of_processing,$date_of_accounting) {
 
-    $sql = "select AA.*, WEEK(date_of_processing,1)-WEEK(STR_TO_DATE(concat(YEAR(date_of_processing),'-',MONTH(date_of_processing),'-',1),'%Y-%m-%d'),1)+1 as dweek from 
+    $ddateofprocess="";
+
+    if( $date_of_processing != '' && $date_of_accounting=='') {
+        $ddateofprocess = "A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' ";
+    } else {
+        $ddateofprocess = "date(A.approved_on)>='$from_date' and date(A.approved_on)<='$to_date' ";
+    }
+
+
+    $sql = "Select * from (select AA.*, WEEK(date_of_processing,1)-WEEK(STR_TO_DATE(concat(YEAR(date_of_processing),'-',MONTH(date_of_processing),'-',1),'%Y-%m-%d'),1)+1 as dweek from 
 
             (select A.*, A.id as sampleid, C.depot_name, D.distributor_name, D.sell_out, D.type_id,
 
@@ -211,12 +236,17 @@ function get_sample_expired_details($from_date, $to_date) {
                 left join location_master G on(D.location_id=G.id) 
 
                 left join area_master H on(D.area_id=H.id) 
-				
+                
                 left join zone_master J on(D.zone_id=J.id) 
                 
-            where (A.status='Approved' ) and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date') AA 
+            where (A.status='Approved' ) and ".$ddateofprocess." ) AA 
 
-            where AA.class='sample' and AA.class is not null";
+            where AA.class='sample' and AA.class is not null ) A
+            Left Join
+            (
+            SELECT sum(sgst_amt) as sgst_amt,sum(igst_amt) as igst_amt ,sum(cgst_amt) as cgst_amt,tax_percentage ,sum(total_amt)-(sum(sgst_amt)+sum(cgst_amt)+sum(igst_amt)) as amt_exc_tax,sum(total_amt) as total_amt,distributor_out_id
+            from distributor_out_items  GROUP BY distributor_out_id,tax_percentage
+            ) B on (A.id=B.distributor_out_id)";
 
     $query=$this->db->query($sql);
 
@@ -228,37 +258,41 @@ function get_sample_expired_details($from_date, $to_date) {
 
 function get_distributor_in_details($from_date, $to_date) {
 
-    $sql = "select AA.*, WEEK(date_of_processing,1)-WEEK(STR_TO_DATE(concat(YEAR(date_of_processing),'-',MONTH(date_of_processing),'-',1),'%Y-%m-%d'),1)+1 as dweek from 
+    $sql = "Select * from 
+            (select AA.*, WEEK(date_of_processing,1)-WEEK(STR_TO_DATE(concat(YEAR(date_of_processing),'-',MONTH(date_of_processing),'-',1),'%Y-%m-%d'),1)+1 as dweek from 
 
-            (select A.*, A.id as srid, C.depot_name, D.distributor_name, D.sell_out, D.type_id, D.location_id, 
+                        (select A.*,A.id as srid, A.cst as tax_per, C.depot_name, D.distributor_name, D.sell_out, D.type_id, D.location_id, 
 
-                D.city as distributor_city, D.class, D.state as dist_state, D.state_code as dist_state_code, 
+                            D.city as distributor_city, D.class, D.state as dist_state, D.state_code as dist_state_code, 
 
-                D.gst_number as dist_gst_no, I.zone as dist_zone, 
+                            D.gst_number as dist_gst_no, I.zone as dist_zone, 
 
-                E.distributor_type, F.sales_rep_name, G.location, H.area 
+                            E.distributor_type, F.sales_rep_name, G.location, H.area 
 
-            from distributor_in A 
+                        from distributor_in A 
 
-                left join depot_master C on(A.depot_id=C.id) 
+                            left join depot_master C on(A.depot_id=C.id) 
 
-                left join distributor_master D on(A.distributor_id=D.id) 
+                            left join distributor_master D on(A.distributor_id=D.id) 
 
-                left join distributor_type_master E on(D.type_id=E.id) 
+                            left join distributor_type_master E on(D.type_id=E.id) 
 
-                left join location_master G on(D.location_id=G.id) 
+                            left join location_master G on(D.location_id=G.id) 
 
-                left join area_master H on(D.area_id=H.id) 
+                            left join area_master H on(D.area_id=H.id) 
 
-                left join zone_master I on(D.zone_id=I.id) 
-				
-				left join sr_mapping J on(D.area_id=J.area_id and D.type_id=J.type_id and D.zone_id=J.zone_id ) 
-				
-				left join sales_rep_master F on(A.sales_rep_id=F.id AND J.reporting_manager_id=F.id) 
+                            left join zone_master I on(D.zone_id=I.id) 
+                            
+                            left join sr_mapping J on(D.area_id=J.area_id and D.type_id=J.type_id and D.zone_id=J.zone_id ) 
+                            
+                            left join sales_rep_master F on(A.sales_rep_id=F.id AND J.reporting_manager_id=F.id) 
 
-            where (A.status='Approved') and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date') AA 
-
-            where AA.class!='sample' or AA.class is null";
+                        where (A.status='Approved') and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date') AA ) A
+                        Left Join
+                        (
+                        SELECT sum(sgst_amt) as sgst_amt,sum(igst_amt) as igst_amt ,sum(cgst_amt) as cgst_amt,tax_percentage ,sum(total_amt)-(sum(sgst_amt)+sum(cgst_amt)+sum(igst_amt)) as amt_exc_tax,sum(total_amt) as total_amt,distributor_in_id
+                        from distributor_in_items  GROUP BY distributor_in_id,tax_percentage
+                        ) B on (A.id=B.distributor_in_id)";
 
     $query=$this->db->query($sql);
 
@@ -269,11 +303,20 @@ function get_distributor_in_details($from_date, $to_date) {
 }
 
 
-function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $invoicelevelsample) {
+function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $invoicelevelsample,$date_of_processing,$date_of_accounting,$flag) {
 
-    $from_date = formatdate($this->input->post('from_date'));
+    if($this->input->post('from_date')=="" && $this->input->post('to_date')=="")
+    {
+        $from_date = '2017-01-01';
+        $to_date = date("Y-m-d");
+    }
+    else
+    {
+        $from_date = formatdate($this->input->post('from_date'));
+        $to_date = formatdate($this->input->post('to_date'));
+    }
 
-    $to_date = formatdate($this->input->post('to_date'));
+    
 
     $row=9;
 
@@ -313,10 +356,30 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
         // echo '<br>';
 
         if(count($data)>0) {
+            $pr_dist_id='';
+            $pr_inv_no='';
+            $pr_system_id='';
 
             for($i=0; $i<count($data); $i++) {
+                $dist_id=$data[$i]->distributor_out_id;
+                $inv_no=$data[$i]->invoice_no;
+                $system_id=$data[$i]->id;
 
-                $dop=date("d-m-Y", strtotime($data[$i]->invoice_date));
+                if($i==0){
+                    $pr_dist_id=$dist_id;
+                    $pr_inv_no=$inv_no;
+                    $pr_system_id=$system_id;
+                }
+
+                if($dist_id!=$pr_dist_id || $inv_no!=$pr_inv_no || $system_id!=$pr_system_id){
+                    $row=$row+1;
+                    $pr_dist_id=$dist_id;
+                    $pr_inv_no=$inv_no;
+                    $pr_system_id=$system_id;
+                }
+
+                $dop=date("d-m-Y", strtotime($data[$i]->date_of_processing));
+                $mod_on=date("d-m-Y", strtotime($data[$i]->invoice_date));
 
                 $objPHPExcel->getActiveSheet()->setCellValue('A'.$row, '=TEXT(D'.$row.',"mmmm")');
 
@@ -325,12 +388,13 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
                 $objPHPExcel->getActiveSheet()->setCellValue('C'.$row, '=YEAR(D'.$row.')');
 
                 $objPHPExcel->getActiveSheet()->setCellValue('D'.$row, $dop);
+                $objPHPExcel->getActiveSheet()->setCellValue('E'.$row, $mod_on);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('E'.$row, $data[$i]->dweek);
+                $objPHPExcel->getActiveSheet()->setCellValue('F'.$row, $data[$i]->dweek);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('F'.$row, "SALES");
+                $objPHPExcel->getActiveSheet()->setCellValue('G'.$row, "SALES");
 
-                $objPHPExcel->getActiveSheet()->setCellValue('G'.$row, $data[$i]->invoice_no);
+                $objPHPExcel->getActiveSheet()->setCellValue('H'.$row, $data[$i]->invoice_no);
 
                 $status = $data[$i]->status;
 
@@ -342,22 +406,82 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
 
                 if($status=='Cancelled') {
 
-                    $objPHPExcel->getActiveSheet()->setCellValue('H'.$row, '0');
-
+                    
                     $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, '0');
-
-                    // $round_off_amt=round($data[$i]->final_amount)-$data[$i]->final_amount;
 
                     $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, '0');
 
+                    // $round_off_amt=round($data[$i]->final_amount)-$data[$i]->final_amount;
+
                     $objPHPExcel->getActiveSheet()->setCellValue('K'.$row, '0');
+
                     $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, '0');
                     $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, '0');
                     $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, '0');
+                    $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, '0');
+                    $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, '0');
+                    $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, '0');
+                    $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, '0');
+                    $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, '0');
+                    $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, '0');
+                    $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, '0');
+                    $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, '0');
+                    $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, '0');
+                    $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, '0');
+
 
                 } else {
 
-                    $objPHPExcel->getActiveSheet()->setCellValue('H'.$row, $data[$i]->amount);
+                    $tax_per = $data[$i]->tax_percentage;
+                    if($tax_per=='5')
+                    {
+                       $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, $data[$i]->amt_exc_tax);
+                    }
+                    else if($tax_per=='12')
+                    {
+                        $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, $data[$i]->amt_exc_tax);
+                    }
+                    else if($tax_per=='18')
+                    {
+                       $objPHPExcel->getActiveSheet()->setCellValue('K'.$row, $data[$i]->amt_exc_tax);
+                    }
+
+                    $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, $data[$i]->amount);
+
+                    if($data[$i]->cgst_amt!=0)
+                    {
+                        $tax_percentage = $data[$i]->tax_percentage/2;
+                        if($tax_percentage=='2.5')
+                        {
+                            $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, $data[$i]->cgst_amt);
+                            $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, $data[$i]->sgst_amt);
+                        }
+                        if($tax_percentage=='6'){
+                            $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, $data[$i]->sgst_amt);
+                             $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, $data[$i]->sgst_amt);
+                        }
+                        if($tax_percentage=='9'){
+                            $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, $data[$i]->cgst_amt);
+                            $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, $data[$i]->sgst_amt);
+                        }
+                    }
+                    else
+                    {
+                        $tax_percentage = $data[$i]->tax_percentage;
+                        if($tax_percentage=='5')
+                        {
+                            $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, $data[$i]->igst_amt);
+                        }
+                        if($tax_percentage=='12'){
+                            $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, $data[$i]->igst_amt);
+                        }
+                        if($tax_percentage=='18'){
+                            $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, $data[$i]->igst_amt);
+                        }
+                        /*$objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $data[$i]->igst_amt);*/
+                    }
+
+                    /*$objPHPExcel->getActiveSheet()->setCellValue('I'.$row, $data[$i]->amount);*/
 
                     $cstamt=$data[$i]->amount;
 
@@ -379,54 +503,57 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
                         }
                     }
                     
-                    $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, $cgst_amt);
-                    $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, $sgst_amt);
-                    $objPHPExcel->getActiveSheet()->setCellValue('K'.$row, $igst_amt);
-                    $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, $tax_amt);
+                    
+                    $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, $cgst_amt);
+                    $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, $sgst_amt);
+                    $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $igst_amt);
+                    $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $tax_amt);
 
                     $round_off_amt=round($data[$i]->final_amount)-$data[$i]->final_amount;
 
-                    $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, $round_off_amt);
+                    $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $round_off_amt);
 
-                    $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, round($data[$i]->final_amount));
+                    $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, round($data[$i]->final_amount));
 
-                    $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, $data[$i]->depot_name);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->depot_name);
 
-                    $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, $data[$i]->distributor_name);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->distributor_name);
 
-                    $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, $data[$i]->distributor_type);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->distributor_type);
+                    $distributor_name = $data[$i]->distributor_name;
+                    if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED') {
+                        $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->state_code);
+                        $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->state);
+                    } else {
+                        $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->dist_state_code);
+                        $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->dist_state);
+                    }
+					
+                    $objPHPExcel->getActiveSheet()->setCellValue('AG'.$row, $data[$i]->dist_gst_no);
 
-                    $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, $data[$i]->dist_state_code);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AH'.$row, $data[$i]->dist_zone);
 
-                    $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, $data[$i]->dist_state);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AI'.$row, $data[$i]->area);
 
-                    $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, $data[$i]->dist_gst_no);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AJ'.$row, $data[$i]->distributor_city);
 
-                    $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, $data[$i]->dist_zone);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AK'.$row, $data[$i]->location);
 
-                    $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, $data[$i]->area);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AL'.$row, $data[$i]->sales_rep_name);
 
-                    $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, $data[$i]->distributor_city);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AM'.$row, $data[$i]->due_date);
 
-                    $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $data[$i]->location);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AN'.$row, $data[$i]->order_no);
 
-                    $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$i]->sales_rep_name);
-
-                    $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->due_date);
-
-                    $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->order_no);
-
-                    $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->order_date);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AO'.$row, $data[$i]->order_date);
 
                 }
 
-                $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->remarks);
+                $objPHPExcel->getActiveSheet()->setCellValue('AP'.$row, $data[$i]->remarks);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->id);
+                $objPHPExcel->getActiveSheet()->setCellValue('AQ'.$row, $data[$i]->id);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $status);
-
-                $row=$row+1;
+                $objPHPExcel->getActiveSheet()->setCellValue('AR'.$row, $status);
 
             }
 
@@ -438,16 +565,38 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
 
         $include=$include.'Sample & Product Expired, ';
 
-        $data = $this->get_sample_expired_details($from_date, $to_date);
+        $data = $this->get_sample_expired_details($from_date, $to_date,$date_of_processing,$date_of_accounting);
 
         // echo $invoicelevelsample;
         // echo '<br>';
         // echo count($data);
         // echo '<br>';
-    
+
+        $pr_dist_id='';
+        $pr_inv_no='';
+        $pr_system_id='';
+
         for($i=0; $i<count($data); $i++) {
+            $dist_id=$data[$i]->distributor_out_id;
+            $inv_no=$data[$i]->voucher_no;
+            $system_id=$data[$i]->id;
+
+            if($i==0){
+                $pr_dist_id=$dist_id;
+                $pr_inv_no=$inv_no;
+                $pr_system_id=$system_id;
+            }
+
+            if($dist_id!=$pr_dist_id || $inv_no!=$pr_inv_no || $system_id!=$pr_system_id){
+                $row=$row+1;
+                $pr_dist_id=$dist_id;
+                $pr_inv_no=$inv_no;
+                $pr_system_id=$system_id;
+            }
 
             $dop1=date("d-m-Y", strtotime($data[$i]->date_of_processing));
+
+            $mod_on=date("d-m-Y", strtotime($data[$i]->approved_on));
 
             $objPHPExcel->getActiveSheet()->setCellValue('A'.$row, '=TEXT(D'.$row.',"mmmm")');
 
@@ -457,32 +606,85 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
 
             $objPHPExcel->getActiveSheet()->setCellValue('D'.$row, $dop1);
 
-            $objPHPExcel->getActiveSheet()->setCellValue('E'.$row, $data[$i]->dweek);
+            $objPHPExcel->getActiveSheet()->setCellValue('E'.$row, $mod_on);
 
-            $objPHPExcel->getActiveSheet()->setCellValue('F'.$row, "Sample & Product Expired");
+            $objPHPExcel->getActiveSheet()->setCellValue('F'.$row, $data[$i]->dweek);
 
-            $objPHPExcel->getActiveSheet()->setCellValue('G'.$row, $data[$i]->voucher_no);
+            $objPHPExcel->getActiveSheet()->setCellValue('G'.$row, "Sample & Product Expired");
+
+            $objPHPExcel->getActiveSheet()->setCellValue('H'.$row, $data[$i]->voucher_no);
 
             $status = $data[$i]->status;
             if($status=="InActive") {
                 $status='Cancelled';
             }
             if($status=='Cancelled') {
-                $objPHPExcel->getActiveSheet()->setCellValue('H'.$row, '0');
-
-                $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, '0');
-
+               $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, '0');
-
                 $objPHPExcel->getActiveSheet()->setCellValue('K'.$row, '0');
-
                 $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, '0');
-
                 $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, '0');
-
                 $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, '0');
             } else {
-                $objPHPExcel->getActiveSheet()->setCellValue('H'.$row, $data[$i]->amount);
+
+                /*$tax_per = $data[$i]->tax_percentage;*/
+                $tax_per = $data[$i]->tax_percentage;
+                if($tax_per=='5')
+                {
+                   $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, $data[$i]->amt_exc_tax);
+                }
+                else if($tax_per=='12')
+                {
+                    $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, $data[$i]->amt_exc_tax);
+                }
+                else if($tax_per=='18')
+                {
+                   $objPHPExcel->getActiveSheet()->setCellValue('K'.$row, $data[$i]->amt_exc_tax);
+                }
+
+                $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, $data[$i]->amount);
+
+                if($data[$i]->cgst_amt!=0)
+                {
+                    $tax_percentage = $data[$i]->tax_percentage/2;
+                    if($tax_percentage=='2.5')
+                    {
+                        $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, $data[$i]->cgst_amt);
+                        $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, $data[$i]->sgst_amt);
+                    }
+                    if($tax_percentage=='6'){
+                        $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, $data[$i]->sgst_amt);
+                         $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, $data[$i]->sgst_amt);
+                    }
+                    if($tax_percentage=='9'){
+                        $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, $data[$i]->cgst_amt);
+                        $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, $data[$i]->sgst_amt);
+                    }
+                }
+                else
+                {
+                    $tax_percentage = $data[$i]->tax_percentage;
+                    if($tax_percentage=='5')
+                    {
+                        $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, $data[$i]->igst_amt);
+                    }
+                    if($tax_percentage=='12'){
+                        $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, $data[$i]->igst_amt);
+                    }
+                    if($tax_percentage=='18'){
+                        $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, $data[$i]->igst_amt);
+                    }
+                }
 
                 $cstamt=$data[$i]->amount;
 
@@ -504,49 +706,51 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
                     }
                 }
                 
-                $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, $cgst_amt);
-                $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, $sgst_amt);
-                $objPHPExcel->getActiveSheet()->setCellValue('K'.$row, $igst_amt);
-                $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, $tax_amt);
+                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, $cgst_amt);
+                $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, $sgst_amt);
+                $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $igst_amt);
+                $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $tax_amt);
 
                 $round_off_amt=round($data[$i]->final_amount)-$data[$i]->final_amount;
 
-                $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, $round_off_amt);
+                $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $round_off_amt);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, round($data[$i]->final_amount));
+                $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, round($data[$i]->final_amount));
 
-                $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, $data[$i]->depot_name);
+                $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->depot_name);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, $data[$i]->dname);
+                $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->distributor_name);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, $data[$i]->distributor_type);
+                $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->distributor_type);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, $data[$i]->dist_state_code);
+                /*$objPHPExcel->getActiveSheet()->setCellValue('S'.$row, $data[$i]->dist_state_code);
+                $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, $data[$i]->dist_state);*/
 
-                $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, $data[$i]->dist_state);
+                $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->dist_state_code);
+                $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->dist_state);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, $data[$i]->dist_gst_no);
+                $objPHPExcel->getActiveSheet()->setCellValue('AG'.$row, $data[$i]->dist_gst_no);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, $data[$i]->dist_zone);
+                $objPHPExcel->getActiveSheet()->setCellValue('AH'.$row, $data[$i]->dist_zone);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, $data[$i]->area);
+                $objPHPExcel->getActiveSheet()->setCellValue('AI'.$row, $data[$i]->area);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, $data[$i]->distributor_city);
+                $objPHPExcel->getActiveSheet()->setCellValue('AJ'.$row, $data[$i]->distributor_city);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $data[$i]->location);
+                $objPHPExcel->getActiveSheet()->setCellValue('AK'.$row, $data[$i]->location);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$i]->sales_rep_name);
+                $objPHPExcel->getActiveSheet()->setCellValue('AL'.$row, $data[$i]->sales_rep_name);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->due_date);
+                $objPHPExcel->getActiveSheet()->setCellValue('AM'.$row, $data[$i]->due_date);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->sample_type);
+                $objPHPExcel->getActiveSheet()->setCellValue('AN'.$row, $data[$i]->order_no);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->order_date);
+                $objPHPExcel->getActiveSheet()->setCellValue('AO'.$row, $data[$i]->order_date);
             }
 
-            $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->remarks);
+             $objPHPExcel->getActiveSheet()->setCellValue('AP'.$row, $data[$i]->remarks);
 
-            $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->sampleid);
+             $objPHPExcel->getActiveSheet()->setCellValue('AQ'.$row, $data[$i]->sampleid);
 
             // $status = $data[$i]->status;
 
@@ -555,10 +759,6 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
             //     $status='Cancelled';
 
             // }
-
-            $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $status);
-
-            $row=$row+1;
 
         }
 
@@ -567,17 +767,39 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
     if($invoicelevelsalesreturn!="") {
 
         $include=$include.'Sales Return, ';
-
         $data = $this->get_distributor_in_details($from_date, $to_date);    
 
         // echo $invoicelevelsalesreturn;
         // echo '<br>';
         // echo count($data);
         // echo '<br>';
-    
+
+        $pr_dist_id='';
+        $pr_inv_no='';
+        $pr_system_id='';
+
         for($i=0; $i<count($data); $i++) {
 
+            $dist_id=$data[$i]->distributor_in_id;
+            $inv_no=$data[$i]->sales_return_no;
+            $system_id=$data[$i]->id;
+
+            if($i==0){
+                $pr_dist_id=$dist_id;
+                $pr_inv_no=$inv_no;
+                $pr_system_id=$system_id;
+            }
+
+            if($dist_id!=$pr_dist_id || $inv_no!=$pr_inv_no || $system_id!=$pr_system_id){
+                $row=$row+1;
+                $pr_dist_id=$dist_id;
+                $pr_inv_no=$inv_no;
+                $pr_system_id=$system_id;
+            }
+
             $dop1=date("d-m-Y", strtotime($data[$i]->date_of_processing));
+
+            $mod_on=date("d-m-Y", strtotime($data[$i]->approved_on));
 
             $objPHPExcel->getActiveSheet()->setCellValue('A'.$row, '=TEXT(D'.$row.',"mmmm")');
 
@@ -586,33 +808,87 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
             $objPHPExcel->getActiveSheet()->setCellValue('C'.$row, '=YEAR(D'.$row.')');
 
             $objPHPExcel->getActiveSheet()->setCellValue('D'.$row, $dop1);
+            $objPHPExcel->getActiveSheet()->setCellValue('E'.$row, $mod_on);
 
-            $objPHPExcel->getActiveSheet()->setCellValue('E'.$row, $data[$i]->dweek);
+            $objPHPExcel->getActiveSheet()->setCellValue('F'.$row, $data[$i]->dweek);
 
-            $objPHPExcel->getActiveSheet()->setCellValue('F'.$row, 'SALES RETURN');
+            $objPHPExcel->getActiveSheet()->setCellValue('G'.$row, 'SALES RETURN');
 
-            $objPHPExcel->getActiveSheet()->setCellValue('G'.$row, $data[$i]->sales_return_no);
+            $objPHPExcel->getActiveSheet()->setCellValue('H'.$row, $data[$i]->sales_return_no);
 
             $status = $data[$i]->status;
             if($status=="InActive") {
                 $status='Cancelled';
             }
             if($status=='Cancelled') {
-                $objPHPExcel->getActiveSheet()->setCellValue('H'.$row, '0');
-
                 $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, '0');
-
                 $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, '0');
-
                 $objPHPExcel->getActiveSheet()->setCellValue('K'.$row, '0');
-
                 $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, '0');
-
                 $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, '0');
-
                 $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, '0');
+
             } else {
-                $objPHPExcel->getActiveSheet()->setCellValue('H'.$row, $data[$i]->amount);
+                $tax_per = $data[$i]->tax_percentage;
+                if($tax_per=='5')
+                {
+                   $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, $data[$i]->amt_exc_tax);
+                }
+                else if($tax_per=='12')
+                {
+                    $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, $data[$i]->amt_exc_tax);
+                }
+                else if($tax_per=='18')
+                {
+                   $objPHPExcel->getActiveSheet()->setCellValue('K'.$row, $data[$i]->amt_exc_tax);
+                }
+
+                $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, $data[$i]->amount);
+
+                if($data[$i]->cgst_amt!=0)
+                {
+                    $tax_percentage = $data[$i]->tax_percentage/2;
+                    if($tax_percentage=='2.5')
+                    {
+                        $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, $data[$i]->cgst_amt);
+                        $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, $data[$i]->sgst_amt);
+                    }
+                    if($tax_percentage=='6'){
+                        $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, $data[$i]->sgst_amt);
+                         $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, $data[$i]->sgst_amt);
+                    }
+                    if($tax_percentage=='9'){
+                        $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, $data[$i]->cgst_amt);
+                        $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, $data[$i]->sgst_amt);
+                    }
+                }
+                else
+                {
+                    $tax_percentage = $data[$i]->tax_percentage;
+                    if($tax_percentage=='5')
+                    {
+                        $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, $data[$i]->cgst_amt);
+                    }
+                    if($tax_percentage=='12'){
+                        $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, $data[$i]->sgst_amt);
+                    }
+                    if($tax_percentage=='18'){
+                        $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, $data[$i]->cgst_amt);
+                    }
+                }
+
+
+                $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, $data[$i]->amount);
 
                 $cstamt=$data[$i]->amount;
 
@@ -634,51 +910,49 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
                     }
                 }
                 
-                $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, $cgst_amt);
-                $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, $sgst_amt);
-                $objPHPExcel->getActiveSheet()->setCellValue('K'.$row, $igst_amt);
-                $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, $tax_amt);
+                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, $cgst_amt);
+                $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, $sgst_amt);
+                $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $igst_amt);
+                $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $tax_amt);
 
                 $round_off_amt=round($data[$i]->final_amount)-$data[$i]->final_amount;
 
-                $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, $round_off_amt);
+                $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $round_off_amt);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, round($data[$i]->final_amount));
+                $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, round($data[$i]->final_amount));
 
-                $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, $data[$i]->depot_name);
+                $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->depot_name);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, $data[$i]->distributor_name);
+                $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->distributor_name);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, $data[$i]->distributor_type);
+                $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->distributor_type);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, $data[$i]->dist_state_code);
+                $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->dist_state_code);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, $data[$i]->dist_state);
+                $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->dist_state);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, $data[$i]->dist_gst_no);
+                $objPHPExcel->getActiveSheet()->setCellValue('AG'.$row, $data[$i]->dist_gst_no);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, $data[$i]->dist_zone);
+                $objPHPExcel->getActiveSheet()->setCellValue('AH'.$row, $data[$i]->dist_zone);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, $data[$i]->area);
+                $objPHPExcel->getActiveSheet()->setCellValue('AI'.$row, $data[$i]->area);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, $data[$i]->distributor_city);
+                $objPHPExcel->getActiveSheet()->setCellValue('AJ'.$row, $data[$i]->distributor_city);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $data[$i]->location);
+                $objPHPExcel->getActiveSheet()->setCellValue('AK'.$row, $data[$i]->location);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$i]->sales_rep_name);
+                $objPHPExcel->getActiveSheet()->setCellValue('AL'.$row, $data[$i]->sales_rep_name);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, '');
+               $objPHPExcel->getActiveSheet()->setCellValue('AM'.$row, '');
 
-                $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, '');
+               $objPHPExcel->getActiveSheet()->setCellValue('AN'.$row, '');
 
-                $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, '');
+               $objPHPExcel->getActiveSheet()->setCellValue('AO'.$row, '');
             }
 
+            $objPHPExcel->getActiveSheet()->setCellValue('AP'.$row, $data[$i]->remarks);
 
-
-            $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->remarks);
-
-            $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->srid);
+            $objPHPExcel->getActiveSheet()->setCellValue('AQ'.$row, $data[$i]->srid);
 
             // $status = $data[$i]->status;
 
@@ -688,9 +962,8 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
 
             // }
 
-            $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $status);
-
-            $row=$row+1;
+            $objPHPExcel->getActiveSheet()->setCellValue('AR'.$row, $status);
+            
         }
 
     }
@@ -703,11 +976,11 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
 
 
 
-    $objPHPExcel->getActiveSheet()->getStyle('A8:AE8')->getFont()->setBold(true);
+    $objPHPExcel->getActiveSheet()->getStyle('A8:AO8')->getFont()->setBold(true);
 
     
 
-    $objPHPExcel->getActiveSheet()->getStyle('A8'.':AE'.$row)->applyFromArray(array(
+    $objPHPExcel->getActiveSheet()->getStyle('A8'.':AO'.$row)->applyFromArray(array(
 
         'borders' => array(
 
@@ -728,18 +1001,23 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
 
 
     $filename='Sale_Invoice_Report.xls';
+    // $path  = 'C:/wamp64/www/eat_erp_test/assets/uploads/excel_upload/';
+    // $path  = '/home/eatangcp/public_html/test/assets/uploads/excel_upload/';
+    $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/excel_upload/';
 
-    header('Content-Type: application/vnd.ms-excel');
-
-    header('Content-Disposition: attachment;filename="'.$filename.'"');
-
-    header('Cache-Control: max-age=0');
-
-    $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
-
-    $objWriter->save('php://output');
-
-
+    if($flag==0)
+    {
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="'.$filename.'"');
+        header('Cache-Control: max-age=0'); 
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+        $objWriter->save('php://output');
+    }
+    else
+    {
+       $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5'); 
+        $objWriter->save($path.$filename);
+    }
 
     $logarray['table_id']=$this->session->userdata('session_id');
 
@@ -762,148 +1040,34 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
 
 
 function get_distributor_out_sku_details($from_date, $to_date, $status='', $date_of_processing='', $date_of_accounting='') {
-
-    // $sql = "select L.*, J.item_name, J.quantity, J.short_name from
-
-    //         (select I.*, K.location from  
-
-    //         (select M.*, H.sales_rep_name from 
-
-    //         (select G.*, L.distributor_type from 
-
-    //         (select E.*, F.distributor_name, F.sell_out, F.type_id, F.location_id, F.city as distributor_city from 
-
-    //         (select C.*, D.depot_name from 
-
-    //         (select A.*, B.type, B.item_id, B.qty, B.sell_rate, B.grams, B.rate, B.amount as item_amount from 
-
-    //         (select *, MONTHNAME(STR_TO_DATE(month(date_of_processing),'%m')) as dmonth from distributor_out 
-
-    //             where status='Approved' and date_of_processing>='$from_date' and date_of_processing<='$to_date') A 
-
-    //         left join 
-
-    //         (select * from distributor_out_items) B 
-
-    //         on (A.id=B.distributor_out_id)) C 
-
-    //         left join 
-
-    //         (select * from depot_master) D 
-
-    //         on (C.depot_id=D.id)) E 
-
-    //         left join 
-
-    //         (select * from distributor_master) F 
-
-    //         on (E.distributor_id=F.id)) G 
-
-    //         left join
-
-    //         (select * from distributor_type_master) L 
-
-    //         on (G.type_id=L.id)) M 
-
-    //         left join 
-
-    //         (select * from sales_rep_master) H 
-
-    //         on (M.sales_rep_id=H.id)) I 
-
-    //         left join 
-
-    //         (select * from location_master) K 
-
-    //         on (I.location_id=K.id)) L 
-
-    //         left join 
-
-    //         (select id, 'Raw Material' as type, rm_name as item_name, null as quantity, null as short_name from raw_material_master 
-
-    //             where status='Approved' 
-
-    //         union all 
-
-    //         select id, 'Bar' as type, product_name as item_name, null as quantity, short_name from product_master 
-
-    //             where status='Approved' 
-
-    //         union all 
-
-    //         select m.id, 'Box' as type, m.box_name as item_name, sum(p.qty) as quantity, m.short_name from box_master m 
-
-    //         left join box_product p on m.id=p.box_id where m.status='Approved' group by m.id) J 
-
-    //         on (L.item_id=J.id and L.type=J.type)";
-
-
-
-    // $sql = "select AA.*, WEEK(date_of_processing,2)-WEEK(STR_TO_DATE(concat(YEAR(date_of_processing),'-',MONTH(date_of_processing),'-',1),'%Y-%m-%d'),2)+1 as dweek, 
-
-    //             BB.item_name, BB.quantity, BB.short_name from 
-
-    //         (select A.*,A.id as saleid, B.type, B.item_id, B.qty, B.sell_rate, B.grams, B.rate, B.amount as item_amount, 
-
-    //             C.depot_name, D.distributor_name, D.sell_out, D.type_id, D.location_id, D.city as distributor_city, 
-
-    //             E.distributor_type, F.sales_rep_name, G.location, H.area 
-
-    //         from distributor_out A 
-
-    //             left join distributor_out_items B on(A.id=B.distributor_out_id) 
-
-    //             left join depot_master C on(A.depot_id=C.id) 
-
-    //             left join distributor_master D on(A.distributor_id=D.id) 
-
-    //             left join distributor_type_master E on(D.type_id=E.id) 
-
-    //             left join sales_rep_master F on(A.sales_rep_id=F.id) 
-
-    //             left join location_master G on(D.location_id=G.id) 
-
-    //             left join area_master H on(D.area_id=H.id) 
-
-    //         where A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and A.status='Approved') AA 
-
-    //         left join 
-
-    //         (select id, 'Bar' as type, product_name as item_name, null as quantity, short_name from product_master 
-
-    //             where status='Approved' 
-
-    //         union all 
-
-    //         select m.id, 'Box' as type, m.box_name as item_name, sum(p.qty) as quantity, m.short_name 
-
-    //         from box_master m left join box_product p on m.id=p.box_id 
-
-    //         where m.status='Approved' group by m.id) BB 
-
-    //         on (AA.item_id=BB.id and AA.type=BB.type) 
-
-    //         where AA.distributor_name not like '%sample%' and AA.distributor_name not like '%Product Expired%' order by date_of_processing";
-
+    $cond2 = '';
 
     if ($status=="Approved"){
         $cond=" where status='Approved' and (distributor_id!='1' and distributor_id!='189')";
+        $cond2=" and A.status='Approved' and (A.distributor_id!='1' and A.distributor_id!='189')";
     } else if ($status=="pending"){
-        $cond=" where ((status='Pending' and (delivery_status is null or delivery_status = '')) or status='Rejected') and 
-                        (distributor_id!='1' and distributor_id!='189')";
+        $cond=" where ((status='Pending' and (delivery_status is null or delivery_status = '')) or status='Rejected') and (distributor_id!='1' and distributor_id!='189')";
+        $cond2=" and ((A.status='Pending' and (A.delivery_status is null or A.delivery_status = ''))) and (A.distributor_id!='1' and A.distributor_id!='189')";
     } else if ($status=="pending_for_approval"){
-        $cond=" where ((status='Pending' and (delivery_status='Pending' or delivery_status='GP Issued' or 
-                            delivery_status='Delivered Not Complete' or delivery_status='Delivered')) or status='Deleted') and 
-                            (distributor_id!='1' and distributor_id!='189')";
+        $cond=" where ((status='Pending' and (delivery_status='Pending' or delivery_status='GP Issued' or delivery_status='Delivered Not Complete' or delivery_status='Delivered')) or status='Deleted') and (distributor_id!='1' and distributor_id!='189')";
+        $cond2=" and ((A.status='Pending' and (A.delivery_status='Pending' or A.delivery_status='GP Issued' or A.delivery_status='Delivered Not Complete' or A.delivery_status='Delivered')) or A.status='Deleted') and (A.distributor_id!='1' and A.distributor_id!='189')";
     } else if ($status=="pending_for_delivery"){
         $cond=" where status='Approved' and delivery_status='Pending' and (distributor_id!='1' and distributor_id!='189')";
+        $cond2=" and A.status='Approved' and A.delivery_status='Pending' and (A.distributor_id!='1' and A.distributor_id!='189')";
     } else if ($status=="gp_issued"){
         $cond=" where status='Approved' and delivery_status='GP Issued' and (distributor_id!='1' and distributor_id!='189')";
+        $cond2=" and A.status='Approved' and A.delivery_status='GP Issued' and (A.distributor_id!='1' and A.distributor_id!='189')";
+        // $cond2 =  " and (A.status='Approved')";
     } else if ($status=="delivered_not_complete"){
         $cond=" where status='Approved' and delivery_status='Delivered Not Complete' and 
                         (distributor_id!='1' and distributor_id!='189')";
+        $cond2=" and A.status='Approved' and A.delivery_status='Delivered Not Complete' and 
+                        (A.distributor_id!='1' and A.distributor_id!='189')";
+        // $cond2 =  " and (A.status='Approved')";
     } else if ($status!="") {
         $cond=" where status='".$status."' and (distributor_id!='1' and distributor_id!='189')";
+        $cond2=" and A.status='".$status."' and (A.distributor_id!='1' and A.distributor_id!='189')";
+        // $cond2 =  " and (A.status='".$status."')";
     } else {
         $cond="";
     }
@@ -912,13 +1076,17 @@ function get_distributor_out_sku_details($from_date, $to_date, $status='', $date
 
     if( $date_of_processing != '' && $date_of_accounting=='') {
         $ddateofprocess = "A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' ";
-    }
-    else {
+    } else {
         $ddateofprocess = "A.invoice_date>='$from_date' and A.invoice_date<='$to_date' ";
     }
+
+
     
-
-
+    // if($status=='')
+    // {
+    //     $cond2 =  " and (A.status='Approved') ";
+    // }
+    
     $sql = "select * from 
 
             (select AA.*, WEEK(invoice_date,1)-WEEK(STR_TO_DATE(concat(YEAR(invoice_date),'-',MONTH(invoice_date),'-',1),'%Y-%m-%d'),1)+1 as dweek, 
@@ -959,7 +1127,7 @@ function get_distributor_out_sku_details($from_date, $to_date, $status='', $date
 				
 				left join sales_rep_master F on(J.reporting_manager_id=F.id) 
 
-            where ".$ddateofprocess." and (A.status='Approved')) AA 
+            where ".$ddateofprocess." ".$cond2.") AA 
 
             left join 
 
@@ -1069,12 +1237,89 @@ function get_distributor_sale_sku_details($from_date, $to_date) {
 
 }
 
+function get_distributor_sale_sku_details_positive($from_date, $to_date) {
+
+    $sql = "select AA.*, WEEK(date_of_processing,1)-WEEK(STR_TO_DATE(concat(YEAR(date_of_processing),'-',
+
+                                MONTH(date_of_processing),'-',1),'%Y-%m-%d'),1)+1 as dweek, 
+
+                BB.item_name, BB.quantity, BB.short_name from 
+
+            (select A.*,A.id as ssid, B.type, B.item_id, B.qty, B.sell_rate, B.grams, B.rate, B.amount as item_amount, 
+
+                D.distributor_name, D.sell_out, D.type_id, D.location_id as locationid, D.area_id,D.zone_id as zoneid,
+
+                D.city as distributor_city, D.class, D.state as dist_state, D.state_code as dist_state_code, D.gst_number as dist_gst_no, 
+
+                E.distributor_type, G.location, O.store_name as m_distributor_name, 
+
+                l.location as m_distributor_location,
+
+                 
+                F.sales_rep_name,K.zone,I.area,
+                (Select sales_rep_name from sales_rep_master where id=J.sales_rep_id1) as salesrepname,
+                (Select sales_rep_name from sales_rep_master where id=J.sales_rep_id2) as salesrepname1,
+                M.store_id as storeid,O.store_name, Q.distributor_type as d_type,P.zone as d_zone,S.sales_rep_name as reporting_manager,
+                (Select sales_rep_name from sales_rep_master where id=R.sales_rep_id1) as sales1,
+                (Select sales_rep_name from sales_rep_master where id=R.sales_rep_id2) as sales2
+
+                from distributor_sale A 
+                left join distributor_sale_items B on(A.id=B.distributor_sale_id) 
+                left join distributor_master D on(A.distributor_id=D.id) 
+                left join distributor_type_master E on(D.type_id=E.id) 
+                left join location_master G on(D.location_id=G.id) 
+                left join area_master I on(D.area_id=I.id) 
+                left join zone_master K on(D.zone_id=K.id) 
+                left join sr_mapping J on(D.area_id=J.area_id and D.type_id=J.type_id and D.zone_id=J.zone_id) 
+                left join sales_rep_master F on( J.reporting_manager_id=F.id) 
+                left join relationship_master O on(A.store_id=O.id) 
+                left join store_master M on(O.id=M.store_id and M.type_id='7' and A.zone_id=M.zone_id and A.location_id=M.location_id) 
+                left join zone_master P on(A.zone_id=P.id) 
+                left join distributor_type_master Q on(O.type_id=Q.id) 
+                left join location_master l on(A.location_id=l.id) 
+                left join sr_mapping R on(M.store_id=R.area_id1 and M.type_id=R.type_id and M.zone_id=R.zone_id and M.location_id=R.location_id) 
+                left join sales_rep_master S on( R.reporting_manager_id=S.id) 
+            where (A.status='Approved' )  and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date') AA 
+
+            left join 
+
+            (select id, 'Bar' as type, short_name as item_name, null as quantity, short_name from product_master 
+
+                where status='Approved' 
+
+            union all 
+
+            select m.id, 'Box' as type, m.box_name as item_name, sum(p.qty) as quantity, m.short_name 
+
+            from box_master m left join box_product p on m.id=p.box_id 
+
+            where m.status='Approved' group by m.id) BB 
+
+            on (AA.item_id=BB.id and AA.type=BB.type)";
+
+    $query=$this->db->query($sql);
+
+    $result=$query->result();
+
+    return $result;
+
+}
 
 
-function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sample,$credit_debit='',$status_type='',$date_of_processing='',$date_of_accounting='') {
+
+function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sample,$credit_debit='',$status_type='',$date_of_processing='',$date_of_accounting='',$flag='') {
     if($status_type==''){
-        $from_date = formatdate($this->input->post('from_date'));
-        $to_date = formatdate($this->input->post('to_date'));
+
+        if($this->input->post('from_date')!="")
+            $from_date = formatdate($this->input->post('from_date'));
+        else
+            $from_date = '';
+
+
+        if($this->input->post('to_date')!="")
+          $to_date = formatdate($this->input->post('to_date'));
+        else
+          $to_date = '';
     } else {
         $from_date = '2017-01-01';
         $to_date = date("Y-m-d");
@@ -1091,10 +1336,10 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
     $round_off_amt=0;
     $include="";
 	$rounding_amt=0;
-    $fromdate=date("d-m-Y", strtotime($from_date));
-    $todate=date("d-m-Y", strtotime($to_date));
-    $objPHPExcel->getActiveSheet()->setCellValue('B4', $fromdate);
-    $objPHPExcel->getActiveSheet()->setCellValue('E4', $todate);
+  
+
+    $objPHPExcel->getActiveSheet()->setCellValue('B4', $from_date);
+    $objPHPExcel->getActiveSheet()->setCellValue('E4', $to_date);
 
     ini_set('memory_limit', '2000M');
     ini_set('max_execution_time', 0);
@@ -1187,8 +1432,16 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                         $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->con_state);
                         $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->con_gst_number);
                     } else {
-                        $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->dist_state_code);
-                        $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->dist_state);
+                       if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED')
+						 {
+								$objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->state_code);
+								$objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->state);
+						 }
+						else
+						{
+							$objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->dist_state_code);
+							$objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->dist_state);
+						}
                         $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->dist_gst_no);
                     }
 
@@ -1277,7 +1530,7 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
     if($ssallocation!="") {
         $include=$include.'SS Allocation, ';
         $data = $this->get_distributor_sale_sku_details($from_date, $to_date);
-
+        
         $j = 0;
         $prv_dist_id = '';
         $new_dist_id = '';
@@ -1475,14 +1728,14 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
 
 
         // if($bl_insert == true){
-
+        $data = $this->get_distributor_sale_sku_details_positive($from_date, $to_date);
         for($k=0; $k<count($data); $k++){
             $dop1=date("d-m-Y", strtotime($data[$k]->date_of_processing));
-
+            $mod_on1=date("d-m-Y", strtotime($data[$k]->modified_on));
             $objPHPExcel->getActiveSheet()->setCellValue('A'.$row, '=TEXT(D'.$row.',"mmmm")');
             $objPHPExcel->getActiveSheet()->setCellValue('B'.$row, '=CONCATENATE("Q"&ROUNDUP(MONTH(D'.$row.')/3,0))');
             $objPHPExcel->getActiveSheet()->setCellValue('C'.$row, '=YEAR(D'.$row.')');
-			$objPHPExcel->getActiveSheet()->setCellValue('D'.$row, $dop1);
+			$objPHPExcel->getActiveSheet()->setCellValue('D'.$row, $mod_on1);
             $objPHPExcel->getActiveSheet()->setCellValue('E'.$row, $dop1);
             $objPHPExcel->getActiveSheet()->setCellValue('F'.$row, $data[$k]->dweek);
             $objPHPExcel->getActiveSheet()->setCellValue('G'.$row, "SSALLOCATION");
@@ -1566,7 +1819,7 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
 
     if($sample!="") {
         $include=$include.'Sample & Product Expired, ';
-        $data = $this->get_sample_expired_SKU_details($from_date, $to_date);
+        $data = $this->get_sample_expired_SKU_details($from_date, $to_date,$date_of_processing, $date_of_accounting);
 
         for($i=0; $i<count($data); $i++) {
             $dop1=date("d-m-Y", strtotime($data[$i]->date_of_processing));
@@ -1574,7 +1827,7 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
             $objPHPExcel->getActiveSheet()->setCellValue('A'.$row, '=TEXT(D'.$row.',"mmmm")');
             $objPHPExcel->getActiveSheet()->setCellValue('B'.$row, '=CONCATENATE("Q"&ROUNDUP(MONTH(D'.$row.')/3,0))');
             $objPHPExcel->getActiveSheet()->setCellValue('C'.$row, '=YEAR(D'.$row.')');
-			$objPHPExcel->getActiveSheet()->setCellValue('D'.$row, $dop1);
+			$objPHPExcel->getActiveSheet()->setCellValue('D'.$row, $mod_on2);
             $objPHPExcel->getActiveSheet()->setCellValue('E'.$row, $dop1);
             $objPHPExcel->getActiveSheet()->setCellValue('F'.$row, $data[$i]->dweek);
             $objPHPExcel->getActiveSheet()->setCellValue('G'.$row, strtoupper($data[$i]->distributor_name));
@@ -2118,18 +2371,30 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
 
 
     $filename='Sale_Invoice_Sku_Report.xls';
+    // $path  = 'C:/wamp64/www/eat_erp_test/assets/uploads/excel_upload/';
+    // $path  = '/home/eatangcp/public_html/test/assets/uploads/excel_upload/';
+    $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/excel_upload/';
+    if($flag==0)
+    {
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="'.$filename.'"');
+        header('Cache-Control: max-age=0'); 
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
 
-    header('Content-Type: application/vnd.ms-excel');
+        $objWriter->setPreCalculateFormulas(TRUE); 
 
-    header('Content-Disposition: attachment;filename="'.$filename.'"');
+        $objWriter->save('php://output');
+    }
+    else
+    {
+       $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
 
-    header('Cache-Control: max-age=0');
+        $objWriter->setPreCalculateFormulas(TRUE); 
 
-    $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+        $objWriter->save($path.$filename);
+    }
 
-    $objWriter->setPreCalculateFormulas(TRUE); 
-
-    $objWriter->save('php://output');
+    
 
 
 
@@ -2153,18 +2418,24 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
 
 function get_credit_debit_sku_details($from_date, $to_date, $date_of_processing, $date_of_accounting) {
 
-     if( $date_of_processing != '' && $date_of_accounting=='') {
-        $ddateofprocess = "A.date_of_transaction>='$from_date' and A.date_of_transaction<='$to_date' ";
+    $ddateofprocess = '';
+
+    if($from_date!='' && $to_date!='')
+    {
+       if( $date_of_processing != '' && $date_of_accounting=='') {
+            $ddateofprocess = " and A.date_of_transaction>='$from_date' and A.date_of_transaction<='$to_date' ";
+        }
+        else {
+            $ddateofprocess = " and A.approved_on>='$from_date' and A.approved_on<='$to_date' ";
+        } 
     }
-    else {
-        $ddateofprocess = "A.approved_on>='$from_date' and A.approved_on<='$to_date' ";
-    }
+    
 
     $sql = "
 	select AA.*, WEEK(date_of_transaction,1)-WEEK(STR_TO_DATE(concat(YEAR(date_of_transaction),'-',MONTH(date_of_transaction),'-',1),'%Y-%m-%d'),1)+1 as dweek from 
             (select A.id, A.date_of_transaction, A.distributor_id, A.transaction, A.amount_without_tax, A.amount, A.tax, 
                 A.igst, A.cgst, A.sgst, A.status, A.remarks, A.created_by, A.created_on, A.modified_by, A.modified_on, 
-                A.approved_by, A.approved_on, A.rejected_by, A.rejected_on, A.ref_id, A.ref_no, A.ref_date, A.invoice_no, 
+                A.approved_by, A.approved_on, A.rejected_by, A.rejected_on, A.ref_id, A.ref_no, A.ref_date,
                 D.distributor_name, D.sell_out, D.type_id, D.location_id, D.city as distributor_city, 
                 D.class, D.state as dist_state, D.state_code as dist_state_code, D.gst_number as dist_gst_no, 
                 D.area_id,D.zone_id,K.zone,E.distributor_type, F.sales_rep_name, G.location, H.area ,
@@ -2187,7 +2458,7 @@ function get_credit_debit_sku_details($from_date, $to_date, $date_of_processing,
 				
 				left join sales_rep_master F on(J.reporting_manager_id=F.id) 
 
-            where (A.status='Approved' ) and ".$ddateofprocess.") AA ";
+            where (A.status='Approved' ) ".$ddateofprocess.") AA ";
 
     $query=$this->db->query($sql);
 
@@ -2200,7 +2471,17 @@ function get_credit_debit_sku_details($from_date, $to_date, $date_of_processing,
 
 
 
-function get_sample_expired_SKU_details($from_date, $to_date) {
+function get_sample_expired_SKU_details($from_date, $to_date,$date_of_processing, $date_of_accounting) {
+
+    $ddateofprocess="";
+
+    if( $date_of_processing != '' && $date_of_accounting=='') {
+        $ddateofprocess = "A.date_of_processing>='$from_date' and 
+                    A.date_of_processing<='$to_date' ";
+    } else {
+        $ddateofprocess = "date(A.approved_on)>='$from_date' and date(A.approved_on)<='$to_date' ";
+    }
+
 
     // $sql = "select AA.*, WEEK(date_of_processing,1)-WEEK(STR_TO_DATE(concat(YEAR(date_of_processing),'-',MONTH(date_of_processing),'-',1),'%Y-%m-%d'),1)+1 as dweek, 
 
@@ -2316,8 +2597,7 @@ function get_sample_expired_SKU_details($from_date, $to_date) {
 
                 left join sales_rep_master M on(J.sales_rep_id2=M.id) 
 
-            where (A.status='Approved') and A.date_of_processing>='$from_date' and 
-                    A.date_of_processing<='$to_date' and D.class='sample' and D.class is not null) AA 
+            where (A.status='Approved') and ".$ddateofprocess." and D.class='sample' and D.class is not null) AA 
 
             left join 
 
@@ -2373,7 +2653,7 @@ function generate_sample_expired_report() {
 
         $round_off_amt=0;
 
-        $row=2;
+        $row=6;
 
         for($i=0; $i<count($data); $i++) {
 
@@ -2706,9 +2986,7 @@ function get_distributor_in_sku_details($from_date, $to_date) {
 
             where m.status='Approved' group by m.id) BB 
 
-            on (AA.item_id=BB.id and AA.type=BB.type) 
-
-            where AA.class!='sample' or AA.class is null";
+            on (AA.item_id=BB.id and AA.type=BB.type)";
 
     $query=$this->db->query($sql);
 
@@ -2746,7 +3024,7 @@ function generate_sale_return_sku_report() {
 
         $round_off_amt=0;
 
-        $row=2;
+        $row=6;
 
         for($i=0; $i<count($data); $i++) {
 
@@ -2980,7 +3258,7 @@ function generate_raw_material_stock_report() {
 
     $sql = "select distinct date_of_receipt from raw_material_in where status='Approved' and date_of_receipt is not null and 
 
-            date_of_receipt>='$from_date' and date_of_receipt<='$to_date' 
+            date_of_receipt>='$from_date' and date_of_receipt<='$to_date' and date_of_receipt > '2018-10-22' 
 
             order by date_of_receipt";
 
@@ -3014,7 +3292,7 @@ function generate_raw_material_stock_report() {
 
         $objPHPExcel->getActiveSheet()->insertNewColumnBefore('B', $total_col);
 
-        $col=1;
+        $col=7;
 
         for($j=0; $j<$total_col; $j++){
 
@@ -3037,25 +3315,16 @@ function generate_raw_material_stock_report() {
 
 
         $sql = "select C.*, D.rm_name from 
-
                 (select A.*, B.raw_material_id, B.qty, B.rate, B.amount from 
-
                 (select * from raw_material_in where status='Approved' and 
-
-                    date_of_receipt>='$from_date' and date_of_receipt<='$to_date') A 
-
+                    date_of_receipt>='$from_date' and date_of_receipt<='$to_date' and 
+                    date_of_receipt > '2018-10-22') A 
                 left join 
-
                 (select * from raw_material_stock) B 
-
                 on (A.id=B.raw_material_in_id)) C 
-
                 left join 
-
                 (select * from raw_material_master) D 
-
                 on (C.raw_material_id=D.id) 
-
                 order by C.raw_material_id, C.date_of_receipt";
 
         $query=$this->db->query($sql);
@@ -3068,7 +3337,7 @@ function generate_raw_material_stock_report() {
 
             $prev_raw_material_id=0;
 
-            $row=2;
+            $row=5;
 
 
 
@@ -3081,6 +3350,7 @@ function generate_raw_material_stock_report() {
                 if($raw_material_id<>$prev_raw_material_id){
 
                     $prev_raw_material_id=$raw_material_id;
+                    $qty=array();
 
                     $row=$row+1;
 
@@ -3142,7 +3412,7 @@ function generate_raw_material_stock_report() {
 
             where raw_material_id in (select distinct id from batch_processing where status='Approved' and 
 
-                    date_of_processing>='$from_date' and date_of_processing<='$to_date') 
+                    date_of_processing>='$from_date' and date_of_processing<='$to_date' and date_of_processing > '2018-10-22') 
 
             group by raw_material_id";
 
@@ -4509,7 +4779,7 @@ function get_product_stock_details_old($from_date, $to_date) {
 
 
 
-function get_product_stock_details($from_date, $to_date) {
+function get_product_stock_details_old2($from_date, $to_date) {
 
     $sql = "select * from 
 
@@ -4535,13 +4805,13 @@ function get_product_stock_details($from_date, $to_date) {
 
             (select distinct depot_id, product_id from 
 
-            (select depot_id, product_id from batch_processing where status = 'Approved' 
+            (select depot_id, product_id from batch_processing where status = 'Approved' and date_of_processing>'2018-09-21' 
 
             union all 
 
             select distinct A.depot_id, B.product_id from 
 
-            (select id, depot_in_id as depot_id from depot_transfer where status = 'Approved') A 
+            (select id, depot_in_id as depot_id from depot_transfer where status = 'Approved' and date_of_transfer>'2018-09-21') A 
 
             left join 
 
@@ -4555,7 +4825,7 @@ function get_product_stock_details($from_date, $to_date) {
 
             select distinct A.depot_id, B.product_id from 
 
-            (select id, depot_id from distributor_in where status = 'Approved') A 
+            (select id, depot_id from distributor_in where status = 'Approved' and date_of_processing>'2018-09-21') A 
 
             left join 
 
@@ -4579,13 +4849,13 @@ function get_product_stock_details($from_date, $to_date) {
 
             (select E.depot_id, E.product_id, sum(E.tot_qty) as tot_qty_in from 
 
-            (select depot_id, product_id, sum(qty_in_bar) as tot_qty from batch_processing where status = 'Approved' and date_of_processing<'$from_date' group by depot_id, product_id 
+            (select depot_id, product_id, sum(qty_in_bar) as tot_qty from batch_processing where status = 'Approved' and date_of_processing>'2018-09-21' and date_of_processing<'$from_date' group by depot_id, product_id 
 
             union all 
 
             select A.depot_id, B.product_id, sum(B.qty) as tot_qty from 
 
-            (select id, depot_in_id as depot_id from depot_transfer where status = 'Approved' and date_of_transfer<'$from_date') A 
+            (select id, depot_in_id as depot_id from depot_transfer where status = 'Approved' and date_of_transfer>'2018-09-21' and date_of_transfer<'$from_date') A 
 
             left join 
 
@@ -4605,7 +4875,7 @@ function get_product_stock_details($from_date, $to_date) {
 
             select A.depot_id, B.product_id, sum(B.qty) as tot_qty from 
 
-            (select id, depot_id from distributor_in where status = 'Approved' and date_of_processing<'$from_date') A 
+            (select id, depot_id from distributor_in where status = 'Approved' and date_of_processing>'2018-09-21' and date_of_processing<'$from_date') A 
 
             left join 
 
@@ -4633,7 +4903,7 @@ function get_product_stock_details($from_date, $to_date) {
 
             (select A.depot_id, B.product_id, sum(B.qty) as tot_qty from 
 
-            (select id, depot_out_id as depot_id from depot_transfer where status = 'Approved' and date_of_transfer<'$from_date') A 
+            (select id, depot_out_id as depot_id from depot_transfer where status = 'Approved' and date_of_transfer>'2018-09-21' and date_of_transfer<'$from_date') A 
 
             left join 
 
@@ -4653,7 +4923,7 @@ function get_product_stock_details($from_date, $to_date) {
 
             select A.depot_id, B.product_id, sum(B.qty) as tot_qty from 
 
-            (select id, depot_id from distributor_out where status = 'Approved' and date_of_processing<'$from_date') A 
+            (select id, depot_id from distributor_out where status = 'Approved' and date_of_processing>'2018-09-21' and date_of_processing<'$from_date') A 
 
             left join 
 
@@ -4687,7 +4957,7 @@ function get_product_stock_details($from_date, $to_date) {
 
             (select depot_id, product_id, sum(qty_in_bar) as production_qty from batch_processing 
 
-            where status = 'Approved' and date_of_processing>='$from_date' and date_of_processing<='$to_date' 
+            where status = 'Approved' and date_of_processing>'2018-09-21' and date_of_processing>='$from_date' and date_of_processing<='$to_date' 
 
             group by depot_id, product_id) DD 
 
@@ -4705,7 +4975,7 @@ function get_product_stock_details($from_date, $to_date) {
 
             (select A.depot_id, B.product_id, sum(B.qty) as depot_in_qty from 
 
-            (select id, depot_in_id as depot_id from depot_transfer where status = 'Approved' and date_of_transfer>='$from_date' and date_of_transfer<='$to_date') A 
+            (select id, depot_in_id as depot_id from depot_transfer where status = 'Approved' and date_of_transfer>'2018-09-21' and date_of_transfer>='$from_date' and date_of_transfer<='$to_date') A 
 
             left join 
 
@@ -4737,7 +5007,7 @@ function get_product_stock_details($from_date, $to_date) {
 
             (select id, depot_out_id as depot_id from depot_transfer 
 
-            where status = 'Approved' and date_of_transfer>='$from_date' and date_of_transfer<='$to_date') A 
+            where status = 'Approved' and date_of_transfer>'2018-09-21' and date_of_transfer>='$from_date' and date_of_transfer<='$to_date') A 
 
             left join 
 
@@ -4767,7 +5037,7 @@ function get_product_stock_details($from_date, $to_date) {
 
             (select A.depot_id, B.product_id, sum(B.qty) as sale_qty from 
 
-            (select id, depot_id from distributor_out where status = 'Approved' and date_of_processing>='$from_date' and date_of_processing<='$to_date' and distributor_id not in (1, 63, 64, 65, 66, 189)) A 
+            (select id, depot_id from distributor_out where status = 'Approved' and date_of_processing>'2018-09-21' and date_of_processing>='$from_date' and date_of_processing<='$to_date' and distributor_id not in (1, 63, 64, 65, 66, 189)) A 
 
             left join 
 
@@ -4797,7 +5067,7 @@ function get_product_stock_details($from_date, $to_date) {
 
             (select A.depot_id, B.product_id, sum(B.qty) as sample_qty from 
 
-            (select id, depot_id from distributor_out where status = 'Approved' and date_of_processing>='$from_date' and date_of_processing<='$to_date' and distributor_id in (1, 63, 64, 65, 66)) A 
+            (select id, depot_id from distributor_out where status = 'Approved' and date_of_processing>'2018-09-21' and date_of_processing>='$from_date' and date_of_processing<='$to_date' and distributor_id in (1, 63, 64, 65, 66)) A 
 
             left join 
 
@@ -4827,7 +5097,7 @@ function get_product_stock_details($from_date, $to_date) {
 
             (select A.depot_id, B.product_id, sum(B.qty) as expire_qty from 
 
-            (select id, depot_id from distributor_out where status = 'Approved' and date_of_processing>='$from_date' and date_of_processing<='$to_date' and distributor_id = 189) A 
+            (select id, depot_id from distributor_out where status = 'Approved' and date_of_processing>'2018-09-21' and date_of_processing>='$from_date' and date_of_processing<='$to_date' and distributor_id = 189) A 
 
             left join 
 
@@ -4857,7 +5127,7 @@ function get_product_stock_details($from_date, $to_date) {
 
             (select A.depot_id, B.product_id, sum(B.qty) as sale_return_qty from 
 
-            (select id, depot_id from distributor_in where status = 'Approved' and date_of_processing>='$from_date' and date_of_processing<='$to_date') A 
+            (select id, depot_id from distributor_in where status = 'Approved' and date_of_processing>'2018-09-21' and date_of_processing>='$from_date' and date_of_processing<='$to_date') A 
 
             left join 
 
@@ -4916,91 +5186,224 @@ function get_product_stock_details($from_date, $to_date) {
 }
 
 
+function get_product_stock_details($from_date, $to_date) {
+    $sql = "select A.* from 
+            (select YY.*, ZZ.del_pending_qty from 
+            (select WW.*, XX.state, XX.city, XX.depot_name from 
+            (select UU.*, VV.item_name, VV.grams as unit_weight from 
+            (select SS.*, TT.convert_in_qty from 
+            (select QQ.*, RR.convert_out_qty from 
+            (select OO.*, PP.sale_return_qty from 
+            (select MM.*, NN.expire_qty from 
+            (select KK.*, LL.sample_qty from 
+            (select II.*, JJ.sale_qty from 
+            (select GG.*, HH.depot_out_qty from 
+            (select EE.*, FF.depot_in_qty from 
+            (select CC.*, DD.production_qty from 
+            (select AA.depot_id, AA.type, AA.product_id, BB.opening_qty from 
+
+            (select distinct E.depot_id, E.type, E.product_id from 
+            (select distinct depot_id, 'Bar' as type, product_id from batch_processing where status = 'Approved' and date_of_processing>'2018-09-21' and product_id is not null 
+            union all 
+            select distinct C.depot_id, C.type, C.product_id from 
+            (select A.id, A.depot_in_id as depot_id, B.type, B.item_id as product_id from depot_transfer A left join depot_transfer_items B on (A.id=B.depot_transfer_id) where A.status = 'Approved' and A.date_of_transfer>'2018-09-21' and B.item_id is not null) C 
+            union all 
+            select distinct C.depot_id, C.type, C.product_id from 
+            (select A.id, A.depot_id, B.type, B.item_id as product_id from distributor_in A left join distributor_in_items B on (A.id=B.distributor_in_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and B.item_id is not null) C 
+            union all 
+            select distinct C.depot_id, C.type, C.product_id from 
+            (select A.id, A.depot_id, 'Box' as type, B.box_id as product_id from bar_to_box A left join bar_to_box_qty B on (A.id=B.bar_to_box_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and B.box_id is not null) C 
+            union all 
+            select distinct C.depot_id, C.type, C.product_id from 
+            (select A.id, A.depot_id, 'Bar' as type, C.product_id from box_to_bar A left join box_to_bar_qty B on (A.id=B.box_to_bar_id) left join box_product C on (B.box_id=C.box_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and B.box_id is not null and C.product_id is not null) C) E) AA 
+
+            Left join 
+
+            (select F.depot_id, F.type, F.product_id, ifnull(F.tot_qty_in,0)-ifnull(G.tot_qty_out,0) as opening_qty from 
+            (select E.depot_id, E.type, E.product_id, sum(E.tot_qty) as tot_qty_in from 
+            (select depot_id, 'Bar' as type, product_id, sum(qty_in_bar) as tot_qty from batch_processing where status = 'Approved' and date_of_processing>'2018-09-21' and date_of_processing<'$from_date' and product_id is not null group by depot_id, product_id 
+            union all 
+            select C.depot_id, C.type, C.product_id, sum(C.qty) as tot_qty from 
+            (select A.id, A.depot_in_id as depot_id, B.type, B.item_id as product_id, B.qty from depot_transfer A left join depot_transfer_items B on (A.id=B.depot_transfer_id) where A.status = 'Approved' and A.date_of_transfer>'2018-09-21' and A.date_of_transfer<'$from_date' and B.item_id is not null) C 
+            group by C.depot_id, C.type, C.product_id 
+            union all 
+            select C.depot_id, C.type, C.product_id, sum(C.qty) as tot_qty from 
+            (select A.id, A.depot_id as depot_id, B.type, B.item_id as product_id, B.qty from distributor_in A left join distributor_in_items B on (A.id=B.distributor_in_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and A.date_of_processing<'$from_date' and B.item_id is not null) C 
+            group by C.depot_id, C.type, C.product_id 
+            union all 
+            select C.depot_id, C.type, C.product_id, sum(C.qty) as tot_qty from 
+            (select A.id, A.depot_id, 'Box' as type, B.box_id as product_id, B.qty from bar_to_box A left join bar_to_box_qty B on (A.id=B.bar_to_box_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and A.date_of_processing<'$from_date' and B.box_id is not null) C 
+            group by C.depot_id, C.type, C.product_id 
+            union all 
+            select distinct C.depot_id, C.type, C.product_id, sum(C.tot_qty) as tot_qty from 
+            (select A.id, A.depot_id, 'Bar' as type, C.product_id, (B.qty*C.qty) as tot_qty from box_to_bar A left join box_to_bar_qty B on (A.id=B.box_to_bar_id) left join box_product C on (B.box_id=C.box_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and A.date_of_processing<'$from_date' and B.box_id is not null and C.product_id is not null) C 
+            group by C.depot_id, C.type, C.product_id) E 
+            group by E.depot_id, E.type, E.product_id) F 
+            left join 
+            (select E.depot_id, E.type, E.product_id, sum(E.tot_qty) as tot_qty_out from 
+            (select C.depot_id, C.type, C.product_id, sum(C.qty) as tot_qty from 
+            (select A.id, A.depot_out_id as depot_id, B.type, B.item_id as product_id, B.qty from depot_transfer A left join depot_transfer_items B on (A.id=B.depot_transfer_id) where A.status = 'Approved' and A.date_of_transfer>'2018-09-21' and A.date_of_transfer<'$from_date' and B.item_id is not null) C 
+            group by C.depot_id, C.type, C.product_id 
+            union all 
+            select C.depot_id, C.type, C.product_id, sum(C.qty) as tot_qty from 
+            (select A.id, A.depot_id as depot_id, B.type, B.item_id as product_id, B.qty from distributor_out A left join distributor_out_items B on (A.id=B.distributor_out_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and A.date_of_processing<'$from_date' and B.item_id is not null) C 
+            group by C.depot_id, C.type, C.product_id 
+            union all 
+            select C.depot_id, C.type, C.product_id, sum(C.qty) as tot_qty from 
+            (select A.id, A.depot_id, 'Box' as type, B.box_id as product_id, B.qty from box_to_bar A left join box_to_bar_qty B on (A.id=B.box_to_bar_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and A.date_of_processing<'$from_date' and B.box_id is not null) C 
+            group by C.depot_id, C.type, C.product_id 
+            union all 
+            select distinct C.depot_id, C.type, C.product_id, sum(C.tot_qty) as tot_qty from 
+            (select A.id, A.depot_id, 'Bar' as type, C.product_id, (B.qty*C.qty) as tot_qty from bar_to_box A left join bar_to_box_qty B on (A.id=B.bar_to_box_id) left join box_product C on (B.box_id=C.box_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and A.date_of_processing<'$from_date' and B.box_id is not null and C.product_id is not null) C 
+            group by C.depot_id, C.type, C.product_id) E 
+            group by E.depot_id, E.type, E.product_id) G 
+            on (F.depot_id=G.depot_id and F.type=G.type and F.product_id=G.product_id)) BB 
+            on (AA.depot_id=BB.depot_id and AA.type=BB.type and AA.product_id=BB.product_id)) CC 
+
+            left join 
+
+            (select depot_id, 'Bar' as type, product_id, sum(qty_in_bar) as production_qty from batch_processing 
+            where status = 'Approved' and date_of_processing>'2018-09-21' and date_of_processing>='$from_date' and date_of_processing<='$to_date' and product_id is not null 
+            group by depot_id, product_id) DD 
+            on (CC.depot_id=DD.depot_id and CC.type=DD.type and CC.product_id=DD.product_id)) EE 
+
+            left join 
+
+            (select C.depot_id, C.type, C.product_id, sum(C.qty) as depot_in_qty from 
+            (select A.id, A.depot_in_id as depot_id, B.type, B.item_id as product_id, B.qty from depot_transfer A left join depot_transfer_items B on (A.id=B.depot_transfer_id) where A.status = 'Approved' and A.date_of_transfer>'2018-09-21' and A.date_of_transfer>='$from_date' and date_of_transfer<='$to_date' and B.item_id is not null) C 
+            group by C.depot_id, C.type, C.product_id) FF 
+            on (EE.depot_id=FF.depot_id and EE.type=FF.type and EE.product_id=FF.product_id)) GG 
+
+            left join 
+
+            (select C.depot_id, C.type, C.product_id, sum(C.qty) as depot_out_qty from 
+            (select A.id, A.depot_out_id as depot_id, B.type, B.item_id as product_id, B.qty from depot_transfer A left join depot_transfer_items B on (A.id=B.depot_transfer_id) where A.status = 'Approved' and A.date_of_transfer>'2018-09-21' and A.date_of_transfer>='$from_date' and date_of_transfer<='$to_date' and B.item_id is not null) C 
+            group by C.depot_id, C.type, C.product_id) HH 
+            on (GG.depot_id=HH.depot_id and GG.type=HH.type and GG.product_id=HH.product_id)) II 
+
+            left join 
+
+            (select C.depot_id, C.type, C.product_id, sum(C.qty) as sale_qty from 
+            (select A.id, A.depot_id as depot_id, B.type, B.item_id as product_id, B.qty from distributor_out A left join distributor_out_items B on (A.id=B.distributor_out_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and A.date_of_processing>='$from_date' and date_of_processing<='$to_date' and distributor_id not in (1, 63, 64, 65, 66, 189) and B.item_id is not null) C 
+            group by C.depot_id, C.type, C.product_id) JJ 
+            on (II.depot_id=JJ.depot_id and II.type=JJ.type and II.product_id=JJ.product_id)) KK 
+
+            left join 
+
+            (select C.depot_id, C.type, C.product_id, sum(C.qty) as sample_qty from 
+            (select A.id, A.depot_id as depot_id, B.type, B.item_id as product_id, B.qty from distributor_out A left join distributor_out_items B on (A.id=B.distributor_out_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and A.date_of_processing>='$from_date' and date_of_processing<='$to_date' and distributor_id in (1, 63, 64, 65, 66) and B.item_id is not null) C 
+            group by C.depot_id, C.type, C.product_id) LL 
+            on (KK.depot_id=LL.depot_id and KK.type=LL.type and KK.product_id=LL.product_id)) MM 
+
+            left join 
+
+            (select C.depot_id, C.type, C.product_id, sum(C.qty) as expire_qty from 
+            (select A.id, A.depot_id as depot_id, B.type, B.item_id as product_id, B.qty from distributor_out A left join distributor_out_items B on (A.id=B.distributor_out_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and A.date_of_processing>='$from_date' and date_of_processing<='$to_date' and distributor_id = 189 and B.item_id is not null) C 
+            group by C.depot_id, C.type, C.product_id) NN 
+            on (MM.depot_id=NN.depot_id and MM.type=NN.type and MM.product_id=NN.product_id)) OO 
+
+            left join 
+
+            (select C.depot_id, C.type, C.product_id, sum(C.qty) as sale_return_qty from 
+            (select A.id, A.depot_id as depot_id, B.type, B.item_id as product_id, B.qty from distributor_in A left join distributor_in_items B on (A.id=B.distributor_in_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and B.item_id is not null) C 
+            group by C.depot_id, C.type, C.product_id) PP 
+            on (OO.depot_id=PP.depot_id and OO.type=PP.type and OO.product_id=PP.product_id)) QQ 
+
+            left join 
+
+            (select C.depot_id, C.type, C.product_id, sum(C.qty) as convert_out_qty from 
+            (select A.id, A.depot_id, 'Box' as type, B.box_id as product_id, B.qty from box_to_bar A left join box_to_bar_qty B on (A.id=B.box_to_bar_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and B.box_id is not null) C 
+            group by C.depot_id, C.type, C.product_id 
+            union all 
+            select distinct C.depot_id, C.type, C.product_id, sum(C.tot_qty) as convert_out_qty from 
+            (select A.id, A.depot_id, 'Bar' as type, C.product_id, (B.qty*C.qty) as tot_qty from bar_to_box A left join bar_to_box_qty B on (A.id=B.bar_to_box_id) left join box_product C on (B.box_id=C.box_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and B.box_id is not null and C.product_id is not null) C 
+            group by C.depot_id, C.type, C.product_id) RR 
+            on (QQ.depot_id=RR.depot_id and QQ.type=RR.type and QQ.product_id=RR.product_id)) SS 
+
+            left join 
+
+            (select C.depot_id, C.type, C.product_id, sum(C.qty) as convert_in_qty from 
+            (select A.id, A.depot_id, 'Box' as type, B.box_id as product_id, B.qty from bar_to_box A left join bar_to_box_qty B on (A.id=B.bar_to_box_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and B.box_id is not null) C 
+            group by C.depot_id, C.type, C.product_id 
+            union all 
+            select distinct C.depot_id, C.type, C.product_id, sum(C.tot_qty) as convert_in_qty from 
+            (select A.id, A.depot_id, 'Bar' as type, C.product_id, (B.qty*C.qty) as tot_qty from box_to_bar A left join box_to_bar_qty B on (A.id=B.box_to_bar_id) left join box_product C on (B.box_id=C.box_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and B.box_id is not null and C.product_id is not null) C 
+            group by C.depot_id, C.type, C.product_id) TT 
+            on (SS.depot_id=TT.depot_id and SS.type=TT.type and SS.product_id=TT.product_id)) UU 
+
+            left join 
+
+            (select id, 'Bar' as type, short_name as item_name, grams from product_master 
+            union all 
+            select id, 'Box' as type, short_name as item_name, grams from box_master) VV 
+            on (UU.type=VV.type and UU.product_id=VV.id)) WW 
+
+            left join 
+
+            (select * from depot_master) XX 
+            on(WW.depot_id=XX.id)) YY 
+
+            left join 
+
+            (select C.depot_id, C.type, C.product_id, sum(C.qty) as del_pending_qty from 
+            (select A.id, A.depot_id as depot_id, B.type, B.item_id as product_id, B.qty from distributor_out A left join distributor_out_items B on (A.id=B.distributor_out_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and A.date_of_processing>='$from_date' and date_of_processing<='$to_date' and delivery_status = 'Pending' and B.item_id is not null) C 
+            group by C.depot_id, C.type, C.product_id) ZZ 
+            on (YY.depot_id=ZZ.depot_id and YY.type=ZZ.type and YY.product_id=ZZ.product_id)) A 
+
+            order by A.depot_name, A.type, A.item_name";
+
+    $query=$this->db->query($sql);
+    $result=$query->result();
+    return $result;
+}
+
 
 function generate_product_stock_report() {
-
     $from_date = formatdate($this->input->post('from_date'));
-
     $to_date = formatdate($this->input->post('to_date'));
-
     $data = $this->get_product_stock_details($from_date, $to_date);
-
-    
-
     if(count($data)>0) {
-
         $template_path=$this->config->item('template_path');
-
         $file = $template_path.'Product_Stock.xls';
-
         $this->load->library('excel');
-
         $objPHPExcel = PHPExcel_IOFactory::load($file);
-
-
-
         $col_name[]=array();
-
         for($i=0; $i<=20; $i++) {
-
             $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
-
         }
 
-
-
-        $row=1;
-
+        $row=6;
         $col=0;
 
         for($i=0; $i<count($data); $i++){
-
             $row=$row+1;
-
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $data[$i]->state);
-
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $data[$i]->city);
-
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, $data[$i]->depot_name);
-
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $data[$i]->item_name);
-
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $data[$i]->unit_weight);
-
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, $data[$i]->opening_qty);
-
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, $data[$i]->production_qty);
-
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, $data[$i]->depot_in_qty);
-
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+8].$row, $data[$i]->depot_out_qty);
-
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+9].$row, $data[$i]->sale_qty);
-
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+10].$row, $data[$i]->sample_qty);
-
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+11].$row, $data[$i]->expire_qty);
-
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+12].$row, $data[$i]->sale_return_qty);
-
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+13].$row, '=+'.$col_name[$col+5].$row.'+'.$col_name[$col+6].$row.'+'.$col_name[$col+7].$row.'-'.$col_name[$col+8].$row.'-'.$col_name[$col+9].$row.'-'.$col_name[$col+10].$row.'-'.$col_name[$col+11].$row.'+'.$col_name[$col+12].$row);
-
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $data[$i]->type);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $data[$i]->item_name);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, $data[$i]->unit_weight);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, $data[$i]->opening_qty);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, $data[$i]->production_qty);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+8].$row, $data[$i]->depot_in_qty);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+9].$row, $data[$i]->depot_out_qty);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+10].$row, $data[$i]->sale_qty);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+11].$row, $data[$i]->sample_qty);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+12].$row, $data[$i]->expire_qty);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+13].$row, $data[$i]->sale_return_qty);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+14].$row, $data[$i]->convert_out_qty);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+15].$row, $data[$i]->convert_in_qty);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+16].$row, '=+'.$col_name[$col+6].$row.'+'.$col_name[$col+7].$row.'+'.$col_name[$col+8].$row.'-'.$col_name[$col+9].$row.'-'.$col_name[$col+10].$row.'-'.$col_name[$col+11].$row.'-'.$col_name[$col+12].$row.'+'.$col_name[$col+13].$row.'-'.$col_name[$col+14].$row.'+'.$col_name[$col+15].$row);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+17].$row, $data[$i]->del_pending_qty);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+18].$row, '=+'.$col_name[$col+16].$row.'+'.$col_name[$col+17].$row);
         }
 
-
-
-        $objPHPExcel->getActiveSheet()->getStyle('A1:'.$col_name[$col+13].$row)->applyFromArray(array(
-
+        $objPHPExcel->getActiveSheet()->getStyle('A1:'.$col_name[$col+18].$row)->applyFromArray(array(
             'borders' => array(
-
                 'allborders' => array(
-
                     'style' => PHPExcel_Style_Border::BORDER_THIN
-
                 )
-
             )
-
         ));
 
         for ($col = 0; $col <= PHPExcel_Cell::columnIndexFromString($objPHPExcel->getActiveSheet()->getHighestDataColumn()); $col++) {
@@ -5008,35 +5411,20 @@ function generate_product_stock_report() {
         }
 
         $filename='Product_Stock_Report.xls';
-
         header('Content-Type: application/vnd.ms-excel');
-
         header('Content-Disposition: attachment;filename="'.$filename.'"');
-
         header('Cache-Control: max-age=0');
-
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
-
         $objWriter->save('php://output');
 
-
-
         $logarray['table_id']=$this->session->userdata('session_id');
-
         $logarray['module_name']='Reports';
-
         $logarray['cnt_name']='Reports';
-
         $logarray['action']='Product Stock report generated.';
-
         $this->user_access_log_model->insertAccessLog($logarray);
-
     } else {
-
         echo '<script>alert("No data found");</script>';
-
     }
-
 }
 
 
@@ -5591,7 +5979,9 @@ function view_distributor_ledger_report() {
 
     if(count($data)>0) {
 
-        $datatable='<table id="printTable" border="1" cellpadding="3" style="border-collapse: collapse;">
+        $datatable='<div id="printTable" style=""><br/><span style="font-size:20px;margin-left:50px;"><b>Distributor Name:</b> '.$dist_data[0]->distributor_name.'<br/><br/></span><span style="font-size:20px;margin-left:50px;"><b>From Date: </b>'.$this->input->post('from_date').'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>To Date: </b>'.$this->input->post('to_date').'</span><br/><br/><br/><br/>
+		
+		<table border="1" cellpadding="3" style="border-collapse: collapse;margin-left:50px;">
 
                     <thead>
 
@@ -5751,7 +6141,7 @@ function view_distributor_ledger_report() {
 
 
 
-        $datatable=$datatable."</tbody></table>";
+        $datatable=$datatable."</tbody></table></div>";
 
     }
 
@@ -6017,7 +6407,7 @@ function generate_agingwise_report() {
 
             (select * FROM distributor_master) H 
 
-            on (G.distributor_id = H.id) where G.tot_receivable > 0) I 
+            on (G.distributor_id = H.id) where G.tot_receivable <> 0) I 
 
 			left join 
 
@@ -10231,6 +10621,2518 @@ function generate_trailbalance_report() {
 }
 
 
+function view_generate_distributor_balance_ledger_report() {
+
+    $from_date = formatdate($this->input->post('from_date'));
+
+    $to_date = formatdate($this->input->post('to_date'));
+
+    $distributor_id = $this->input->post('distributor_id');
+
+    $includes_twenty = $this->input->post('includes_twenty');
+    $includes_zero = $this->input->post('includes_zero');
+
+    $sql = "select sum(debit_amount) as debit_amount,sum(credit_amount) as credit_amount,distributor_name from 
+
+            (select 
+                invoice_amount as debit_amount, null as credit_amount, m.distributor_name
+
+                from distributor_out d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
+
+                d.date_of_processing<'$from_date' 
+
+            union all 
+
+            select 
+
+                null as debit_amount, final_amount as credit_amount, m.distributor_name
+
+                from distributor_in d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
+
+                d.date_of_processing<'$from_date'
+
+            union all 
+
+            select * from 
+
+            (select null as debit_amount, 
+
+                B.payment_amount as credit_amount,E.distributor_name from 
+
+            (select * from payment_details where status = 'Approved' and 
+
+                date_of_deposit<'$from_date') A 
+
+            left join 
+
+            (select * from payment_details_items ) B 
+
+            on (A.id=B.payment_id)
+            
+            left join
+
+            (select * from distributor_master) E
+
+            on (E.id=B.distributor_id)) C where C.credit_amount is not null 
+
+            union all 
+
+            select  
+
+                    case when transaction='Debit Note' then amount end as debit_amount, 
+
+                    case when transaction='Credit Note' then amount end as credit_amount, m.distributor_name 
+
+                from credit_debit_note d,distributor_master m where d.distributor_id=m.id and d.status = 'Approved' and 
+
+                d.date_of_transaction<'$from_date') A group by distributor_name";
+
+    $query=$this->db->query($sql);
+
+    $open_bal_data=$query->result();
+
+
+
+    $sql = "select sum(debit_amount) as debit_amount,sum(credit_amount) as credit_amount,distributor_name from 
+
+            (select 
+                invoice_amount as debit_amount, null as credit_amount, m.distributor_name
+
+                from distributor_out d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
+
+                d.date_of_processing>='$from_date' and d.date_of_processing<='$to_date' 
+
+            union all 
+
+            select 
+
+                null as debit_amount, final_amount as credit_amount, m.distributor_name
+
+                from distributor_in d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
+
+                d.date_of_processing>='$from_date' and d.date_of_processing<='$to_date' 
+
+            union all 
+
+            select * from 
+
+            (select null as debit_amount, 
+
+                B.payment_amount as credit_amount,E.distributor_name from 
+
+            (select * from payment_details where status = 'Approved' and 
+
+                date_of_deposit>='$from_date' and date_of_deposit<='$to_date') A 
+
+            left join 
+
+            (select * from payment_details_items ) B 
+
+            on (A.id=B.payment_id)
+            
+            left join
+
+            (select * from distributor_master) E
+
+            on (E.id=B.distributor_id)) C where C.credit_amount is not null 
+
+            union all 
+
+            select  
+
+                    case when transaction='Debit Note' then amount end as debit_amount, 
+
+                    case when transaction='Credit Note' then amount end as credit_amount, m.distributor_name 
+
+                from credit_debit_note d,distributor_master m where d.distributor_id=m.id and d.status = 'Approved' and 
+
+                d.date_of_transaction>='$from_date' and d.date_of_transaction<='$to_date') A group by distributor_name
+                
+                ";
+
+    $query=$this->db->query($sql);
+
+    $data=$query->result();
+
+
+
+   
+
+    
+
+    if(count($data)>0) {
+
+        $datatable='<div id="printTable" style=""><br/>
+         
+        <span style="font-size:20px;margin-left:50px;"><b>From Date: </b>'.$this->input->post('from_date').'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>To Date: </b>'.$this->input->post('to_date').'
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <input type="submit" name="download" class="btn btn-danger" value="Download Report" />
+        </span><br/><br/><br/><br/>
+        <div class="table-responsive">
+        <table border="1" cellpadding="3" style="border-collapse: collapse;margin-left:50px;">
+            <thead>
+                <tr>
+                    <th>SR No</th>
+                    <th>Distributor Name</th>
+                    <th>Opening Balance</th>
+                    <th>Debit</th>
+                    <th>Credit</th>
+                    <th>Closing Balance</th>
+                </tr>
+            </thead>
+            <tbody>';
+
+        $running_balance=0;
+
+
+        $openbal_debit=0;
+        $openbal_credit=0;
+        $openbal=0;
+        $j=0;
+        for($i=0; $i<count($data); $i++){
+
+            
+
+            if(count($open_bal_data)>0) {
+                for($j=0; $j<count($open_bal_data); $j++){
+                    if($data[$i]->distributor_name==$open_bal_data[$j]->distributor_name) {
+                        // $openbal_debit = strval($open_bal_data[$j]->debit_amount);
+                        // $openbal_credit = strval($open_bal_data[$j]->credit_amount);
+                            $openbal =strval($open_bal_data[$j]->debit_amount)-strval($open_bal_data[$j]->credit_amount);
+                            /*$objPHPExcel->getActiveSheet()->setCellValue('B'.$row, $openbal);*/                            
+                        }
+                    }
+                $openbal = $openbal;
+            }
+            else{  
+              $openbal = 0;
+            }
+
+            $closing_amount = (($openbal+$data[$i]->debit_amount)-$data[$i]->credit_amount);
+            $closing_amount2 = round((($openbal+$data[$i]->debit_amount)-$data[$i]->credit_amount),2);
+
+            if($includes_twenty=='' && $includes_zero=='')
+            {
+                if($closing_amount2!=0)
+                {
+                    $datatable=$datatable.'<tr>';
+                    $datatable=$datatable. "<td>".($j+1)."</td>";
+                    $datatable=$datatable. "<td>".$data[$i]->distributor_name."</td>";
+                    $datatable=$datatable. "<td class='something'> 0</td>";
+                    $datatable=$datatable. "<td class='something'>".$data[$i]->debit_amount."</td>";
+                    $datatable=$datatable. "<td class='something'>".$data[$i]->credit_amount."</td>";
+                    $datatable=$datatable. "<td class='something'>".round((($openbal+$data[$i]->debit_amount)-$data[$i]->credit_amount),2)."</td>";
+                    $datatable=$datatable. "<tr>";  
+                    $j = $j+1;
+                } 
+            }
+            else if($includes_twenty!='' && $includes_zero=='')
+            {
+                if($closing_amount<20 && $closing_amount2!=0)
+                {
+                    $datatable=$datatable.'<tr>';
+                    $datatable=$datatable. "<td>".($j+1)."</td>";
+                    $datatable=$datatable. "<td>".$data[$i]->distributor_name."</td>";
+                    $datatable=$datatable. "<td class='something'> 0</td>";
+                    $datatable=$datatable. "<td class='something'>".$data[$i]->debit_amount."</td>";
+                    $datatable=$datatable. "<td class='something'>".$data[$i]->credit_amount."</td>";
+                    $datatable=$datatable. "<td class='something'>".round((($openbal+$data[$i]->debit_amount)-$data[$i]->credit_amount),2)."</td>";
+                    $datatable=$datatable. "<tr>";  
+                    $j = $j+1;
+                } 
+            }
+            else if($includes_twenty=='' && $includes_zero!='')
+            {
+                 $datatable=$datatable.'<tr>';
+                    $datatable=$datatable. "<td>".($j+1)."</td>";
+                    $datatable=$datatable. "<td>".$data[$i]->distributor_name."</td>";
+                    $datatable=$datatable. "<td class='something'> 0</td>";
+                    $datatable=$datatable. "<td class='something'>".$data[$i]->debit_amount."</td>";
+                    $datatable=$datatable. "<td class='something'>".$data[$i]->credit_amount."</td>";
+                    $datatable=$datatable. "<td class='something'>".round((($openbal+$data[$i]->debit_amount)-$data[$i]->credit_amount),2)."</td>";
+                    $datatable=$datatable. "<tr>";  
+                    $j = $j+1;
+            }
+            else if($includes_twenty!='' && $includes_zero!='')
+            {
+              if($closing_amount<20)
+                {
+                    $datatable=$datatable.'<tr>';
+                    $datatable=$datatable. "<td>".($j+1)."</td>";
+                    $datatable=$datatable. "<td>".$data[$i]->distributor_name."</td>";
+                    $datatable=$datatable. "<td class='something'> 0</td>";
+                    $datatable=$datatable. "<td class='something'>".$data[$i]->debit_amount."</td>";
+                    $datatable=$datatable. "<td class='something'>".$data[$i]->credit_amount."</td>";
+                    $datatable=$datatable. "<td class='something'>".round((($openbal+$data[$i]->debit_amount)-$data[$i]->credit_amount),2)."</td>";
+                    $datatable=$datatable. "<tr>";  
+                    $j = $j+1;
+                }  
+            }
+
+            
+            
+        }
+
+         $datatable=$datatable."</tbody></table></div></div>";
+
+         return $datatable;
+    } else {
+
+        echo '<script>alert("No data found");</script>';
+
+    }
+
+}
+
+function generate_distributor_balance_ledger_report() {
+
+    $from_date = formatdate($this->input->post('from_date'));
+
+    $to_date = formatdate($this->input->post('to_date'));
+
+    $distributor_id = $this->input->post('distributor_id');
+
+    $includes_twenty = $this->input->post('includes_twenty');
+    $includes_zero = $this->input->post('includes_zero');
+
+
+    $sql = "select sum(debit_amount) as debit_amount,sum(credit_amount) as credit_amount,distributor_name from 
+
+            (select 
+                invoice_amount as debit_amount, null as credit_amount, m.distributor_name
+
+                from distributor_out d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
+
+                d.date_of_processing<'$from_date' 
+
+            union all 
+
+            select 
+
+                null as debit_amount, final_amount as credit_amount, m.distributor_name
+
+                from distributor_in d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
+
+                d.date_of_processing<'$from_date'
+
+            union all 
+
+            select * from 
+
+            (select null as debit_amount, 
+
+                B.payment_amount as credit_amount,E.distributor_name from 
+
+            (select * from payment_details where status = 'Approved' and 
+
+                date_of_deposit<'$from_date') A 
+
+            left join 
+
+            (select * from payment_details_items ) B 
+
+            on (A.id=B.payment_id)
+            
+            left join
+
+            (select * from distributor_master) E
+
+            on (E.id=B.distributor_id)) C where C.credit_amount is not null 
+
+            union all 
+
+            select  
+
+                    case when transaction='Debit Note' then amount end as debit_amount, 
+
+                    case when transaction='Credit Note' then amount end as credit_amount, m.distributor_name 
+
+                from credit_debit_note d,distributor_master m where d.distributor_id=m.id and d.status = 'Approved' and 
+
+                d.date_of_transaction<'$from_date') A group by distributor_name";
+
+    $query=$this->db->query($sql);
+
+    $open_bal_data=$query->result();
+
+
+
+    $sql = "select sum(debit_amount) as debit_amount,sum(credit_amount) as credit_amount,distributor_name from 
+
+            (select 
+                invoice_amount as debit_amount, null as credit_amount, m.distributor_name
+
+                from distributor_out d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
+
+                d.date_of_processing>='$from_date' and d.date_of_processing<='$to_date' 
+
+            union all 
+
+            select 
+
+                null as debit_amount, final_amount as credit_amount, m.distributor_name
+
+                from distributor_in d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
+
+                d.date_of_processing>='$from_date' and d.date_of_processing<='$to_date' 
+
+            union all 
+
+            select * from 
+
+            (select null as debit_amount, 
+
+                B.payment_amount as credit_amount,E.distributor_name from 
+
+            (select * from payment_details where status = 'Approved' and 
+
+                date_of_deposit>='$from_date' and date_of_deposit<='$to_date') A 
+
+            left join 
+
+            (select * from payment_details_items ) B 
+
+            on (A.id=B.payment_id)
+            
+            left join
+
+            (select * from distributor_master) E
+
+            on (E.id=B.distributor_id)) C where C.credit_amount is not null 
+
+            union all 
+
+            select  
+
+                    case when transaction='Debit Note' then amount end as debit_amount, 
+
+                    case when transaction='Credit Note' then amount end as credit_amount, m.distributor_name 
+
+                from credit_debit_note d,distributor_master m where d.distributor_id=m.id and d.status = 'Approved' and 
+
+                d.date_of_transaction>='$from_date' and d.date_of_transaction<='$to_date') A group by distributor_name
+                
+                ";
+
+    $query=$this->db->query($sql);
+
+    $data=$query->result();
+
+
+
+   
+
+    
+
+    if(count($data)>0) {
+
+        // $template_path=$this->config->item('template_path');
+
+        // $file = $template_path.'Product_Stock.xls';
+
+        // $this->load->library('excel');
+
+        // $objPHPExcel = PHPExcel_IOFactory::load($file);
+
+
+
+        $this->load->library('excel');
+
+        $objPHPExcel = new PHPExcel();
+
+        $objPHPExcel->setActiveSheetIndex(0);
+
+
+
+        $col_name[]=array();
+
+        for($i=0; $i<=20; $i++) {
+
+            $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
+
+        }
+
+
+
+        $row1=1;
+
+
+
+        $row=6;
+
+        $col=0;
+
+
+
+        
+
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row1, "From Date:");
+
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row1, $this->input->post('from_date'));
+
+        $row1=$row1+1;
+
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row1, "To Date:");
+
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row1, $this->input->post('to_date'));
+
+
+
+        //------------ setting headers of excel -------------
+
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, 'Distributor Name');
+
+        
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, 'Opening Balance');
+
+
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, 'Debit');
+
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, 'Credit');
+
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, 'Closing Balance');
+
+
+
+        $running_balance=0;
+
+        $row=$row+1;
+
+        
+
+        $openbal_debit=0;
+        $openbal_credit=0;
+        $openbal=0;
+
+        for($i=0; $i<count($data); $i++){
+
+             if(count($open_bal_data)>0) {
+                for($j=0; $j<count($open_bal_data); $j++){
+                    if($data[$i]->distributor_name==$open_bal_data[$j]->distributor_name) {
+                        // $openbal_debit = strval($open_bal_data[$j]->debit_amount);
+                        // $openbal_credit = strval($open_bal_data[$j]->credit_amount);
+                            $openbal =strval($open_bal_data[$j]->debit_amount)-strval($open_bal_data[$j]->credit_amount);
+                            $objPHPExcel->getActiveSheet()->setCellValue('B'.$row, $openbal);
+                        }
+                        
+                    }
+                }
+                else {
+                        
+                        $openbal = 0;
+                        $objPHPExcel->getActiveSheet()->setCellValue('B'.$row, '0');
+                }
+
+             
+
+
+            $closing_amount = (($openbal+$data[$i]->debit_amount)-$data[$i]->credit_amount);
+            $closing_amount2 = round((($openbal+$data[$i]->debit_amount)-$data[$i]->credit_amount),2);
+            if($includes_twenty=='' && $includes_zero=='')
+            {
+                if($closing_amount2!=0)
+                {
+                    $objPHPExcel->getActiveSheet()->setCellValue('A'.$row, $data[$i]->distributor_name);
+
+                
+
+                    $objPHPExcel->getActiveSheet()->setCellValue('C'.$row, $data[$i]->debit_amount);
+
+                    $objPHPExcel->getActiveSheet()->setCellValue('D'.$row, $data[$i]->credit_amount);
+
+                    $closing_bal = (($openbal+$data[$i]->debit_amount)-$data[$i]->credit_amount);
+                    $closing_bal = round($closing_bal,2);
+                    $objPHPExcel->getActiveSheet()->setCellValue('E'.$row, $closing_bal);
+
+                     $row=$row+1;
+                }
+            }
+            else if($includes_twenty!='' && $includes_zero=='')
+            {
+                if($closing_amount<20 && $closing_amount2!=0)
+                {
+
+                    $objPHPExcel->getActiveSheet()->setCellValue('A'.$row, $data[$i]->distributor_name);
+
+                
+
+                    $objPHPExcel->getActiveSheet()->setCellValue('C'.$row, $data[$i]->debit_amount);
+
+                    $objPHPExcel->getActiveSheet()->setCellValue('D'.$row, $data[$i]->credit_amount);
+
+                    $closing_bal = (($openbal+$data[$i]->debit_amount)-$data[$i]->credit_amount);
+                    $closing_bal = round($closing_bal,2);
+                    $objPHPExcel->getActiveSheet()->setCellValue('E'.$row, $closing_bal);
+
+                     $row=$row+1;
+                }
+            }
+            else if($includes_twenty=='' && $includes_zero!='')
+            {
+
+                    $objPHPExcel->getActiveSheet()->setCellValue('A'.$row, $data[$i]->distributor_name);
+
+                
+
+                    $objPHPExcel->getActiveSheet()->setCellValue('C'.$row, $data[$i]->debit_amount);
+
+                    $objPHPExcel->getActiveSheet()->setCellValue('D'.$row, $data[$i]->credit_amount);
+
+                    $closing_bal = (($openbal+$data[$i]->debit_amount)-$data[$i]->credit_amount);
+                    $closing_bal = round($closing_bal,2);
+                    $objPHPExcel->getActiveSheet()->setCellValue('E'.$row, $closing_bal);
+
+                     $row=$row+1;
+            }
+            else if($includes_twenty!='' && $includes_zero!='')
+            {
+                if($closing_amount<20)
+                {
+                    $objPHPExcel->getActiveSheet()->setCellValue('A'.$row, $data[$i]->distributor_name);
+
+                
+
+                    $objPHPExcel->getActiveSheet()->setCellValue('C'.$row, $data[$i]->debit_amount);
+
+                    $objPHPExcel->getActiveSheet()->setCellValue('D'.$row, $data[$i]->credit_amount);
+
+                    $closing_bal = (($openbal+$data[$i]->debit_amount)-$data[$i]->credit_amount);
+                    $closing_bal = round($closing_bal,2);
+                    $objPHPExcel->getActiveSheet()->setCellValue('E'.$row, $closing_bal);
+
+                     $row=$row+1;
+                }
+            }
+
+            /*$objPHPExcel->getActiveSheet()->setCellValue('A'.$row, $data[$i]->distributor_name);
+
+            
+
+            $objPHPExcel->getActiveSheet()->setCellValue('C'.$row, $data[$i]->debit_amount);
+
+            $objPHPExcel->getActiveSheet()->setCellValue('D'.$row, $data[$i]->credit_amount);
+
+            $closing_bal = (($openbal+$data[$i]->debit_amount)-$data[$i]->credit_amount);
+            $closing_bal = round($closing_bal,2);
+            $objPHPExcel->getActiveSheet()->setCellValue('E'.$row, $closing_bal);
+
+             $row=$row+1;*/
+
+        }
+
+
+
+        //$row=$row+1;
+
+        for ($col = 0; $col <= PHPExcel_Cell::columnIndexFromString($objPHPExcel->getActiveSheet()->getHighestDataColumn()); $col++) {
+            $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn($col)->setAutoSize(true);
+        }
+
+
+
+        $objPHPExcel->getActiveSheet()->getStyle('A6:'.'E'.($row-1))->applyFromArray(array(
+
+            'borders' => array(
+
+                'allborders' => array(
+
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+
+                )
+
+            )
+
+        ));
+
+        
+       /*$result = $this->get_upload_telly_report(9);    
+
+        if(count($result)>0)    
+        {
+            
+            $path=FCPATH.'uploads/excel_upload/';
+            $file_name = $path.$result[0]->file_name;
+            $file1 = PHPExcel_IOFactory::load($file_name);
+            $file1->setActiveSheetIndex(0);  
+            $sheet = $file1->getActiveSheet();        
+            $objPHPExcel->addExternalSheet($sheet);
+          
+        }
+       */
+
+        $filename='Ledger_Balance_Report.xls';
+
+        header('Content-Type: application/vnd.ms-excel');
+
+        header('Content-Disposition: attachment;filename="'.$filename.'"');
+
+        header('Cache-Control: max-age=0');
+
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+
+        $objWriter->save('php://output');
+
+
+
+        
+
+    } else {
+
+        echo '<script>alert("No data found");</script>';
+
+    }
+
+}
+
+
+public function get_adjustment_bal()
+{
+    $from_date = formatdate($this->input->post('from_date'));
+
+    $to_date = formatdate($this->input->post('to_date'));
+
+    $distributor_id = $this->input->post('distributor_id');
+
+    $sql = "Select sum(closingbalance) as adjusmentbal from (
+            SELECT A.*,
+            IFNULL(ROUND(((Case When B.openingbalance IS NULL then 0 else B.openingbalance end ) +A.debit_amount)-A.credit_amount,2),0)  as closingbalance
+             from (
+            SELECT Ifnull(Sum(debit_amount), 0)  AS debit_amount, 
+                   Ifnull(Sum(credit_amount), 0) AS credit_amount, 
+                   distributor_name 
+            FROM   (SELECT invoice_amount AS debit_amount, 
+                           NULL           AS credit_amount, 
+                           m.distributor_name 
+                    FROM   distributor_out d 
+                           LEFT JOIN distributor_master m 
+                                  ON d.distributor_id = m.id 
+                    WHERE  d.status = 'Approved' 
+                           AND d.date_of_processing >= '$from_date' 
+                           AND d.date_of_processing <= '$to_date' 
+                    UNION ALL 
+                    SELECT NULL         AS debit_amount, 
+                           final_amount AS credit_amount, 
+                           m.distributor_name 
+                    FROM   distributor_in d 
+                           LEFT JOIN distributor_master m 
+                                  ON d.distributor_id = m.id 
+                    WHERE  d.status = 'Approved' 
+                           AND d.date_of_processing >= '$from_date' 
+                           AND d.date_of_processing <= '$to_date' 
+                    UNION ALL 
+                    SELECT * 
+                    FROM   (SELECT NULL             AS debit_amount, 
+                                   B.payment_amount AS credit_amount, 
+                                   E.distributor_name 
+                            FROM   (SELECT * 
+                                    FROM   payment_details 
+                                    WHERE  status = 'Approved' 
+                                           AND date_of_deposit >= '$from_date' 
+                                           AND date_of_deposit <= '$to_date') A 
+                                   LEFT JOIN (SELECT * 
+                                              FROM   payment_details_items) B 
+                                          ON ( A.id = B.payment_id ) 
+                                   LEFT JOIN (SELECT * 
+                                              FROM   distributor_master) E 
+                                          ON ( E.id = B.distributor_id )) C 
+                    WHERE  C.credit_amount IS NOT NULL 
+                    UNION ALL 
+                    SELECT CASE 
+                             WHEN TRANSACTION = 'Debit Note' THEN amount 
+                           END AS debit_amount, 
+                           CASE 
+                             WHEN TRANSACTION = 'Credit Note' THEN amount 
+                           END AS credit_amount, 
+                           m.distributor_name 
+                    FROM   credit_debit_note d, 
+                           distributor_master m 
+                    WHERE  d.distributor_id = m.id 
+                           AND d.status = 'Approved' 
+                           AND d.date_of_transaction >= '$from_date' 
+                           AND d.date_of_transaction <= '$to_date') A 
+            GROUP  BY distributor_name 
+            ) A
+
+            Left join
+            (
+            SELECT  CASE WHEN A.distributor_name IS NULL THEN 0 else  IFNULL((A.debit_amount-A.credit_amount),0) end  as openingbalance  ,A.distributor_name from (select sum(debit_amount) as debit_amount,sum(credit_amount) as credit_amount,distributor_name from 
+
+                        (select 
+                            invoice_amount as debit_amount, null as credit_amount, m.distributor_name
+
+                            from distributor_out d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
+
+                            d.date_of_processing<'$from_date' 
+
+                        union all 
+
+                        select 
+
+                            null as debit_amount, final_amount as credit_amount, m.distributor_name
+
+                            from distributor_in d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
+
+                            d.date_of_processing<'$from_date'
+
+                        union all 
+
+                        select * from 
+
+                        (select null as debit_amount, 
+
+                            B.payment_amount as credit_amount,E.distributor_name from 
+
+                        (select * from payment_details where status = 'Approved' and 
+
+                            date_of_deposit<'$from_date') A 
+
+                        left join 
+
+                        (select * from payment_details_items ) B 
+
+                        on (A.id=B.payment_id)
+                        
+                        left join
+
+                        (select * from distributor_master) E
+
+                        on (E.id=B.distributor_id)) C where C.credit_amount is not null 
+
+                        union all 
+
+                        select  
+
+                                case when transaction='Debit Note' then amount end as debit_amount, 
+
+                                case when transaction='Credit Note' then amount end as credit_amount, m.distributor_name 
+
+                            from credit_debit_note d,distributor_master m where d.distributor_id=m.id and d.status = 'Approved' and 
+
+                            d.date_of_transaction<'$from_date') A group by distributor_name)A
+            ) B On A.distributor_name=B.distributor_name ) A
+            Where closingbalance  BETWEEN -5 and 5";
+    $query=$this->db->query($sql);
+    return $query->result();
+
+}
+
+public function get_ledger_details()
+{
+    $from_date = formatdate($this->input->post('from_date'));
+
+    $to_date = formatdate($this->input->post('to_date'));
+
+    $distributor_id = $this->input->post('distributor_id');
+
+    $sql = "Select * , Case When closingbalance<0 Then 'Debit Note' Else 'Credit Note' end as transaction_type  from (
+        SELECT A.*,
+        IFNULL(ROUND(((Case When B.openingbalance IS NULL then 0 else B.openingbalance end ) +A.debit_amount)-A.credit_amount,2),0)  as closingbalance
+         from (
+        SELECT Ifnull(Sum(debit_amount), 0)  AS debit_amount, 
+               Ifnull(Sum(credit_amount), 0) AS credit_amount, 
+               distributor_name,dist_id 
+        FROM   (SELECT invoice_amount AS debit_amount, 
+                       NULL           AS credit_amount, 
+                       m.distributor_name ,m.id as dist_id
+                FROM   distributor_out d 
+                       LEFT JOIN distributor_master m 
+                              ON d.distributor_id = m.id 
+                WHERE  d.status = 'Approved' 
+                       AND d.date_of_processing >= '$from_date' 
+                       AND d.date_of_processing <= '$to_date' 
+                UNION ALL 
+                SELECT NULL         AS debit_amount, 
+                       final_amount AS credit_amount, 
+                       m.distributor_name ,m.id as dist_id
+                FROM   distributor_in d 
+                       LEFT JOIN distributor_master m 
+                              ON d.distributor_id = m.id 
+                WHERE  d.status = 'Approved' 
+                       AND d.date_of_processing >= '$from_date' 
+                       AND d.date_of_processing <= '$to_date' 
+                UNION ALL 
+                SELECT * 
+                FROM   (SELECT NULL             AS debit_amount, 
+                               B.payment_amount AS credit_amount, 
+                               E.distributor_name ,E.id as dist_id
+                        FROM   (SELECT * 
+                                FROM   payment_details 
+                                WHERE  status = 'Approved' 
+                                       AND date_of_deposit >= '$from_date' 
+                                       AND date_of_deposit <= '$to_date') A 
+                               LEFT JOIN (SELECT * 
+                                          FROM   payment_details_items) B 
+                                      ON ( A.id = B.payment_id ) 
+                               LEFT JOIN (SELECT * 
+                                          FROM   distributor_master) E 
+                                      ON ( E.id = B.distributor_id )) C 
+                WHERE  C.credit_amount IS NOT NULL 
+                UNION ALL 
+                SELECT CASE 
+                         WHEN TRANSACTION = 'Debit Note' THEN amount 
+                       END AS debit_amount, 
+                       CASE 
+                         WHEN TRANSACTION = 'Credit Note' THEN amount 
+                       END AS credit_amount, 
+                       m.distributor_name ,m.id as dist_id
+                FROM   credit_debit_note d, 
+                       distributor_master m 
+                WHERE  d.distributor_id = m.id 
+                       AND d.status = 'Approved' 
+                       AND d.date_of_transaction >= '$from_date' 
+                       AND d.date_of_transaction <= '$to_date') A 
+        GROUP  BY distributor_name 
+        ) A
+
+        Left join
+        (
+        SELECT  CASE WHEN A.distributor_name IS NULL THEN 0 else  IFNULL((A.debit_amount-A.credit_amount),0) end  as openingbalance  ,A.distributor_name from (select sum(debit_amount) as debit_amount,sum(credit_amount) as credit_amount,distributor_name,dist_id from 
+
+                    (select 
+                        invoice_amount as debit_amount, null as credit_amount, m.distributor_name,m.id as dist_id
+
+                        from distributor_out d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
+
+                        d.date_of_processing<'$from_date' 
+
+                    union all 
+
+                    select 
+
+                        null as debit_amount, final_amount as credit_amount, m.distributor_name,m.id as dist_id
+
+                        from distributor_in d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
+
+                        d.date_of_processing<'$from_date'
+
+                    union all 
+
+                    select * from 
+
+                    (select null as debit_amount, 
+
+                        B.payment_amount as credit_amount,E.distributor_name,E.id as dist_id from 
+
+                    (select * from payment_details where status = 'Approved' and 
+
+                        date_of_deposit<'$from_date') A 
+
+                    left join 
+
+                    (select * from payment_details_items ) B 
+
+                    on (A.id=B.payment_id)
+                    
+                    left join
+
+                    (select * from distributor_master) E
+
+                    on (E.id=B.distributor_id)) C where C.credit_amount is not null 
+
+                    union all 
+
+                    select  
+
+                            case when transaction='Debit Note' then amount end as debit_amount, 
+
+                            case when transaction='Credit Note' then amount end as credit_amount, m.distributor_name ,m.id as dist_id
+
+                        from credit_debit_note d,distributor_master m where d.distributor_id=m.id and d.status = 'Approved' and 
+
+                        d.date_of_transaction<'$from_date') A group by distributor_name)A
+        ) B On A.distributor_name=B.distributor_name ) A
+        Where (closingbalance  BETWEEN -5 and 5) and closingbalance!=0";
+    $query=$this->db->query($sql);
+    return $query->result_array();
+}
+
+public function save_credit_debit($data)
+{
+    $this->db->insert_batch('credit_debit_note',$data);
+    $action = 'Credit_debit_note Entry Created.';
+    $logarray['table_id']=$this->session->userdata('session_id');;
+    $logarray['module_name']='Credit_debit_note';
+    $logarray['cnt_name']='Credit_debit_note';
+    $logarray['action']=$action;
+    $this->user_access_log_model->insertAccessLog($logarray);
+    
+}
+
+function upload_distributor_balance_ledger_report() {
+
+    $from_date = formatdate($this->input->post('from_date'));
+
+    $to_date = formatdate($this->input->post('to_date'));
+
+    $distributor_id = $this->input->post('distributor_id');
+    $includes = 'No';
+
+    if($this->input->post('includes_zero')==0)
+    {
+        $includes = 'Yes';
+    }
+    
+    /*if($this->input->post('excel_upload')!='')
+    {
+    }*/
+
+    $excel_upload = $this->input->post('excel_upload');
+    $telly_date = '';
+    
+    if($excel_upload!='' && $excel_upload!='Default')
+    {
+        $result = $this->get_upload_telly_report($excel_upload); 
+        if(count($result)>0)    
+        {
+            $telly_date = $result[0]->telly_date;
+        }  
+    }
+    
+
+    $sql = "select sum(debit_amount) as debit_amount,sum(credit_amount) as credit_amount,distributor_name from 
+
+            (select 
+                invoice_amount as debit_amount, null as credit_amount, m.distributor_name
+
+                from distributor_out d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
+
+                d.date_of_processing<'$from_date' 
+
+            union all 
+
+            select 
+
+                null as debit_amount, final_amount as credit_amount, m.distributor_name
+
+                from distributor_in d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
+
+                d.date_of_processing<'$from_date'
+
+            union all 
+
+            select * from 
+
+            (select null as debit_amount, 
+
+                B.payment_amount as credit_amount,E.distributor_name from 
+
+            (select * from payment_details where status = 'Approved' and 
+
+                date_of_deposit<'$from_date') A 
+
+            left join 
+
+            (select * from payment_details_items ) B 
+
+            on (A.id=B.payment_id)
+            
+            left join
+
+            (select * from distributor_master) E
+
+            on (B.distributor_id=E.id)) C where C.credit_amount is not null 
+
+            union all 
+
+            select  
+
+                    case when transaction='Debit Note' then amount end as debit_amount, 
+
+                    case when transaction='Credit Note' then amount end as credit_amount, m.distributor_name 
+
+                from credit_debit_note d,distributor_master m where d.distributor_id=m.id and d.status = 'Approved' and 
+
+                d.date_of_transaction<'$from_date') A group by distributor_name";
+
+    $query=$this->db->query($sql);
+
+    $open_bal_data=$query->result();
+
+    if($telly_date!='')
+    {
+        $cond = '"'.$telly_date.'"';
+    }
+    else
+    {
+        $cond = '(SELECT date(max(added_on)) from tally_report)';
+    }
+
+    $sql = "Select A.*,B.r_tally_name,B.r_closing_bal from 
+                (select sum(debit_amount) as debit_amount,sum(credit_amount) as credit_amount,distributor_name,tally_name from 
+
+                            (select 
+                                invoice_amount as debit_amount, null as credit_amount, m.distributor_name,m.tally_name
+
+                                from distributor_out d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' 
+
+                                and d.date_of_processing>='$from_date' and d.date_of_processing<='$to_date'
+
+                            union all 
+
+                            select 
+
+                                null as debit_amount, final_amount as credit_amount, m.distributor_name,m.tally_name
+
+                                from distributor_in d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' 
+                                            and d.date_of_processing>='$from_date' and d.date_of_processing<='$to_date'
+
+                            union all 
+
+                            select * from 
+
+                            (select null as debit_amount, 
+
+                                B.payment_amount as credit_amount,E.distributor_name,E.tally_name from 
+
+                            (select * from payment_details where status = 'Approved' 
+                                        and date_of_deposit>='$from_date' and date_of_deposit<='$to_date') A 
+
+                            left join 
+
+                            (select * from payment_details_items ) B 
+
+                            on (A.id=B.payment_id)
+                            
+                            left join
+
+                            (select * from distributor_master) E
+
+                            on (B.distributor_id=E.id)) C where C.credit_amount is not null 
+
+                            union all 
+
+                            select  
+
+                                    case when transaction='Debit Note' then amount end as debit_amount, 
+
+                                    case when transaction='Credit Note' then amount end as credit_amount, m.distributor_name ,m.tally_name
+
+                                from credit_debit_note d,distributor_master m where d.distributor_id=m.id and d.status = 'Approved' 
+                and d.date_of_transaction>='$from_date' and d.date_of_transaction<='$to_date') A group by distributor_name,tally_name)A
+                left Join
+                (Select A.tally_name as r_tally_name, A.closing_bal as r_closing_bal, A.distributer_id from tally_report A 
+                Where A.tally_report_id=(SELECT tally_report_id from tally_report 
+                Where distributer_id=A.distributer_id and 
+                date(added_on)=$cond)) B
+                on (A.tally_name=B.r_tally_name)
+                ";
+     //(SELECT date(max(added_on)) from tally_report)           
+    $query=$this->db->query($sql);
+
+    $data=$query->result();
+
+    if(count($data)>0) {
+
+        // $template_path=$this->config->item('template_path');
+
+        // $file = $template_path.'Product_Stock.xls';
+
+        // $this->load->library('excel');
+
+        // $objPHPExcel = PHPExcel_IOFactory::load($file);
+
+
+
+        $this->load->library('excel');
+
+        $objPHPExcel = new PHPExcel();
+
+        $objPHPExcel->setActiveSheetIndex(0);
+
+
+
+        $col_name[]=array();
+
+        for($i=0; $i<=20; $i++) {
+
+            $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
+
+        }
+
+
+
+        $row1=1;
+
+
+
+        $row=6;
+
+        $col=0;
+
+
+
+        
+
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row1, "From Date:");
+
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row1, $this->input->post('from_date'));
+
+        $row1=$row1+1;
+
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row1, "To Date:");
+
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row1, $this->input->post('to_date'));
+        $row1=$row1+1;
+
+        if($telly_date!="")
+        {
+           $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row1, "Telly Date:");
+           $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row1, date('d/m/Y',strtotime($telly_date)));
+        }
+        
+
+
+        //------------ setting headers of excel -------------
+
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, 'Distributor Name');
+
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, 'Tally Name');
+        
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, 'Opening Balance');
+
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, 'Debit');
+
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, 'Credit');
+
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, 'Closing Balance');
+
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, 'Tally Name');
+
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, 'Closing Balance');
+
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+8].$row, 'Difference');
+
+
+        $running_balance=0;
+
+        $row=$row+1;
+
+        $openbal_debit=0;
+        $openbal_credit=0;
+        $openbal=0;
+
+        for($i=0; $i<count($data); $i++){
+
+             if(count($open_bal_data)>0) {
+                for($j=0; $j<count($open_bal_data); $j++){
+                    if($data[$i]->distributor_name==$open_bal_data[$j]->distributor_name) {
+                        // $openbal_debit = strval($open_bal_data[$j]->debit_amount);
+                        // $openbal_credit = strval($open_bal_data[$j]->credit_amount);
+                            $openbal =strval($open_bal_data[$j]->debit_amount)-strval($open_bal_data[$j]->credit_amount);
+                            $objPHPExcel->getActiveSheet()->setCellValue('C'.$row, $openbal);
+                        }
+                        
+                    }
+                }
+                else {
+                        $objPHPExcel->getActiveSheet()->setCellValue('B'.$row, '0');
+                }
+
+             
+
+
+            //$row=$row+1;
+          
+
+            if($includes=='No' && (($data[$i]->r_closing_bal!=0 || (($openbal+$data[$i]->debit_amount)-$data[$i]->credit_amount)!=0)))
+            {
+                $objPHPExcel->getActiveSheet()->setCellValue('A'.$row, $data[$i]->distributor_name);
+
+                 $objPHPExcel->getActiveSheet()->setCellValue('B'.$row, $data[$i]->tally_name);
+
+                $objPHPExcel->getActiveSheet()->setCellValue('D'.$row, $data[$i]->debit_amount);
+
+                $objPHPExcel->getActiveSheet()->setCellValue('E'.$row, $data[$i]->credit_amount);
+
+                $objPHPExcel->getActiveSheet()->setCellValue('F'.$row,  '='.'C'.strval($row).'+'.'D'.strval($row).'-'.'E'.strval($row));
+
+                $objPHPExcel->getActiveSheet()->setCellValue('G'.$row, $data[$i]->r_tally_name);
+
+                $objPHPExcel->getActiveSheet()->setCellValue('H'.$row, $data[$i]->r_closing_bal);
+
+                if($data[$i]->r_closing_bal!='' || $data[$i]->r_closing_bal!=null)
+                {
+                  $objPHPExcel->getActiveSheet()->setCellValue('I'.$row,  '='.'F'.strval($row).'-'.'H'.strval($row));
+                }
+                
+                $row=$row+1;
+            }
+            else if($includes=='Yes')
+            {
+
+                $objPHPExcel->getActiveSheet()->setCellValue('A'.$row, $data[$i]->distributor_name);
+
+                 $objPHPExcel->getActiveSheet()->setCellValue('B'.$row, $data[$i]->tally_name);
+
+                $objPHPExcel->getActiveSheet()->setCellValue('D'.$row, $data[$i]->debit_amount);
+
+                $objPHPExcel->getActiveSheet()->setCellValue('E'.$row, $data[$i]->credit_amount);
+
+                $objPHPExcel->getActiveSheet()->setCellValue('F'.$row,  '='.'C'.strval($row).'+'.'D'.strval($row).'-'.'E'.strval($row));
+
+                $objPHPExcel->getActiveSheet()->setCellValue('G'.$row, $data[$i]->r_tally_name);
+
+                $objPHPExcel->getActiveSheet()->setCellValue('H'.$row, $data[$i]->r_closing_bal);
+
+                if($data[$i]->r_closing_bal!='' || $data[$i]->r_closing_bal!=null)
+                {
+                  $objPHPExcel->getActiveSheet()->setCellValue('I'.$row,  '='.'F'.strval($row).'-'.'H'.strval($row));
+                }
+                
+                $row=$row+1;
+            }
+        }
+
+        //$row=$row+1;
+
+        for ($col = 0; $col <= PHPExcel_Cell::columnIndexFromString($objPHPExcel->getActiveSheet()->getHighestDataColumn()); $col++) {
+            $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn($col)->setAutoSize(true);
+        }
+
+        $objPHPExcel->getActiveSheet()->getStyle('A7:'.'I'.$row)->applyFromArray(array(
+
+            'borders' => array(
+
+                'allborders' => array(
+
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+
+                )
+
+            )
+
+        ));
+
+        $objPHPExcel->getActiveSheet()->getStyle('A6:'.'I'.($row-1))->applyFromArray(array(
+
+            'borders' => array(
+
+                'allborders' => array(
+
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+
+                )
+
+            )
+
+        ));
+
+
+   if($excel_upload!='' && $excel_upload!='Default')
+    {
+        if(count($result)>0)    
+        {
+            $path=FCPATH.'uploads/excel_upload/';
+            $file_name = $path.$result[0]->file_name;
+            $file1 = PHPExcel_IOFactory::load($file_name);
+            $file1->setActiveSheetIndex(0);  
+            $sheet = $file1->getActiveSheet();        
+            $objPHPExcel->addExternalSheet($sheet);
+        }
+
+    }
+
+       
+       
+
+        $filename='Ledger_Balance_Report.xls';
+
+        header('Content-Type: application/vnd.ms-excel');
+
+        header('Content-Disposition: attachment;filename="'.$filename.'"');
+
+        header('Cache-Control: max-age=0');
+
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+
+        $objWriter->save('php://output');
+
+
+
+        
+
+    } else {
+
+        echo '<script>alert("No data found");</script>';
+
+    }
+
+}
+
+
+
+
+public function send_exception_report() {
+    $date = date('Y-m-d');
+    // $date = '2018-11-05';
+    //and (A.ref_id is null or A.ref_id = '')  removed this from sales and Sales Return 
+    //and date(A.created_on)<date('".$date."') bcoz ref_id is only assign to previous approved
+    //and case When (date(A.created_on)=date('".$date."') AND (A.ref_id is not null or A.ref_id != '') Then (A.ref_id is not null or A.ref_id != '')
+
+    $sql = "select 'Sales' as temp_col, sum(case when date(A.created_on)=date('".$date."') then 1 else 0 end) as entry_done, 
+        sum(case when date(A.date_of_processing)<date('".$date."') and (A.status = 'Pending' or A.status = 'Deleted') and (A.delivery_status='Pending' or A.delivery_status='GP Issued' or A.delivery_status='Delivered Not Complete' or A.delivery_status='Delivered') then 1 else 0 end) as pending, 
+            sum(
+            case 
+            when date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')))
+                 then 1 
+            when date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')))
+                 then 0
+            when date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)<date('".$date."') ))
+                  then 1
+            else 0
+            END
+            ) as prior_pending 
+            from distributor_out A 
+            where A.date_of_processing is not null and A.distributor_id!='1' and A.distributor_id!='189' 
+
+
+            union all 
+
+            select 'Payment Received' as temp_col, sum(case when date(A.created_on)=date('".$date."') then 1 else 0 end) as entry_done, 
+            sum(case when date(A.date_of_deposit)<date('".$date."') and (A.status = 'Pending' or A.status = 'Deleted') and (A.ref_id is null or A.ref_id = '') then 1 else 0 end) as pending, 
+             sum(
+                case 
+                when date(A.date_of_deposit)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')))
+                     then 1 
+                when date(A.date_of_deposit)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')))
+                     then 0
+                when date(A.date_of_deposit)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)<date('".$date."') ))
+                      then 1
+                else 0
+                END
+                ) as prior_pending
+            from payment_details A where A.date_of_deposit is not null 
+
+            union all
+
+            select 'Sales Return' as temp_col, sum(case when date(A.created_on)=date('".$date."') then 1 else 0 end) as entry_done, 
+            sum(case when date(A.date_of_processing)<date('".$date."') and (A.status = 'Pending' or A.status = 'Deleted') then 1 else 0 end) as pending, 
+            sum(
+            case 
+            when date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')))
+                 then 1 
+            when date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')))
+                 then 0
+            when date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)<date('".$date."') ))
+                  then 1
+            else 0
+            END
+            ) as prior_pending  
+            from distributor_in A where A.date_of_processing is not null
+
+            union all 
+
+            select 'Sample' as temp_col, sum(case when date(A.created_on)=date('".$date."') then 1 else 0 end) as entry_done, 
+            sum(case when date(A.date_of_processing)<date('".$date."') and (A.status = 'Pending' or A.status = 'Deleted') and (delivery_status='Pending' or delivery_status='GP Issued' or delivery_status='Delivered Not Complete' or delivery_status='Delivered') and (A.ref_id is null or A.ref_id = '') then 1 else 0 end) as pending, 
+           sum(
+            case 
+            when date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')))
+                 then 1 
+            when date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')))
+                 then 0
+            when date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)<date('".$date."') ))
+                  then 1
+            else 0
+            END
+            ) as prior_pending 
+            from distributor_out A 
+            where A.date_of_processing is not null and (A.distributor_id='1' or A.distributor_id='189') 
+
+            union all 
+
+            select 'Credit Notes' as temp_col, sum(case when date(A.created_on)=date('".$date."') then 1 else 0 end) as entry_done, 
+            sum(case when date(A.date_of_transaction)<date('".$date."') and (A.status = 'Pending' or A.status = 'Deleted') then 1 else 0 end) as pending, 
+            sum(
+                case 
+                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')))
+                     then 1 
+                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')))
+                     then 0
+                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)<date('".$date."') ))
+                      then 1
+                else 0
+                END
+            ) as prior_pending 
+            from credit_debit_note A where A.date_of_transaction is not null and transaction = 'Credit Note' 
+
+            union all 
+
+            select 'Debit Notes' as temp_col, sum(case when date(A.created_on)=date('".$date."') then 1 else 0 end) as entry_done, 
+            sum(case when date(A.date_of_transaction)<date('".$date."') and (A.status = 'Pending' or A.status = 'Deleted') then 1 else 0 end) as pending, 
+            sum(
+                case 
+                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')))
+                     then 1 
+                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')))
+                     then 0
+                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)<date('".$date."') ))
+                      then 1
+                else 0
+                END
+            ) as prior_pending
+            from credit_debit_note A where A.date_of_transaction is not null and transaction = 'Debit Note'";
+
+    $query = $this->db->query($sql);
+    $result = $query->result();
+    $entry_table = '';
+    if(count($result)>0) {
+        for($i=0; $i<count($result); $i++) {
+            $link1 = '';
+            $link2 = '';
+            if(strtoupper(trim($result[$i]->temp_col))=='SALES') {
+                $link1 = base_url().'index.php/distributor_out';
+                $link2 = base_url().'index.php/distributor_out/checkstatus/pending_for_approval';
+            }
+            if(strtoupper(trim($result[$i]->temp_col))=='PAYMENT RECEIVED') {
+                $link1 = base_url().'index.php/payment';
+                $link2 = base_url().'index.php/payment/checkstatus/Pending';
+            }
+            if(strtoupper(trim($result[$i]->temp_col))=='SALES RETURN') {
+                $link1 = base_url().'index.php/Distributor_in';
+                $link2 = base_url().'index.php/Distributor_in/checkstatus/Pending';
+            }
+            if(strtoupper(trim($result[$i]->temp_col))=='SAMPLE') {
+                $link1 = base_url().'index.php/Sample_out';
+                $link2 = base_url().'index.php/Sample_out/checkstatus/pending_for_approval';
+            }
+            if(strtoupper(trim($result[$i]->temp_col))=='CREDIT NOTES' || strtoupper(trim($result[$i]->temp_col))=='DEBIT NOTES') {
+                $link1 = base_url().'index.php/Credit_debit_note';
+                $link2 = base_url().'index.php/Credit_debit_note/checkstatus/Pending';
+            }
+            $entry_table = $entry_table . '<tr>
+                                <td>'.$result[$i]->temp_col.'</td>
+                                <td style="text-align: center;"><a href="'.$link1.'" target="_blank">'.$result[$i]->entry_done.'</a></td>
+                                <td style="text-align: center; color: #F00;"><a href="'.$link2.'" target="_blank" style="color: #F00;">'.$result[$i]->pending.'</a></td>
+                                <td style="text-align: center; color: #F00;"><a href="'.$link2.'" target="_blank" style="color: #F00;">'.$result[$i]->prior_pending.'</a></td>
+                            </tr>';
+        }
+    }
+    // echo $sql;
+    // echo '<br/><br/>';
+
+    $sql = "select 'Sales Delivery' as temp_col, sum(case when A.delivery_status = 'Pending' then 1 else 0 end) as delivery_pending, sum(case when A.delivery_status = 'GP Issued' then 1 else 0 end) as in_transit from distributor_out A where A.status = 'Approved' and A.date_of_processing is not null and A.distributor_id!='1' and A.distributor_id!='189' 
+
+        union all 
+
+        select 'Sample Delivery' as temp_col, sum(case when A.delivery_status = 'Pending' then 1 else 0 end) as delivery_pending, sum(case when A.delivery_status = 'GP Issued' then 1 else 0 end) as in_transit from distributor_out A where A.status = 'Approved' and A.date_of_processing is not null and (A.distributor_id='1' or A.distributor_id='189')";
+    $query = $this->db->query($sql);
+    $result = $query->result();
+    $delivery_table = '';
+    if(count($result)>0) {
+        for($i=0; $i<count($result); $i++) {
+            $link1 = '';
+            $link2 = '';
+            if(strtoupper(trim($result[$i]->temp_col))=='SALES DELIVERY') {
+                $link1 = base_url().'index.php/distributor_out/checkstatus/pending_for_delivery';
+                $link2 = base_url().'index.php/distributor_out/checkstatus/gp_issued';
+            } else if(strtoupper(trim($result[$i]->temp_col))=='SAMPLE DELIVERY') {
+                $link1 = base_url().'index.php/sample_out/checkstatus/pending_for_delivery';
+                $link2 = base_url().'index.php/sample_out/checkstatus/gp_issued';
+            }
+            $delivery_table = $delivery_table . '<tr>
+                                <td>'.$result[$i]->temp_col.'</td>
+                                <td style="text-align: center; color: #F00;"><a href="'.$link1.'" target="_blank" style="color: #F00;">'.$result[$i]->delivery_pending.'</a></td>
+                                <td style="text-align: center; color: #F00;"><a href="'.$link2.'" target="_blank" style="color: #F00;">'.$result[$i]->in_transit.'</a></td>
+                            </tr>';
+        }
+    }
+    // echo $sql;
+    // echo '<br/><br/>';
+
+    $sql = "select Distinct 'Sales' as temp_col, A.id, A.date_of_processing as ref_date, A.invoice_no as ref_no, A.distributor_id, A.invoice_amount as amount, A.modified_by, A.modified_on, B.distributor_name, concat(ifnull(C.first_name,''),' ',ifnull(C.last_name,'')) as modifiedby 
+        from distributor_out A left join distributor_master B on (A.distributor_id=B.id) left join user_master C on (A.modified_by=C.id) 
+        where A.date_of_processing is not null and A.distributor_id!='1' and A.distributor_id!='189' and date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and 
+            (Case When 
+            date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')
+            Then 1=1
+            When date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')
+            Then 1=0
+            When date(A.created_on)<date('".$date."') 
+            Then 1=1
+            else
+            1=0
+            End )
+        ) 
+
+        union all 
+
+        select Distinct 'Payment Received' as temp_col, A.id, A.date_of_deposit as ref_date, B.ref_no, B.distributor_id, B.payment_amount as amount, A.modified_by, A.modified_on, C.distributor_name, concat(ifnull(D.first_name,''),' ',ifnull(D.last_name,'')) as modifiedby 
+        from payment_details A left join payment_details_items B on (A.id=B.payment_id) left join distributor_master C on (B.distributor_id=C.id) left join user_master D on (A.modified_by=D.id) 
+        where A.date_of_deposit is not null and date(A.date_of_deposit)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and 
+            (Case When 
+            date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')
+            Then 1=1
+            When date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')
+            Then 1=0
+            When date(A.created_on)<date('".$date."') 
+            Then 1=1
+            else
+            1=0
+            End )
+        )
+
+        union all 
+
+        select Distinct 'Sales Return' as temp_col, A.id, A.date_of_processing as ref_date, A.sales_return_no as ref_no, A.distributor_id, A.final_amount as amount, A.modified_by, A.modified_on, B.distributor_name, concat(ifnull(C.first_name,''),' ',ifnull(C.last_name,'')) as modifiedby 
+        from distributor_in A left join distributor_master B on (A.distributor_id=B.id) left join user_master C on (A.modified_by=C.id) 
+        where A.date_of_processing is not null and date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (Case When 
+            date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')
+            Then 1=1
+            When date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')
+            Then 1=0
+            When date(A.created_on)<date('".$date."') 
+            Then 1=1
+            else
+            1=0
+            End ))
+
+        union all 
+
+        select Distinct 'Sample' as temp_col, A.id, A.date_of_processing as ref_date, A.voucher_no as ref_no, A.distributor_id, A.final_amount as amount, A.modified_by, A.modified_on, B.distributor_name, concat(ifnull(C.first_name,''),' ',ifnull(C.last_name,'')) as modifiedby 
+        from distributor_out A left join distributor_master B on (A.distributor_id=B.id) left join user_master C on (A.modified_by=C.id) 
+        where A.date_of_processing is not null and (A.distributor_id='1' or A.distributor_id='189') and date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (Case When 
+            date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')
+            Then 1=1
+            When date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')
+            Then 1=0
+            When date(A.created_on)<date('".$date."') 
+            Then 1=1
+            else
+            1=0
+            End ))
+
+        union all 
+
+        select Distinct 'Credit Notes' as temp_col, A.id, A.date_of_transaction as ref_date, A.ref_no, A.distributor_id, A.amount, A.modified_by, A.modified_on, B.distributor_name, concat(ifnull(C.first_name,''),' ',ifnull(C.last_name,'')) as modifiedby 
+        from credit_debit_note A left join distributor_master B on (A.distributor_id=B.id) left join user_master C on (A.modified_by=C.id) 
+        where A.date_of_transaction is not null and date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (Case When 
+            date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')
+            Then 1=1
+            When date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')
+            Then 1=0
+            When date(A.created_on)<date('".$date."') 
+            Then 1=1
+            else
+            1=0
+            End )
+        ) and transaction = 'Credit Note' 
+
+        union all 
+
+        select Distinct 'Debit Notes' as temp_col, A.id, A.date_of_transaction as ref_date, A.ref_no, A.distributor_id, A.amount, A.modified_by, A.modified_on, B.distributor_name, concat(ifnull(C.first_name,''),' ',ifnull(C.last_name,'')) as modifiedby 
+        from credit_debit_note A left join distributor_master B on (A.distributor_id=B.id) left join user_master C on (A.modified_by=C.id) 
+        where A.date_of_transaction is not null and date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (Case When 
+            date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')
+            Then 1=1
+            When date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')
+            Then 1=0
+            When date(A.created_on)<date('".$date."') 
+            Then 1=1
+            else
+            1=0
+            End )
+        ) and transaction = 'Debit Note'";
+
+    $query = $this->db->query($sql);
+    $result = $query->result();
+    $filename = '';
+    $path = '';
+    if(count($result)>0) {
+        $this->load->library('excel');
+        $objPHPExcel = new PHPExcel();
+        $objPHPExcel->setActiveSheetIndex(0);
+
+        $col_name[]=array();
+        for($i=0; $i<=20; $i++) {
+            $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
+        }
+
+        $row=1;
+        $col=0;
+
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Wholesome Habits Private Limited");
+        $row=$row+2;
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Exception Reporting - Operations");
+        $row=$row+2;
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Reporting Date - " . (($date!=null && $date!="")?date("d/m/Y",strtotime($date)):""));
+
+        //------------ setting headers of excel -------------
+        $row=$row+2;
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, 'Entry Type');
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, 'System ID');
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, 'Ref Date');
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, 'Reference');
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, 'Distributor');
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, 'Amount');
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, 'Modified By');
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, 'Modified On');
+
+        for($i=0; $i<count($result); $i++) {
+
+            if($result[$i]->temp_col=='Sample')
+            {
+                $url = base_url('index.php/sample_out/edit/d_'.$result[$i]->id);
+            }
+            else if($result[$i]->temp_col=='Sales')
+            {
+                $url = base_url('index.php/Distributor_out/edit/d_'.$result[$i]->id);
+            }
+            else if($result[$i]->temp_col=='Payment Received')
+            {
+                $url = base_url('index.php/payment/edit/'.$result[$i]->id);
+            }
+            else if($result[$i]->temp_col=='Sales Return')
+            {
+                $url = base_url('index.php/distributor_in/edit/'.$result[$i]->id);
+            }
+            else if($result[$i]->temp_col=='Credit Notes' || $result[$i]->temp_col=='Debit Notes')
+            {
+                $url = base_url('index.php/credit_debit_note/edit/'.$result[$i]->id);
+            }
+
+            
+           
+            $row=$row+1;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $result[$i]->temp_col);
+            /*$objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row,'=Hyperlink("'.$url.'",'.$result[$i]->id.')');*/
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row,$result[$i]->id);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, (($result[$i]->ref_date!=null && $result[$i]->ref_date!="")?date("d/m/Y",strtotime($result[$i]->ref_date)):""));
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $result[$i]->ref_no);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $result[$i]->distributor_name);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, $result[$i]->amount);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, $result[$i]->modifiedby);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, (($result[$i]->modified_on!=null && $result[$i]->modified_on!="")?date("d/m/Y",strtotime($result[$i]->modified_on)):""));
+        }
+
+        $objPHPExcel->getActiveSheet()->getStyle('A7:H7')->getFont()->setBold(true);
+        $objPHPExcel->getActiveSheet()->getStyle('A7:'.$col_name[$col+7].$row)->applyFromArray(array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+            )
+        ));
+
+        for ($col = 0; $col <= PHPExcel_Cell::columnIndexFromString($objPHPExcel->getActiveSheet()->getHighestDataColumn()); $col++) {
+            $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn($col)->setAutoSize(true);
+        }
+
+        $filename='Exception_Report.xls';
+        //$path  = 'C:\xampp\htdocs\eat_erp_new_30\assets\uploads\exception_reports';
+        $path  = '/home/eatangcp/public_html/test/assets/uploads/exception_reports/';
+        //$path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/exception_reports/';
+
+        // header('Content-Type: application/vnd.ms-excel');
+        // header('Content-Disposition: attachment;filename="'.$filename.'"');
+        // header('Cache-Control: max-age=0');
+        // $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+        // $objWriter->save('php://output');
+
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5'); 
+        $objWriter->save($path.$filename);
+    }
+
+    $message = '<html>
+                <body>
+                    <h3>Wholesome Habits Private Limited</h3>
+                    <h4>Exception Reporting - Operations</h4>
+                    <p>Reporting Date - '.(($date!=null && $date!="")?date("d/m/Y",strtotime($date)):"").'</p>
+                    <table border="1" style="border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th style="background-color: #44546A; color: #FFF; padding: 10px;">Type</th>
+                                <th style="background-color: #44546A; color: #FFF; padding: 10px;">Entries Done</th>
+                                <th style="background-color: #44546A; color: #FFF; padding: 10px;">Pending Approval</th>
+                                <th style="background-color: #44546A; color: #FFF; padding: 10px;">Prior Period Modifications</th>
+                            </tr>
+                        </thead>
+                        <tbody>'.$entry_table.'</tbody>
+                    </table>
+                    <br/><br/>
+                    <table border="1" style="border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th style="background-color: #44546A; color: #FFF; padding: 10px;">Type</th>
+                                <th style="background-color: #44546A; color: #FFF; padding: 10px;">Delivery Pending</th>
+                                <th style="background-color: #44546A; color: #FFF; padding: 10px;">In Transit</th>
+                            </tr>
+                        </thead>
+                        <tbody>'.$delivery_table.'</tbody>
+                    </table>
+                    <br/><br/>
+                    Regards,
+                    <br/><br/>
+                    CS
+                </body>
+                </html>';
+    $from_email = 'cs@eatanytime.co.in';
+    $from_email_sender = 'Wholesome Habits Pvt Ltd';
+    $subject = 'Exception Report - '.(($date!=null && $date!="")?date("d/m/Y",strtotime($date)):"");
+
+    /*$to_email = "dhava.maru@pecanreams.com";
+    $cc="sangeeta.yadav@pecanreams.com";
+    $bcc="yadavsangeeta521@gmail.com";*/
+    
+    // $to_email = "prasad.bhisale@pecanreams.com";
+    // $cc = 'prasad.bhisale@pecanreams.com';
+    // $bcc = 'prasad.bhisale@pecanreams.com';
+
+    $to_email = "priti.tripathi@eatanytime.co.in, operations@eatanytime.co.in";
+    $cc="rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, dhaval.maru@pecanreams.com";
+    $bcc="prasad.bhisale@pecanreams.com, sangeeta.yadav@pecanreams.com";
+    echo $attachment = $path.$filename;
+    // $to_email = 'dhaval.maru@otbconsulting.co.in,dhavalbright@gmail.com';
+    // $to_email = 'rishit.sanghvi@eatanytime.in,swapnil.darekar@eatanytime.in;dhaval.maru@otbconsulting.co.in';
+    $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc, $cc, $attachment);
+
+    // $mailSent=1;
+    
+    echo $message;
+    echo '<br/><br/>';
+    echo $mailSent;
+
+    if($mailSent==1){
+        $logarray['table_id']=$this->session->userdata('session_id');
+        $logarray['module_name']='Reports';
+        $logarray['cnt_name']='Reports';
+        $logarray['action']='Exception report sent.';
+        $this->user_access_log_model->insertAccessLog($logarray);
+    }
+}
+
+public function sales_rep_route_plan()
+{
+    $from_date = formatdate($this->input->post('from_date'));
+    $to_date = formatdate($this->input->post('to_date'));
+    $sales_rep_id = $this->input->post('salesrep_id');
+    ////utf8mb4_unicode_ci
+    $startdate = date('Y-m-d', strtotime($from_date));
+    $enddate = date('Y-m-d', strtotime($to_date));
+
+    $date_from = strtotime($startdate);
+    $date_to  = strtotime($enddate);
+    $batch_array = [];
+
+    for ($i=$date_from; $i<=$date_to; $i+=86400) 
+    {  
+        $e_day =  date('l', $i); 
+        $e_week =  date('W', $i);  
+
+        if ($e_week % 2 == 0) {
+            $day = 'Alternate '.$e_day;
+        }
+        else
+        {
+            $day = 'Every '.$e_day;
+        }
+
+        if(!in_array($day,$batch_array))
+        {
+            if (strpos($day, 'Sunday') !== false) {
+                
+            }
+            else
+            {
+                $batch_array[]=$day;
+            }
+        }
+    }
+    
+    $tendays = date('Y-m-d', strtotime("-10 days"));
+    $twentydays  = date('Y-m-d', strtotime('-10 day', strtotime($tendays)));
+    $thirtydays =date('Y-m-d', strtotime('-10 day', strtotime($twentydays)));
+
+    $infrequency = "'" . implode ( "', '", $batch_array ) . "'";
+    $cond = '';
+    if($sales_rep_id!='ALL')
+    {
+        $cond = " AND  A.sales_rep_id='$sales_rep_id'";
+    }else
+    {
+        $cond = " AND  A.sales_rep_id NOT IN(2)";
+    }
+
+   $sql = "Select A.*,0 as current_stock ,IFNULL(C.totalnooforders,0) as totalnooforders,IFNULL(D.betweennooforders,0) as betweennooforders ,G.sales_rep_name  from (
+            Select A.*,B.date_of_visit as last_visit,DATEDIFF(CURRENT_DATE(),B.date_of_visit) as days_diff,IFNULL(C.od_units,0) as total_ods_unit
+            from (
+            SELECT DISTINCT A.*,B.distributor_name 
+            from (SELECT store_id,frequency,sales_rep_id from sales_rep_beat_plan WHERE frequency IN($infrequency) ) A
+            Left JOIN
+            (Select Distinct C.* FROM(
+                    Select B.* from (
+                            Select concat('d_',A.id) as id , A.distributor_name   FROM
+                            (Select * from distributor_master )A
+                            LEFT JOIN sr_mapping B ON (A.area_id = B.area_id and A.zone_id = B.zone_id and  A.type_id = B.type_id) 
+                            Where A.status='approved' and A.class='normal'
+                    ) B
+                    Union 
+                    (
+                            Select concat('s_',A.id) as id , A.distributor_name  FROM
+                            (Select * from sales_rep_distributors)A
+                    )            
+            ) C ) B On (A.store_id=B.id COLLATE utf8_unicode_ci) 
+            WHERE distributor_name is NOT NULL ) A 
+            LEFT JOIN
+            (SELECT DISTINCT store_id,sales_rep_id,max(date(date_of_visit)) as date_of_visit  from  sales_rep_detailed_beat_plan  Where is_edit='edit'
+            GROUP BY store_id,sales_rep_id 
+            ORDER BY date(date_of_visit) ) B
+            on (A.store_id=B.store_id and A.sales_rep_id=B.sales_rep_id)
+            left JOIN
+            (select sum(B.qty)as od_units,sales_rep_id,distributor_id,
+            CASE WHEN ((FLOOR((DayOfMonth(date(created_on))-1)/7)+1 )=1 OR (FLOOR((DayOfMonth(date(created_on))-1)/7)+1 )=3 OR (FLOOR((DayOfMonth(date(created_on))-1)/7)+1 )=5) 
+            THEN  CONCAT('Every ',DAYNAME(date(created_on))) ELSE CONCAT('Alternate ',DAYNAME(date(created_on))) end as dayname 
+            from (select * from sales_rep_orders Where date(created_on)>='$from_date' and date(created_on)<='$to_date')A 
+            left join (
+                    select C.sales_rep_order_id, case when C.type='Bar' then C.qty else C.qty*D.qty end as qty 
+                from sales_rep_order_items C left join box_product D on (C.type = 'Box' and C.item_id = D.box_id)
+
+            ) B on(A.id=B.sales_rep_order_id)
+            GROUP BY sales_rep_id,distributor_id) C on (A.sales_rep_id=C.sales_rep_id and A.store_id=C.distributor_id and (A.frequency=C.dayname COLLATE utf8_unicode_ci))
+            ) A
+            LEFT JOIN
+            (select sales_rep_id,distributor_id,count(id) as totalnooforders from sales_rep_orders GROUP BY sales_rep_id,distributor_id) C
+            on(A.sales_rep_id=C.sales_rep_id and A.store_id=C.distributor_id)
+            LEFT JOIN
+            (select sales_rep_id,distributor_id,count(id) as betweennooforders from sales_rep_orders 
+                Where date(created_on)>='$from_date' and date(created_on)<='$to_date' GROUP BY sales_rep_id,distributor_id) D
+            on(A.sales_rep_id=D.sales_rep_id and A.store_id=D.distributor_id)
+            JOIN
+            (SELECT sales_rep_name,id from sales_rep_master Where status='Approved') G
+            On A.sales_rep_id=G.id
+            Where  A.sales_rep_id is NOT NULL
+            ".$cond."
+            ORDER BY sales_rep_id,frequency,distributor_name DESC ";
+    $result = $this->db->query($sql)->result();
+    return  $result;
+}
+
+public function sales_rep_route_plan_summary()
+{
+    $from_date = formatdate($this->input->post('from_date'));
+    $to_date = formatdate($this->input->post('to_date'));
+    $sales_rep_id = $this->input->post('salesrep_id');
+    ////utf8mb4_unicode_ci
+    $startdate = date('Y-m-d', strtotime($from_date));
+    $enddate = date('Y-m-d', strtotime($to_date));
+
+    $date_from = strtotime($startdate);
+    $date_to  = strtotime($enddate);
+    $batch_array = [];
+
+    for ($i=$date_from; $i<=$date_to; $i+=86400) 
+    {  
+        $e_day =  date('l', $i); 
+        $e_week =  date('W', $i);  
+
+        if ($e_week % 2 == 0) {
+            $day = 'Alternate '.$e_day;
+        }
+        else
+        {
+            $day = 'Every '.$e_day;
+        }
+
+        if(!in_array($day,$batch_array))
+        {
+            if (strpos($day, 'Sunday') !== false) {
+                
+            }
+            else
+            {
+                $batch_array[]=$day;
+            }
+        }
+    }
+    
+    $tendays = date('Y-m-d', strtotime("-10 days"));
+    $twentydays  = date('Y-m-d', strtotime('-10 day', strtotime($tendays)));
+    $thirtydays =date('Y-m-d', strtotime('-10 day', strtotime($twentydays)));
+
+    $infrequency = "'" . implode ( "', '", $batch_array ) . "'";
+    $cond = '';
+    if($sales_rep_id!='ALL')
+    {
+        $cond = " Where A.sales_rep_id='$sales_rep_id'";
+    }
+    else
+    {
+        $cond = " Where  A.sales_rep_id NOT IN(2)";
+    }
+
+    $sql = "Select * from (Select A.*,B.visited_store,E.planned_store,F.betweenten,
+            F.betweentwenty,F.betweenthirty,G.sales_rep_name
+            from (SELECT sales_rep_id,count(store_id) as total_store from  sales_rep_beat_plan WHERE 
+            sales_rep_id IN (SELECT  Distinct id  from sales_rep_master Where sr_type='Sales Representative' and `status`='Approved'
+            ) GROUP BY sales_rep_id ) A
+            JOIN
+            (SELECT sales_rep_name,id from sales_rep_master Where status='Approved') G
+            On A.sales_rep_id=G.id
+            left JOIN
+            (Select sales_rep_id,count(store_id) as visited_store from sales_rep_detailed_beat_plan Where 
+            is_edit='edit' and date(date_of_visit) BETWEEN '$from_date' and '$to_date' GROUP BY sales_rep_id) B
+            ON A.sales_rep_id=B.sales_rep_id
+            left JOIN
+            (SELECT sales_rep_id,count(store_id) as planned_store from sales_rep_beat_plan 
+            Where frequency IN ($infrequency)  and date(created_on) NOT BETWEEN '$from_date' and '$to_date'   GROUP BY sales_rep_id
+            ) E on A.sales_rep_id=E.sales_rep_id
+            left JOIN
+            (Select sum(betweenten) as betweenten ,sum(betweentwenty) as betweentwenty ,sum(betweenthirty) as betweenthirty,sales_rep_id 
+            from (Select B.store_id,B.sales_rep_id, DATEDIFF(CURRENT_DATE(),last_visit) as last_visit, 
+            Case When DATEDIFF(CURRENT_DATE(),last_visit) BETWEEN 1 and 10 Then 1 else 0 end as betweenten,
+            Case When DATEDIFF(CURRENT_DATE(),last_visit) BETWEEN 10 and 20 Then 1 else 0 end as betweentwenty, 
+            Case When DATEDIFF(CURRENT_DATE(),last_visit) >=20 Then 1 else 0 end as betweenthirty 
+            from (SELECT DISTINCT store_id,sales_rep_id from sales_rep_beat_plan )A 
+            JOIN (SELECT DISTINCT store_id,sales_rep_id,max(date(date_of_visit)) as last_visit 
+            from sales_rep_detailed_beat_plan Where is_edit='edit' GROUP BY store_id,sales_rep_id) B 
+            On (A.sales_rep_id=B.sales_rep_id and A.store_id=B.store_id) ORDER By sales_rep_id ) A GROUP By sales_rep_id) F
+            On A.sales_rep_id=F.sales_rep_id ) A ".$cond;
+
+    $result = $this->db->query($sql)->result();
+    return  $result;
+}
+
+public function merchendizer_rep_route_plan()
+{
+    $from_date = formatdate($this->input->post('from_date'));
+    $to_date = formatdate($this->input->post('to_date'));
+    $sales_rep_id = $this->input->post('merchendizer_id');
+    ////utf8mb4_unicode_ci
+    $startdate = date('Y-m-d', strtotime($from_date));
+    $enddate = date('Y-m-d', strtotime($to_date));
+
+    $date_from = strtotime($startdate);
+    $date_to  = strtotime($enddate);
+    $batch_array = [];
+
+    for ($i=$date_from; $i<=$date_to; $i+=86400) 
+    {  
+        $e_day =  date('l', $i); 
+        $e_week =  date('W', $i);  
+
+        if ($e_week % 2 == 0) {
+            $day = 'Alternate '.$e_day;
+        }
+        else
+        {
+            $day = 'Every '.$e_day;
+        }
+
+        if(!in_array($day,$batch_array))
+        {
+            if (strpos($day, 'Sunday') !== false) {
+                
+            }
+            else
+            {
+                $batch_array[]=$day;
+            }
+        }
+    }
+    
+    $tendays = date('Y-m-d', strtotime("-10 days"));
+    $twentydays  = date('Y-m-d', strtotime('-10 day', strtotime($tendays)));
+    $thirtydays =date('Y-m-d', strtotime('-10 day', strtotime($twentydays)));
+
+    $infrequency = "'" . implode ( "', '", $batch_array ) . "'";
+    $cond = '';
+    if($sales_rep_id!='ALL')
+    {
+        $cond = " Where  A.sales_rep_id='$sales_rep_id'";
+    }
+
+
+    $sql = "SELECT A.*,B.date_of_visit as last_visit,DATEDIFF(CURRENT_DATE(),B.date_of_visit) as days_diff,IFNULL(C.current_stock,0) as current_stock  from (select Distinct E.*,B.location,F.sales_rep_name         from (Select A.*,B.store_name from 
+         (Select store_id,frequency,sales_rep_id,location_id from  merchandiser_beat_plan Where frequency IN($infrequency))  A 
+        left join 
+        (SELECT * FROM relationship_master where type_id ='4' or type_id='7') B 
+        on (A.store_id=B.id))E
+        left join 
+        (select * from sales_rep_master where sr_type='Merchandizer' order by sales_rep_name desc ) F 
+        on (E.sales_rep_id=F.id)
+        left join
+        (select * from location_master) B 
+        on (E.location_id=B.id))A
+        left JOIN
+        (SELECT DISTINCT store_id,sales_rep_id,max(date(date_of_visit)) as date_of_visit from merchandiser_detailed_beat_plan Where  is_edit='edit' GROUP BY store_id,sales_rep_id ORDER BY date(date_of_visit) 
+        )B 
+        on (A.store_id=B.store_id and A.sales_rep_id=B.sales_rep_id)
+        Left JOIN
+        (Select* from (Select sum(qty) as current_stock,m_id,dist_id,location_id from (
+        Select Distinct B.* from (Select  m_id,dist_id,location_id,max(date(date_of_visit)) as max_date from merchandiser_stock
+        where id IN(Select DISTINCT merchandiser_stock_id from merchandiser_stock_details ) GROUP By m_id,dist_id,location_id )A
+        Left join 
+        (Select  DISTINCT B.* from 
+            (SELECT * from merchandiser_stock_details) A
+            left join 
+            (SELECT * from  merchandiser_stock)B
+            On (A.merchandiser_stock_id=B.id)
+        )B On (A.m_id=B.m_id and A.dist_id=B.dist_id and A.location_id=B.location_id and A.max_date=date(B.date_of_visit))
+        ) A
+        left join 
+        (SELECT * from merchandiser_stock_details )B ON
+                    A.id=B.merchandiser_stock_id 
+        Group By  m_id,dist_id,location_id)A Order By m_id )C
+            on (A.store_id=C.dist_id and A.sales_rep_id=C.m_id and A.location_id=C.location_id)
+            ".$cond."
+            ORDER By A.sales_rep_id,A.frequency ";
+    $result = $this->db->query($sql)->result();
+    return  $result;
+}
+
+public function merchendizer_rep_route_plan_summary()
+{
+    $from_date = formatdate($this->input->post('from_date'));
+    $to_date = formatdate($this->input->post('to_date'));
+    $sales_rep_id = $this->input->post('merchendizer_id');
+    ////utf8mb4_unicode_ci
+    $startdate = date('Y-m-d', strtotime($from_date));
+    $enddate = date('Y-m-d', strtotime($to_date));
+
+    $date_from = strtotime($startdate);
+    $date_to  = strtotime($enddate);
+    $batch_array = [];
+
+    for ($i=$date_from; $i<=$date_to; $i+=86400) 
+    {  
+        $e_day =  date('l', $i); 
+        $e_week =  date('W', $i);  
+
+        if ($e_week % 2 == 0) {
+            $day = 'Alternate '.$e_day;
+        }
+        else
+        {
+            $day = 'Every '.$e_day;
+        }
+
+        if(!in_array($day,$batch_array))
+        {
+            if (strpos($day, 'Sunday') !== false) {
+                
+            }
+            else
+            {
+                $batch_array[]=$day;
+            }
+        }
+    }
+    
+    $tendays = date('Y-m-d', strtotime("-10 days"));
+    $twentydays  = date('Y-m-d', strtotime('-10 day', strtotime($tendays)));
+    $thirtydays =date('Y-m-d', strtotime('-10 day', strtotime($twentydays)));
+
+    $infrequency = "'" . implode ( "', '", $batch_array ) . "'";
+    $cond = '';
+    if($sales_rep_id!='ALL')
+    {
+        $cond = " Where A.sales_rep_id='$sales_rep_id'";
+    }
+    else
+    {
+        $cond = " Where  A.sales_rep_id NOT IN(2)";
+    }
+
+    $sql = "Select A.*,IFNULL(B.visited_store,0) as visited_store,IFNULL(E.planned_store,0) as planned_store,IFNULL(F.betweenten,0) as betweenten,IFNULL(F.betweentwenty,0) as betweentwenty,IFNULL(F.betweenthirty ,0) as betweenthirty ,G.sales_rep_name from (SELECT sales_rep_id,count(store_id) as total_store from  merchandiser_beat_plan 
+            WHERE sales_rep_id IN (SELECT  Distinct id  from sales_rep_master Where sr_type='Merchandizer' and `status`='Approved') GROUP BY sales_rep_id )A
+            JOIN
+            (SELECT sales_rep_name,id from sales_rep_master Where status='Approved') G
+            On A.sales_rep_id=G.id
+            left JOIN
+            (Select sales_rep_id,count(store_id) as visited_store from merchandiser_detailed_beat_plan Where 
+            is_edit='edit' and date(date_of_visit) BETWEEN '$from_date' and '$to_date' GROUP BY sales_rep_id) B
+            ON A.sales_rep_id=B.sales_rep_id
+            left JOIN
+            (SELECT sales_rep_id,count(store_id) as planned_store from merchandiser_beat_plan  
+             Where frequency IN(".$infrequency.") GROUP BY sales_rep_id) E on A.sales_rep_id=E.sales_rep_id
+            Left join
+            (Select sum(betweenten) as betweenten ,sum(betweentwenty) as betweentwenty ,sum(betweenthirty) as betweenthirty,sales_rep_id 
+            from (Select B.store_id,B.sales_rep_id, DATEDIFF(CURRENT_DATE(),last_visit) as last_visit, 
+            Case When DATEDIFF(CURRENT_DATE(),last_visit) BETWEEN 1 and 10 Then 1 else 0 end as betweenten,
+            Case When DATEDIFF(CURRENT_DATE(),last_visit) BETWEEN 10 and 20 Then 1 else 0 end as betweentwenty, 
+            Case When DATEDIFF(CURRENT_DATE(),last_visit) >=20 Then 1 else 0 end as betweenthirty 
+            from (SELECT DISTINCT store_id,sales_rep_id from merchandiser_beat_plan )A 
+            JOIN (SELECT DISTINCT store_id,sales_rep_id,max(date(date_of_visit)) as last_visit 
+            from merchandiser_detailed_beat_plan Where is_edit='edit' GROUP BY store_id,sales_rep_id) B 
+            On (A.sales_rep_id=B.sales_rep_id and A.store_id=B.store_id) ORDER By sales_rep_id ) A GROUP By sales_rep_id )F
+            On A.sales_rep_id=F.sales_rep_id ".$cond;
+
+    $result = $this->db->query($sql)->result();
+    return  $result;
+}
+
+
+public function get_upload_telly_report($id='')
+{
+    $cond = '';
+    if($id!='')
+    {
+        $cond = ' AND telly_report_upload_id='.$id;
+    }
+
+    $sql = "Select * from telly_report_upload Where file_name IS NOT NULL ".$cond. " Order By telly_report_upload_id desc";
+    $result = $this->db->query($sql)->result();
+    return  $result;
+}
+
+public function generate_mt_stock_report() {
+    $date = formatdate($this->input->post('date'));
+    $this->get_mt_stock_report($date, 'generate');
+}
+
+public function send_mt_stock_tracker() {
+    $date = date('Y-m-d');
+
+    $reportpath = $this->get_mt_stock_report($date, 'save');
+    $report_date = date('d-m-Y', strtotime($date));
+
+    $message = '<html>
+                <body>
+                    <h3>Wholesome Habits Private Limited</h3>
+                    <h4>MT Stock Tracker</h4>
+                    <p>Reporting Date - '.$report_date.'</p>
+                    <p>PFA</p>
+                    <br/><br/>
+                    Regards,
+                    <br/><br/>
+                    CS
+                </body>
+                </html>';
+    $from_email = 'cs@eatanytime.co.in';
+    $from_email_sender = 'Wholesome Habits Pvt Ltd';
+    $subject = 'MT_Stock_Tracker_'.$report_date;
+
+    /*$to_email = "dhava.maru@pecanreams.com";
+    $cc="sangeeta.yadav@pecanreams.com";
+    $bcc="yadavsangeeta521@gmail.com";*/
+    
+    // $to_email = "prasad.bhisale@pecanreams.com";
+    // $cc = 'prasad.bhisale@pecanreams.com';
+    // $bcc = 'prasad.bhisale@pecanreams.com';
+
+    $to_email = "priti.tripathi@eatanytime.co.in, operations@eatanytime.in";
+    $cc="rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, dhaval.maru@pecanreams.com";
+    $bcc="prasad.bhisale@pecanreams.com, sangeeta.yadav@pecanreams.com";
+    echo $attachment = $reportpath;
+    echo '<br/><br/>';
+    // $to_email = 'dhaval.maru@otbconsulting.co.in,dhavalbright@gmail.com';
+    // $to_email = 'rishit.sanghvi@eatanytime.in,swapnil.darekar@eatanytime.in;dhaval.maru@otbconsulting.co.in';
+    $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc, $cc, $attachment);
+
+    // $mailSent=1;
+    
+    // echo $message;
+    // echo '<br/><br/>';
+    echo $mailSent;
+    echo '<br/><br/>';
+
+    if($mailSent==1){
+        $logarray['table_id']=$this->session->userdata('session_id');
+        $logarray['module_name']='Reports';
+        $logarray['cnt_name']='Reports';
+        $logarray['action']='Exception report sent.';
+        $this->user_access_log_model->insertAccessLog($logarray);
+    }
+}
+
+public function get_mt_stock_report($date='', $action='save') {
+    if($date==''){
+        $date = date('Y-m-d');
+    }
+
+    $report_date = date('d-m-Y', strtotime($date));
+    $reportpath = '';
+    
+    $sql = "Select  G.*, H.store_name from 
+            (Select  E.*, F.location from 
+            (Select  A.*, D.zone from 
+            (select * from store_master where status='Approved' and zone_id='16') A 
+            left join 
+            (select * from zone_master) D 
+            on (A.zone_id=D.id)) E 
+            left join 
+            (select * from location_master) F 
+            on (E.location_id=F.id)) G 
+            left join 
+            (select * from relationship_master) H 
+            on (G.store_id=H.id) 
+            where G.status='Approved' order by G.modified_on desc";
+    $query = $this->db->query($sql);
+    $result = $query->result();
+
+    if(count($result)>0){
+        $template_path = $this->config->item('template_path');
+        $file = $template_path.'MT_Stock_Tracker.xlsx';
+        $this->load->library('excel');
+        $objPHPExcel = PHPExcel_IOFactory::load($file);
+
+        $col_name[]=array();
+        for($i=0; $i<=100; $i++) {
+            $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
+        }
+
+        // echo count($result);
+        // echo '<br/>';
+
+        // $j = 19;
+        // $region = $objPHPExcel->getActiveSheet()->getCell('A'.strval($j))->getValue();
+        // echo $region;
+        // echo '<br/>';
+
+        // $lst_row = 129;
+
+        $objPHPExcel->getActiveSheet()->setCellValue('N17', $report_date);
+        $row = 19;
+
+        for($i=0; $i<count($result); $i++){
+            $zone = $result[$i]->zone;
+            $store = $result[$i]->store_name;
+            $location = $result[$i]->location;
+            $category = $result[$i]->category;
+
+            $zone_id = $result[$i]->zone_id;
+            $store_id = $result[$i]->store_id;
+            $location_id = $result[$i]->location_id;
+
+            // echo $i;
+            // echo '<br/>';
+            // echo $zone_id;
+            // echo '<br/>';
+            // echo $store_id;
+            // echo '<br/>';
+            // echo $location_id;
+            // echo '<br/>';
+
+            $date_of_visit = '';
+            $butterscotch_cnt = 0;
+            $orange_cnt = 0;
+            $chocopeanut_cnt = 0;
+            $mango_cnt = 0;
+            $bambaiya_cnt = 0;
+            $berry_cnt = 0;
+            $chyawanprash_cnt = 0;
+            $variety_cnt = 0;
+
+            $sql = "select * from merchandiser_stock where dist_id = '$store_id' and location_id = '$location_id' and 
+                    date(date_of_visit)<=date('".$date."') 
+                    order by date_of_visit desc";
+            $query = $this->db->query($sql);
+            $result2 = $query->result();
+            if(count($result2)>0){
+                $merchandiser_stock_id = $result2[0]->id;
+                if(isset($result2[0]->date_of_visit)){
+                    if($result2[0]->date_of_visit!=null && $result2[0]->date_of_visit!=''){
+                        $date_of_visit = date('d-m-Y',strtotime($result2[0]->date_of_visit));
+                    }
+                }
+
+                $sql = "select * from merchandiser_stock_details where merchandiser_stock_id = '$merchandiser_stock_id'";
+                $query = $this->db->query($sql);
+                $result2 = $query->result();
+                if(count($result2)>0){
+                    for($j=0; $j<count($result2); $j++){
+                        if($result2[$j]->item_id=='3'){
+                            $butterscotch_cnt = $result2[$j]->qty;
+                        } else if($result2[$j]->item_id=='1'){
+                            $orange_cnt = $result2[$j]->qty;
+                        } else if($result2[$j]->item_id=='12'){
+                            $chocopeanut_cnt = $result2[$j]->qty;
+                        } else if($result2[$j]->item_id=='6'){
+                            $mango_cnt = $result2[$j]->qty;
+                        } else if($result2[$j]->item_id=='9'){
+                            $berry_cnt = $result2[$j]->qty;
+                        } else if($result2[$j]->item_id=='10'){
+                            $chyawanprash_cnt = $result2[$j]->qty;
+                        } else if($result2[$j]->item_id=='17'){
+                            $variety_cnt = $result2[$j]->qty;
+                        } else if($result2[$j]->item_id=='4'){
+                            $bambaiya_cnt = $result2[$j]->qty;
+                        }
+                    }
+                }
+            }
+
+            // $bl_flag = false;
+            // $row = 19;
+
+            // for($j=19; $j<1000; $j++){
+            //     $region = $objPHPExcel->getActiveSheet()->getCell('A'.strval($j))->getValue();
+            //     $group = $objPHPExcel->getActiveSheet()->getCell('B'.strval($j))->getValue();
+            //     $loc = $objPHPExcel->getActiveSheet()->getCell('C'.strval($j))->getValue();
+
+            //     if($region==''){
+            //         $row = $j;
+            //         $lst_row = $j;
+            //         break;
+            //     }
+
+            //     if(strtoupper(trim($zone))==strtoupper(trim($region)) && 
+            //        strtoupper(trim($store))==strtoupper(trim($group)) && 
+            //        strtoupper(trim($location))==strtoupper(trim($loc))){
+            //             $bl_flag = true;
+            //             $row = $j;
+            //             break;
+            //     }
+            // }
+
+            // if($bl_flag==false){
+            //     echo 'Not Found';
+            //     echo '<br/>';
+            // } else {
+            //     echo 'Found';
+            //     echo '<br/>';
+            // }
+
+            $col = 0;
+            // if($bl_flag==false){
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $zone);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $store);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, $location);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $store."-".$location);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $category);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, '=VLOOKUP(E'.$row.',$E$1:$F$3,2,0)');
+
+                $sql = "select A.*, B.sales_rep_name from merchandiser_beat_plan A 
+                        left join sales_rep_master B on (A.sales_rep_id=B.id) 
+                        where A.zone_id = '$zone_id' and A.store_id = '$store_id' and A.location_id = '$location_id' 
+                        order by A.modified_on desc";
+                $query = $this->db->query($sql);
+                $result2 = $query->result();
+                if(count($result2)>0){
+                    $sales_rep_name = $result2[0]->sales_rep_name;
+                    $excel_sales_rep1 = $objPHPExcel->getActiveSheet()->getCell('G17')->getValue();
+                    $excel_sales_rep2 = $objPHPExcel->getActiveSheet()->getCell('H17')->getValue();
+                    $frequency = "";
+                    if(strtoupper(trim($sales_rep_name))==strtoupper(trim($excel_sales_rep1))){
+                        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, $result2[0]->frequency);
+                    } else if(strtoupper(trim($sales_rep_name))==strtoupper(trim($excel_sales_rep2))){
+                        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, $result2[0]->frequency);
+                    }
+                }
+
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+8].$row, '=IF(G'.$row.'="",$J$17,$I$17)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+9].$row, '=IF(H'.$row.'="",$J$17,$I$17)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+10].$row, '=IF((I'.$row.'=$J$17)*(J'.$row.'=$J$17),"NOT UPDATED","UPDATED")');
+            // }
+
+            if($date_of_visit!=''){
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+12].$row, $date_of_visit);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+13].$row, '=+M'.$row.'-$N$17');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+14].$row, $butterscotch_cnt);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+15].$row, $orange_cnt);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+16].$row, $chocopeanut_cnt);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+17].$row, $mango_cnt);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+18].$row, $bambaiya_cnt);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+19].$row, $berry_cnt);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+20].$row, $chyawanprash_cnt);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+21].$row, $variety_cnt);
+            }
+            
+            // echo $date_of_visit;
+            // echo '<br/>';
+
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+35].$row, '=SUM(AK'.$row.':AR'.$row.')');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+36].$row, '=+AA'.$row.'-O'.$row);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+37].$row, '=+AB'.$row.'-P'.$row);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+38].$row, '=+AC'.$row.'-Q'.$row);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+39].$row, '=+AD'.$row.'-R'.$row);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+40].$row, '=+AE'.$row.'-S'.$row);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+41].$row, '=+AF'.$row.'-T'.$row);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+42].$row, '=+AG'.$row.'-U'.$row);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+43].$row, '=+AH'.$row.'-V'.$row);
+
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+45].$row, '=SUM(AU'.$row.':BB'.$row.')');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+46].$row, '=IF(O'.$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+47].$row, '=IF(P'.$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+48].$row, '=IF(Q'.$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+49].$row, '=IF(R'.$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+50].$row, '=IF(S'.$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+51].$row, '=IF(T'.$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+52].$row, '=IF(U'.$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+53].$row, '=IF(V'.$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
+
+            $row = $row + 1;
+        }
+
+        $row = $row - 1;
+
+        $objPHPExcel->getActiveSheet()->getStyle('A19:K'.$row)->applyFromArray(array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+            )
+        ));
+        $objPHPExcel->getActiveSheet()->getStyle('M19:V'.$row)->applyFromArray(array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+            )
+        ));
+        $objPHPExcel->getActiveSheet()->getStyle('Y19:AH'.$row)->applyFromArray(array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+            )
+        ));
+        $objPHPExcel->getActiveSheet()->getStyle('AJ19:AR'.$row)->applyFromArray(array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+            )
+        ));
+        $objPHPExcel->getActiveSheet()->getStyle('AT19:BB'.$row)->applyFromArray(array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+            )
+        ));
+        
+        $filename = 'MT_Stock_Tracker_'.$report_date.'.xlsx';
+
+        if($action=="save") {
+            $path  = '/home/eatangcp/public_html/test/assets/uploads/mt_stock_reports/';
+            $upload_path = '/home/eatangcp/public_html/test/assets/uploads/mt_stock_reports';
+            // $path  = 'C:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports/';
+            // $upload_path = 'C:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports';
+            if(!is_dir($upload_path)) {
+                mkdir($upload_path, 0777, TRUE);
+            }
+
+            $reportpath = $path.$filename;
+
+            // header('Content-Type: application/vnd.ms-excel');
+            // header('Content-Disposition: attachment;filename="'.$filename.'"');
+            // header('Cache-Control: max-age=0');
+
+            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007'); 
+            $objWriter->save($reportpath);
+
+            echo $reportpath;
+            echo '<br/><br/>';
+
+            return $reportpath;
+        } else {
+            // header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Type: application/openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="'.$filename.'"');
+            header('Cache-Control: max-age=0');
+            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+            $objWriter->save('php://output');
+
+            $logarray['table_id']=$this->session->userdata('session_id');
+            $logarray['module_name']='Reports';
+            $logarray['cnt_name']='Reports';
+            $logarray['action']='MT Stock Tracker Report Generated.';
+            $this->user_access_log_model->insertAccessLog($logarray);
+
+            exit;
+        }
+    }
+}
 
 }
 

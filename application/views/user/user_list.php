@@ -48,24 +48,26 @@
 									<thead>
 										<tr>
 										<th width="65" style="text-align:center;" >Sr. No.</th>
-											<th  >Name</th>
-											<th >Email Id</th>
+										<th width="65" style="text-align:center;" >Edit</th>
+											<th>Name</th>
+											<th>Email Id</th>
 											<th width="110">Mobile No</th>
-											<th width="110">Creation Date</th>
+											<!--<th width="110">Creation Date</th>-->
 										</tr>
 									</thead>
 									<tbody>
 										<?php for ($i=0; $i < count($data); $i++) { ?>
 										<tr>
 											<td  style="text-align:center;"><?php echo $i+1; ?></td>
-											<td><a href="<?php echo base_url().'index.php/user/edit/'.$data[$i]->id; ?>"><?php echo $data[$i]->first_name . ' ' . $data[$i]->middle_name . ' ' . $data[$i]->last_name; ?></a></td>
+											<td style="text-align:center; vertical-align: middle; "><a href="<?php echo base_url().'index.php/user/edit/'.$data[$i]->id; ?>"><i class="fa fa-edit"></i></a></td>
+											<td><?php echo $data[$i]->first_name . ' ' . $data[$i]->middle_name . ' ' . $data[$i]->last_name; ?></td>
 											<td><?php echo $data[$i]->email_id; ?></td>
 											<td><?php echo $data[$i]->mobile; ?></td>
-											<td>
+											<!--<td>
 												<span style="display:none;">
-                                                    <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
+                                                    <?php// echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
                                                 </span>
-												<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
+												<?php //echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>-->
 										</tr>
 										<?php } ?>
 									</tbody>

@@ -27,11 +27,31 @@ class Distributor_sale extends CI_Controller{
         if(count($result)>0) {
             $data['access']=$result;
             $data['data'] = $this->distributor_sale_model->get_data();
-
+            $data['distributor'] = $this->distributor_model->get_data('Approved','','Super Stockist');
+            $result = $this->db->query(" select A.zone,A.id  from 
+                    (select * from zone_master where (type_id='4' or type_id='7') and `status`='Approved') A 
+                    left join 
+                    (select * from distributor_type_master) B 
+                    on (A.type_id=B.id) where A.status='Approved'  order by A.zone desc")->result();
+            
+            $data['zone'] = $result;
             load_view('distributor_sale/distributor_sale_list', $data);
         } else {
             echo '<script>alert("You donot have access to this page.");</script>';
             $this->load->view('login/main_page');
+        }
+    }
+
+    public function get_zone()
+    {
+        $dist_name = $this->input->post('dist_name');
+        $result =$this->db->query("SELECT A.zone_id ,B.zone from 
+                (select *  from distributor_master WHERE  class='Super Stockist' and STATUS='Approved') A
+                left JOIN
+                (SELECT * from zone_master) B on B.id=A.zone_id")->result();
+        if(count($result)>0)
+        {
+            echo json_encode($result);
         }
     }
 
@@ -40,7 +60,7 @@ class Distributor_sale extends CI_Controller{
         if(count($result)>0) {
             if($result[0]->r_insert == 1) {
                 $data['access'] = $this->distributor_sale_model->get_access();
-                $data['distributor'] = $this->distributor_model->get_data('Approved', '', 'Super Stockist');
+                $data['distributor'] = $this->distributor_model->get_data('Approved', '', 'super stockist');
                 $data['box'] = $this->box_model->get_data('Approved');
                 $data['bar'] = $this->product_model->get_data('Approved');
                 //$data['store'] = $this->distributor_sale_model->get_store();
@@ -61,139 +81,256 @@ class Distributor_sale extends CI_Controller{
 
     public function download_csv()
     {
-            $template_path=$this->config->item('template_path');
-            $file = $template_path.'superstockis_upload.xls';
-            $this->load->library('excel');
+            $distributor_id = $this->input->post('distributor_id');
+            $zone_id = $this->input->post('zone_id');
 
-            $objPHPExcel = PHPExcel_IOFactory::load($file);
-            $objPHPExcel->setActiveSheetIndex(1);
-            $row = 1;
-            $sqlqueries = "Select A.distributor_name from 
-                        (select * from distributor_master where class='Super Stockist') A 
-                        left join 
-                        (select * from sales_rep_master) B 
-                        on (A.sales_rep_id=B.id) GROUP BY  A.distributor_name order by A.distributor_name asc";
-
-            $distributor_result  = $this->db->query($sqlqueries)->result();
-            foreach($distributor_result  as $dist)
+            if(count($zone_id)!=0 || $distributor_id!='')
             {
-                $objPHPExcel->getActiveSheet()->setCellValue('A'.$row,$dist->distributor_name);
-                $row = $row+1;
-            }
-             
-            $zn = 1;
-            $sqlzone = "select A.zone  from 
-                        (select * from zone_master where (type_id='4' or type_id='7')) A 
-                        left join 
-                        (select * from distributor_type_master) B 
-                        on (A.type_id=B.id) where A.status='Approved'  order by A.zone desc";
+                $template_path=$this->config->item('template_path');
+                $file = $template_path.'superstockis_upload_new.xlsx';
+                $this->load->library('excel');
 
-            $zone_result  = $this->db->query($sqlzone)->result();             
-             foreach($zone_result  as $dist)
-            {
-                $objPHPExcel->getActiveSheet()->setCellValue('B'.$zn,$dist->zone);
-                $zn = $zn+1;
-            }
-            $rn = 1;
-            $sqlregion = "Select E.store_id, E.store_name from(
-                        Select  A.*,D.store_name,D.id as did from (select * from store_master) A 
-                        left join (select * from relationship_master)D
-                        on (A.store_id=D.id))E  left join 
-                        (select * from zone_master)F on (E.zone_id=F.id)  
-                        group by E.store_id, E.store_name";
+                $objPHPExcel = PHPExcel_IOFactory::load($file);
+                $objPHPExcel->setActiveSheetIndex(1);
 
-            $region_result  = $this->db->query($sqlregion)->result();             
-             foreach($region_result  as $dist)
-            {
-                $objPHPExcel->getActiveSheet()->setCellValue('C'.$rn,$dist->store_name);
-                $rn = $rn+1;
+                $row1 = 2;
+                $sqlqueries = "Select A.distributor_name from 
+                            (select * from distributor_master where class='Super Stockist') A 
+                            left join 
+                            (select * from sales_rep_master) B 
+                            on (A.sales_rep_id=B.id) Where A.distributor_name='$distributor_id' 
+                            GROUP By A.distributor_name
+                            order by A.distributor_name asc";
+
+                $distributor_result  = $this->db->query($sqlqueries)->result();
+                foreach($distributor_result  as $dist)
+                {
+                    $objPHPExcel->getActiveSheet()->setCellValue('N'.$row1,$dist->distributor_name);
+                    $row1 = $row1+1;
+                }
+
+
+
+                $objPHPExcel->getActiveSheet()->setCellValue('A1', 'Sr. No');
+                $objPHPExcel->getActiveSheet()->setCellValue('B1', 'Zone');
+                $objPHPExcel->getActiveSheet()->setCellValue('C1', 'Relation');
+                $objPHPExcel->getActiveSheet()->setCellValue('F1', 'Sr. No.');
+                $objPHPExcel->getActiveSheet()->setCellValue('G1', 'Zone');
+                $objPHPExcel->getActiveSheet()->setCellValue('H1', 'Relation');
+                $objPHPExcel->getActiveSheet()->setCellValue('I1', 'Concatenate');
+                $objPHPExcel->getActiveSheet()->setCellValue('J1', 'Location');
+                $objPHPExcel->getActiveSheet()->setCellValue('L1', 'Product');
+                $objPHPExcel->getActiveSheet()->setCellValue('N1', 'Distributor');
+                $objPHPExcel->getActiveSheet()->setCellValue('O1', 'Zone');
+
+                $row = 1;
+               
+                $implode_zone = implode(',',$zone_id);        
+                $sqlregion = "Select Distinct E.store_id, E.store_name,E.zone_id,E.location_id,E.location,F.zone from(
+                    Select  A.*,D.store_name,D.id as did,F.location from (select * from store_master) A 
+                    left join (select * from relationship_master)D
+                    on (A.store_id=D.id)
+                    left join
+                    (select * from location_master) F 
+                    on (A.location_id=F.id)
+                    )E  left join 
+                    (select * from zone_master)F on (E.zone_id=F.id)
+                    Where zone_id IN ($implode_zone)
+                    Order By Zone,store_name ASC";
+
+                $region_result  = $this->db->query($sqlregion)->result();
+
+                $sqlregion1 = "Select Distinct E.store_id, E.store_name,E.zone_id,E.location_id,E.location,F.zone from(
+                    Select  A.*,D.store_name,D.id as did,F.location from (select * from store_master) A 
+                    left join (select * from relationship_master)D
+                    on (A.store_id=D.id)
+                    left join
+                    (select * from location_master) F 
+                    on (A.location_id=F.id)
+                    )E  left join 
+                    (select * from zone_master)F on (E.zone_id=F.id)
+                    Where zone_id IN ($implode_zone)
+                    Order By Zone,store_name,location ASC";
+
+                $region_result1  = $this->db->query($sqlregion1)->result();
+
+                if(count($region_result)>0)
+                {
+                    $unique_store_name = array();
+                    $unique_location = array();
+                    $unique_zone_array =  array();
+                    $unique_zone_relation_array = array();    
+                    $unique_zone_relation_location = array();    
+
+                    foreach($region_result  as $dist)
+                    {
+                        $combination = $dist->zone.'&&'.$dist->store_name;
+                        if(array_search($combination, array_column($unique_zone_relation_array, 'zone_relation_comb')) !== false)
+                          {
+                            $a = 'Value is in array';
+                          }
+                          else
+                          {
+                             $unique_zone_relation_array[]=array("zone_relation_comb"=>$combination);
+                          }
+
+
+                          if(array_search($dist->zone, array_column($unique_zone_array, 'zone')) !== false)
+                          {
+                            $a = 'Value is in array';
+                          }
+                          else
+                          {
+                             $unique_zone_array[]=array("zone"=>$dist->zone);
+                          }
+                        
+                    
+                    }
+
+                    foreach($region_result1  as $dist1)
+                    {
+                        
+                        $combination_2 = $dist1->zone.'&&'.$dist1->store_name.'&&'.$dist1->location;
+                        if(array_search($combination_2, array_column($unique_zone_relation_location, 'zone_relation_location_comb')) !== false)
+                          {
+                            $a = 'Value is in array';
+                          }
+                          else
+                          {
+                             $unique_zone_relation_location[]=array("zone_relation_location_comb"=>$combination_2);
+                          }
+                    }
+
+                    $zr = 2;     
+
+                     
+                    if(count($unique_zone_relation_array)>0)
+                    {
+                        $temp=1;
+                        for ($i=0; $i <count($unique_zone_relation_array) ; $i++) 
+                        { 
+                            $explode_zr = explode('&&',$unique_zone_relation_array[$i]['zone_relation_comb']);
+                            $objPHPExcel->getActiveSheet()->setCellValue('A'.$zr,$temp);
+                            $objPHPExcel->getActiveSheet()->setCellValue('B'.$zr,$explode_zr[0]);
+                            $objPHPExcel->getActiveSheet()->setCellValue('C'.$zr,$explode_zr[1]);
+                            $temp = $temp+1;
+                            $zr = $zr+1;
+                        }
+                    }   
+
+
+
+                    $zrl = 2;   
+                    if(count($unique_zone_relation_location)>0)
+                    {
+                        $temp2=1;
+                        for ($i=0; $i <count($unique_zone_relation_location) ; $i++) 
+                        { 
+                            $explode_zr = explode('&&',$unique_zone_relation_location[$i]['zone_relation_location_comb']);
+                            $objPHPExcel->getActiveSheet()->setCellValue('F'.$zrl,$temp2);
+                            $objPHPExcel->getActiveSheet()->setCellValue('G'.$zrl,$explode_zr[0]);
+                            $objPHPExcel->getActiveSheet()->setCellValue('H'.$zrl,$explode_zr[1]);
+                            $objPHPExcel->getActiveSheet()->setCellValue('I'.$zrl,$explode_zr[0].$explode_zr[1]);
+                            $objPHPExcel->getActiveSheet()->setCellValue('J'.$zrl,$explode_zr[2]);
+                            $temp2 = $temp2+1;
+                            $zrl = $zrl+1;
+                        }
+                    }
+
+                    $pr = 2;
+                    $sqlprodmaster = "Select product_name from product_master 
+                                      union Select box_name from box_master";
+                    $prodmaster_result  = $this->db->query($sqlprodmaster)->result();       
+                    foreach($prodmaster_result  as $dist)
+                    {
+                        $objPHPExcel->getActiveSheet()->setCellValue('L'.$pr,$dist->product_name);
+                        $pr = $pr+1;
+                    }
+
+                    $z = 2;   
+                    if(count($unique_zone_array)>0)
+                    {
+                        $temp2=1;
+                        for ($i=0; $i <count($unique_zone_array) ; $i++) 
+                        {
+                            $objPHPExcel->getActiveSheet()->setCellValue('O'.$z,$unique_zone_array[$i]['zone']);
+                            $z = $z+1;
+                        }
+                    }
+
+                    $objPHPExcel->setActiveSheetIndex(0);
+                    $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(50);
+                    $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(30);
+                    $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(30);
+                    $objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth(30);
+                    $objPHPExcel->getActiveSheet()->getColumnDimension('F')->setWidth(50); 
+                    for($j=2;$j<=100;$j++)
+                    {
+                        $objValidation = $objPHPExcel->getActiveSheet()->getCell('B'.$j)->getDataValidation();
+                        $this->common_excel($objValidation);
+                        $objValidation->setFormula1('\'Sheet2\'!$N$2:$N$'.($row1-1));
+
+                        $objValidation = $objPHPExcel->getActiveSheet()->getCell('C'.$j)->getDataValidation();
+                        $this->common_excel($objValidation);
+                        $objValidation->setFormula1('\'Sheet2\'!$O$2:O$'.($z-1));
+
+                       $objValidation = $objPHPExcel->getActiveSheet()->getCell('D'.$j)->getDataValidation();
+                       $this->common_excel($objValidation);
+                       $objValidation->setFormula1('OFFSET(Sheet2!$B$1, MATCH(C'.$j.',Sheet2!B:B, 0)-1, 1, COUNTIF(Sheet2!B:B, C'.$j.'))');
+                      
+                      $objValidation = $objPHPExcel->getActiveSheet()->getCell('E'.$j)->getDataValidation();
+                       $this->common_excel($objValidation);
+                       $objValidation->setFormula1('OFFSET(Sheet2!$I$1, MATCH(CONCATENATE(C'.$j.',D'.$j.'),Sheet2!I:I, 0)-1, 1, COUNTIF(Sheet2!I:I, CONCATENATE(C'.$j.',D'.$j.')))');
+
+                        $objValidation = $objPHPExcel->getActiveSheet()->getCell('F'.$j)->getDataValidation();
+                        $this->common_excel($objValidation);
+                        $objValidation->setFormula1('\'Sheet2\'!$L$2:$L$'.($pr-1));
+                    }
+
+                    $objPHPExcel->getSheetByName('Sheet2')->setSheetState(PHPExcel_Worksheet::SHEETSTATE_HIDDEN);
+                    $filename='superstockis_upload(3).xlsx';
+                    header('Content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                    header('Content-Disposition: attachment;filename="'.$filename.'"');
+                    header('Cache-Control: max-age=0');
+                    $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+                    $objWriter->save('php://output');
+                }
+                else
+                {
+                    $this->session->set_flashdata('error', 'Result Not Found');
+                    redirect(base_url().'index.php/Distributor_sale');
+                }  
             }
+            else
+            {
+                $this->session->set_flashdata('error', 'Please Select Distributor and Zone Properly');
+                redirect(base_url().'index.php/Distributor_sale');
+            }
+
             
-            $ln = 1;
-            $sqllocation = "Select  D.location from 
-                        (select * from store_master) A 
-                        left join 
-                        (select * from location_master) D 
-                        on (A.location_id=D.id) GROUP BY  D.location ";
 
-            $location_result  = $this->db->query($sqllocation)->result();             
-             foreach($location_result  as $dist)
-            {
-                $objPHPExcel->getActiveSheet()->setCellValue('D'.$ln,$dist->location);
-                $ln = $ln+1;
-            }
-
-            $pr = 1;
-            $sqlprodmaster = "Select product_name from product_master 
-                              union Select box_name from box_master";
-            $prodmaster_result  = $this->db->query($sqlprodmaster)->result();       
-            foreach($prodmaster_result  as $dist)
-            {
-                $objPHPExcel->getActiveSheet()->setCellValue('E'.$pr,$dist->product_name);
-                $pr = $pr+1;
-            }
-            $objPHPExcel->setActiveSheetIndex(0);
-            $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(50);
-            $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(30);
-            $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(30);
-            $objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth(30);
-            $objPHPExcel->getActiveSheet()->getColumnDimension('F')->setWidth(50);
-
-            for($j=2;$j<=100;$j++)
-            {
-                $objValidation = $objPHPExcel->getActiveSheet()->getCell('B'.$j)->getDataValidation();
-                $this->common_excel($objValidation);
-                $objValidation->setFormula1('\'Sheet2\'!$A$1:$A$'.($row-1));
-
-                $objValidation = $objPHPExcel->getActiveSheet()->getCell('C'.$j)->getDataValidation();
-                $this->common_excel($objValidation);
-                $objValidation->setFormula1('\'Sheet2\'!$B$1:$B$'.($zn-1));
-
-                $objValidation = $objPHPExcel->getActiveSheet()->getCell('D'.$j)->getDataValidation();
-                $this->common_excel($objValidation);
-                $objValidation->setFormula1('\'Sheet2\'!$C$1:$C$'.($rn-1));
-
-                $objValidation = $objPHPExcel->getActiveSheet()->getCell('E'.$j)->getDataValidation();
-                $this->common_excel($objValidation);
-                $objValidation->setFormula1('\'Sheet2\'!$D$1:$D$'.($ln-1));
-
-                $objValidation = $objPHPExcel->getActiveSheet()->getCell('F'.$j)->getDataValidation();
-                $this->common_excel($objValidation);
-                $objValidation->setFormula1('\'Sheet2\'!$E$1:$E$'.($pr-1));
-            }
-
-            /*$objValidation = $objPHPExcel->getActiveSheet()->getCell('B2')->getDataValidation();
-            $this->common_excel($objValidation);
-            $objValidation->setFormula1('\'Sheet2\'!$A$1:$A$'.$row);
-
-            $objValidation = $objPHPExcel->getActiveSheet()->getCell('C2')->getDataValidation();
-            $this->common_excel($objValidation);
-            $objValidation->setFormula1('\'Sheet2\'!$B$1:$B$'.$zn);
-
-            $objValidation = $objPHPExcel->getActiveSheet()->getCell('D2')->getDataValidation();
-            $this->common_excel($objValidation);
-            $objValidation->setFormula1('\'Sheet2\'!$C$1:$C$'.$rn);
-
-            $objValidation = $objPHPExcel->getActiveSheet()->getCell('E2')->getDataValidation();
-            $this->common_excel($objValidation);
-            $objValidation->setFormula1('\'Sheet2\'!$D$1:$D$'.$ln);
-
-            $objValidation = $objPHPExcel->getActiveSheet()->getCell('F2')->getDataValidation();
-            $this->common_excel($objValidation);
-            $objValidation->setFormula1('\'Sheet2\'!$E$1:$E$'.$ln);*/
-
-           /*for ($col = 0; $col <= PHPExcel_Cell::columnIndexFromString($objPHPExcel->getActiveSheet()->getHighestDataColumn()); $col++) {
-                $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn($col)->setAutoSize(true);
-            }*/
-
-            $objPHPExcel->getSheetByName('Sheet2')->setSheetState(PHPExcel_Worksheet::SHEETSTATE_HIDDEN);
-            $filename='superstockis_upload.xlsx';
-            header('Content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-            header('Content-Disposition: attachment;filename="'.$filename.'"');
-            header('Cache-Control: max-age=0');
-            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
-            $objWriter->save('php://output');
+            
     }
+
+
+    public function download_csv_ex()
+    {           
+        $template_path=$this->config->item('template_path');
+        $file = $template_path.'superstockis_upload_new.xlsx';
+        $this->load->library('excel');
+
+        $objPHPExcel = PHPExcel_IOFactory::load($file);
+        $objPHPExcel->setActiveSheetIndex(1);
+       
+        $filename='superstockis_upload_new_time.xlsx';
+        header('Content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="'.$filename.'"');
+        header('Cache-Control: max-age=0');
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $objWriter->save('php://output');
+            
+    }
+
 
     public function upload_file()
     {
@@ -711,7 +848,7 @@ class Distributor_sale extends CI_Controller{
             if($result[0]->r_view == 1 || $result[0]->r_edit == 1) {
                 $data['access'] = $this->distributor_sale_model->get_access();
                 $data['data'] = $this->distributor_sale_model->get_data('', $id);
-				$data['distributor'] = $this->distributor_model->get_data('Approved', '', 'Super Stockist');
+				$data['distributor'] = $this->distributor_model->get_data('Approved', '', 'super stockist');
                 $data['box'] = $this->box_model->get_data('Approved');
                 $data['bar'] = $this->product_model->get_data('Approved');
                 $data['distributor_sale_items'] = $this->distributor_sale_model->get_distributor_sale_items($id);

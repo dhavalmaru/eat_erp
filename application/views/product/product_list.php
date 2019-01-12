@@ -55,34 +55,37 @@
 									<thead>
 										<tr>
 										   <th width="60" style="text-align:center;" >Sr. No.</th>
+											<th width="65 " style="text-align:center;">Edit</th>
 											<th width=" ">Product Name</th>
 											<th width=" ">Short Name</th>
-											<th width="130px ">Disclosed Grams</th>
-											<th width="140px; ">Avg Grams In Bar</th>
-											<th width="90px; ">Rate (In Rs)</th>
-											<th width="90px; ">Cost (In Rs)</th>
-											<th width=" 195px;">Anticipated Wastage (In %)</th>
+											<th width="60px ">Disclosed Grams</th>
+											<th width="60px; ">Avg Grams In Bar</th>
+											<th width="60px; ">Rate (In Rs)</th>
+											<th width="60px; ">Cost (In Rs)</th>
+											<th width="60px;">Anticipated Wastage (In %)</th>
 											<!-- <th width="50">Rate Of Box</th> -->
-											<th width="110px; ">Creation Date</th>
+											<!--<th>Creation Date</th-->
 										</tr>
 									</thead>
 									<tbody>
 										<?php for ($i=0; $i < count($data); $i++) { ?>
 										<tr>
 											<td style="text-align:center;"><?php echo $i+1; ?></td>
-											<td><a href="<?php echo base_url().'index.php/product/edit/'.$data[$i]->id; ?>"><?php echo $data[$i]->product_name; ?></a></td>
-											<td><?php echo $data[$i]->grams; ?></td>
+											<td style="text-align:center; vertical-align: middle; "><a href="<?php echo base_url().'index.php/product/edit/'.$data[$i]->id; ?>"><i class="fa fa-edit"></i></a></td>
+											<td><?php echo $data[$i]->product_name; ?></td>
 											<td><?php echo $data[$i]->short_name; ?></td>
+											<td><?php echo $data[$i]->grams; ?></td>
+									
 											<td><?php echo $data[$i]->avg_grams; ?></td>
 											<td><?php echo $data[$i]->rate; ?></td>
 											<td><?php echo $data[$i]->cost; ?></td>
 											<td><?php echo $data[$i]->anticipated_wastage; ?></td>
 											<!-- <td><?php //echo $data[$i]->rate_of_box; ?></td> -->
-											<td>
+											<!-- <td>
 												<span style="display:none;">
-                                                    <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
+                                                    <?php// echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
                                                 </span>
-												<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
+												<?php //echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>-->
 										</tr>
 										<?php } ?>
 									</tbody>

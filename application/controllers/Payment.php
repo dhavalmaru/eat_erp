@@ -39,6 +39,7 @@ class Payment extends CI_Controller{
         $result=$this->payment_model->get_access();
         if(count($result)>0) {
             $data['access']=$result;
+            $data['status']=$status;
             $data['data']=$this->payment_model->get_data($status);
 
             $count_data=$this->payment_model->get_data();
@@ -175,7 +176,8 @@ class Payment extends CI_Controller{
 
     public function update($id){
         $this->payment_model->save_data($id);
-        redirect(base_url().'index.php/payment');
+        // redirect(base_url().'index.php/payment');
+		  echo '<script>window.open("'.base_url().'index.php/payment", "_parent")</script>';
     }
 
     public function view_payment_slip($id){

@@ -60,6 +60,7 @@
 									<thead>
 										<tr>
 											<th width="65" style="text-align:center;" >Sr. No.</th>
+											<th width="65" style="text-align:center;" >Edit</th>
 											<th >City </th>
 											<th> State</th>
 											
@@ -71,12 +72,13 @@
 										 for($i=0; $i < count($city_details); $i++) { ?>
 										<tr id="trow_<?php echo $i;?>">
 											<td style="text-align:center;"><?php if(isset($city_details)){ echo ($i+1) ;} else {echo '1';} ?></td>
+											<td style="text-align:center; vertical-align: middle; "><a href="<?php echo base_url().'index.php/city_master/city_view/'.$city_details[$i]->city_id; ?>"><i class="fa fa-edit"></i></a></td>
 											
-												<td>
-														<a href="<?php echo base_url().'index.php/city_master/city_view/'.$city_details[$i]->city_id; ?>"><?php echo $city_details[$i]->city_name; ?></a>
+											<td>
+													<?php echo $city_details[$i]->city_name; ?>
 													
-												</td>
-												<td><?php echo $city_details[$i]->state_name;?></td>
+											</td>
+											<td><?php echo $city_details[$i]->state_name;?></td>
 												
 												
 										</tr>

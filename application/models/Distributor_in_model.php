@@ -17,9 +17,9 @@ function get_access(){
 function get_data($status='', $id=''){
     if($status!=""){
         if($status=="Pending"){
-            $cond=" where status='Pending' or status='Deleted'";
+            $cond=" where A.status='Pending' or A.status='Deleted'";
         } else{
-            $cond=" where status='".$status."'";
+            $cond=" where A.status='".$status."'";
         }
     } else {
         $cond="";
@@ -27,9 +27,9 @@ function get_data($status='', $id=''){
 
     if($id!=""){
         if($cond=="") {
-            $cond=" where id='".$id."'";
+            $cond=" where A.id='".$id."'";
         } else {
-            $cond=$cond." and id='".$id."'";
+            $cond=$cond." and A.id='".$id."'";
         }
     }
 
@@ -37,7 +37,13 @@ function get_data($status='', $id=''){
             (select E.*, F.sales_rep_name from 
             (select C.*, D.depot_name, D.state as depot_state from 
             (select A.*, B.distributor_name, B.sell_out from 
-            (select * from distributor_in".$cond.") A 
+            (select A.*, concat(B.first_name, ' ', B.last_name) as createdby, 
+                concat(C.first_name, ' ', C.last_name) as modifiedby, 
+                concat(D.first_name, ' ', D.last_name) as approvedby 
+            from distributor_in A 
+            left join user_master B on(A.created_by=B.id) 
+            left join user_master C on(A.modified_by=C.id) 
+            left join user_master D on(A.approved_by=D.id) ".$cond.") A 
             left join 
             (select * from distributor_master) B 
             on (A.distributor_id=B.id)) C 
@@ -55,7 +61,7 @@ function get_data($status='', $id=''){
 }
 
 function get_pending_data($id=''){
-    $query=$this->db->query("SELECT * FROM distributor_in WHERE ref_id = '$id' and status!='InActive'");
+    $query=$this->db->query("SELECT * FROM distributor_in WHERE ref_id = '$id' and status!='InActive' AND status!='Rejected'");
     $result=$query->result();
     if (count($result)>0){
         $id = $result[0]->id;
@@ -85,31 +91,27 @@ function save_data($id=''){
     $exchanged_status="";
     if($checked=='1') {
         $checked_status="yes";
-    }
-    else {
+    } else {
         $checked_status="no";   
     }
 
     if($exchanged=="1") {
         $exchanged_status="yes";
-    }
-    else {
+    } else {
         $exchanged_status="no";
     }
 
     $date_of_processing=$this->input->post('date_of_processing');
     if($date_of_processing==''){
         $date_of_processing=NULL;
-    }
-    else{
+    } else {
         $date_of_processing=formatdate($date_of_processing);
     }
 
     $due_date=$this->input->post('due_date');
     if($due_date==''){
         $due_date=NULL;
-    }
-    else{
+    } else {
         $due_date=formatdate($due_date);
     }
     
@@ -204,7 +206,30 @@ function save_data($id=''){
                 }
                 
                 if($ref_id!=null && $ref_id!=''){
-                    $sql = "Update distributor_in A, distributor_in B 
+
+                    $modified_approved_date = NULL;
+                    $get_modified_approved_date_result = $this->db->select('modified_approved_date')->where('id',$id)->get('distributor_in')->result();
+
+                    if(count($get_modified_approved_date_result)>0)
+                    {
+                       $modified_approved_date = $get_modified_approved_date_result[0]->modified_approved_date;
+                        
+                        if($modified_approved_date!=null && $modified_approved_date!="")
+                        {
+                            $modified_approved_date = date("Y-m-d");
+                        }else
+                        {
+                            $modified_approved_date = NULL;
+                        }
+                    }
+                    else
+                    {
+                       $modified_approved_date = NULL;
+                    }
+
+                    if($modified_approved_date!=null && $modified_approved_date!=null)
+                    {
+                        $sql = "Update distributor_in A, distributor_in B 
                             Set A.date_of_processing=B.date_of_processing, A.depot_id=B.depot_id, A.distributor_id=B.distributor_id,
                                 A.sales_rep_id=B.sales_rep_id, A.amount=B.amount, A.tax=B.tax, A.cst=B.cst, 
                                 A.tax_amount=B.tax_amount, A.final_amount=B.final_amount, A.due_date=B.due_date, 
@@ -213,8 +238,28 @@ function save_data($id=''){
                                 A.modified_by=B.modified_by, A.modified_on=B.modified_on, 
                                 A.approved_by='$curusr', A.approved_on='$now', A.sales_return_no = '$sales_return_no', 
                                 A.cgst = B.cgst, A.sgst = B.sgst, A.igst = B.igst, A.cgst_amount = B.cgst_amount, 
-                                A.sgst_amount = B.sgst_amount, A.igst_amount = B.igst_amount 
+                                A.sgst_amount = B.sgst_amount, A.igst_amount = B.igst_amount,A.round_off_amount=B.round_off_amount,A.freezed=B.freezed ,
+                                A.sales_type=B.sales_type,
+                                A.invoice_nos=B.invoice_nos,A.modified_approved_date='$modified_approved_date'
                             WHERE A.id = '$ref_id' and B.id = '$id'";
+                    }
+                    else
+                    {
+                        $sql = "Update distributor_in A, distributor_in B 
+                            Set A.date_of_processing=B.date_of_processing, A.depot_id=B.depot_id, A.distributor_id=B.distributor_id,
+                                A.sales_rep_id=B.sales_rep_id, A.amount=B.amount, A.tax=B.tax, A.cst=B.cst, 
+                                A.tax_amount=B.tax_amount, A.final_amount=B.final_amount, A.due_date=B.due_date, 
+                                A.is_expired=B.is_expired, A.final_cost_amount=B.final_cost_amount, 
+                                A.status='$status', A.remarks='$remarks', 
+                                A.modified_by=B.modified_by, A.modified_on=B.modified_on, 
+                                A.approved_by='$curusr', A.approved_on='$now', A.sales_return_no = '$sales_return_no', 
+                                A.cgst = B.cgst, A.sgst = B.sgst, A.igst = B.igst, A.cgst_amount = B.cgst_amount, 
+                                A.sgst_amount = B.sgst_amount, A.igst_amount = B.igst_amount,A.round_off_amount=B.round_off_amount,A.freezed=B.freezed,
+                                A.sales_type=B.sales_type,A.invoice_nos=B.invoice_nos,A.modified_approved_date=NULL
+                            WHERE A.id = '$ref_id' and B.id = '$id'";
+                    }
+
+                    
                     $this->db->query($sql);
 
                     $sql = "Delete from distributor_in where id = '$id'";
@@ -266,7 +311,19 @@ function save_data($id=''){
 
                 $this->set_ledger($id);
                 
+                $sql = "select * from distributor_out where distributor_in_id = '$id' and distributor_id != '189'";
+                $query=$this->db->query($sql);
+                $result=$query->result();
+                if(count($result)>0){
+                    $distributor_out_id = $result[0]->id;
+                    $this->set_ledger_sales($distributor_out_id);
+                }
+				  echo '<script>var win=window.open("'.base_url().'index.php/distributor_in/view_sales_return_receipt/'.$id.'");
+                    win.print();
+                    </script>'; 
+				sleep(2);
                 $action='Distributor In Entry '.$status.'.';
+				
             }
         }
         
@@ -317,8 +374,19 @@ function save_data($id=''){
                     'igst' => format_number($this->input->post('igst'),2),
                     'cgst_amount' => format_number($this->input->post('cgst_amount'),2),
                     'sgst_amount' => format_number($this->input->post('sgst_amount'),2),
-                    'igst_amount' => format_number($this->input->post('igst_amount'),2)
+                    'igst_amount' => format_number($this->input->post('igst_amount'),2),
+                    'round_off_amount' => format_number($this->input->post('round_off_amount'),2),
+                    'sales_type'=>$this->input->post('sales_type'),
+                    'invoice_nos'=>$this->input->post('invoice_no')
                 );
+
+        $date_p=strtotime($date_of_processing);
+        $current_d=strtotime($now);
+
+        if($ref_id!=null && $ref_id!="")
+        {
+            $data['modified_approved_date']=$now;
+        }
 
         if($id==''){
             $data['created_by']=$curusr;
@@ -341,6 +409,8 @@ function save_data($id=''){
         $box=$this->input->post('box[]');
         $qty=$this->input->post('qty[]');
         $sell_rate=$this->input->post('sell_rate[]');
+        $sell_margin=$this->input->post('sell_margin[]');
+        $tax_per=$this->input->post('tax_per[]');
         $grams=$this->input->post('grams[]');
         $rate=$this->input->post('rate[]');
         $amount=$this->input->post('amount[]');
@@ -376,13 +446,13 @@ function save_data($id=''){
                             'igst_amt' => format_number($igst_amt[$k],2),
                             'tax_amt' => format_number($tax_amt[$k],2),
                             'total_amt' => format_number($total_amt[$k],2),
-                            'batch_no' => $batch_no[$k]
+                            'batch_no' => $batch_no[$k],
+                            'margin_per' => $sell_margin[$k],
+                            'tax_percentage' => $tax_per[$k]
                         );
                 $this->db->insert('distributor_in_items', $data);
             }
         }
-
-
 
 
         if($checked=="1") {
@@ -456,8 +526,6 @@ function save_data($id=''){
         }
 
 
-
-
         if($exchanged=="1") {
             // $data = array(
             //             'date_of_processing' => $date_of_processing,
@@ -498,6 +566,8 @@ function save_data($id=''){
             $box=$this->input->post('box_ex[]');
             $qty=$this->input->post('qty_ex[]');
             $sell_rate=$this->input->post('sell_rate_ex[]');
+            $sell_margin=$this->input->post('sell_margin_ex[]');
+            $tax_per=$this->input->post('tax_per_ex[]');
             $grams=$this->input->post('grams_ex[]');
             $rate=$this->input->post('rate_ex[]');
             $amount=$this->input->post('amount_ex[]');
@@ -507,7 +577,8 @@ function save_data($id=''){
             $sgst_amt_ex=$this->input->post('sgst_amt_ex[]');
             $igst_amt_ex=$this->input->post('igst_amt_ex[]');
             $tax_amt_ex=$this->input->post('tax_amt_ex[]');
-
+            $batch_no_ex=$this->input->post('batch_no_ex[]');
+            
             for ($k=0; $k<count($type); $k++) {
                 if(isset($type[$k]) and $type[$k]!="") {
                     if($type[$k]=="Bar"){
@@ -529,9 +600,13 @@ function save_data($id=''){
                                 'cgst_amount' => format_number($cgst_amt_ex[$k],2),
                                 'sgst_amount' => format_number($sgst_amt_ex[$k],2),
                                 'igst_amount' => format_number($igst_amt_ex[$k],2),
-                                'tax_amount' => format_number($tax_amt_ex[$k],2)
+                                'tax_amount' => format_number($tax_amt_ex[$k],2),
+                                'margin_per' => $sell_margin[$k],
+                                'tax_percentage' => $tax_per[$k],
+                                'batch_no_ex' => $batch_no_ex[$k]
                             );
                     $this->db->insert('distributor_out_exchange_items', $data);
+                    /*echo $this->db->last_query().'<br>';*/
                 }
             }
 
@@ -740,6 +815,125 @@ function set_ledger($id) {
     }
 }
 
+function set_ledger_sales($id) {
+    $now=date('Y-m-d H:i:s');
+    $curusr=$this->session->userdata('session_id');
+
+    $sql = "select A.*, B.id as acc_id, B.ledger_name from distributor_out A left join account_ledger_master B 
+                on (A.distributor_id = B.ref_id and B.ref_type = 'Distributor') 
+            where A.id = '$id' and B.status = 'Approved'";
+    $query=$this->db->query($sql);
+    $result=$query->result();
+    if(count($result)>0){
+        if(isset($result[0]->invoice_date) && $result[0]->invoice_date!=''){
+            $ref_date = $result[0]->invoice_date;
+        } else {
+            $ref_date = $result[0]->date_of_processing;
+        }
+        
+        $data = array(
+                    'ref_id' => $id,
+                    'ref_type' => 'Distributor_Sales',
+                    'entry_type' => 'Total Amount',
+                    'invoice_no' => $result[0]->invoice_no,
+                    'vendor_id' => $result[0]->distributor_id,
+                    'acc_id' => $result[0]->acc_id,
+                    'ledger_name' => $result[0]->ledger_name,
+                    'type' => 'Debit',
+                    'amount' => $result[0]->final_amount,
+                    'status' => $result[0]->status,
+                    'is_active' => '1',
+                    'ledger_type' => 'Main Entry',
+                    'narration' => $result[0]->remarks,
+                    'ref_date' => $ref_date,
+                    'modified_by' => $curusr,
+                    'modified_on' => $now
+                );
+
+        $ledger_array[0] = $data;
+        $ledger_array[1] = $data;
+        $ledger_array[2] = $data;
+
+        // echo json_encode($ledger_array);
+        // echo '<br/>';
+
+        $ledger_array[1]['entry_type'] = 'Taxable Amount';
+        $ledger_array[1]['acc_id'] = '1';
+        $ledger_array[1]['ledger_name'] = 'Sales';
+        $ledger_array[1]['type'] = 'Credit';
+        $ledger_array[1]['amount'] = $result[0]->amount;
+        $ledger_array[1]['ledger_type'] = 'Sub Entry';
+
+        $ledger_array[2]['entry_type'] = 'Tax';
+        $ledger_array[2]['acc_id'] = '2';
+        $ledger_array[2]['ledger_name'] = 'GST';
+        $ledger_array[2]['type'] = 'Credit';
+        $ledger_array[2]['amount'] = $result[0]->tax_amount;
+        $ledger_array[2]['ledger_type'] = 'Sub Entry';
+
+        // echo json_encode($ledger_array);
+        // echo '<br/>';
+
+
+        $sql = "select * from account_ledger_entries where ref_id = '$id' and 
+                ref_type = 'Distributor_Sales'";
+        $query=$this->db->query($sql);
+        $data =  $query->result();
+        if (count($data)>0){
+            $this->db->where('ref_id', $id);
+            $this->db->where('ref_type', 'Distributor_Sales');
+            $this->db->where('entry_type', 'Total Amount');
+            $this->db->update('account_ledger_entries', $ledger_array[0]);
+
+            $this->db->where('ref_id', $id);
+            $this->db->where('ref_type', 'Distributor_Sales');
+            $this->db->where('entry_type', 'Taxable Amount');
+            $this->db->update('account_ledger_entries', $ledger_array[1]);
+
+            $this->db->where('ref_id', $id);
+            $this->db->where('ref_type', 'Distributor_Sales');
+            $this->db->where('entry_type', 'Tax');
+            $this->db->update('account_ledger_entries', $ledger_array[2]);
+        } else {
+            $series = 1;
+            $sql = "select * from series_master where type = 'Account_Voucher'";
+            $query=$this->db->query($sql);
+            $data =  $query->result();
+            if (count($data)>0){
+                $series = intval($data[0]->series) + 1;
+
+                $sql = "update series_master set series = '$series' where type = 'Account_Voucher'";
+                $this->db->query($sql);
+            } else {
+                $series = 1;
+
+                $sql = "insert into series_master (type, series) values ('Account_Voucher', '".$series."')";
+                $this->db->query($sql);
+            }
+
+            $voucher_id = $series;
+
+            $ledger_array[0]['voucher_id'] = $voucher_id;
+            $ledger_array[0]['created_by']=$curusr;
+            $ledger_array[0]['created_on']=$now;
+
+            $ledger_array[1]['voucher_id'] = $voucher_id;
+            $ledger_array[1]['created_by']=$curusr;
+            $ledger_array[1]['created_on']=$now;
+
+            $ledger_array[2]['voucher_id'] = $voucher_id;
+            $ledger_array[2]['created_by']=$curusr;
+            $ledger_array[2]['created_on']=$now;
+
+            $this->db->insert('account_ledger_entries', $ledger_array[0]);
+            $this->db->insert('account_ledger_entries', $ledger_array[1]);
+            $this->db->insert('account_ledger_entries', $ledger_array[2]);
+        }
+
+        // echo json_encode($ledger_array);
+    }
+}
+
 function check_product_availablity(){
     $id=$this->input->post('id');
     $depot_id=$this->input->post('depot_id');
@@ -887,6 +1081,36 @@ function get_distributor_out_items_for_exchange($id){
             on (C.box_id=B.id)) C";
     $query=$this->db->query($sql);
     return $query->result();
+}
+
+
+public function get_product_percentage($product_id,$distributor_id)
+{
+    $sql = "SELECT B.margin,A.category_id,A.tax_percentage from
+            (Select category_id,tax_percentage from product_master Where id=$product_id ) A
+            Left JOIN
+            (SELECT * from distributor_category_margin ) B
+            on A.category_id=B.category_id
+            Where B.distributor_id=$distributor_id";
+    $result = $this->db->query($sql)->result();
+
+    return $result;
+
+}
+
+
+public function get_box_percentage($product_id,$distributor_id)
+{
+    $sql = "SELECT B.margin,A.category_id,A.tax_percentage from
+            (Select category_id,tax_percentage from box_master Where id=$product_id ) A
+            Left JOIN
+            (SELECT * from distributor_category_margin ) B
+            on A.category_id=B.category_id
+            Where B.distributor_id=$distributor_id";
+    $result = $this->db->query($sql)->result();
+
+    return $result;
+
 }
 }
 ?>

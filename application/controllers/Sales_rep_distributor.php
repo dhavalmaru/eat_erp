@@ -85,7 +85,7 @@ class Sales_rep_distributor extends CI_Controller{
             $id = 's_'.$id;
         } else {
             $distributor_id = substr($id, 2);
-            $id = $this->sales_rep_distributor_model->save_data($distributor_id);
+            $this->sales_rep_distributor_model->save_data($distributor_id);
         }
 
         if($this->input->post('place_order')=="Yes") {

@@ -14,18 +14,25 @@
         <link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>css/theme-blue.css"/>
         <link href="<?php echo base_url() . 'js/jquery-ui-1.11.2/jquery-ui.min.css'; ?>" rel="stylesheet" type="text/css" />
 		<link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>css/user-details.css"/>
-        <!-- EOF CSS INCLUDE -->      
+        <!-- EOF CSS INCLUDE --> 
+        <style type="text/css">
+        input[readonly], input[disabled], select[disabled], textarea[disabled] {
+                background-color:transparent!important;
+                color: #0b385f !important; 
+                cursor: not-allowed !important;
+            }
+            
+        </style>     
     </head>
     <body>								
         <!-- START PAGE CONTAINER -->
          <div class="page-container page-navigation-top">            
             <!-- PAGE CONTENT -->
-			   <?php $this->load->view('templates/menus');?>
-              <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
-                   <div class="heading-h2"><a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp; <a href="<?php echo base_url().'index.php/distributor'; ?>" > Distributor List </a>  &nbsp; &#10095; &nbsp; Distributor Details</div>
+                <?php $this->load->view('templates/menus');?>
+                <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
+                    <div class="heading-h2"><a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp; <a href="<?php echo base_url().'index.php/distributor'; ?>" > Distributor List </a>  &nbsp; &#10095; &nbsp; Distributor Details</div>
                 
-                <!-- PAGE CONTENT WRAPPER -->
-                  <div class="page-content-wrap">
+                    <div class="page-content-wrap">
                     <div class="row main-wrapper">
 					    <div class="main-container">           
                          <div class="box-shadow">							
@@ -34,15 +41,20 @@
                                 <div class="col-md-12 custom-padding" style="padding:0;" >
                                  <div class="panel panel-default">
 							     	<div class="panel-body">
-									<div class="form-group"  >
+									<div class="form-group">
 										<div class="col-md-12 col-sm-12 col-xs-12">
 											<label class="col-md-2 col-sm-2 col-xs-12 control-label">Distributor Name <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="hidden" class="form-control" name="d_id" id="d_id" value="<?php if(isset($data)) echo $data[0]->d_id;?>"/>
+                                                <input type="hidden" class="form-control" name="master_distributor_id" id="master_distributor_id" value="<?php if(isset($data)) echo $data[0]->master_distributor_id;?>"/>
                                                 <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) {if(strrpos($data[0]->d_id, "d_") !== false) echo $data[0]->id;}?>"/>
                                                 <input type="text" class="form-control" name="distributor_name" id="distributor_name" placeholder="Distributor Name" value="<?php if(isset($data)) echo $data[0]->distributor_name;?>"/>
                                             </div>
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Address</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+										<div class="col-md-12 col-sm-12 col-xs-12">
+											<label class="col-md-2 col-sm-2 col-xs-12 control-label">Address</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="address" id="address" placeholder="Address" value="<?php if(isset($data)) echo $data[0]->address;?>"/>
                                             </div>
@@ -55,6 +67,10 @@
                                                 <input type="hidden" name="city_id" id="city_id" />
                                                 <input type="text" class="form-control autocompleteCity" name="city" id ="city" placeholder="City" value="<?php if(isset($data)) { echo  $data[0]->city; } ?>"/>
                                             </div>
+                                        </div>
+									</div>
+									<div class="form-group">
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Pincode</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="pincode" placeholder="Pincode" value="<?php if (isset($data)) { echo $data[0]->pincode; } ?>"/>
@@ -68,6 +84,10 @@
                                                 <input type="hidden" name="state_id" id="state_id" />
                                                 <input type="text" class="form-control loadstatedropdown" name="state" id="state" placeholder="State" value="<?php if(isset($data)) { echo  $data[0]->state; } ?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group">
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Country</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="hidden" name="country_id" id="country_id">
@@ -81,6 +101,10 @@
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="state_code" id="state_code" placeholder="State Code" value="<?php if(isset($data)) { echo  $data[0]->state_code; } ?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group">
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">GST Number</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="gst_number" id="gst_number" placeholder="Gst Number" value="<?php if(isset($data)) { echo  $data[0]->gst_number; } ?>"/>
@@ -101,6 +125,10 @@
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control latitude" id="latitude" name="d_latitude" placeholder="Latitude" value="<?php if (isset($data)) { echo $data[0]->latitude; } ?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group">
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Longitude</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control longitude" id="longitude" name="d_longitude" placeholder="Longitude" value="<?php if (isset($data)) { echo $data[0]->longitude; } ?>"/>
@@ -113,6 +141,10 @@
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="d_email_id" placeholder="Email Id" value="<?php if (isset($data)) { echo $data[0]->email_id; } ?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group">
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Mobile <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="d_mobile" placeholder="Mobile" value="<?php if (isset($data)) { echo $data[0]->mobile; } ?>"/>
@@ -123,27 +155,27 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Tin Number </label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-
                                                 <input type="text" class="form-control" name="tin_number" placeholder="Tin Number" value="<?php if (isset($data)) { echo $data[0]->tin_number; } ?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group">
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Cst Number </label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
- 
                                                 <input type="text" class="form-control" name="cst_number" placeholder="Cst Number" value="<?php if (isset($data)) { echo $data[0]->cst_number; } ?>"/>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                      
-                                           <label class="col-md-2 col-sm-2 col-xs-12 control-label">Margin On MRP (In %)<span class="asterisk_sign">*</span></label>
-                                           <div class="col-md-4 col-sm-4 col-xs-12">
- 
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Margin On MRP (In %)<span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="sell_out" placeholder="Margin On MRP" value="<?php if (isset($data)) { echo $data[0]->sell_out; } ?>"/>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="form-group">
-
                                         <div class="col-md-12">
                                             <!-- <label class="col-md-2 control-label">Contact Person <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4">
@@ -155,6 +187,10 @@
                                                 <input type="radio" name="send_invoice" class="icheckbox" value="0" id="send_invoice_no" data-error="#err_send_invoice" <?php if (isset($data)) { if($data[0]->send_invoice=='0') echo 'checked'; } ?>/>&nbsp;&nbsp;No
                                                 <div id="err_send_invoice"></div>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group">
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Credit Period (In Days) <span class="asterisk_sign">*</span></label>
                                              <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="credit_period" placeholder="Credit Period In Days" value="<?php if (isset($data)) { echo $data[0]->credit_period; } ?>"/>
@@ -167,9 +203,9 @@
                                             <div class="col-md-4">
                                                 <select class="form-control" name="class" id="classes">
                                                     <option value="">Select</option>
-                                                    <option value="Normal" <?php if(isset($data)) {if ($data[0]->class=='Normal') echo 'selected';}?>>Retailer</option>
-                                                    <option value="Super Stockist" <?php if(isset($data)) {if ($data[0]->class=='Super Stockist') echo 'selected';}?>>Distributor</option>
-                                                    <option value="Sample" <?php if(isset($data)) {if ($data[0]->class=='Sample') echo 'selected';}?>>Sample</option>
+                                                    <option value="normal" <?php if(isset($data)) {if ($data[0]->class=='normal') echo 'selected';}?>>Retailer</option>
+                                                    <option value="super stockist" <?php if(isset($data)) {if ($data[0]->class=='super stockist') echo 'selected';}?>>Distributor</option>
+                                                    <option value="sample" <?php if(isset($data)) {if ($data[0]->class=='sample') echo 'selected';}?>>Sample</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -179,7 +215,7 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Type <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12" >
-                                                <select name="type_id" id="type_id" class="form-control">
+                                                <select name="type_id" id="type_id" class="form-control select2">
                                                     <option value="">Select</option>
                                                     <?php if(isset($type)) { for ($k=0; $k < count($type) ; $k++) { ?>
                                                             <option value="<?php echo $type[$k]->id; ?>" <?php if (isset($data)) { if($type[$k]->id==$data[0]->type_id) { echo 'selected'; } } ?>><?php echo $type[$k]->distributor_type; ?></option>
@@ -192,7 +228,7 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Zone <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="zone_id" id="zone_id" class="form-control">
+                                                <select name="zone_id" id="zone_id" class="form-control select2">
                                                     <option value="">Select</option>
                                                     <?php if(isset($zone)) { for ($k=0; $k < count($zone) ; $k++) { ?>
                                                             <option value="<?php echo $zone[$k]->id; ?>" <?php if (isset($data)) { if($zone[$k]->id==$data[0]->zone_id) { echo 'selected'; } } ?>><?php echo $zone[$k]->zone; ?></option>
@@ -206,7 +242,7 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Area <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="area_id" id="area_id" class="form-control">
+                                                <select name="area_id" id="area_id" class="form-control select2">
                                                     <option value="">Select</option>
                                                     <?php if(isset($area)) { for ($k=0; $k < count($area) ; $k++) { ?>
                                                             <option value="<?php echo $area[$k]->id; ?>" <?php if (isset($data)) { if($area[$k]->id==$data[0]->area_id) { echo 'selected'; } } ?>><?php echo $area[$k]->area; ?></option>
@@ -219,13 +255,17 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Location <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="location_id"  id="location_id"class="form-control">
+                                                <select name="location_id"  id="location_id"class="form-control select2">
                                                     <option value="">Select</option>
                                                     <?php if(isset($location)) { for ($k=0; $k < count($location) ; $k++) { ?>
                                                             <option value="<?php echo $location[$k]->id; ?>" <?php if (isset($data)) { if($location[$k]->id==$data[0]->location_id) { echo 'selected'; } } ?>><?php echo $location[$k]->location; ?></option>
                                                     <?php }} ?>
                                                 </select>
                                             </div>
+                                        </div>
+                                    </div>
+									<div class="form-group">
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Document</label>
                                             <div class="col-md-2 col-sm-2 col-xs-12" >
                                                 <input type="hidden" class="form-control" name="doc_document" value="<?php if(isset($data)) echo $data[0]->doc_document; ?>" />
@@ -241,16 +281,57 @@
                                     </div>
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
-                                            
- 
                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Tally Name<span class="asterisk_sign"></span></label>
                                            <div class="col-md-4 col-sm-4 col-xs-12">
- 
                                                 <input type="text" class="form-control" name="tally_name" placeholder="Tally Name" value="<?php if (isset($data)) { echo $data[0]->tally_name; } ?>"/>
                                             </div>
                                         </div>
                                     </div>
-                                    
+
+                                    <br>
+                                    <div class="h-scroll">  
+                                    <div class="table-stripped form-group" style="padding:15px;" >
+                                      <table class="table table-bordered" style="margin-bottom: 0px; ">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 450px">Category<span class="asterisk_sign">*</span></th>
+                                                    <th style="width: 450px ">Margin On MRP (In %)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="category_details">
+                                                <?php
+
+                                                for ($i=0; $i <count($category_detail) ; $i++) {
+                                                   // $margin = '' ;
+                                                   // if(isset($margin_detail))
+                                                   // {
+                                                   //  if(count($margin_detail)>0)
+                                                   //  {
+
+                                                   //      if($category_detail[$i]->id==$margin_detail[$i]->category_id)
+                                                   //      {
+                                                   //          $margin = $margin_detail[$i]->margin;
+                                                   //      }
+                                                   //  }  
+                                                   // }
+                                                    
+                                                ?>
+                                                   <tr>
+                                                         <td>
+                                                            <input type="text" class="form-control margin" name="category[]" id="category_<?=$i?>" value="<?=$category_detail[$i]->category_name?>" readonly/>
+                                                            <input type="hidden" class="form-control margin" name="category_id[]" id="category_id_<?=$i?>" value="<?=$category_detail[$i]->id?>" />
+                                                        
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" class="form-control margin" name="margin[]" id="margin_<?=$i?>" placeholder="Margin On MRP"  value="<?php if(isset($category_detail[$i]->margin)) echo $category_detail[$i]->margin; ?>" onkeypress="return StopNonNumeric(this,event)"/>
+                                                        </td>
+                                                   </tr>
+                                                <?php }
+                                                ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    </div>
 
                            			<div class="h-scroll">	
                                     <div class="table-stripped form-group" style="padding:15px;" >
@@ -321,7 +402,7 @@
                                                 <th style="width: 300px ">Country </th>
                                                 <th style="width: 300px ">State Code </th>
                                                 <th style="width: 300px ">GST Number </th>
-                                                <th style="width: 75px; text-align:center;">Action</th>
+                                                <!-- <th style="width: 75px; text-align:center;">Action</th> -->
                                             </tr>
                                         </thead>
                                         <tbody id="consignee_details">
@@ -329,6 +410,9 @@
                                                 for($i=0; $i<count($distributor_consignee); $i++) { ?>
                                             <tr id="consignee_<?php echo $i; ?>_row">
                                                 <td>
+                                                    <input type="hidden" class="form-control con_name" name="con_id[]" placeholder="Consignee Name" 
+                                                    value="<?php if (isset($distributor_consignee)) { echo $distributor_consignee[$i]->id; } ?>"/>
+
                                                     <input type="text" class="form-control con_name" name="con_name[]" id="con_name_<?php echo $i; ?>" placeholder="Consignee Name" value="<?php if (isset($distributor_consignee)) { echo $distributor_consignee[$i]->con_name; } ?>"/>
                                                 </td>
                                                 <td>
@@ -355,9 +439,9 @@
                                                 <td>
                                                     <input type="text" class="form-control con_gst_number" name="con_gst_number[]" id="con_gst_number_<?php echo $i; ?>" placeholder="Consignee Gst Number" value="<?php if (isset($distributor_consignee)) { echo $distributor_consignee[$i]->con_gst_number; } ?>"/>
                                                 </td>
-                                                <td style="text-align:center; vertical-align: middle;">
+                                                <!-- <td style="text-align:center; vertical-align: middle;">
                                                     <a id="consignee_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o" ></span></a>
-                                                </td>
+                                                </td> -->
                                             </tr>
                                         <?php }} else { ?>
                                             <tr id="consignee_<?php echo $i; ?>_row">
@@ -631,10 +715,10 @@
                                             '<td>' + 
                                                 '<input type="text" class="form-control mobile" name="mobile[]" id="mobile_'+counter+'" placeholder="Mobile" value=""/>' + 
                                             '</td>' + 
-                                            '<td style="text-align:center;     vertical-align: middle;">' + 
-                                                '<a id="box_'+counter+'_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>' + 
-                                            '</td>' + 
                                         '</tr>');
+                     /*'<td style="text-align:center;     vertical-align: middle;">' + 
+                                                '<a id="box_'+counter+'_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>' + 
+                                            '</td>'*/
                     $('#box_details').append(newRow);
                     $('.delete_row').click(function(event){
                         delete_row($(this));

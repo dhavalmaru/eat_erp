@@ -144,9 +144,8 @@ class User_roles extends CI_Controller
         // $data['rep_grp_5']=0;
         // $data['rep_grp_6']=0;
 
-        //if (isset($data['rep_1_view'])) {if ($data['rep_1_view']==1) $data['rep_grp_1']=1;}
+        if (isset($data['rep_1_view'])) {if ($data['rep_1_view']==1) $data['rep_grp_1']=1;}
 		if (isset($data['rep_18_view'])) {if ($data['rep_18_view']==1) $data['rep_grp_1']=1;}
-		if (isset($data['rep_15_view'])) {if ($data['rep_15_view']==1) $data['rep_grp_1']=1;}
 		
 		if (isset($data['rep_5_view'])) {if ($data['rep_5_view']==1) $data['rep_grp_3']=1;}
         if (isset($data['rep_6_view'])) {if ($data['rep_6_view']==1) $data['rep_grp_3']=1;}

@@ -28,6 +28,11 @@
     .payment_details table td { padding:4px;}
     .payment_details table th { font-size:15px; background:#f1f1f1; padding:8px 5px;}
     .payment_details h1 { padding:3px; margin:0; font-size:20px; padding:10px; background:#f1f1f1; margin-bottom:5px}
+	.user_data td
+{
+	padding:5px!important;
+	
+}
 </style>
 </head>
 
@@ -85,7 +90,35 @@
                 </table>
             </div>
         </div>
+    <table class="user_data" border="0" width="100%" style="border-collapse:collapse;margin-top:30px " class="table" cellspacing="10">
+					<tr valign="center" >
+						   <td style="font-weight:bold">Created By:</td>
+						   <td><?php if(isset($data[0]->createdby)) echo $data[0]->createdby; ?></td>
+						   
+						    <td style="font-weight:bold">Created On:</td>
+						    <td><?php if(isset($data[0]->created_on)) echo $data[0]->created_on?></td>
+						  
+						  
+					</tr>
+					<tr valign="center" >
+					    <td style="font-weight:bold">Modified By:</td>
+						   <td><?php if(isset($data[0]->modifiedby)) echo $data[0]->modifiedby; ?></td>
+						   <td style="font-weight:bold">Modified On:</td>
+						     <td><?php if(isset($data[0]->modified_on)) echo $data[0]->modified_on?></td>
+						   
+					</tr>
+					
+					<tr valign="center" >
+					  <td style="font-weight:bold">Approved By:</td>
+						   <td><?php if(isset($data[0]->approvedby)) echo $data[0]->approvedby; ?></td>
+						   <td style="font-weight:bold">Approved On:</td>
+						     <td><?php if(isset($data[0]->approved_on))echo $data[0]->approved_on ?>
+							</td>
+					</tr>
+	</table>
+
     </div>
+	
     <?php } ?>
 </body>
 </html>

@@ -38,7 +38,7 @@ function get_data($status='', $id=''){
         }
     }
 
-    $sql = "select * from sales_rep_location".$cond." order by modified_on desc";
+    $sql = "select * , id as mid,distributor_id as store_id from sales_rep_location".$cond."  order by modified_on desc";
     $query=$this->db->query($sql);
     return $query->result();
 }
@@ -51,6 +51,7 @@ function get_data_qty($status='', $id=''){
 
 function save_data($id='',$status=''){
     $now=date('Y-m-d H:i:s');
+    $now1=date('Y-m-d');
     $curusr=$this->session->userdata('session_id');
     $sales_rep_id=$this->session->userdata('sales_rep_id');
     $date_of_visit=$this->input->post('date_of_visit');
@@ -68,7 +69,7 @@ function save_data($id='',$status=''){
 
     $data = array(
         'sales_rep_id' => $sales_rep_id,
-        'date_of_visit' => $date_of_visit,
+        'date_of_visit' => $now1,
         'distributor_type' => $this->input->post('distributor_type'),
         'distributor_id' => $this->input->post('distributor_id'),
         'distributor_name' => $this->input->post('distributor_name'),
@@ -91,9 +92,7 @@ function save_data($id='',$status=''){
         'butterscotch_bar' => (($this->input->post('butterscotch_bar')=='')?'0':$this->input->post('butterscotch_bar')),
         'chocopeanut_bar' => (($this->input->post('chocopeanut_bar')=='')?'0':$this->input->post('chocopeanut_bar')),
         'bambaiyachaat_bar' => (($this->input->post('bambaiyachaat_bar')=='')?'0':$this->input->post('bambaiyachaat_bar')),
-        'mangoginger_bar' => (($this->input->post('mangoginger_bar')=='')?'0':$this->input->post('mangoginger_bar')),
-        'berry_blast_bar' => (($this->input->post('berry_blast_bar')=='')?'0':$this->input->post('berry_blast_bar')),
-        'chyawanprash_bar' => (($this->input->post('chyawanprash_bar')=='')?'0':$this->input->post('chyawanprash_bar'))
+        'mangoginger_bar' => (($this->input->post('mangoginger_bar')=='')?'0':$this->input->post('mangoginger_bar'))
     );
 
     if($id==''){
@@ -198,15 +197,16 @@ function get_locations($zone_id='', $area_id=''){
 
 function get_distributors($zone_id='', $area_id=''){
     $cond = '';
-    if($zone_id!=''){
+    /*if($zone_id!=''){
         $cond = $cond . " and zone_id = '$zone_id'";
     }
     if($area_id!=''){
         $cond = $cond . " and area_id = '$area_id'";
-    }
+    }*/
 
+    //and class = 'super stockist'
     $sales_rep_id = $this->session->userdata('sales_rep_id');
-    $sql = "select * from distributor_master where status = 'approved' and class = 'super stockist'" . $cond;
+    $sql = "select * from distributor_master where status = 'approved' " . $cond;
     $query=$this->db->query($sql);
     return $query->result();
 }

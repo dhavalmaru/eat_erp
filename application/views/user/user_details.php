@@ -58,6 +58,10 @@
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="email_id" id="email_id" placeholder="Email ID" value="<?php if(isset($data)) echo $data[0]->email_id;?>"/>
                                             </div>
+                                        </div>
+									</div>
+									<div class="form-group">
+										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Mobile No <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="mobile" placeholder="Mobile No" value="<?php if(isset($data)) echo $data[0]->mobile;?>"/>
@@ -68,7 +72,7 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Role <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">                                                        
-                                                <select class="form-control" name="role_id" id="role_id">
+                                                <select class="form-control select2" name="role_id" id="role_id">
                                                     <option value="">Select</option>
                                                     <?php for ($i=0; $i < count($roles) ; $i++) { ?>
                                                         <option value="<?php echo $roles[$i]->id; ?>" <?php if(isset($data)){ if ($data[0]->role_id==$roles[$i]->id) echo 'selected'; } else { echo ''; }?>><?php echo $roles[$i]->role_name; ?></option>

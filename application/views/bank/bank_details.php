@@ -41,27 +41,35 @@
 							     	<div class="panel-body">
                                
 								 
-										  <div class="form-group"  >
+										<div class="form-group"  >
 											<div class="col-md-12 col-sm-12 col-xs-12">
 												<label class="col-md-2 col-sm-2 col-xs-12 control-label">Bank Name <span class="asterisk_sign">*</span></label>
 												 <div class="col-md-4 col-sm-4 col-xs-12">
 														<input type="text" class="form-control" id="bank_name" name="bank_name" placeholder="Bank Name" value="<?php if(isset($data)) {echo $data[0]->b_name; } ?>" />
 													</div>
+											</div>
+										</div>
+										<div class="form-group"  >
+											<div class="col-md-12 col-sm-12 col-xs-12">
 												      <label class="col-md-2 col-sm-2 col-xs-12 control-label">Reg Address</label>
 												     <div class="col-md-4 col-sm-4 col-xs-12">
 														<input type="text" class="form-control" name="registered_address" placeholder="Registered Address" value="<?php if(isset($data)) {echo $data[0]->registered_address; } ?>" />
 													</div>
-												</div>
 											</div>
+										</div>
 										
 									 
 										<div class="form-group"  >
 											<div class="col-md-12 col-sm-12 col-xs-12">
-											<label class="col-md-2 col-sm-2 col-xs-12 control-label">Reg Phone</label>
+												<label class="col-md-2 col-sm-2 col-xs-12 control-label">Reg Phone</label>
 											    <div class="col-md-4 col-sm-4 col-xs-12">
 														<input type="text" class="form-control" name="registered_phone" placeholder="Registered Phone" value="<?php if(isset($data)) {echo $data[0]->registered_phone; } ?>" />
 													</div>
-													 <label class="col-md-2 col-sm-2 col-xs-12 control-label">Reg Email</label>
+											</div>
+										</div>
+										<div class="form-group"  >
+											<div class="col-md-12 col-sm-12 col-xs-12">		
+											<label class="col-md-2 col-sm-2 col-xs-12 control-label">Reg Email</label>
 													   <div class="col-md-4 col-sm-4 col-xs-12">
 														<input type="text" class="form-control" name="registered_email" placeholder="Registered Email" value="<?php if(isset($data)) {echo $data[0]->registered_email; } ?>" />
 													</div>
@@ -107,15 +115,19 @@
 											<div class="form-group">
 												<div class="col-md-12 col-sm-12 col-xs-12">
 												 <label class="col-md-2 col-sm-2 col-xs-12 control-label">Bank Address <span class="asterisk_sign">*</span></label>
-												 <div class="col-md-4 col-sm-4 col-xs-12">  
+														<div class="col-md-4 col-sm-4 col-xs-12">  
 															<input type="text" class="form-control" name="bank_address" placeholder="Bank Address" value="<?php if(isset($data)) {echo $data[0]->b_address; } ?>" />
 														</div>										  
+												</div>										  
+											</div>	
+											<div class="form-group"  >
+												<div class="col-md-12 col-sm-12 col-xs-12">											
 													<label class="col-md-2 col-sm-2 col-xs-12 control-label">Bank Landmark</label>
 														<div class="col-md-4 col-sm-4 col-xs-12">     
 															<input type="text" class="form-control" name="bank_landmark" placeholder="Bank Landmark" value="<?php if(isset($data)) {echo $data[0]->b_landmark; } ?>" />
 														</div>
-													</div>
 												</div>
+											</div>
 											 
 
 											<div class="form-group">
@@ -125,14 +137,17 @@
 															<input type="hidden" name="bank_city_id" id="bank_add_city_id" />
                                                     		<input type="text" class="form-control autocompleteCity" name="bank_city" id ="bank_add_city" placeholder="Bank City" value="<?php if(isset($data)) { echo  $data[0]->b_city; } ?>"/>
 														</div>
-												 
+												</div>
+											</div>
+											<div class="form-group"  >
+												<div class="col-md-12 col-sm-12 col-xs-12">
 												
 													<label class="col-md-2 col-sm-2 col-xs-12 control-label">Bank Pincode</label>
 														<div class="col-md-4 col-sm-4 col-xs-12"> 
                                                     		<input type="text" class="form-control" name="bank_pincode" id ="bank_add_pincode" placeholder="Bank Pincode" value="<?php if(isset($data)) { echo  $data[0]->b_pincode; } ?>"/>
 														</div>
-													</div>
 												</div>
+											</div>
 										
 
 											<div class="form-group">
@@ -142,19 +157,22 @@
 															<input type="hidden" name="bank_state_id" id="bank_add_state_id" />
                                                     		<input type="text" class="form-control loadstatedropdown" name="bank_state" id ="bank_add_state" placeholder="Bank State" value="<?php if(isset($data)) { echo  $data[0]->b_state; } ?>"/>
 														</div>
-												 
+												</div>
+											</div>
+											<div class="form-group"  >
+												<div class="col-md-12 col-sm-12 col-xs-12">
 												 
 													<label class="col-md-2 col-sm-2 col-xs-12 control-label">Bank Country</label>
 														<div class="col-md-4 col-sm-4 col-xs-12"> 
                                                     		<input type="hidden" name="bank_country_id" id="bank_add_country_id" />
                                                     		<input type="text" class="form-control loadcountrydropdown" name="bank_country" id ="bank_add_country" placeholder="Bank Country" value="<?php if(isset($data)) { echo  $data[0]->b_country; } ?>"/>
 														</div>
-													</div>
+												</div>
 												 
 											</div>
 
 											<div class="form-group">
-											 <div class="col-md-12 col-sm-12 col-xs-12">
+												<div class="col-md-12 col-sm-12 col-xs-12">
 												 <label class="col-md-2 col-sm-2 col-xs-12 control-label">Account Type <span class="asterisk_sign">*</span></label>
 													<div class="col-md-4 col-sm-4 col-xs-12"> 
 													  <select class="form-control" name="account_type">
@@ -164,27 +182,33 @@
 															<option value="Overdraft" <?php if(isset($data)) { if($data[0]->b_accounttype == 'Overdraft') echo 'selected'; } ?>>Overdraft</option>
 														</select>
 														</div>
-												 
+												</div>
+											</div>
+											<div class="form-group"  >
+												<div class="col-md-12 col-sm-12 col-xs-12">
 													<label class="col-md-2 col-sm-2 col-xs-12 control-label">Account No. <span class="asterisk_sign">*</span></label>
 														<div class="col-md-4 col-sm-4 col-xs-12"> 
 															<input type="text" class="form-control" name="account_no" placeholder="Account No" value="<?php if(isset($data)) {echo $data[0]->b_accountnumber; } ?>" />
 														</div>
-													</div>
+												</div>
 												 
 											</div>
 
 											<div class="form-group">
-												 <div class="col-md-12 col-sm-12 col-xs-12">
+												<div class="col-md-12 col-sm-12 col-xs-12">
 													<label class="col-md-2 col-sm-2 col-xs-12 control-label">IFSC Code <span class="asterisk_sign">*</span></label>
 														<div class="col-md-4 col-sm-4 col-xs-12"> 
 															<input type="text" class="form-control" name="ifsc" placeholder="IFSC Code" value="<?php if(isset($data)) {echo $data[0]->b_ifsc; } ?>" />
 														</div>
-												 
+												</div>
+											</div>
+											<div class="form-group"  >
+												<div class="col-md-12 col-sm-12 col-xs-12">
 													<label class="col-md-2 col-sm-2 col-xs-12 control-label">Customer ID <span class="asterisk_sign">*</span></label>
 														<div class="col-md-4 col-sm-4 col-xs-12"> 
 															<input type="text" class="form-control" name="customer_id" placeholder="Customer ID" value="<?php if(isset($data)) {echo $data[0]->b_customerid; } ?>" />
 														</div>
-													</div>												 
+												</div>												 
 											</div>
 										
 									     	<div class="form-group">
@@ -193,7 +217,10 @@
 														<div class="col-md-4 col-sm-4 col-xs-12"> 
 															<input type="text" class="form-control" name="phone_no" placeholder="Bank Phone no" value="<?php if(isset($data)) {echo $data[0]->b_phone_number; } ?>" />
 														</div>
-												
+												</div>
+											</div>
+											<div class="form-group"  >
+												<div class="col-md-12 col-sm-12 col-xs-12">
 														<label class="col-md-2 col-sm-2 col-xs-12 control-label">Relationship Manager</label>
 														<div class="col-md-4 col-sm-4 col-xs-12"> 
 															<input type="text" id="relation_manager" name="relation_manager" class="form-control auto_client" value="<?php if(isset($data)) {echo $data[0]->b_relationshipmanager; } ?>" placeholder="Relationship Manager" />
@@ -207,6 +234,10 @@
 														<div class="col-md-4 col-sm-4 col-xs-12"> 
 															<input type="text" class="form-control format_number" name="opening_balance" placeholder="Opening Balance" value="<?php if(isset($data)) {echo format_money($data[0]->b_openingbalance,2); } ?>" />
 														</div>
+												</div>
+											</div>
+											<div class="form-group"  >
+												<div class="col-md-12 col-sm-12 col-xs-12">
 												
 													<label class="col-md-2 col-sm-2 col-xs-12 control-label">Balance Ref Date <span class="asterisk_sign">*</span></label>
 														<div class="col-md-4 col-sm-4 col-xs-12"> 

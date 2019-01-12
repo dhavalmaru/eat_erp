@@ -12,7 +12,7 @@
 </head>
 
 <body>
-    <table cellspacing="0" cellpadding="5" border="1" style="border-collapse: collapse; width:925px; margin:auto; font-family:Arcon-Regular, OpenSans-Regular, Arcon, Verdana, Geneva, sans-serif; font-size:14px; font-weight:400; border:1px solid #666;"    >
+    <table cellspacing="0" cellpadding="5" border="1" style="border-collapse: collapse; width:925px; margin:auto; font-family:Arcon-Regular, OpenSans-Regular, Arcon, Verdana, Geneva, sans-serif; font-size:14px; font-weight:400;"    >
         <col width="43" />
         <col width="115" />
         <col width="110" />
@@ -33,9 +33,9 @@
         </tr>
         <tr>
             <td colspan="9" valign="top" style="line-height:20px; padding:0;"> 
-                <table width="100%"  border="0" cellspacing="0" cellpadding="5"  style="border-collapse: collapse;">
+                <table width="100%"  border="1" cellspacing="0" cellpadding="5"  style="border-collapse: collapse;">
                     <tr style="border-bottom:1px solid #666;"  >
-                        <td width="40%" style="line-height:20px; border-bottom:1px solid #666; ">
+                        <td width="40%" style="line-height:20px; border-bottom:1px solid #666;  border-left:1px solid #666;">
                             <p style="margin:0;">
                                 <span style=" font-size:15px; font-weight:500;" >Wholesome Habits Pvt Ltd</span><br />
                                 C/109, Hind Saurashtra Ind. Estate. 85/86, <br />
@@ -75,7 +75,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td  valign="top" style="border:none;" >
+                        <td  valign="top" >
                             <p style="margin:0;" ><span style=" font-size:15px; font-weight:500;" >GSTIN:</span> 
                                 <?php if (isset($vendor_gst_number)) echo $vendor_gst_number; ?>
                             </p>
@@ -118,9 +118,9 @@
             <td width="132" align="center" valign="top">Total Amount </td>
         </tr>
         <?php if(isset($items)) { for($i=0; $i<count($items); $i++) { ?>
-        <tr valign="top" style="border: none;">
+        <tr valign="top" style="border-right:1px solid #000;border-left:1px solid #000;">
             <td valign="top" align="center" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><?php echo $i+1; ?></td>
-            <td valign="top" align="left" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><?php echo $items[$i]->rm_name; ?></td>
+            <td valign="top" align="left" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><?php echo $items[$i]->rm_name . (($items[$i]->item_desc!='')?' - '.$items[$i]->item_desc:''); ?></td>
             <td width="130" valign="top" align="right" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><p style="margin:0; "><?php echo $items[$i]->qty; ?></p></td>
             <td valign="top" align="right" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><p style="margin:0; "><?php echo $items[$i]->rate; ?></p></td>
             <td valign="top" align="right" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><p style="margin:0; "><?php echo $items[$i]->amount; ?></p></td>
@@ -129,8 +129,8 @@
             <td valign="top" align="right" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><p style="margin:0; "><?php echo $items[$i]->igst_amt; ?></p></td>
             <td valign="top" align="right" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><p style="margin:0; "><?php echo round($items[$i]->total_amt,2); ?></p></td>
         </tr>
-        <?php }} ?>
-        <tr valign="top" style="border: none;">
+        <?php }} ?>       
+        <tr valign="top" style="border-right:1px solid #000;border-left:1px solid #000;">
             <td valign="top" align="center" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;">&nbsp;</td>
             <td valign="top" align="center" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;">&nbsp;</td>
             <td width="130" valign="top" align="right" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><p style="margin:0; ">  </p></td>
@@ -141,7 +141,7 @@
             <td valign="top" align="right" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><p style="margin:0; ">  </p></td>
             <td valign="top" align="right" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><p style="margin:0; ">  </p></td>
         </tr>
-        <tr valign="top" style="border: none;">
+        <tr valign="top" style="border-right:1px solid #000;border-left:1px solid #000;">
             <td valign="top" align="center" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;">&nbsp;</td>
             <td valign="top" align="center" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;">&nbsp;</td>
             <td width="130" valign="top" align="right" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><p style="margin:0; ">  </p></td>
@@ -152,7 +152,7 @@
             <td valign="top" align="right" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><p style="margin:0; ">  </p></td>
             <td valign="top" align="right" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><p style="margin:0; ">  </p></td>
         </tr>
-        <tr valign="top" style="border: none;">
+        <tr valign="top" style="border-right:1px solid #000;border-left:1px solid #000;">
             <td valign="top" align="center" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;">&nbsp;</td>
             <td valign="top" align="center" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;">&nbsp;</td>
             <td width="130" valign="top" align="right" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><p style="margin:0; ">  </p></td>
@@ -163,10 +163,23 @@
             <td valign="top" align="right" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><p style="margin:0; ">  </p></td>
             <td valign="top" align="right" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:1px solid #666;"><p style="margin:0; ">  </p></td>
         </tr>
+        <?php 
+           if($other_charges_amount!=0 && $other_charges_amount!=''){
+        ?>
+         <tr>
+            <td  valign="top" style="padding:0;">&nbsp;</td>
+            <td  valign="top" style="border-left:1px solid #666;"> Other Charges -  <?php if (isset($other_charges)) echo $other_charges; ?></td>
+            <td  colspan="6" ></td>
+            <td style=" font-size:14px; font-weight:500;"   >  <span style="text-align:left; float:left"> &#8377; </span> <span style="text-align:right; float:right"><?php if (isset($other_charges_amount)) echo round($other_charges_amount,2); ?></span> </td>
+        </tr>
+        <?php } ?>
         <tr>
             <!-- <td colspan="3" valign="top" style="padding:0;">&nbsp;</td> -->
             <td colspan="8" valign="top" style="font-size:14px; font-weight:500;"> TOTAL</td>
             <td style=" font-size:14px; font-weight:500;"   >  <span style="text-align:left; float:left"> &#8377; </span> <span style="text-align:right; float:right"><?php if (isset($total_amount)) echo round($total_amount,2); ?></span> </td>
+        </tr>
+        <tr>
+            <td colspan="9" valign="top" style="font-size:14px; font-weight:500;"> Remarks: <?php if (isset($remarks)) echo $remarks; ?></td>
         </tr>
         <tr>
             <td colspan="6" valign="middle" style="padding:0;">
@@ -197,11 +210,33 @@
                     </tr>
                 </table>
             </td>
-            <td colspan="3" align="center" valign="middle" style=" font-size:14px; font-weight:500;"> For Wholsome Habits Pvt Ltd <br/> 
+            <td colspan="3" align="center" valign="middle" style=" font-size:14px; font-weight:500; border:1px solid #000;" > For Wholsome Habits Pvt Ltd <br/> 
                 <img src="<?php echo base_url().'/assets/invoice/'; ?>stamp.jpg" height="95"  alt="Sign3 Rishit" /> <br/>Authorised Signatory
             </td>
         </tr>
     </table>
     <p style="text-align:center; font-family:OpenSans-Regular, Arcon,Verdana, Geneva, sans-serif; font-size:12px; line-height:18px;">&nbsp;</p>
+  <table class="user_data" border="0" width="100%" style="border-collapse:collapse;margin-top:20px;font-size:12px " class="table" cellspacing="10">
+					<tr valign="center" >
+						  <td width="100%" align="center"><b>Created By:</b>
+						 <?php if(isset($createdby)) echo $createdby; ?>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+						 <b> Modified By:</b>
+						  <?php if(isset($modifiedby)) echo $modifiedby; ?>  &nbsp; &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp;
+						  <b> Approved By:</b>
+						  <?php if(isset($approvedby)) echo $approvedby; ?></td>
+						  
+					</tr>
+					<tr valign="center" >
+					      <td width="100%" align="center"><b>Created On:</b>
+						    <?php if(isset($created_on)) echo date("d-m-Y h:m:i", strtotime($created_on))?>&nbsp; &nbsp; &nbsp; &nbsp;
+						  <b> Modified On:</b>
+						     <?php if(isset($modified_on)) echo date("d-m-Y h:m:i", strtotime($modified_on)) ?>&nbsp; &nbsp; &nbsp; &nbsp;
+						   <b> Approved On:</b>
+						    <?php if(isset($approved_on))echo date("d-m-Y h:m:i", strtotime($approved_on)) ?>
+							</td>
+					</tr>
+					
+					
+	</table>
 </body>
 </html>

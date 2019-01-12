@@ -39,13 +39,17 @@
                                         <label class="col-md-2 col-sm-2 col-xs-12 control-label">Sales Representative <span class="asterisk_sign">*</span></label>
                                         <div class="col-md-4 col-sm-4 col-xs-12">
                                             <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
-                                            <select name="sales_rep_id" id="sales_rep_id" class="form-control">
+                                            <select name="sales_rep_id" id="sales_rep_id" class="form-control select2">
                                                 <option value="">Select</option>
                                                 <?php if(isset($sales_rep)) { for ($k=0; $k < count($sales_rep) ; $k++) { ?>
                                                         <option value="<?php echo $sales_rep[$k]->id; ?>" <?php if(isset($data)) { if($sales_rep[$k]->id==$data[0]->sales_rep_id) { echo 'selected'; } } ?>><?php echo $sales_rep[$k]->sales_rep_name; ?></option>
                                                 <?php }} ?>
                                             </select>
                                         </div>
+                                    </div>
+                                </div>
+								<div class="form-group">
+                                    <div class="col-md-12 col-sm-12 col-xs-12">
                                         <div style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Status <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
@@ -61,7 +65,7 @@
                                     <div class="col-md-12 col-sm-12 col-xs-12">
                                         <label class="col-md-2 col-sm-2 col-xs-12 control-label">Month <span class="asterisk_sign">*</span></label>
                                         <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <select name="month" id="month" class="form-control">
+                                            <select name="month" id="month" class="form-control select2">
                                                 <option value="">Select</option>
                                                 <?php 
                                                     $min_date = date('Y-m-d', strtotime("2016-01-01"));
@@ -71,6 +75,10 @@
                                                 <?php $date = date('Y-m-d', strtotime("-1 months", strtotime($date))); } ?>
                                             </select>
                                         </div>
+									</div>
+                                </div>
+								<div class="form-group">
+                                    <div class="col-md-12 col-sm-12 col-xs-12">
                                         <label class="col-md-2 col-sm-2 col-xs-12 control-label">Target <span class="asterisk_sign">*</span></label>
                                         <div class="col-md-4 col-sm-4 col-xs-12">
                                             <input type="text" class="form-control format_number" name="target" id="target" placeholder="Target" value="<?php if (isset($data)) { echo format_money($data[0]->target); } ?>" />

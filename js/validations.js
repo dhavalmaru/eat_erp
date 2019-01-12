@@ -11,6 +11,10 @@ $.validator.addMethod("numbersandcommaonly", function(value, element) {
     return this.optional(element) || /^[0-9]|^,+$/i.test(value);
 }, "Numbers only please.");
 
+$.validator.addMethod("numbersandcommaanddotonly", function(value, element) {
+    return this.optional(element) || /^(0*[0-9][0-9.,]*)$/i.test(value);
+}, "Not Valid Input");
+
 $.validator.addMethod("checkemail", function(value, element) {
     return this.optional(element) || (/^[a-z0-9]+([-._][a-z0-9]+)*@([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,4}$/i.test(value) && /^(?=.{1,64}@.{4,64}$)(?=.{6,100}$).*/i.test(value));
 }, "Please enter valid email address.");
@@ -386,6 +390,12 @@ $("#form_product_details").validate({
         },
         short_name: {
             required: true
+        },
+        category_id:{
+            required: true
+        },
+        tax_percentage:{
+            required: true
         }
         // ,
         // rate_of_box: {
@@ -659,7 +669,9 @@ $("#form_distributor_details").validate({
         'con_state_code[]': {
             required: true
         },
-		
+		'margin[]': {
+            required: true
+        },
     },
 
     ignore: false,
@@ -765,6 +777,13 @@ $("#form_purchase_order_details").validate({
         },
         total_amount: {
             required: true
+        },
+        remarks: {
+            required: {
+                depends: function() {
+                    return (d_status == "Approved");
+                }
+            }
         }
     },
 
@@ -924,6 +943,13 @@ $("#form_raw_material_in_details").validate({
         },
         final_amount: {
             required: true
+        },
+        remarks: {
+            required: {
+                depends: function() {
+                    return (d_status == "Approved");
+                }
+            }
         }
     },
 
@@ -993,6 +1019,86 @@ function check_raw_material() {
     
     return valid;
 }
+
+
+
+
+// ----------------- PAYMENT VOUCHER FORM VALIDATION -------------------------------------
+$("#form_payment_voucher").validate({
+    rules: {
+        vendor_id: {
+            required: true
+        },
+        vendor_name:{
+            required: true
+        },
+        final_amount: {
+            required: true
+        },
+        type: {
+            required: true
+        },
+        invoice_date:{
+           required: true
+       },
+       invoice_no:{
+        required: true
+       },
+       attached:{
+        required: true
+       },
+       po_no:{
+        required: true
+       },
+       type_use:{
+        required: true
+       },
+       purchase_order_id:{
+        required: true
+       },
+    },
+
+    ignore: ":not(:visible)",
+
+    errorPlacement: function (error, element) {
+        var placement = $(element).data('error');
+        if (placement) {
+            $(placement).append(error);
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
+$('#form_payment_voucher').submit(function() {
+    removeMultiInputNamingRules('#form_payment_voucher', 'input[alt="tax[]"]');
+    removeMultiInputNamingRules('#form_payment_voucher', 'input[alt="qty[]"]');
+    removeMultiInputNamingRules('#form_payment_voucher', 'input[alt="rate[]"]');
+    removeMultiInputNamingRules('#form_payment_voucher', 'input[alt="particulars[]"]');
+    removeMultiInputNamingRules('#form_payment_voucher', 'input[alt="invoice_date[]"]');
+    removeMultiInputNamingRules('#form_payment_voucher', 'input[alt="invoice_no[]"]');
+    
+
+    addMultiInputNamingRules('#form_payment_voucher', 'input[name="tax[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_payment_voucher', 'input[name="qty[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_payment_voucher', 'input[name="rate[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_payment_voucher', 'input[name="particulars[]"]', { required: true }, "");
+   
+
+    if (!$("#form_payment_voucher").valid()) {
+        return false;
+    } else {
+
+        removeMultiInputNamingRules('#form_payment_voucher', 'input[alt="tax[]"]');
+        removeMultiInputNamingRules('#form_payment_voucher', 'input[alt="qty[]"]');
+        removeMultiInputNamingRules('#form_payment_voucher', 'input[alt="rate[]"]');
+        removeMultiInputNamingRules('#form_payment_voucher', 'input[alt="particulars[]"]');
+        removeMultiInputNamingRules('#form_payment_voucher', 'input[alt="invoice_date[]"]');
+        removeMultiInputNamingRules('#form_payment_voucher', 'input[alt="invoice_no[]"]');
+            
+        return true;
+    }
+});
 
 
 
@@ -1085,6 +1191,13 @@ $("#form_batch_processing_details").validate({
         },
         wastage_variance: {
             required: true
+        },
+        remarks: {
+            required: {
+                depends: function() {
+                    return (d_status == "Approved");
+                }
+            }
         }
     },
 
@@ -1251,122 +1364,228 @@ $('#form_distributor_out_list').submit(function() {
 
 
 // ----------------- DISTRIBUTOR OUT DETAILS FORM VALIDATION -------------------------------------
-$("#form_distributor_out_details").validate({
-    rules: {
-        date_of_processing: {
-            required: true
-        },
-        depot_id: {
-            required: true
-        },
-        distributor_id: {
-            required: true
-        },
-        sales_rep_id: {
-            required: true
-        },
-        total_amount: {
-            required: true
-        },
-        due_date: {
-            required: true
-        },
-        delivery_status: {
-            required: true
-        },
-        delivery_date: {
-            required: {
-				depends: function() {
-					return ($("#delivery_status").val() == "Delivered");
-				}
-			}
-        },
-        transport_type: {
-            required: true
-        },
-        vehicle_number: {
-            required: {
-                depends: function() {
-                    return ($("#transport_type").val() == "Transport");
-                }
-            }
-        },
-        reverse_charge: {
-            required: true
-        },
-        shipping_address: {
-            required: true
-        },
-        distributor_consignee_id: {
-            required: {
-                depends: function() {
-                    return ($("#shipping_address_no:checked").length);
-                }
-            }
-        },
-        // order_no: {
-            // required: true
-        // }
-    },
 
-    ignore: ":not(:visible)",
 
-    errorPlacement: function (error, element) {
-        var placement = $(element).data('error');
-        if (placement) {
-            $(placement).append(error);
-        } else {
-            error.insertAfter(element);
-        }
-    }
+var clkBtn = "";
+$('input[type="submit"]').click(function(evt) {
+    $(this).find().attr('form','novalidate');
+    clkBtn = evt.target.id;
 });
 
-$('#form_distributor_out_details').submit(function() {
-    removeMultiInputNamingRules('#form_distributor_out_details', 'select[alt="type[]"]');
-    removeMultiInputNamingRules('#form_distributor_out_details', 'select[alt="bar[]"]');
-    removeMultiInputNamingRules('#form_distributor_out_details', 'select[alt="box[]"]');
-    removeMultiInputNamingRules('#form_distributor_out_details', 'input[alt="qty[]"]');
-    removeMultiInputNamingRules('#form_distributor_out_details', 'input[alt="sell_rate[]"]');
+/*if(btnID=='btn_reject')
+  {
+    console.log('entered');
+  }*/
+$("#form_distributor_out_details").validate({
+        rules: {
+            date_of_processing: {
+                required: true
+            },
+            depot_id: {
+                required: true
+            },
+            distributor_id: {
+                required: true
+            },
+            sales_rep_id: {
+                required: true
+            },
+            total_amount: {
+                required: true
+            },
+            due_date: {
+                required: true
+            },
+            delivery_status: {
+                required: true
+            },
+            delivery_date: {
+                required: {
+                    depends: function() {
+                        return ($("#delivery_status").val() == "Delivered");
+                    }
+                }
+            },
+            transport_type: {
+                required: true
+            },
+            vehicle_number: {
+                required: {
+                    depends: function() {
+                        return ($("#transport_type").val() == "Transport");
+                    }
+                }
+            },
+            reverse_charge: {
+                required: true
+            },
+            shipping_address: {
+                required: true
+            },
+            distributor_consignee_id: {
+                required: {
+                    depends: function() {
+                        return ($("#shipping_address_no:checked").length);
+                    }
+                }
+            },
+            basis_of_sales: {
+                required: true
+                
+            },
+             order_no: {
+                required: {
+                    depends: function() {
+                        return (clkBtn!='btn_reject');
+                    }
+                },
+                check_order_id_availablity: {
+                  required: {
+                    depends: function() {
+                            return (clkBtn!='btn_reject');
+                        }
+                    }  
+                }
+            },
+            email_from: {
+                required: true,
+                checkemail: true
+            },
+            email_date_time:{
+                required: true
+            },
+            remarks: {
+                required: {
+                    depends: function() {
+                        return (d_status == "Approved");
+                    }
+                }
+            }
+        },
 
+        ignore: ":not(:visible)",
 
-    addMultiInputNamingRules('#form_distributor_out_details', 'select[name="type[]"]', { required: true }, "");
-    addMultiInputNamingRules('#form_distributor_out_details', 'select[name="bar[]"]', { required: true }, "");
-    addMultiInputNamingRules('#form_distributor_out_details', 'select[name="box[]"]', { required: true }, "");
-    addMultiInputNamingRules('#form_distributor_out_details', 'input[name="qty[]"]', { required: true }, "");
-    addMultiInputNamingRules('#form_distributor_out_details', 'input[name="sell_rate[]"]', { required: true }, "");
-    if (!$("#form_distributor_out_details").valid()) {
-        return false;
-    } else {
-        if (check_product_availablity_for_distributor_out()==false) {
-            return false;
+        errorPlacement: function (error, element) {
+            var placement = $(element).data('error');
+            if (placement) {
+                $(placement).append(error);
+            } else {
+                error.insertAfter(element);
+            }
         }
+    });  
 
+$('#form_distributor_out_details').submit(function() {
+    var btnID = clkBtn;
+    if(btnID=='btn_reject')
+    {
+        return true;
+    }else
+    {
         removeMultiInputNamingRules('#form_distributor_out_details', 'select[alt="type[]"]');
         removeMultiInputNamingRules('#form_distributor_out_details', 'select[alt="bar[]"]');
         removeMultiInputNamingRules('#form_distributor_out_details', 'select[alt="box[]"]');
         removeMultiInputNamingRules('#form_distributor_out_details', 'input[alt="qty[]"]');
         removeMultiInputNamingRules('#form_distributor_out_details', 'input[alt="sell_rate[]"]');
-        
+
+
+        addMultiInputNamingRules('#form_distributor_out_details', 'select[name="type[]"]', { required: true }, "");
+        addMultiInputNamingRules('#form_distributor_out_details', 'select[name="bar[]"]', { required: true }, "");
+        addMultiInputNamingRules('#form_distributor_out_details', 'select[name="box[]"]', { required: true }, "");
+        addMultiInputNamingRules('#form_distributor_out_details', 'input[name="qty[]"]', { required: true }, "");
+        addMultiInputNamingRules('#form_distributor_out_details', 'input[name="sell_rate[]"]', { required: true }, "");
+        if (!$("#form_distributor_out_details").valid()) {
+            return false;
+        } else {
+            if (check_product_availablity_for_distributor_out()==false) {
+                return false;
+            }
+
+            removeMultiInputNamingRules('#form_distributor_out_details', 'select[alt="type[]"]');
+            removeMultiInputNamingRules('#form_distributor_out_details', 'select[alt="bar[]"]');
+            removeMultiInputNamingRules('#form_distributor_out_details', 'select[alt="box[]"]');
+            removeMultiInputNamingRules('#form_distributor_out_details', 'input[alt="qty[]"]');
+            removeMultiInputNamingRules('#form_distributor_out_details', 'input[alt="sell_rate[]"]');
+            
+            return true;
+        }
+    }
+    
+});
+
+$.validator.addMethod("check_order_id_availablity", function (value, element) {
+    var result = 1;
+
+    $.ajax({
+        url: BASE_URL+'index.php/distributor_out/check_order_id_availablity',
+        data: 'id='+$("#id").val()+'&order_no='+$("#order_no").val()+'&ref_id='+$("#ref_id").val(),
+        type: "POST",
+        dataType: 'html',
+        global: false,
+        async: false,
+        success: function (data) {
+            result = parseInt(data);
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+        }
+    });
+
+    if (result) {
+        return false;
+    } else {
         return true;
     }
-});
+}, 'Order No already in use.');
 
 function check_product_availablity_for_distributor_out() {
     var validator = $("#form_distributor_out_details").validate();
     var valid = true;
+    var btn_val = $(document.activeElement).val();
 
-    if($("#distributor_id").val()=="214"){
-        var order=$("#order_no").val();
-        var pattern= /^\d{3}-?\d{7}-?\d{7}$/;
-        if(!pattern.test(order)) {
+    if(btn_val=='Submit For Approval' || btn_val=='Delete') {
+        $.ajax({
+            url: BASE_URL+'index.php/Freezed/check_freedzed_month',
+            data: 'date='+$("#date_of_processing").val(),
+            type: "POST",
+            dataType: 'html',
+            global: false,
+            async: false,
+            success: function (data) {
+                result = parseInt(data);
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert(xhr.status);
+                alert(thrownError);
+            }
+        });
+
+        if (result) {
             var errors = {};
-            var name = $('#order_no').attr('name');
-            errors[name] = "Please Enter Valid Order No eg. 123-1234567-1234567.";
+            var name = $('#date_of_processing').attr('name');
+            errors[name] = "Please Select Another Date ,This Date is Freezed";
             validator.showErrors(errors);
             valid = false;
         }
     }
 
+    if($('#basis_of_sales').val()=='PO Number')
+    {
+        if($("#distributor_id").val()=="214"){
+            var order=$("#order_no").val();
+            var pattern= /^\d{3}-?\d{7}-?\d{7}$/;
+            if(!pattern.test(order)) {
+                var errors = {};
+                var name = $('#order_no').attr('name');
+                errors[name] = "Please Enter Valid Order No eg. 123-1234567-1234567.";
+                validator.showErrors(errors);
+                valid = false;
+            }
+        }
+    }
+    
+	
     if($('.type').length=='0'){
         var errors = {};
         var name = $('#date_of_processing').attr('name');
@@ -1390,74 +1609,75 @@ function check_product_availablity_for_distributor_out() {
                 var qty = parseFloat(get_number($('#qty_'+index).val()));
                 if (isNaN(qty)) qty=0;
 
-                $('.bar').each(function(){
-                    if ($(this).is(":visible") == true) { 
-                        if(bar_id != $(this).attr('id')){
-                            if(bar == $(this).val()){
-                                var errors = {};
-                                var name = $(this).attr('name');
-                                errors[name] = "Please select different bar for all records.";
-                                validator.showErrors(errors);
-                                valid = false;
-                            }
-                        }
-                    }
-                });
-
-
-                // var result = 1;
-
-                // $.ajax({
-                //     url: BASE_URL+'index.php/Stock/check_bar_availablity_for_depot',
-                //     data: 'id='+$("#id").val()+'&module='+module+'&depot_id='+depot_id+'&product_id='+bar,
-                //     type: "POST",
-                //     dataType: 'html',
-                //     global: false,
-                //     async: false,
-                //     success: function (data) {
-                //         result = parseInt(data);
-                //     },
-                //     error: function (xhr, ajaxOptions, thrownError) {
-                //         alert(xhr.status);
-                //         alert(thrownError);
+                // $('.bar').each(function(){
+                //     if ($(this).is(":visible") == true) { 
+                //         if(bar_id != $(this).attr('id')){
+                //             if(bar == $(this).val()){
+                //                 var errors = {};
+                //                 var name = $(this).attr('name');
+                //                 errors[name] = "Please select different bar for all records.";
+                //                 validator.showErrors(errors);
+                //                 valid = false;
+                //             }
+                //         }
                 //     }
                 // });
 
-                // if (result) {
-                //     var id = "bar_"+index;
-                //     var errors = {};
-                //     var name = $("#"+id).attr('name');
-                //     errors[name] = "Bar not available in selected depot.";
-                //     validator.showErrors(errors);
-                //     valid = false;
-                // }
+                if(btn_val=='Approve') {
+					var result = 1;
 
-                // result = 1;
+					$.ajax({
+						url: BASE_URL+'index.php/Stock/check_bar_availablity_for_depot',
+						data: 'id='+$("#id").val()+'&module='+module+'&depot_id='+depot_id+'&product_id='+bar,
+						type: "POST",
+						dataType: 'html',
+						global: false,
+						async: false,
+						success: function (data) {
+							result = parseInt(data);
+						},
+						error: function (xhr, ajaxOptions, thrownError) {
+							alert(xhr.status);
+							alert(thrownError);
+						}
+					});
 
-                // $.ajax({
-                //     url: BASE_URL+'index.php/Stock/check_bar_qty_availablity_for_depot',
-                //     data: 'id='+$("#id").val()+'&module='+module+'&depot_id='+depot_id+'&product_id='+bar+'&qty='+qty+'&ref_id='+ref_id,
-                //     type: "POST",
-                //     dataType: 'html',
-                //     global: false,
-                //     async: false,
-                //     success: function (data) {
-                //         result = parseInt(data);
-                //     },
-                //     error: function (xhr, ajaxOptions, thrownError) {
-                //         alert(xhr.status);
-                //         alert(thrownError);
-                //     }
-                // });
+					if (result) {
+						var id = "bar_"+index;
+						var errors = {};
+						var name = $("#"+id).attr('name');
+						errors[name] = "Bar not available in selected depot.";
+						validator.showErrors(errors);
+						valid = false;
+					}
 
-                // if (result) {
-                //     var id = "qty_"+index;
-                //     var errors = {};
-                //     var name = $("#"+id).attr('name');
-                //     errors[name] = "Bar qty is not enough in selected depot.";
-                //     validator.showErrors(errors);
-                //     valid = false;
-                // }
+					result = 1;
+
+					$.ajax({
+						url: BASE_URL+'index.php/Stock/check_bar_qty_availablity_for_depot',
+						data: 'id='+$("#id").val()+'&module='+module+'&depot_id='+depot_id+'&product_id='+bar+'&qty='+qty+'&ref_id='+ref_id,
+						type: "POST",
+						dataType: 'html',
+						global: false,
+						async: false,
+						success: function (data) {
+							result = parseInt(data);
+						},
+						error: function (xhr, ajaxOptions, thrownError) {
+							alert(xhr.status);
+							alert(thrownError);
+						}
+					});
+
+					if (result) {
+						var id = "qty_"+index;
+						var errors = {};
+						var name = $("#"+id).attr('name');
+						errors[name] = "Bar qty is not enough in selected depot.";
+						validator.showErrors(errors);
+						valid = false;
+					}
+				}
             }
         });
 
@@ -1470,74 +1690,75 @@ function check_product_availablity_for_distributor_out() {
                 var qty = parseFloat(get_number($('#qty_'+index).val()));
                 if (isNaN(qty)) qty=0;
 
-                $('.box').each(function(){
-                    if ($(this).is(":visible") == true) { 
-                        if(box_id != $(this).attr('id')){
-                            if(box == $(this).val()){
-                                var errors = {};
-                                var name = $(this).attr('name');
-                                errors[name] = "Please select different box for all records.";
-                                validator.showErrors(errors);
-                                valid = false;
-                            }
-                        }
-                    }
-                });
-
-
-                // var result = 1;
-
-                // $.ajax({
-                //     url: BASE_URL+'index.php/Stock/check_box_availablity_for_depot',
-                //     data: 'id='+$("#id").val()+'&module='+module+'&depot_id='+$("#depot_id").val()+'&box_id='+box,
-                //     type: "POST",
-                //     dataType: 'html',
-                //     global: false,
-                //     async: false,
-                //     success: function (data) {
-                //         result = parseInt(data);
-                //     },
-                //     error: function (xhr, ajaxOptions, thrownError) {
-                //         alert(xhr.status);
-                //         alert(thrownError);
+                // $('.box').each(function(){
+                //     if ($(this).is(":visible") == true) { 
+                //         if(box_id != $(this).attr('id')){
+                //             if(box == $(this).val()){
+                //                 var errors = {};
+                //                 var name = $(this).attr('name');
+                //                 errors[name] = "Please select different box for all records.";
+                //                 validator.showErrors(errors);
+                //                 valid = false;
+                //             }
+                //         }
                 //     }
                 // });
 
-                // if (result) {
-                //     var id = "bar_"+index;
-                //     var errors = {};
-                //     var name = $("#"+id).attr('name');
-                //     errors[name] = "Box not available in selected depot.";
-                //     validator.showErrors(errors);
-                //     valid = false;
-                // }
+                if(btn_val=='Approve') {
+					var result = 1;
 
-                // result = 1;
+					$.ajax({
+						url: BASE_URL+'index.php/Stock/check_box_availablity_for_depot',
+						data: 'id='+$("#id").val()+'&module='+module+'&depot_id='+$("#depot_id").val()+'&box_id='+box,
+						type: "POST",
+						dataType: 'html',
+						global: false,
+						async: false,
+						success: function (data) {
+							result = parseInt(data);
+						},
+						error: function (xhr, ajaxOptions, thrownError) {
+							alert(xhr.status);
+							alert(thrownError);
+						}
+					});
 
-                // $.ajax({
-                //     url: BASE_URL+'index.php/Stock/check_box_qty_availablity_for_depot',
-                //     data: 'id='+$("#id").val()+'&module='+module+'&depot_id='+$("#depot_id").val()+'&box_id='+box+'&qty='+qty+'&ref_id='+ref_id,
-                //     type: "POST",
-                //     dataType: 'html',
-                //     global: false,
-                //     async: false,
-                //     success: function (data) {
-                //         result = parseInt(data);
-                //     },
-                //     error: function (xhr, ajaxOptions, thrownError) {
-                //         alert(xhr.status);
-                //         alert(thrownError);
-                //     }
-                // });
+					if (result) {
+						var id = "bar_"+index;
+						var errors = {};
+						var name = $("#"+id).attr('name');
+						errors[name] = "Box not available in selected depot.";
+						validator.showErrors(errors);
+						valid = false;
+					}
 
-                // if (result) {
-                //     var id = "qty_"+index;
-                //     var errors = {};
-                //     var name = $("#"+id).attr('name');
-                //     errors[name] = "Box qty is not enough in selected depot.";
-                //     validator.showErrors(errors);
-                //     valid = false;
-                // }
+					result = 1;
+
+					$.ajax({
+						url: BASE_URL+'index.php/Stock/check_box_qty_availablity_for_depot',
+						data: 'id='+$("#id").val()+'&module='+module+'&depot_id='+$("#depot_id").val()+'&box_id='+box+'&qty='+qty+'&ref_id='+ref_id,
+						type: "POST",
+						dataType: 'html',
+						global: false,
+						async: false,
+						success: function (data) {
+							result = parseInt(data);
+						},
+						error: function (xhr, ajaxOptions, thrownError) {
+							alert(xhr.status);
+							alert(thrownError);
+						}
+					});
+
+					if (result) {
+						var id = "qty_"+index;
+						var errors = {};
+						var name = $("#"+id).attr('name');
+						errors[name] = "Box qty is not enough in selected depot.";
+						validator.showErrors(errors);
+						valid = false;
+					}
+				}
             }
         });
     }
@@ -1561,6 +1782,13 @@ $("#form_payment_details").validate({
         },
         total_amount: {
             required: true
+        },
+        remarks: {
+            required: {
+                depends: function() {
+                    return (d_status == "Approved");
+                }
+            }
         }
     },
 
@@ -1616,6 +1844,17 @@ function check_payment_details() {
     var validator = $("#form_payment_details").validate();
     var valid = true;
 
+    if($('#payment_mode').val()=='Cash'){
+        if(add_denomination_amount()==false)
+        {
+            var errors = {};
+            var name = $('#total_amount').attr('name');
+            errors[name] = "Denomination and Total Amount is not same.";
+            validator.showErrors(errors);
+            valid = false;
+        }
+    }
+      
     if($('.distributor').length=='0'){
         var errors = {};
         var name = $('#date_of_deposit').attr('name');
@@ -1636,7 +1875,61 @@ function check_payment_details() {
 }
 
 
+function add_denomination_amount() {
 
+    var denomination_2000=0,denomination_500=0,denomination_100=0;
+    var denomination_50=0,denomination_20=0,denomination_10=0;denomination_other_amount=0;
+
+    if($('#denomination_2000').val()!='')
+    {
+      denomination_2000 = parseInt($('#denomination_2000').val())*2000;
+    }
+
+    if($('#denomination_500').val()!='')
+    {
+      denomination_500 =  parseInt($('#denomination_500').val())*500;
+    
+    }
+
+    if($('#denomination_100').val()!='')
+    {
+       denomination_100 = parseInt($('#denomination_100').val())*100;
+    }
+
+    if($('#denomination_50').val()!='')
+    {
+       denomination_50 = parseInt($('#denomination_50').val())*50;
+    }
+
+    if($('#denomination_20').val()!='')
+    {
+       denomination_20 = parseInt($('#denomination_20').val())*20;
+    }
+
+    if($('#denomination_10').val()!='')
+    {
+       denomination_10 = parseInt($('#denomination_10').val())*10;
+    }
+
+    if($('#denomination_other_amount').val()!='')
+    {
+       denomination_other_amount = parseInt($('#denomination_other_amount').val());
+    }
+
+    var total_amount = (denomination_2000+denomination_500+denomination_100+denomination_50+denomination_20+denomination_10+denomination_other_amount);
+
+
+    if(total_amount==parseInt($('#total_amount').val()))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+
+    }
+    
+}
 
 // ----------------- DISTRIBUTOR IN DETAILS FORM VALIDATION -------------------------------------
 $("#form_distributor_in_details").validate({
@@ -1672,6 +1965,13 @@ $("#form_distributor_in_details").validate({
                     return ($("#exc_table").css("display") == "block");
                 }
             }
+        },
+        invoice_no:
+        {
+            required: true
+        },
+        sales_type:{
+            required: true
         }
     },
 
@@ -1685,8 +1985,6 @@ $("#form_distributor_in_details").validate({
             error.insertAfter(element);
         }
     }
-
-
 });
 
 
@@ -1711,6 +2009,7 @@ $('#form_distributor_in_details').submit(function() {
     addMultiInputNamingRules('#form_distributor_in_details', 'input[name="qty[]"]', { required: true }, "");
     addMultiInputNamingRules('#form_distributor_in_details', 'input[name="sell_rate[]"]', { required: true }, "");
     addMultiInputNamingRules('#form_distributor_in_details', 'select[name="batch_no[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_distributor_in_details', 'select[name="batch_no_ex[]"]', { required: true }, "");
 
     addMultiInputNamingRules('#form_distributor_in_details', 'select[name="type_ex[]"]', { required: true }, "");
     addMultiInputNamingRules('#form_distributor_in_details', 'select[name="bar_ex[]"]', { required: true }, "");
@@ -1737,6 +2036,8 @@ $('#form_distributor_in_details').submit(function() {
         removeMultiInputNamingRules('#form_distributor_in_details', 'select[alt="box_ex[]"]');
         removeMultiInputNamingRules('#form_distributor_in_details', 'input[alt="qty_ex[]"]');
         removeMultiInputNamingRules('#form_distributor_in_details', 'input[alt="sell_rate_ex[]"]');
+        removeMultiInputNamingRules('#form_distributor_in_details', 'select[alt="batch_no_ex[]"]');
+
 
         return true;
     }
@@ -1745,6 +2046,33 @@ $('#form_distributor_in_details').submit(function() {
 function check_product_availablity_for_distributor_in() {
     var validator = $("#form_distributor_in_details").validate();
     var valid = true;
+    var btn_val = $(document.activeElement).val();
+
+    if(btn_val=='Submit For Approval' || btn_val=='Delete') {
+        $.ajax({
+            url: BASE_URL+'index.php/Freezed/check_freedzed_month',
+            data: 'date='+$("#date_of_processing").val(),
+            type: "POST",
+            dataType: 'html',
+            global: false,
+            async: false,
+            success: function (data) {
+                result = parseInt(data);
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert(xhr.status);
+                alert(thrownError);
+            }
+        });
+
+        if (result) {
+            var errors = {};
+            var name = $('#date_of_processing').attr('name');
+            errors[name] = "Please Select Another Date ,This Date is Freezed";
+            validator.showErrors(errors);
+            valid = false;
+        }
+    }
 
     if($('.type').length=='0'){
         var errors = {};
@@ -1768,19 +2096,19 @@ function check_product_availablity_for_distributor_in() {
                 var qty = parseFloat(get_number($('#qty_'+index).val()));
                 if (isNaN(qty)) qty=0;
 
-                $('.bar').each(function(){
-                    if ($(this).is(":visible") == true) { 
-                        if(bar_id != $(this).attr('id')){
-                            if(bar == $(this).val()){
-                                var errors = {};
-                                var name = $(this).attr('name');
-                                errors[name] = "Please select different bar for all records.";
-                                validator.showErrors(errors);
-                                valid = false;
-                            }
-                        }
-                    }
-                }); 
+                // $('.bar').each(function(){
+                //     if ($(this).is(":visible") == true) { 
+                //         if(bar_id != $(this).attr('id')){
+                //             if(bar == $(this).val()){
+                //                 var errors = {};
+                //                 var name = $(this).attr('name');
+                //                 errors[name] = "Please select different bar for all records.";
+                //                 validator.showErrors(errors);
+                //                 valid = false;
+                //             }
+                //         }
+                //     }
+                // }); 
 
 
                 // var result = 1;
@@ -1848,19 +2176,19 @@ function check_product_availablity_for_distributor_in() {
                 var qty = parseFloat(get_number($('#qty_'+index).val()));
                 if (isNaN(qty)) qty=0;
 
-                $('.box').each(function(){
-                    if ($(this).is(":visible") == true) { 
-                        if(box_id != $(this).attr('id')){
-                            if(box == $(this).val()){
-                                var errors = {};
-                                var name = $(this).attr('name');
-                                errors[name] = "Please select different box for all records.";
-                                validator.showErrors(errors);
-                                valid = false;
-                            }
-                        }
-                    }
-                });
+                // $('.box').each(function(){
+                //     if ($(this).is(":visible") == true) { 
+                //         if(box_id != $(this).attr('id')){
+                //             if(box == $(this).val()){
+                //                 var errors = {};
+                //                 var name = $(this).attr('name');
+                //                 errors[name] = "Please select different box for all records.";
+                //                 validator.showErrors(errors);
+                //                 valid = false;
+                //             }
+                //         }
+                //     }
+                // });
                 
                 // var result = 1;
 
@@ -2197,6 +2525,29 @@ $("#form_download_report").validate({
 
 
 
+// ----------------- Category FORM VALIDATION -------------------------------------
+$("#category_master").validate({
+    rules: {
+        category_name: {
+            required: true
+        }
+    },
+
+    ignore: false,
+
+    errorPlacement: function (error, element) {
+        var placement = $(element).data('error');
+        if (placement) {
+            $(placement).append(error);
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
+
+
+
 // ----------------- Tax FORM VALIDATION -------------------------------------
 $("#form_tax").validate({
     rules: {
@@ -2331,6 +2682,12 @@ $("#form_box_details").validate({
             required: true
         },
         short_name: {
+            required: true
+        },
+        category_id:{
+            required: true
+        },
+        tax_percentage:{
             required: true
         }
     },
@@ -2472,6 +2829,9 @@ $("#form_bar_to_box_details").validate({
         total_amount: {
             required: true
         },
+        "batch_no[]": {
+            required: true
+        },
     },
 
     ignore: false,
@@ -2565,50 +2925,49 @@ function check_box_availablity_for_bar_to_box() {
                 }
             });
 
-            $('.box').each(function(){
-                if(box_id != $(this).attr('id')){
-                    if(box == $(this).val()){
-                        var errors = {};
-                        var name = $(this).attr('name');
-                        errors[name] = "Please select different box for all records.";
-                        validator.showErrors(errors);
-                        valid = false;
-                    } 
-                //     else {
-                //         var id2 = $(this).attr('id');
-                //         var index2 = id2.substr(id2.lastIndexOf('_')+1);
-                //         var box_id2 = $(this).attr('id');
-                //         var box2 = $(this).val();
-                //         var qty2 = parseFloat(get_number($('#qty_'+index2).val()));
-                //         if (isNaN(qty2)) qty2=0;
+            // $('.box').each(function(){
+            //     if(box_id != $(this).attr('id')){
+            //         if(box == $(this).val()){
+            //             var errors = {};
+            //             var name = $(this).attr('name');
+            //             errors[name] = "Please select different box for all records.";
+            //             validator.showErrors(errors);
+            //             valid = false;
+            //         } else {
+            //             var id2 = $(this).attr('id');
+            //             var index2 = id2.substr(id2.lastIndexOf('_')+1);
+            //             var box_id2 = $(this).attr('id');
+            //             var box2 = $(this).val();
+            //             var qty2 = parseFloat(get_number($('#qty_'+index2).val()));
+            //             if (isNaN(qty2)) qty2=0;
 
-                //         $.ajax({
-                //             url: BASE_URL+'index.php/Box/get_products',
-                //             data: 'id='+box2,
-                //             type: "POST",
-                //             dataType: 'json',
-                //             global: false,
-                //             async: false,
-                //             success: function (data) {
-                //                 var result = parseInt(data.result);
-                //                 if(result==1){
-                //                     for(var i=0; i<data.product.length; i++){
-                //                         for(var j=0; j<product_id.length; j++){
-                //                             if(product_id[j]==data.product[i]){
-                //                                 product_qty[j]=parseFloat(product_qty[j])+(parseFloat(data.qty[i])*qty2);
-                //                             }
-                //                         }
-                //                     }
-                //                 }
-                //             },
-                //             error: function (xhr, ajaxOptions, thrownError) {
-                //                 alert(xhr.status);
-                //                 alert(thrownError);
-                //             }
-                //         });
-                //     }
-                }
-            });
+            //             $.ajax({
+            //                 url: BASE_URL+'index.php/Box/get_products',
+            //                 data: 'id='+box2,
+            //                 type: "POST",
+            //                 dataType: 'json',
+            //                 global: false,
+            //                 async: false,
+            //                 success: function (data) {
+            //                     var result = parseInt(data.result);
+            //                     if(result==1){
+            //                         for(var i=0; i<data.product.length; i++){
+            //                             for(var j=0; j<product_id.length; j++){
+            //                                 if(product_id[j]==data.product[i]){
+            //                                     product_qty[j]=parseFloat(product_qty[j])+(parseFloat(data.qty[i])*qty2);
+            //                                 }
+            //                             }
+            //                         }
+            //                     }
+            //                 },
+            //                 error: function (xhr, ajaxOptions, thrownError) {
+            //                     alert(xhr.status);
+            //                     alert(thrownError);
+            //                 }
+            //             });
+            //         }
+            //     }
+            // });
         });
 
         for(var j=0; j<product_id.length; j++){
@@ -2692,6 +3051,9 @@ $("#form_box_to_bar_details").validate({
         total_amount: {
             required: true
         },
+        "batch_no[]": {
+            required: true
+        },
     },
 
     ignore: false,
@@ -2740,7 +3102,8 @@ function check_box_availablity_for_box_to_bar() {
     } else {
 
         var depot_id = $("#depot_id").val();
-
+        var module = "box_to_bar";
+        
         $('.box').each(function(){
             var id = $(this).attr('id');
             var index = id.substr(id.lastIndexOf('_')+1);
@@ -2757,17 +3120,17 @@ function check_box_availablity_for_box_to_bar() {
                 var qty = parseFloat(get_number($('#qty_'+index).val()));
                 if (isNaN(qty)) qty=0;
 
-                $('.box').each(function(){
-                    if(box_id != $(this).attr('id')){
-                        if(box == $(this).val()){
-                            var errors = {};
-                            var name = $(this).attr('name');
-                            errors[name] = "Please select different box for all records.";
-                            validator.showErrors(errors);
-                            valid = false;
-                        }
-                    }
-                });
+                // $('.box').each(function(){
+                //     if(box_id != $(this).attr('id')){
+                //         if(box == $(this).val()){
+                //             var errors = {};
+                //             var name = $(this).attr('name');
+                //             errors[name] = "Please select different box for all records.";
+                //             validator.showErrors(errors);
+                //             valid = false;
+                //         }
+                //     }
+                // });
 
                 var result = 1;
 
@@ -2870,6 +3233,19 @@ $('#form_depot_transfer_details').submit(function() {
     addMultiInputNamingRules('#form_depot_transfer_details', 'select[name="bar[]"]', { required: true }, "");
     addMultiInputNamingRules('#form_depot_transfer_details', 'select[name="box[]"]', { required: true }, "");
     addMultiInputNamingRules('#form_depot_transfer_details', 'input[name="qty[]"]', { required: true }, "");
+    
+    $('.type').each(function(){
+        var id = $(this).attr('id');
+        var index = id.substr(id.lastIndexOf('_')+1);
+        if($('.type').val()=='Bar' || $('.type').val()=='Box')
+        {
+          var name = $('#batch_no_'+index).attr('name')
+          removeMultiInputNamingRules('#form_depot_transfer_details', 'select[name="'+name+'"]');
+          addMultiInputNamingRules('#form_depot_transfer_details', 'select[name="'+name+'"]', { required: true });
+        }
+        
+    });
+
     if (!$("#form_depot_transfer_details").valid()) {
         return false;
     } else {
@@ -2883,6 +3259,15 @@ $('#form_depot_transfer_details').submit(function() {
         removeMultiInputNamingRules('#form_depot_transfer_details', 'select[alt="box[]"]');
         removeMultiInputNamingRules('#form_depot_transfer_details', 'input[alt="qty[]"]');
         
+        $('.type').each(function(){
+        var id = $(this).attr('id');
+        var index = id.substr(id.lastIndexOf('_')+1);
+        if($('.type').val()=='Bar' || $('.type').val()=='Box')
+        {
+          var name = $('#batch_no_'+index).attr('name')
+          removeMultiInputNamingRules('#form_depot_transfer_details', 'select[name="'+name+'"]');
+        }
+        });
         return true;
     }
 });
@@ -2997,19 +3382,19 @@ function check_product_availablity_for_depot_transfer() {
                 var qty = parseFloat(get_number($('#qty_'+index).val()));
                 if (isNaN(qty)) qty=0;
 
-                $('.bar').each(function(){
-                    if ($(this).is(":visible") == true) { 
-                        if(bar_id != $(this).attr('id')){
-                            if(bar == $(this).val()){
-                                var errors = {};
-                                var name = $(this).attr('name');
-                                errors[name] = "Please select different bar for all records.";
-                                validator.showErrors(errors);
-                                valid = false;
-                            }
-                        }
-                    }
-                });
+                // $('.bar').each(function(){
+                //     if ($(this).is(":visible") == true) { 
+                //         if(bar_id != $(this).attr('id')){
+                //             if(bar == $(this).val()){
+                //                 var errors = {};
+                //                 var name = $(this).attr('name');
+                //                 errors[name] = "Please select different bar for all records.";
+                //                 validator.showErrors(errors);
+                //                 valid = false;
+                //             }
+                //         }
+                //     }
+                // });
 
                 var result = 1;
 
@@ -3076,19 +3461,19 @@ function check_product_availablity_for_depot_transfer() {
                 var qty = parseFloat(get_number($('#qty_'+index).val()));
                 if (isNaN(qty)) qty=0;
 
-                $('.box').each(function(){
-                    if ($(this).is(":visible") == true) { 
-                        if(box_id != $(this).attr('id')){
-                            if(box == $(this).val()){
-                                var errors = {};
-                                var name = $(this).attr('name');
-                                errors[name] = "Please select different box for all records.";
-                                validator.showErrors(errors);
-                                valid = false;
-                            }
-                        }
-                    }
-                });
+                // $('.box').each(function(){
+                //     if ($(this).is(":visible") == true) { 
+                //         if(box_id != $(this).attr('id')){
+                //             if(box == $(this).val()){
+                //                 var errors = {};
+                //                 var name = $(this).attr('name');
+                //                 errors[name] = "Please select different box for all records.";
+                //                 validator.showErrors(errors);
+                //                 valid = false;
+                //             }
+                //         }
+                //     }
+                // });
 
                 var result = 1;
 
@@ -3546,10 +3931,12 @@ $("#form_credit_debit_note_details").validate({
         },
         amount_without_tax: {
             required: true,
-            numbersonly: true
+            // numbersonly: true,
+            numbersandcommaanddotonly: true
         },
         tax: {
-            numbersonly: true
+            // numbersonly: true,
+            numbersandcommaanddotonly: true
         },
         remarks: {
             required: true
@@ -3572,7 +3959,47 @@ $('#form_credit_debit_note_details').submit(function() {
     if (!$("#form_credit_debit_note_details").valid()) {
         return false;
     }
+    else {
+        if (check_freezed_credit_debit_note()==false) {
+            return false;
+        }
+        return true;
+    }
 });
+
+function check_freezed_credit_debit_note() {
+    var validator = $("#form_credit_debit_note_details").validate();
+    var valid = true;
+    var btn_val = $(document.activeElement).val();
+
+    if(btn_val=='Submit For Approval' || btn_val=='Delete') {
+        $.ajax({
+            url: BASE_URL+'index.php/Freezed/check_freedzed_month',
+            data: 'date='+$("#date_of_transaction").val(),
+            type: "POST",
+            dataType: 'html',
+            global: false,
+            async: false,
+            success: function (data) {
+                result = parseInt(data);
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert(xhr.status);
+                alert(thrownError);
+            }
+        });
+
+        if (result) {
+            var errors = {};
+            var name = $('#date_of_transaction').attr('name');
+            errors[name] = "Please Select Another Date ,This Date is Freezed";
+            validator.showErrors(errors);
+            valid = false;
+        }
+    }
+
+    return valid;
+}
 
 
 
@@ -4322,28 +4749,28 @@ $("#form_sales_rep_location_details").validate({
             required: true
         },
         orange_bar: {
-            digits: true,
-            required: true
+            digits: true
+            // required: true
         },
         mint_bar: {
-            digits: true,
-            required: true
+            digits: true
+            // required: false
         },
         butterscotch_bar: {
-            digits: true,
-            required: true
+            digits: true
+            // required: true
         },
         chocopeanut_bar: {
-            digits: true,
-            required: true
+            digits: true
+            // required: true
         },
         bambaiyachaat_bar: {
-            digits: true,
-            required: true
+            digits: true
+            // required: true
         },
         mangoginger_bar: {
-            digits: true,
-            required: true
+            digits: true
+            // required: true
         }
     },
 
@@ -4713,6 +5140,9 @@ $("#form_distributor_out_sku_details").validate({
     rules: {
         sales_rep_id: {
             required: true
+        },
+        tracking_id:{
+            required: true
         }
     },
 
@@ -4728,6 +5158,32 @@ $("#form_distributor_out_sku_details").validate({
     }
 });
 
+$("#form_distributor_out_model").validate({
+    rules: {
+        delivery_status: {
+            required: true
+        },
+        upload:{
+            required: true
+        }
+    },
+
+    ignore: ":not(:visible)",
+
+    errorPlacement: function (error, element) {
+        var placement = $(element).data('error');
+        if (placement) {
+            $(placement).append(error);
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
+
+
+
+
 $('#form_distributor_out_sku_details').submit(function() {
     removeMultiInputNamingRules('#form_distributor_out_sku_details', '.batch_no_qty');
     removeMultiInputNamingRules('#form_distributor_out_sku_details', '.batch_no_no');
@@ -4737,9 +5193,9 @@ $('#form_distributor_out_sku_details').submit(function() {
     if (!$("#form_distributor_out_sku_details").valid()) {
         return false;
     } else {
-        if (check_product_availablity_for_sku_details()==false) {
-            return false;
-        }
+        // if (check_product_availablity_for_sku_details()==false) {
+            // return false;
+        // }
 
         removeMultiInputNamingRules('#form_distributor_out_sku_details', '.batch_no_qty');
         removeMultiInputNamingRules('#form_distributor_out_sku_details', '.batch_no_no');
@@ -4915,16 +5371,218 @@ function check_product_availablity_for_sku_details() {
 
 
 
-// ----------------- ORDER FORM VALIDATION -------------------------------------
-$("#form_order_details").validate({
+
+// ----------------- DISTRIBUTOR PO DETAILS FORM VALIDATION -------------------------------------
+$("#form_distributor_po_details").validate({
     rules: {
-        date_of_processing: {
+        date_of_po: {
+            required: true
+        },
+        po_expiry_date: {
+            required: true
+        },
+        depot_id: {
+            required: true
+        },
+        delivery_through: {
             required: true
         },
         distributor_id: {
             required: true
         },
-        total_amount: {
+        type_id: {
+            required: true
+        },
+        zone_id: {
+            required: true
+        },
+        store_id: {
+            required: true
+        },
+        location_id: {
+            required: true
+        },
+        discount: {
+            required: true
+        },
+        tax: {
+            required: true
+        },
+        tax_per: {
+            required: true
+        },
+        estimate_delivery_date: {
+            required: true
+        },
+        po_number:{
+            required: true     
+        },
+        distributor_consignee_id:{
+            required: true     
+        },
+        delivery_date: {
+            required: {
+                depends: function() {
+                    return ($("#delivery_status").val() == "Delivered");
+                }
+            }
+        },
+         basis_of_sales: {
+                required: true
+                
+            },
+             po_number: {
+                required: {
+                    depends: function() {
+                        return (clkBtn!='btn_reject');
+                    }
+                },
+                check_order_id_availablity: {
+                  required: {
+                    depends: function() {
+                            return (clkBtn!='btn_reject');
+                        }
+                    }  
+                }
+            },
+            email_from: {
+                required: true,
+                checkemail: true
+            },
+            email_date_time:{
+                required: true
+            },
+        remarks: {
+            required: {
+                depends: function() {
+                    return (d_status == "Approved");
+                }
+            }
+        }
+    },
+
+    ignore: ":not(:visible)",
+
+    errorPlacement: function (error, element) {
+        var placement = $(element).data('error');
+        if (placement) {
+            $(placement).append(error);
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
+$("#form_distributor_po_list").validate({
+    rules: {    
+        delivery_status:{
+            required: true     
+        },
+        delivery_date:{
+            required: true     
+        },
+        person_receving:{
+            required: true     
+        },
+        cancellation_date:{
+            required: true     
+        }
+    },    
+    ignore: ":not(:visible)",
+
+    errorPlacement: function (error, element) {
+        var placement = $(element).data('error');
+        if (placement) {
+            $(placement).append(error);
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
+
+function check_po_invoice_amount() {
+    var validator = $("#form_distributor_po_details").validate();
+    var valid = true;
+
+    if(parseFloat(get_number($('#entered_invoice_amount').val()))!=parseFloat(get_number($('#invoice_amount').val())))
+    {
+        var errors = {};
+        var name = $('#entered_invoice_amount').attr('name');
+        errors[name] = "Please Enter Correct amount";
+        validator.showErrors(errors);
+        valid = false;
+    }
+
+    return valid;
+}
+
+$('#form_distributor_po_details').submit(function() {
+    removeMultiInputNamingRules('#form_distributor_po_details', 'select[alt="type[]"]');
+    removeMultiInputNamingRules('#form_distributor_po_details', 'select[alt="bar[]"]');
+    removeMultiInputNamingRules('#form_distributor_po_details', 'select[alt="box[]"]');
+    removeMultiInputNamingRules('#form_distributor_po_details', 'input[alt="qty[]"]');
+    removeMultiInputNamingRules('#form_distributor_po_details', 'input[alt="sell_rate[]"]');
+
+    addMultiInputNamingRules('#form_distributor_po_details', 'select[name="type[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_distributor_po_details', 'select[name="bar[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_distributor_po_details', 'select[name="box[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_distributor_po_details', 'input[name="qty[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_distributor_po_details', 'input[name="sell_rate[]"]', { required: true }, "");
+    if (!$("#form_distributor_po_details").valid()) {
+        return false;
+    } else {
+         if (check_po_invoice_amount()==false) {
+            return false;
+        }
+
+        removeMultiInputNamingRules('#form_distributor_po_details', 'select[alt="type[]"]');
+        removeMultiInputNamingRules('#form_distributor_po_details', 'select[alt="bar[]"]');
+        removeMultiInputNamingRules('#form_distributor_po_details', 'select[alt="box[]"]');
+        removeMultiInputNamingRules('#form_distributor_po_details', 'input[alt="qty[]"]');
+        removeMultiInputNamingRules('#form_distributor_po_details', 'input[alt="sell_rate[]"]');
+        
+        return true;
+    }
+});
+
+function StopNonNumeric(el, evt)
+{
+    //var r=e.which?e.which:event.keyCode;
+    //return (r>31)&&(r!=46)&&(48>r||r>57)?!1:void 0
+    var charCode = (evt.which) ? evt.which : event.keyCode;
+    var number = el.value.split('.');
+    if (charCode != 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+        return false;
+    }
+    //just one dot (thanks ddlab)
+    if(number.length>1 && charCode == 46){
+         return false;
+    }
+    //get the carat position
+    var dotPos = el.value.indexOf(".");
+    if( dotPos>-1 && (number[1].length > 5)){
+        return false;
+    }
+    return true;
+}
+
+
+
+
+// ----------------- PRODUCTION DETAILS FORM VALIDATION -------------------------------------
+$("#form_production_details").validate({
+    rules: {
+        p_id: {
+            required: true
+        },
+        from_date: {
+            required: true
+        },
+        to_date: {
+            required: true
+        },
+        manufacturer_id: {
             required: true
         }
     },
@@ -4941,51 +5599,120 @@ $("#form_order_details").validate({
     }
 });
 
-$('#form_order_details').submit(function() {
-    removeMultiInputNamingRules('#form_order_details', 'select[alt="type[]"]');
-    removeMultiInputNamingRules('#form_order_details', 'select[alt="bar[]"]');
-    removeMultiInputNamingRules('#form_order_details', 'select[alt="box[]"]');
-    removeMultiInputNamingRules('#form_order_details', 'input[alt="qty[]"]');
-    removeMultiInputNamingRules('#form_order_details', 'input[alt="sell_rate[]"]');
-
-
-    addMultiInputNamingRules('#form_order_details', 'select[name="type[]"]', { required: true }, "");
-    addMultiInputNamingRules('#form_order_details', 'select[name="bar[]"]', { required: true }, "");
-    addMultiInputNamingRules('#form_order_details', 'select[name="box[]"]', { required: true }, "");
-    addMultiInputNamingRules('#form_order_details', 'input[name="qty[]"]', { required: true }, "");
-    addMultiInputNamingRules('#form_order_details', 'input[name="sell_rate[]"]', { required: true }, "");
-    if (!$("#form_order_details").valid()) {
+$('#form_production_details').submit(function() {
+    if (!$("#form_production_details").valid()) {
         return false;
     } else {
-        if (check_product_availablity_for_order()==false) {
+        return true;
+    }
+});
+
+
+// ----------------- CONFIRM DETAILS FORM VALIDATION -------------------------------------
+$("#form_confirm_details").validate({
+    rules: {
+        p_id: {
+            required: true
+        },
+        from_date: {
+            required: true
+        },
+        to_date: {
+            required: true
+        },
+        manufacturer_id: {
+            required: true
+        },
+        confirm_from_date: {
+            required: true
+        },
+        confirm_to_date: {
+            required: true
+        }
+    },
+
+    ignore: ":not(:visible)",
+
+    errorPlacement: function (error, element) {
+        var placement = $(element).data('error');
+        if (placement) {
+            $(placement).append(error);
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
+$('#form_confirm_details').submit(function() {
+    if (!$("#form_confirm_details").valid()) {
+        return false;
+    } else {
+        return true;
+    }
+});
+
+
+// ----------------- CONFIRM BATCH FORM VALIDATION -------------------------------------
+$("#form_confirm_batch").validate({
+    rules: {
+        p_id: {
+            required: true
+        },
+        manufacturer_id: {
+            required: true
+        },
+        confirm_from_date: {
+            required: true
+        },
+        confirm_to_date: {
+            required: true
+        }
+    },
+
+    ignore: ":not(:visible)",
+
+    errorPlacement: function (error, element) {
+        var placement = $(element).data('error');
+        if (placement) {
+            $(placement).append(error);
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
+$('#form_confirm_batch').submit(function() {
+    removeMultiInputNamingRules('#form_confirm_batch', 'select[alt="bar[]"]');
+    removeMultiInputNamingRules('#form_confirm_batch', 'input[alt="qty[]"]');
+
+    addMultiInputNamingRules('#form_confirm_batch', 'select[name="bar[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_confirm_batch', 'input[name="qty[]"]', { required: true }, "");
+
+    if (!$("#form_confirm_batch").valid()) {
+        return false;
+    } else {
+        if (check_batch()==false) {
             return false;
         }
 
-        removeMultiInputNamingRules('#form_order_details', 'select[alt="type[]"]');
-        removeMultiInputNamingRules('#form_order_details', 'select[alt="bar[]"]');
-        removeMultiInputNamingRules('#form_order_details', 'select[alt="box[]"]');
-        removeMultiInputNamingRules('#form_order_details', 'input[alt="qty[]"]');
-        removeMultiInputNamingRules('#form_order_details', 'input[alt="sell_rate[]"]');
+        removeMultiInputNamingRules('#form_confirm_batch', 'select[alt="bar[]"]');
+        removeMultiInputNamingRules('#form_confirm_batch', 'input[alt="qty[]"]');
         
         return true;
     }
 });
 
-function check_product_availablity_for_order() {
-    var validator = $("#form_order_details").validate();
+function check_batch() {
+    var validator = $("#form_confirm_batch").validate();
     var valid = true;
 
-    if($('.type').length=='0'){
+    if($('.bar').length=='0'){
         var errors = {};
-        var name = $('#date_of_processing').attr('name');
+        var name = $('#p_id').attr('name');
         errors[name] = "Please add atleast one item.";
         validator.showErrors(errors);
         valid = false;
     } else {
-        // var depot_id = $("#depot_id").val();
-        var distributor_id = $("#distributor_id").val();
-        var module="order";
-
         $('.bar').each(function(){
             if ($(this).is(":visible") == true) { 
                 var id = $(this).attr('id');
@@ -5008,144 +5735,62 @@ function check_product_availablity_for_order() {
                         }
                     }
                 });
-
-
-                // var result = 1;
-
-                // $.ajax({
-                //     url: BASE_URL+'index.php/Stock/check_bar_availablity_for_depot',
-                //     data: 'id='+$("#id").val()+'&module='+module+'&depot_id='+$("#depot_id").val()+'&product_id='+bar,
-                //     type: "POST",
-                //     dataType: 'html',
-                //     global: false,
-                //     async: false,
-                //     success: function (data) {
-                //         result = parseInt(data);
-                //     },
-                //     error: function (xhr, ajaxOptions, thrownError) {
-                //         alert(xhr.status);
-                //         alert(thrownError);
-                //     }
-                // });
-
-                // if (result) {
-                //     var id = "bar_"+index;
-                //     var errors = {};
-                //     var name = $("#"+id).attr('name');
-                //     errors[name] = "Bar not available in selected depot.";
-                //     validator.showErrors(errors);
-                //     valid = false;
-                // }
-
-                // result = 1;
-
-                // $.ajax({
-                //     url: BASE_URL+'index.php/Stock/check_bar_qty_availablity_for_depot',
-                //     data: 'id='+$("#id").val()+'&module='+module+'&depot_id='+$("#depot_id").val()+'&product_id='+bar+'&qty='+qty,
-                //     type: "POST",
-                //     dataType: 'html',
-                //     global: false,
-                //     async: false,
-                //     success: function (data) {
-                //         result = parseInt(data);
-                //     },
-                //     error: function (xhr, ajaxOptions, thrownError) {
-                //         alert(xhr.status);
-                //         alert(thrownError);
-                //     }
-                // });
-
-                // if (result) {
-                //     var id = "qty_"+index;
-                //     var errors = {};
-                //     var name = $("#"+id).attr('name');
-                //     errors[name] = "Bar qty is not enough in selected depot.";
-                //     validator.showErrors(errors);
-                //     valid = false;
-                // }
-            }
-        });
-
-        $('.box').each(function(){
-            if ($(this).is(":visible") == true) { 
-                var id = $(this).attr('id');
-                var index = id.substr(id.lastIndexOf('_')+1);
-                var box_id = $(this).attr('id');
-                var box = $(this).val();
-                var qty = parseFloat(get_number($('#qty_'+index).val()));
-                if (isNaN(qty)) qty=0;
-
-                $('.box').each(function(){
-                    if ($(this).is(":visible") == true) { 
-                        if(box_id != $(this).attr('id')){
-                            if(box == $(this).val()){
-                                var errors = {};
-                                var name = $(this).attr('name');
-                                errors[name] = "Please select different box for all records.";
-                                validator.showErrors(errors);
-                                valid = false;
-                            }
-                        }
-                    }
-                });
-
-
-                // var result = 1;
-
-                // $.ajax({
-                //     url: BASE_URL+'index.php/Stock/check_box_availablity_for_depot',
-                //     data: 'id='+$("#id").val()+'&module='+module+'&depot_id='+$("#depot_id").val()+'&box_id='+box,
-                //     type: "POST",
-                //     dataType: 'html',
-                //     global: false,
-                //     async: false,
-                //     success: function (data) {
-                //         result = parseInt(data);
-                //     },
-                //     error: function (xhr, ajaxOptions, thrownError) {
-                //         alert(xhr.status);
-                //         alert(thrownError);
-                //     }
-                // });
-
-                // if (result) {
-                //     var id = "bar_"+index;
-                //     var errors = {};
-                //     var name = $("#"+id).attr('name');
-                //     errors[name] = "Box not available in selected depot.";
-                //     validator.showErrors(errors);
-                //     valid = false;
-                // }
-
-                // result = 1;
-
-                // $.ajax({
-                //     url: BASE_URL+'index.php/Stock/check_box_qty_availablity_for_depot',
-                //     data: 'id='+$("#id").val()+'&module='+module+'&depot_id='+$("#depot_id").val()+'&box_id='+box+'&qty='+qty,
-                //     type: "POST",
-                //     dataType: 'html',
-                //     global: false,
-                //     async: false,
-                //     success: function (data) {
-                //         result = parseInt(data);
-                //     },
-                //     error: function (xhr, ajaxOptions, thrownError) {
-                //         alert(xhr.status);
-                //         alert(thrownError);
-                //     }
-                // });
-
-                // if (result) {
-                //     var id = "qty_"+index;
-                //     var errors = {};
-                //     var name = $("#"+id).attr('name');
-                //     errors[name] = "Box qty is not enough in selected depot.";
-                //     validator.showErrors(errors);
-                //     valid = false;
-                // }
             }
         });
     }
 
     return valid;
 }
+
+
+// ----------------- CONFIRM RAW MATERIAL FORM VALIDATION -------------------------------------
+$("#form_confirm_raw_material").validate({
+    rules: {
+        p_id: {
+            required: true
+        },
+        manufacturer_id: {
+            required: true
+        },
+        confirm_from_date: {
+            required: true
+        },
+        confirm_to_date: {
+            required: true
+        }
+    },
+
+    ignore: ":not(:visible)",
+
+    errorPlacement: function (error, element) {
+        var placement = $(element).data('error');
+        if (placement) {
+            $(placement).append(error);
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
+$('#form_confirm_raw_material').submit(function() {
+    removeMultiInputNamingRules('#form_confirm_raw_material', 'select[alt="raw_material[]"]');
+    removeMultiInputNamingRules('#form_confirm_raw_material', 'input[alt="required_qty[]"]');
+    removeMultiInputNamingRules('#form_confirm_raw_material', 'input[alt="available_qty[]"]');
+    removeMultiInputNamingRules('#form_confirm_raw_material', 'input[alt="difference_qty[]"]');
+
+    addMultiInputNamingRules('#form_confirm_raw_material', 'select[name="raw_material[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_confirm_raw_material', 'input[name="required_qty[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_confirm_raw_material', 'input[name="available_qty[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_confirm_raw_material', 'input[name="difference_qty[]"]', { required: true }, "");
+
+    if (!$("#form_confirm_raw_material").valid()) {
+        return false;
+    } else {
+        removeMultiInputNamingRules('#form_confirm_raw_material', 'select[alt="raw_material[]"]');
+        removeMultiInputNamingRules('#form_confirm_raw_material', 'input[alt="required_qty[]"]');
+        removeMultiInputNamingRules('#form_confirm_raw_material', 'input[alt="available_qty[]"]');
+        removeMultiInputNamingRules('#form_confirm_raw_material', 'input[alt="difference_qty[]"]');
+        
+        return true;
+    }
+});

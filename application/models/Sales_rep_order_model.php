@@ -49,10 +49,20 @@ function get_distributors($status='', $id=''){
 }
 
 function get_data($status='', $id=''){
-    if($status!=""){
-        $cond=" where status='".$status."'";
-    } else {
-        $cond="";
+    // if($status!=""){
+    //     $cond=" where status='".$status."'";
+    // } else {
+    //     $cond="";
+    // }
+
+    $cond=" where status='Approved'";
+
+    if(strtoupper(trim($status))=="PENDING"){
+        if($cond=="") {
+            $cond=" where delivery_status='pending'";
+        } else {
+            $cond=$cond." and delivery_status='pending'";
+        }
     }
 
     if($id!=""){
@@ -98,10 +108,67 @@ function get_data($status='', $id=''){
             left join 
             (select * from user_master) D 
             on (C.modified_by=D.id)) E ".$cond." 
-            order by E.modified_on desc";
+            and E.date_of_processing = date(now()) order by E.modified_on desc";
     $query=$this->db->query($sql);
     return $query->result();
 }
+
+
+function get_data1($status='', $id=''){
+    if($status!=""){
+        $cond=" where status='".$status."'";
+    } else {
+        $cond="";
+    }
+
+    if($id!=""){
+        if($cond=="") {
+            $cond=" where id='".$id."'";
+        } else {
+            $cond=$cond." and id='".$id."'";
+        }
+    }
+
+    $sales_rep_id=$this->session->userdata('sales_rep_id');
+    if($sales_rep_id!=""){
+        if($cond=="") {
+            $cond=" where sales_rep_id='".$sales_rep_id."'";
+        } else {
+            $cond=$cond." and sales_rep_id='".$sales_rep_id."'";
+        }
+    }
+
+    $sql = "select E.* from 
+            (select C.*, concat(ifnull(D.first_name,''),' ',ifnull(D.last_name,'')) as user_name from 
+            (select A.*, B.distributor_name, B.sell_out, B.contact_person, B.contact_no, B.area from 
+            (select concat('s_',id) as id, sales_rep_id, date_of_processing, distributor_id, 
+                null as invoice_no, amount, status, remarks, modified_by, modified_on from sales_rep_orders 
+            union all 
+            select concat('d_',id) as id, sales_rep_id, date_of_processing, concat('d_',distributor_id) as distributor_id, 
+                invoice_no, final_amount as amount, status, remarks, modified_by, modified_on from distributor_out) A
+            left join 
+            (select concat('s_',id) as id, distributor_name, margin as sell_out, contact_person, contact_no, city as area 
+                from sales_rep_distributors
+            union all 
+            select concat('d_',E.id) as id, E.distributor_name, E.sell_out, E.contact_person, E.contact_no, E.area from 
+            (select C.*, D.area from 
+            (select A.*, B.contact_person, B.mobile as contact_no from 
+            (select id, distributor_name, sell_out, area_id from distributor_master) A 
+            left join 
+            (select * from distributor_contacts) B 
+            on (A.id = B.distributor_id)) C 
+            left join 
+            (select * from area_master) D 
+            on (C.Area_id = D.id)) E) B 
+            on (A.distributor_id = B.id)) C 
+            left join 
+            (select * from user_master) D 
+            on (C.modified_by=D.id)) E ".$cond." and
+           E.date_of_processing = date(now()) order by E.modified_on desc";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
 
 function get_distributor_out_data1($status='', $id=''){
     $curusr = $this->session->userdata('session_id');

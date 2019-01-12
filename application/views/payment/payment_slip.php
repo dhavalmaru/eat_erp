@@ -1,225 +1,197 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title> Cheque </title>
-<style>
-@font-face {
-    font-family: "OpenSans-Regular";
-    src: url("<?php echo base_url().'/assets/invoice/'; ?>OpenSans-Regular.ttf") format("truetype");
-}
-*{margin:0; padding:0;		}
- img { }
-  @media print{@page {size: landscape}}
-  body { font-family: "verdana"; font-size:13px; font-weight:500; margin:0; padding:0;		}
-  table, th, td {
-    border: 1px solid black;
-    border-collapse: collapse;
-    width: 1330px;
-    margin-left: 5px;
-    margin-top: 10px;
-    padding:6px 10px;
-}
-th { font-size:15px; padding:5px 10px; font-weight:400; }
-</style>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Receipt Voucher</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <!-- Bootstrap 3.3.6 -->
+
+    <style>
+        body {  margin:0; padding:0; letter-spacing: 0.5px; font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;}
+        .debit_note {  margin:20px auto; border:0px solid #ddd; max-width:800px; }
+        .header-section {text-align:center;}
+        h1 { font-size:23px; font-weight:600!important; margin:0; padding:0; text-align:center; }
+        h2 { font-size:23px; font-weight:600!important; margin:0; padding:0; text-align:center; padding-bottom:5px; }
+        p{ padding:0; margin:0; font-size:13px; line-height:21px; }
+        table  { margin:10px 0;   }
+        table tr td  { border:1px solid #999; padding:3px 10px;  }
+        .table-bordered { font-size:13px;  border-collapse:collapse; width:100%;}
+        .table {   border-collapse:collapse; width:100%;}
+        .table-bordered tr th{ border:1px solid #999; padding:3px 7px; border-collapse:collapse;  }
+        .modal-body-inside { padding:10px; }
+        @media print{@page {size: portrait}}
+        /*.modal-body-inside table { font-size: 14px; }*/
+		.user_data tr, .user_data td
+		{
+			border:none!important;
+			padding:5px!important;
+		}
+    </style>
 </head>
 
-<body>
+<body class="hold-transition">
+<div class="debit_note">
+    <div class="header-section">
+        <center style="width:100%;display:inline-block;margin:0 auto;">
+            <img src="<?php echo base_url().'/assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:150px;" />
+            <p style="font-size:12px;line-height:18px;margin:0;margin-bottom:10px;">
+                C/109, Hind Saurashtra Ind. Estate. 85/86, Andheri Kurla Road, Marol Naka, Andheri East. Mumbai 400059
+                <br /> +91 8268000456 
+                <br><a href="mailto:cs@eatanytime.in">cs@eatanytime.in</a><br>
+                GSTIN: 27AABCW7811R1ZN
+            </p>
+        </center>
+    </div>
 
-<div style="width:1349px; height:550px; " >
- <img src="<?php echo base_url().'/assets/invoice/'; ?>cheque.png " style="width:100%; overflow:auto;"/>
- <!--Date Left Side  Start-->
-<div  style="position: absolute;  top:48px;   left:18.6%;  font-size: 22px; font-weight:600; "> <?php if (isset($d1)) echo $d1; ?> </div> 
-<div  style="position: absolute;  top:48px;   left: 20.6%;  font-size: 22px; font-weight:600; "> <?php if (isset($d2)) echo $d2; ?> </div> 
-<div  style="position: absolute;  top:48px;   left: 23.2%;  font-size: 22px; font-weight:600; "> <?php if (isset($m1)) echo $m1; ?> </div> 
-<div  style="position: absolute;  top:48px;   left: 25.3%;  font-size: 22px; font-weight:600; "> <?php if (isset($m2)) echo $m2; ?> </div> 
-<div  style="position: absolute;  top:48px;   left: 27.9%;  font-size: 22px; font-weight:600; "> <?php if (isset($y1)) echo $y1; ?> </div> 
-<div  style="position: absolute;   top:48px;   left: 30%;  font-size: 22px; font-weight:600; "> <?php if (isset($y2)) echo $y2; ?> </div> 
-<div  style="position: absolute; top:48px;  left: 32.1%;  font-size: 22px; font-weight:600; "> <?php if (isset($y3)) echo $y3; ?> </div> 
-<div  style="position: absolute;  top:48px;   left: 34.2%;  font-size: 22px; font-weight:600; "> <?php if (isset($y4)) echo $y4; ?> </div> 
- <!--Date Left Side  End-->
- 
-  <!--Date Right Side  Start-->
- <div  style="position: absolute;  top:45px;   right:2.1%;  font-size: 22px; font-weight:600; "> <?php if (isset($y4)) echo $y4; ?> </div> 
-<div  style="position: absolute;   top:45px;   right:4.3%;   font-size: 22px; font-weight:600; "> <?php if (isset($y3)) echo $y3; ?> </div> 
-<div  style="position: absolute;   top:45px;   right:6.4%;   font-size: 22px; font-weight:600; "> <?php if (isset($y2)) echo $y2; ?> </div> 
-<div  style="position: absolute;   top:45px;    right:8.5%;   font-size: 22px; font-weight:600; "> <?php if (isset($y1)) echo $y1; ?> </div> 
-<div  style="position: absolute;   top:45px;   right:11%;   font-size: 22px; font-weight:600; "> <?php if (isset($m2)) echo $m2; ?> </div> 
-<div  style="position: absolute;   top:45px;   right:13.1%;  font-size: 22px; font-weight:600; "> <?php if (isset($m1)) echo $m1; ?> </div> 
-<div  style="position: absolute;  top:45px;   right:15.7%;  font-size: 22px; font-weight:600; "> <?php if (isset($d2)) echo $d2; ?> </div> 
-<div  style="position: absolute;  top:45px;   right:17.8%;  font-size: 22px; font-weight:600; "> <?php if (isset($d1)) echo $d1; ?> </div> 
-  <!--Date Right Side  End-->
-
-
-<!--cheque Details Left Side Start-->
-
-<!--cheque details-->
-<div style="width: 226px; position: absolute;  top: 229px; left: 1%;"> <?php if (isset($items['0']->payment_mode)) echo $items['0']->payment_mode; ?><?php if (isset($items['0']->payment_mode) && isset($id)) echo ' - ' . $id; ?> </div> 
-<div style="width: 226px; position: absolute;  top: 259px; left: 1%;"> <?php if (isset($items['1']->payment_mode)) echo $items['1']->payment_mode; ?><?php if (isset($items['1']->payment_mode) && isset($id)) echo ' - ' . $id; ?> </div> 
-<div style="width: 226px; position: absolute;  top: 289px; left: 1%;"> <?php if (isset($items['2']->payment_mode)) echo $items['2']->payment_mode; ?><?php if (isset($items['2']->payment_mode) && isset($id)) echo ' - ' . $id; ?> </div> 
-<div style="width: 226px; position: absolute;  top: 319px; left: 1%;"> <?php if (isset($items['3']->payment_mode)) echo $items['3']->payment_mode; ?><?php if (isset($items['3']->payment_mode) && isset($id)) echo ' - ' . $id; ?> </div> 
-<div style="width: 226px; position: absolute;  top: 348px; left: 1%;"> <?php if (isset($items['4']->payment_mode)) echo $items['4']->payment_mode; ?><?php if (isset($items['4']->payment_mode) && isset($id)) echo ' - ' . $id; ?> </div> 
-  <!--Cheque details End-->
- 
- <!--Cheque No. Start-->
-<div style="width:100px; position: absolute;  top: 229px;  left:18.5%;"> <?php if (isset($items['0']->cheque_no)) echo $items['0']->cheque_no; ?> </div> 
-<div style="width:100px; position: absolute;  top: 259px;  left:18.5%;"> <?php if (isset($items['1']->cheque_no)) echo $items['1']->cheque_no; ?> </div> 
-<div style="width:100px; position: absolute;  top: 289px;  left:18.5%;"> <?php if (isset($items['2']->cheque_no)) echo $items['2']->cheque_no; ?> </div> 
-<div style="width:100px; position: absolute;  top: 319px;  left:18.5%;"> <?php if (isset($items['3']->cheque_no)) echo $items['3']->cheque_no; ?> </div> 
-<div style="width:100px; position: absolute;  top: 348px;  left:18.5%;"> <?php if (isset($items['4']->cheque_no)) echo $items['4']->cheque_no; ?> </div> 
- <!--Cheque No. End-->
-
- <!--Rs. Start-->
-<div style="width:118px; position: absolute;  top: 229px;  left:26.7%; text-align:right;"> <?php if (isset($items['0']->payment_amount)) echo $items['0']->payment_amount; ?> </div> 
-<div style="width:118px; position: absolute;  top: 259px;   left:26.7%; text-align:right;"> <?php if (isset($items['1']->payment_amount)) echo $items['1']->payment_amount; ?> </div> 
-<div style="width:118px; position: absolute;  top: 289px;  left:26.7%; text-align:right;"> <?php if (isset($items['2']->payment_amount)) echo $items['2']->payment_amount; ?> </div> 
-<div style="width:118px; position: absolute;  top: 319px;  left:26.7%; text-align:right;"> <?php if (isset($items['3']->payment_amount)) echo $items['3']->payment_amount; ?> </div> 
-<div style="width:118px; position: absolute;  top: 348px;   left:26.7%; text-align:right;"> <?php if (isset($items['4']->payment_amount)) echo $items['4']->payment_amount; ?> </div> 
-<div style="width:118px; position: absolute;  top: 376px;   left:26.7%; text-align:right;"> <?php if (isset($total_amount)) echo $total_amount; ?> </div> 
-
-<div style="width:350px; position: absolute;  top: 398px;   left:9.7%; line-height:20px;"> <?php if (isset($total_amount_in_words)) echo $total_amount_in_words; ?> </div> 
- 
- <!--Rs. End-->
- <!--Cheque Details Left Sided End-->
- 
- 
- 
- 
-<!--cheque Details Right Side Start-->
-<div style="position:relative; margin-left:40.8%; margin-top:-540px;">
-<!--Branch Name Start-->
-		<div style="width: 190px;position: absolute;   top: 226px; left: 0%;"> <?php if (isset($items['0']->bank_name)) echo $items['0']->bank_name; ?> </div> 
-		<div style="width: 190px; position: absolute;  top: 253px; left:0%;"> <?php if (isset($items['1']->bank_name)) echo $items['1']->bank_name; ?> </div> 
-		<div style="width: 190px; position: absolute;  top: 279px; left: 0%;"> <?php if (isset($items['2']->bank_name)) echo $items['2']->bank_name; ?> </div> 
-		<div style="width: 190px; position: absolute;  top: 305px; left:0%;"> <?php if (isset($items['3']->bank_name)) echo $items['3']->bank_name; ?> </div> 
-		<div style="width: 190px; position: absolute;  top: 331px; left: 0%;"> <?php if (isset($items['4']->bank_name)) echo $items['4']->bank_name; ?> </div> 
-		<div style="width: 190px; position: absolute;  top: 359px; left: 0%;"> <?php if (isset($items['5']->bank_name)) echo $items['5']->bank_name; ?> </div> 
-		  <!--Branch Name End-->
+    <table width="100%" border="0" cellspacing="0" class="table" style="border-collapse:collapse;  ">
+        <tr style="border:none;">
+            <td style="border:none;" colspan="6" align="center"><h2><b>Receipt Voucher</b></h2></td>
+        </tr>
+        <tr style="border:none;">
+            <td width="17%" style="border:none;"><p> Ref.</p></td>
+            <td width="3%" style="border:none;">:</td>
+            <td width="40%" style="border:none;"><p><b> WHPL/RECEIPT/<?php echo calculateFiscalYearForDate($date_of_deposit)?>/<?php if(isset($id)) echo $id; ?> </b></p></td>
+            <td width="22%" style="border:none;"><p>Transaction Date</p></td>
+            <td width="4%" style="border:none;">:</td>
+            <td width="14%" style="border:none;">
+                <p>
+                    <b> 
+                        <?php if (isset($date_of_deposit)) echo date('d/m/Y',strtotime($date_of_deposit)); ?>
+                             
+                    </b>
+                </p>
+            </td>
+        </tr>
+        <!-- <tr style="border:none;">
+            <td width="17%" style="border:none;"><p>Invoice No.</p></td>
+            <td width="3%" height="25" style="border:none;">:</td>
+            <td width="40%" style="border:none;"><p><b> <?php //if(isset($debit_note[0]['invoice_no'])) echo $debit_note[0]['invoice_no']; ?></b></p></td>
+            <td width="22%" style="border:none;"><p>Invoice Date</p></td>
+            <td width="4%" style="border:none;">:</td>
+            <td width="14%" style="border:none;">
+                <p>
+                    <b> 
+                        <?php //if(isset($debit_note[0]['invoice_date'])) 
+                                //echo (($debit_note[0]['invoice_date']!=null && $debit_note[0]['invoice_date']!='')?
+                                //date('d/m/Y',strtotime($debit_note[0]['invoice_date'])):''); ?> 
+                    </b>
+                </p>
+            </td>
+        </tr> -->
+		 <tr style="border:none;">
+            <td width="17%" style="border:none;"><p> Bank name</p></td>
+            <td width="3%" style="border:none;">:</td>
+            <td width="80%" style="border:none;" colspan="3">
+                <p><b> <?php if (isset($b_name)) echo $b_name; ?> </b></p>
+            </td>
+            <!-- <td width="22%" style="border:none;"><p>Warehouse GSTIN</p></td>
+            <td width="4%" style="border:none;">:</td>
+            <td width="14%" style="border:none;">
+                <p>
+                    <b> 
+                        <?php //if(isset($grn_details[0]['gst_id'])) echo $grn_details[0]['gst_id']; ?>
+                    </b>
+                </p>
+            </td> -->
+        </tr>
+        <tr style="border:none;">
+            <td  width="17%" style="border:none; vertical-align:top;"><p>Deposit Mode: </p></td>
+            <td  width="3%" style="border:none; vertical-align:top;">:</td>
+            <td  width="80%" style="border:none; vertical-align:top;" colspan="3">
+                <p>
+                    <b> <?php if (isset($items['0']->payment_mode)) echo $items['0']->payment_mode; ?>
+                </p>
+            </td>
+            <!-- <td width="22%" style="border:none; vertical-align:top;"><p>Warehouse</p></td>
+            <td width="4%" style="border:none; vertical-align:top;">:</td>
+            <td width="14%" style="border:none; vertical-align:top;">
+                <p>
+                    <b> 
+                        <?php //if(isset($grn_details[0]['warehouse_name'])) echo $grn_details[0]['warehouse_name']; ?>
+                    </b>
+                </p>
+            </td> -->
+        </tr>
+       
+		
 		 
-		 <!--City Start-->
-		<div style="width:100px; position: absolute;  top: 226px;  left:25.1%; text-align:center;"> <?php if (isset($items['0']->bank_city)) echo $items['0']->bank_city; ?> </div> 
-		<div style="width:100px; position: absolute;  top: 253px;  left:25.1%; text-align:center;"> <?php if (isset($items['1']->bank_city)) echo $items['1']->bank_city; ?> </div> 
-		<div style="width:100px; position: absolute;  top: 279px;  left:25.1%; text-align:center;"> <?php if (isset($items['2']->bank_city)) echo $items['2']->bank_city; ?> </div> 
-		<div style="width:100px; position: absolute;  top: 305px;  left:25.1%; text-align:center;"> <?php if (isset($items['3']->bank_city)) echo $items['3']->bank_city; ?> </div> 
-		<div style="width:100px; position: absolute;  top: 331px;  left:25.1%; text-align:center;"> <?php if (isset($items['4']->bank_city)) echo $items['4']->bank_city; ?> </div> 
-		<div style="width:100px; position: absolute;  top: 359px;  left:25.1%; text-align:center;"> <?php if (isset($items['5']->bank_city)) echo $items['5']->bank_city; ?> </div> 
-		 <!--City End-->
+        <tr>
+            <td colspan="6" height="10" style="border:none;">&nbsp;</td>
+        </tr>
+		 <tr>
+            <td colspan="3"  style="border-left:none;"><p><b>Distributor Name</b></p></td>
+            <td colspan="1" align="center"  style="border-right:none;"><p><b>Invoice No.</b></p></td>
+            <td colspan="2" align="center"  style="border-right:none;"><p><b>Amount</b></p></td>
+        </tr>
+			<?php if(isset($distributor)) { for($i=0;$i<count($distributor);$i++) {?>
+       
+        <tr valign="top"  style="border:none; ">
+            <td colspan="3"   style="border-left:none; border-bottom:none; ">
+                <p>
+                   <?php if(isset($distributor[$i]->distributor_name)) echo $distributor[$i]->distributor_name; ?>
+                </p>
+            </td>
+            <td colspan="1" align="center" valign="top" style="border-right:none;border-bottom:none; "><p><b><?php if(isset($distributor[$i]->invoice_no)) echo $distributor[$i]->invoice_no; ?></b></p></td>
+		 <td colspan="2" align="center" valign="top" style="border-right:none;border-bottom:none; "><p><b>Rs. <?php if(isset($distributor[$i]->payment_amount)) echo format_money($distributor[$i]->payment_amount,2); ?></b></p></td>
+        </tr>
+      	<?php }} ?>
+    
+        <tr valign="top"  style="border:none; ">
+            <td colspan="4"   style="border-left: none; " >
+                <p><b>
+                    Total Amount
+                </b></p>
+            </td>
+            <td colspan="2" align="center" valign="top" style="border-right:none; "><p><b>Rs. <?php if (isset($total_amount)) echo format_money($total_amount,2); ?></b></p></td>
+        </tr>
+       
+        <tr>
+            <td height="40" colspan="4" valign="top" style="border:none; border-bottom:1px solid #999; border-right:1px solid #999;"> 
+                <p><b><?php if(isset($total_amount_in_words)) echo $total_amount_in_words; ?></b></p>
+            </td>
+            
+        </tr>
+        <!-- <tr valign="bottom" >
+            <td colspan="6" style="border:none;">&nbsp;   </td>
+            <td colspan="3" style="border:none;"></td>
+        </tr> -->
+        <tr valign="bottom" >
+            <td colspan="6" style="border:none;"><p style="text-align: center;">This is a computer generated. No signature required. &nbsp;</p></td>
+            <!-- <td colspan="2" style="border:none;"> &nbsp; </td>
+            <td valign="bottom" colspan="2" style="border:none; text-align:center "><p> <b>Authorised Signatory</b></p></td> -->
+        </tr>
+        
+    </table>
+    <table class="user_data" border="0" width="100%" style="border-collapse:collapse;margin-top:20px;font-size:12px " class="table" 	cellspacing="10">
+				<tr valign="center" >
+						  <td width="100%" align="center"><b>Created By:</b>
+						 <?php if(isset($createdby)) echo $createdby; ?>&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp
+						  <span style="<?php if(isset($created_on)) 
+						if(date("d-m-Y h:m:i", strtotime($created_on)) <> date("d-m-Y h:m:i", strtotime($modified_on)))
+						echo ' ';else echo 'display:none;';?>">
+						 <b> Modified By:</b>
+						  <?php if(isset($modifiedby)) echo $modifiedby; ?>  &nbsp &nbsp &nbsp  &nbsp &nbsp &nbsp &nbsp </span>
+						  <b> Approved By:</b>
+						  <?php if(isset($approvedby)) echo $approvedby; ?></td>
+						  
+				</tr>
+				<tr valign="center" >
+					    <td width="100%" align="center"><b>Created On:</b>
+						    <?php if(isset($created_on)) echo date("d-m-Y h:m:i", strtotime($created_on))?>&nbsp &nbsp &nbsp &nbsp
+						<span style="<?php if(isset($created_on)) 
+						if(date("d-m-Y h:m:i", strtotime($created_on)) <> date("d-m-Y h:m:i", strtotime($modified_on)))
+						echo ' ';else echo 'display:none;';?>">
+						  <b> Modified On:</b>
+						     <?php if(isset($modified_on)) echo date("d-m-Y h:m:i", strtotime($modified_on)) ?>&nbsp &nbsp &nbsp &nbsp </span>
+						   <b> Approved On:</b>
+						    <?php if(isset($approved_on))echo date("d-m-Y h:m:i", strtotime($approved_on)) ?>
+							</td>
+				</tr>
+					
+	</table>
 
-		 <!--Cheque No Start-->
-		<div style="width:130px; position: absolute;  top: 229px;  left:39.1%;"> <?php if (isset($items['0']->cheque_no)) echo $items['0']->cheque_no; ?> </div> 
-		<div style="width:130px; position: absolute;  top: 256px;   left:39.1%;"> <?php if (isset($items['1']->cheque_no)) echo $items['1']->cheque_no; ?> </div> 
-		<div style="width:130px; position: absolute;  top: 282px;  left:39.1%;"> <?php if (isset($items['2']->cheque_no)) echo $items['2']->cheque_no; ?>  </div> 
-		<div style="width:130px; position: absolute;  top: 308px;  left:39.1%;"> <?php if (isset($items['3']->cheque_no)) echo $items['3']->cheque_no; ?> </div> 
-		<div style="width:130px; position: absolute;  top: 334px;   left:39.1%;"> <?php if (isset($items['4']->cheque_no)) echo $items['4']->cheque_no; ?> </div>
-		<div style="width:130px; position: absolute;  top: 362px;   left:39.1%;">  </div>
-		<div style="width:340px; position: absolute;  top: 382px;   left:13.9%; line-height:30px;"> <?php if (isset($total_amount_in_words)) echo $total_amount_in_words; ?> </div> 
-		 <!--Cheque No End-->
-
-
-		 <!--Denomination. Start-->
-		<div style="width:170px; position: absolute;  top: 227px;  left:74.8%; text-align:right;"> <?php //if (isset($denomination['0']->denomination_2000)) {if ($denomination['0']->denomination_2000>0) echo $denomination['0']->denomination_2000*2000;} ?> </div> 
-		<div style="width:170px; position: absolute;  top: 227px;  left:74.8%; text-align:right;"> <?php if (isset($denomination['0']->denomination_1000)) {if ($denomination['0']->denomination_1000>0) echo $denomination['0']->denomination_1000*1000;} ?> </div> 
-		<div style="width:170px; position: absolute;  top: 254px;  left:74.8%; text-align:right;"> <?php if (isset($denomination['0']->denomination_500)) {if ($denomination['0']->denomination_500>0) echo $denomination['0']->denomination_500*500;} ?> </div> 
-		<div style="width:170px; position: absolute;  top: 280px;  left:74.8%; text-align:right;"> <?php if (isset($denomination['0']->denomination_100)) {if ($denomination['0']->denomination_100>0) echo $denomination['0']->denomination_100*100;} ?> </div> 
-		<div style="width:170px; position: absolute;  top: 306px;  left:74.8%; text-align:right;"> <?php if (isset($denomination['0']->denomination_50)) {if ($denomination['0']->denomination_50>0) echo $denomination['0']->denomination_50*50;} ?> </div> 
-		<div style="width:170px; position: absolute;  top: 332px;  left:74.8%; text-align:right;"> <?php if (isset($denomination['0']->denomination_20)) {if ($denomination['0']->denomination_20>0) echo $denomination['0']->denomination_20*20;} ?> </div> 
-		<div style="width:170px; position: absolute;  top: 360px;  left:74.8%; text-align:right;"> <?php if (isset($denomination['0']->denomination_10)) {if ($denomination['0']->denomination_10>0) echo $denomination['0']->denomination_10*10;} ?> </div> 
-		<div style="width:170px; position: absolute;  top: 386px;  left:74.8%; text-align:right;"> <?php if (isset($denomination['0']->denomination_other_amount)) {if ($denomination['0']->denomination_other_amount>0) echo $denomination['0']->denomination_other_amount;} ?> </div> 
-		<div style="width:170px; position: absolute;  top: 415px;  left:74.8%; text-align:right;"> <?php if (isset($total_amount)) echo $total_amount; ?> </div> 
-		 <!--Denomination. End-->
- </div>
- <!--Cheque Details Right Sided End-->
 </div>
-
-
-<div style=" border-top:1px dashed #999; padding-top:10px;">
-<table>
-
-	<thead>
-		<tr><th colspan="9"><h4>PIS Report</h4></th></tr>
-	</thead>
-	<tbody>
-		<tr style="padding-bottom:0!important;">
-			<td style="font-weight:bold; text-decoration:none; border:none;"> <span style="border-bottom:0px solid #666; padding-bottom:5px;"> Deposit Slip:</span></td>
-			<td style="border:none;"><?php if (isset($id)) echo $id; ?></td>
-			 <td style="font-weight:bold; text-decoration:none; border:none;"> <span style="border-bottom:0px solid #666; padding-bottom:5px;">Deposit Date:</span></td>
-			<td style="border:none;"><?php if (isset($date_of_deposit)) echo date('d/m/Y',strtotime($date_of_deposit)); ?></td>
-				<td style="font-weight:bold; text-decoration:none; border:none;"> <span style="border-bottom:0px solid #666; padding-bottom:5px;"> Deposit Mode: </span></td>
-			<td style="border:none;"><?php if (isset($items['0']->payment_mode)) echo $items['0']->payment_mode; ?></td>
-			<td style="font-weight:bold; text-decoration:none; border:none;"> <span style="border-bottom:0px solid #666; padding-bottom:5px;">Deposit Amount:</span></td>
-			<td colspan="2" style="border:none;"><?php if (isset($total_amount)) echo $total_amount; ?></td>
-		</tr>
-	 
-		<tr>
-			<td style="font-weight:bold; text-decoration:none; border:none;"> <span style="border-bottom:0px solid #666; padding-bottom:8px;"> Bank Name:</span></td>
-			<td style="border:none;"><?php if (isset($b_name)) echo $b_name; ?></td>
-			<td style="font-weight:bold; text-decoration:none; border:none;"> <span style="border-bottom:0px solid #666; padding-bottom:8px;">Bank Branch:</span></td>
-			<td colspan="6" style="border:none;"><?php if (isset($b_branch)) echo $b_branch; ?></td>
-		</tr> 
-		<tr><td colspan="9" style="font-weight:bold; text-align:center;">Denomination</td></tr>
-		<tr>
-			<td style="font-weight:bold; text-align:center;">1000</td>
-			<td style="font-weight:bold; text-align:center;">500</td>
-			<td style="font-weight:bold; text-align:center;">100</td>
-			<td style="font-weight:bold; text-align:center;">50</td>
-			<td style="font-weight:bold; text-align:center;">20</td>
-			<td style="font-weight:bold; text-align:center;">10</td>
-			<td style="font-weight:bold; text-align:center;">5</td>
-			<td style="font-weight:bold; text-align:center;">1</td>
-			<td style="font-weight:bold; text-align:center;">Total</td>
-		</tr>
-		<tr>
-			<td style="text-align:center;"><?php if (isset($denomination['0']->denomination_1000)) {if ($denomination['0']->denomination_1000>0) echo $denomination['0']->denomination_1000;} ?></td>
-			<td style="text-align:center;"><?php if (isset($denomination['0']->denomination_500)) {if ($denomination['0']->denomination_500>0) echo $denomination['0']->denomination_500;} ?></td>
-			<td style="text-align:center;"><?php if (isset($denomination['0']->denomination_100)) {if ($denomination['0']->denomination_100>0) echo $denomination['0']->denomination_100;} ?></td>
-			<td style="text-align:center;"><?php if (isset($denomination['0']->denomination_50)) {if ($denomination['0']->denomination_50>0) echo $denomination['0']->denomination_50;} ?></td>
-			<td style="text-align:center;"><?php if (isset($denomination['0']->denomination_20)) {if ($denomination['0']->denomination_20>0) echo $denomination['0']->denomination_20;} ?></td>
-			<td style="text-align:center;"><?php if (isset($denomination['0']->denomination_10)) {if ($denomination['0']->denomination_10>0) echo $denomination['0']->denomination_10;} ?></td>
-			<td style="text-align:center;"><?php if (isset($denomination['0']->denomination_5)) {if ($denomination['0']->denomination_5>0) echo $denomination['0']->denomination_5;} ?></td>
-			<td style="text-align:center;"><?php if (isset($denomination['0']->denomination_1)) {if ($denomination['0']->denomination_1>0) echo $denomination['0']->denomination_1;} ?></td>
-			<td style="text-align:center;"><?php echo intval((isset($denomination['0']->denomination_1000)?$denomination['0']->denomination_1000:0))+
-						  intval((isset($denomination['0']->denomination_500)?$denomination['0']->denomination_500:0))+
-						  intval((isset($denomination['0']->denomination_100)?$denomination['0']->denomination_100:0))+
-						  intval((isset($denomination['0']->denomination_50)?$denomination['0']->denomination_50:0))+
-						  intval((isset($denomination['0']->denomination_20)?$denomination['0']->denomination_20:0))+
-						  intval((isset($denomination['0']->denomination_10)?$denomination['0']->denomination_10:0))+
-						  intval((isset($denomination['0']->denomination_5)?$denomination['0']->denomination_5:0))+
-						  intval((isset($denomination['0']->denomination_1)?$denomination['0']->denomination_1:0)); ?></td>
-		</tr>
-	</tbody>
-</table>
-
-<table>
-
-	<tbody>
-		<tr>
-			<td>Distributor Name</td>
-			<td>Invoice No</td>
-			<td>Receipt Date</td>
-			<td>Mode</td>
-			<td>Instrument #</td>
-			<td colspan="3">Bank Name</td>
-			<td>Amount</td>
-		</tr>
-		<?php if(isset($distributor)) { for($i=0;$i<count($distributor);$i++) {?>
-		<tr>
-			<td><?php if(isset($distributor[$i]->distributor_name)) echo $distributor[$i]->distributor_name; ?></td>
-			<td><?php if(isset($distributor[$i]->invoice_no)) echo $distributor[$i]->invoice_no; ?></td>
-			<td><?php if (isset($date_of_deposit)) echo date('d/m/Y',strtotime($date_of_deposit)); ?></td>
-			<td><?php if (isset($items['0']->payment_mode)) echo $items['0']->payment_mode; ?></td>
-			<td><?php if(isset($distributor[$i]->ref_no)) echo $distributor[$i]->ref_no; ?></td>
-			<td colspan="3"><?php if(isset($distributor[$i]->bank_name)) echo $distributor[$i]->bank_name; ?><?php if(isset($distributor[$i]->bank_city)) echo ' ' . $distributor[$i]->bank_city; ?></td>
-			<td><?php if(isset($distributor[$i]->payment_amount)) echo $distributor[$i]->payment_amount; ?></td>
-		</tr>
-		<?php }} ?>
-		<tr>
-			<td colspan="7" style="border:none;">&nbsp;</td>
-			<td style="border:none;">Total</td>
-			<td><?php if (isset($total_amount)) echo $total_amount; ?></td>
-		</tr>
-	</tbody>
-</table>
-</div>
-
 </body>
 </html>

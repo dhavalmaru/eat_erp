@@ -106,14 +106,17 @@
 									<thead>
 										<tr>
 										    <th width="58" style="text-align:center;"> Sr. No.</th>
+									
 											<th width="110">Date Of Deposit</th>
-											<th width="110">Id</th>
-											<th width="290">Bank Name</th>
+											<th width="58" style="text-align:center;"> Edit</th>
+											<th width="100" class="view_payment_slip" style="text-align:center; <?php if(strtoupper(trim($status))=='APPROVED') echo ''; else echo 'display: none;'; ?>">View Payment Slip</th>
+											<th width="50">Id</th>
+											<th width="90">Bank Name</th>
 											<th width="290">Distributor Name</th>
-									      	<th width="125"> Total Amount (In Rs) </th>
-											<th width="110"> Creation Date</th>
-											<th width="110"> Status</th>
-											<th width="100" class="view_payment_slip" style="text-align:center;">View Payment Slip</th>
+									      	<th width="80"> Total Amount (In Rs) </th>
+											<!--<th width="110"> Creation Date</th>
+											<th width="110"> Status</th>-->
+										
 										</tr>
 									</thead>
 									<tbody>
@@ -121,22 +124,33 @@
 										<tr>
 											<td style="text-align:center;"><?php echo $i+1; ?></td>
 											<td>
-                                                <span style="display:none;">
+                                            <span style="display:none;">
                                                     <?php echo (($data[$i]->date_of_deposit!=null && $data[$i]->date_of_deposit!='')?date('Ymd',strtotime($data[$i]->date_of_deposit)):''); ?>
-                                                </span>
-                                                <a href="<?php echo base_url().'index.php/payment/edit/'.$data[$i]->id; ?>"><?php echo (($data[$i]->date_of_deposit!=null && $data[$i]->date_of_deposit!='')?date('d/m/Y',strtotime($data[$i]->date_of_deposit)):''); ?></a>
+                                            </span>
+                                              <?php echo (($data[$i]->date_of_deposit!=null && $data[$i]->date_of_deposit!='')?date('d/m/Y',strtotime($data[$i]->date_of_deposit)):''); ?>
                                             </td>
+											<td style="text-align:center; vertical-align: middle; "><a href="<?php echo base_url().'index.php/payment/edit/'.$data[$i]->id; ?>"><i class="fa fa-edit"></i></a></td>
+											<td class="view_payment_slip" style="text-align:center;vertical-align: middle; <?php if(strtoupper(trim($status))=='APPROVED') echo ''; else echo 'display: none;'; ?>"><?php if ($data[$i]->id!=null) { ?><a href="<?php echo base_url().'index.php/payment/view_payment_slip/'.$data[$i]->id; ?>" target="_blank"> <span class="fa fa-file-pdf-o"></span></a><?php } ?></td>
+											
 											<td><?php echo $data[$i]->id; ?></td>
 											<td><?php echo $data[$i]->b_name; ?></td>
-											<td><?php echo $data[$i]->distributor_name; ?></td>
+											<td ><?php 
+												if (strlen(trim($data[$i]->distributor_name))>50) {
+													echo ' <span class="distributor_name" data-attr="'.$data[$i]->distributor_name.'" style="cursor:pointer">'.substr($data[$i]->distributor_name,0,30).' <span style="color:#41a541"> &nbsp Read More...</span>  </span>';
+												}
+												else
+												{
+													echo $data[$i]->distributor_name;
+												}
+											?></td>
 											<td><?php echo format_money($data[$i]->total_amount,2); ?></td>
-											<td>
+											<!--<td>
 												<span style="display:none;">
-                                                    <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
+                                                    <?php //echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
                                                 </span>
-												<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
-											<td><?php echo $data[$i]->status; ?></td>
-											<td class="view_payment_slip" style="text-align:center;vertical-align: middle;"><?php if ($data[$i]->id!=null) { ?><a href="<?php echo base_url().'index.php/payment/view_payment_slip/'.$data[$i]->id; ?>" target="_blank"> <span class="fa fa-file-pdf-o"></span></a><?php } ?></td>
+												<?php// echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
+											<td><?php //echo $data[$i]->status; ?></td>-->
+										
 										</tr>
 										<?php } ?>
 									</tbody>
@@ -156,6 +170,24 @@
             </div>            
             <!-- END PAGE CONTENT -->
         </div>
+
+         <div class="modal fade" id="myModal" role="dialog">
+		    <div class="modal-dialog">
+		      <!-- Modal content-->
+		      <div class="modal-content">
+		        <div class="modal-header">
+		          <button type="button" class="close" data-dismiss="modal">&times;</button>
+		          <h4 class="modal-title">Distributor Name</h4>
+		        </div>
+		        <div class="modal-body">
+		        </div>
+		        <div class="modal-footer">
+		          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		        </div>
+		      </div>
+		      
+		    </div>
+		</div>
         <!-- END PAGE CONTAINER -->
 						
         <?php $this->load->view('templates/footer');?>
@@ -185,6 +217,14 @@
 	            else {
 	                $('.approved').attr('class','active');
 	            }
+
+	           	$('body').on('click', '.distributor_name', function() {
+	            	var content = $(this).attr('data-attr');
+	            	console.log('content_content'+content);
+	            	modal = $('#myModal');
+	            	modal.find('.modal-body').html(content);
+	            	modal.modal('show'); 
+	            });
 	    	});
 		</script>
     <!-- END SCRIPTS -->      

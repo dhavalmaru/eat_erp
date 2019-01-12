@@ -23,19 +23,19 @@
 			   <?php $this->load->view('templates/menus');?>
               <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
                 
-                   <div class="heading-h3"> 
+                <div class="heading-h3"> 
                    <div class="heading-h3-heading mobile-head">	 <a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp; Distributor Type List  </div>						 
 					  <div class="heading-h3-heading mobile-head">
-					  <div class="pull-right btn-margin">	
+						<div class="pull-right btn-margin">	
 								<?php $this->load->view('templates/download');?>	
-								</div>	
+						</div>	
                     	<div class="pull-right btn-margin"  style="<?php if($access[0]->r_insert=='0') echo 'display: none;';?>">
 									<a class="btn btn-success  " href="<?php echo base_url() . 'index.php/distributor_type/add'; ?>">
 										<span class="fa fa-plus"></span> Add Distributor Type
 									</a>
 									
 									
-								</div>
+						</div>
 								
 								
 				     </div>	      
@@ -53,20 +53,22 @@
 									<thead>
 										<tr>
 											<th width="65" style="text-align:center;">Sr. No.</th>
+											<th width="65" style="text-align:center;">Edit</th>
 											<th  >Distributor Type</th>
-											<th width="110">Creation Date</th>
+											<!--<th width="110">Creation Date</th>-->
 										</tr>
 									</thead>
 									<tbody>
 										<?php for ($i=0; $i < count($data); $i++) { ?>
 										<tr>
 											<td style="text-align:center;"><?php echo $i+1; ?></td>
-											<td><a href="<?php echo base_url().'index.php/distributor_type/edit/'.$data[$i]->id; ?>"><?php echo $data[$i]->distributor_type; ?></a></td>
-											<td>
+											<td style="text-align:center; vertical-align: middle; "><a href="<?php echo base_url().'index.php/distributor_type/edit/'.$data[$i]->id; ?>"><i class="fa fa-edit"></i></a></td>
+											<td><?php echo $data[$i]->distributor_type; ?></td>
+										<!--	<td>
 												<span style="display:none;">
-                                                    <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
+                                                    <?php// echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
                                                 </span>
-												<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
+												<?php// echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>-->
 										</tr>
 										<?php } ?>
 									</tbody>

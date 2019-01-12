@@ -33,7 +33,7 @@
                             <form id="form_vendor_type_details" role="form" class="form-horizontal" method="post" action="<?php if (isset($data)) echo base_url(). 'index.php/vendor_type/update/' . $data[0]->id; else echo base_url().'index.php/vendor_type/save'; ?>">
                               <div class="box-shadow-inside">
                                 <div class="col-md-12 custom-padding" style="padding:0;" >
-                                 <div class="panel panel-default">
+                                <div class="panel panel-default">
 								
 								<div class="panel-body">
 									<div class="form-group"  >

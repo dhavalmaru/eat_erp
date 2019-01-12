@@ -6,7 +6,6 @@ class Dashboard_model extends CI_Model {
         error_reporting(E_ALL);
         ini_set('display_errors', 1);
         parent::__construct();
-		
     }
 
     function get_access(){

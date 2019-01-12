@@ -17,19 +17,19 @@
 		<link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url().'css/custome_vj_css.css'; ?>"/>    
         <!-- EOF CSS INCLUDE -->    
 			<style>
-			  @media only screen and  (min-width:580px)  and (max-width:658px) {
-					.heading-h3-heading  {     width: 100%!important;}
-		   	.heading-h3-heading  {     width: 100%!important; text-align:left!important; float:initial!important; display:flex!important;}	
-			.heading-h3-heading .btn-margin{ margin-left:0; margin-right:8px;}
-			  }
-		     @media only screen and  (min-width:659px)  and (max-width:718px) { 
-				.heading-h3-heading:first-child {     width: 44%!important;}
-		   	.heading-h3-heading:last-child {     width: 56%!important;}		
-			.heading-h3-heading .btn-margin{ margin-bottom:0px!important; }
-		   }
-		  @media only screen and  (min-width:709px)  and (max-width:718px) { 			 
-			.heading-h3-heading .btn-margin{   }
-		   }
+				@media only screen and  (min-width:580px)  and (max-width:658px) {
+						.heading-h3-heading  {     width: 100%!important;}
+				.heading-h3-heading  {     width: 100%!important; text-align:left!important; float:initial!important; display:flex!important;}	
+				.heading-h3-heading .btn-margin{ margin-left:0; margin-right:8px;}
+				  }
+				 @media only screen and  (min-width:659px)  and (max-width:718px) { 
+					.heading-h3-heading:first-child {     width: 44%!important;}
+				.heading-h3-heading:last-child {     width: 56%!important;}		
+				.heading-h3-heading .btn-margin{ margin-bottom:0px!important; }
+				}
+				@media only screen and  (min-width:709px)  and (max-width:718px) { 			 
+				.heading-h3-heading .btn-margin{   }
+				}
 		</style>	
     </head>
     <body>								
@@ -63,30 +63,33 @@
 								<table id="customers2" class="table datatable table-bordered" >
 									<thead>
 										<tr>
-										<th width="65" style="text-align:center;" >Sr. No.</th>
+											<th width="65" style="text-align:center;" >Sr. No.</th>
+											<th width="65" style="text-align:center;" >Edit</th>
 											<th width="140">Date Of Transfer</th>
 											<th >Distributor Out</th>
 											<th  >Distributor In</th>
-											<th width="110">Creation Date</th>
+											<!--<th width="110">Creation Date</th>-->
 										</tr>
 									</thead>
 									<tbody>
 										<?php for ($i=0; $i < count($data); $i++) { ?>
 										<tr>
 											<td  style="text-align:center;"><?php echo $i+1; ?></td>
+											<td style="text-align:center; vertical-align: middle; "><a href="<?php echo base_url().'index.php/distributor_transfer/edit/'.$data[$i]->id; ?>"><i class="fa fa-edit"></i></a></td>
 											<td>
                                                 <span style="display:none;">
                                                     <?php echo (($data[$i]->date_of_transfer!=null && $data[$i]->date_of_transfer!='')?date('Ymd',strtotime($data[$i]->date_of_transfer)):''); ?>
                                                 </span>
-                                                <a href="<?php echo base_url().'index.php/distributor_transfer/edit/'.$data[$i]->id; ?>"><?php echo (($data[$i]->date_of_transfer!=null && $data[$i]->date_of_transfer!='')?date('d/m/Y',strtotime($data[$i]->date_of_transfer)):''); ?></a>
+                                              <?php echo (($data[$i]->date_of_transfer!=null && $data[$i]->date_of_transfer!='')?date('d/m/Y',strtotime($data[$i]->date_of_transfer)):''); ?>
                                             </td>
 											<td><?php echo $data[$i]->distributor_out_name; ?></td>
 											<td><?php echo $data[$i]->distributor_in_name; ?></td>
-											<td>
+											<!--<td>
 												<span style="display:none;">
-                                                    <?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
+                                                    <?php //echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
                                                 </span>
-												<?php echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
+												<?php// echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?>
+											</td>-->
 										</tr>
 										<?php } ?>
 									</tbody>

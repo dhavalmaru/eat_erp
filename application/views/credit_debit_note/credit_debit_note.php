@@ -23,6 +23,11 @@
         .modal-body-inside { padding:10px; }
         @media print{@page {size: portrait}}
         /*.modal-body-inside table { font-size: 14px; }*/
+		.user_data tr, .user_data td
+		{
+			border:none!important;
+			padding:5px!important;
+		}
     </style>
 </head>
 
@@ -111,6 +116,23 @@
                 </p>
             </td> -->
         </tr>
+		
+		  <tr style="border:none;">
+            <td width="17%" style="border:none;"><p>Reference Invoice No.</p></td>
+            <td width="3%" style="border:none;">:</td>
+            <td width="80%" style="border:none;" colspan="3">
+                <p><b> <?php if(isset($credit_debit_note[0]->invoice_no)) echo $credit_debit_note[0]->invoice_no; ?> </b></p>
+            </td>
+            <!-- <td width="22%" style="border:none;"><p>Warehouse GSTIN</p></td>
+            <td width="4%" style="border:none;">:</td>
+            <td width="14%" style="border:none;">
+                <p>
+                    <b> 
+                        <?php //if(isset($grn_details[0]['gst_id'])) echo $grn_details[0]['gst_id']; ?>
+                    </b>
+                </p>
+            </td> -->
+        </tr>
         <tr>
             <td colspan="6" height="10" style="border:none;">&nbsp;</td>
         </tr>
@@ -179,10 +201,31 @@
             <!-- <td colspan="2" style="border:none;"> &nbsp; </td>
             <td valign="bottom" colspan="2" style="border:none; text-align:center "><p> <b>Authorised Signatory</b></p></td> -->
         </tr>
-        <!-- <tr valign="bottom" >
-            <td colspan="6" style="border:none;">&nbsp;   </td>
-        </tr> -->
+        
     </table>
+    <table class="user_data" border="0" width="100%" style="border-collapse:collapse;margin-top:20px;font-size:12px " class="table" cellspacing="10">
+					<tr valign="center" >
+						  <td width="100%" align="center"><b>Created By:</b>
+						 <?php if(isset($credit_debit_note[0]->createdby)) echo $credit_debit_note[0]->createdby; ?>&nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp
+						 <b> Modified By:</b>
+						  <?php if(isset($credit_debit_note[0]->modifiedby)) echo $credit_debit_note[0]->modifiedby; ?>  &nbsp &nbsp &nbsp  &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp
+						  <b> Approved By:</b>
+						  <?php if(isset($credit_debit_note[0]->approvedby)) echo $credit_debit_note[0]->approvedby; ?></td>
+						  
+					</tr>
+					<tr valign="center" >
+					      <td width="100%" align="center"><b>Created On:</b>
+						    <?php if(isset($credit_debit_note[0]->created_on)) echo $credit_debit_note[0]->created_on?>&nbsp &nbsp &nbsp &nbsp
+						  <b> Modified On:</b>
+						     <?php if(isset($credit_debit_note[0]->modified_on)) echo $credit_debit_note[0]->modified_on?>&nbsp &nbsp &nbsp &nbsp
+						   <b> Approved On:</b>
+						    <?php if(isset($credit_debit_note[0]->approved_on))echo $credit_debit_note[0]->approved_on ?>
+							</td>
+					</tr>
+					
+					
+	</table>
+
 </div>
 </body>
 </html>

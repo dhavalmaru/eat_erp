@@ -209,6 +209,7 @@
     												<tr>
                                                         <th width="65" align="center" style="<?php if($status!='pending') echo 'display: none;'; ?>">Select</th>
                                                         <th width="65" align="center">Sr. No.</th>
+                                                        <th width="65">Edit</th>
                                                         <th width="156">Date Of processing</th>
     													<th width="130">Order Number</th>
     													<th width="140">Retailer Name</th>
@@ -374,7 +375,7 @@
 
                 columnDefs = [
                                 {
-                                    "targets": [9],
+                                    "targets": [10],
                                     "visible": false,
                                     "searchable": false
                                 }

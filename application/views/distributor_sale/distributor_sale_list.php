@@ -16,7 +16,9 @@
           <link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>css/theme-blue.css"/>
 		<link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>mobile-menu/vendor-1437d0659c.css"/>
 		<link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url().'css/custome_vj_css.css'; ?>"/>    
-        <!-- EOF CSS INCLUDE -->    
+        <!-- EOF CSS INCLUDE -->
+
+
 		<style> 
 		   @media only screen and  (min-width:645px)  and (max-width:718px) { 
 				.heading-h3-heading:first-child {     width: 44%!important;}
@@ -39,6 +41,12 @@
              color: #fff;
              opacity: 1!important;
              }
+
+             .modal-body .select2-container{
+                display: inherit!important;
+                width: 100%!important;
+             }
+
 		</style>	
     </head>
     <body>								
@@ -49,7 +57,12 @@
               <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
                 
                    <div class="heading-h3"> 
-                   <div class="heading-h3-heading mobile-head">	 <a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp;  Super Stockist Sale List <a class="btn btn-default-danger pull-right "  style="margin-right:8px!important;" href="<?php echo base_url('index.php/Distributor_sale/download_csv');?>" ><i class="fa fa-file-pdf-o "></i> Download Sample</a> </div>						 
+                   <div class="heading-h3-heading mobile-head">	 <a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp;  Super Stockist Sale List 
+                        <!-- <a class="btn btn-default-danger pull-right "  style="margin-right:8px!important;" href="<?php echo base_url('index.php/Distributor_sale/download_csv');?>" ><i class="fa fa-file-pdf-o "></i> Download Sample</a> --> 
+                        <a class="btn btn-default-danger pull-right" data-toggle="modal" href="#myModal1" style="margin-right:8px!important;">
+                        <span class="fa fa-file-excel-o"></span> Download Sample
+                        </a>
+                   </div>						 
 					  <div class="heading-h3-heading mobile-head">
 					  <div class="pull-right btn-margin">	
 								<?php $this->load->view('templates/download');?>	
@@ -60,9 +73,9 @@
 									</a>
 						
 								</div>
-								 <a class="btn btn-success" data-toggle="modal" href="#myModal">
-                                <span class="fa fa-file-excel-o"></span> Add Excel
-                            </a> 
+								<a class="btn btn-success" data-toggle="modal" href="#myModal">
+                                    <span class="fa fa-file-excel-o"></span> Add Excel
+                                </a> 
 							
 				     </div>	      
                 </div>
@@ -87,6 +100,8 @@
 									<thead>
 										<tr>
 										    <th width="58" style="text-align:center;"> Sr. No.</th>
+										    <th width="58" style="text-align:center;">Edit</th>
+								
 											<th width="150"> Date Of processing</th>
 											<th> Distributor Name</th>
 											<th width="120"> Amount (In Rs) </th>
@@ -97,11 +112,13 @@
 										<?php for ($i=0; $i < count($data); $i++) { ?>
 										<tr>
 											<td style="text-align:center;"><?php echo $i+1; ?></td>
+											<td style="text-align:center; vertical-align: middle; "><a href="<?php echo base_url().'index.php/distributor_sale/edit/'.$data[$i]->id; ?>"><i class="fa fa-edit"></i></a></td>
+
 											<td>
                                                 <span style="display:none;">
                                                     <?php echo (($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('Ymd',strtotime($data[$i]->date_of_processing)):''); ?>
                                                 </span>
-                                                <a href="<?php echo base_url().'index.php/distributor_sale/edit/'.$data[$i]->id; ?>"><?php echo (($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('d/m/Y',strtotime($data[$i]->date_of_processing)):''); ?></a>
+                                              <?php echo (($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('d/m/Y',strtotime($data[$i]->date_of_processing)):''); ?>
                                             </td>
 											<td><?php echo $data[$i]->distributor_name; ?></td>
 											<td><?php echo format_money($data[$i]->amount,2); ?></td>
@@ -123,35 +140,75 @@
                     </div>
                 </div>
                 <!-- END PAGE CONTENT WRAPPER -->
-				
-				     <div class="modal fade" id="myModal" role="dialog" style="">
-                <div class="modal-dialog">
-                    <!-- Modal content-->
-                    <div class="modal-content" style="">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            <h4 class="modal-title">
-                               Add Bulk Entries Of Super Stockist
-                            </h4>
+				<div class="modal fade" id="myModal1" role="dialog" style="">
+                    <div class="modal-dialog">
+                        <!-- Modal content-->
+                        <div class="modal-content" style="">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title">
+                                   Download Sample 
+                                </h4>
+                            </div>
+                            <form method="POST" action="<?php echo base_url();?>index.php/Distributor_sale/download_csv" class="form-horizontal excelform" enctype="multipart/form-data">
+                            <div class="modal-body">
+                                <label class="control-label">Select Distributor <span class="asterisk_sign">*</span></label>
+                                <br/>
+                                <div class="form-group">
+                                    <select name="distributor_id" id="distributor_id" class="form-control " >
+                                                <option value="">Select</option>
+                                                <?php if(isset($distributor)) { for ($k=0; $k < count($distributor) ; $k++) { ?>
+                                                       <option value="<?php echo $distributor[$k]->distributor_name; ?>" ><?php echo $distributor[$k]->distributor_name; ?></option>
+                                                <?php }} ?>
+                                      </select>
+                                </div>
+                                    <div class="form-group">
+                                     <label class="control-label">Select Zone <span class="asterisk_sign"></span></label>
+                                         <select name="zone_id[]" id="zone_id" class="form-control select2" multiple="multiple">
+                                            <?php if(isset($zone)) { for ($j=0; $j < count($zone) ; $j++) { ?>
+                                                           <option value="<?php echo $zone[$j]->id; ?>" ><?php echo $zone[$j]->zone; ?></option>
+                                                    <?php }} ?>
+                                          </select>
+                                    </div>
+                                <div class="row"><br></div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                                <!-- <button id="btn_save" class="btn btn-success pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</button> -->
+                                <input type="submit"  class="btn btn-success pull-right"  value="Download" />
+                            </div>
+                            </form>
                         </div>
-                        <form method="POST" action="<?php base_url();?>Distributor_sale/upload_file" class="form-horizontal excelform" enctype="multipart/form-data">
-                        <div class="modal-body">
-						 <div class="form-group">
+                    </div>
+                </div>   
+    		     <div class="modal fade" id="myModal" role="dialog" style="">
+                    <div class="modal-dialog">
+                        <!-- Modal content-->
+                        <div class="modal-content" style="">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title">
+                                   Add Bulk Entries Of Super Stockist
+                                </h4>
+                            </div>
+                            <form method="POST" action="<?php base_url();?>Distributor_sale/upload_file" class="form-horizontal excelform" enctype="multipart/form-data">
+                            <div class="modal-body">
+    						 <div class="form-group">
 
-                                         <label class="col-md-4 col-sm-4 col-xs-12 control-label">Add Excel <span class="asterisk_sign"></span></label>
-                                     
-                                             <input type="file" class="fileinput btn btn-info btn-small  bar_image" name="upload" id="image" placeholder="image" value=""/>
-                         </div>
+                                             <label class="col-md-4 col-sm-4 col-xs-12 control-label">Add Excel <span class="asterisk_sign"></span></label>
+                                         
+                                                 <input type="file" class="fileinput btn btn-info btn-small  bar_image" name="upload" id="image" placeholder="image" value=""/>
+                             </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                                <!-- <button id="btn_save" class="btn btn-success pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</button> -->
+                                <input type="submit"  class="btn btn-success pull-right"  value="Save" />
+                            </div>
+                            </form>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
-                            <!-- <button id="btn_save" class="btn btn-success pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</button> -->
-                            <input type="submit"  class="btn btn-success pull-right"  value="Save" />
-                        </div>
-                        </form>
                     </div>
                 </div>
-            </div>
             </div>            
             <!-- END PAGE CONTENT -->
         </div>
@@ -159,10 +216,44 @@
 						
         <?php $this->load->view('templates/footer');?>
         <script type="text/javascript">
+            var BASE_URL = '<?= base_url()?>';
+        </script>
+        <script type="text/javascript">
                 $(document).on('submit','form.excelform',function(){
                     setTimeout(function(){ 
                         document.location.reload();
                     }, 1000);
+                });
+
+                $(document).ready(function(){
+                   /* $('#zone_id').multiselect({
+                        buttonWidth: '100%'
+                    });*/
+
+                    /*$('#distributor_id').on('change',function(){
+
+                        $('#zone_div').show();
+
+                        $.ajax({
+                            url:BASE_URL+'index.php/Distributor_sale/get_zone',
+                            type : 'POST',
+                            data:{dist_name:$(this).val()},
+                            dataType:"json",
+                            success:function(data){
+                                var zone = '';
+                                $('#zone_id').empty();
+                                if(data.length>0)
+                                {
+                                  $.each(data, function(idx, obj) {
+                                   zone+="<option value='"+obj.zone_id+"'>"+obj.zone+"</option>";
+                                    });
+                                  $('#zone_id').append(zone);   
+                                }
+                               
+                            }
+
+                        })
+                    });*/
                 });
                 /*var filename = '<?= $filename;?>';
                 $( document ).ready(function() {
