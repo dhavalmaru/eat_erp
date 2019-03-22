@@ -1,2 +1,5 @@
-# Ignore folder named `output`
+# Ignore folder named `uploads`
 uploads/
+
+# Ignore folder named `assets/uploads`
+assets/uploads/
