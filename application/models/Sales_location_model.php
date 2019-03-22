@@ -214,8 +214,7 @@ function get_data($status='', $id='',$frequency='',$temp_date=''){
             (select * from sales_rep_location 
             Where date(date_of_visit)=$temp_date and sales_rep_id=$sales_rep_id ) H
             on(G.store_id=H.distributor_id and G.id=H.detailed_bit_plan_id)
-            ".$cond2."
-			group by H.date_of_visit,mid ,H.distributor_type,H.remarks,H.followup_date,H.distributor_type,G.store_id
+            ".$cond2." 
             order by G.sequence asc,G.modified_on Desc
             ";
 
