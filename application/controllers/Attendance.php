@@ -13,7 +13,7 @@ class Attendance extends CI_Controller{
         $this->load->library('session');
         $this->load->library('email');
         $this->load->helper('common_functions');
-        $this->load->model('attendance_model');
+        $this->load->model('attendence_model');
         $this->load->model('distributor_model');
         $this->load->model('sales_rep_model');
         $this->load->model('area_model');
@@ -24,10 +24,10 @@ class Attendance extends CI_Controller{
     }
 
     public function index() {
-        $result=$this->attendance_model->get_access();
+        $result=$this->attendence_model->get_access();
         if(count($result)>0) {
             $data['access']=$result;
-            // $data['data'] = $this->attendance_model->get_data();
+            // $data['data'] = $this->attendence_model->get_data();
 
             load_view('attendance/upload', $data);
         } else {

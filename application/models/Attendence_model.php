@@ -8,11 +8,11 @@ function __Construct(){
     $this->load->helper('common_functions');
 }
 
-/*public function get_access(){
+function get_access(){
     $role_id=$this->session->userdata('role_id');
-    $query=$this->db->query("SELECT * FROM user_role_options WHERE section = 'Sales_Rep' AND role_id='$role_id' AND (r_insert = 1 OR r_view = 1 OR r_edit=1 OR r_approvals = 1 OR r_export = 1)");
+    $query=$this->db->query("SELECT * FROM user_role_options WHERE section = 'Distributor' AND role_id='$role_id' AND (r_insert = 1 OR r_view = 1 OR r_edit=1 OR r_approvals = 1 OR r_export = 1)");
     return $query->result();
-}*/
+}
 
 public function get_employee_code()
 {
