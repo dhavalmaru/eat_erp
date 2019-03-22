@@ -140,8 +140,210 @@ function get_sales_rep_details(){
     // return $query->result();
 // }
 
+function get_sales_rep_order_email(){
+    $sql = "select sum(A.amount)as od_value,sum(B.qty)as od_units from (select * from sales_rep_orders where date(date_of_processing)=date(now()))A left join (select * from sales_rep_order_items) B on(A.id=B.sales_rep_order_id)";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_sales_rep_total_visits_email($frequency=''){
+	  $day = date('l');
+        $m = date('F');
+        $year = date('Y');
+        $get_alternate  = $this->get_alternate($day,$m,$year);
+        if($get_alternate)
+        {
+            $frequency = 'Alternate '.$day;
+        }
+        else
+        {
+            $frequency = 'Every '.$day;
+        }
+    $sql = "SELECT (A.unplan+A.temp_count) as unplan, sales_rep_id from (SELECT count(store_id) as unplan,(Select count(id) as tem_visit_count from sales_rep_detailed_beat_plan Where bit_plan_id=0 and is_edit='edit' and date(date_of_visit)=date(now()) and frequency='".$frequency."' ) as temp_count,sales_rep_id from sales_rep_detailed_beat_plan Where date(date_of_visit)=date(now()) and store_id IN ( Select DISTINCT store_id from sales_rep_beat_plan Where date(created_on)= date(now()))and frequency='".$frequency."'  ) A UNION SELECT count(store_id) as unplan,sales_rep_id from sales_rep_detailed_beat_plan Where date(date_of_visit)=date(now()) and store_id IN ( Select DISTINCT store_id from sales_rep_beat_plan Where date(created_on)<>date(now())) and frequency='".$frequency."' UNION SELECT count(store_id) as unplan,sales_rep_id from sales_rep_detailed_beat_plan Where date(date_of_visit)=date(now()) and store_id IN ( Select DISTINCT store_id from sales_rep_beat_plan Where date(created_on)<>date(now()))and is_edit='edit' and frequency='".$frequency."'";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_sales_rep_email($frequency=''){
+      $day = date('l');
+        $m = date('F');
+        $year = date('Y');
+        $get_alternate  = $this->get_alternate($day,$m,$year);
+        if($get_alternate)
+        {
+            $frequency = 'Alternate '.$day;
+        }
+        else
+        {
+            $frequency = 'Every '.$day;
+        }
+
+    
+     $sql="
+            select * from (SELECT A.*,(IFNULL(T.tem_visit_count, 0)+IFNULL(F.unplanned_count, 0)) as unplanned_count,E.p_call, B.sales_rep_name,  C.planned_count, D.actual_count,'Present' as emp_status   from 
+                        (SELECT DISTINCT sales_rep_id,frequency from sales_rep_detailed_beat_plan Where frequency='".$frequency."' and date(date_of_visit)=date(now())) A 
+                                LEFT join ( 
+                        Select `count`  as unplanned_count ,sales_rep_id,frequency from 
+                        (
+                                SELECT count(id) as `count` ,sales_rep_id,frequency from sales_rep_detailed_beat_plan A Where frequency= '".$frequency."' and store_id 
+                                IN (Select DISTINCT store_id from sales_rep_beat_plan Where frequency='".$frequency."' and date(created_on)=date(now()) and sales_rep_id=A.sales_rep_id) 
+                                and date(date_of_visit)=date(now()) GROUP BY sales_rep_id,frequency 
+                        )A GROUP BY sales_rep_id,frequency )F on  F.sales_rep_id=A.sales_rep_id 
+                                left join (SELECT sales_rep_name,id from sales_rep_master Where status='Approved') B 
+                        on B.id=A.sales_rep_id 
+                        left join (SELECT count(id) as p_call,sales_rep_id from sales_rep_orders where date(date_of_processing)=date(now())) E 
+                        on A.sales_rep_id=E.sales_rep_id
+                        LEFT JOIN 
+                        (
+                        SELECT count(*) as planned_count ,sales_rep_id from ( SELECT store_id,sales_rep_id,date_of_visit from sales_rep_detailed_beat_plan 
+                        Where frequency= '".$frequency."' and store_id IN (Select DISTINCT store_id from sales_rep_beat_plan Where frequency='".$frequency."'
+                        and date(created_on)<>date(now()) ) and date(date_of_visit)=date(now()) and is_edit='edit') B GROUP BY sales_rep_id 
+                        ) C on C.sales_rep_id=A.sales_rep_id 
+                        LEFT JOIN ( 
+                        SELECT count(*) as actual_count ,sales_rep_id from ( 
+                                                        SELECT store_id,sales_rep_id,date_of_visit from sales_rep_detailed_beat_plan 
+                                                        Where frequency= '".$frequency."' and store_id IN (Select DISTINCT store_id from sales_rep_beat_plan Where frequency= '".$frequency."'
+                                                        and date(created_on)<>date(now()) ) and date(date_of_visit)=date(now()) 
+                         ) B GROUP BY sales_rep_id 
+                        ) D 
+                        on D.sales_rep_id=A.sales_rep_id
+                        LEFT JOIN
+                (Select count(id) as tem_visit_count,sales_rep_id,frequency  
+                from sales_rep_detailed_beat_plan Where  bit_plan_id=0 and is_edit='edit'  
+                and date(date_of_visit)=date(now())
+                GROUP By sales_rep_id,frequency) T on (A.sales_rep_id=T.sales_rep_id)
+                UNION
+                SELECT A.sales_rep_id,'' as frequency,'' as unplanned_count,'' as p_call,B.sales_rep_name,'' as planned_count,
+                 '' as actual_count,'Absent' as emp_status        
+                From
+                (Select DISTINCT sales_rep_id 
+                from sales_rep_beat_plan Where frequency='".$frequency."' and sales_rep_id NOT IN(
+                SELECT DISTINCT sales_rep_id from sales_rep_detailed_beat_plan Where frequency='".$frequency."' and date(date_of_visit)=date(now()) ) )  A
+                join (SELECT sales_rep_name,id from sales_rep_master Where status='Approved') B 
+                on B.id=A.sales_rep_id)J where sales_rep_id<>'2';
+            ";
+        $query=$this->db->query($sql);
+        return $query->result();
+}
 
 
+public function get_sales_rep_daily_route_plan($frequency='')
+{
+    $day = date('l');
+    $m = date('F');
+    $year = date('Y');
+    $get_alternate  = $this->get_alternate($day,$m,$year);
+    if($get_alternate)
+    {
+        $frequency = 'Alternate '.$day;
+    }
+    else
+    {
+        $frequency = 'Every '.$day;
+    }
 
+    $sql = "Select A.*,C.od_units,D.betweennooforders,G.sales_rep_name from (SELECT DISTINCT A.*,B.distributor_name 
+            from (Select * from (Select Distinct A.store_id,A.sales_rep_id, Case When is_edit='edit' Then 'Visited' Else 'Not Visited' end as plan_status,Case When (date(A.created_on)=date(now()))  Then 'Unplanned' ELSE A.frequency end as frequency  FROM
+            (SELECT store_id,sales_rep_id,frequency,created_on from sales_rep_beat_plan Where frequency='".$frequency."')A
+            left JOIN
+            (Select store_id,sales_rep_id,frequency,is_edit,bit_plan_id from sales_rep_detailed_beat_plan Where 
+            frequency='".$frequency."' and date(date_of_visit)=date(now()))B
+            ON (A.sales_rep_id=B.sales_rep_id and A.store_id=B.store_id and A.frequency=B.frequency)
+            UNION
+            SELECT Distinct store_id,sales_rep_id,Case When is_edit='edit' Then 'Visited' Else 'Not Visited' end as plan_status,
+             'Unplanned' as  frequency From sales_rep_detailed_beat_plan Where bit_plan_id=0 and frequency='".$frequency."' and date(date_of_visit)=date(now())) A ORDER By sales_rep_id,frequency) A
+            Left JOIN
+            (Select Distinct C.* FROM(
+                    Select B.* from (
+                            Select concat('d_',A.id) as id , A.distributor_name   FROM
+                            (Select * from distributor_master )A
+                            LEFT JOIN sr_mapping B ON (A.area_id = B.area_id and A.zone_id = B.zone_id and  A.type_id = B.type_id) 
+                            Where A.status='approved' and A.class='normal'
+                    ) B
+                    Union 
+                    (
+                            Select concat('s_',A.id) as id , A.distributor_name  FROM
+                            (Select * from sales_rep_distributors )A
+                    )            
+            ) C ) B On (A.store_id=B.id COLLATE utf8_unicode_ci) 
+            WHERE distributor_name is NOT NULL )A
+            left JOIN
+            (select sum(B.qty)as od_units,sales_rep_id,distributor_id 
+            from (select * from sales_rep_orders Where date(created_on)=date(now()))A 
+            left join (
+                    select C.sales_rep_order_id, case when C.type='Bar' then C.qty else C.qty*D.qty end as qty 
+                from sales_rep_order_items C left join box_product D on (C.type = 'Box' and C.item_id = D.box_id)
+
+            ) B on(A.id=B.sales_rep_order_id)
+            GROUP BY sales_rep_id,distributor_id) C on (A.sales_rep_id=C.sales_rep_id and A.store_id=C.distributor_id )
+            LEFT JOIN
+            (select sales_rep_id,distributor_id,count(id) as betweennooforders from sales_rep_orders 
+                Where  date(created_on)=date(now()) GROUP BY sales_rep_id,distributor_id) D
+            on(A.sales_rep_id=D.sales_rep_id and A.store_id=D.distributor_id)
+            Join 
+            (SELECT sales_rep_name,id from sales_rep_master Where status='Approved') G
+            On A.sales_rep_id=G.id
+            Where A.sales_rep_id IS NOT NULL and A.sales_rep_id!=2
+            ORDER  By A.sales_rep_id,A.store_id ";
+        $query=$this->db->query($sql);
+        return $query->result();
+}
+
+
+function get_sales_rep1_email($frequency=''){
+	 $day = date('l');
+        $m = date('F');
+        $year = date('Y');
+        $get_alternate  = $this->get_alternate($day,$m,$year);
+        if($get_alternate)
+        {
+            $frequency = 'Alternate '.$day;
+        }
+        else
+        {
+            $frequency = 'Every '.$day;
+        }
+    $sql = "select count(distinct(sales_rep_id)) as total_sales_rep from sales_rep_detailed_beat_plan where frequency='".$frequency."' and sales_rep_id NOT IN(2) ";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+function get_sales_rep2_email($frequency=''){
+		 $day = date('l');
+        $m = date('F');
+        $year = date('Y');
+        $get_alternate  = $this->get_alternate($day,$m,$year);
+        if($get_alternate)
+        {
+            $frequency = 'Alternate '.$day;
+        }
+        else
+        {
+            $frequency = 'Every '.$day;
+        }
+    $sql = "select count(distinct(sales_rep_id)) as present_sales_rep from sales_rep_detailed_beat_plan Where date(date_of_visit)=date(now()) and frequency='".$frequency."' and sales_rep_id NOT IN(2)";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+ public function get_alternate($day,$m,$year)
+    {
+        
+        $date1 = date('d-m-Y', strtotime('second '.$day.' of '.$m.' '.$year));
+        $date2 = date('d-m-Y', strtotime('fourth '.$day.' of '.$m.' '.$year));
+
+        $todaysdate = date('d-m-Y');
+        if($date1==$todaysdate) 
+        {
+            return true;
+        }
+        elseif($date2==$todaysdate)
+        {
+            return true;
+        }
+        else
+        {
+           return false;
+        }
+    }
 }
 ?>

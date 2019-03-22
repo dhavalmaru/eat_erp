@@ -100,7 +100,7 @@
                     <span id="batch_confirmed"> (<?php echo $batch_confirmed; ?>) </span>
                 </a>
 				<a href="<?php echo base_url(); ?>index.php/production/checkstatus/raw_material_confirmed">
-                    <span class="ng-binding">Raw Material Confirmed</span>
+                    <span class="ng-binding">Completed</span>
                     <span id="raw_material_confirmed"> (<?php echo $raw_material_confirmed; ?>) </span>
                 </a>
                 <a href="<?php echo base_url(); ?>index.php/production/checkstatus/inactive">
@@ -130,7 +130,7 @@
 						<option value="1">Requested (<?php echo $requested; ?>)</option>
 						<option value="2">Confirmed (<?php echo $confirmed; ?>)</option>
 						<option value="3">Batch Confirmed (<?php echo $batch_confirmed; ?>) </option>
-						<option value="4">Raw Material Confirmed (<?php echo $raw_material_confirmed; ?>)</option>
+						<option value="4">Completed (<?php echo $raw_material_confirmed; ?>)</option>
                         <option value="5">Inactive (<?php echo $inactive; ?>)</option>
 					</select>			
     			</div>
@@ -158,7 +158,7 @@
                                 </li>
                                 <li class="raw_material_confirmed">
                                     <a  href="<?php echo base_url(); ?>index.php/production/checkstatus/raw_material_confirmed">
-                                        <span class="ng-binding">Raw Material Confirmed</span>
+                                        <span class="ng-binding">Completed</span>
                                         <span id="raw_material_confirmed"> (<?php echo $raw_material_confirmed; ?>) </span>
                                     </a>
                                 </li>
@@ -401,31 +401,27 @@
         }
 
         $('#image').change(function () {
-
             var ext = $(this).val().split('.').pop().toLowerCase();
             if($.inArray(ext, ['pdf','png','jpg','jpeg']) == -1) {
                 alert('This is not an allowed file type.');
-                    this.value = '';
+                this.value = '';
             } else {
                 /*alert($(this).val().replace(/C:\\fakepath\\/i, ''));*/
                 var filename = $(this).val().replace(/C:\\fakepath\\/i, '');
                 var check = $('#check').val();
                 $.ajax({
-                        url:BASE_URL+'index.php/production/check_file_name',
-                        type : 'POST',
-                        data:{check:check,filename:filename},
-                        dataType:"json",
-                        success:function(data){
-                            if(data==1)
-                            {
-                               $('#image').val(''); 
-                               $('.file-input-name').text('');
-                                alert('Image Already Exsist');
-                            }
-                           
+                    url:BASE_URL+'index.php/production/check_file_name',
+                    type : 'POST',
+                    data:{check:check,filename:filename},
+                    dataType:"json",
+                    success:function(data){
+                        if(data==1){
+                           $('#image').val(''); 
+                           $('.file-input-name').text('');
+                            alert('Image Already Exsist');
                         }
-
-                    });
+                    }
+                });
             }
         });
     </script>

@@ -69,7 +69,8 @@ function save_data($id=''){
         'status' => $this->input->post('status'),
         'remarks' => $this->input->post('remarks'),
         'modified_by' => $curusr,
-        'modified_on' => $now
+        'modified_on' => $now,
+        'production_id' => $this->input->post('production_id')
     );
 
     if($id==''){
@@ -115,6 +116,17 @@ function save_data($id=''){
     $logarray['cnt_name']='Bar_to_box';
     $logarray['action']=$action;
     $this->user_access_log_model->insertAccessLog($logarray);
+    
+    $module = $this->input->post('module');
+    $production_id = $this->input->post('production_id');
+    if($module=='production'){
+        $sql = "update production_details set bar_conversion = '1' where id = '$production_id'";
+        $this->db->query($sql);
+
+        redirect(base_url().'index.php/production/post_details/'.$production_id);
+    } else {
+        redirect(base_url().'index.php/batch_master');
+    }
 }
 
 function check_product_availablity(){

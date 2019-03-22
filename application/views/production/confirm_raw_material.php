@@ -101,7 +101,7 @@
                                                         <input type="text" class="form-control available_qty" name="available_qty[]" id="available_qty_<?php echo $i; ?>" placeholder="Available Qty" value="<?php if (isset($raw_material_items)) { echo $raw_material_items[$i]->available_qty; } ?>" readonly />
                                                     </td>
                                                     <td>
-                                                        <input type="text" class="form-control difference_qty" name="difference_qty[]" id="difference_qty_<?php echo $i; ?>" placeholder="Difference Qty" value="<?php if (isset($raw_material_items)) { echo $raw_material_items[$i]->difference_qty; } ?>" readonly />
+                                                        <input type="text" class="form-control difference_qty" name="difference_qty[]" id="difference_qty_<?php echo $i; ?>" placeholder="Difference Qty" value="<?php if (isset($raw_material_items)) { echo $raw_material_items[$i]->difference_qty; } ?>" style="<?php if (isset($raw_material_items)) { if($raw_material_items[$i]->difference_qty<0) echo 'color: red;'; } ?>" readonly />
                                                     </td>
                                                 </tr>
                                             <?php }} ?>
@@ -110,7 +110,7 @@
                                     </div>
                                 </div>
                                 
-                                <div class="form-group" style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
+                                <div class="form-group" style="<?php if(isset($data)) echo 'display: none;'; else echo 'display: none;';?>">
                                     <div class="col-md-12 col-sm-12 col-xs-12">
                                         <div style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Status <span class="asterisk_sign">*</span></label>
@@ -127,7 +127,7 @@
                                     <div class="col-md-12 col-sm-12 col-xs-12">
                                         <label class="col-md-2 col-sm-2 col-xs-12 control-label">Remarks </label>
                                         <div class="col-md-10  col-sm-10 col-xs-12">
-                                            <textarea class="form-control" name="remarks"><?php if(isset($data)) echo $data[0]->remarks; ?></textarea>
+                                            <textarea class="form-control" name="remarks"><?php if(isset($data)) echo $data[0]->confirm_raw_material_remarks; ?></textarea>
                                         </div>
                                     </div>
                                 </div>

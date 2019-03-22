@@ -14,6 +14,7 @@ class Batch_master extends CI_Controller{
         $this->load->library('email');
         $this->load->helper('common_functions');
         $this->load->model('batch_master_model');
+        $this->load->model('production_model');
         $this->load->database();
     }
 
@@ -45,11 +46,14 @@ class Batch_master extends CI_Controller{
         echo json_encode($data);
     }
 	
-    public function add(){
+    public function add($p_id='', $module=''){
         $result=$this->batch_master_model->get_access();
         if(count($result)>0) {
             if($result[0]->r_insert == 1) {
                 $data['access'] = $this->batch_master_model->get_access();
+                $data['p_id'] = $p_id;
+                $data['production'] = $this->production_model->get_data('Approved');
+                $data['module'] = $module;
 
                 load_view('batch_master/batch_master_details', $data);
             } else {
@@ -61,13 +65,16 @@ class Batch_master extends CI_Controller{
         }
     }
 
-    public function edit($id){
+    public function edit($id, $module=''){
         $result=$this->batch_master_model->get_access();
         if(count($result)>0) {
             if($result[0]->r_view == 1 || $result[0]->r_edit == 1) {
                 $data['access'] = $this->batch_master_model->get_access();
                 $data['data'] = $this->batch_master_model->get_data('', $id);
 				$data['batch_doc'] = $this->batch_master_model->get_batch_doc($id);
+                $data['production'] = $this->production_model->get_data('Approved');
+                $data['module'] = $module;
+
                 load_view('batch_master/batch_master_details', $data);
             } else {
                 echo "Unauthorized access";
@@ -80,12 +87,12 @@ class Batch_master extends CI_Controller{
 
     public function save(){
         $this->batch_master_model->save_data();
-        redirect(base_url().'index.php/batch_master');
+        // redirect(base_url().'index.php/batch_master');
     }
 
     public function update($id){
         $this->batch_master_model->save_data($id);
-        redirect(base_url().'index.php/batch_master');
+        // redirect(base_url().'index.php/batch_master');
     }
 
     public function check_batch_id_availablity(){

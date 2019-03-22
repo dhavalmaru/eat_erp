@@ -90,6 +90,30 @@
             ul.topnav li { width:20%; text-align:center;  border-right:1px solid #eee; }
             ul.topnav li a {  border-bottom:none!important;     } 
         }
+        .heading-h3 
+        {
+            background: #eee;
+            line-height: 25px;
+            padding: 7px 15px;
+            text-transform: uppercase;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 61px;
+            width: 100%;
+            font-size: 14px;
+            border-bottom: 1px solid #ddd;
+        }
+        .heading-h3-heading:first-child
+        {
+                line-height: 32px;
+        }
+        .heading-h3-heading
+        {
+            width: 50%;
+            float: left;
+            /* line-height: 34px; */
+            text-transform: capitalize;
+        }
         </style>
     </head>
     <body>								
@@ -98,7 +122,30 @@
             <!-- PAGE CONTENT -->
             <?php $this->load->view('templates/menus');?>
             <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
-               <div class="heading-h2">   Dashboard    </div>
+                
+                <div class="heading-h3"> 
+                    <div class="heading-h3-heading">
+                        <a href="<?php echo base_url().'index.php/dashboard'; ?>">  Dashboard  </a>
+                    </div>
+                    <div class="heading-h3-heading">
+                        <?php 
+                            $role_id=$this->session->userdata('role_id');
+                            if($this->session->userdata('role_id')=='1'){
+                        ?>
+                        <div class="dropdown pull-right">
+                            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+                                Select Dashboard
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a href="<?php echo base_url()?>index.php/Dashboard"> Sales Dashboard </a></li>
+                                <li><a href="<?php echo base_url()?>index.php/Dashboard/production"> Production Dashboard </a></li>
+                            </ul>
+                        </div>
+                        <?php } ?>
+                    </div>        
+                </div>
+                
                 <!-- PAGE CONTENT WRAPPER -->
                 <div class="page-content-wrapper ">
                 <div class="row main-wrapper"> 

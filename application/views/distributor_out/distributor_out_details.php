@@ -118,7 +118,7 @@
                                                             <option value="<?php echo $distributor[$k]->id; ?>" <?php if(isset($data)) { if($distributor[$k]->id==$data[0]->distributor_id) { echo 'selected'; } } ?>><?php echo $distributor[$k]->distributor_name; ?></option>
                                                     <?php }} ?>
                                                 </select>
-                                                <input type="hidden" name="sell_out" id="sell_out" value="<?php if(isset($data)) { if($data[0]->discount!=0) echo $data[0]->discount; else echo $data[0]->sell_out; } ?>"/>
+                                                <input type="hidden" name="sell_out" id="sell_out" value="<?php if(isset($data)) { if($data[0]->discount!=0) echo $data[0]->discount; /*else echo $data[0]->sell_out;*/ } ?>"/>
                                                 <!-- <input type="hidden" name="state" id="state" value="<?php //if(isset($data)) { echo $data[0]->state; } ?>"/> -->
                                                 <input type="hidden" name="class" id="class" value="<?php if(isset($data)) { echo $data[0]->class; } ?>"/>
                                                 <!-- <input type="hidden" name="distributor_id" id="distributor_id" value="<?php //if(isset($data)) { echo $data[0]->distributor_id; } ?>"/>
@@ -242,6 +242,12 @@
                                             <input type="text" class="form-control" name="discount" id="discount" placeholder="Discount" value="<?php if(isset($data)) { echo $data[0]->discount; } ?>" />
                                         </div>
                                     </div>
+                                    <div class="form-group direct">
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">GSTIN </label>
+                                        <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <input type="text" class="form-control" name="gstin" id="gstin" placeholder="GSTIN" value="<?php if(isset($data)) { echo $data[0]->gstin; } ?>" />
+                                        </div>
+                                    </div>
 										
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
@@ -323,7 +329,8 @@
                                                         <input type="hidden" class="form-control" name="igst[]" id="igst_<?php echo $i; ?>" placeholder="igst" value="0" readonly />
                                                         <input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_<?php echo $i; ?>" placeholder="tax_per" value="<?php if (isset($distributor_out_items)) { echo $distributor_out_items[$i]->tax_percentage; } ?>"/>
                                                         <input type="hidden" class="form-control sell_margin" name="sell_margin[]" id="sell_margin_<?php echo $i; ?>" placeholder="Sell Margin" value="<?php if (isset($distributor_out_items)) { echo $distributor_out_items[$i]->margin_per; } ?>"/>
-                                                        <input type="text" class="form-control sell_rate" name="sell_rate[]" id="sell_rate_<?php echo $i; ?>" placeholder="Sell Rate" value="0"/>
+                                                        <input type="hidden" class="form-control promo_margin" name="promo_margin[]" id="promo_margin_<?php echo $i; ?>" placeholder="Promotion Margin" value="<?php if (isset($distributor_out_items)) { echo $distributor_out_items[$i]->promo_margin; } ?>"/>
+                                                        <input type="text" class="form-control sell_rate" name="sell_rate[]" id="sell_rate_<?php echo $i; ?>" placeholder="Sell Rate" value="0" readonly />
                                                     
                                                     </td>
                                                     <td style="display: none;">
@@ -399,7 +406,8 @@
                                                     <input type="hidden" class="form-control" name="igst[]" id="igst_<?php echo $i; ?>" placeholder="igst" value="0" readonly />
                                                     <input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_<?php echo $i; ?>" placeholder="tax_per" value="0"/>
                                                     <input type="hidden" class="form-control sell_margin" name="sell_margin[]" id="sell_margin_<?php echo $i; ?>" placeholder="Sell Margin" value="0"/>
-                                                    <input type="text" class="form-control sell_rate" name="sell_rate[]" id="sell_rate_<?php echo $i; ?>" placeholder="Sell Rate" value="0"/>
+                                                    <input type="hidden" class="form-control promo_margin" name="promo_margin[]" id="promo_margin_<?php echo $i; ?>" placeholder="Promotion Margin" value="0"/>
+                                                    <input type="text" class="form-control sell_rate" name="sell_rate[]" id="sell_rate_<?php echo $i; ?>" placeholder="Sell Rate" value="0" readonly />
                                                 
                                                 </td>
                                                 <td style="display: none;">
@@ -615,7 +623,7 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Supplier Ref </label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="supplier_ref" id="supplier_ref" placeholder="Supplier Ref" value="<?php if (isset($data)) { echo $data[0]->supplier_ref; } ?>" />
+                                                <input type="text" class="form-control" name="supplier_ref" id="supplier_ref" placeholder="Supplier Ref" value="<?php //if (isset($data)) { echo $data[0]->supplier_ref; } ?>" />
                                             </div>
                                         </div>
                                     </div>
@@ -623,7 +631,7 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Despatch Doc No </label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="despatch_doc_no" id="despatch_doc_no" placeholder="Despatch Doc No" value="<?php if(isset($data)) { echo $data[0]->despatch_doc_no; } ?>" />
+                                                <input type="text" class="form-control" name="despatch_doc_no" id="despatch_doc_no" placeholder="Despatch Doc No" value="<?php //if(isset($data)) { echo $data[0]->despatch_doc_no; } ?>" />
                                             </div>
                                         </div>
                                     </div>
@@ -631,7 +639,7 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Despatch Through </label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="despatch_through" id="despatch_through" placeholder="Despatch Through" value="<?php if (isset($data)) { echo $data[0]->despatch_through; } ?>" />
+                                                <input type="text" class="form-control" name="despatch_through" id="despatch_through" placeholder="Despatch Through" value="<?php //if (isset($data)) { echo $data[0]->despatch_through; } ?>" />
                                             </div>
                                         </div>
                                     </div>
@@ -639,7 +647,7 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Destination </label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="destination" id="destination" placeholder="Destination" value="<?php if(isset($data)) { echo $data[0]->destination; } ?>" />
+                                                <input type="text" class="form-control" name="destination" id="destination" placeholder="Destination" value="<?php //if(isset($data)) { echo $data[0]->destination; } ?>" />
                                             </div>
                                         </div>
                                     </div> -->
@@ -952,7 +960,7 @@
                 });
                 $('#depot_id').on('change', function(event){
                     get_depot_details($('#depot_id').val());
-                    get_distributor_details($('#distributor_id').val());
+                    get_distributor_details($('#distributor_id').val(), false);
                     // console.log('1');
                     if($('#distributor_consignee_id').val()!='') {
                         get_consignee_details1($('#distributor_consignee_id').val());
@@ -969,9 +977,8 @@
                 $('#distributor_consignee_id').on('change', function(event) { 
                     if($('#distributor_consignee_id').val()!='') {
                         get_consignee_details1($('#distributor_consignee_id').val());
-                    }
-                    else {
-                        get_distributor_details($('#distributor_id').val());
+                    } else {
+                        get_distributor_details($('#distributor_id').val(), false);
                         // console.log('2');
                     }
                     // alert('hi');
@@ -988,7 +995,7 @@
                             //if(data.result==1){
                                 // console.log(data.state);
 								//alert($('#distributor_id').val());
-								if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550" && $('#distributor_id').val()!="622" && $('#distributor_id').val()!="626" && $('#distributor_id').val()!="640") {
+								if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550" && $('#distributor_id').val()!="622" && $('#distributor_id').val()!="626" && $('#distributor_id').val()!="640" && $('#distributor_id').val()!="1299" && $('#distributor_id').val()!="1319") {
 									// alert($('#distributor_id').val());
 									$('#state').val(data.state);
 									$('#state_code').val(data.state_code);
@@ -1043,7 +1050,7 @@
                             get_consignee_details1($('#distributor_consignee_id').val());
                         }
                     } else {
-                        get_distributor_details($('#distributor_id').val());
+                        get_distributor_details($('#distributor_id').val(), false);
                         // console.log('3');
                         $('#shipping_address_div').hide();
                     }
@@ -1224,7 +1231,7 @@
                                 }
                             }
                             
-                            // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640){
+                            // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319){
                             //     $('#sell_out').val($("#discount").val());
                             // } else {
                             //     $('#sell_out').val(data.sell_out);
@@ -1234,7 +1241,7 @@
                                 $('#distributor_name').val(data.product_name);
                             }
 
-                            if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550" && $('#distributor_id').val()!="622" && $('#distributor_id').val()!="626" && $('#distributor_id').val()!="640") {
+                            if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550" && $('#distributor_id').val()!="622" && $('#distributor_id').val()!="626" && $('#distributor_id').val()!="640" && $('#distributor_id').val()!="1299" && $('#distributor_id').val()!="1319") {
                                 $('#state').val(data.state);
                                 $('#state_code').val(data.state_code);
                             }
@@ -1305,7 +1312,7 @@
                     }
                 });
 
-                if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640){
+                if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319){
                     $('.direct').show();
                 } else {
                     $('.direct').hide();
@@ -1321,7 +1328,7 @@
                     var id = elem.attr('id');
                     var index = id.substr(id.lastIndexOf('_')+1);
                     var sell_out = 0;
-                    // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640){
+                    // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319){
                     //     sell_out = parseFloat($('#sell_out').val());
                     // } else {
                     //     sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
@@ -1359,25 +1366,26 @@
                     if (isNaN(igst)) igst=0;
                     if (isNaN(tax_per)) tax_per=0;
 
-                    var cgst_amt = (qty*((sell_rate*cgst)/100)).toFixed(2);
-                    var sgst_amt = (qty*((sell_rate*sgst)/100)).toFixed(2);
-                    var igst_amt = (qty*((sell_rate*igst)/100)).toFixed(2);
-                    var tax_amt = (qty*((sell_rate*tax_per)/100)).toFixed(2);
+                    var cgst_amt = Math.round(qty*((sell_rate*cgst)/100)*100)/100;
+                    var sgst_amt = Math.round(qty*((sell_rate*sgst)/100)*100)/100;
+                    var igst_amt = Math.round(qty*((sell_rate*igst)/100)*100)/100;
+                    // var tax_amt = Math.round(qty*((sell_rate*tax_per)/100)*100)/100;
+                    var tax_amt = cgst_amt+sgst_amt+igst_amt;
                     
                     if (isNaN(cgst_amt)) cgst_amt=0;
                     if (isNaN(sgst_amt)) sgst_amt=0;
                     if (isNaN(igst_amt)) igst_amt=0;
                     if (isNaN(tax_amt)) tax_amt=0;
 
-                    var amount = (qty*sell_rate).toFixed(2);
-                    var total_amount = parseFloat(amount,2) + parseFloat(tax_amt,2);
+                    var amount = Math.round(qty*sell_rate*100)/100;
+                    var total_amount = Math.round((parseFloat(amount,2) + parseFloat(tax_amt,2))*100)/100;
 
                     $("#sell_rate_"+index).val(Math.round(sell_rate*10000)/10000);
-                    $("#amount_"+index).val(amount);
-                    $("#cgst_amt_"+index).val(cgst_amt);
-                    $("#sgst_amt_"+index).val(sgst_amt);
-                    $("#igst_amt_"+index).val(igst_amt);
-                    $("#tax_amt_"+index).val(tax_amt);
+                    $("#amount_"+index).val(amount.toFixed(2));
+                    $("#cgst_amt_"+index).val(cgst_amt.toFixed(2));
+                    $("#sgst_amt_"+index).val(sgst_amt.toFixed(2));
+                    $("#igst_amt_"+index).val(igst_amt.toFixed(2));
+                    $("#tax_amt_"+index).val(tax_amt.toFixed(2));
                     $("#total_amt_"+index).val(total_amount.toFixed(2));
                 });
 
@@ -1390,17 +1398,22 @@
                 var index = id.substr(id.lastIndexOf('_')+1);
                 var qty = parseFloat(get_number($("#qty_"+index).val(),2));
                 var sell_out = 0;
-                // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640){
+                // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319){
                 //     sell_out = parseFloat($('#sell_out').val());
                 // } else {
                 //     sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
                 // }
                 sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
+                if (isNaN(sell_out)) sell_out=0;
+
+                var pro_margin = 0;
+                pro_margin = parseFloat(get_number($("#promo_margin_"+index).val(),2));
+                if (isNaN(pro_margin)) pro_margin=0;
+
                 var tax_per = parseFloat(get_number($("#tax_per_"+index).val(),2));
                 var distributor_id = $("#distributor_id").val();
-                var grams_in_bar = 0;
-                var rate = 0;
-                var grams =0;
+                var rate = parseFloat(get_number($("#rate_"+index).val(),2));
+                var grams = parseFloat(get_number($("#grams_"+index).val(),2));
 
                 $.ajax({
                     url:BASE_URL+'index.php/distributor_out/get_product_details',
@@ -1412,13 +1425,14 @@
                         if(data.result==1){
                             grams = parseFloat(data.grams);
                             rate = parseFloat(data.rate);
-                            // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640){
+                            // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319){
                             //     sell_out = parseFloat($('#sell_out').val());
                             // } else {
-                            //     sell_out = parseFloat(data.margin);
+                            //     sell_out = parseFloat(data.inv_margin);
                             // }
-                            sell_out = parseFloat(data.margin);
+                            sell_out = parseFloat(data.inv_margin);
                             tax_per = parseFloat(data.tax_percentage);
+                            pro_margin = parseFloat(data.pro_margin);
                         }
                     },
                     error: function (response) {
@@ -1434,6 +1448,7 @@
                 if (isNaN(rate)) rate=0;
                 if (isNaN(sell_out)) sell_out=0;
                 if (isNaN(tax_per)) tax_per=0;
+                if (isNaN(pro_margin)) pro_margin=0;
 
                 var discount = parseFloat(get_number($("#sell_out").val(),2));
                 if (isNaN(discount)) discount=0;
@@ -1442,37 +1457,36 @@
                 var sgst = $("#sgst_"+index).val();
                 var igst = $("#igst_"+index).val();
 
-                // console.log(sell_out);
-                // console.log(tax_per);
-
                 var sell_rate = rate-((rate*(sell_out+discount))/100);
                 sell_rate = sell_rate/(100+tax_per)*100;
 
                 // console.log(sell_rate);
 
-                var cgst_amt = (qty*((sell_rate*cgst)/100)).toFixed(2);
-                var sgst_amt = (qty*((sell_rate*sgst)/100)).toFixed(2);
-                var igst_amt = (qty*((sell_rate*igst)/100)).toFixed(2);
-                var tax_amt = (qty*((sell_rate*tax_per)/100)).toFixed(2);
+                var cgst_amt = Math.round(qty*((sell_rate*cgst)/100)*100)/100;
+                var sgst_amt = Math.round(qty*((sell_rate*sgst)/100)*100)/100;
+                var igst_amt = Math.round(qty*((sell_rate*igst)/100)*100)/100;
+                // var tax_amt = Math.round(qty*((sell_rate*tax_per)/100)*100)/100;
+                var tax_amt = cgst_amt+sgst_amt+igst_amt;
                 
                 if (isNaN(cgst_amt)) cgst_amt=0;
                 if (isNaN(sgst_amt)) sgst_amt=0;
                 if (isNaN(igst_amt)) igst_amt=0;
                 if (isNaN(tax_amt)) tax_amt=0;
 
-                var amount = (qty*sell_rate).toFixed(2);
-                var total_amount = parseFloat(amount,2) + parseFloat(tax_amt,2);
+                var amount = Math.round(qty*sell_rate*100)/100;
+                var total_amount = Math.round((parseFloat(amount,2) + parseFloat(tax_amt,2))*100)/100;
 
                 $("#grams_"+index).val(grams);
                 $("#rate_"+index).val(rate);
                 $("#sell_margin_"+index).val(sell_out);
+                $("#promo_margin_"+index).val(pro_margin);
                 $("#tax_per_"+index).val(tax_per);
                 $("#sell_rate_"+index).val(Math.round(sell_rate*10000)/10000);
-                $("#amount_"+index).val(amount);
-                $("#cgst_amt_"+index).val(cgst_amt);
-                $("#sgst_amt_"+index).val(sgst_amt);
-                $("#igst_amt_"+index).val(igst_amt);
-                $("#tax_amt_"+index).val(tax_amt);
+                $("#amount_"+index).val(amount.toFixed(2));
+                $("#cgst_amt_"+index).val(cgst_amt.toFixed(2));
+                $("#sgst_amt_"+index).val(sgst_amt.toFixed(2));
+                $("#igst_amt_"+index).val(igst_amt.toFixed(2));
+                $("#tax_amt_"+index).val(tax_amt.toFixed(2));
                 $("#total_amt_"+index).val(total_amount.toFixed(2));
 
                 get_total();
@@ -1484,17 +1498,19 @@
                 var index = id.substr(id.lastIndexOf('_')+1);
                 var qty = parseFloat(get_number($("#qty_"+index).val(),2));
                 var sell_out = 0;
-                // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640){
+                // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319){
                 //     sell_out = parseFloat($('#sell_out').val());
                 // } else {
                 //     sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
                 // }
                 sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
+                var pro_margin = parseFloat(get_number($("#promo_margin_"+index).val(),2));
+
                 var tax_per = parseFloat(get_number($("#tax_per_"+index).val(),2));
                 var distributor_id = $("#distributor_id").val();
-                var grams_in_bar = 0;
-                var rate = 0;
-
+                var rate = parseFloat(get_number($("#rate_"+index).val(),2));
+                var grams = parseFloat(get_number($("#grams_"+index).val(),2));
+                
                 $.ajax({
                     url:BASE_URL+'index.php/distributor_out/get_box_details',
                     method:"post",
@@ -1505,13 +1521,14 @@
                         if(data.result==1){
                             grams = parseFloat(data.grams);
                             rate = parseFloat(data.rate);
-                            // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640){
+                            // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319){
                             //     sell_out = parseFloat($('#sell_out').val());
                             // } else {
-                            //     sell_out = parseFloat(data.margin);
+                            //     sell_out = parseFloat(data.inv_margin);
                             // }
-                            sell_out = parseFloat(data.margin);
+                            sell_out = parseFloat(data.inv_margin);
                             tax_per = parseFloat(data.tax_percentage);
+                            pro_margin = parseFloat(data.pro_margin);
                         }
                     },
                     error: function (response) {
@@ -1527,6 +1544,7 @@
                 if (isNaN(rate)) rate=0;
                 if (isNaN(sell_out)) sell_out=0;
                 if (isNaN(tax_per)) tax_per=0;
+                if (isNaN(pro_margin)) pro_margin=0;
 
                 var discount = parseFloat(get_number($("#sell_out").val(),2));
                 if (isNaN(discount)) discount=0;
@@ -1538,67 +1556,69 @@
                 var sell_rate = rate-((rate*(sell_out+discount))/100);
                 sell_rate = sell_rate/(100+tax_per)*100;
 
-                var cgst_amt = (qty*((sell_rate*cgst)/100)).toFixed(2);
-                var sgst_amt = (qty*((sell_rate*sgst)/100)).toFixed(2);
-                var igst_amt = (qty*((sell_rate*igst)/100)).toFixed(2);
-                var tax_amt = (qty*((sell_rate*tax_per)/100)).toFixed(2);
+                var cgst_amt = Math.round(qty*((sell_rate*cgst)/100)*100)/100;
+                var sgst_amt = Math.round(qty*((sell_rate*sgst)/100)*100)/100;
+                var igst_amt = Math.round(qty*((sell_rate*igst)/100)*100)/100;
+                // var tax_amt = Math.round(qty*((sell_rate*tax_per)/100)*100)/100;
+                var tax_amt = cgst_amt+sgst_amt+igst_amt;
                 
                 if (isNaN(cgst_amt)) cgst_amt=0;
                 if (isNaN(sgst_amt)) sgst_amt=0;
                 if (isNaN(igst_amt)) igst_amt=0;
                 if (isNaN(tax_amt)) tax_amt=0;
 
-                var amount = (qty*sell_rate).toFixed(2);
-                var total_amount = parseFloat(amount,2) + parseFloat(tax_amt,2);
+                var amount = Math.round((qty*sell_rate)*100)/100;
+                var total_amount = Math.round((parseFloat(amount,2) + parseFloat(tax_amt,2))*100)/100;
 
                 $("#grams_"+index).val(grams);
                 $("#rate_"+index).val(rate);
                 $("#sell_margin_"+index).val(sell_out);
+                $("#promo_margin_"+index).val(pro_margin);
                 $("#tax_per_"+index).val(tax_per);
                 $("#sell_rate_"+index).val(Math.round(sell_rate*10000)/10000);
-                $("#amount_"+index).val(amount);
-                $("#cgst_amt_"+index).val(cgst_amt);
-                $("#sgst_amt_"+index).val(sgst_amt);
-                $("#igst_amt_"+index).val(igst_amt);
-                $("#tax_amt_"+index).val(tax_amt);
+                $("#amount_"+index).val(amount.toFixed(2));
+                $("#cgst_amt_"+index).val(cgst_amt.toFixed(2));
+                $("#sgst_amt_"+index).val(sgst_amt.toFixed(2));
+                $("#igst_amt_"+index).val(igst_amt.toFixed(2));
+                $("#tax_amt_"+index).val(tax_amt.toFixed(2));
                 $("#total_amt_"+index).val(total_amount.toFixed(2));
 
                 get_total();
             }
 
-            function get_product_detail(elem) {
-                /*alert('entered');*/
-                var box_id = elem.val();
-                var id = elem.attr('id');
-                var index = id.substr(id.lastIndexOf('_')+1);
-                var box = box_id;
-                var distributor_id = $("#distributor_id").val();  
-                if(distributor_id!="") {
-                    $.ajax({
-                        url:BASE_URL+'index.php/Distributor_out/get_product_percentage/'+box+'/'+distributor_id,
-                        method:"GET",
-                        dataType:"json",
-                        async:false,
-                        success: function(data){
-                            if(data!=0)
-                            {
-                                var obj = data;
-                                var margin = parseFloat(obj.margin);
-                                /*alert(margin);*/
-                                $('#sell_margin_'+index).val(margin);
-                                var tax_percentage = parseFloat(obj.tax_percentage);
-                                $('#tax_per_'+index).val(tax_percentage);  
-                            }
-                        },
-                        error: function (response) {
-                            var r = jQuery.parseJSON(response.responseText);
-                            alert("Message: " + r.Message);
-                            alert("StackTrace: " + r.StackTrace);
-                            alert("ExceptionType: " + r.ExceptionType);
-                        }
-                    });
-                }  
-            }
+            // function get_product_detail(elem) {
+            //     /*alert('entered');*/
+            //     var box_id = elem.val();
+            //     var id = elem.attr('id');
+            //     var index = id.substr(id.lastIndexOf('_')+1);
+            //     var box = box_id;
+            //     var distributor_id = $("#distributor_id").val();  
+            //     if(distributor_id!="") {
+            //         $.ajax({
+            //             url:BASE_URL+'index.php/Distributor_out/get_product_percentage/'+box+'/'+distributor_id,
+            //             method:"GET",
+            //             dataType:"json",
+            //             async:false,
+            //             success: function(data){
+            //                 if(data!=0)
+            //                 {
+            //                     var obj = data;
+            //                     var margin = parseFloat(obj.inv_margin);
+            //                     /*alert(margin);*/
+            //                     $('#sell_margin_'+index).val(margin);
+            //                     var tax_percentage = parseFloat(obj.tax_percentage);
+            //                     $('#tax_per_'+index).val(tax_percentage);  
+            //                 }
+            //             },
+            //             error: function (response) {
+            //                 var r = jQuery.parseJSON(response.responseText);
+            //                 alert("Message: " + r.Message);
+            //                 alert("StackTrace: " + r.StackTrace);
+            //                 alert("ExceptionType: " + r.ExceptionType);
+            //             }
+            //         });
+            //     }  
+            // }
 
             function get_amount(elem){
                 var id = elem.attr('id');
@@ -1610,10 +1630,11 @@
                 var sgst = parseFloat(get_number($("#sgst_"+index).val(),2));
                 var igst = parseFloat(get_number($("#igst_"+index).val(),2));
                 var amount = qty*sell_rate;
-                var cgst_amt = parseFloat((amount*cgst)/100);
-                var sgst_amt = parseFloat((amount*sgst)/100);
-                var igst_amt = parseFloat((amount*igst)/100);
-                var tax_amt = parseFloat((amount*tax_per)/100);
+                var cgst_amt = Math.round((amount*cgst)*100)/100;
+                var sgst_amt = Math.round((amount*sgst)*100)/100;
+                var igst_amt = Math.round((amount*igst)*100)/100;
+                // var tax_amt = Math.round((amount*tax_per)*100)/100;
+                var tax_amt = cgst_amt+sgst_amt+igst_amt;
 
                 $("#amount_"+index).val(amount.toFixed(2));
                 $("#cgst_amt_"+index).val((cgst_amt).toFixed(2));
@@ -1621,7 +1642,7 @@
                 $("#igst_amt_"+index).val((igst_amt).toFixed(2));
                 $("#tax_amt_"+index).val((tax_amt).toFixed(2));
 
-                var total_amt = parseFloat(tax_amt+amount);
+                var total_amt = Math.round((tax_amt+amount)*100)/100;
                 $("#total_amt_"+index).val((total_amt).toFixed(2));
 
                 get_total();
@@ -1696,7 +1717,7 @@
                 $("#tax_amount").val(tax_amt.toFixed(2));
                 $("#final_amount").val(final_amt.toFixed(2));
 
-                var round_off_amt = final_amt.toFixed(0) - final_amt.toFixed(2);
+                var round_off_amt = Math.round(final_amt) - (Math.round(final_amt*100)/100);
 
                 $("#round_off_amount").val(round_off_amt.toFixed(2));
                 $("#invoice_amount").val(final_amt.toFixed(0));
@@ -1744,7 +1765,9 @@
                 $.each($('.tax_amt'), function(i, item) {
                     var amount =  $('#amount_'+i).val();
                     var tax_per = parseFloat($('#tax_per_'+i).val());
-                    var tax_amt = parseFloat(amount*tax_per/100);
+                    // var tax_amt = parseFloat(amount*tax_per/100);
+                    var tax_amt = parseFloat($('#cgst_amt_'+i).val())+parseFloat($('#sgst_amt_'+i).val())+parseFloat($('#igst_amt_'+i).val());
+                    
                     if(tax_amt==0 || isNaN(tax_amt)) {
                         $('#tax_amt_'+i).val(0);    
                     }
@@ -1757,6 +1780,7 @@
                     var amount =  parseFloat($('#amount_'+i).val());
                     var tax_amt = parseFloat($('#tax_amt_'+i).val());
                     var totamt1=parseFloat(amount+tax_amt);
+
                     if(isNaN(totamt1) || totamt1==0) {
                         totamt1=0;
                         $('#total_amt_'+i).val(totamt1);
@@ -1809,7 +1833,8 @@
                                                 '<input type="hidden" class="form-control" name="igst[]" id="igst_'+counter+'" placeholder="igst" value="0" readonly />' + 
                                                 '<input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_'+counter+'" placeholder="tax_per" value="0"/>' + 
                                                 '<input type="hidden" class="form-control sell_margin" name="sell_margin[]" id="sell_margin_'+counter+'" placeholder="Sell Margin" value="0"/>' + 
-                                                '<input type="text" class="form-control sell_rate" name="sell_rate[]" id="sell_rate_'+counter+'" placeholder="Sell Rate" value=""/>' + 
+                                                '<input type="hidden" class="form-control promo_margin" name="promo_margin[]" id="promo_margin_'+counter+'" placeholder="Promotion Margin" value="0"/>' + 
+                                                '<input type="text" class="form-control sell_rate" name="sell_rate[]" id="sell_rate_'+counter+'" placeholder="Sell Rate" value="" readonly />' + 
                                             '</td>' + 
                                             '<td style="display: none;">' + 
                                                 '<input type="text" class="form-control grams" name="grams[]" id="grams_'+counter+'" placeholder="Grams" value="" readonly />' + 

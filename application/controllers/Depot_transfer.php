@@ -18,6 +18,7 @@ class Depot_transfer extends CI_Controller{
         $this->load->model('raw_material_model');
         $this->load->model('box_model');
         $this->load->model('product_model');
+        $this->load->model('production_model');
         $this->load->database();
     }
 
@@ -35,7 +36,7 @@ class Depot_transfer extends CI_Controller{
         }
     }
 
-    public function add(){
+    public function add($p_id='', $module=''){
         $result=$this->depot_transfer_model->get_access();
         if(count($result)>0) {
             if($result[0]->r_insert == 1) {
@@ -48,6 +49,9 @@ class Depot_transfer extends CI_Controller{
                 $sql = "select * from batch_master where date_of_processing >= '$date' and status = 'Approved' and batch_no!=''";
                 $query = $this->db->query($sql);
                 $data['batch'] = $query->result();
+                $data['p_id'] = $p_id;
+                $data['production'] = $this->production_model->get_data('Approved');
+                $data['module'] = $module;
 
                 load_view('depot_transfer/depot_transfer_details', $data);
             } else {
@@ -59,7 +63,7 @@ class Depot_transfer extends CI_Controller{
         }
     }
 
-    public function edit($id){
+    public function edit($id, $module=''){
         $result=$this->depot_transfer_model->get_access();
         if(count($result)>0) {
             if($result[0]->r_view == 1 || $result[0]->r_edit == 1) {
@@ -74,6 +78,8 @@ class Depot_transfer extends CI_Controller{
                 $query = $this->db->query($sql);
                 $data['batch'] = $query->result();
                 $data['depot_transfer_items'] = $this->depot_transfer_model->get_depot_transfer_items($id);
+                $data['production'] = $this->production_model->get_data('Approved');
+                $data['module'] = $module;
 
                 load_view('depot_transfer/depot_transfer_details', $data);
             } else {
@@ -87,12 +93,12 @@ class Depot_transfer extends CI_Controller{
 
     public function save(){
         $this->depot_transfer_model->save_data();
-        redirect(base_url().'index.php/depot_transfer');
+        // redirect(base_url().'index.php/depot_transfer');
     }
 
     public function update($id){
         $this->depot_transfer_model->save_data($id);
-        redirect(base_url().'index.php/depot_transfer');
+        // redirect(base_url().'index.php/depot_transfer');
     }
 
     public function check_raw_material_availablity(){

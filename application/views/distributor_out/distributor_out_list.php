@@ -291,6 +291,7 @@
                                                         <th width="50" style="text-align:center; <?php //if($status!='gp_issued') echo 'display: none;'; ?>">View GP</th>
     													<th width="50" style="display:none;">Resend Invoice</th>
     													<th width="50" style=" <?php //if($status!='gp_issued') echo 'display: none;'; ?>">Tracking Id</th>
+    													<th width="50" style=" <?php //if($status!='gp_issued') echo 'display: none;'; ?>">Credit Note</th>
 														
     												</tr>
     											</thead>

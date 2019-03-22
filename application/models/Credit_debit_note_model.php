@@ -44,7 +44,9 @@ function get_data($status='', $id=''){
             (select * from credit_debit_note".$cond.") A 
             left join 
             (select * from distributor_master) B 
-            on (A.distributor_id=B.id) order by A.modified_on desc";
+            on (A.distributor_id=B.id)
+            Where A.remarks!='Adjusted through Ledger Balance'
+            order by A.modified_on desc";
     $query=$this->db->query($sql);
     return $query->result();
 }
@@ -170,7 +172,8 @@ function save_data($id=''){
                                 A.ref_date='$ref_date', A.modified_approved_date='$modified_approved_date', 
                                 A.amount_without_tax=B.amount_without_tax, A.tax=B.tax, 
                                 A.igst=B.igst, A.cgst=B.cgst, A.sgst=B.sgst, A.distributor_type=B.distributor_type, 
-                                A.invoice_no=B.invoice_no, A.freezed=B.freezed 
+                                A.invoice_no=B.invoice_no, A.freezed=B.freezed, A.distributor_out_id=B.distributor_out_id, 
+                                A.distributor_in_id=B.distributor_in_id 
                             WHERE A.id = '$ref_id' and B.id = '$id'";
                     } else {
                         $sql = "Update credit_debit_note A, credit_debit_note B 
@@ -181,7 +184,8 @@ function save_data($id=''){
                                 A.ref_date='$ref_date', A.modified_approved_date=NULL, 
                                 A.amount_without_tax=B.amount_without_tax, A.tax=B.tax, 
                                 A.igst=B.igst, A.cgst=B.cgst, A.sgst=B.sgst, A.distributor_type=B.distributor_type, 
-                                A.invoice_no=B.invoice_no, A.freezed=B.freezed 
+                                A.invoice_no=B.invoice_no, A.freezed=B.freezed, A.distributor_out_id=B.distributor_out_id, 
+                                A.distributor_in_id=B.distributor_in_id 
                             WHERE A.id = '$ref_id' and B.id = '$id'";
                     }
                     

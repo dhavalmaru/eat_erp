@@ -204,15 +204,15 @@ function save_data($id=''){
         'tin_number' => $this->input->post('tin_number'),
         'cst_number' => $this->input->post('cst_number'),
         // 'contact_person' => $this->input->post('contact_person'),
-        'sales_rep_id' => $this->input->post('sales_rep_id'),
-        'sell_out' => $this->input->post('sell_out'),
-        'send_invoice' => $this->input->post('send_invoice'),
-        'credit_period' => $this->input->post('credit_period'),
+        'sales_rep_id' => ($this->input->post('sales_rep_id')==''?null:$this->input->post('sales_rep_id')),
+        'sell_out' => ($this->input->post('sell_out')==''?null:$this->input->post('sell_out')),
+        'send_invoice' => ($this->input->post('send_invoice')==''?null:$this->input->post('send_invoice')),
+        'credit_period' => ($this->input->post('credit_period')==''?null:$this->input->post('credit_period')),
         'class' => $this->input->post('class'),
-        'area_id' => $this->input->post('area_id'),
-        'type_id' => $this->input->post('type_id'),
-        'zone_id' => $this->input->post('zone_id'),
-        'location_id' => $this->input->post('location_id'),
+        'area_id' => ($this->input->post('area_id')==''?null:$this->input->post('area_id')),
+        'type_id' => ($this->input->post('type_id')==''?null:$this->input->post('type_id')),
+        'zone_id' => ($this->input->post('zone_id')==''?null:$this->input->post('zone_id')),
+        'location_id' => ($this->input->post('location_id')==''?null:$this->input->post('location_id')),
         'status' => $this->input->post('status'),
         'remarks' => $this->input->post('remarks'),
         'modified_by' => $curusr,
@@ -221,21 +221,19 @@ function save_data($id=''){
         'document_name' => $this->input->post('document_name'),
         'state_code' => $this->input->post('state_code'),
         'gst_number' => $this->input->post('gst_number'),
-        'latitude' => $this->input->post('d_latitude'),
-        'longitude' => $this->input->post('d_longitude'),
+        'latitude' => ($this->input->post('d_latitude')==''?null:$this->input->post('d_latitude')),
+        'longitude' => ($this->input->post('d_longitude')==''?null:$this->input->post('d_longitude')),
         'tally_name' => $this->input->post('tally_name'),
-        'master_distributor_id' => $this->input->post('master_distributor_id')
+        'master_distributor_id' => ($this->input->post('master_distributor_id')==''?null:$this->input->post('master_distributor_id'))
     );
 
     if($id==''){
         $data['created_by']=$curusr;
         $data['created_on']=$now;
 
-        
         $this->db->insert('distributor_master',$data);
         $id=$this->db->insert_id();
         $action='Distributor Created.';
-
 
         // $data1 = array(
         //     'ledger_name' => $this->input->post('distributor_name'),
@@ -247,7 +245,6 @@ function save_data($id=''){
         // );
 
         // $this->db->insert('account_ledger_master',$data1);
-
     } else {
         $this->db->where('id', $id);
         $this->db->update('distributor_master',$data);
@@ -263,8 +260,6 @@ function save_data($id=''){
 
         // $this->db->where('distributor_id', $id);
         // $this->db->update('account_ledger_master',$data1);
-
-
     }
 
     if(isset($_FILES['doc_file']['name'])) {
@@ -319,15 +314,17 @@ function save_data($id=''){
     $this->db->where('distributor_id', $id);
     $this->db->delete('distributor_category_margin');
 
-    $margin=$this->input->post('margin[]');
     $category=$this->input->post('category_id[]');
+    $inv_margin=$this->input->post('inv_margin[]');
+    $pro_margin=$this->input->post('pro_margin[]');
 
     for ($j=0; $j<count($category); $j++) {
         if(isset($category[$j]) and $category[$j]!="") {
             $data = array(
                         'distributor_id' => $id,
-                        'category_id' => $category[$j],
-                        'margin' => $margin[$j],
+                        'category_id' => ($category[$j]==''?null:$category[$j]),
+                        'inv_margin' => ($inv_margin[$j]==''?null:$inv_margin[$j]),
+                        'pro_margin' => ($pro_margin[$j]==''?null:$pro_margin[$j])
                     );
             $this->db->insert('distributor_category_margin', $data);
         }
@@ -366,8 +363,7 @@ function save_data($id=''){
 
     for ($k=0; $k<count($con_name); $k++) {
         if(isset($con_name[$k]) and $con_name[$k]!="") {
-
-             $data = array(
+            $data = array(
                         'distributor_id' => $id,
                         'con_name' => $con_name[$k],
                         'con_address' => $con_address[$k],
@@ -379,22 +375,16 @@ function save_data($id=''){
                         'con_gst_number' => $con_gst_number[$k]
                     );
 
-             if($con_id[$k]!="")
-             {
+            if($con_id[$k]!="") {
                 $this->db->where('id',$con_id[$k])->update('distributor_consignee', $data);
-             }
-             else
-            {
-
+            } else {
                 $this->db->insert('distributor_consignee', $data);
             }
-            
-            
         }
     }
 
     $d_id = $this->input->post('d_id');
-    if(strrpos($d_id, "s_") !== false){
+    if(strrpos($d_id, "s_") !== false) {
         $sql = "update sales_rep_distributors set status = 'Active', distributor_id = '$id', 
                 modified_by = '$curusr', modified_on = '$now' 
                 where id = '".substr($d_id, 2)."'";
@@ -411,7 +401,8 @@ function save_data($id=''){
 }
 
 public function getDistributor_margin($distributor_id) {
-    $sql = "select A.*, B.margin from category_master A left join distributor_category_margin B on (A.id = B.category_id and B.distributor_id = '$distributor_id')";
+    $sql = "select A.*, B.inv_margin, B.pro_margin from category_master A left join distributor_category_margin B 
+            on (A.id = B.category_id and B.distributor_id = '$distributor_id')";
     return $this->db->query($sql)->result();
 }
 

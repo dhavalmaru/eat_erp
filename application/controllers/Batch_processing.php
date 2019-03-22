@@ -18,13 +18,13 @@ class Batch_processing extends CI_Controller{
         $this->load->model('depot_model');
         $this->load->model('batch_master_model');
         $this->load->model('raw_material_model');
-       // $this->load->model('ingredients_master');
+        // $this->load->model('ingredients_master');
         $this->load->model('stock_model');
+        $this->load->model('production_model');
         $this->load->database();
     }
 
     //index function
-	
     public function index(){
         $result=$this->batch_processing_model->get_access();
         if(count($result)>0) {
@@ -34,7 +34,6 @@ class Batch_processing extends CI_Controller{
             $this->load->view('login/main_page');
         }
     }
-
 
     public function checkstatus($status=''){
         $result=$this->batch_processing_model->get_access();
@@ -76,8 +75,7 @@ class Batch_processing extends CI_Controller{
         }
     }
 
-     public function get_data_ajax($status='')
-    {
+    public function get_data_ajax($status=''){
         $draw = intval($this->input->get("draw"));
         $start = intval($this->input->get("start"));
         $length = intval($this->input->get("length"));
@@ -86,30 +84,29 @@ class Batch_processing extends CI_Controller{
         for ($i=0; $i < count($data); $i++) { 
                 $records[] =  array(
                         $i+1,   
-  '<span style="display:none;">'.(($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('Ymd',strtotime($data[$i]->date_of_processing)):'').'</span>'.(($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('d/m/Y',strtotime($data[$i]->date_of_processing)):''),							
+                        '<span style="display:none;">'.(($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('Ymd',strtotime($data[$i]->date_of_processing)):'').'</span>'.(($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('d/m/Y',strtotime($data[$i]->date_of_processing)):''),							
                         '<a href="'.base_url().'index.php/batch_processing/edit/'.$data[$i]->id.'"><i class="fa fa-edit"></i></a>',
                         '<a href="'.base_url().'index.php/batch_processing/view_batch_processing_receipt/'.$data[$i]->id.'" target="_blank"><span class="fa fa-file-pdf-o" style=""></span></a>',
                         ''.$data[$i]->batch_no.'',
-                      
                         ''.$data[$i]->depot_name.'',
                         ''.$data[$i]->product_name.'',
                         ''.format_money($data[$i]->qty_in_bar,2).'',
                         ''.format_money($data[$i]->actual_wastage,2).''
                     );
-      }
+        }
 
-      $output = array(
+        $output = array(
                         "draw" => $draw,
                         "recordsTotal" => count($data),
                         "recordsFiltered" => count($data),
                         "data" => $records
                     );
-       echo json_encode($output); 
+        echo json_encode($output); 
     }
 
     // public function get_data(){
     // $id=$this->input->post('id');
-   // $id=1;
+    // $id=1;
 
     // $result=$this->batch_processing_model->get_data('', $id);
     // $data['result'] = 0;
@@ -122,7 +119,8 @@ class Batch_processing extends CI_Controller{
 
     // echo json_encode($data);
     // }
-    public function add(){
+
+    public function add($p_id='', $module=''){
         $result=$this->batch_processing_model->get_access();
         if(count($result)>0) {
             if($result[0]->r_insert == 1) {
@@ -131,6 +129,9 @@ class Batch_processing extends CI_Controller{
                 $data['depot'] = $this->depot_model->get_data('Approved');
                 $data['batch_no'] = $this->batch_master_model->get_data('Approved');
                 $data['raw_material'] = $this->raw_material_model->get_data('Approved');
+                $data['p_id'] = $p_id;
+                $data['production'] = $this->production_model->get_data('Approved');
+                $data['module'] = $module;
 
                 load_view('batch_processing/batch_processing_details', $data);
             } else {
@@ -142,7 +143,7 @@ class Batch_processing extends CI_Controller{
         }
     }
 
-    public function edit($id){
+    public function edit($id, $module=''){
         $result=$this->batch_processing_model->get_access();
         if(count($result)>0) {
             if($result[0]->r_view == 1 || $result[0]->r_edit == 1) {
@@ -154,10 +155,13 @@ class Batch_processing extends CI_Controller{
                 $data['batch_no'] = $this->batch_master_model->get_data('Approved');
                 $data['raw_material'] = $this->raw_material_model->get_data('Approved');
                 $data['raw_material_stock'] = $this->batch_processing_model->get_batch_raw_material($id);
-              
-				   $data['batch_images'] = $this->batch_processing_model->get_batch_images($id);
+                
+				$data['batch_images'] = $this->batch_processing_model->get_batch_images($id);
+
+                $data['production'] = $this->production_model->get_data('Approved');
+                $data['module'] = $module;
 				
-				    // $query=$this->db->query("SELECT * FROM batch_images WHERE batch_processing_id = '$id'");
+				// $query=$this->db->query("SELECT * FROM batch_images WHERE batch_processing_id = '$id'");
                 // $result=$query->result();
                 // if(count($result)>0){
                     // $data['batch_images']=$result;
@@ -173,8 +177,8 @@ class Batch_processing extends CI_Controller{
         }
     }
 	
-		    public function get_batch_raw_material1(){
-			$product_id=$this->input->post('product_id');
+    public function get_batch_raw_material1(){
+		$product_id=$this->input->post('product_id');
         // $id=1;
 
         $result=$this->batch_processing_model->get_batch_raw_material1($product_id);
@@ -194,17 +198,14 @@ class Batch_processing extends CI_Controller{
 	
 
     public function save(){
-		
-		
         $this->batch_processing_model->save_data();
-   
-        redirect(base_url().'index.php/batch_processing');
+        // redirect(base_url().'index.php/batch_processing');
     }
 
     public function update($id){
         $this->batch_processing_model->save_data($id);
-      //  redirect(base_url().'index.php/batch_processing');
-	    echo '<script>window.open("'.base_url().'index.php/batch_processing", "_parent")</script>';
+        //  redirect(base_url().'index.php/batch_processing');
+	    // echo '<script>window.open("'.base_url().'index.php/batch_processing", "_parent")</script>';
     }
 
     public function check_batch_id_availablity(){
@@ -217,9 +218,6 @@ class Batch_processing extends CI_Controller{
         echo $result;
     }
 	
-	 
-
-
     public function check_raw_material_qty_availablity(){
         $result = $this->stock_model->check_raw_material_qty_availablity();
         echo $result;

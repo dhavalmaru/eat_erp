@@ -39,20 +39,19 @@ class Distributor_in extends CI_Controller{
         $this->checkstatus('Approved');
     }
 
-    public function get_data($status='')
-    {
+    public function get_data($status=''){
        $draw = intval($this->input->get("draw"));
        $start = intval($this->input->get("start"));
        $length = intval($this->input->get("length"));
        /*$data = $this->distributor_in_model->get_data($status);*/
        $records = array();
-       $data=$this->distributor_in_model->get_data($status);;
+       $data=$this->distributor_in_model->get_data($status);
        for ($i=0; $i < count($data); $i++) { 
                 $records[] =  array(
                         $i+1,
-						 (($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('d/m/Y',strtotime($data[$i]->date_of_processing)):''),
+                         (($data[$i]->date_of_processing!=null && $data[$i]->date_of_processing!='')?date('d/m/Y',strtotime($data[$i]->date_of_processing)):''),
                         '<a href="'.base_url().'index.php/distributor_in/edit/'.$data[$i]->id.'"><i class="fa fa-edit">',
-						 '<a class="hide_col" href="'.base_url().'index.php/distributor_in/view_sales_return_receipt/'.$data[$i]->id.'" target="_blank"><span class="fa fa-file-pdf-o" style="font-size:20px;"></span></a>',
+                         '<a class="hide_col" href="'.base_url().'index.php/distributor_in/view_sales_return_receipt/'.$data[$i]->id.'" target="_blank"><span class="fa fa-file-pdf-o" style="font-size:20px;"></span></a>',
                   
                        
                         ''.$data[$i]->sales_return_no.'',
@@ -60,6 +59,10 @@ class Distributor_in extends CI_Controller{
                         ''.$data[$i]->distributor_name.'',
                     
                         ''.format_money($data[$i]->final_amount,2).'',
+                        
+                        '<a href="'.($data[$i]->credit_debit_note_id!=NULL?base_url('index.php/credit_debit_note/view_credit_debit_note/').'/'.$data[$i]->credit_debit_note_id:'javascript:void(0)').'" target="_blank"> 
+                                '.($data[$i]->credit_debit_note_id!=NULL?'<span class="fa fa-file-pdf-o" style="font-size:20px;"></span>':'').'
+                            </a>',
                        );
                        
           }
@@ -225,8 +228,7 @@ class Distributor_in extends CI_Controller{
         echo $result;
     }
 
-    public function get_product_percentage($product_id,$distributor_id)
-    {
+    public function get_product_percentage($product_id,$distributor_id){
         $result = $this->distributor_in_model->get_product_percentage($product_id,$distributor_id);
 
         if(count($result)>0) {
@@ -237,8 +239,7 @@ class Distributor_in extends CI_Controller{
         }
     }
 
-    public function get_box_percentage($product_id,$distributor_id)
-    {
+    public function get_box_percentage($product_id,$distributor_id){
         $result = $this->distributor_in_model->get_box_percentage($product_id,$distributor_id);
 
         if(count($result)>0) {
@@ -248,5 +249,52 @@ class Distributor_in extends CI_Controller{
             echo 0;
         }
     }
+    
+    public function get_product_details(){
+        $id=$this->input->post('id');
+        $distributor_id=$this->input->post('distributor_id');
+        // $id=1;
+
+        $result=$this->distributor_out_model->get_product_details('', $id, $distributor_id);
+        $data['result'] = 0;
+        if(count($result)>0) {
+            $data['result'] = 1;
+            $data['product_name'] = $result[0]->product_name;
+            $data['barcode'] = $result[0]->barcode;
+            $data['grams'] = $result[0]->grams;
+            $data['avg_grams'] = $result[0]->avg_grams;
+            $data['rate'] = $result[0]->rate;
+            $data['cost'] = $result[0]->cost;
+            $data['anticipated_wastage'] = $result[0]->anticipated_wastage;
+            $data['tax_percentage'] = $result[0]->tax_percentage;
+            $data['inv_margin'] = $result[0]->inv_margin;
+            $data['pro_margin'] = $result[0]->pro_margin;
+        }
+
+        echo json_encode($data);
+    }
+
+    public function get_box_details(){
+        $id=$this->input->post('id');
+        $distributor_id=$this->input->post('distributor_id');
+        // $id=1;
+
+        $result=$this->distributor_out_model->get_box_details('', $id, $distributor_id);
+        $data['result'] = 0;
+        if(count($result)>0) {
+            $data['result'] = 1;
+            $data['box_name'] = $result[0]->box_name;
+            $data['barcode'] = $result[0]->barcode;
+            $data['grams'] = $result[0]->grams;
+            $data['rate'] = $result[0]->rate;
+            $data['cost'] = $result[0]->cost;
+            $data['tax_percentage'] = $result[0]->tax_percentage;
+            $data['inv_margin'] = $result[0]->inv_margin;
+            $data['pro_margin'] = $result[0]->pro_margin;
+        }
+
+        echo json_encode($data);
+    }
+
 }
 ?>

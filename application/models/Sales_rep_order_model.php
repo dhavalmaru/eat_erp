@@ -30,14 +30,14 @@ function get_distributors($status='', $id=''){
         }
     }
 
-    $sales_rep_id=$this->session->userdata('sales_rep_id');
+    /*$sales_rep_id=$this->session->userdata('sales_rep_id');
     if($sales_rep_id!=""){
         if($cond=="") {
             $cond=" where sales_rep_id='".$sales_rep_id."'";
         } else {
             $cond=$cond." and sales_rep_id='".$sales_rep_id."'";
         }
-    }
+    }*/
 
     $sql = "select A.* from 
             (select concat('d_',id) as id, distributor_name, sell_out, status, sales_rep_id from distributor_master 

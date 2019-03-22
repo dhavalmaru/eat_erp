@@ -31,156 +31,157 @@ class Eat_Attendence extends CI_controller {
     public function upload_excel()
     {
           $path=FCPATH.'assets/uploads/attendence_upload/';
-            $config = array(
-            'upload_path' => $path,
-            'allowed_types' => "xlsx",
-            'overwrite' => TRUE,
-            'max_size' => "2048000", 
-            'max_height' => "768",
-            'max_width' => "1024"
-            );
-            $new_name = time().'_'.str_replace(' ', "_", $_FILES["upload"]['name']);
-            $config['file_name'] = $new_name;
+          $config = array(
+          'upload_path' => $path,
+          'allowed_types' => "xlsx",
+          'overwrite' => TRUE,
+          'max_size' => "2048000", 
+          'max_height' => "768",
+          'max_width' => "1024"
+          );
+          $new_name = time().'_'.str_replace(' ', "_", $_FILES["upload"]['name']);
+          $config['file_name'] = $new_name;
 
-            $this->load->library('upload', $config);
-             if(!$this->upload->do_upload('upload'))
-            { 
-                $this->upload->display_errors();
-            }
-            else
-            {
-                $imageDetailArray = $this->upload->data();
-            }
+          $this->load->library('upload', $config);
+           if(!$this->upload->do_upload('upload'))
+          { 
+              $this->upload->display_errors();
+          }
+          else
+          {
+              $imageDetailArray = $this->upload->data();
+          }
 
-            $file = $path.$new_name;
-            $this->load->library('excel');
-            $objPHPExcel = PHPExcel_IOFactory::load($file);
-            $objPHPExcel->setActiveSheetIndex(0);
-            echo $highestrow = $objPHPExcel->setActiveSheetIndex(0)->getHighestRow();
-            $now=date('Y-m-d H:i:s');
-            $curusr=$this->session->userdata('session_id');
-            $batch_array = array();
-            $employee_array = array();
-            $unique_employee_array = array();
+          $file = $path.$new_name;
+          $this->load->library('excel');
+          $objPHPExcel = PHPExcel_IOFactory::load($file);
+          $objPHPExcel->setActiveSheetIndex(0);
+          $highestrow = $objPHPExcel->setActiveSheetIndex(0)->getHighestRow();
+          $now=date('Y-m-d H:i:s');
+          $curusr=$this->session->userdata('session_id');
+          $batch_array = array();
+          $employee_array = array();
+          $unique_employee_array = array();
 
-            for($i=4;$i<=$highestrow;$i++)
-            { 
-                  echo "eneterd";
-                  $emp_no = $objPHPExcel->getActiveSheet()->getCell('A'.$i)->getValue();
-                  $emp_name = $objPHPExcel->getActiveSheet()->getCell('B'.$i)->getValue();
-                  $job_title = $objPHPExcel->getActiveSheet()->getCell('C'.$i)->getValue();
-                  $department = $objPHPExcel->getActiveSheet()->getCell('D'.$i)->getValue();
-                  $location = $objPHPExcel->getActiveSheet()->getCell('E'.$i)->getValue();
-                  $date = $objPHPExcel->getActiveSheet()->getCell('F'.$i)->getValue();
-                  $first_in = $objPHPExcel->getActiveSheet()->getCell('H'.$i)->getValue();
-                  $last_out = $objPHPExcel->getActiveSheet()->getCell('K'.$i)->getValue();
-                  $emp_status = $objPHPExcel->getActiveSheet()->getCell('M'.$i)->getValue();
-                  $effective_hour = $objPHPExcel->getActiveSheet()->getCell('N'.$i)->getValue();
-                  $gross_hour = $objPHPExcel->getActiveSheet()->getCell('O'.$i)->getValue();
+          for($i=4;$i<=$highestrow;$i++)
+          { 
+                echo "eneterd";
+                $emp_no = $objPHPExcel->getActiveSheet()->getCell('A'.$i)->getValue();
+                $emp_name = $objPHPExcel->getActiveSheet()->getCell('B'.$i)->getValue();
+                $job_title = $objPHPExcel->getActiveSheet()->getCell('C'.$i)->getValue();
+                $department = $objPHPExcel->getActiveSheet()->getCell('D'.$i)->getValue();
+                $location = $objPHPExcel->getActiveSheet()->getCell('E'.$i)->getValue();
+                $date = $objPHPExcel->getActiveSheet()->getCell('F'.$i)->getValue();
+                $first_in = $objPHPExcel->getActiveSheet()->getCell('H'.$i)->getValue();
+                $last_out = $objPHPExcel->getActiveSheet()->getCell('K'.$i)->getValue();
+                $emp_status = $objPHPExcel->getActiveSheet()->getCell('M'.$i)->getValue();
+                $effective_hour = $objPHPExcel->getActiveSheet()->getCell('N'.$i)->getValue();
+                $gross_hour = $objPHPExcel->getActiveSheet()->getCell('O'.$i)->getValue();
 
-                  $date = \PHPExcel_Style_NumberFormat::toFormattedString($date, 'YYYY-MM-DD');
+                $date = \PHPExcel_Style_NumberFormat::toFormattedString($date, 'YYYY-MM-DD');
 
-                  $combination = $emp_no.'&&'.$date;
-                  $unique_comb = $emp_no.'&&'.date("m",strtotime($date)).'&&'.date("Y",strtotime($date));
-                      
-                  if($emp_no!="")
-                  {
+                $combination = $emp_no.'&&'.$date;
+                $unique_comb = $emp_no.'&&'.date("m",strtotime($date)).'&&'.date("Y",strtotime($date));
+                    
+                if($emp_no!="")
+                {
 
-                    if(array_search($unique_comb, array_column($unique_employee_array, 'employee_comb')) !== false)
-                      {
+                  if(array_search($unique_comb, array_column($unique_employee_array, 'employee_comb')) !== false)
+                    {
+                      $a = 'Value is in array';
+                    }
+                    else
+                    {
+                       $unique_employee_array[]=array("employee_comb"=>$unique_comb);
+                    }
+
+                  if(array_search($combination, array_column($employee_array, 'employee_comb')) !== false)
+                    {
                         $a = 'Value is in array';
-                      }
-                      else
-                      {
-                         $unique_employee_array[]=array("employee_comb"=>$unique_comb);
-                      }
+                    }
+                    else
+                    {
+                          $employee_array[]=array("employee_comb"=>$combination);
+                          if($first_in=='NA')
+                              $first_in = 0;
 
-                    if(array_search($combination, array_column($employee_array, 'employee_comb')) !== false)
-                      {
-                          $a = 'Value is in array';
-                      }
-                      else
-                      {
-                            $employee_array[]=array("employee_comb"=>$combination);
-                            if($first_in=='NA')
-                                $first_in = 0;
+                          if($last_out=='NA')
+                              $last_out=0;
 
-                            if($last_out=='NA')
-                                $last_out=0;
+                          $where = array("emp_no"=>$emp_no,'date'=>$date);
 
-                            $where = array("emp_no"=>$emp_no,'date'=>$date);
+                          $result = $this->db->select("*")->where($where)->get("employee_attendence")->result();
+                                                   
 
-                            $result = $this->db->select("*")->where($where)->get("employee_attendence")->result();
-                                                     
+                          $data = array(  'emp_no' =>$emp_no,
+                                          'emp_name' => $emp_name,
+                                          'job_title' => $job_title,
+                                          'department' =>$department,
+                                          'location' => $location,
+                                          'date' => $date,
+                                          'first_in' => $first_in,
+                                          'last_out'=>$last_out,
+                                          'emp_status'=>$emp_status,
+                                          'effective_hour'=>$effective_hour,
+                                          'gross_hour'=>$gross_hour,
+                                          'modified_by' => $curusr,
+                                          'modified_on' => $now,
+                                          'created_by' => $curusr,
+                                          'created_on' => $now,
+                                       );
+                          $batch_array[] =$data;
 
-                            $data = array(  'emp_no' =>$emp_no,
-                                            'emp_name' => $emp_name,
-                                            'job_title' => $job_title,
-                                            'department' =>$department,
-                                            'location' => $location,
-                                            'date' => $date,
-                                            'first_in' => $first_in,
-                                            'last_out'=>$last_out,
-                                            'emp_status'=>$emp_status,
-                                            'effective_hour'=>$effective_hour,
-                                            'gross_hour'=>$gross_hour,
-                                            'modified_by' => $curusr,
-                                            'modified_on' => $now,
-                                            'created_by' => $curusr,
-                                            'created_on' => $now,
-                                         );
-                            $batch_array[] =$data;
-
-                            if(count($result)>0)
-                            {
-                               $data = array('emp_no' =>$emp_no,
-                                            'emp_name' => $emp_name,
-                                            'job_title' => $job_title,
-                                            'department' =>$department,
-                                            'location' => $location,
-                                            'date' => $date,
-                                            'first_in' => $first_in,
-                                            'last_out'=>$last_out,
-                                            'adjusted_in_time' => $first_in,
-                                            'adjusted_out_time'=>$last_out,
-                                            'emp_status'=>$emp_status,
-                                            'effective_hour'=>$effective_hour,
-                                            'gross_hour'=>$gross_hour,
-                                            'modified_by' => $curusr,
-                                            'modified_on' => $now,
-                                         );
-                              $this->db->where($where)->update('employee_attendence',$data);
-                            }else
-                            {
-                               $data = array(  'emp_no' =>$emp_no,
-                                            'emp_name' => $emp_name,
-                                            'job_title' => $job_title,
-                                            'department' =>$department,
-                                            'location' => $location,
-                                            'date' => $date,
-                                            'first_in' => $first_in,
-                                            'last_out'=>$last_out,
-                                            'adjusted_in_time' => $first_in,
-                                            'adjusted_out_time'=>$last_out,
-                                            'emp_status'=>$emp_status,
-                                            'effective_hour'=>$effective_hour,
-                                            'gross_hour'=>$gross_hour,
-                                            'modified_by' => $curusr,
-                                            'modified_on' => $now,
-                                            'created_by' => $curusr,
-                                            'created_on' => $now,
-                                         );
-                              $this->db->insert('employee_attendence',$data);
-                              echo $this->db->last_query();
-                            }
-                      }
-                  }
-            }
+                          if(count($result)>0)
+                          {
+                             $data = array('emp_no' =>$emp_no,
+                                          'emp_name' => $emp_name,
+                                          'job_title' => $job_title,
+                                          'department' =>$department,
+                                          'location' => $location,
+                                          'date' => $date,
+                                          'first_in' => $first_in,
+                                          'last_out'=>$last_out,
+                                          'adjusted_in_time' => $first_in,
+                                          'adjusted_out_time'=>$last_out,
+                                          'emp_status'=>$emp_status,
+                                          'effective_hour'=>$effective_hour,
+                                          'gross_hour'=>$gross_hour,
+                                          'modified_by' => $curusr,
+                                          'modified_on' => $now,
+                                       );
+                            $this->db->where($where)->update('employee_attendence',$data);
+                            echo $this->db->last_query();
+                          }else
+                          {
+                             $data = array(  'emp_no' =>$emp_no,
+                                          'emp_name' => $emp_name,
+                                          'job_title' => $job_title,
+                                          'department' =>$department,
+                                          'location' => $location,
+                                          'date' => $date,
+                                          'first_in' => $first_in,
+                                          'last_out'=>$last_out,
+                                          'adjusted_in_time' => $first_in,
+                                          'adjusted_out_time'=>$last_out,
+                                          'emp_status'=>$emp_status,
+                                          'effective_hour'=>$effective_hour,
+                                          'gross_hour'=>$gross_hour,
+                                          'modified_by' => $curusr,
+                                          'modified_on' => $now,
+                                          'created_by' => $curusr,
+                                          'created_on' => $now,
+                                       );
+                            $this->db->insert('employee_attendence',$data);
+                            echo $this->db->last_query();
+                          }
+                    }
+                }
+          }
 
           /*echo "<pre>";
           print_r($unique_employee_array);
           echo "</pre>";*/
-         /* for ($j=0; $j <count($unique_employee_array) ; $j++) 
+          /* for ($j=0; $j <count($unique_employee_array) ; $j++) 
           { 
             echo "<br>".$unique_employee_array[$j]['employee_comb']."<br>";
             $explode = explode("&&",$unique_employee_array[$j]['employee_comb']);
@@ -675,8 +676,11 @@ class Eat_Attendence extends CI_controller {
       			else {
       				$to_email = $result[0]->email_id;
       			}
+
+
+            $emp_name = $result[0]->emp_name;
             /*$bcc = 'vaibhav.desai@eatanytime.in, rishit.sanghvi@otbconsulting.co.in, swapnil.darekar@otbconsulting.co.in';*/
-            $subject = 'Attendence For Month - '.date('F Y ',strtotime($result[0]->date));
+            $subject = $emp_name.' Attendence For Month - '.date('F Y ',strtotime($result[0]->date));
 
             /*$cc='sangeeta.yadav@pecanreams.com';  */
             if($to_email!='')
@@ -1002,7 +1006,7 @@ class Eat_Attendence extends CI_controller {
           if($this->input->post('btn_reject')!=null)
           {
             /* if checkbox is clicked and clicked on reject status is change to reject */
-            if((($adjusted_in_time_ex!=0 && $adjusted_in_time_ex!='') || ($adjusted_out_time_e!='' && $adjusted_out_time_e!='')) && $emp_check[$i]==1)
+            if($emp_check[$i]==1)
             {
               $status_approval = "rejected";
             }
@@ -1072,7 +1076,7 @@ class Eat_Attendence extends CI_controller {
 
           /*if previous time is not same as current time change status nand time is not equal to 0 then change the emp_status as present */
 
-          if($this->session->userdata("user_name")=='rishit.sanghvi@otbconsulting.co.in')
+          if($this->session->userdata("user_name")=='rishit.sanghvi@otbconsulting.co.in' || $this->session->userdata("user_name")=='swapnil.darekar@eatanytime.in')
           {
             $where = array("emp_id"=>$emp_id[$i],'date'=>$a_date);
             $this->db->where($where)->update("employee_attendence",$insert_array);

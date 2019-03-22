@@ -111,7 +111,7 @@ tfoot tr th:last-child {
                 
                 <!-- PAGE CONTENT WRAPPER -->
                  <div class="page-content-wrap" >
-                    <div class="row main-wrapper">                  
+                    <div class="row main-wrapper" style="">                  
                        <div class="main-container">           
                          <div class="box-shadow custom-padding">
 						  <form id="form_download_report" role="form" class="form-horizontal" method="post" enctype="multipart/form-data" action="<?php if(isset($report_id)) { echo base_url().'index.php/export/generate_report/'.$report_id; } ?>">
@@ -144,10 +144,24 @@ tfoot tr th:last-child {
                                             </div>
                                         </div>
                                     </div>
-
+                                    <div class="form-group" style="border-top:1px solid #ddd; border-bottom:none; <?php if($report_id !='27') echo 'display:none;';?>">
+                                      <div class="col-md-6  col-sm-6 col-xs-12">
+                                          <div class="">
+                                             <label class="col-md-4 col-sm-4 col-xs-12  control-label">Select Depo</label>
+                                             <div class="col-md-6 col-sm-6  col-xs-12">
+                                                  <select name="depot_id" id="depot_id" class="form-control ">
+                                                  <option value="ALL">ALL</option>
+                                                  <?php if(isset($depot)) { for ($k=0; $k < count($depot) ; $k++) { ?>
+                                                          <option value="<?php echo $depot[$k]->id; ?>" <?php if(isset($data)) { if($depot[$k]->id==$data[0]->depot_id) { echo 'selected'; } } ?>><?php echo $depot[$k]->depot_name; ?></option>
+                                                  <?php }} ?>
+                                              </select>
+                                             </div>
+                                          </div>
+                                       </div>
+                                    </div>
 
                                     <div class="form-group" style="border-top:1px solid #ddd; border-bottom:none; <?php if($report_id !='5') echo 'display:none;';?>">
-                                         <div class="col-md-6  col-sm-6 col-xs-12">
+                                        <div class="col-md-6  col-sm-6 col-xs-12">
                                             <div class="">
                                                 <label class="col-md-4 col-sm-4 col-xs-12  control-label">Select Distributor</label>
                                                 <div class="col-md-6 col-sm-6  col-xs-12">
@@ -162,7 +176,20 @@ tfoot tr th:last-child {
                                                     </select>
                                                 </div>
                                             </div>
-                                        </div>
+										</div>
+										   <div class="col-md-6  col-sm-6 col-xs-12">
+                                            <div class="">
+                                                
+                                                   
+													<label class="radio-inline">
+													<input type="radio" name="remark_visibility" id="with_remark"  value="With Remark" checked>With Remark
+													</label>
+													<label class="radio-inline">
+														<input type="radio" name="remark_visibility" id="without_remark" value="Without Remark">Without Remark
+													</label>
+                                                
+                                            </div>
+											</div>
                                     </div>
 
                                     <!-- <div class="form-group" style="border-top:1px solid #ddd; border-bottom:none; <?php //if($report_id !='15') echo 'display:none;';?>">
@@ -184,7 +211,7 @@ tfoot tr th:last-child {
                                         </div>
                                     </div> -->
 									
-							                      <div class="form-group" style="border-top:1px solid #ddd; border-bottom:none; <?php if($report_id !='13') echo 'display:none;';?>">
+							           <div class="form-group" style="border-top:1px solid #ddd; border-bottom:none; <?php if($report_id !='13') echo 'display:none;';?>">
                                          <div class="col-md-6  col-sm-6 col-xs-12">
                                             <div class="">
                                                 <label class="col-md-4 col-sm-4 col-xs-12  control-label">Select Sales Representative</label>
@@ -203,13 +230,25 @@ tfoot tr th:last-child {
                                         </div>
                                     </div>
 
-                                    <div class="form-group" style="border-top:1px solid #ddd; border-bottom:none; <?php if($report_id !='21') echo 'display:none;';?>">
+                                      <div class="form-group" style="border-top:1px solid #ddd; border-bottom:none; <?php if($report_id !='20') echo 'display:none;';?>">
                                          <div class="col-md-6  col-sm-6 col-xs-12">
                                             <div class="">
                                                 <label class="col-md-4 col-sm-4 col-xs-12  control-label">Include</label>
                                                 <div class="col-md-6 col-sm-6  col-xs-12">
-                                                    <input type="checkbox" name="includes_zero" id="includes_zero" > 0 Closing Balance <br>
+                                                    <input type="checkbox" name="includes_zero" class='includes_zero' id="includes_zero" 
+                                                    value='0'> 0 Closing Balance <br>
                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" style="border-top:1px solid #ddd; border-bottom:none; <?php if($report_id !='20') echo 'display:none;';?>">
+                                         <div class="col-md-6  col-sm-6 col-xs-12">
+                                            <div class="">
+                                                <label class="col-md-4 col-sm-4 col-xs-12  control-label">Include</label>
+                                                <div class="col-md-6 col-sm-6  col-xs-12">
+                                                  <input type="checkbox" name="includes_twenty" class='includes_zero' id="includes_twenty" value='20'> Less Then 20  Closing Balance<br>
                                                 </div>
                                             </div>
                                         </div>
@@ -299,7 +338,7 @@ tfoot tr th:last-child {
 										</div>
                                     </div>
 
-                                    <div class="form-group" style="border-top:1px solid #ddd; <?php if($report_type=='Aging Wise') echo 'display:none;';?>">
+                                    <div class="form-group" style="border-top:1px solid #ddd; <?php if($report_type=='Aging Wise' || $report_type=='MT Stock Tracker') echo 'display:none;';?>">
 										  <div class="col-md-6  col-sm-6 col-xs-12">
 											<label class="col-md-4  col-sm-4 col-xs-12 control-label" >From</label>
 											<div class="col-md-6  col-sm-6 col-xs-12">                                                                  
@@ -320,7 +359,7 @@ tfoot tr th:last-child {
 										</div>
 									</div>
 
-                                    <div class="form-group" style="border-top:1px solid #ddd; <?php if($report_type!='Aging Wise') echo 'display:none;';?>">
+                                    <div class="form-group" style="border-top:1px solid #ddd; <?php if($report_type!='Aging Wise' && $report_type!='MT Stock Tracker') echo 'display:none;';?>">
                                           <div class="col-md-6  col-sm-6 col-xs-12">
                                             <label class="col-md-4  col-sm-4 col-xs-12 control-label" >Date</label>
                                             <div class="col-md-6  col-sm-6 col-xs-12">                                                                  
@@ -336,22 +375,24 @@ tfoot tr th:last-child {
 
                                   
 
-									<div class="row" style="text-align:center; margin:15px 0;">
-                                    	<input type="submit" name="download" class="btn btn-danger" value="Download Report" />
+								<div class="row" style="text-align:center; margin:15px 0;">
+                                    	<input type="submit" name="download" class="btn btn-danger" value="Download Report" style=" <?php if($report_id =='20') echo 'display:none;';?>"/>
+                                      <a class="btn btn-success" data-toggle="modal" href="#telly_report_uploaded" id="telly_popup" style=" <?php if($report_id!=20) echo 'display:none;';?>">
+                                          <span class="fa fa-file-excel-o"></span> Download Report
+                                      </a>
+
+
+                                     <input type="submit" name="btn_adjus" class="btn btn-danger" value="Adjust Closing Balance" id="btn_adjus" style="<?php if($report_id!=20) echo 'display:none;';?>"/>
+
+                                     <input type="button" name="download" class="btn btn-danger" value="View Report" id="view_tally" style=" <?php if($report_id !='20') echo 'display:none;';?>" />
+                                      
                                         <!--<span class="fa fa-download"> </span>-->
-                                      <a class="btn btn-success" data-toggle="modal" href="#myModal" style="<?php if($report_id !='21') echo 'display:none;';?>">
+                                      <a class="btn btn-success" data-toggle="modal" href="#myModal" style="<?php if($report_id !='20') echo 'display:none;';?>">
                                           <span class="fa fa-file-excel-o"></span> Upload Tally Report
                                       </a>    
 
                                       <input type="button" id="view_report" class="btn btn-danger" value="View Report" style="<?php if($report_id !='5') echo 'display:none;';?>" />
                                       <input type="button" id="print_report" class="btn btn-danger" value="Print Report" style="<?php if($report_id !='5') echo 'display:none;';?>" />
-
-                                         <!-- <a id="view_report" name="view" class="btn btn-danger" style="<?php //if($report_id !='5') echo 'display:none;';?>">View Report</a>
-                                         <a id="print_report" name="print" class="btn btn-danger" style="<?php //if($report_id !='5') echo 'display:none;';?>">Print Report</a> -->
-                                         
-                                         <!--<span class="fa fa-eye"> </span> -->
-                                    
-                                    </div>
 
                                     <div class="form-group" style="border-top:1px solid #ddd; border-bottom:none; <?php if($report_id !='5') echo 'display:none;';?>">
                                          <div class="col-md-12  col-sm-12 col-xs-12">
@@ -364,6 +405,16 @@ tfoot tr th:last-child {
                                         </div>
                                     </div>
 
+                                    <div class="form-group" style="border-top:1px solid #ddd; border-bottom:none;">
+                                         <div class="col-md-12  col-sm-12 col-xs-12">
+                                            <div class="">
+                                                
+                                                <div class="col-md-12 col-sm-12  col-xs-12 telly_table datatable">
+                                                    
+                                                </div>
+                                            </div>
+                                        </div>
+
                                 </div>
                                 <br clear="all">                              
                             	</div>
@@ -371,11 +422,62 @@ tfoot tr th:last-child {
 							</div>
 							<br clear="all"/>
 						</div>	
-					</div>
+					
                             <div class="panel-footer">
 						 
 								<a href="<?php echo base_url(); ?>index.php/Reports/view_reports" class="btn btn-danger" type="reset" id="reset">Cancel</a>
                             </div>
+
+            <div class="modal fade" id="telly_report_uploaded" role="dialog" style="">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content" style="">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">
+                          Download Ledger Balance
+                        </h4>
+                    </div>
+                    <div>
+                      <table style="width: 100%!important;">
+                        <tr>
+                          <th style="color:#fff">SR NO.</th>
+                          <th style="color:#fff">File Name</th>
+                          <th style="color:#fff">Telly Date</th>
+                          <th style="color:#fff">Check</th>
+                        </tr>
+                        <?php
+                        $j=0;
+
+                        if(count($upload_telly_report)>0)
+                        {
+                            for ($i=0; $i <count($upload_telly_report); $i++) { 
+                            echo "<tr><td>".($j+1)."</td>
+                                  <td><a href='".base_url()."/uploads/excel_upload/".$upload_telly_report[$i]->file_name."'>".$upload_telly_report[$i]->file_name."</a></td>
+                                  <td><input type='hidden' value='".$upload_telly_report[$i]->telly_report_upload_id."'>".date("Y-m-d h:i:s A" ,strtotime($upload_telly_report[$i]->added_on))."</td>
+                                  <td><input type='radio' name='excel_upload' value='".$upload_telly_report[$i]->telly_report_upload_id."' > </td>
+                                </tr>";
+
+                                $j = $j+1;
+                          }
+                        }
+                        else
+                        {
+                          echo "<input type='radio' name='excel_upload' value='Default' checked style='display:none'>";
+                        }
+                        
+                      ?>
+                      </table>
+                      
+                    </div>
+
+                    <div class="modal-footer">
+                       <input type="submit" name="download" class="btn btn-danger" value="Download Report" />     
+                    </div>
+                </div>
+            </div>
+        </div>
+        
 						</form>
 						</div>
 						</div>
@@ -386,6 +488,8 @@ tfoot tr th:last-child {
             <!-- END PAGE CONTENT -->
         </div>
         <!-- END PAGE CONTAINER -->
+		
+		     
 
         <div class="modal fade" id="myModal" role="dialog" style="">
             <div class="modal-dialog">
@@ -471,12 +575,20 @@ tfoot tr th:last-child {
           $(document).ready(function(){
             $('#view_report').click(function(){
               // alert($('#from_date').val());
+
+              var remarks = '';
+              if($("#with_remark").is(":checked")){
+                  remarks = 'With Remark';
+              } else {
+                  remarks = 'Without Remark';
+              }
+
               $.ajax({
                 type: 'post',
                 url: '<?php echo base_url();?>index.php/Export/generate_ledger_report',
                 dataType:"html",
                 async:false,
-                data: {distributor_id: $('#distributor_id').val(), from_date: $('#from_date').val(), to_date: $('#to_date').val()},
+                data: { distributor_id: $('#distributor_id').val(), from_date: $('#from_date').val(), to_date: $('#to_date').val(), remark_visibility: remarks },
                 success: function (data) {
                   // alert(data);
                   // var damt=0;
@@ -539,6 +651,33 @@ tfoot tr th:last-child {
             $('#print_report').click(function(){
                 printData();
             });
+			
+			
+			$('#view_tally').click(function(){
+
+            var includes_zero1 = $('input[name="includes_zero"]:checked').val();
+            var includes_twenty1 = $('input[name="includes_twenty"]:checked').val();
+
+            if(includes_zero1==undefined)
+                includes_zero1='';
+
+            if(includes_twenty1==undefined)
+                includes_twenty1='';
+
+            $.ajax({
+                type: 'POST',
+                url: '<?php echo base_url();?>index.php/Export/view_system_report/'+20,
+                async:false,
+                data: {excel_upload: '', from_date: $('#from_date').val(), to_date: $('#to_date').val(),includes_zero:includes_zero1,includes_twenty:includes_twenty1},
+                success: function (data) {
+                 $("#ledger_table").DataTable().destroy();;
+                 $(".telly_table").html(data);
+                 $("#ledger_table").DataTable();
+
+                }
+              });
+
+          }); 
           });
         </script> 
         <script>

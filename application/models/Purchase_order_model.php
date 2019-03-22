@@ -26,12 +26,17 @@ function get_pending_data($id=''){
     return $id;
 }
 
-
 function get_data($status='', $id=''){
     if($status!=""){
-        if($status=="Pending"){
+        if(strtoupper(trim($status))=="PENDING"){
             $cond=" where status='Pending' or status='Deleted'";
-        } else{
+        } else if(strtoupper(trim($status))=="OPEN"){
+            $cond=" where status='Approved' and (po_status<>'Closed' or po_status is null)";
+        } else if(strtoupper(trim($status))=="PAYMENT_PENDING"){
+            $cond=" where status='Approved' and po_status='Raw Material In'";
+        } else if(strtoupper(trim($status))=="ADVANCE"){
+            $cond=" where status='Approved' and po_status='Advance'";
+        } else {
             $cond=" where status='".$status."'";
         }
     } else {
@@ -76,8 +81,8 @@ function get_raw_material_in_items($id){
     return $query->result();
 }
 
-function get_purchase_order_nos($vendor_id){
-    $sql = "select * from purchase_order where status='Approved' and vendor_id = '$vendor_id' and (po_status NOT IN('Raw Material IN','Closed') or po_status is null)";
+function get_purchase_order_nos($vendor_id='', $po_id=''){
+    $sql = "select * from purchase_order where status='Approved' and vendor_id = '$vendor_id' and (id = '$po_id' or po_status NOT IN('Raw Material IN','Closed') or po_status is null)";
     $query=$this->db->query($sql);
     return $query->result();
 }
@@ -414,7 +419,7 @@ function send_email($id){
                 $from_email_sender = 'Wholesome Habits Pvt Ltd';
                 $to_email = $email_id;
                 /*$bcc = 'vaibhav.desai@eatanytime.in, rishit.sanghvi@otbconsulting.co.in, swapnil.darekar@otbconsulting.co.in';*/
-                $bcc = 'yadavsangeeta521@gmail.com';
+                $bcc = 'vaibhav.desai@eatanytime.in, dinesh.parkhi@eatanytime.in';
                 $subject = 'Purchase Order from Wholesome Habits Pvt Ltd';
                 // $message = '<html><head></head><body>Dear, '.$vendor_name.',<br /><br />' .
                 //             'Please find our purchase order link to this email.' .
@@ -669,11 +674,19 @@ function generate_purchase_order($id,$pdfFilePath='') {
     else
         $this->output->set_output($output);*/
 }
+
 function generate_purchase_order_file($id) {
     $now=date('Y-m-d H:i:s');
     $curusr=$this->session->userdata('session_id');
 
-    $sql = "select * from purchase_order where id = '$id'";
+    $sql = "select A.*, concat(B.first_name, ' ', B.last_name) as createdby, 
+            concat(C.first_name, ' ', C.last_name) as modifiedby, 
+            concat(D.first_name, ' ', D.last_name) as approvedby 
+            from purchase_order A 
+            left join user_master B on (A.created_by=B.id) 
+            left join user_master C on (A.modified_by=C.id) 
+            left join user_master D on (A.approved_by=D.id) 
+            where A.id = '$id'";
     $query=$this->db->query($sql);
     $result=$query->result();
     if(count($result)>0){
@@ -687,6 +700,12 @@ function generate_purchase_order_file($id) {
         $po_no=$result[0]->po_no;
         $other_charges_amount=$result[0]->other_charges_amount;
         $other_charges=$result[0]->other_charges;
+        $createdby=$result[0]->createdby;
+        $created_on=$result[0]->created_on;
+        $modifiedby=$result[0]->modifiedby;
+        $modified_on=$result[0]->modified_on;
+        $approvedby=$result[0]->approvedby;
+        $approved_on=$result[0]->approved_on;
     } else {
         $order_date=null;
         $total_amount=0;
@@ -695,6 +714,15 @@ function generate_purchase_order_file($id) {
         $shipping_method=null;
         $shipping_term=null;
         $delivery_date=null;
+        $po_no=null;
+        $other_charges_amount=null;
+        $other_charges=null;
+        $createdby=null;
+        $created_on=null;
+        $modifiedby=null;
+        $modified_on=null;
+        $approvedby=null;
+        $approved_on=null;
     }
     $data['total_amount']=round($total_amount,2);
     $data['order_date']=$order_date;
@@ -703,6 +731,12 @@ function generate_purchase_order_file($id) {
     $data['delivery_date']=$delivery_date;
     $data['other_charges_amount']=$other_charges_amount;
     $data['other_charges']=$other_charges;
+    $data['createdby']=$createdby;
+    $data['created_on']=$created_on;
+    $data['modifiedby']=$modifiedby;
+    $data['modified_on']=$modified_on;
+    $data['approvedby']=$approvedby;
+    $data['approved_on']=$approved_on;
 
     $sql = "select * from depot_master where id = '$depot_id'";
     $query=$this->db->query($sql);
@@ -714,9 +748,17 @@ function generate_purchase_order_file($id) {
         $address = get_address($result[0]->address, "", $result[0]->city, $result[0]->pincode, $result[0]->state, $result[0]->country);
 
         $data['depot_name']=$depot_name;
-        $data['depot_contact_person']=$contact_person;
         $data['depot_address']=$address;
     }
+
+    $sql = "select * from depot_contacts where depot_id = '$depot_id'";
+    $query=$this->db->query($sql);    
+    $result=$query->result();    
+    if(count($result)>0){
+       $contact_person=$result[0]->contact_person;
+       $data['depot_contact_person']=$contact_person;     
+    }
+
 
     $sql = "select * from vendor_master where id = '$vendor_id'";
     $query=$this->db->query($sql);

@@ -140,6 +140,53 @@ function get_data_promoter($status='', $id=''){
     return $query->result();
 }
 
+function get_data_merchandizer($status='', $id=''){
+    if($status!=""){
+        $cond=" where status='".$status."'";
+    } else {
+        $cond="";
+    }
+
+    if($id!=""){
+        if($cond=="") {
+            $cond=" where id='".$id."'";
+        } else {
+            $cond=$cond." and id='".$id."'";
+        }
+    }
+
+    $sql = "Select * from sales_rep_master where sr_type='Merchandizer' and `status`='Approved' order by modified_on desc";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_data_salesrep($status='', $id=''){
+    if($status!=""){
+        $cond=" where status='".$status."'";
+    } else {
+        $cond="";
+    }
+
+    if($id!=""){
+        if($cond=="") {
+            $cond=" where id='".$id."'";
+        } else {
+            $cond=$cond." and id='".$id."'";
+        }
+    }
+
+    $sql = "Select * from sales_rep_master where sr_type='Sales Representative' and `status`='Approved' order by modified_on desc";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+public function get_zone()
+{
+     $sql = "Select Distinct zone  from zone_master Where status='Approved'";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
 function save_data($id=''){
     $now=date('Y-m-d H:i:s');
     $curusr=$this->session->userdata('session_id');
@@ -157,6 +204,7 @@ function save_data($id=''){
         'modified_by' => $curusr,
         'modified_on' => $now,
         'sr_type' => $this->input->post('sr_type'),
+        'zone' => trim($this->input->post('zone')),
        // 'reporting_manager_id' => $this->input->post('reporting_manager_id')
     );
 
@@ -207,6 +255,21 @@ function save_data($id=''){
         $logarray['cnt_name']='User';
         $logarray['action']='User Created.';
         $this->user_access_log_model->insertAccessLog($logarray);
+    }
+    else
+    {
+        $data = array(
+            'first_name' => $this->input->post('sales_rep_name'),
+            'status' => $this->input->post('status'),
+            'email_id' => $this->input->post('email_id'),
+            'mobile' => $this->input->post('mobile'),
+            'modified_by' => $curusr,
+            'modified_on' => $now
+        );
+        $this->db->where('sales_rep_id', $id);
+        $this->db->update('user_master',$data);
+        $action='Sales Representative Modified.';
+        
     }
 }
 

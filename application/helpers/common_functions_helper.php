@@ -168,6 +168,14 @@
 
         $user_data['userdata'] = $CI->session->all_userdata();
 
+        $sales_rep_id=$CI->session->userdata('sales_rep_id');
+        $now1=date('Y-m-d');
+        $where = array("date(check_in_time)"=>$now1,
+                   "sales_rep_id"=>$sales_rep_id);
+        $result2 = $CI->db->select("sales_rep_id, working_status, id, check_in_time, check_out_time, check_out")
+                    ->where($where)->get('sales_attendence')->result();
+        $user_data['attendancedata'] = $result2;
+
     	$data = $data + $user_data;
 
     	$CI->load->view($view, $data);
@@ -340,6 +348,14 @@
 
         $user_data['userdata'] = $CI->session->all_userdata();
 
+        $sales_rep_id=$CI->session->userdata('sales_rep_id');
+        $now1=date('Y-m-d');
+        $where = array("date(check_in_time)"=>$now1,
+                   "sales_rep_id"=>$sales_rep_id);
+        $result2 = $CI->db->select("sales_rep_id, working_status, id, check_in_time, check_out_time, check_out")
+                    ->where($where)->get('sales_attendence')->result();
+        $user_data['attendancedata'] = $result2;
+
         $data = $user_data;
 
         $CI->load->view($view, $data);
@@ -380,20 +396,23 @@
             $CI->email->initialize($config);
 
             //send mail
+            $result = '1';
             $CI->email->from($from_email, $from_email_sender);
             $CI->email->to($to_email);
             $CI->email->bcc($bcc);
             $CI->email->subject($subject);
             $CI->email->message($message);
             $CI->email->set_mailtype("html");
-            return $CI->email->send();
+            // $result = $CI->email->send();
+            
+            return $result;
 
         } catch (Exception $ex) {
             
         }
     }
 
-    function send_email_new($from_email, $from_email_sender, $to_email, $subject, $message, $bcc='swapnil.darekar@otbconsulting.co.in',$cc='',$attachment='') {
+    function send_email_new($from_email, $from_email_sender, $to_email, $subject, $message, $bcc='swapnil.darekar@otbconsulting.co.in', $cc='', $attachment='') {
         try {
             $CI =& get_instance();
 
@@ -412,6 +431,8 @@
             $config['newline'] = "\r\n"; //use double quotes
             $CI->email->initialize($config);
 
+            $result = '1';
+
             //send mail
             $CI->email->from($from_email, $from_email_sender);
             $CI->email->to($to_email);
@@ -423,8 +444,11 @@
             if($attachment!='')
                 $CI->email->attach($attachment);
             $CI->email->set_mailtype("html");
-            return $CI->email->send();
-            $CI->email->print_debugger();
+            // $result = $CI->email->send();
+            // $CI->email->print_debugger();
+            $CI->email->clear(TRUE);
+
+            return $result;
 
         } catch (Exception $ex) {
             

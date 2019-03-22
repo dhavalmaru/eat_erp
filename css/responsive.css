@@ -427,3 +427,12 @@ ul.topnav li.icon {display: none;}
    
    @media only screen and  (min-width:1001px)  and (max-width:1228px) {
    .dropdown-selector { width:44%!important;} }
+   
+   
+   @media only screen and (min-device-width: 768px) and (max-device-width: 1023px) 
+{
+   .header-fixed-style .toggle_menu
+   {
+	  color:#fff!important;
+   }
+}

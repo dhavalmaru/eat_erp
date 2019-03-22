@@ -15,7 +15,7 @@
 		<link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>css/user-details.css"/>
         <!-- EOF CSS INCLUDE -->      
 		
-		<style>		 
+		<style>
             th{text-align:center;}
             .center{text-align:center;}
             @media print {
@@ -37,6 +37,9 @@
             .download {
                 font-size: 21px;
                 color: #5cb85c;
+            }
+            input[readonly] {
+                color: #475c7c !important;
             }
 		</style>
     </head>
@@ -78,15 +81,36 @@
 										</div>
 										<div class="form-group" style="display: none;">
 											<div class="col-md-12 col-sm-12 col-xs-12">
-
 												<label class="col-md-2 col-sm-2 col-xs-12 control-label" style="display: none;">Batch Id <span class="asterisk_sign">*</span></label>
 												<div class="col-md-4 col-sm-4 col-xs-12" style="display: none;">
 													<input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
-													<input type="hidden" class="form-control" name="ref_id" id="ref_id" value="<?php if(isset($data)) echo $data[0]->ref_id;?>"/>
+													<input type="hidden" class="form-control" name="module" id="module" value="<?php if(isset($module)) echo $module;?>"/>
+                                                    <input type="hidden" class="form-control" name="ref_id" id="ref_id" value="<?php if(isset($data)) echo $data[0]->ref_id;?>"/>
 													<input type="text" class="form-control" name="batch_id_as_per_fssai" id="batch_id_as_per_fssai" placeholder="Batch Id" value="<?php if(isset($data)) { echo  $data[0]->batch_id_as_per_fssai; } ?>"/>
 												</div>
 											</div>
 										</div>
+                                        <div class="form-group" style="display: none;">
+                                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                                <label class="col-md-2 col-sm-2 col-xs-12 control-label">Production <span class="asterisk_sign">*</span></label>
+                                                <div class="col-md-4 col-sm-4 col-xs-12">
+                                                    <select name="production_id" id="production_id" class="form-control select2">
+                                                        <option value="">Select</option>
+                                                        <?php 
+                                                            $production_id = '';
+                                                            if(isset($data)) $production_id = $data[0]->production_id;
+                                                            if($production_id==''){
+                                                                if(isset($p_id)) $production_id = $p_id;
+                                                            }
+
+                                                            if(isset($production)) { for ($k=0; $k < count($production) ; $k++) { 
+                                                        ?>
+                                                            <option value="<?php echo $production[$k]->id; ?>" <?php if(isset($production_id)) { if($production[$k]->id==$production_id) echo 'selected'; } ?> ><?php echo $production[$k]->p_id; ?></option>
+                                                        <?php }} ?>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
 										<div class="form-group"  >
 											<div class="col-md-12 col-sm-12 col-xs-12">
 												<label class="col-md-2 col-sm-2 col-xs-12 control-label">Date Of Processing <span class="asterisk_sign">*</span></label>
@@ -117,28 +141,24 @@
 												<div class="col-md-4 col-sm-4 col-xs-12">
 													<input type="text" class="form-control" name="no_of_batch" id="no_of_batch" placeholder="No.of Batches" value="<?php if (isset($data)) { echo $data[0]->no_of_batch; } ?>"/>
 												</div>
-											
-											
-                                           
 											</div>
 										</div>
 									
 									    <div class="form-group">
-                                        <div class="col-md-12 col-sm-12 col-xs-12">
-                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Product <span class="asterisk_sign">*</span></label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="product_id" id="product_id" class="form-control select2">
-                                                    <option value="">Select</option>
-                                                    <?php if(isset($product)) { for ($k=0; $k < count($product); $k++) { ?>
-                                                            <option value="<?php echo $product[$k]->id; ?>" <?php if(isset($data)) { if($product[$k]->id==$data[0]->product_id) { echo 'selected'; } } ?>><?php echo $product[$k]->product_name; ?></option>
-                                                    <?php }} ?>
-                                                </select>
-                                                <!-- <input type="hidden" name="product_id" id="product_id" value="<?php //if(isset($data)) { echo  $data[0]->product_id; } ?>"/>
-                                                <input type="text" class="form-control load_product" name="product" id="product" placeholder="Type To Select Product...." value="<?php //if(isset($data)) { echo  $data[0]->product_name; } ?>"/> -->
+                                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                                <label class="col-md-2 col-sm-2 col-xs-12 control-label">Product <span class="asterisk_sign">*</span></label>
+                                                <div class="col-md-4 col-sm-4 col-xs-12">
+                                                    <select name="product_id" id="product_id" class="form-control select2">
+                                                        <option value="">Select</option>
+                                                        <?php if(isset($product)) { for ($k=0; $k < count($product); $k++) { ?>
+                                                                <option value="<?php echo $product[$k]->id; ?>" <?php if(isset($data)) { if($product[$k]->id==$data[0]->product_id) { echo 'selected'; } } ?>><?php echo $product[$k]->product_name; ?></option>
+                                                        <?php }} ?>
+                                                    </select>
+                                                    <!-- <input type="hidden" name="product_id" id="product_id" value="<?php //if(isset($data)) { echo  $data[0]->product_id; } ?>"/>
+                                                    <input type="text" class="form-control load_product" name="product" id="product" placeholder="Type To Select Product...." value="<?php //if(isset($data)) { echo  $data[0]->product_name; } ?>"/> -->
+                                                </div>
                                             </div>
-                                          
                                         </div>
-                                    </div>
 						
 									
 									
@@ -205,21 +225,53 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Total (In Kg) <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="total_kg" id="total_kg" placeholder="Total Kg" value="<?php if (isset($data)) { echo $data[0]->total_kg; } ?>"/>
-                                            </div>
-                                        </div>
-                                    </div>
-									<div class="form-group">
-                                        <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Output (In Kg) <span class="asterisk_sign">*</span></label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="output_kg" id="output_kg" placeholder="Output Kg" value="<?php if (isset($data)) { echo $data[0]->output_kg; } ?>"/>
+                                                <input type="text" class="form-control" name="total_kg" id="total_kg" placeholder="Total Kg" value="<?php if (isset($data)) { echo $data[0]->total_kg; } ?>" readonly />
                                             </div>
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
-                                            
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Anticipated Wastage (In %) <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control format_number" name="anticipated_wastage" id="anticipated_wastage" placeholder="Anticipated Wastage" value="<?php if (isset($data)) { echo $data[0]->anticipated_wastage; } ?>" readonly />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Anticipated Water Loss (In %) <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control format_number" name="anticipated_water_loss" id="anticipated_water_loss" placeholder="Anticipated Water Loss" value="<?php if (isset($data)) { echo $data[0]->anticipated_water_loss; } ?>" readonly />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Anticipated Output (In Kg) <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control format_number" name="anticipated_output_in_kg" id="anticipated_output_in_kg" placeholder="Anticipated Output" value="<?php if (isset($data)) { echo $data[0]->anticipated_output_in_kg; } ?>" readonly />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Anticipated Grams <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control format_number" name="anticipated_grams" id="anticipated_grams" placeholder="Anticipated Grams" value="<?php if (isset($data)) { echo $data[0]->anticipated_grams; } ?>" readonly />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Anticipated Output (In Bars) <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control format_number" name="anticipated_output_in_bars" id="anticipated_output_in_bars" placeholder="Anticipated Output" value="<?php if (isset($data)) { echo $data[0]->anticipated_output_in_bars; } ?>" readonly />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Qty In Bar <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control format_number" name="qty_in_bar" id="qty_in_bar" placeholder="Qty In Bar" value="<?php if (isset($data)) { echo $data[0]->qty_in_bar; } ?>"/>
@@ -228,13 +280,21 @@
                                     </div>
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Avg Grams In Bar <span class="asterisk_sign">*</span></label>
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Actual Grams In Bar <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="avg_grams" id="avg_grams" placeholder="Avg Grams In Bar" value="<?php if (isset($data)) { echo $data[0]->avg_grams; } ?>"/>
+                                                <input type="text" class="form-control" name="avg_grams" id="avg_grams" placeholder="Actual Grams In Bar" value="<?php if (isset($data)) { echo $data[0]->avg_grams; } ?>" readonly />
                                             </div>
                                         </div>
                                     </div>
-									<div class="form-group">
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Difference In Bars <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="difference_in_bars" id="difference_in_bars" placeholder="Difference In Bars" value="<?php if (isset($data)) { echo $data[0]->difference_in_bars; } ?>" readonly />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Actual Wastage (In Kg)<span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
@@ -244,32 +304,56 @@
                                     </div>
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Actual Water Loss (In Kg)<span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control format_number" name="actual_water_loss" id="actual_water_loss" placeholder="Actual Water Loss" value="<?php if (isset($data)) { echo $data[0]->actual_water_loss; } ?>"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Total Wastage (In Kg)<span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control format_number" name="total_wastage" id="total_wastage" placeholder="Total Wastage" value="<?php if (isset($data)) { echo $data[0]->total_wastage; } ?>" readonly />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Actual % wastage/ Output <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control format_number" name="actual_wastage_percent" id="actual_wastage_percent" placeholder="Actual Wastage Percent" value="<?php if (isset($data)) { echo $data[0]->actual_wastage_percent; } ?>" readonly />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" style="display: none;">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Output (In Kg) <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="output_kg" id="output_kg" placeholder="Output Kg" value="<?php if (isset($data)) { echo $data[0]->output_kg; } ?>"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" style="display: none;">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Wastage (In %) <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control format_number" name="wastage_percent" id="wastage_percent" placeholder="Wastage Percent" value="<?php if (isset($data)) { echo $data[0]->wastage_percent; } ?>"/>
                                             </div>
                                         </div>
 									</div>
-									<div class="form-group">
-                                        <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Anticipated Wastage (In %) <span class="asterisk_sign">*</span></label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control format_number" name="anticipated_wastage" id="anticipated_wastage" placeholder="Anticipated Wastage" value="<?php if (isset($data)) { echo $data[0]->anticipated_wastage; } ?>"/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
+                                    <div class="form-group" style="display: none;">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Wastage Variance (In %) <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control format_number" name="wastage_variance" id="wastage_variance" placeholder="Wastage Variance" value="<?php if (isset($data)) { echo $data[0]->wastage_variance; } ?>"/>
                                             </div>
-                                            <!-- <div style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
+                                            <!-- <div style="<?php //if(isset($data)) echo ''; else echo 'display: none;';?>">
                                                 <label class="col-md-2 col-sm-2 col-xs-12 control-label">Status <span class="asterisk_sign">*</span></label>
                                                 <div class="col-md-4 col-sm-4 col-xs-12">
                                                     <select class="form-control" name="status">
-                                                        <option value="Approved" <?php if(isset($data)) {if ($data[0]->status=='Approved') echo 'selected';}?>>Active</option>
-                                                        <option value="InActive" <?php if(isset($data)) {if ($data[0]->status=='InActive') echo 'selected';}?>>InActive</option>
+                                                        <option value="Approved" <?php //if(isset($data)) {if ($data[0]->status=='Approved') echo 'selected';}?>>Active</option>
+                                                        <option value="InActive" <?php //if(isset($data)) {if ($data[0]->status=='InActive') echo 'selected';}?>>InActive</option>
                                                     </select>
                                                 </div>
                                             </div> -->
@@ -292,7 +376,7 @@
                                         </div>
                                     </div>
 									
-                                	<div class="h-scroll">	
+                                	<div class="h-scroll" style="display: none;">	
                                         <div class="table-stripped form-group" style="padding:15px;">
                                             <table class="table table-bordered" style="margin-bottom: 0px; ">
                                             <thead>
@@ -386,7 +470,14 @@
                                         }
                                 ?>
                                 <div class="panel-footer">
-                                    <a href="<?php echo base_url(); ?>index.php/batch_processing" class="btn btn-danger btn-sm pull-right" type="reset" id="reset">Cancel</a>
+                                    <?php 
+                                        $action = '';
+                                        if(isset($module)) { if($module=='production') $action = base_url().'index.php/production/post_details/'.$production_id; }
+                                        if($action==''){
+                                            $action = base_url().'index.php/batch_processing';
+                                        }
+                                    ?>
+                                    <a href="<?php echo $action; ?>" class="btn btn-danger btn-sm pull-right" type="reset" id="reset">Cancel</a>
                                     <?php $curusr=$this->session->userdata('session_id'); ?>
                                     <input type="submit" class="btn btn-success btn-sm" id="btn_submit" name="btn_submit" value="Submit For Approval" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_edit=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || $data[0]->status=='InActive')) echo ''; else echo 'display: none;';} else if($access[0]->r_insert=='1') echo ''; else echo 'display: none;';} else echo 'display: none;'; ?>" />
                                     <input type="submit" class="btn btn-danger btn-sm" id="btn_delete" name="btn_delete" value="Delete" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_delete=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved') && $data[0]->status!='InActive') echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
@@ -454,7 +545,11 @@
 
                 var product_id = $("#product_id").val();
                 var qty_in_bar = parseFloat(get_number($("#qty_in_bar").val(),2));
+                var actual_wastage = parseFloat(get_number($("#actual_wastage").val(),2));
+                var actual_water_loss = parseFloat(get_number($("#actual_water_loss").val(),2));
                 var grams_in_bar = 0;
+                var anticipated_wastage = 0;
+                var anticipated_water_loss = 0;
 
                 $.ajax({
                     url:BASE_URL+'index.php/Product/get_data',
@@ -466,6 +561,7 @@
                         if(data.result==1){
                             grams_in_bar = parseFloat(data.avg_grams);
                             anticipated_wastage = parseFloat(data.anticipated_wastage);
+                            anticipated_water_loss = parseFloat(data.anticipated_water_loss);
                         }
                     },
                     error: function (response) {
@@ -477,73 +573,98 @@
                 });
 
                 if (isNaN(qty_in_bar)) qty_in_bar=0;
+                if (isNaN(actual_wastage)) actual_wastage=0;
+                if (isNaN(actual_water_loss)) actual_water_loss=0;
                 if (isNaN(grams_in_bar)) grams_in_bar=0;
+                if (isNaN(anticipated_wastage)) anticipated_wastage=0;
+                if (isNaN(anticipated_water_loss)) anticipated_water_loss=0;
                 if (isNaN(total_qty)) total_qty=0;
 
-                var actual_wastage = total_qty-((qty_in_bar*grams_in_bar)/1000);
-                var wastage_percent = (actual_wastage/total_qty)*100;
-                var wastage_variance = wastage_percent-anticipated_wastage;
+                var anticipated_output_in_kg = total_qty - ((total_qty*(anticipated_wastage+anticipated_water_loss))/100);
+                if (isNaN(anticipated_output_in_kg)) anticipated_output_in_kg=0;
+                var anticipated_output_in_bars = 0;
+                if(grams_in_bar!=0){
+                    anticipated_output_in_bars = (anticipated_output_in_kg*1000)/grams_in_bar;
+                }
+                if (isNaN(anticipated_output_in_bars)) anticipated_output_in_bars=0;
+                
+                $("#anticipated_wastage").val(Math.round(anticipated_wastage*100)/100);
+                $("#anticipated_water_loss").val(Math.round(anticipated_water_loss*100)/100);
+                $("#anticipated_grams").val(Math.round(grams_in_bar*100)/100);
+                $("#anticipated_output_in_kg").val(Math.round(anticipated_output_in_kg*100)/100);
+                $("#anticipated_output_in_bars").val(Math.round(anticipated_output_in_bars*100)/100);
 
-                var output_kg = parseFloat(get_number($('#output_kg').val(),2));
-                if (isNaN(output_kg)) output_kg=0;
-                if (qty_in_bar==0) qty_in_bar=1;
-                var avg_grams = (output_kg*1000)/qty_in_bar;
+                var avg_grams = 0;
+                if(qty_in_bar!=0){
+                    avg_grams = (anticipated_output_in_kg*1000)/qty_in_bar;
+                }
+                var difference_in_bars = anticipated_output_in_bars - qty_in_bar;
+                var total_wastage_in_kg = ((difference_in_bars*grams_in_bar)/1000)+actual_wastage+actual_water_loss;
+                var actual_wastage_percent = 0;
+                if(total_qty!=0){
+                    actual_wastage_percent = total_wastage_in_kg/total_qty;
+                }
+
+                // var actual_wastage = total_qty-((qty_in_bar*grams_in_bar)/1000);
+                var wastage_percent = 0;
+                if(total_qty!=0){
+                    wastage_percent = (actual_wastage/total_qty)*100;
+                }
+                var wastage_variance = wastage_percent-anticipated_wastage;
 
                 $('#total_kg').val(Math.round(total_qty*100)/100);
                 $('#avg_grams').val(Math.round(avg_grams*100)/100);
+                $('#difference_in_bars').val(Math.round(difference_in_bars*100)/100);
                 $("#actual_wastage").val(Math.round(actual_wastage*100)/100);
+                $("#actual_water_loss").val(Math.round(actual_water_loss*100)/100);
+                $("#total_wastage").val(Math.round(total_wastage_in_kg*100)/100);
+                $("#actual_wastage_percent").val(Math.round(actual_wastage_percent*100)/100);
                 $("#wastage_percent").val(Math.round(wastage_percent*100)/100);
-                $("#anticipated_wastage").val(Math.round(anticipated_wastage*100)/100);
                 $("#wastage_variance").val(Math.round(wastage_variance*100)/100);
             }
 			
-			
-			
-			       // function get_no_of_batch()
-				   // {
-					
-					// var no_of_batch = $("#no_of_batch").val();
-					// console.log(no_of_batch);
-					 // var product_id = $("#product_id").val();
-					  // $.ajax({
-                    // url:BASE_URL+'index.php/batch_processing/get_data',
-                    // method:"post",
-                    // data:{no_of_batch:no_of_batch},
-                    // dataType:"json",
-                    // async:false,
-                    // success: function(data){
-                       
-                            // no_of_batch = data.no_of_batch;
-                          
-                       
-                    // },
-                    // error: function (response) {
-                        // var r = jQuery.parseJSON(response.responseText);
-                        // alert("Message: " + r.Message);
-                        // alert("StackTrace: " + r.StackTrace);
-                        // alert("ExceptionType: " + r.ExceptionType);
-                    // }
+            // function get_no_of_batch(){
+    			
+    			// var no_of_batch = $("#no_of_batch").val();
+    			// console.log(no_of_batch);
+    			 // var product_id = $("#product_id").val();
+    			  // $.ajax({
+                // url:BASE_URL+'index.php/batch_processing/get_data',
+                // method:"post",
+                // data:{no_of_batch:no_of_batch},
+                // dataType:"json",
+                // async:false,
+                // success: function(data){
+                   
+                        // no_of_batch = data.no_of_batch;
+                      
+                   
+                // },
+                // error: function (response) {
+                    // var r = jQuery.parseJSON(response.responseText);
+                    // alert("Message: " + r.Message);
+                    // alert("StackTrace: " + r.StackTrace);
+                    // alert("ExceptionType: " + r.ExceptionType);
+                // }
                 // });
-					
-				   // }
+            // }
 			
-			
-			
-			
-			  $('#product_id').on('change', function() {
-                  // alert( this.value ); // or $(this).val()
-                  get_raw_material();
-                });
-				 $("#no_of_batch").blur(function(){
-                    get_raw_material();
-                });
+            $('#product_id').on('change', function() {
+                // alert( this.value ); // or $(this).val()
+                get_raw_material();
+                get_wastage();
+            });
+			 $("#no_of_batch").blur(function(){
+                get_raw_material();
+                get_wastage();
+            });
 				
-			  function get_raw_material(){
+            function get_raw_material(){
 				  // get_no_of_batch();
 				  
                 var product_id = $('#product_id').val();
-					console.log(product_id);
-					var no_of_batch = $("#no_of_batch").val();
+				// console.log(product_id);
+				var no_of_batch = $("#no_of_batch").val();
 					// var qty_per_batch = parseFloat(get_number($("#qty_per_batch").val(),2));
 				//var qty_per_batch=no_of_batch*qty_per_batch;
                 
@@ -554,47 +675,42 @@
                     dataType:"json",
                     async:false,
                     success: function(data){
-						console.log(data.length);
+						// console.log(data.length);
                         if(data.length>0){
 							
                             // $("#raw_material_details > tbody").html("");
                             // $("tbody", "#raw_material_details").remove();
                             $("#raw_material_details").empty();
-							console.log('jsonData '+data);
+							// console.log('jsonData '+data);
 							
-							 var counter = $('.raw_material').length;
+                            var counter = $('.raw_material').length;
 					
-					var newRow='';
-					for (var i = 0; i < data.length; i++) {
-						 var parsejson = data[i];
-						 parsejson.qty_per_batch= no_of_batch * parsejson.qty_per_batch
-						 console.log(parsejson.rm_name);
-						newRow += '<tr id="raw_material_'+counter+'_row">'+
-                                            '<td>'+
-                                                '<select name="raw_material_id[]" class="form-control raw_material select2" id="raw_material_'+counter+'">'+
-                                                    '<option value="'+parsejson.rm_id+'">'+parsejson.rm_name+'</option>'+
-                                                '</select>'+
-                                            '</td>'+
-                                            '<td>'+
-                                                 '<input type="text" class="form-control qty" name="qty[]" id="qty_'+counter+'" placeholder="Qty" value="' +parsejson.qty_per_batch + '" onchange="get_amount(this)" />' + 
-                                            '</td>'+
-                                            '<td style="text-align:center; display:none; vertical-align: middle;">'+
-                                                '<a id="raw_material_'+counter+'_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>'+
-                                            '</td>'+
-                                        '</tr>';
-										
-										   counter++;
-					}
-					console.log(newRow);
+        					var newRow='';
+        					for (var i = 0; i < data.length; i++) {
+        						 var parsejson = data[i];
+        						 parsejson.qty_per_batch= no_of_batch * parsejson.qty_per_batch
+        						 // console.log(parsejson.rm_name);
+        						newRow += '<tr id="raw_material_'+counter+'_row">'+
+                                                    '<td>'+
+                                                        '<select name="raw_material_id[]" class="form-control raw_material select2" id="raw_material_'+counter+'">'+
+                                                            '<option value="'+parsejson.rm_id+'">'+parsejson.rm_name+'</option>'+
+                                                        '</select>'+
+                                                    '</td>'+
+                                                    '<td>'+
+                                                         '<input type="text" class="form-control qty" name="qty[]" id="qty_'+counter+'" placeholder="Qty" value="' +parsejson.qty_per_batch + '" onchange="get_amount(this)" />' + 
+                                                    '</td>'+
+                                                    '<td style="text-align:center; display:none; vertical-align: middle;">'+
+                                                        '<a id="raw_material_'+counter+'_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>'+
+                                                    '</td>'+
+                                                '</tr>';
+        										
+        										   counter++;
+        					}
+        					// console.log(newRow);
 					
-					 $('#raw_material_details').append(newRow);
-					 $('.select2').select2();
-					
-              
-                 
-				
-					
-					 
+        				    $('#raw_material_details').append(newRow);
+        				    $('.select2').select2();
+
                             $('.format_number').keyup(function(){
                                 format_number(this);
                             });
@@ -608,8 +724,6 @@
                                 delete_row($(this));
                                 get_wastage();
                             });
-
-                           
                         }
                     },
                     error: function (response) {
@@ -620,14 +734,7 @@
                     }
                 });
             }
-					
-							
-							
-							
-							
-							
-							
-					
+				
             // jQuery(function(){
                 // var counter = $('.raw_material').length;
                 // $('#repeat-raw_material').click(function(event){
@@ -663,8 +770,7 @@
                 // });
             // });
 			
-			
-			       jQuery(function(){
+            jQuery(function(){
                 var counter = $('.title').length;
 				
                 $('#repeat-bar_image').click(function(event){

@@ -1,718 +1,813 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<title>Eat-ERP</title>
-	<meta name="viewport" content="width=device-width,height=device-height, initial-scale=1  maximum-scale=1">
-	<meta name="mobile-web-app-capable" content="yes">
-	<meta name="HandheldFriendly" content="True">
-	
-	<link rel="shortcut icon" href="<?php echo base_url(); ?>img/favicon.png">
-	<link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/font-awesome.min.css">
-	<link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/css/materialize.min.css" rel="stylesheet" />
-	<link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/fakeLoader.css">
-	<link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/slick.css">
-	<link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/slick-theme.css">
-	<link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/owl.carousel.css">
-	<link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/owl.theme.css">
-	<link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/owl.transitions.css">
-	<link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/style.css">
-	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-	<link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/font/material-design-icons/Material-Design-Icons.woff" rel="stylesheet">
-	
-	<style>
-		.submitLink 
-		{
-			  background-color: transparent;
-			  text-decoration: none;
-			  border: none;
-			  color: #428bca;
-			  cursor: pointer;
-			  font-size:16px!important;
-		}
+   <head>
+      <meta charset="UTF-8">
+      <title>Eat-ERP</title>
+      <meta name="viewport" content="width=device-width,height=device-height, initial-scale=1  maximum-scale=1">
+      <meta name="mobile-web-app-capable" content="yes">
+      <meta name="HandheldFriendly" content="True">
+      <link rel="shortcut icon" href="<?php echo base_url(); ?>img/favicon.png">
+      <link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/font-awesome.min.css">
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/css/materialize.min.css" rel="stylesheet" />
+      <link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/fakeLoader.css">
+      <link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/slick.css">
+      <link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/slick-theme.css">
+      <link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/owl.carousel.css">
+      <link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/owl.theme.css">
+      <link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/owl.transitions.css">
+      <link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/style.css">
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/font/material-design-icons/Material-Design-Icons.woff" rel="stylesheet">
+      <style>
+         .collapsible-header
+         {
+         color: #0c2c4e!important;
+         }
+         .submitLink 
+         {
+         background-color: transparent;
+         text-decoration: none;
+         border: none;
+         color: #428bca;
+         cursor: pointer;
+         font-size:16px!important;
+         }
+         .btn_color
+         {
+         background-color:#7A8491!important;
+         color:#fff!important;
+         }
+         input::-webkit-input-placeholder
+         { 
+         font-size:0.8rem!important;
+         color: #000!important;
+         }
+         .input-field.col label {
+         left: .75rem!important;
+         font-size: 12px!important;
+         font-weight: 900!important;
+         color: #000;
+         }
+         input:not([type]), input[type=text], input[type=password], input[type=email], input[type=url], input[type=time], input[type=date], input[type=datetime], input[type=datetime-local], input[type=tel], input[type=number], input[type=search], textarea.materialize-textarea
+         {
+         color: #000!important;
+         font-size:13px!important;
+         }
+         }
+         select
+         {
+         color: #000!important;
+         }
+         label.error {
+         margin-top: 37px;
+         color: red !important;
+         transform: translateY(0%) !important; 
+         }
+         .input-field label:not(.error).active {
+         margin-top: 37px;
+         }
+         .row
+         {
+         margin-bottom:10px!important
+         }
+         textarea.materialize-textarea
+         {
+         border: 1px solid #f2f2f2;
+         }
+         input[type=number]
+         {
+         margin:0px;
+         height: 2.5rem;
+         text-align:center!important;
+         }
+         textarea.materialize-textarea
+         {
+         padding:0;
+         height:70px!important;
+         }
+         .panel-footer
+         {
+         padding-top:20px;
+         }
+         .app-pages 
+         {
+         margin-top: 25px;
+         }
+         . {
+         position: relative;
+         height: 26px;
+         width: 120px;
+         margin: 20px auto;
+         background: rgba(0, 0, 0, 0.25);
+         border-radius: 3px;
+         -webkit-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
+         box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px rgba(255, 255, 255, 0.1);
+         }
+         .-label {
+         position: relative;
+         z-index: 2;
+         float: left;
+         width: 58px;
+         line-height: 26px;
+         font-size: 11px;
+         color: rgba(255, 255, 255, 0.35);
+         text-align: center;
+         text-shadow: 0 1px 1px rgba(0, 0, 0, 0.45);
+         cursor: pointer;
+         }
+         .-label:active {
+         font-weight: bold;
+         }
+         .-label-off {
+         padding-left: 2px;
+         }
+         .-label-on {
+         padding-right: 2px;
+         }
+         . {
+         display: none;
+         }
+         .:checked + .-label {
+         font-weight: bold;
+         color: rgba(0, 0, 0, 0.65);
+         text-shadow: 0 1px rgba(255, 255, 255, 0.25);
+         -webkit-transition: 0.15s ease-out;
+         -moz-transition: 0.15s ease-out;
+         -ms-transition: 0.15s ease-out;
+         -o-transition: 0.15s ease-out;
+         transition: 0.15s ease-out;
+         -webkit-transition-property: color, text-shadow;
+         -moz-transition-property: color, text-shadow;
+         -ms-transition-property: color, text-shadow;
+         -o-transition-property: color, text-shadow;
+         transition-property: color, text-shadow;
+         }
+         .:checked + .-label-on ~ . {
+         left: 60px;
+         /* Note: left: 50%; doesn't transition in WebKit */
+         }
+         . {
+         position: absolute;
+         z-index: 1;
+         top: 2px;
+         left: 2px;
+         display: block;
+         width: 58px;
+         height: 22px;
+         border-radius: 3px;
+         background-color: #65bd63;
+         background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #9dd993), color-stop(100%, #65bd63));
+         background-image: -webkit-linear-gradient(top, #9dd993, #65bd63);
+         background-image: -moz-linear-gradient(top, #9dd993, #65bd63);
+         background-image: -ms-linear-gradient(top, #9dd993, #65bd63);
+         background-image: -o-linear-gradient(top, #9dd993, #65bd63);
+         background-image: linear-gradient(top, #9dd993, #65bd63);
+         -webkit-box-shadow: inset 0 1px rgba(255, 255, 255, 0.5), 0 0 2px rgba(0, 0, 0, 0.2);
+         box-shadow: inset 0 1px rgba(255, 255, 255, 0.5), 0 0 2px rgba(0, 0, 0, 0.2);
+         -webkit-transition: left 0.15s ease-out;
+         -moz-transition: left 0.15s ease-out;
+         -ms-transition: left 0.15s ease-out;
+         -o-transition: left 0.15s ease-out;
+         transition: left 0.15s ease-out;
+         }
 
-        .input-field label {
-            color: #000;
-            font-size:12px!important;
-        }
-
-        label.error {
-            margin-top: 37px;
-            color: red !important;
-            transform: translateY(0%) !important; 
-           font-size:12px!important;
-        }
-
-        input::-webkit-input-placeholder
-        { 
-            font-size:0.8rem!important;
-            color: #000!important;
-        }
-
-        input:not([type]), input[type=text], input[type=password], input[type=email], input[type=url], input[type=time], input[type=date], input[type=datetime], input[type=datetime-local], input[type=tel], input[type=number], input[type=search], textarea.materialize-textarea
+        [type="radio"]:not(:checked)+label, [type="radio"]:checked+label
+       {
+             padding-left: 22px!important;
+       }
+       .collapsible-header
+       {
+           border-top: 3px solid #0c2c4e!important;
+           color:#0c2c4e!important;
+       }
+        /*#stock_entry 
         {
-            color: #000;
-            font-size:12px!important;
-        }
+          width:100%!important;
+        }*/
+      </style>
+   <body>
+      <!-- START PAGE CONTAINER -->
+      <div class="navbar">
+         <?php $this->load->view('templates/header2');?>
+      </div>
+      <?php $this->load->view('templates/menu2');?> 
+      <div class="contact app-pages app-section" style="margin:50 auto">
+      <div class="container">
+         <div id="basic-form" class="section">
+            <div class="row">
+               <div class="col s12">
+                  <div class="card-panel">
+                     <div class="row">
+                        <?php
+                           $visit_detail = '';
+                           if($this->session->userdata('visit_detail')!=null)
+                           {
+                               $visit_detail = $this->session->userdata('visit_detail');
+                               
+                           }
+                           
+                           $retailer_detail  = $this->session->userdata('retailer_detail');
+                           
+                           if($visit_detail!=''){
+                              if ($visit_detail['distributor_types']!='' && $visit_detail['distributor_types']=='New')
+                              {
+                                 $style='display:block';
+                                 $style2 = 'display:none';
+                              }
+                                  
+                           };
+                           ?> 
+                        <!-- START PAGE CONTAINER -->
+                        <!-- PAGE CONTENT -->
+                        <div class="app-title">
+                           <h5>Order Details</h5>
+                        </div>
+                        <hr>
+                        <!-- PAGE CONTENT WRAPPER -->
+                        <form id="form_sales_rep_order_details" role="form" method="post" action="<?php if (isset($data)) echo base_url(). 'index.php/sales_rep_location/save/' . $data[0]->id; else echo base_url().'index.php/Sales_rep_store_plan/save_order'; ?>">
+                           <div class="row">
+                              <div class="col s12">
+                                 <div class="input-field col s3">
+                                    <label for="dob">Date</label>
+                                 </div>
+                                 <div class="input-field col s9"   style="top:0.8rem;color:#000!important;">
+                                    <input type="hidden" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
+                                    <input type="hidden"  name="date_of_processing" id="date_of_processing" value="<?php if(isset($data)) echo (($data[0]->date_of_processing!=null && $data[0]->date_of_processing!='')?date('d/m/Y',strtotime($data[0]->date_of_processing)):date('d/m/Y')); else echo date('d/m/Y'); ?>"/>
+                                    <?php if(isset($data)) echo (($data[0]->date_of_processing!=null && $data[0]->date_of_processing!='')?date('d/m/Y',strtotime($data[0]->date_of_processing)):date('d/m/Y')); else echo date('d/m/Y'); ?>
+                                 </div>
+                              </div>
+                           </div>
+                           
 
-        th{
-            font-size:0.8rem!important;
-            color: #000;
-        }
-        
+                             <?php 
+                                if(isset($distributor_name))
+                                  $style = 'display:block';
+                                else
+                                  $style = 'display:none';
+                             ?>
+                             <div class="row"  style='<?=$style;?>'>
+                                <br>
+                                <div class="col s12">
+                                   <div class="input-field col s3" >
+                                      <label>Retailer <span class="asterisk_sign">*</span></label>
+                                   </div>
+                                   <div class="input-field col s9">
+                                      <?=(isset($distributor_name)?$distributor_name:'')?>
+                                   </div>
+                                </div>
+                             </div>
+                             <?php 
+                              if(isset($zone))
+                                $style = 'display:block';
+                              else
+                                $style = 'display:none';
+                             ?>
+                             <div class="row"  style='<?=$style;?>'>
+                              <br>
+                                <div class="col s12">
+                                   <div class="input-field col s3" >
+                                      <label>Zone <span class="asterisk_sign">*</span></label>
+                                   </div>
+                                   <div class="input-field col s9">
+                                      <?=(isset($zone)?$zone:'')?>
+                                   </div>
+                                </div>
+                            </div>
 
-        select
-        {
-            color: #000!important;
-            font-size:0.8rem!important;
-        }
+                             <?php 
+                                if(isset($visit_detail['channel_type']))
+                                {
+                                  if($visit_detail['channel_type']=='MT')
+                                    $style = 'display:block';
+                                  else
+                                    $style = 'display:none';
+                                }
+                                else
+                                {
+                                  $style = 'display:none';
+                                }
+                             ?>
+                             <div class="row"  style='<?=$style;?>'>
+                                <div class="col s12">
+                                   <div class="input-field col s3" >
+                                      <label>Relation <span class="asterisk_sign">*</span></label>
+                                   </div>
+                                   <div class="input-field col s9">
+                                      <?=(isset($store_name)?$store_name:'')?>
+                                   </div>
+                                </div>
+                             </div>
 
-        .control-label{
-            color: #000!important;
-        }
-	 textarea.materialize-textarea
-		 {
-			 border: 1px solid #f2f2f2;
-		
-		 }
-		  textarea.materialize-textarea
-		 {
-			 padding:0;
-			 height:70px!important;
-		 }
 
-         
-	</style>
+                           <?php 
+                            if(isset($area))
+                              $style = 'display:block';
+                            else
+                              $style = 'display:none';
+                           ?>
+                           <div class="row"  style='<?=$style;?>'>
+                              <div class="col s12">
+                                 <div class="input-field col s3" >
+                                    <label>Area <span class="asterisk_sign">*</span></label>
+                                 </div>
+                                 <div class="input-field col s9">
+                                    <?=(isset($area)?$area:'')?>
+                                 </div>
+                              </div>
+                           </div>
 
-<body>								
-	<!-- START PAGE CONTAINER -->
-	
-		<div class="navbar">
-		 <?php $this->load->view('templates/header2');?>
-		</div>
+                           <?php 
+                            if(isset($location))
+                              $style = 'display:block';
+                            else
+                              $style = 'display:none';
+                           ?>
+                           <div class="row"  style='<?=$style;?>'>
+                             <div class="col s12">
+                               <div class="input-field col s3" >
+                                  <label>Location <span class="asterisk_sign">*</span></label>
+                               </div>
+                               <div class="input-field col s9">
+                                  <?=(isset($location)?$location:'')?>
+                               </div>
+                             </div>
+                           </div>
 
-		<?php $this->load->view('templates/menu2');?>	
-
-	
-<div class="contact app-pages app-section" style="margin:50 auto">
-	<div class="container">
-			
-		<div id="basic-form" class="section">
-              <div class="row">
-                <div class="col s12">
-				<div class="card-panel">
-              
-				<div class="row">
-
-		
-         <!-- START PAGE CONTAINER -->
-       
-            <!-- PAGE CONTENT -->
-			 
-            <div class="app-title">
-				<h5>Order Details</h5>
-			</div>
-			
-                  <hr>
-                <!-- PAGE CONTENT WRAPPER -->
                           
-                      
-                            <form id="form_sales_rep_order_details" role="form" method="post" action="<?php if (isset($data)) echo base_url(). 'index.php/sales_rep_order/save/' . $data[0]->id; else echo base_url().'index.php/sales_rep_order/save'; ?>">
-                         
-						 
-						  <div class="row"  >
-                                    <div class="col s12">
-                                       <div class="input-field col s3">
-											<label for="dob">Date</label>
-										</div> 
-											<div class="input-field col s9"   style="top:0.8rem;color:#000!important;">
-												<input type="hidden" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
-												
-												
-												<input type="hidden"  name="date_of_processing" id="date_of_processing" value="<?php if(isset($data)) echo (($data[0]->date_of_processing!=null && $data[0]->date_of_processing!='')?date('d/m/Y',strtotime($data[0]->date_of_processing)):date('d/m/Y')); else echo date('d/m/Y'); ?>"/>
-												<?php if(isset($data)) echo (($data[0]->date_of_processing!=null && $data[0]->date_of_processing!='')?date('d/m/Y',strtotime($data[0]->date_of_processing)):date('d/m/Y')); else echo date('d/m/Y'); ?>
-											
-										  
-												
-											</div>
-                                    </div>
-                                </div>
-								
-							
-									<div class="row" >
-										<div class="col s12">
-										
-                                           
-                                            <div class="input-field col s12">
-										
-                                                <select name="distributor_id" class="browser-default" id="distributor_id">
-                                                    <option value="">Select Retailer</option>
-                                                    <?php if(isset($distributor)) { for ($k=0; $k < count($distributor) ; $k++) { ?>
-                                                            <option value="<?php echo $distributor[$k]->id; ?>" <?php if(isset($data)) {if($distributor[$k]->id==$data[0]->distributor_id) {echo 'selected';}} else if(isset($distributor_id)) {if($distributor[$k]->id==$distributor_id) {echo 'selected';}} ?>><?php echo $distributor[$k]->distributor_name; ?></option>
-                                                    <?php }} ?>
-                                                </select>
-												 
-												  
-											</div> 
-                                                <input type="hidden" name="sell_out" id="sell_out" value="<?php if(isset($data)) { echo $data[0]->sell_out; } ?>"/>
-                                                
-                                            </div>
-									</div>
-									
 
-                                	<div class="h-scroll">	
-                                       <div class="table-stripped form-group"   >
-                                        <table class="table table-bordered" style="margin-bottom: 0px; ">
-                                        <thead>
-                                            <tr>
-                                                <th style="width: 80px;">Type <span class="asterisk_sign">*</span></th>
-                                                <th style="width: 125px;">Item <span class="asterisk_sign">*</span></th>
-                                                <th>Qty <span class="asterisk_sign">*</span></th>
-                                                <th style="display: none;">Rate (In Rs) </th>
-                                                <th style="display: none;">Sell Rate (In Rs) <span class="asterisk_sign">*</span></th>
-                                                <th style="display: none;">Grams</th>
-                                                <th style="display: none;">Amount (In Rs)</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="box_details">
-                                        <?php $i=0; if(isset($sales_rep_order_items)) {
-                                                for($i=0; $i<count($sales_rep_order_items); $i++) { ?>
-                                            <tr id="box_<?php echo $i; ?>_row">
-                                                <td> 
 
-                                                    <select name="type[]" id="type_<?php echo $i;?>" class="browser-default type">
-                                                        <option value="">Select Type</option>
-                                                        <option value="Bar" <?php if($sales_rep_order_items[$i]->type=="Bar") { echo 'selected'; } ?>>Bar</option>
-                                                        <option value="Box" <?php if($sales_rep_order_items[$i]->type=="Box") { echo 'selected'; } ?>>Box</option>
-                                                    </select>
-                                                </td>
-                                                <td>
-												<span class="bar_field" style="<?php if($sales_rep_order_items[$i]->type=="Box") { echo 'display: none;'; } ?>">
-                                                    <select name="bar[]" class="browser-default bar" id="bar_<?php echo $i;?>" data-error="#err_item_<?php echo $i;?>" style="<?php if($sales_rep_order_items[$i]->type=="Box") { echo 'display: none;'; } ?>">
-                                                        <option value="">Select Item</option>
-                                                        <?php if(isset($bar)) { for ($k=0; $k < count($bar) ; $k++) { ?>
-                                                                <option value="<?php echo $bar[$k]->id; ?>" <?php if($sales_rep_order_items[$i]->type=="Bar" && $bar[$k]->id==$sales_rep_order_items[$i]->item_id) { echo 'selected'; } ?>><?php echo $bar[$k]->short_name; ?></option>
-                                                        <?php }} ?>
-                                                    </select>
-												</span>
-												<span class="bar_field" style="<?php if($sales_rep_order_items[$i]->type=="Bar") { echo 'display: none;'; } ?>">
-                                                    <select name="box[]" class="browser-default box"  id="box_<?php echo $i;?>" data-error="#err_item_<?php echo $i;?>" style="<?php if($sales_rep_order_items[$i]->type=="Bar") { echo 'display: none;'; } ?>">
-                                                        <option value="">Select Item</option>
-                                                        <?php if(isset($box)) { for ($k=0; $k < count($box) ; $k++) { ?>
-                                                                <option value="<?php echo $box[$k]->id; ?>" <?php if($sales_rep_order_items[$i]->type=="Box" && $box[$k]->id==$sales_rep_order_items[$i]->item_id) { echo 'selected'; } ?>><?php echo $box[$k]->short_name; ?></option>
-                                                        <?php }} ?>
-                                                    </select>
-												</span>
-                                                    <div id="err_item_<?php echo $i;?>"></div>
-                                                </td>
-                                                <td>
-                                                    <input type="number" class="form-control qty" name="qty[]" id="qty_<?php echo $i; ?>" placeholder="0" value="<?php if (isset($sales_rep_order_items)) { echo $sales_rep_order_items[$i]->qty; } ?>"/>
-                                                </td>
-                                                <td style="display: none;">
-                                                    <input type="text" class="form-control rate" name="rate[]" id="rate_<?php echo $i; ?>" placeholder="Rate" value="<?php if (isset($sales_rep_order_items)) { echo $sales_rep_order_items[$i]->rate; } ?>" readonly />
-                                                </td>
-                                                <td style="display: none;">
-                                                    <input type="text" class="form-control sell_rate" name="sell_rate[]" id="sell_rate_<?php echo $i; ?>" placeholder="Sell Rate" value="<?php if (isset($sales_rep_order_items)) { echo $sales_rep_order_items[$i]->sell_rate; } ?>"/>
-                                                </td>
-                                                <td style="display: none;">
-                                                    <input type="text" class="form-control grams" name="grams[]" id="grams_<?php echo $i; ?>" placeholder="Grams" value="<?php if (isset($sales_rep_order_items)) { echo $sales_rep_order_items[$i]->grams; } ?>" readonly />
-                                                </td>
-                                                <td style="display: none;">
-                                                    <input type="text" class="form-control amount" name="amount[]" id="amount_<?php echo $i; ?>" placeholder="Amount" value="<?php if (isset($sales_rep_order_items)) { echo $sales_rep_order_items[$i]->amount; } ?>" readonly />
-                                                </td>
-                                                 <td style="text-align:center;     vertical-align: middle;">
-                                                    <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>
-                                                </td>
-                                            </tr>
-                                        <?php }} else { ?>
-                                            <tr id="box_<?php echo $i; ?>_row">
-                                                <td>
-                                                    <select name="type[]" class="browser-default type"   id="type_<?php echo $i;?>">
-                                                        <option value="">Select Type</option>
-                                                        <option value="Bar">Bar</option>
-                                                        <option value="Box">Box</option>
-                                                    </select>
-                                                </td>
-                                                <td>
-												
-                                                    <select name="bar[]" class="browser-default bar" id="bar_<?php echo $i;?>" data-error="#err_item_<?php echo $i;?>" style="">
-                                                        <option value="">Select Item</option>
-                                                        <?php if(isset($bar)) { for ($k=0; $k < count($bar) ; $k++) { ?>
-                                                                <option value="<?php echo $bar[$k]->id; ?>"><?php echo $bar[$k]->short_name; ?></option>
-                                                        <?php }} ?>
-                                                    </select>
-													
-												
-												
-                                                    <select name="box[]" class="browser-default box" id="box_<?php echo $i;?>" data-error="#err_item_<?php echo $i;?>" style="display: none;">
-                                                        <option value="">Select Item</option>
-                                                        <?php if(isset($box)) { for ($k=0; $k < count($box) ; $k++) { ?>
-                                                                <option value="<?php echo $box[$k]->id; ?>"><?php echo $box[$k]->short_name; ?></option>
-                                                        <?php }} ?>
-                                                    </select>
-											
-                                                    <div id="err_item_<?php echo $i;?>"></div>
-                                                </td>
-                                                <td>
-                                                    <input type="number" class="form-control qty" name="qty[]" id="qty_<?php echo $i; ?>" placeholder="0" value=""/>
-                                                </td>
-                                                <td style="display: none;">
-                                                    <input type="text" class="form-control rate" name="rate[]" id="rate_<?php echo $i; ?>" placeholder="Rate" value="" readonly />
-                                                </td>
-                                                <td style="display: none;">
-                                                    <input type="text" class="form-control sell_rate" name="sell_rate[]" id="sell_rate_<?php echo $i; ?>" placeholder="Sell Rate" value=""/>
-                                                </td>
-                                                <td style="display: none;">
-                                                    <input type="text" class="form-control grams" name="grams[]" id="grams_<?php echo $i; ?>" placeholder="Grams" value="" readonly />
-                                                </td>
-                                                <td style="display: none;">
-                                                    <input type="text" class="form-control amount" name="amount[]" id="amount_<?php echo $i; ?>" placeholder="Amount" value="" readonly />
-                                                </td>
-                                                  <td style="text-align:center;     vertical-align: middle;">
-                                                    <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>
-                                                </td>
-                                            </tr>
-                                        <?php } ?>
-                                        </tbody>
-                                        <tfoot>
-                                            <tr>
-                                                <td colspan="8">
-                                                    <button type="button" class="btn button shadow btn_color" style="padding: 0px 15px;" id="repeat-box"  >+</button>
-                                                </td>
-                                            </tr>
-                                        </tfoot>
-                                        </table>
-                                    </div>
-									</div>
-                                    <div class="form-group" style="display: none;">
-                                        <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Total Amount (In Rs)<span class="asterisk_sign">*</span></label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="total_amount" id="total_amount" placeholder="Total Amount" value="<?php if (isset($data)) { echo $data[0]->amount; } ?>" readonly />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group" style="<?php echo 'display: none;';?>">
-                                        <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <div style="<?php echo 'display: none;';?>">
-                                                <label class="col-md-2 col-sm-2 col-xs-12 control-label">Status <span class="asterisk_sign">*</span></label>
-                                                <div class="col-md-4 col-sm-4 col-xs-12">
-                                                    <select class="form-control" name="status">
-                                                        <option value="Approved" <?php if(isset($data)) {if ($data[0]->status=='Approved') echo 'selected';}?>>Active</option>
-                                                        <option value="InActive" <?php if(isset($data)) {if ($data[0]->status=='InActive') echo 'selected';}?>>InActive</option>
-                                                    </select>
+                            <input type="hidden" class="form-control" name="id" id="id" value="<?php 
+                                     if(isset($id)){
+                                       if($id!='') echo $id;
+                                     }
+                                     ?>"/>
+                           <?php 
+                              if(isset($distributor_name))
+                              {
+                                $style = 'display:block';
+
+                              }
+                           ?>
+                            
+                           <div class="row" >
+                              <div class="col s12">
+                                 <div class="input-field col s3" >
+                                    <label>Distributor  <span class="asterisk_sign">*</span></label>
+                                 </div>
+                                 <div class="input-field col s9">
+                                    <select name="distributor_id" id="distributor_id" class="browser-default">
+                                       <option value="">Select</option>
+                                       <?php if(isset($distributor)) { for ($k=0; $k < count($distributor) ; $k++) { ?>
+                                       <option value="<?php echo $distributor[$k]->id; ?>" <?php  
+
+                                       if($distributor[$k]->id==$selected_distributor ) { echo 'selected'; } ?>><?php echo $distributor[$k]->distributor_name; ?></option>
+                                       <?php }} ?>
+                                    </select>
+                                 </div>
+                                 </div>
+                              </div>
+                              <input type="hidden" class="form-control" name="id" id="id" value="<?php 
+                                       if(isset($id)){
+                                         if($id!='') echo $id;
+                                       }
+                                       ?>"/>
+                              <input type="hidden" class="form-control" name="place_order" id="place_order" value="No"/>
+                           <div class="row" id='stock_entry'>
+                                <ul class="collapsible">
+                                     <li>
+                                       <div class="collapsible-header active" ><i class="material-icons">add</i> <strong>Bars</strong></div>
+                                       <div class="collapsible-body">
+                                          <div class="">
+                                             <div class="app-title">
+                                                <h5>Available Quantities</h5>
+                                             </div>
+                                             <hr>
+                                             <div class="row">
+                                               <div class="col s12">
+                                                  <div class="input-field col s4"></div>
+                                                  <div class="input-field col s3">
+                                                     <center><label class="">Bar</label></center>
+                                                  </div>
+                                                  <div class="input-field col s3">
+                                                     <center><label class="">Box</label></center>
+                                                  </div>
+                                               </div>
+                                             </div>
+                                             <br>
+                                             <div class="row">
+                                                <div class="col s12">
+                                                   <div class="input-field col s4">
+                                                      <label class="">Orange<span class="asterisk_sign">*</span></label>
+                                                   </div>
+                                                   <div class="input-field col s3">
+                                                      <input type="number"   value="<?php if(isset($order_detail['orange_bar']))
+                                                         {
+                                                            $exs =  explode('_',$order_detail['orange_bar']);
+                                                            echo $exs[0];
+                                                         } 
+                                                         ?>" 
+                                                         class="form-control type qty" name="orange_bar" placeholder="0" id="type_0" onblur="qty_change(this)"/>
+                                                   </div>
+                                                   <div class="input-field col s3">
+                                                      <div class="">
+                                                         <input type="number"   value="<?php if(isset($order_detail['orange_box']))
+                                                            {
+                                                               $exs1 =  explode('_',$order_detail['orange_box']);
+                                                               echo $exs1[0]; 
+                                                            } 
+                                                         ?>" 
+                                                         class="form-control qty" name="orange_box" placeholder="0" id="type_0" onblur="qty_change(this)"/>
+                                                      </div>
+                                                   </div>
                                                 </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                   
-									
-									<div class="row">
-										<div class="col s12">
-										<div class="input-field col s3">
-											<label>Remarks <span class="asterisk_sign"></span></label>
-										</div> 
-									<div class="input-field col s9">
-                                     <!--store_id is a Retailer id-->
-										
-										 <textarea id="textarea1" class="materialize-textarea" class="" name="remarks" id="remarks" value="<?php if(isset($data[0]->remarks)) echo $data[0]->remarks;?>"></textarea>
-                                           
-											
-									</div> 
-									</div> 
-									</div>
-                              
-								<div class="panel-footer">
-									<a href="<?php echo base_url(); ?>index.php/sales_rep_order" class="button shadow btn_color1" style="display: inline-block;" type="reset" id="reset">Cancel</a>
-                                    <button class="right button shadow btn_color2" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;'; else if(substr($data[0]->id,0,1)=="d") echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</button>
-                                </div>
-					
-                                
-							</form>
-							
-						
-					           
+                                                <div class="col s12">
+                                                   <div class="input-field col s4">
+                                                      <label class="">Butterscotch<span class="asterisk_sign">*</span></label>
+                                                   </div>
+                                                   <div class="input-field col s3">
+                                                      <input type="number" value="<?php
+                                                         if(isset($order_detail['butterscotch_bar']))
+                                                         {
+                                                           $exs2 = explode("_",$order_detail['butterscotch_bar']);
+                                                           echo $exs2[0];
+                                                         } 
+                                                         ?>" class="form-control qty" name="butterscotch_bar" placeholder="0" id="type_1"
+                                                        
+                                                         />  
+                                                   </div>
+                                                   <div class="input-field col s3">
+                                                      <input type="number" value="<?php
+                                                         if(isset($order_detail['butterscotch_box']))
+                                                         {
+                                                            $exs3 =explode("_",$order_detail['butterscotch_box']);
+                                                            echo $exs3[0];
+                                                         } 
+                                                         ?>" class="form-control qty" name="butterscotch_box" placeholder="0" id="type_1"
+                                                        
+                                                         />  
+                                                   </div>
+                                                </div>
+                                                <div class="col s12">
+                                                   <div class="input-field col s4">
+                                                      <label class="">Choco<span class="asterisk_sign">*</span></label>
+                                                   </div>
+                                                   <div class="input-field col s3">
+                                                      <input type="number" value="<?php
+                                                         if(isset($order_detail['chocopeanut_bar']))
+                                                         {
+                                                            $exs4 = explode("_",$order_detail['chocopeanut_bar']);
+                                                           echo $exs4[0];
+                                                         } 
+                                                         ?>" class="form-control qty" name="chocopeanut_bar" placeholder="0" id="type_3"/>
+                                                   </div>
+                                                   <div class="input-field col s3">
+                                                      <input type="number" value="<?php
+                                                         if(isset($order_detail['chocopeanut_box']))
+                                                         {
+                                                            if($order_detail['chocopeanut_box']!=NULL)
+                                                            {
+                                                               $exs5 =explode("_",$order_detail['chocopeanut_box']);
+                                                               echo $exs5[0];
+                                                            }
+                                                         } 
+                                                         ?>" class="form-control qty" name="chocopeanut_box" placeholder="0" id="type_3"/>
+                                                   </div>
+                                                </div>
+                                                <div class="col s12">
+                                                   <div class="input-field col s4">
+                                                      <label class="">Chaat<span class="asterisk_sign">*</span></label>
+                                                   </div>
+                                                   <div class="input-field col s3">
+                                                      <input type="number" value="<?php
+                                                         if(isset($order_detail['bambaiyachaat_bar']))
+                                                         {
+                                                            if($order_detail['bambaiyachaat_bar']!=NULL)
+                                                            {
+                                                              $exs6 =  explode("_",$order_detail['bambaiyachaat_bar']);
+                                                               echo $exs6[0];
+                                                            }
+                                                         } 
+                                                         ?>" class="form-control qty" name="bambaiyachaat_bar" placeholder="0" id="type_4"/>
+                                                   </div>
+                                                    <div class="input-field col s3">
+                                                      <input type="number" value="<?php
+                                                         if(isset($order_detail['bambaiyachaat_box']))
+                                                         {
+                                                            if($order_detail['bambaiyachaat_box']!=NULL)
+                                                            {
+                                                              $exs7 = explode("_",$order_detail['bambaiyachaat_box']);
+                                                             echo $exs7[0];
+                                                            }
+                                                         } 
+                                                         ?>" class="form-control qty" name="bambaiyachaat_box" placeholder="0" id="type_4"/>
+                                                   </div>
+                                                </div>
+                                                <div class="col s12">
+                                                   <div class="input-field col s4">
+                                                      <label class="">Mango<span class="asterisk_sign">*</span></label>
+                                                   </div>
+                                                   <div class="input-field col s3">
+                                                      <input type="number" value="<?php
+                                                         if(isset($order_detail['mangoginger_bar']))
+                                                         {
+                                                            if($order_detail['mangoginger_bar']!=NULL)
+                                                            {
+                                                               $exs8 = explode("_",$order_detail['mangoginger_bar']);
+                                                                  echo $exs8[0];
+                                                            }
+                                                         } 
+                                                         ?>" class="form-control qty" name="mangoginger_bar" placeholder="0"
+                                                         id="type_5"/>
+                                                   </div>
+                                                   <div class="input-field col s3">
+                                                      <input type="number" value="<?php
+                                                         if(isset($order_detail['mangoginger_box']))
+                                                         {
+                                                             if($order_detail['mangoginger_box']!=NULL)
+                                                            {
+                                                               $exs9 =explode("_",$order_detail['mangoginger_box']);
+                                                                  echo $exs9[0];
+                                                            }
+                                                         } 
+                                                         ?>" class="form-control qty" name="mangoginger_box" placeholder="0"
+                                                         id="type_5"/>
+                                                   </div>
+                                                </div>
+                                                <div class="col s12">
+                                                   <div class="input-field col s4">
+                                                      <label class="">Berry<span class="asterisk_sign">*</span></label>
+                                                   </div>
+                                                   <div class="input-field col s3">
+                                                      <input type="number" value="<?php if(isset($order_detail['berry_blast_bar']))
+                                                         {
+                                                            if($order_detail['berry_blast_bar']!=NULL)
+                                                            {
+                                                               $exs10 = explode("_",$order_detail['berry_blast_bar']);
+                                                              echo $exs10[0];
+                                                            }
+                                                         } 
+                                                         ?>" class="form-control qty" name="berry_blast_bar" placeholder="0" id="type_6"/>
+                                                   </div>
+                                                   <div class="input-field col s3">
+                                                      <input type="number" value="<?php if(isset($order_detail['berry_blast_box']))
+                                                         {
+                                                            if($order_detail['berry_blast_box']!=NULL)
+                                                            {
+                                                               $exs11 = explode("_",$order_detail['berry_blast_box']);
+                                                               echo $exs11[0];
+                                                            }
+                                                         } 
+                                                         ?>" class="form-control qty" name="berry_blast_box" placeholder="0" id="type_6"/>
+                                                   </div>
+                                                </div>
+                                                <div class="col s12">
+                                                   <div class="input-field col s4">
+                                                      <label class="">Chywanprash<span class="asterisk_sign">*</span></label>
+                                                   </div>
+                                                   <div class="input-field col s3">
+                                                      <input type="number" value="<?php
+                                                         if(isset($order_detail['chyawanprash_bar']))
+                                                         {
+                                                            if($order_detail['chyawanprash_bar']!=NULL)
+                                                            {
+                                                               $exs12 =explode("_",$order_detail['chyawanprash_bar']);
+                                                               echo $exs12[0];
+                                                            }
+                                                         } 
+                                                         ?>" class="form-control qty" name="chyawanprash_bar" placeholder="0"
+                                                         id="type_7"/>
+                                                   </div>
+                                                   <div class="input-field col s3">
+                                                      <input type="number" value="<?php
+                                                         if(isset($order_detail['chyawanprash_box']))
+                                                         {
+                                                            if($order_detail['chyawanprash_box']!=NULL)
+                                                            {
+                                                               $exs13 = explode("_",$order_detail['chyawanprash_box']);
+                                                               echo $exs13[0];
+                                                            }
+                                                         } 
+                                                         ?>" class="form-control qty" name="chyawanprash_box" placeholder="0"
+                                                         id="type_7"/>
+                                                   </div>
+                                                </div>
+                                                <div class="col s12">
+                                                   <div class="input-field col s4">
+                                                      <label class="">Variety Box<span class="asterisk_sign">*</span></label>
+                                                   </div>
+                                                   <div class="input-field col s3">
+                                                   <input type="number" value="<?php
+                                                         if(isset($order_detail['variety_box']))
+                                                         {
+                                                            if($order_detail['variety_box']!=NULL)
+                                                            {
+                                                               $exs7 = explode('_',$order_detail['variety_box']);
+                                                               echo $exs7[0];
+                                                            }
+                                                         } 
+                                                         ?>" class="form-control qty" name="variety_box" placeholder="0" id="type_8" />
+                                                   </div>
+                                                  
+                                                </div>
+                                             </div>
+                                          </div>
+                                       </div>
+                                    </li>
+                                    <li>
+                                       <div class="collapsible-header"><i class="material-icons">add</i> <strong> Cookies </strong></div>
+                                       <div class="collapsible-body">
+                                          <div class="app-title">
+                                             <h5>Available Quantities</h5>
+                                          </div>
+                                          <hr>
+                                          <div class="row">
+                                             <div class="col s12">
+                                                <div class="input-field col s6">
+                                                   <label class="">Chocolate <span class="asterisk_sign">*</span></label>
+                                                </div>
+                                                <div class="input-field col s4">
+                                                   <input type="number" value="<?php if(isset($order_detail['chocolate_cookies_box']))
+                                                         {
+                                                            if($order_detail['chocolate_cookies_box']!=NULL)
+                                                            {
+                                                               $ex6 = explode('_',$order_detail['chocolate_cookies_box']);
+                                                               echo trim($ex6[0]);
+                                                            }
+                                                         } 
+                                                  ?>" class="form-control" name="chocolate_cookies" placeholder="0"/>
+                                                </div>
+                                             </div>
+                                             <div class="col s12">
+                                                <div class="input-field col s6">
+                                                   <label class=""> Dark Chocolate <span class="asterisk_sign">*</span></label>
+                                                </div>
+                                                <div class="input-field col s4">
+                                                   <input type="number" value="<?php if(isset($order_detail['dark_chocolate_cookies_box']))
+                                                         {
+                                                            if($order_detail['dark_chocolate_cookies_box']!=NULL)
+                                                            {
+                                                               $ex10 = explode('_',$order_detail['dark_chocolate_cookies_box']);
+                                                               echo trim($ex10[0]);
+                                                            }
+                                                         } 
+                                                  ?>" class="form-control" name="dark_chocolate_cookies" placeholder="0"/>
+                                                </div>
+                                             </div>
+                                             <div class="col s12">
+                                                <div class="input-field col s6">
+                                                   <label class="">Cranberry <span class="asterisk_sign">*</span></label>
+                                                </div>
+                                                <div class="input-field col s4">
+                                                   <input type="number" value="<?php  if(isset($order_detail['cranberry_cookies_box']))
+                                                         {
+                                                            if($order_detail['cranberry_cookies_box']!=NULL)
+                                                            {
+                                                               $ex11 = explode('_',$order_detail['cranberry_cookies_box']);
+                                                               echo trim($ex11[0]);
+                                                            }
+                                                         } 
+                                                  ?>" class="form-control" name="cranberry_cookies" placeholder="0"/>
+                                                </div>
+                                             </div>
+                                          </div>
+                                    </li>
+                                    <li>
+                                       <div class="collapsible-header "><i class="material-icons">add</i> <strong>TrailMix </strong></div>
+                                       <div class="collapsible-body">
+                                       <div class="app-title">
+                                       <h5>Available Quantities</h5>
+                                       </div>
+                                       <hr>  
+                                       <div class="row">
+                                       <div class="col s12">
+                                       <div class="input-field col s8">
+                                       <label class="">Cranberry & Orange  <span class="asterisk_sign">*</span></label>
+                                       </div> 
+                                       <div class="input-field col s4">
+                                       <input type="number" value="<?php  if(isset($order_detail['cranberry_orange_box']))
+                                             {
+                                                if($order_detail['cranberry_orange_box']!=NULL)
+                                                {
+                                                   $ex12 = explode('_',$order_detail['cranberry_orange_box']);
+                                                   echo trim($ex12[0]);
+                                                }
+                                             } 
+                                      ?>" class="form-control" name="cranberry_orange_zest" placeholder="0"/>
+                                       </div>
+                                       </div>
+                                       <div class="col s12">
+                                       <div class="input-field col s8">
+                                       <label class="">Fig & Raisins <span class="asterisk_sign">*</span></label>
+                                       </div> 
+                                       <div class="input-field col s4">
+                                       <input type="number" value="<?php if(isset($order_detail['fig_raisins_box']))
+                                             {
+                                                if($order_detail['fig_raisins_box']!=NULL)
+                                                {
+                                                   $ex13 = explode('_',$order_detail['fig_raisins_box']);
+                                                   echo trim($ex13[0]);
+                                                }
+                                             } 
+                                      ?>" class="form-control" name="fig_raisins" placeholder="0"/>
+                                       </div>
+                                       </div>
+                                       <div class="col s12">
+                                       <div class="input-field col s8">
+                                       <label class="">Papaya & pineapple<span class="asterisk_sign">*</span></label>
+                                       </div> 
+                                       <div class="input-field col s4">
+                                       <input type="number" value="<?php if(isset($order_detail['papaya_pineapple_box']))
+                                             {
+                                                if($order_detail['papaya_pineapple_box']!=NULL)
+                                                {
+                                                   $ex14 = explode('_',$order_detail['papaya_pineapple_box']);
+                                                   echo trim($ex14[0]);
+                                                }
+                                             } 
+                                      ?>" class="form-control" name="papaya_pineapple" placeholder="0"/>
+                                       </div>
+                                       </div>
+                                       </div>
+                                       </div>
+                                    </li>
+                                 </ul>
+                              <div class="row">
+                              <div class="col s12">
+                              <div class="input-field col s3">
+                              <label>Remarks <span class="asterisk_sign"></span></label>
+                              </div> 
+                              <div class="input-field col s9">
+                              <textarea id="textarea1" class="materialize-textarea" class="" name="remarks" id="remarks" value="<?php if(isset($remarks)) echo $remarks;?>"><?php if(isset($remarks)) echo $remarks;?></textarea>
+                              </div> 
+                              </div> 
+                              </div>             
+                              <div class="panel-footer">
+
+                              <a href="javascript:history.back()" class="button shadow btn_color " style="display: inline-block;" type="reset" id="reset">Back</a>
+                              <input type="submit" value="Confirm Order" id="Saver" name="srld" class="right button shadow btn_color2 "  style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>margin-right: 22px;font-size:16px;padding: 8px 12px;"/>
+                              </div>
+                           </div>
+                         </form>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <div id="confirm_content" style="display:none">
+                  <div class="logout-containerr">
+                      <button type="button" class="close" data-confirmmodal-but="close">×</button>
+                      <div class="confirmModal_header"> <span class="fa fa-sign-out"></span> Route Sequence? </div>
+                      <div class="confirmModal_content">
+                          <p>Are You want this route permenant??</p>
+                      </div>
+                      <div class="confirmModal_footer">
+                          <!-- <a href="<?php echo base_url();?>index.php/login/logout" class="btn btn-success ">Yes</a> -->
+                          <button type="button" class="btn " data-confirmmodal-but="ok">Yes</button>
+                          <button type="button" class="btn " data-confirmmodal-but="cancel">No</button>
+                      </div>
+                    </div>
+                </div>
+            </div>
+         </div>
+      </div>
+      <?php $this->load->view('templates/footer2');?>
+      <script type="text/javascript">
+         var BASE_URL="<?php echo base_url()?>";
+      </script>
+      <script type="text/javascript" src="<?php echo base_url(); ?>js/load_autocomplete.js"></script>
+      <script type="text/javascript" src="<?php echo base_url(); ?>js/validations.js"></script>
+      <script type="text/javascript">
+         $(document).ready(function(){
+         
+             $("#channel_type").attr("disabled", true);
+         
+         $('select').material_select();
+       });
+      </script>
+      <script>
+         $('.datepicker').pickadate({
+          selectMonths: true, // Creates a dropdown to control month
+          selectYears: 15 // Creates a dropdown of 15 years to control year
+          });
+            $('select').material_select();
+          
+      </script>
+      <script type="text/javascript">
+         function set_radio_button(val,elem)
+         { 
+            /*alert('entedr');*/
+           $('#type_id_'+val).val(elem.value);
+           /* alert(elem.value);*/
+         }
+
+         function qty_change(elem) {
+        
+           var id = elem.id;
+           var explode = id.split('_');
+           var index = explode[1];
+           var type = $('#type_id_'+index).val();
            
-        </div>
-        </div>
-        </div>
-        </div>
-        </div>
-        </div>
-        </div>
-        </div>
-		
-		
-		
-
-		
-       
-   <?php $this->load->view('templates/footer2');?>
-
-        <script type="text/javascript">
-            var BASE_URL="<?php echo base_url()?>";
-        </script>
-        <script type="text/javascript" src="<?php echo base_url(); ?>js/load_autocomplete.js"></script>
-        <script type="text/javascript" src="<?php echo base_url(); ?>js/validations.js"></script>
-        <script type="text/javascript">
-            $(document).ready(function(){
-                $(".type").change(function(){
-                   // alert('f');
-                    show_item($(this));
-                });
-                $(".bar").change(function(){
-                    get_bar_details($(this));
-                });
-                $(".box").change(function(){
-                    get_box_details($(this));
-                });
-                $(".qty").blur(function(){
-                    get_amount($(this));
-                });
-                $(".sell_rate").blur(function(){
-                    get_amount($(this));
-                });
-                $('.delete_row').click(function(event){
-                    delete_row($(this));
-                    get_total();
-                });
-                $('#distributor_id').click(function(event){
-                    get_distributor_details($('#distributor_id').val());
-
-                    // if($('#distributor_id').val()==1){
-                    //     $('#sample_distributor_div').show();
-                    // } else {
-                    //     $('#sample_distributor_div').hide();
-                    // }
-                });
-                // $('#sample_distributor_id').click(function(event){
-                //     get_distributor_details($('#sample_distributor_id').val());
-                // });
-                $("#discount").change(function(){
-                    $('#sell_out').val($("#discount").val());
-                });
-                $('input[type=radio][name=tax]').on('change', function() {
-                    switch($(this).val()) {
-                        case 'vat':
-                            $('#cst').val(6);
-                            break;
-                        case 'cst':
-                            $('#cst').val(2);
-                            break;
-                    }
-
-                    get_sell_rate();
-                });
-                
-                addMultiInputNamingRules('#form_sales_rep_order_details', 'select[name="box[]"]', { required: true }, "");
-                addMultiInputNamingRules('#form_sales_rep_order_details', 'select[name="bar[]"]', { required: true }, "");
-                addMultiInputNamingRules('#form_sales_rep_order_details', 'input[name="qty[]"]', { required: true }, "");
-                addMultiInputNamingRules('#form_sales_rep_order_details', 'input[name="sell_rate[]"]', { required: true }, "");
-
-                get_distributor_details($('#distributor_id').val());
-
-                if($('#distributor_id').val()==1){
-                    $('#sample_distributor_div').show();
-                } else {
-                    $('#sample_distributor_div').hide();
-                }
-
-                // if($('#sample_distributor_id').val()!=''){
-                //     get_distributor_details($('#sample_distributor_id').val());
-                // }
-            });
-
-            function show_item(elem){
-                //alert('h');
-                var id = elem.attr('id');
-                var index = id.substr(id.lastIndexOf('_')+1);
-                if(elem.val()=="Bar"){
-                    $("#bar_"+index).show();
-                    $("#box_"+index).hide();
-                } else {
-                    $("#box_"+index).show();
-                    $("#bar_"+index).hide();
-                }
-
-                $("#grams_"+index).val('');
-                $("#rate_"+index).val('');
-
-                // get_total();
-            }
-
-            function get_distributor_details(distributor_id){
-                // var distributor_id = $('#distributor_id').val();
-                var sell_out = 0;
-
-                $.ajax({
-                    url:BASE_URL+'index.php/Sales_rep_order/get_distributor_data',
-                    method:"post",
-                    data:{id:distributor_id},
-                    dataType:"json",
-                    async:false,
-                    success: function(data){
-                        if(data.result==1){
-                            $('#sell_out').val(data.sell_out);
-
-                            sell_out = parseFloat($('#sell_out').val());
-                            if (isNaN(sell_out)) sell_out=0;
-
-                            get_sell_rate();
-                        }
-                    },
-                    error: function (response) {
-                        var r = jQuery.parseJSON(response.responseText);
-                        alert("Message: " + r.Message);
-                        alert("StackTrace: " + r.StackTrace);
-                        alert("ExceptionType: " + r.ExceptionType);
-                    }
-                });
-            }
-
-            function get_sell_rate(){
-                $('.rate').each(function(){
-                    var elem = $(this);
-                    var id = elem.attr('id');
-                    var index = id.substr(id.lastIndexOf('_')+1);
-                    var sell_out = parseFloat(get_number($("#sell_out").val(),2));
-                    var qty = parseFloat(get_number($("#qty_"+index).val(),2));
-                    var rate = parseFloat(get_number($("#rate_"+index).val(),2));
-                    // var cst = parseFloat(get_number($("#cst").val(),2));
-                    var cst = 6;
-                    var sell_rate = rate-((rate*sell_out)/100);
-                    sell_rate = sell_rate/(100+cst)*100;
-
-                    if (isNaN(qty)) qty=0;
-                    if (isNaN(rate)) rate=0;
-                    if (isNaN(sell_rate)) sell_rate=0;
-
-                    var amount = qty*sell_rate;
-
-                    $("#sell_rate_"+index).val(Math.round(sell_rate*100)/100);
-                    $("#amount_"+index).val(Math.round(amount*100)/100);
-                });
-
-                get_total();
-            }
-
-            function get_bar_details(elem){
-                var box_id = elem.val();
-                var id = elem.attr('id');
-                var index = id.substr(id.lastIndexOf('_')+1);
-                var qty = parseFloat(get_number($("#qty_"+index).val(),2));
-                var sell_out = parseFloat(get_number($("#sell_out").val(),2));
-                if (isNaN(sell_out)) sell_out=0;
-                var grams_in_bar = 0;
-                var rate = 0;
-
-                $.ajax({
-                    url:BASE_URL+'index.php/Product/get_data',
-                    method:"post",
-                    data:{id:box_id},
-                    dataType:"json",
-                    async:false,
-                    success: function(data){
-                        if(data.result==1){
-                            grams = parseFloat(data.grams);
-                            rate = parseFloat(data.rate);
-                        }
-                    },
-                    error: function (response) {
-                        var r = jQuery.parseJSON(response.responseText);
-                        alert("Message: " + r.Message);
-                        alert("StackTrace: " + r.StackTrace);
-                        alert("ExceptionType: " + r.ExceptionType);
-                    }
-                });
-
-                if (isNaN(qty)) qty=0;
-                if (isNaN(grams)) grams=0;
-                if (isNaN(rate)) rate=0;
-                // var cst = parseFloat(get_number($("#cst").val(),2));
-                var cst = 6;
-                var sell_rate = rate-((rate*sell_out)/100);
-                sell_rate = sell_rate/(100+cst)*100;
-
-                var amount = qty*sell_rate;
-                $("#grams_"+index).val(grams);
-                $("#rate_"+index).val(rate);
-                $("#sell_rate_"+index).val(Math.round(sell_rate*100)/100);
-                $("#amount_"+index).val(Math.round(amount*100)/100);
-
-                get_total();
-            }
-
-            function get_box_details(elem){
-                var box_id = elem.val();
-                var id = elem.attr('id');
-                var index = id.substr(id.lastIndexOf('_')+1);
-                var qty = parseFloat(get_number($("#qty_"+index).val(),2));
-                var sell_out = parseFloat(get_number($("#sell_out").val(),2));
-                if (isNaN(sell_out)) sell_out=0;
-                var grams_in_bar = 0;
-                var rate = 0;
-
-                $.ajax({
-                    url:BASE_URL+'index.php/Box/get_data',
-                    method:"post",
-                    data:{id:box_id},
-                    dataType:"json",
-                    async:false,
-                    success: function(data){
-                        if(data.result==1){
-                            grams = parseFloat(data.grams);
-                            rate = parseFloat(data.rate);
-                        }
-                    },
-                    error: function (response) {
-                        var r = jQuery.parseJSON(response.responseText);
-                        alert("Message: " + r.Message);
-                        alert("StackTrace: " + r.StackTrace);
-                        alert("ExceptionType: " + r.ExceptionType);
-                    }
-                });
-
-                if (isNaN(qty)) qty=0;
-                if (isNaN(grams)) grams=0;
-                if (isNaN(rate)) rate=0;
-                // var cst = parseFloat(get_number($("#cst").val(),2));
-                var cst = 6;
-                var sell_rate = rate-((rate*sell_out)/100);
-                sell_rate = sell_rate/(100+cst)*100;
-
-                var amount = qty*sell_rate;
-                $("#grams_"+index).val(grams);
-                $("#rate_"+index).val(rate);
-                $("#sell_rate_"+index).val(Math.round(sell_rate*100)/100);
-                $("#amount_"+index).val(Math.round(amount*100)/100);
-
-                get_total();
-            }
-
-            function get_amount(elem){
-                var id = elem.attr('id');
-                var index = id.substr(id.lastIndexOf('_')+1);
-                var qty = parseFloat(get_number($("#qty_"+index).val(),2));
-                var sell_rate = parseFloat(get_number($("#sell_rate_"+index).val(),2));
-                var amount = qty*sell_rate;
-                $("#amount_"+index).val(Math.round(amount*100)/100);
-
-                get_total();
-            }
-
-            function get_total(){
-                var total_amount = 0;
-
-                $('.amount').each(function(){
-                    amount = parseFloat(get_number($(this).val(),2));
-                    if (isNaN(amount)) amount=0;
-                    total_amount = total_amount + amount;
-                });
-
-                // var cst = 0;
-                // if($.trim($('#state').val()).toUpperCase()=="MAHARASHTRA"){
-                //     cst = 6;
-                // } else {
-                //     cst = 2;
-                // }
-
-                // var cst = parseFloat(get_number($('#cst').val(),2));
-                var cst = 6;
-
-                var tax_amount = total_amount*cst/100;
-                var final_amount = total_amount + tax_amount;
-
-                // $("#total_amount").val(Math.round(total_amount*100)/100);
-                // $("#tax_amount").val(Math.round(tax_amount*100)/100);
-                // $("#final_amount").val(Math.round(final_amount*100)/100);
-                
-                $("#total_amount").val(Math.round(final_amount*100)/100);
-            }
-
-            jQuery(function(){
-                var counter = $('.box').length;
-                $('#repeat-box').click(function(event){
-                    event.preventDefault();
-                    var newRow = jQuery('<tr id="box_'+counter+'_row">' + 
-                                            '<td>' + 
-                                                '<select name="type[]" class="browser-default type" id="type_'+counter+'">' + 
-                                                    '<option value="">Select Type</option>' + 
-                                                    '<option value="Bar">Bar</option>' + 
-                                                    '<option value="Box">Box</option>' + 
-                                                '</select>' + 
-                                            '</td>' + 
-                                            '<td>' + 
-                                                '<select name="bar[]" class="browser-default bar" id="bar_'+counter+'" data-error="#err_item_'+counter+'" style="">' + 
-                                                    '<option value="">Select Item</option>' + 
-                                                    '<?php if(isset($bar)) { for ($k=0; $k < count($bar) ; $k++) { ?>' + 
-                                                            '<option value="<?php echo $bar[$k]->id; ?>"><?php echo $bar[$k]->short_name; ?></option>' + 
-                                                    '<?php }} ?>' + 
-                                                '</select>' + 
-                                                '<select name="box[]" class="browser-default box" id="box_'+counter+'" data-error="#err_item_'+counter+'" style="display: none;">' + 
-                                                    '<option value="">Select Item</option>' + 
-                                                    '<?php if(isset($box)) { for ($k=0; $k < count($box) ; $k++) { ?>' + 
-                                                            '<option value="<?php echo $box[$k]->id; ?>"><?php echo $box[$k]->short_name; ?></option>' + 
-                                                    '<?php }} ?>' + 
-                                                '</select>' + 
-                                                '<div id="err_item_'+counter+'"></div>' + 
-                                            '</td>' + 
-                                            '<td>' + 
-                                                '<input type="number" class="qty" name="qty[]" id="qty_'+counter+'" placeholder="0" value=""/>' + 
-                                            '</td>' + 
-                                            '<td style="display: none;">' + 
-                                                '<input type="text" class=" rate" name="rate[]" id="rate_'+counter+'" placeholder="Rate" value="" readonly />' + 
-                                            '</td>' + 
-                                            '<td style="display: none;">' + 
-                                                '<input type="text" class="browser-default sell_rate" name="sell_rate[]" id="sell_rate_'+counter+'" placeholder="Sell Rate" value=""/>' + 
-                                            '</td>' + 
-                                            '<td style="display: none;">' + 
-                                                '<input type="text" class="browser-default grams" name="grams[]" id="grams_'+counter+'" placeholder="Grams" value="" readonly />' + 
-                                            '</td>' + 
-                                            '<td style="display: none;">' + 
-                                                '<input type="text" class="browser-default amount" name="amount[]" id="amount_'+counter+'" placeholder="Amount" value="" readonly />' + 
-                                            '</td>' + 
-                                            '<td style="text-align:center;">' + 
-                                                '<a id="box_'+counter+'_row_delete" class="delete_row" href="#"><i class="fa fa-trash-o "  ></i></a>' + 
-                                            '</td>' + 
-                                        '</tr>');
-                    $('#box_details').append(newRow);
-                    $('.format_number').keyup(function(){
-                        format_number(this);
-                    });
-                    $(".type").change(function(){
-                        show_item($(this));
-                    });
-                    $(".bar").change(function(){
-                        get_bar_details($(this));
-                    });
-                    $(".box").change(function(){
-                        get_box_details($(this));
-                    });
-                    $(".qty").blur(function(){
-                        get_amount($(this));
-                    });
-                    $(".sell_rate").blur(function(){
-                        get_amount($(this));
-                    });
-                    $('.delete_row').click(function(event){
-                        delete_row($(this));
-                        get_total();
-                    });
-                    counter++;
-                });
-            });
-				 
-          $('select').material_select();
-        </script>
-        <script>
-			 $('.datepicker').pickadate({
-				selectMonths: true, // Creates a dropdown to control month
-				selectYears: 15 // Creates a dropdown of 15 years to control year
-			  });
-          $('select').material_select();
-        </script>
-		
-    <!-- END SCRIPTS -->      
-    </body>
+         }
+      </script>
+      <!-- END SCRIPTS -->      
+   </body>
 </html>

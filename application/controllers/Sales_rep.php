@@ -85,6 +85,7 @@ class Sales_rep extends CI_Controller{
             $data['inactive']=$inactive;
             $data['all']=count($count_data);
 
+
             load_view('sales_rep/sales_rep_list', $data);
 
         } else {
@@ -99,6 +100,7 @@ class Sales_rep extends CI_Controller{
         if(count($result)>0) {
             if($result[0]->r_insert == 1) {
                 $data['access'] = $this->sales_rep_model->get_access();
+                $data['zone']=$this->sales_rep_model->get_zone();
 				//$data['manager_data'] = $this->sales_rep_model->get_manager_data('','');
                 load_view('sales_rep/sales_rep_details', $data);
             } else {
@@ -119,7 +121,7 @@ class Sales_rep extends CI_Controller{
 				//$data['manager_data'] = $this->sales_rep_model->get_manager_data('', $id);
                 $docs=$this->document_model->edit_view_doc('', $id, 'Sales_Rep');
                 $data=array_merge($data, $docs);
-
+                $data['zone']=$this->sales_rep_model->get_zone();
                 load_view('sales_rep/sales_rep_details', $data);
             } else {
                 echo "Unauthorized access";

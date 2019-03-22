@@ -11,29 +11,57 @@ class Dashboard extends CI_Controller
       
         $this->load->helper('common_functions');
         $this->load->model('dashboard_model');
+        $this->load->model('task_model');
 		// $this->load->library('session');
     }
 
     //index function
     public function index(){
-        $result=$this->dashboard_model->get_access();
-        if(count($result)>0) {
-            $data['total_sale']=$this->dashboard_model->get_total_sale();
-            $data['total_dist']=$this->dashboard_model->get_total_distributor();
-            $data['total_stock']=$this->dashboard_model->get_total_stock();
-            $data['total_receivable']=$this->dashboard_model->get_total_receivable();
+        $role_id=$this->session->userdata('role_id');
 
-            load_view('dashboard/dashboard_new', $data);
+        if($role_id==10){
+            redirect(base_url().'index.php/Dashboard/production');
         } else {
-            echo '<script>alert("You donot have access to this page.");</script>';
-            $this->load->view('login/main_page');
+            $result=$this->dashboard_model->get_access();
+            if(count($result)>0) {
+                $data['total_sale']=$this->dashboard_model->get_total_sale();
+                $data['total_dist']=$this->dashboard_model->get_total_distributor();
+                $data['total_stock']=$this->dashboard_model->get_total_stock();
+                $data['total_receivable']=$this->dashboard_model->get_total_receivable();
+
+                load_view('dashboard/dashboard_new', $data);
+            } else {
+                echo '<script>alert("You donot have access to this page.");</script>';
+                $this->load->view('login/main_page');
+            }
         }
     }
 
     public function dashboardscreen(){
-        
-        load_view_without_data('dashboard/dashboard_screen');
-        
+        $role_id=$this->session->userdata('role_id');
+
+        if($role_id==10){
+            redirect(base_url().'index.php/Dashboard/production');
+        } else {
+            load_view_without_data('dashboard/dashboard_screen');
+        }
+    }
+	
+    public function production(){
+        $curusr=$this->session->userdata('session_id');
+        $data['pre_production']=$this->dashboard_model->get_notifications('Pre Production');
+        $data['post_production']=$this->dashboard_model->get_notifications('Post Production');
+        $data['po_count']=$this->dashboard_model->get_po_count();
+        $data['tasklist']=$this->task_model->getTaskList($curusr, 'pending', 'dashboard');
+        load_view('dashboard/production', $data);
+    }
+
+    public function stock_entry(){
+        load_view_without_data('dashboard/stock_entry1');
+    }
+
+    public function stock_entry1(){
+        load_view_without_data('dashboard/stock_entry');
     }
 
     // public function stock(){

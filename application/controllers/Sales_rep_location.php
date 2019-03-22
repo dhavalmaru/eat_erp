@@ -15,6 +15,7 @@ class Sales_rep_location extends CI_Controller{
         $this->load->helper('common_functions');
         $this->load->model('sales_rep_location_model');
         $this->load->model('sales_rep_distributor_model');
+        $this->load->model('distributor_model');
         $this->load->database();
     }
 
@@ -31,6 +32,7 @@ class Sales_rep_location extends CI_Controller{
             $this->load->view('login/main_page');
         }
     }
+    
 
     public function add(){
         $result=$this->sales_rep_location_model->get_access();
@@ -142,6 +144,14 @@ class Sales_rep_location extends CI_Controller{
         echo $result;
     }
 
+    public function get_distributor_details() {
+        $postData = $this->input->post();
+        $distributor_id = $postData['distributor_id'];
+        $data = $this->distributor_model->get_data('', $distributor_id);
+
+        echo json_encode($data);
+    }
+
     public function get_area(){ 
         $postData = $this->input->post();
         $zone_id = $postData['zone_id'];
@@ -155,7 +165,7 @@ class Sales_rep_location extends CI_Controller{
         echo $area; 
     }
 
-    public function get_locations(){ 
+	public function get_locations(){ 
         $postData = $this->input->post();
         $zone_id = $postData['zone_id'];
         $area_id = $postData['area_id'];
@@ -167,6 +177,43 @@ class Sales_rep_location extends CI_Controller{
         }
 
         echo $location;
+    }
+	
+
+    public function get_location_data(){ 
+        $postData = $this->input->post();
+        $zone_id = $postData['zone_id'];
+        $store_id = $postData['store_id'];
+        $id = $postData['id'];
+        $data = $this->sales_rep_location_model->get_location_data($store_id,$zone_id,$id);
+        echo json_encode($data); 
+    }
+
+	public function get_retailer(){ 
+        $postData = $this->input->post();
+        $zone_id = $postData['zone_id'];
+        $area_id = $postData['area_id'];
+        $location_id = $postData['location_id'];
+		$dist_type = $postData['dist_type'];
+		$distributor_id = $postData['distributor_id'];
+		               // $data['distributor'] = $this->sales_rep_distributor_model->get_data2('Approved');
+		if($dist_type=='New')
+			$data = $this->sales_rep_distributor_model->get_data2('','' ,$zone_id, $area_id, $location_id);
+		else
+			$data = $this->sales_rep_distributor_model->get_data2('Approved','' ,$zone_id, $area_id, $location_id);
+
+        $retailer = '<option value="">Select</option>';
+        for($i=0; $i<count($data); $i++){
+			
+			if($distributor_id!="")
+				$select = "selected";
+			else
+				$select = '';
+			
+            $retailer = $retailer . '<option value="'.$data[$i]->id.'" "'.$select.'">'.$data[$i]->distributor_name.'</option>';
+        }
+
+        echo $retailer;
     }
 
     public function get_location(){

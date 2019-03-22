@@ -15,19 +15,52 @@ class Dashboard_model extends CI_Model {
         return $query->result();
     }
 
+    function get_notifications($notification_type='') {
+        $curusr=$this->session->userdata('session_id');
+        $sql = "select A.*, B.p_id, B.manufacturer_id, B.from_date, B.to_date, B.confirm_from_date, B.confirm_to_date, B.p_status, 
+                    B.batch_master, B.production_details, B.bar_conversion, B.depot_transfer, 
+                    B.documents_upload, B.raw_material_recon, B.report_approved, B.report_status, 
+                    C.depot_name 
+                from notifications A 
+                left join production_details B on(A.reference_id = B.id) 
+                left join depot_master C on (B.manufacturer_id = C.id) 
+                where A.status='Approved' and (A.user_type='All' or A.user_id='$curusr') and 
+                A.notification_type = '$notification_type' and date(A.notification_date)<=curdate() 
+                order by A.notification_id, A.id";
+        $query=$this->db->query($sql);
+        return $query->result();
+    }
+
+    function get_po_count() {
+        $sql = "select sum(case when status = 'Pending' then 1 else 0 end) as pending_cnt, 
+                        sum(case when status = 'Approved' and po_status <> 'Closed' then 1 else 0 end) as open_cnt, 
+                        sum(case when status = 'Approved' and po_status = 'Raw Material In' then 1 else 0 end) as pending_payment_cnt, 
+                        sum(case when status = 'Approved' and po_status = 'Advance' then 1 else 0 end) as advance_payment_cnt 
+                from purchase_order where status in ('Pending', 'Approved')";
+        $query=$this->db->query($sql);
+        return $query->result();
+    }
+
     function get_raw_material_stock() {
-        $sql="select H.*, I.rm_name from
+        $sql="select H.*, I.rm_name from 
             (select F.*, G.depot_name from 
             (select E.depot_id, E.raw_material_id, sum(tot_qty) as tot_qty from 
             (select C.depot_id, C.raw_material_id, ifnull(C.qty_in,0)-ifnull(D.qty_out,0) as tot_qty from 
             (select AA.depot_id, AA.raw_material_id, sum(AA.qty) as qty_in from 
-            (select '1' as depot_id, id as raw_material_id, '0' as qty from raw_material_master 
+            (select B.id as depot_id, A.id as raw_material_id, 0 as qty 
+                from raw_material_master A left join depot_master B on(1=1) 
             union all 
             select A.depot_id, B.raw_material_id, B.qty from 
             (select * from raw_material_in where status = 'Approved' and date_of_receipt > '2018-10-22') A 
             inner join 
             (select * from raw_material_stock) B 
             on (A.id = B.raw_material_in_id) 
+            union all 
+            select A.depot_id, B.raw_material_id, B.qty from 
+            (select * from raw_material_in_out where status = 'Approved' and date_of_processing > '2018-10-22') A 
+            inner join 
+            (select * from raw_material_in_out_items Where type='Stock IN') B 
+            on (A.id = B.raw_material_in_out_id) 
             union all 
             select A.depot_in_id as depot_id, B.item_id as raw_material_id, B.qty from 
             (select * from depot_transfer where status = 'Approved' and date_of_transfer > '2018-10-22') A 
@@ -42,6 +75,12 @@ class Dashboard_model extends CI_Model {
             (select * from batch_raw_material) B 
             on (A.id = B.batch_processing_id) 
             union all 
+            select A.depot_id, B.raw_material_id, B.qty from 
+            (select * from raw_material_in_out where status = 'Approved' and date_of_processing > '2018-10-22') A 
+            inner join 
+            (select * from raw_material_in_out_items Where type='Stock Out') B 
+            on (A.id = B.raw_material_in_out_id) 
+            union all 
             select A.depot_out_id as depot_id, B.item_id as raw_material_id, B.qty from 
             (select * from depot_transfer where status = 'Approved' and date_of_transfer > '2018-10-22') A 
             inner join 
@@ -55,7 +94,8 @@ class Dashboard_model extends CI_Model {
             left join 
             (select * from raw_material_master) I 
             on (H.raw_material_id=I.id) 
-            where H.tot_qty<>0";
+            where H.tot_qty<>0 
+            order by H.depot_name, I.rm_name";
         $query=$this->db->query($sql);
         return $query->result();
     }
@@ -120,7 +160,8 @@ class Dashboard_model extends CI_Model {
             left join 
             (select * from product_master where status = 'Approved') I 
             on (H.product_id=I.id) 
-            where H.tot_qty<>0";
+            where H.tot_qty<>0 
+            order by H.depot_name, I.product_name";
         $query=$this->db->query($sql);
         return $query->result();
     }
@@ -175,7 +216,8 @@ class Dashboard_model extends CI_Model {
             left join 
             (select * from box_master where status = 'Approved') I 
             on (H.box_id=I.id) 
-            where H.tot_qty<>0";
+            where H.tot_qty<>0 
+            order by H.depot_name, I.box_name";
         $query=$this->db->query($sql);
         return $query->result();
     }
@@ -338,7 +380,7 @@ class Dashboard_model extends CI_Model {
             on (J.product_id=K.id) 
             group by J.distributor_id, J.distributor_name, J.product_id, K.short_name) L 
             where L.bal_qty<>0 
-            order by L.distributor_name, L.product_id";
+            order by L.distributor_name, L.short_name";
         $query=$this->db->query($sql);
         return $query->result();
     }
@@ -392,7 +434,7 @@ class Dashboard_model extends CI_Model {
             on (J.box_id=K.id) 
             group by J.distributor_id, J.distributor_name, K.short_name) L 
             where L.bal_qty<>0 
-            order by L.distributor_id, L.short_name";
+            order by L.distributor_name, L.short_name";
         $query=$this->db->query($sql);
         return $query->result();
     }

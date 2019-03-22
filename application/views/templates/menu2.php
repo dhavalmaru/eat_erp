@@ -7,43 +7,80 @@
 					<span><?php if (isset($userdata['user_name'])) {echo $userdata['user_name'];} ?></span>
 				</div>
 			</li>
-			<li>
-				<a href="<?php echo  base_url().'index.php/Dashboard_sales_rep'; ?>"><i class="fa fa-home"></i>Home</a>
+			<li id="home">
+				<a   href="<?php echo  base_url().'index.php/Dashboard_sales_rep'; ?>"><i class="fa fa-home"></i>Home</a>
 			</li>
-					<li <?php if ($Sales_Rep_Distributors==0) echo 'style="display: none;"'; else if(isset($type) && $type=="Promoter") echo 'style="display:none;"'; ?>>
-						  <a href="<?php echo  base_url().'index.php/Sales_rep_store_plan'; ?>" class="menu--link" title="">
-							<i class="menu--icon  fa fa-fw fa-map-marker"></i>
-							<span class="menu--label">Visit</span>
-						  </a>
-						</li>
+					
+						
+						<li>
+						  <a  class="menu--link" title="">
+						  	<?php
+						  	 // $check_in_time = $this->session->userdata('check_in_time');
+						  	 // $check_out_time = $this->session->userdata('check_out_time');
 
-						<li <?php if ($Sales_Rep_Distributors!=0 || $Sales_Rep_Location==0) echo 'style="display: none;"'; else if(isset($type) && $type=="Promoter") echo 'style="display:none;"'; ?>>
-						  <a href="<?php echo  base_url().'index.php/Merchandiser_location'; ?>" class="menu--link" title="">
-							<i class="menu--icon  fa fa-fw fa-map-marker"></i>
-							<span class="menu--label">Visit</span>
-						  </a>
-						</li>
+						  	$check_in_time = null;
+				  	 		$check_out_time = null;
+				  	 		
+						  	if(isset($attendancedata)){
+						  		if(count($attendancedata)>0){
+						  			$check_in_time = $attendancedata[0]->check_in_time;
+						  	 		$check_out_time = $attendancedata[0]->check_out_time;
+						  		}
+						  	}
+						  	
+						  	 
+						  	if($check_in_time!=null)
+						  	{
+						  		$now = date("Y-m-d");
+						  		$s_checkin = date("Y-m-d",strtotime($check_in_time));
+						  		$h_checkin = date("h:i A",strtotime($check_in_time));
 
-						<li   <?php if ($Sales_Rep_Route_Plan==0) echo 'style="display: none;"'; else if(isset($type) && $type=="Promoter") echo 'style="display:none;"'; ?>>
-						  <a href="<?php echo  base_url().'index.php/Sales_rep_route_plan'; ?>" class="menu--link" title="">
-							<i class="menu--icon  fa fa-fw fa-globe"></i>
-							<span class="menu--label">Route Plan</span>
-						  </a>
-						</li>
+						  		if($now!=$s_checkin)
+						  		{
+						  			$check = '00:00';
+						  		}
+						  		else
+						  		{
+						  			$check = $h_checkin ;
+						  		}
+						  	}
+						  	else
+						  	{
+						  		$check = ' 00:00';
+						  	}
 
-						<li <?php if ($Sales_Rep_Distributors==0) echo 'style="display: none;"'; ?>>
-						  <a href="<?php echo  base_url().'index.php/Sales_rep_distributor'; ?>" class="menu--link" title="">
-							<i class="menu--icon  fa fa-fw fa-group"></i>
-							<span class="menu--label">Retailers</span>
-						  </a>
-						</li>
+						  	if($check_out_time!=null)
+						  	{
+						  		$now = date("Y-m-d");
+						  		$s_checkout = date("Y-m-d",strtotime($check_out_time));
+						  		$h_checkout = date("h:i A",strtotime($check_out_time));
 
-						<li  <?php if ($Sales_Rep_Orders==0) echo 'style="display: none;"'; ?>>
-						  <a href="<?php echo  base_url().'index.php/Sales_rep_order'; ?>" class="menu--link" title="">
-							<i class="menu--icon  fa fa-fw fa-shopping-cart"></i>
-							<span class="menu--label">Orders</span>
+						  		if($now!=$s_checkout)
+						  		{
+						  			$check_out = '00:00';
+						  		}
+						  		else
+						  		{
+						  			$check_out = $h_checkout ;
+						  		}
+						  	}
+						  	else
+						  	{
+						  		$check_out = ' 00:00';
+						  	}
+
+						  	?>
+							<span class="menu--label">Check In Time (<?=$check?>)</span>
 						  </a>
 						</li>
+						
+						<li>
+						  <a class="menu--link" title="">
+						
+							<span class="menu--label">Check Out Time (<?=$check_out?>)</span>
+						  </a>
+						</li>
+						
 						<li>
 						  <a href="<?php echo base_url();?>index.php/login/logout" class="menu--link" title="">
 							<i class="menu--icon  fa fa-sign-out"></i>

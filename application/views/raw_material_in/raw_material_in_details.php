@@ -75,7 +75,7 @@
 					    <div class="main-container">           
                          <div class="box-shadow">
 							
-                            <form id="form_raw_material_in_details" role="form" class="form-horizontal" method="post" action="<?php if (isset($data)) echo base_url(). 'index.php/raw_material_in/update/' . $data[0]->id; else echo base_url().'index.php/raw_material_in/save'; ?>">
+                            <form id="form_raw_material_in_details" role="form" class="form-horizontal" method="post" enctype="multipart/form-data" action="<?php if (isset($data)) echo base_url(). 'index.php/raw_material_in/update/' . $data[0]->id; else echo base_url().'index.php/raw_material_in/save'; ?>">
                               <div class="box-shadow-inside">
                                 <div class="col-md-12 custom-padding" style="padding:0;" >
                                  <div class="panel panel-default">
@@ -103,7 +103,7 @@
                                                             <option value="<?php echo $vendor[$k]->id; ?>" <?php if(isset($data)) { if($vendor[$k]->id==$data[0]->vendor_id) { echo 'selected'; } } ?>><?php echo $vendor[$k]->vendor_name; ?></option>
                                                     <?php }} ?>
                                                 </select>
-												 <input type="hidden" id="vendor_state" name="vendor_state" value="" />
+												 <input type="hidden" id="vendor_state" name="vendor_state" value="<?php if(isset($data[0]->vendor_state)) echo $data[0]->vendor_state; ?>" />
                                                 <!-- <input type="hidden" name="vendor_id" id="vendor_id" value="<?php //if(isset($data)) { echo  $data[0]->vendor_id; } ?>"/>
                                                 <input type="text" class="form-control load_vendor" name="vendor" id="vendor" placeholder="Type To Select Vendor...." value="<?php //if(isset($data)) { echo  $data[0]->vendor_name; } ?>"/> -->
                                             </div>
@@ -117,9 +117,11 @@
                                                 <select name="purchase_order_id" id="purchase_order_id" class="form-control select2">
                                                     <option value="">Select</option>
                                                     <?php if(isset($purchase_order)) { for ($k=0; $k < count($purchase_order); $k++) { ?>
-                                                            <option value="<?php echo $purchase_order[$k]->id; ?>" <?php if(isset($data)) { if($purchase_order[$k]->id==$data[0]->purchase_order_id) { echo 'selected'; } } ?>><?php echo (($purchase_order[$k]->order_date!=null && $purchase_order[$k]->order_date!='')?date('d/m/Y',strtotime($purchase_order[$k]->order_date)):'') . ' - ' . $purchase_order[$k]->id; ?></option>
+                                                            <option value="<?php echo $purchase_order[$k]->id; ?>" <?php if(isset($data)) { if($purchase_order[$k]->id==$data[0]->purchase_order_id) { echo 'selected'; } } ?>><?php echo $purchase_order[$k]->po_no; ?><?php //echo (($purchase_order[$k]->order_date!=null && $purchase_order[$k]->order_date!='')?date('d/m/Y',strtotime($purchase_order[$k]->order_date)):'') . ' - ' . $purchase_order[$k]->id; ?></option>
                                                     <?php }} ?>
                                                 </select>
+                                                <input type="hidden" name="po_id" id="po_id" value="<?php if(isset($data)) { echo  $data[0]->purchase_order_id; } ?>"/>
+
                                                 <!-- <input type="hidden" name="purchase_order_id" id="purchase_order_id" value="<?php //if(isset($data)) { echo  $data[0]->purchase_order_id; } ?>"/>
                                                 <input type="text" class="form-control load_purchase_order" name="purchase_order" id="purchase_order" placeholder="Type To Select Vendor...." value="<?php //if(isset($data)) { echo  $data[0]->purchase_order_name; } ?>"/> -->
                                             </div>
@@ -135,7 +137,7 @@
                                                             <option value="<?php echo $depot[$k]->id; ?>" <?php if(isset($data)) { if($depot[$k]->id==$data[0]->depot_id) { echo 'selected'; } } ?>><?php echo $depot[$k]->depot_name; ?></option>
                                                     <?php }} ?>
                                                 </select>
-												 <input type="hidden" id="depot_state" name="depot_state" value="" />
+												 <input type="hidden" id="depot_state" name="depot_state" value="<?php if(isset($data[0]->depot_state)) echo $data[0]->depot_state; ?>" />
                                                 <!-- <input type="hidden" name="depot_id" id="depot_id" value="<?php //if(isset($data)) { echo  $data[0]->depot_id; } ?>"/>
                                                 <input type="text" class="form-control load_depot" name="depot" id="depot" placeholder="Type To Select Depot...." value="<?php //if(isset($data)) { echo  $data[0]->depot_name; } ?>"/> -->
                                             </div>
@@ -146,6 +148,21 @@
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Gate Pass No <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="gate_pass_no" id="gate_pass_no" placeholder="Gate Pass No" value="<?php if(isset($data[0]->gate_pass_no)) echo $data[0]->gate_pass_no;?>"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">COA</label>
+                                            <div class="col-md-2 col-sm-2 col-xs-12" >
+                                                <input type="hidden" class="form-control" name="doc_document" value="<?php if(isset($data)) echo $data[0]->doc_document; ?>" />
+                                                <input type="hidden" class="form-control" name="document_name" value="<?php if(isset($data)) echo $data[0]->document_name; ?>" />
+                                                <!-- <input type="file" class="fileinput btn btn-info btn-small doc_file" name="doc_file" id="doc_file" data-error="#doc_file_error"/> -->
+                                                <input type="file" class="fileinput btn btn-info btn-small doc_file" name="doc_file" id="doc_file" data-error="#doc_file_error"/>
+                                                <div id="doc_file_error"></div>
+                                            </div>          
+                                            <div class="col-md-1 col-sm-1 col-xs-12 download-width" >
+                                                <?php if(isset($data)) { if($data[0]->doc_document!= '') { ?><a target="_blank" id="doc_file_download" href="<?php if(isset($data)) echo base_url().$data[0]->doc_document; ?>"><span class="fa download fa-download" ></span></a></a><?php }} ?>
                                             </div>
                                         </div>
                                     </div>
@@ -333,11 +350,11 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">VAT (In Rs) </label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="vat" id="vat" placeholder="VAT" value="<?php if (isset($data)) { echo format_money($data[0]->vat,2); } ?>"/>
+                                                <input type="text" class="form-control" name="vat" id="vat" placeholder="VAT" value="<?php //if (isset($data)) { echo format_money($data[0]->vat,2); } ?>"/>
                                             </div>
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">CST (In Rs)</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="cgst_amt" id="cgst_amt" placeholder="CST" value="<?php if (isset($data)) { echo format_money($data[0]->cgst_amt,2); } ?>"/>
+                                                <input type="text" class="form-control" name="cgst_amt" id="cgst_amt" placeholder="CST" value="<?php //if (isset($data)) { echo format_money($data[0]->cgst_amt,2); } ?>"/>
                                             </div>
                                         </div>
                                     </div>-->
@@ -345,7 +362,7 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Excise (In Rs) </label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="excise" id="excise" placeholder="Excise" value="<?php if (isset($data)) { echo format_money($data[0]->excise,2); } ?>"/>
+                                                <input type="text" class="form-control" name="excise" id="excise" placeholder="Excise" value="<?php //if (isset($data)) { echo format_money($data[0]->excise,2); } ?>"/>
                                             </div>
 											
 											
@@ -353,7 +370,7 @@
 											
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Final Amount (In Rs) <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="final_amt" id="final_amount" placeholder="Final Amount" value="<?php if (isset($data)) { echo format_money($data[0]->final_amt,2); } ?>" readonly />
+                                                <input type="text" class="form-control" name="final_amt" id="final_amount" placeholder="Final Amount" value="<?php //if (isset($data)) { echo format_money($data[0]->final_amt,2); } ?>" readonly />
                                             </div>
                                         </div>
                                     </div>-->
@@ -456,13 +473,8 @@
             var stock_flag = "<?php if(isset($raw_material_stock)) { echo 1;}else{ echo 0;} ?>"
         </script>
         <script type="text/javascript">
-	
-			
-			  var newRow1;
+			var newRow1;
             $(document).ready(function(){ 
-
-                
-
                 newRow1 = jQuery('<tr id="box_row1">' + 
                                     '<td>' + 
                                         '&nbsp;' + 
@@ -607,11 +619,6 @@
                 }
             });
 
-			
-			
-		
-			
-			
             $(document).ready(function(){
                 // $(".qty").blur(function(){
                     // get_amount($(this));
@@ -641,26 +648,25 @@
                 //     get_purchase_order_details();
                 // });
                 $('#purchase_order_id').on('change', function() {
-                  // alert( this.value ); // or $(this).val()
-                  get_purchase_order_details();
+                    // alert( this.value ); // or $(this).val()
+                    get_purchase_order_details();
                 });
                 $('#vendor_id').on('change', function() {
-                  // alert( this.value ); // or $(this).val()
-                  get_purchase_order_nos();
+                    // alert( this.value ); // or $(this).val()
+                    get_purchase_order_nos();
                 });
                 $(".datepicker1").datepicker({ maxDate: 0,changeMonth: true,yearRange:'-100:+0',changeYear: true });
                 
-				
-				
-				
-				
-				
+                // get_purchase_order_details();
+                // get_depot_details();
+
                 addMultiInputNamingRules('#form_raw_material_in_details', 'select[name="raw_material[]"]', { required: true }, "");
                 addMultiInputNamingRules('#form_raw_material_in_details', 'input[name="qty[]"]', { required: true }, "");
                 addMultiInputNamingRules('#form_raw_material_in_details', 'input[name="rate[]"]', { required: true }, "");
             });
 			
 			var get_depot_details = function(){
+                // console.log($('#depot_id').val());
                 $.ajax({
                     url:BASE_URL+'index.php/Depot/get_data',
                     method:"post",
@@ -709,7 +715,7 @@
                 $.ajax({
                     url:BASE_URL+'index.php/Purchase_order/get_purchase_order_nos',
                     method:"post",
-                    data:{vendor_id:vendor_id},
+                    data:{vendor_id:vendor_id, po_id:$('#po_id').val()},
                     dataType:"json",
                     async:false,
                     success: function(data){
@@ -922,7 +928,7 @@
                     var id = elem.attr('id');
                     var index = id.substr(id.lastIndexOf('_')+1);
                     var qty = parseFloat(get_number($("#qty_"+index).val(),2));
-                    var rate = parseFloat(get_number($("#rate_"+index).val(),2));
+                    var rate = parseFloat(get_number($("#rate_"+index).val(),4));
                     var tax_per = parseFloat(get_number($("#tax_per_"+index).val(),2));
 
                     if (isNaN(qty)) qty=0;
@@ -967,6 +973,7 @@
 
                 get_total();
             }
+
             function get_raw_material_details(elem){
                 var depot_state = $("#depot_state").val();
                 var vendor_state = $("#vendor_state").val();
@@ -1044,14 +1051,15 @@
 
                 get_total();
             }
-        function get_amount(elem){
+
+            function get_amount(elem){
                 var depot_state = $("#depot_state").val();
                 var vendor_state = $("#vendor_state").val();
                 var id = elem.id;
                 var index = id.substr(id.lastIndexOf('_')+1);
 				
                 var qty = parseFloat(get_number($("#qty_"+index).val(),2));
-                var rate = parseFloat(get_number($("#rate_"+index).val(),2));
+                var rate = parseFloat(get_number($("#rate_"+index).val(),4));
                 var tax_per = parseFloat(get_number($("#tax_per_"+index).val(),2));
 
                 if (isNaN(qty)) qty=0;
@@ -1095,8 +1103,7 @@
 
                 get_total();
             }
-       
-        
+
 			function get_total(){
                 var total_amt = 0;
                 $('.amount').each(function(){
@@ -1104,38 +1111,35 @@
                     if (isNaN(amount)) amount=0;
                     total_amt = total_amt + amount;
                 });
-				
-				
-				 var cgst_amount = 0;
-				 $('.cgst_amt').each(function(){
+
+				var cgst_amount = 0;
+				$('.cgst_amt').each(function(){
                     cgst_amt = parseFloat(get_number($(this).val(),2));
                     if (isNaN(cgst_amt)) cgst_amt=0;
                     cgst_amount = cgst_amount + cgst_amt;
                 });
 				
-				 var sgst_amount = 0;
-				 $('.sgst_amt').each(function(){
+				var sgst_amount = 0;
+				$('.sgst_amt').each(function(){
                     sgst_amt = parseFloat(get_number($(this).val(),2));
                     if (isNaN(sgst_amt)) sgst_amt=0;
                     sgst_amount = sgst_amount + sgst_amt;
                 });
 
-				 var igst_amount = 0;
-				 $('.igst_amt').each(function(){
+				var igst_amount = 0;
+				$('.igst_amt').each(function(){
                     igst_amt = parseFloat(get_number($(this).val(),2));
                     if (isNaN(igst_amt)) igst_amt=0;
                     igst_amount = igst_amount + igst_amt;
                 });
 				
-				  var tax_amt=0;
-				  $('.tax_amt').each(function(){
+				var tax_amt=0;
+				$('.tax_amt').each(function(){
                     taxamt = parseFloat(get_number($(this).val(),2));
                     if (isNaN(taxamt)) taxamt=0;
                     tax_amt = tax_amt + taxamt;
                 });
 
-				
-				
 				var final_amt=0;
 				$('.final_amt').each(function(){
                     finalamt = parseFloat(get_number($(this).val(),2));
@@ -1143,25 +1147,23 @@
                     final_amt = final_amt + finalamt;
                 });
 
-                
-				 $("#final_amt").val(final_amt.toFixed(2));
+				$("#final_amt").val(final_amt.toFixed(2));
 
                 // var excise = parseFloat(get_number($("#excise").val(),2));
                 final_amount = total_amt + cgst_amount + sgst_amount + igst_amount;
 
                 var other_charges_amount = 0;
-                if($('#other_charges_amount').val()!='')
-                {
+                if($('#other_charges_amount').val()!='') {
                     other_charges_amount = parseFloat(get_number($('#other_charges_amount').val(),2));
                 }
 
                 final_amount = other_charges_amount+final_amount;
 
                 $("#final_amount").val(format_money(Math.round(final_amount*100)/100,2));
-				 $("#total_amount").val(format_money(Math.round(total_amt*100)/100,2));
-				  $("#cgst_amount").val(format_money(Math.round(cgst_amount*100)/100,2));
-				   $("#sgst_amount").val(format_money(Math.round(sgst_amount*100)/100,2));
-				    $("#igst_amount").val(format_money(Math.round(igst_amount*100)/100,2));
+                $("#total_amount").val(format_money(Math.round(total_amt*100)/100,2));
+                $("#cgst_amount").val(format_money(Math.round(cgst_amount*100)/100,2));
+                $("#sgst_amount").val(format_money(Math.round(sgst_amount*100)/100,2));
+                $("#igst_amount").val(format_money(Math.round(igst_amount*100)/100,2));
             }
 
             function get_po_total(){
@@ -1172,49 +1174,46 @@
                     total_amt = total_amt + amount;
                 });
                 
-                
-                 var cgst_amount = 0;
-                 $('.po_cgst_amt').each(function(){
+                var cgst_amount = 0;
+                $('.po_cgst_amt').each(function(){
                     cgst_amt = parseFloat(get_number($(this).val(),2));
                     if (isNaN(cgst_amt)) cgst_amt=0;
                     cgst_amount = cgst_amount + cgst_amt;
                 });
                 
-                 var sgst_amount = 0;
-                 $('.po_sgst_amt').each(function(){
+                var sgst_amount = 0;
+                $('.po_sgst_amt').each(function(){
                     sgst_amt = parseFloat(get_number($(this).val(),2));
                     if (isNaN(sgst_amt)) sgst_amt=0;
                     sgst_amount = sgst_amount + sgst_amt;
                 });
 
-                 var igst_amount = 0;
-                 $('.po_igst_amt').each(function(){
+                var igst_amount = 0;
+                $('.po_igst_amt').each(function(){
                     igst_amt = parseFloat(get_number($(this).val(),2));
                     if (isNaN(igst_amt)) igst_amt=0;
                     igst_amount = igst_amount + igst_amt;
                 });
                 
-                  var tax_amt=0;
-                  $('.po_tax_amt').each(function(){
+                var tax_amt=0;
+                $('.po_tax_amt').each(function(){
                     taxamt = parseFloat(get_number($(this).val(),2));
                     if (isNaN(taxamt)) taxamt=0;
                     tax_amt = tax_amt + taxamt;
                 });
 
-                
-                
                 var final_amt=0;
                 $('.po_final_amt').each(function(){
                     finalamt = parseFloat(get_number($(this).val(),2));
                     if (isNaN(finalamt)) finalamt=0;
                     final_amt = final_amt + finalamt;
                 });
+
                 $("#po_final_amt").val(final_amt.toFixed(2));
                 final_amount = total_amt + cgst_amount + sgst_amount + igst_amount;
 
                 var po_other_charges_amount = 0;
-                if($('#po_other_charges_amount').val()!='')
-                {
+                if($('#po_other_charges_amount').val()!='') {
                     po_other_charges_amount = parseFloat(get_number($('#po_other_charges_amount').val(),2));
                 }
 
@@ -1227,7 +1226,7 @@
                 $("#po_igst_amount").val(format_money(Math.round(igst_amount*100)/100,2));
             }
            
-		   jQuery(function(){
+            jQuery(function(){
                 $('#repeat-raw_material').click(function(event){
 					var counter = $('.raw_material').length;
                     event.preventDefault();
@@ -1317,6 +1316,6 @@
                 });
             });
         </script>
-    <!-- END SCRIPTS -->      
+        <!-- END SCRIPTS -->      
     </body>
 </html>

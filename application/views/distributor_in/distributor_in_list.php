@@ -120,7 +120,7 @@
 								
 											<th width="120" >Amount (In Rs)</th>
 										
-											
+											<th width="100" style=" <?php //if($status!='gp_issued') echo 'display: none;'; ?>">Credit Debit Note</th>
 										</tr>
 									</thead>
 									<tbody>

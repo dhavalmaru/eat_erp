@@ -108,7 +108,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group depo" style="<?=(isset($data[0]->basis_of_sales)?'display: none':'display: block')?>>
+                                    <div class="form-group depo" style="<?=(isset($data[0]->basis_of_sales)?'display: none':'display: block')?>">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Option of Basis of Sales<span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
@@ -340,6 +340,7 @@
                                                     <input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_<?php echo $i; ?>" placeholder="tax_per" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->tax_percentage; } ?>"/>
                                                     <input type="hidden" class="form-control sell_margin" name="sell_margin[]" id="sell_margin_<?php echo $i; ?>" placeholder="Sell Margin" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->margin_per; } ?>"/>
                                                    <input type="text" class="form-control sell_rate" name="sell_rate[]" id="sell_rate_<?php echo $i; ?>" placeholder="Sell Rate" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->sell_rate; } ?>"/>
+                                                   <input type="hidden" class="form-control promo_margin" name="promo_margin[]" id="promo_margin_<?php echo $i; ?>" placeholder="Promotion Margin" value="0"/>
                                                 </td>
                                                 <td style="display: none;">
                                                     <input type="text" class="form-control grams" name="grams[]" id="grams_<?php echo $i; ?>" placeholder="Grams" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->grams; } ?>" readonly />
@@ -415,6 +416,7 @@
                                                     <input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_<?php echo $i; ?>" placeholder="tax_per" value="0"/>
                                                     <input type="hidden" class="form-control sell_margin" name="sell_margin[]" id="sell_margin_<?php echo $i; ?>" placeholder="Sell Margin" value="0"/>
                                                     <input type="text" class="form-control sell_rate" name="sell_rate[]" id="sell_rate_<?php echo $i; ?>" placeholder="Sell Rate" value="0"/>
+                                                    <input type="hidden" class="form-control promo_margin" name="promo_margin[]" id="promo_margin_<?php echo $i; ?>" placeholder="Promotion Margin" value="0"/>
                                                 
                                                 </td>
                                                 <td style="display: none;">
@@ -877,7 +879,7 @@
             function get_distributor_details(distributor_id){
                 // var distributor_id = $('#distributor_id').val();
                 var sell_out = 0;
-
+               
                 $.ajax({
                     url:BASE_URL+'index.php/Distributor/get_data',
                     method:"post",
@@ -965,6 +967,24 @@
                     $('.direct').show();
                 } else {
                     $('.direct').hide();
+                }
+                
+                
+                if($('#distributor_id').val()!="" && $('input[name=delivery_through]:checked').val()=='WHPL'){
+                    /*alert("Hii5");*/
+                   $('.box').each(function(){
+                        if ($(this).is(":visible") == true) {
+                            get_box_details($(this));
+                        }
+                    });
+
+                    $('.bar').each(function(){
+                        if ($(this).is(":visible") == true){
+                            get_bar_details($(this));
+                        }
+                    }); 
+
+                    get_total();
                 }
             }
 
@@ -1231,7 +1251,9 @@
                 var rate = 0;
                 var grams =0;
                 var store_id = $('#store_id').val();
-
+                var pro_margin = 0;
+                pro_margin = parseFloat(get_number($("#promo_margin_"+index).val(),2));
+                if (isNaN(pro_margin)) pro_margin=0;
 
                 $.ajax({
                     url:BASE_URL+'index.php/distributor_po/get_product_details',
@@ -1249,6 +1271,7 @@
                                 sell_out = parseFloat(data.margin);
                             }
                             tax_per = parseFloat(data.tax_percentage);
+                            pro_margin = parseFloat(data.pro_margin);
                         }
                     },
                     error: function (response) {
@@ -1264,6 +1287,7 @@
                 if (isNaN(rate)) rate=0;
                 if (isNaN(sell_out)) sell_out=0;
                 if (isNaN(tax_per)) tax_per=0;
+                if (isNaN(pro_margin)) pro_margin=0;
 
                 var cgst = $("#cgst_"+index).val();
                 var sgst = $("#sgst_"+index).val();
@@ -1296,6 +1320,7 @@
                 $("#igst_amt_"+index).val(igst_amt);
                 $("#tax_amt_"+index).val(tax_amt);
                 $("#total_amt_"+index).val(total_amount.toFixed(2));
+                $("#promo_margin_"+index).val(pro_margin);
 
                 get_total();
             }
@@ -1316,6 +1341,9 @@
                 var grams_in_bar = 0;
                 var rate = 0;
                 var store_id = $('#store_id').val();;
+                var pro_margin = 0;
+                pro_margin = parseFloat(get_number($("#promo_margin_"+index).val(),2));
+                if (isNaN(pro_margin)) pro_margin=0;
                 
                 var delivery_through = $("input[name=delivery_through]:checked").val();
                 /*if(delivery_through=="Distributor" && $('#store_id').val()!='')
@@ -1344,6 +1372,7 @@
                                 sell_out = parseFloat(data.margin);
                             }
                             tax_per = parseFloat(data.tax_percentage);
+                            pro_margin = parseFloat(data.pro_margin);
                         }
                     },
                     error: function (response) {
@@ -1359,6 +1388,7 @@
                 if (isNaN(rate)) rate=0;
                 if (isNaN(sell_out)) sell_out=0;
                 if (isNaN(tax_per)) tax_per=0;
+                if (isNaN(pro_margin)) pro_margin=0;
 
                 var cgst = $("#cgst_"+index).val();
                 var sgst = $("#sgst_"+index).val();
@@ -1391,6 +1421,7 @@
                 $("#igst_amt_"+index).val(igst_amt);
                 $("#tax_amt_"+index).val(tax_amt);
                 $("#total_amt_"+index).val(total_amount.toFixed(2));
+                $("#promo_margin_"+index).val(pro_margin);
 
                 get_total();
             }
@@ -1695,7 +1726,8 @@
                                                 '<input type="hidden" class="form-control" name="igst[]" id="igst_'+counter+'" placeholder="igst" value="0" readonly />' + 
                                                 '<input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_'+counter+'" placeholder="tax_per" value="0"/>' + 
                                                 '<input type="hidden" class="form-control sell_margin" name="sell_margin[]" id="sell_margin_'+counter+'" placeholder="Sell Margin" value="0"/>' + 
-                                                '<input type="text" class="form-control sell_rate" name="sell_rate[]" id="sell_rate_'+counter+'" placeholder="Sell Rate" value=""/>' + 
+                                                '<input type="text" class="form-control sell_rate" name="sell_rate[]" id="sell_rate_'+counter+'" placeholder="Sell Rate" value=""/>'  + 
+                                                '<input type="hidden" class="form-control promo_margin" name="promo_margin[]" id="promo_margin_'+counter+'" placeholder="Promotion Margin" value="0"/>' + 
                                             '</td>' + 
                                             '<td style="display: none;">' + 
                                                 '<input type="text" class="form-control grams" name="grams[]" id="grams_'+counter+'" placeholder="Grams" value="" readonly />' + 

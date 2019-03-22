@@ -88,13 +88,16 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Depot <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="depot_id" id="depot_id" class="form-control select2" onchange="get_depot_details();">
+                                                <?php 
+                                                //onchange="get_depot_details();"
+                                                ?>
+                                                <select name="depot_id" id="depot_id" class="form-control select2" >
                                                     <option value="">Select</option>
                                                     <?php if(isset($depot)) { for ($k=0; $k < count($depot) ; $k++) { ?>
                                                             <option value="<?php echo $depot[$k]->id; ?>" <?php if(isset($data)) { if($depot[$k]->id==$data[0]->depot_id) { echo 'selected'; } } ?>><?php echo $depot[$k]->depot_name; ?></option>
                                                     <?php }} ?>
                                                 </select>
-                                                <input type="hidden" id="depot_state" name="depot_state" value="" />
+                                                <input type="hidden" id="depot_state" name="depot_state" value="MAHARASHTRA" />
                                             </div>
                                         </div>
                                     </div>
@@ -294,7 +297,7 @@
                                     <button class="btn btn-success pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</button>
                                 </div> -->
                                   <?php
-                                if(isset($data[0]->po_status))
+                                /*if(isset($data[0]->po_status))
                                         {
                                             if($data[0]->po_status=='Raw Material IN' || $data[0]->po_status=='Closed' || $data[0]->po_status=='Advance')
                                             {
@@ -308,7 +311,7 @@
                                         else
                                         {
                                                 $style="display:block";
-                                        }
+                                        }*/
                                 ?>
 
                                 <?php $curusr=$this->session->userdata('session_id'); ?>
@@ -332,7 +335,7 @@
                                  <div class="panel-footer">
                                     <a href="<?php echo base_url(); ?>index.php/Purchase_order" class="btn btn-danger btn-sm pull-right" type="reset" id="reset">Cancel</a>
                                     <?php $curusr=$this->session->userdata('session_id'); ?>
-                                    <div style="<?=$style?>">
+                                    <div >
                                         <input type="submit" class="btn btn-success btn-sm" id="btn_submit" name="btn_submit" value="Submit For Approval" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_edit=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || $data[0]->status=='InActive')) echo ''; else echo 'display: none;';} else if($access[0]->r_insert=='1') echo ''; else echo 'display: none;';} else echo 'display: none;'; ?>" />
                                     <input type="submit" class="btn btn-danger btn-sm" id="btn_delete" name="btn_delete" value="Delete" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_delete=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved') && $data[0]->status!='InActive') echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
                                     <input type="submit" class="btn btn-success btn-sm" id="btn_approve" name="btn_approve" value="Approve" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
@@ -381,6 +384,11 @@
                     $(".datepicker1").datepicker({ maxDate: 0,changeMonth: true,yearRange:'-100:+0',changeYear: true });
                 }
                 set_total();
+
+                if($('#vendor_id').val()!='')
+                {
+                    get_vendor_details();
+                }
             });
             var get_vendor_details = function(){
                 $.ajax({
@@ -427,6 +435,7 @@
             var set_total = function (){
                 var depot_state = $("#depot_state").val();
                 var vendor_state = $("#vendor_state").val();
+                /*alert('vendor_state'+vendor_state);*/
                 
                 $('.rate').each(function(){
                     //alert('j');
@@ -688,12 +697,12 @@
                 addMultiInputNamingRules('#form_purchase_order_details', 'input[name="qty[]"]', { required: true, number: true }, "");
             });
 
-        function isNumberKey(evt){
-            var charCode = (evt.which) ? evt.which : event.keyCode
-            if (charCode > 31 && ((charCode < 48 || charCode > 57) && charCode!=46 ))
-                return false;
-            return true;
-        }
+            function isNumberKey(evt){
+                var charCode = (evt.which) ? evt.which : event.keyCode
+                if (charCode > 31 && ((charCode < 48 || charCode > 57) && charCode!=46 ))
+                    return false;
+                return true;
+            }
 
         </script>
     </body>

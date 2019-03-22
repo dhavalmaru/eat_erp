@@ -17,6 +17,7 @@ class Bar_to_box extends CI_Controller{
         $this->load->model('bar_to_box_model');
         $this->load->model('depot_model');
         $this->load->model('product_model');
+        $this->load->model('production_model');
         $this->load->database();
     }
 
@@ -34,7 +35,7 @@ class Bar_to_box extends CI_Controller{
         }
     }
 
-    public function add(){
+    public function add($p_id='', $module=''){
         $result=$this->bar_to_box_model->get_access();
         if(count($result)>0) {
             if($result[0]->r_insert == 1) {
@@ -45,6 +46,10 @@ class Bar_to_box extends CI_Controller{
                 $sql = "select * from batch_master where date_of_processing >= '$date' and status = 'Approved' and batch_no!=''";
                 $query = $this->db->query($sql);
                 $data['batch'] = $query->result();
+                $data['p_id'] = $p_id;
+                $data['production'] = $this->production_model->get_data('Approved');
+                $data['module'] = $module;
+
                 load_view('bar_to_box/bar_to_box_details', $data);
             } else {
                 echo "Unauthorized access";
@@ -55,7 +60,7 @@ class Bar_to_box extends CI_Controller{
         }
     }
 
-    public function edit($id){
+    public function edit($id, $module=''){
         $result=$this->bar_to_box_model->get_access();
         if(count($result)>0) {
             if($result[0]->r_view == 1 || $result[0]->r_edit == 1) {
@@ -68,6 +73,9 @@ class Bar_to_box extends CI_Controller{
                 $sql = "select * from batch_master where date_of_processing >= '$date' and status = 'Approved' and batch_no!=''";
                 $query = $this->db->query($sql);
                 $data['batch'] = $query->result();
+                $data['production'] = $this->production_model->get_data('Approved');
+                $data['module'] = $module;
+                
                 load_view('bar_to_box/bar_to_box_details', $data);
             } else {
                 echo "Unauthorized access";

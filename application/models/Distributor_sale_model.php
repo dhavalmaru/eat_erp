@@ -161,16 +161,23 @@ function get_distributor_zone($type_id){
     return $query->result();
 }
 
-function get_store($zone_id){
+function get_store($zone_id,$store_id=''){
+
+    $cond = '';
+    if($store_id!='')
+    {
+        $cond = ' And E.store_id='.$store_id;
+    }
+
     $sql = "Select E.store_id, E.store_name from(Select  A.*,D.store_name,D.id as did from 
-            (select * from store_master) A 
+            (select * from store_master Where status='Approved') A 
             left join 
-            (select * from relationship_master)D
+            (select * from relationship_master Where status='Approved')D
             on (A.store_id=D.id))E
              left join 
-            (select * from zone_master)F
+            (select * from zone_master Where status='Approved')F
             on (E.zone_id=F.id)
-            where F.id='". $zone_id ."' group by E.store_id, E.store_name";
+            where F.id='". $zone_id ."' ".$cond." group by E.store_id, E.store_name";
     $query=$this->db->query($sql);
     return $query->result();
 }
@@ -188,9 +195,9 @@ function get_store($zone_id){
 // }
 function get_location_data($store_id,$zone_id){
     $sql = "Select  A.*,D.location from 
-            (select * from store_master) A 
+            (select * from store_master Where status='Approved') A 
             left join 
-            (select * from location_master) D 
+            (select * from location_master Where status='Approved') D 
             on (A.location_id=D.id)
             where A.store_id='".$store_id  ."' and  A.zone_id='". $zone_id ."' ";
     $query=$this->db->query($sql);

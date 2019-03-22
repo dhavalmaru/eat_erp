@@ -14,19 +14,35 @@ function check_raw_material_availablity(){
     $depot_id=$this->input->post('depot_id');
     $raw_material_id=$this->input->post('raw_material_id');
 
+    $raw_material_in_cond = '';
+    if($module=="raw_material_in"){
+        $raw_material_in_cond=" and id<>'$id' ";
+    }
+
+    $raw_material_in_out_cond = '';
+    if($module=="raw_material_in_out"){
+        $raw_material_in_out_cond=" and id<>'$id' ";
+    }
+
     $depot_transfer_cond="";
     if($module=="depot_transfer"){
-        $depot_transfer_cond=" and id<>'$id'";
+        $depot_transfer_cond=" and id<>'$id' ";
     }
     
     $sql="select id from raw_material_in 
-        where status = 'Approved' and depot_id = '$depot_id' and 
-        id in (select distinct raw_material_in_id from raw_material_stock where raw_material_id = '$raw_material_id') 
+        where status = 'Approved' and depot_id = '$depot_id' ".$raw_material_in_cond." and 
+            id in (select distinct raw_material_in_id from raw_material_stock 
+                where raw_material_id = '$raw_material_id') 
+        union all 
+        select distinct id from raw_material_in_out 
+        where status = 'Approved' and depot_id = '$depot_id' ".$raw_material_in_out_cond." and 
+            id In (select distinct raw_material_in_out_id from raw_material_in_out_items 
+                where raw_material_id = '$raw_material_id' and type='Stock IN') 
         union all 
         select id from depot_transfer 
-        where status = 'Approved' and depot_in_id = '$depot_id' and 
-        id in (select distinct depot_transfer_id from depot_transfer_items where type = 'Raw Material' and 
-            item_id = '$raw_material_id')".$depot_transfer_cond;
+        where status = 'Approved' and depot_in_id = '$depot_id' ".$depot_transfer_cond." and 
+            id in (select distinct depot_transfer_id from depot_transfer_items 
+                where type = 'Raw Material' and item_id = '$raw_material_id')";
     $query=$this->db->query($sql);
     $result=$query->result();
     if (count($result)==0){
@@ -42,8 +58,11 @@ function check_raw_material_qty_availablity(){
     $depot_id=$this->input->post('depot_id');
     $raw_material_id=$this->input->post('raw_material_id');
     $qty=floatval(format_number($this->input->post('qty')));
-    $ref_id=$this->input->post('ref_id');
-
+    $get_stock = '';
+    if($this->input->post('get_stock')){
+        $get_stock=$this->input->post('get_stock');
+    }
+    $ref_id = $this->input->post('ref_id');
     // $id=4;
     // $module="depot_transfer";
     // $depot_id=4;
@@ -59,19 +78,48 @@ function check_raw_material_qty_availablity(){
         }
     }
     
+    $raw_material_in_cond = '';
+    if($module=="raw_material_in"){
+        $raw_material_in_cond=" and id<>'$id'";
+
+        if($ref_id!=''){
+            $raw_material_in_cond=$raw_material_in_cond." and id<>'$ref_id'";
+        }
+    }
+    
+    $raw_material_in_out_cond = '';
+    if($module=="raw_material_in_out"){
+        $raw_material_in_out_cond=" and id<>'$id'";
+
+        if($ref_id!=''){
+            $raw_material_in_out_cond=$raw_material_in_out_cond." and id<>'$ref_id'";
+        }
+    }
+
     $depot_transfer_cond="";
     if($module=="depot_transfer"){
         $depot_transfer_cond=" and id<>'$id'";
+
+        if($ref_id!=''){
+            $depot_transfer_cond=$depot_transfer_cond." and id<>'$ref_id'";
+        }
     }
     
     $sql="select sum(A.tot_qty) as tot_qty_in from 
         (select sum(qty) as tot_qty from raw_material_stock 
-        where raw_material_id = '$raw_material_id' and raw_material_in_id in (select distinct id from raw_material_in 
-            where status = 'Approved' and depot_id = '$depot_id' and date_of_receipt > '2018-10-22') 
+        where raw_material_id = '$raw_material_id' and 
+            raw_material_in_id in (select distinct id from raw_material_in 
+            where status = 'Approved' and depot_id = '$depot_id' and date_of_receipt > '2018-10-22' ".$raw_material_in_cond.") 
+        Union all
+        select sum(qty) as tot_qty from raw_material_in_out_items 
+        where raw_material_id = '$raw_material_id' and type='Stock IN' and 
+            raw_material_in_out_id in (select distinct id from raw_material_in_out 
+            where status = 'Approved' and depot_id = '$depot_id' and date_of_processing > '2018-10-22' ".$raw_material_in_out_cond.") 
         union all 
         select sum(qty) as tot_qty from depot_transfer_items 
-        where item_id = '$raw_material_id' and type = 'Raw Material' and depot_transfer_id in (select distinct id from depot_transfer 
-            where status = 'Approved' and depot_in_id = '$depot_id' and date_of_transfer > '2018-10-22'".$depot_transfer_cond.")) A";
+        where item_id = '$raw_material_id' and type = 'Raw Material' and 
+            depot_transfer_id in (select distinct id from depot_transfer 
+            where status = 'Approved' and depot_in_id = '$depot_id' and date_of_transfer > '2018-10-22' ".$depot_transfer_cond.")) A";
     $query=$this->db->query($sql);
     $result=$query->result();
     if (count($result)>0){
@@ -82,12 +130,19 @@ function check_raw_material_qty_availablity(){
 
     $sql="select sum(A.tot_qty) as tot_qty_out from 
         (select sum(qty) as tot_qty from batch_raw_material 
-        where raw_material_id = '$raw_material_id' and batch_processing_id in (select distinct id from batch_processing 
-            where status = 'Approved' and depot_id = '$depot_id' and date_of_processing > '2018-10-22'".$batch_processing_cond.") 
+        where raw_material_id = '$raw_material_id' and 
+            batch_processing_id in (select distinct id from batch_processing 
+                where status = 'Approved' and depot_id = '$depot_id' and date_of_processing > '2018-10-22' ".$batch_processing_cond.") 
+        union all 
+        select sum(qty) as tot_qty from raw_material_in_out_items 
+        where raw_material_id = '$raw_material_id' and type='Stock Out' and 
+            raw_material_in_out_id in (select distinct id from raw_material_in_out 
+                where status = 'Approved' and depot_id = '$depot_id' and date_of_processing > '2018-10-22' ".$raw_material_in_out_cond.") 
         union all 
         select sum(qty) as tot_qty from depot_transfer_items 
-        where item_id = '$raw_material_id' and type = 'Raw Material' and depot_transfer_id in (select distinct id from depot_transfer 
-            where status = 'Approved' and depot_out_id = '$depot_id' and date_of_transfer > '2018-10-22'".$depot_transfer_cond.")) A";
+        where item_id = '$raw_material_id' and type = 'Raw Material' and 
+            depot_transfer_id in (select distinct id from depot_transfer 
+                where status = 'Approved' and depot_out_id = '$depot_id' and date_of_transfer > '2018-10-22' ".$depot_transfer_cond.")) A";
     $query=$this->db->query($sql);
     $result=$query->result();
     if (count($result)>0){
@@ -96,10 +151,14 @@ function check_raw_material_qty_availablity(){
         $tot_qty_out=0;
     }
 
-    if (($tot_qty_in-$tot_qty_out-$qty)<0){
-        return 1;
+    if($get_stock!=''){
+        return ($tot_qty_in-$tot_qty_out);
     } else {
-        return 0;
+        if(($tot_qty_in-$tot_qty_out-$qty)<0){
+            return 1;
+        } else {
+            return 0;
+        }
     }
 }
 
@@ -153,7 +212,11 @@ function check_bar_qty_availablity_for_depot(){
     $product_id=$this->input->post('product_id');
     $qty=floatval(format_number($this->input->post('qty')));
     $ref_id=$this->input->post('ref_id');
-
+    $get_stock = '';
+    if($this->input->post('get_stock'))
+    {
+        $get_stock=$this->input->post('get_stock');
+    }
     // $id=3721;
     // $module='distributor_out';
     // $depot_id=2;
@@ -168,7 +231,11 @@ function check_bar_qty_availablity_for_depot(){
     $distributor_in_cond="";
     if($module=="distributor_in"){
         $distributor_in_cond=" and id<>'$id'";
+        if($ref_id!=''){
+            $distributor_in_cond=$distributor_in_cond." and id<>'$ref_id'";
+        }
     }
+
     $box_to_bar_cond="";
     if($module=="box_to_bar"){
         $box_to_bar_cond=" and id<>'$id'";
@@ -245,11 +312,21 @@ function check_bar_qty_availablity_for_depot(){
     // echo $qty;
     // echo '<br/>';
 
-    if (($tot_qty_in-$tot_qty_out-$qty)<0){
-        return 1;
-    } else {
-        return 0;
+    
+
+    if($get_stock!='')
+    {
+        return ($tot_qty_in-$tot_qty_out);
     }
+    else
+    {
+       if (($tot_qty_in-$tot_qty_out-$qty)<0){
+        return 1;
+        } else {
+            return 0;
+        }  
+    }
+    
 }
 
 function check_box_availablity_for_depot(){
@@ -298,6 +375,11 @@ function check_box_qty_availablity_for_depot(){
     $box_id=$this->input->post('box_id');
     $qty=floatval(format_number($this->input->post('qty')));
     $ref_id=$this->input->post('ref_id');
+    $get_stock = '';
+    if($this->input->post('get_stock'))
+    {
+        $get_stock=$this->input->post('get_stock');
+    }
 
     // $id=4;
     // $module="depot_transfer";
@@ -312,6 +394,9 @@ function check_box_qty_availablity_for_depot(){
     $distributor_in_cond="";
     if($module=="distributor_in"){
         $distributor_in_cond=" and id<>'$id'";
+        if($ref_id!=''){
+            $distributor_in_cond=$distributor_in_cond." and id<>'$ref_id'";
+        }
     }
     $box_to_bar_cond="";
     if($module=="box_to_bar"){
@@ -369,10 +454,17 @@ function check_box_qty_availablity_for_depot(){
         $tot_qty_out=0;
     }
 
-    if (($tot_qty_in-$tot_qty_out-$qty)<0){
-        return 1;
-    } else {
-        return 0;
+    if($get_stock!='')
+    {
+        return ($tot_qty_in-$tot_qty_out);
+    }
+    else
+    {
+       if (($tot_qty_in-$tot_qty_out-$qty)<0){
+            return 1;
+        } else {
+            return 0;
+        }  
     }
 }
 

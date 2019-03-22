@@ -16,6 +16,7 @@ class Login extends CI_Controller
         $this->load->library('email');
         $this->load->helper('common_functions');
         $this->load->model('dashboard_model');
+        $this->load->model('user_access_log_model');
         $this->load->database();
     }
 
@@ -45,7 +46,7 @@ class Login extends CI_Controller
 			 $uname=get_cookie('email');
              $upass=get_cookie('password');
 
-			 $query=$this->db->query("SELECT A.id,A.email_id,A.first_name,A.last_name,A.role_id,A.sales_rep_id,B.sr_type FROM user_master A left outer join sales_rep_master B on B.id=A.sales_rep_id WHERE A.email_id = '$uname' AND A.password = '$upass'");
+			 $query=$this->db->query("SELECT A.id,A.emp_code,A.email_id,A.first_name,A.last_name,A.role_id,A.sales_rep_id,B.sr_type,A.status FROM user_master A left outer join sales_rep_master B on B.id=A.sales_rep_id WHERE A.email_id = '$uname' AND A.password = '$upass' AND A.status IS NOT NULL ");
 				$result=$query->result();
 			
 		}
@@ -53,54 +54,73 @@ class Login extends CI_Controller
 		        $uname=$this->input->post('email');
         $upass=$this->input->post('password');
 
-			$query=$this->db->query("SELECT A.id,A.email_id,A.first_name,A.last_name,A.role_id,A.sales_rep_id,B.sr_type FROM user_master A left outer join sales_rep_master B on B.id=A.sales_rep_id WHERE A.email_id = '$uname' AND A.password = '$upass'");
+			$query=$this->db->query("SELECT A.id,A.emp_code,A.email_id,A.first_name,A.last_name,A.role_id,A.sales_rep_id,B.sr_type,A.status FROM user_master A left outer join sales_rep_master B on B.id=A.sales_rep_id WHERE A.email_id = '$uname' AND A.password = '$upass' AND A.status IS NOT NULL ");
 				$result=$query->result();
 		}
 		
         if(count($result) > 0 ) {
-            $sessiondata = array(
-                                'session_id' => $result[0]->id,
-                                'user_name' => $result[0]->email_id,
-                                'login_name' => $result[0]->first_name . ' ' . $result[0]->last_name,
-                                'role_id' => $result[0]->role_id,
-                                'sales_rep_id' => $result[0]->sales_rep_id,
-                                'type' => $result[0]->sr_type
-                            );
+            
+            if($result[0]->status!='InActive')
+            {
+                  $sessiondata = array(
+                                    'session_id' => $result[0]->id,
+                                    'user_name' => $result[0]->email_id,
+                                    'login_name' => $result[0]->first_name . ' ' . $result[0]->last_name,
+                                    'role_id' => $result[0]->role_id,
+                                    'sales_rep_id' => $result[0]->sales_rep_id,
+                                    'type' => $result[0]->sr_type,
+                                    'emp_code' => $result[0]->emp_code
+                                );
 
-            $this->session->set_userdata($sessiondata);
+                $this->session->set_userdata($sessiondata);
+                $unexpired_cookie_exp_time = 2147483647 - time();
+                set_cookie('email',$uname,$unexpired_cookie_exp_time); 
+                set_cookie('password',$upass,$unexpired_cookie_exp_time);
+                
+                $logarray['table_id']='1';
+                $logarray['module_name']='Login';
+                $logarray['cnt_name']='Login';
+                $logarray['action']='Logged in';
+                $this->user_access_log_model->insertAccessLog($logarray);
 
-			set_cookie('email',$uname,'3600'); 
-			set_cookie('password',$upass,'3600');
-			
-            $logarray['table_id']='1';
-            $logarray['user_name']='Login';
-            $logarray['cnt_name']='Login';
-            $logarray['action']='Logged in';
-            $this->user_access_log_model->insertAccessLog($logarray);
+                $srtype=$result[0]->sr_type;
+                $role_id=$result[0]->role_id;
 
-            $srtype=$result[0]->sr_type;
-
-            if(isset($result[0]->sales_rep_id) && $result[0]->sales_rep_id<>""){
-                if($srtype==='Promoter') {
-                    redirect(base_url().'index.php/Dashboard_promoter/');    
-                }
-                else if($srtype=='Merchandizer') {
-                    redirect(base_url().'index.php/merchandiser_location');
-                }
-                else {
-                    redirect(base_url().'index.php/Dashboard_sales_rep');
-                }
-            } else {
-                 $result=$this->dashboard_model->get_access();
-                 if(count($result)>0) {
-					 //echo '<script>alert("'.$this->session->userdata('role_id').'");</script>';
-                     redirect(base_url().'index.php/Dashboard');
-                }
-                else {
-                     redirect(base_url().'index.php/Dashboard/Dashboardscreen');
-                 }
-				// echo $this->session->userdata('role_id');
+                if(isset($result[0]->sales_rep_id) && $result[0]->sales_rep_id<>""){
+                    // echo 'index.php/Sales_Attendence/';
+                    redirect(base_url().'index.php/Sales_Attendence/');    
+                    /*if($srtype==='Promoter') {
+                        redirect(base_url().'index.php/Dashboard_promoter/');    
+                    }
+                    else if($srtype=='Merchandizer') {
+                        redirect(base_url().'index.php/merchandiser_location');
+                    }
+                    else {
+                        redirect(base_url().'index.php/Dashboard_sales_rep');
+                    }*/
+                } else {
+                    if($role_id==10){
+                        redirect(base_url().'index.php/Dashboard/production');
+                    } else {
+                        $result=$this->dashboard_model->get_access();
+                        if(count($result)>0) {
+                            //echo '<script>alert("'.$this->session->userdata('role_id').'");</script>';
+                            redirect(base_url().'index.php/Dashboard');
+                        } else {
+                            redirect(base_url().'index.php/Dashboard/Dashboardscreen');
+                        }
+                    }
+                    
+                    // echo $this->session->userdata('role_id');
+                }   
             }
+            else
+            {
+                echo "<script>alert('User is Inactive');</script>";
+                $this->load->view('login/main_page');
+            }
+
+            
         } else {
             echo "<script>alert('Invalid Username or Password.');</script>";
 			$this->load->view('login/main_page');
@@ -244,23 +264,21 @@ class Login extends CI_Controller
         echo 1;
     }
 	
-		public function chk_coockie() {
+		// public function chk_coockie() {
 		
 		
-			$cookie= array(
- 
-			   'name'   => 'session_id',
-	 
-			   'value'  => 56,
-	 
-			   'expire' => '0',
- 
-			);
- 
-			$this->input->set_cookie($cookie);		
+			// $unexpired_cookie_exp_time = 2147483647 - time();
+			 
+			// $cookie = array(
+				// 'name' => 'cookie_name',
+				// 'value' => 'cookie_value',
+				// 'expire'=> $unexpired_cookie_exp_time
+			// );
+			 
+			// $CI->input->set_cookie($cookie);
 			
 		 
-		}
+		// }
 
 }
 	  

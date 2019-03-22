@@ -95,7 +95,7 @@ class Sample_out extends CI_Controller{
             $gp_issued=0;
             $delivered_not_complete=0;
 
-       if (count($result)>0){
+            if (count($result)>0){
                 for($i=0;$i<count($count_data);$i++){
                     if (strtoupper(trim($count_data[$i]->status))=="APPROVED")
                         $active=$active+1;

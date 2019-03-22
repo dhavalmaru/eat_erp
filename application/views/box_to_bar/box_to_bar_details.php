@@ -66,12 +66,13 @@
 										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Depot <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="depot_id" id="depot_id" class="form-control select2">
+                                                <select name="depot_id" id="depot_id" class="form-control">
                                                     <option value="">Select</option>
                                                     <?php if(isset($depot)) { for ($k=0; $k < count($depot) ; $k++) { ?>
                                                             <option value="<?php echo $depot[$k]->id; ?>" <?php if(isset($data)) { if($depot[$k]->id==$data[0]->depot_id) { echo 'selected'; } } ?>><?php echo $depot[$k]->depot_name; ?></option>
                                                     <?php }} ?>
                                                 </select>
+                                                <input type="hidden" name="prev_depo" id="prev_depo" value="<?php if(isset($data)) { echo  $data[0]->depot_id; } ?>"/>
                                                 <!-- <input type="hidden" name="depot_id" id="depot_id" value="<?php //if(isset($data)) { echo  $data[0]->depot_id; } ?>"/>
                                                 <input type="text" class="form-control load_depot" name="depot" id="depot" placeholder="Type To Select Depot...." value="<?php //if(isset($data)) { echo  $data[0]->depot_name; } ?>"/> -->
                                             </div>
@@ -259,6 +260,7 @@
         <script type="text/javascript" src="<?php echo base_url(); ?>js/validations.js"></script>
         <script type="text/javascript">
             $(document).ready(function(){
+
                 $(".box").change(function(){
                     get_box_details($(this));
                 });
@@ -270,7 +272,21 @@
                     get_total();
                 });
                 $("#depot_id").change(function(){
-                    get_bar_details();
+                    addMultiInputNamingRules('#form_box_to_bar_details', 'input[name="total_bar_qty[]"]', {  }, "");
+                    addMultiInputNamingRules('#form_box_to_bar_details', 'input[name="bal_bar_qty[]"]', {  }, "");
+                   
+                    var check_box_qty = checkbox_qty();
+                    if(check_box_qty==false)
+                    {
+                        var previous_val = $("#prev_depo").val();
+                        $("#depot_id").val(previous_val);
+                    }
+                    else
+                    {
+                        $("#prev_depo").val($(this).val());
+                        get_bar_details();
+                    }
+                    
                 });
                 $(".datepicker1").datepicker({ maxDate: 0,changeMonth: true,yearRange:'-100:+0',changeYear: true });
                 

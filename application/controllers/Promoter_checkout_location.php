@@ -161,7 +161,7 @@ class Promoter_checkout_location extends CI_Controller{
             $message = '<html><head></head><body>Hi,<br /><br />
                         Please find below Promoters Stock Report for - '.$date.'. <br /><br />'.$table.'<br/>
                         <br />Thanks</body></html>';
-            $to_email = 'rishit.sanghvi@eatanytime.in,swapnil.darekar@eatanytime.in';
+            $to_email = 'rishit.sanghvi@eatanytime.in,swapnil.darekar@eatanytime.in, prasad.bhisale@pecanreams.com';
             $bcc="dhaval.maru@otbconsulting.co.in";
             //$to_email = 'dhaval.maru@otbconsulting.co.in';
             $mailSent=send_email($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc);
@@ -231,7 +231,7 @@ class Promoter_checkout_location extends CI_Controller{
                             Please find below Promoters Check in Report for - '.$date.'. <br /><br />'.$table.'<br/>
                             <br />Thanks</body></html>';
                             // echo $message;
-                $to_email = 'rishit.sanghvi@eatanytime.in,swapnil.darekar@eatanytime.in';
+                $to_email = 'rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, prasad.bhisale@pecanreams.com';
                 $bcc="dhaval.maru@otbconsulting.co.in";
                 // $to_email = 'dhaval.maru@otbconsulting.co.in';
                 // $to_email = 'dhaval.maru@otbconsulting.co.in';

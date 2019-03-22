@@ -54,6 +54,7 @@ function get_data($status='', $id=''){
             G.distributor_name, G.sell_out, G.class, G.depot_name, G.depot_address, G.depot_city, G.depot_pincode, 
             G.depot_state, G.depot_state_code, G.depot_country, G.sales_rep_name, 
             concat(ifnull(H.first_name,''),' ',ifnull(H.last_name,'')) as user_name, 
+            concat(ifnull(I.first_name,''),' ',ifnull(I.last_name,'')) as approver_name, 
             G.sample_distributor_id, G.delivery_status, G.delivery_date, G.receivable_doc, G.transport_type, 
             G.vehicle_number, G.cgst, G.sgst, G.igst, G.cgst_amount, G.sgst_amount, G.igst_amount, G.reverse_charge, 
             G.shipping_address, G.distributor_consignee_id, G.con_name, G.con_address, G.con_city, G.con_pincode, 
@@ -75,7 +76,10 @@ function get_data($status='', $id=''){
             on (E.sales_rep_id=F.id)) G 
             left join 
             (select * from user_master) H 
-            on (G.modified_by=H.id) order by G.modified_on desc";
+            on (G.modified_by=H.id) 
+            left join 
+            (select * from user_master) I 
+            on (G.approved_by=I.id) order by G.modified_on desc";
     $query=$this->db->query($sql);
     return $query->result();
 }
@@ -139,8 +143,8 @@ function get_distributor_out_data1($status='', $id=''){
             $cond=$cond." and d_id='".$id."'";
         }
     }
-	
-    $sql = "select * from 
+    
+    $sql = "select Z.*, Y.id as credit_debit_note_id from(select * from 
             (select concat('d_',I.id) as d_id, I.id, I.date_of_processing, I.invoice_no, I.voucher_no, I.gate_pass_no,  
             I.distributor_id, I.sales_rep_id, 
             I.final_amount,  I.status, I.created_on, I.modified_by, I.modified_on, I.class,
@@ -206,8 +210,11 @@ function get_distributor_out_data1($status='', $id=''){
             on (A.distributor_id = B.id)) C 
             left join 
             (select * from user_master) D 
-            on (C.modified_by=D.id)) I".$cond."
-            order by I.modified_on desc";
+            on (C.modified_by=D.id)) I ".$cond." )Z
+            left join
+            (select * from credit_debit_note where status = 'Approved')Y
+            on (Z.id=Y.distributor_out_id) 
+            order by Z.modified_on desc";
 
     $query=$this->db->query($sql);
     return $query->result();
@@ -439,9 +446,6 @@ function save_data($id=''){
         $email_date_time= date('Y-m-d H:i:s',strtotime($email_date_time));
     }
 	
-	
-	
-
     $invoice_date=$this->input->post('invoice_date');
     if($invoice_date==''){
         $invoice_date=NULL;
@@ -466,7 +470,7 @@ function save_data($id=''){
         $invoice_no = $this->input->post('invoice_no');
         $distributor_in_type = $this->input->post('distributor_in_type');
         
-        $remarks = $this->input->post('remarks');
+        $remarks = str_replace("'", "", $this->input->post('remarks'));
 
         if($status == 'Rejected'){
             $sql = "Update distributor_out Set status='$status', remarks='$remarks', approved_by='$curusr', approved_on='$now', 
@@ -510,29 +514,22 @@ function save_data($id=''){
                 }
 
                 if($ref_id!=null && $ref_id!=''){
+                    $modified_approved_date = NULL;
+                    $get_modified_approved_date_result = $this->db->select('modified_approved_date')->where('id',$id)->get('distributor_out')->result();
 
-                   $modified_approved_date = NULL;
-                   $get_modified_approved_date_result = $this->db->select('modified_approved_date')->where('id',$id)->get('distributor_out')->result();
-
-                    if(count($get_modified_approved_date_result)>0)
-                    {
-                       $modified_approved_date = $get_modified_approved_date_result[0]->modified_approved_date;
+                    if(count($get_modified_approved_date_result)>0){
+                        $modified_approved_date = $get_modified_approved_date_result[0]->modified_approved_date;
                         
-                        if($modified_approved_date!=null && $modified_approved_date!="")
-                        {
+                        if($modified_approved_date!=null && $modified_approved_date!=""){
                             $modified_approved_date = date("Y-m-d");
-                        }else
-                        {
+                        } else {
                             $modified_approved_date = NULL;
                         }
-                    }
-                    else
-                    {
+                    } else {
                        $modified_approved_date = NULL;
                     }
                     
-                    if($modified_approved_date!=null && $modified_approved_date!=null)
-                    {
+                    if($modified_approved_date!=null && $modified_approved_date!=null){
                         $sql = "Update distributor_out A, distributor_out B 
                             Set A.date_of_processing=B.date_of_processing, A.depot_id=B.depot_id, A.distributor_id=B.distributor_id,
                                 A.sales_rep_id=B.sales_rep_id, A.amount=B.amount, A.tax=B.tax, A.tax_per=B.tax_per, 
@@ -558,9 +555,7 @@ function save_data($id=''){
                                 A.invoice_date = '$invoice_date',A.modified_approved_date='$modified_approved_date' ,
                                 A.gstin=B.gstin
                             WHERE A.id = '$ref_id' and B.id = '$id'";
-                    }
-                    else
-                    {
+                    } else {
                         $sql = "Update distributor_out A, distributor_out B 
                             Set A.date_of_processing=B.date_of_processing, A.depot_id=B.depot_id, A.distributor_id=B.distributor_id,
                                 A.sales_rep_id=B.sales_rep_id, A.amount=B.amount, A.tax=B.tax, A.tax_per=B.tax_per, 
@@ -610,10 +605,11 @@ function save_data($id=''){
                 }
 
                 $this->set_ledger($id);
+                $this->set_credit_note($id);
 
-                echo '<script>var win= window.open("'.base_url().'index.php/distributor_out/view_tax_invoice/'.$id.'");
-                win.print();
-                </script>';
+                // echo '<script>var win= window.open("'.base_url().'index.php/distributor_out/view_tax_invoice/'.$id.'");
+                // win.print();
+                // </script>';
                 
                 $action='Distributor Out Entry '.$status.'. Delivery Status: ' . $delivery_status;
             }
@@ -706,7 +702,7 @@ function save_data($id=''){
             'invoice_no' => $this->input->post('invoice_no'),
             'depot_id' => $this->input->post('depot_id'),
             'distributor_id' => $this->input->post('distributor_id'),
-            'sales_rep_id' => $this->input->post('sales_rep_id'),
+            'sales_rep_id' => ($this->input->post('sales_rep_id')==''?null:$this->input->post('sales_rep_id')),
             'amount' => format_number($this->input->post('total_amount'),2),
             'tax' => $this->input->post('tax'),
             'tax_per' => format_number($this->input->post('tax_per'),2),
@@ -765,11 +761,9 @@ function save_data($id=''){
             //'tracking_id' => $this->input->post('tracking_id')
         );
 
-        if($ref_id!=null && $ref_id!="")
-        {
+        if($ref_id!=null && $ref_id!=""){
             $data['modified_approved_date']=$now;
         }
-
 
         if($id==''){
             $data['created_by']=$curusr;
@@ -810,6 +804,7 @@ function save_data($id=''){
         $qty=$this->input->post('qty[]');
         $sell_rate=$this->input->post('sell_rate[]');
         $sell_margin=$this->input->post('sell_margin[]');
+        $promo_margin=$this->input->post('promo_margin[]');
         $tax_per=$this->input->post('tax_per[]');
         $grams=$this->input->post('grams[]');
         $rate=$this->input->post('rate[]');
@@ -842,6 +837,7 @@ function save_data($id=''){
                             'tax_amt' => format_number($tax_amt[$k],2),
                             'total_amt' => format_number($total_amt[$k],2),
                             'margin_per' => $sell_margin[$k],
+                            'promo_margin' => $promo_margin[$k],
                             'tax_percentage' => $tax_per[$k]
                         );
                 $this->db->insert('distributor_out_items', $data);
@@ -911,6 +907,201 @@ function save_data($id=''){
     $logarray['cnt_name']='Distributor_Out';
     $logarray['action']=$action;
     $this->user_access_log_model->insertAccessLog($logarray);
+}
+
+function set_credit_note($id=''){
+    $sql = "select * from distributor_out where id = '$id'";
+    $query = $this->db->query($sql);
+    $result = $query->result();
+    if(count($result)>0){
+        $date_of_processing = $result[0]->date_of_processing;
+        $invoice_no = $result[0]->invoice_no;
+        $distributor_id = $result[0]->distributor_id;
+        $created_by = $result[0]->created_by;
+        $created_on = $result[0]->created_on;
+        $modified_by = $result[0]->modified_by;
+        $modified_on = $result[0]->modified_on;
+        $approved_by = $result[0]->approved_by;
+        $approved_on = $result[0]->approved_on;
+        $rejected_by = $result[0]->rejected_by;
+        $rejected_on = $result[0]->rejected_on;
+        $discount = $result[0]->discount;
+
+        if($discount==null || $discount==''){
+            $discount = 0;
+        }
+
+        $sql = "select * from distributor_out_items where distributor_out_id = '$id'";
+        $query = $this->db->query($sql);
+        $result = $query->result();
+
+        $total_inv_amount = 0;
+        $total_amount = 0;
+        $tax_type = 'Intra';
+        $promo_margin = 0;
+        $bal_amount = 0;
+
+        // echo json_encode($result);
+        // echo '<br/>';
+
+        if(count($result)>0){
+            for($i=0; $i<count($result); $i++){
+                $qty = floatval($result[$i]->qty);
+                $rate = floatval($result[$i]->rate);
+                $total_amt = floatval($result[$i]->total_amt);
+                $margin_per = floatval($result[$i]->margin_per);
+                $tax_percentage = floatval($result[$i]->tax_percentage);
+                $promo_margin = floatval($result[$i]->promo_margin);
+                $cgst_amt = floatval($result[$i]->cgst_amt);
+                $sgst_amt = floatval($result[$i]->sgst_amt);
+                $igst_amt = floatval($result[$i]->igst_amt);
+
+                if($igst_amt>0){
+                    $tax_type = 'Inter';
+                }
+
+                $total_inv_amount = $total_inv_amount + $total_amt;
+
+                $total_margin = $margin_per + $promo_margin + $discount;
+                $sell_rate = $rate - (($rate*$total_margin)/100);
+                // $sell_rate = $sell_rate/(100+$tax_percentage)*100;
+
+                $tot_amt = $qty * $sell_rate;
+                $total_amount = $total_amount + $tot_amt;
+
+                // echo $total_margin.'<br/>';
+                // echo $rate.'<br/>';
+                // echo $sell_rate.'<br/>';
+                // echo $tot_amt.'<br/>';
+            }
+        }
+
+        $bal_amount = round($total_inv_amount - $total_amount, 0);
+
+        $credit_debit_note_id = '';
+        $ref_no = '';
+        $ref_date = null;
+        $modified_approved_date = null;
+
+        $sql = "select * from credit_debit_note where distributor_out_id = '$id'";
+        $query = $this->db->query($sql);
+        $result = $query->result();
+        if(count($result)==0){
+            if($bal_amount!=0){
+                $sql="select * from series_master where type='Credit_debit_note'";
+                $query=$this->db->query($sql);
+                $result=$query->result();
+                if(count($result)>0){
+                    $series=intval($result[0]->series)+1;
+
+                    $sql="update series_master set series = '$series' where type = 'Credit_debit_note'";
+                    $this->db->query($sql);
+                } else {
+                    $series=1;
+
+                    $sql="insert into series_master (type, series) values ('Credit_debit_note', '$series')";
+                    $this->db->query($sql);
+                }
+
+                $ref_date = date('Y-m-d');
+
+                if (isset($ref_date)){
+                    if($ref_date==''){
+                        $financial_year="";
+                    } else {
+                        $financial_year=calculateFiscalYearForDate($ref_date);
+                    }
+                } else {
+                    $financial_year="";
+                }
+                
+                $ref_no = 'WHPL/credit_note/'.$financial_year.'/'.strval($series);
+                $modified_approved_date = null;
+            }
+        } else {
+            $credit_debit_note_id = $result[0]->id;
+            $ref_no = $result[0]->ref_no;
+            $ref_date = $result[0]->ref_date;
+            $modified_approved_date = $result[0]->modified_approved_date;
+        }
+
+        if($bal_amount!=0){
+            $bal_amount = round($total_inv_amount - $total_amount, 0);
+
+            // echo $total_inv_amount.'<br/>';
+            // echo $total_amount.'<br/>';
+            // echo $bal_amount.'<br/>';
+
+            $tax_per = 18;
+            $amount_without_tax = round($bal_amount/(1+($tax_per/100)), 4);
+            $cgst_amt = 0;
+            $sgst_amt = 0;
+            $igst_amt = 0;
+            if($tax_type == 'Intra'){
+                $cgst_amt = round(($amount_without_tax*($tax_per/2))/100, 4);
+                $sgst_amt = round(($amount_without_tax*($tax_per/2))/100, 4);
+            } else {
+                $igst_amt = round(($amount_without_tax*$tax_per)/100, 4);
+            }
+
+            $amount = round(($amount_without_tax + $cgst_amt + $sgst_amt + $igst_amt), 0);
+
+            // echo $amount_without_tax.'<br/>';
+            // echo $cgst_amt.'<br/>';
+            // echo $sgst_amt.'<br/>';
+            // echo $igst_amt.'<br/>';
+            // echo $amount.'<br/>';
+
+            $data = array(
+                'date_of_transaction' => $date_of_processing,
+                'distributor_id' => $distributor_id,
+                'transaction' => 'Credit Note',
+                'invoice_no' => $invoice_no,
+                'distributor_type' => 'Invoice',
+                'amount' => $amount,
+                'tax' => $tax_per,
+                'igst' => $igst_amt,
+                'cgst' => $cgst_amt,
+                'sgst' => $sgst_amt,
+                'amount_without_tax' => $amount_without_tax,
+                'status' => 'Approved',
+                'remarks' => 'SG - Promotion Charges Credit Note against invoice no '.$invoice_no,
+                'created_by' => $created_by,
+                'created_on' => $created_on,
+                'modified_by' => $modified_by,
+                'modified_on' => $modified_on,
+                'approved_by' => $approved_by,
+                'approved_on' => $approved_on,
+                'rejected_by' => $rejected_by,
+                'rejected_on' => $rejected_on,
+                'ref_no' => $ref_no,
+                'ref_date' => $ref_date,
+                'modified_approved_date' => $modified_approved_date,
+                'distributor_out_id' => $id
+            );
+
+            if($credit_debit_note_id==''){
+                $this->db->insert('credit_debit_note',$data);
+                $credit_debit_note_id=$this->db->insert_id();
+                $action='Credit_debit_note Entry Created.';
+            } else {
+                $this->db->where('id', $credit_debit_note_id);
+                $this->db->update('credit_debit_note',$data);
+                $action='Credit_debit_note Entry Modified.';
+            }
+
+            $logarray['table_id']=$credit_debit_note_id;
+            $logarray['module_name']='Credit_debit_note';
+            $logarray['cnt_name']='Credit_debit_note';
+            $logarray['action']=$action;
+            $this->user_access_log_model->insertAccessLog($logarray);
+        } else {
+            if($credit_debit_note_id!=''){
+                $sql = "update credit_debit_note set status = 'InActive' where id = '$credit_debit_note_id'";
+                $this->db->query($sql);
+            }
+        }
+    }
 }
 
 function set_delivery_status() {
@@ -999,7 +1190,6 @@ function set_delivery_status() {
             $this->tax_invoice_model->generate_gate_pass($distributor_out_id);
         }
     }
-
 }
 
 function set_sku_batch(){
@@ -1429,19 +1619,16 @@ function check_order_id_availablity(){
     }
 }
 
-
-public function get_product_percentage($product_id,$distributor_id)
-{
-    $sql = "SELECT B.margin,A.category_id,A.tax_percentage from
-            (Select category_id,tax_percentage from product_master Where id=$product_id ) A
-            Left JOIN
-            (SELECT * from distributor_category_margin ) B
+public function get_product_percentage($product_id,$distributor_id){
+    $sql = "select B.inv_margin, A.category_id, A.tax_percentage, B.pro_margin from
+            (select category_id,tax_percentage from product_master Where id=$product_id ) A
+            left join 
+            (select * from distributor_category_margin ) B
             on A.category_id=B.category_id
-            Where B.distributor_id=$distributor_id";
+            where B.distributor_id=$distributor_id";
     $result = $this->db->query($sql)->result();
 
     return $result;
-
 }
 
 public function get_product_details($status='', $id='', $distributor_id=''){
@@ -1479,7 +1666,7 @@ public function get_product_details($status='', $id='', $distributor_id=''){
         $cond2 = " and (B.distributor_id is null)";
     }
 
-    $sql = "select A.*, B.margin from product_master A left join distributor_category_margin B 
+    $sql = "select A.*, B.inv_margin, B.pro_margin from product_master A left join distributor_category_margin B 
             on(A.category_id=B.category_id ".$cond2.") 
             ".$cond." order by A.product_name";
     $query=$this->db->query($sql);
@@ -1520,7 +1707,7 @@ public function get_distributor_box_details($status='', $id='', $distributor_id=
         }*/
     }
 
-    $sql = "select A.*, B.margin from box_master A left join distributor_category_margin B 
+    $sql = "select A.*, B.inv_margin, B.pro_margin from box_master A left join distributor_category_margin B 
             on(A.category_id=B.category_id ".$cond2.") 
             ".$cond." order by A.box_name";
     $query=$this->db->query($sql);
@@ -1561,22 +1748,19 @@ public function get_box_details($status='', $id='', $distributor_id=''){
         }*/
     }
 
-    $sql = "select A.*, B.margin from box_master A left join distributor_category_margin B 
+    $sql = "select A.*, B.inv_margin, B.pro_margin from box_master A left join distributor_category_margin B 
             on(A.category_id=B.category_id ".$cond2.") 
             ".$cond." order by A.box_name";
     $query=$this->db->query($sql);
     return $query->result();
 }
 
-
-public function get_comments($id)
-{
+public function get_comments($id){
     $result = $this->db->select('comments')->where('id',$id)->get('distributor_out')->result();
     return $result;
 }
 
-public function save_comments()
-{
+public function save_comments(){
    $id=$this->input->post('delivery_comments_id');
    echo $delivery_comments=$this->input->post('delivery_comments');
   
@@ -1590,7 +1774,6 @@ public function save_comments()
       $this->db->update('distributor_out',$data);
    }
 }
-
 
 }
 ?>

@@ -65,6 +65,14 @@
                                 </div>
                                 <div class="form-group">
                                     <div class="col-md-12 col-sm-12 col-xs-12">
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Same As Above </label>
+                                        <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <input type="checkbox" class="" id="same_as_above" onchange="set_confirmation_dates();" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12 col-sm-12 col-xs-12">
                                         <label class="col-md-2 col-sm-2 col-xs-12 control-label">Confirm From Date <span class="asterisk_sign">*</span></label>
                                         <div class="col-md-4 col-sm-4 col-xs-12">
                                             <input type="text" class="form-control datepicker" name="confirm_from_date" id="confirm_from_date" placeholder="Confirm From Date" value="<?php if(isset($data)) echo (($data[0]->confirm_from_date!=null && $data[0]->confirm_from_date!='')?date('d/m/Y',strtotime($data[0]->confirm_from_date)):'');?>" />
@@ -79,7 +87,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-group" style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
+                                <div class="form-group" style="<?php if(isset($data)) echo 'display: none;'; else echo 'display: none;';?>">
                                     <div class="col-md-12 col-sm-12 col-xs-12">
                                         <div style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Status <span class="asterisk_sign">*</span></label>
@@ -96,7 +104,7 @@
                                     <div class="col-md-12 col-sm-12 col-xs-12">
                                         <label class="col-md-2 col-sm-2 col-xs-12 control-label">Remarks </label>
                                         <div class="col-md-10  col-sm-10 col-xs-12">
-                                            <textarea class="form-control" name="remarks"><?php if(isset($data)) echo $data[0]->remarks;?></textarea>
+                                            <textarea class="form-control" name="remarks"><?php if(isset($data)) echo $data[0]->confirmation_remarks;?></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -129,6 +137,16 @@
                     delete_row($(this));
                 });
             });
+
+            var set_confirmation_dates = function(){
+                if($('#same_as_above').is(":checked")){
+                    $('#confirm_from_date').val($('#from_date').val());
+                    $('#confirm_to_date').val($('#to_date').val());
+                } else {
+                    $('#confirm_from_date').val('');
+                    $('#confirm_to_date').val('');
+                }
+            }
         </script>
     </body>
 </html>

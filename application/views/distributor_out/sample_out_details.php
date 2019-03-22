@@ -316,7 +316,7 @@
                                                 <th>Sell Rate (In Rs) <span class="asterisk_sign">*</span></th>
                                                 <th style="display: none;">Grams</th>
                                                 <th>Amount (In Rs)</th>
-                                                <th>Action</th>
+                                                <th class="table_action">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody id="box_details">
@@ -360,7 +360,7 @@
                                                 <td>
                                                     <input type="text" class="form-control amount" name="amount[]" id="amount_<?php echo $i; ?>" placeholder="Amount" value="<?php if (isset($distributor_out_items)) { echo $distributor_out_items[$i]->amount; } ?>" readonly />
                                                 </td>
-                                                 <td style="text-align:center;     vertical-align: middle;">
+                                                 <td class="table_action" style="text-align:center;     vertical-align: middle;">
                                                      <?php  
                                                      $style = '';
                                                         if(isset($data[0]->freezed)){
@@ -414,7 +414,7 @@
                                                 <td>
                                                     <input type="text" class="form-control amount" name="amount[]" id="amount_<?php echo $i; ?>" placeholder="Amount" value="" readonly />
                                                 </td>
-                                                  <td style="text-align:center;     vertical-align: middle;">
+                                                  <td class="table_action" style="text-align:center;     vertical-align: middle;">
                                                     <?php  
                                                     if(isset($data[0]->freezed)){
                                                         if($data[0]->freezed==1){
@@ -608,9 +608,11 @@
                                                 <label class="col-md-2 col-sm-2 col-xs-12 control-label">Status <span class="asterisk_sign">*</span></label>
                                                 <div class="col-md-4 col-sm-4 col-xs-12">
                                                     <select class="form-control" name="status">
-                                                        <option value="Approved" <?php if(isset($data)) {if ($data[0]->status=='Approved') echo 'selected';}?>>Active</option>
                                                         <option value="Pending" <?php if(isset($data)) {if ($data[0]->status=='Pending') echo 'selected';} ?>>Pending</option>
-                                                        <option value="InActive" <?php if(isset($data)) {if ($data[0]->status=='InActive') echo 'selected';}?>>InActive</option>
+                                                        <option value="Deleted" <?php if(isset($data)) {if ($data[0]->status=='Deleted') echo 'selected';}?>>Deleted</option>
+                                                        <option value="Rejected" <?php if(isset($data)) {if ($data[0]->status=='Rejected') echo 'selected';}?>>Rejected</option>
+                                                        <option value="Approved" <?php if(isset($data)) {if ($data[0]->status=='Approved') echo 'selected';} ?>>Approved</option>
+                                                        <option value="InActive" <?php if(isset($data)) {if ($data[0]->status=='InActive') echo 'selected';} ?>>Cancelled</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -1077,11 +1079,16 @@
                                             '<td>' + 
                                                 '<input type="text" class="form-control" name="total_amount" id="total_amount" placeholder="Total Amount" value="<?php if (isset($data)) { echo $data[0]->amount; } ?>" readonly />' + 
                                             '</td>' + 
-                                            '<td style="text-align:center;">' + 
+                                            '<td class="table_action" style="text-align:center;">' + 
                                                 '&nbsp;' + 
                                             '</td>' + 
                                         '</tr>');
-                    $('#box_details').append(newRow1);
+
+                $('#box_details').append(newRow1);
+                if(!$('#btn_submit').is(':visible')){
+                    $('.table_action').hide();
+                }
+
                 $('#repeat-box').click(function(event){
                     event.preventDefault();
                     var newRow = jQuery('<tr id="box_'+counter+'_row">' + 

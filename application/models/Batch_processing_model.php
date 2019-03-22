@@ -24,9 +24,8 @@ function get_pending_data($id=''){
     return $id;
 }
 
-
 function get_data($status='', $id=''){
-     if($status!=""){
+    if($status!=""){
         if($status=="Pending"){
             $cond=" where A.status='Pending' or A.status='Deleted'";
         } else{
@@ -77,13 +76,10 @@ function get_batch_raw_material($id){
     return $query->result();
 }
 
- function get_batch_images($id){
+function get_batch_images($id){
     $query=$this->db->query("SELECT * FROM batch_images WHERE batch_processing_id = '$id'");
-               return $query->result();
- }
-	  
-               
-
+    return $query->result();
+}
 
 function save_data($id='') {
     $now=date('Y-m-d H:i:s');
@@ -92,12 +88,11 @@ function save_data($id='') {
     $date_of_processing=$this->input->post('date_of_processing');
     if($date_of_processing==''){
         $date_of_processing=NULL;
-    }
-    else{
+    } else {
         $date_of_processing=formatdate($date_of_processing);
     }
 
-      if($this->input->post('btn_approve')!=null || $this->input->post('btn_reject')!=null){
+    if($this->input->post('btn_approve')!=null || $this->input->post('btn_reject')!=null){
         if($this->input->post('btn_approve')!=null){
             if($this->input->post('status')=="Deleted"){
                 $status = 'InActive';
@@ -134,7 +129,17 @@ function save_data($id='') {
                                 A.avg_grams=B.avg_grams,
                                 A.status='$status', A.remarks='$remarks', 
                                 A.modified_by=B.modified_by, A.modified_on=B.modified_on, 
-                                A.approved_by='$curusr', A.approved_on='$now' 
+                                A.approved_by='$curusr', A.approved_on='$now', 
+                                A.production_id=B.production_id, 
+                                A.no_of_batch=B.no_of_batch, 
+                                A.anticipated_water_loss=B.anticipated_water_loss, 
+                                A.anticipated_output_in_kg=B.anticipated_output_in_kg, 
+                                A.anticipated_grams=B.anticipated_grams, 
+                                A.anticipated_output_in_bars=B.anticipated_output_in_bars, 
+                                A.difference_in_bars=B.difference_in_bars, 
+                                A.actual_water_loss=B.actual_water_loss, 
+                                A.total_wastage=B.total_wastage, 
+                                A.actual_wastage_percent=B.actual_wastage_percent 
                             WHERE A.id = '$ref_id' and B.id = '$id'";
                     $this->db->query($sql);
 
@@ -155,14 +160,18 @@ function save_data($id='') {
                     $this->db->query($sql);
                 }
 
+                $module = $this->input->post('module');
+                $production_id = $this->input->post('production_id');
+                if($module=='production'){
+                    $sql = "update production_details set production_details = '1' where id = '$production_id'";
+                    $this->db->query($sql);
+                }
+
                 $action='batch_raw_material '.$status.'.';
 				echo '<script>var win = window.open("'.base_url().'index.php/batch_processing/view_batch_processing_receipt/'.$id.'") 	win.print();</script>';
             }
         }
-    }
-    else
-    {
-
+    } else {
         if($this->input->post('btn_delete')!=null){
             if($this->input->post('status')=="Approved"){
                 $status = 'Deleted';
@@ -193,8 +202,6 @@ function save_data($id='') {
             'depot_id' => $this->input->post('depot_id'),
             'no_of_batch' => $this->input->post('no_of_batch'),
             'product_id' => $this->input->post('product_id'),
-         
-
             'qty_in_bar' => format_number($this->input->post('qty_in_bar'),2),
             'actual_wastage' => format_number($this->input->post('actual_wastage'),2),
             'wastage_percent' => format_number($this->input->post('wastage_percent'),2),
@@ -207,7 +214,16 @@ function save_data($id='') {
             'remarks' => $this->input->post('remarks'),
             'modified_by' => $curusr,
             'modified_on' => $now,
-            'ref_id' => $ref_id
+            'ref_id' => $ref_id,
+            'production_id' => ($this->input->post('production_id')==''?'0':$this->input->post('production_id')),
+            'anticipated_water_loss' => format_number($this->input->post('anticipated_water_loss'),2),
+            'anticipated_output_in_kg' => format_number($this->input->post('anticipated_output_in_kg'),2),
+            'anticipated_grams' => format_number($this->input->post('anticipated_grams'),2),
+            'anticipated_output_in_bars' => format_number($this->input->post('anticipated_output_in_bars'),2),
+            'difference_in_bars' => format_number($this->input->post('difference_in_bars'),2),
+            'actual_water_loss' => format_number($this->input->post('actual_water_loss'),2),
+            'total_wastage' => format_number($this->input->post('total_wastage'),2),
+            'actual_wastage_percent' => format_number($this->input->post('actual_wastage_percent'),2)
         );
 
         if($id==''){
@@ -225,9 +241,8 @@ function save_data($id='') {
         } else {
             $this->db->where('id', $id);
             $this->db->update('batch_processing',$data);
-            $action='Payment Entry Modified.';
+            $action='Batch Processing Entry Modified.';
         }
-
 
         $this->db->where('batch_processing_id', $id);
         $this->db->delete('batch_raw_material');
@@ -315,104 +330,31 @@ function save_data($id='') {
 
     }
     
-  
-
-            // for ($k=0; $k<count($title); $k++) {
-                // if(isset($docname[$k]) and $docname[$k]!="") {
-                // if(isset($title[$k]) and $title[$k]!="") {
-             
-
-                   
-                  // $filePath='uploads/distributor_receivables/';
-					// $upload_path = './' . $filePath;
-					// if(!is_dir($upload_path)) {
-					// mkdir($upload_path, 0777, TRUE);
-				// }
-
-                   
-
-                    // $confi['upload_path']=$upload_path;
-                    // $confi['allowed_types']='*';
-                    // $this->load->library('upload', $confi);
-                    // $this->upload->initialize($confi);
-                    // $extension="";
-
-                    // $file_nm='doc_'.$doccnt;
-
-                    // while (!isset($_FILES[$file_nm])) {
-                        // $doccnt = $doccnt + 1;
-                        // $file_nm = 'doc_'.$doccnt;
-                    // }
-
-                    // if(!empty($_FILES[$file_nm]['name'])) {
-                        // if($this->upload->do_upload($file_nm)) {
-                            // echo "Uploaded <br>";
-                        // } else {
-                            // echo "Failed<br>";
-                            // echo $this->upload->data();
-                        // }   
-
-                        // $upload_data=$this->upload->data();
-                        // $fileName=$upload_data['file_name'];
-                        // $extension=$upload_data['file_ext'];
-                            
-                        // $data = array(
-                         
-                            // 'title' => $title[$k],
-                          
-                          
-                            // 'doc_document' => $filePath.$fileName,
-                            // 'document_name' => $fileName
-                        // );
-                        // $this->db->insert('batch_images', $data);
-                    // } else {
-                        // if($file_path_count>=$k) {
-                            // $path=$file_path_db[$k]['docpath'];
-                            // $flnm=$file_path_db[$k]['docfilename'];
-                        // } else {
-                            // $path="";
-                            // $flnm="";
-                        // }
-
-                        // $data = array(
-                         // 'title' => $title[$k],
-                            // 'doc_document' => $docdocument[$k],
-                            // 'document_name' => $documentname[$k]
-                        // );
-                        // $this->db->insert('batch_images', $data);
-                    // }
-                // }
-
-                // $doccnt = $doccnt + 1;
-
-                // if($k!=count($docname)-1) {
-                    // $file_nm='doc_'.$doccnt;
-
-                    // while (!isset($_FILES[$file_nm])) {
-                        // $doccnt = $doccnt + 1;
-                        // $file_nm = 'doc_'.$doccnt;
-                    // }
-                // }
-            // }
-
     $logarray['table_id']=$id;
     $logarray['module_name']='Batch_Processing';
     $logarray['cnt_name']='Batch_Processing';
     $logarray['action']=$action;
     $this->user_access_log_model->insertAccessLog($logarray);
 
+    $module = $this->input->post('module');
+    $production_id = $this->input->post('production_id');
+    if($module=='production'){
+        echo '<script>window.open("'.base_url().'index.php/production/post_details/'.$production_id.'", "_parent")</script>';
+    } else {
+        echo '<script>window.open("'.base_url().'index.php/batch_processing", "_parent")</script>';
+    }
 }
 
 function get_batch_raw_material1($product_id){
-	     $product_id=$this->input->post('id');
+	$product_id=$this->input->post('id');
 	   
-     $sql = 
-			"select C.rm_id,C.qty_per_batch, D.rm_name from (select A.*, B.ing_id,B.rm_id,B.qty_per_batch,B.rm_name from 
+    $sql = "select C.rm_id,C.qty_per_batch, D.rm_name from 
+            (select A.*, B.ing_id,B.rm_id,B.qty_per_batch,B.rm_name from 
 			( select * from ingredients_master) A 
             left join 
             (select * from ingredients_details) B 
             on (B.ing_id=A.id))C
-			 left join 
+			left join 
             (select * from raw_material_master) D
             on (C.rm_id=D.id)  where  C.product_id='$product_id'";
 			
@@ -424,9 +366,6 @@ function get_batch_raw_material1($product_id){
     $query=$this->db->query($sql);
     return $query->result();
 }
-	
-
-	
 
 function check_batch_id_availablity(){
     $id=$this->input->post('id');

@@ -16,7 +16,7 @@
 		<link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>css/user-details.css"/>
         <!-- EOF CSS INCLUDE -->     
 		
-		<style>		
+		<style>
             input[type=radio], input[type=checkbox] { margin: 8px 0px 0px;      vertical-align: text-bottom;}		
 			th{text-align:center;}
 			.center{text-align:center;}
@@ -28,7 +28,7 @@
             @media screen and (max-width:806px) {   
                 .h-scroll { overflow-x:scroll;} .h-scroll .table-stripped{ width:805px!important;}
             }
-            .delete_row_ex .trash {
+            .delete_row_new_ex .trash {
                 font-size: 21px;
                 color: #cc2127;
             }
@@ -118,7 +118,7 @@
                                                             <option value="<?php echo $distributor[$k]->id; ?>" <?php if(isset($data)) { if($distributor[$k]->id==$data[0]->distributor_id) { echo 'selected'; } } ?>><?php echo $distributor[$k]->distributor_name; ?></option>
                                                     <?php }} ?>
                                                 </select>
-                                                <input type="hidden" name="sell_out" id="sell_out" value="<?php if(isset($data)) { echo $data[0]->sell_out; } ?>"/>
+                                                <input type="hidden" name="sell_out" id="sell_out" value="<?php if(isset($data)) { if($data[0]->discount!=0) echo $data[0]->discount; /*else echo $data[0]->sell_out;*/ } ?>"/>
                                                 <!-- <input type="hidden" name="distributor_id" id="distributor_id" value="<?php //if(isset($data)) { echo $data[0]->distributor_id; } ?>"/>
                                                 <input type="text" class="form-control load_distributor" name="distributor" id="distributor" placeholder="Type To Select Distributor...." value="<?php //if(isset($data)) { echo $data[0]->distributor_name; } ?>"/> -->
                                                 <input type="hidden" class="form-control" name="state" id="state" placeholder="State" value="" />
@@ -135,12 +135,23 @@
                                                             <option value="<?php echo $depot[$k]->id; ?>" <?php if(isset($data)) { if($depot[$k]->id==$data[0]->depot_id) { echo 'selected'; } } ?>><?php echo $depot[$k]->depot_name; ?></option>
                                                     <?php }} ?>
                                                 </select>
+                                                <input type="hidden" name="prev_depo" id="prev_depo" value="<?php 
+                                                        if(isset($data)) { 
+                                                        echo $data[0]->depot_id;
+                                                        }
+                                                        ?>">
                                                 <input type="hidden" class="form-control" name="depot_state" id="depot_state" value="<?php if(isset($data)) { echo  $data[0]->depot_state; } ?>"/>
                                                 <!-- <input type="hidden" name="depot_id" id="depot_id" value="<?php //if(isset($data)) { echo $data[0]->depot_id; } ?>"/>
                                                 <input type="text" class="form-control load_depot" name="depot" id="depot" placeholder="Type To Select Depot...." value="<?php //if(isset($data)) { echo $data[0]->depot_name; } ?>"/> -->
                                             </div>
                                         </div>
 									</div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Discount </label>
+                                        <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <input type="text" class="form-control" name="discount" id="discount" placeholder="Discount" value="<?php if(isset($data)) { echo $data[0]->discount; } ?>" />
+                                        </div>
+                                    </div>
 									<div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Sales Representative <span class="asterisk_sign">*</span></label>
@@ -226,7 +237,7 @@
                                             </div> -->
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Is stock expired?<span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input <?php if (isset($data)) { if($data[0]->is_expired=='yes') { echo 'checked'; } } ?> type="checkbox" class="form-select" name="expired" id="expired" value="<?php if (isset($data)) { if($data[0]->is_expired=='yes') { echo '1'; } } else { echo '1'; } ?>"/>
+                                                <input <?php if (isset($data)) { if($data[0]->is_expired=='yes') { echo 'checked'; } } ?> type="checkbox" class="form-select" name="expired" id="expired" value="1"/>
                                             </div>
                                         </div>
                                     </div>
@@ -238,7 +249,7 @@
                                             </div> -->
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Is there exchange of stock?<span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="checkbox" <?php if (isset($data)) { if($data[0]->is_exchanged=='yes') { echo 'checked'; } } ?> class="form-select" name="exhanged" id="exchanged" value="<?php if (isset($data)) { if($data[0]->is_exchanged=='yes') { echo '1'; } } else { echo '1'; } ?>"/>
+                                                <input type="checkbox" <?php if (isset($data)) { if($data[0]->is_exchanged=='yes') { echo 'checked'; } } ?> class="form-select" name="exhanged" id="exchanged" value="1"/>
                                             </div>
                                         </div>
                                     </div>
@@ -297,6 +308,7 @@
                                                 </td>
                                                 <td>
                                                     <input type="text" class="form-control qty" name="qty[]" id="qty_<?php echo $i; ?>" placeholder="Qty" value="<?php if (isset($distributor_in_items)) { echo $distributor_in_items[$i]->qty; } ?>"/>
+                                                    <input type="hidden" class="form-control pre_qty" name="pre_qty[]" id="pre_qty_<?php echo $i; ?>" placeholder="Qty" value="<?php if (isset($distributor_in_items)) { echo $distributor_in_items[$i]->qty; } ?>"/>
                                                 </td>
                                                 <td class="print_hide">
                                                     <input type="text" class="form-control rate" name="rate[]" id="rate_<?php echo $i; ?>" placeholder="Rate" value="<?php if (isset($distributor_in_items)) { echo $distributor_in_items[$i]->rate; } ?>" readonly />
@@ -307,6 +319,7 @@
                                                     <input type="hidden" class="form-control" name="igst[]" id="igst_<?php echo $i; ?>" placeholder="igst" value="0" readonly />
                                                     <input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_<?php echo $i; ?>" placeholder="tax_per" value="<?php if (isset($distributor_in_items)) { echo $distributor_in_items[$i]->tax_percentage; } ?>"/>
                                                     <input type="hidden" class="form-control sell_margin" name="sell_margin[]" id="sell_margin_<?php echo $i; ?>" placeholder="Sell Margin" value="<?php if (isset($distributor_in_items)) { echo $distributor_in_items[$i]->margin_per; } ?>"/>
+                                                    <input type="hidden" class="form-control promo_margin" name="promo_margin[]" id="promo_margin_<?php echo $i; ?>" placeholder="Promo Margin" value="<?php if (isset($distributor_in_items)) { echo $distributor_in_items[$i]->promo_margin; } ?>"/>
                                                     <input type="text" class="form-control sell_rate" name="sell_rate[]" id="sell_rate_<?php echo $i; ?>" placeholder="Sell Rate" value="<?php if (isset($distributor_in_items)) { echo $distributor_in_items[$i]->sell_rate; } ?>"/>
                                                 </td>
                                                 <td style="display:none;">
@@ -361,7 +374,7 @@
                                                                  $style =  'display: block;';
                                                             }
                                                     ?>
-                                                    <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  style="<?=$style?>"></span></a>
+                                                    <a id="box_<?php echo $i; ?>_row_delete" class="delete_row_new" href="#"><span class="fa trash fa-trash-o"  style="<?=$style?>"></span></a>
                                                 </td>
                                             </tr>
                                         <?php }} else { ?>
@@ -400,7 +413,7 @@
                                                     <input type="hidden" class="form-control" name="igst[]" id="igst_<?php echo $i; ?>" placeholder="igst" value="0" readonly />
                                                     <input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_<?php echo $i; ?>" placeholder="tax_per" value="0"/>
                                                     <input type="hidden" class="form-control sell_margin" name="sell_margin[]" id="sell_margin_<?php echo $i; ?>" placeholder="Sell Margin" value="0"/>
-                                                    
+                                                    <input type="hidden" class="form-control promo_margin" name="promo_margin[]" id="promo_margin_<?php echo $i; ?>" placeholder="Promo Margin" value="0"/>
                                                     <input type="text" class="form-control sell_rate" name="sell_rate[]" id="sell_rate_<?php echo $i; ?>" placeholder="Sell Rate" value=""/>
                                                 </td>
                                                 <td style="display: none;">
@@ -454,7 +467,7 @@
                                                                  $style =  'display: block;';
                                                             }
                                                     ?>
-                                                    <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  style="<?=$style?>"></span></a>
+                                                    <a id="box_<?php echo $i; ?>_row_delete" class="delete_row_new" href="#"><span class="fa trash fa-trash-o"  style="<?=$style?>"></span></a>
                                                 </td>
                                             </tr>
                                         <?php } ?>
@@ -528,12 +541,12 @@
                                                     <input type="text" class="form-control rate_ex" name="rate_ex[]" id="rate_ex_<?php echo $i; ?>" placeholder="Rate" value="<?php if (isset($distributor_in_items_ex)) { echo $distributor_in_items_ex[$i]->rate; } ?>" readonly />
                                                 </td>
                                                 <td>
-                                                     <input type="hidden" class="form-control" name="cgst[]" id="cgst_ex_<?php echo $i; ?>" placeholder="cgst" value="0" readonly />
-                                                    <input type="hidden" class="form-control" name="sgst[]" id="sgst_ex_<?php echo $i; ?>" placeholder="sgst" value="0" readonly />
-                                                    <input type="hidden" class="form-control" name="igst[]" id="igst_ex_<?php echo $i; ?>" placeholder="igst" value="0" readonly />
-                                                    <input type="hidden" class="form-control tax_per" name="tax_per_ex[]" id="tax_per_ex_<?php echo $i; ?>" placeholder="tax_per" value="<?php if (isset($distributor_in_items_ex)) { echo $distributor_in_items_ex[$i]->tax_percentage; } ?>"/>
-                                                    <input type="hidden" class="form-control sell_margin" name="sell_margin_ex[]" id="sell_margin_ex_<?php echo $i; ?>" placeholder="Sell Margin" value="<?php if (isset($distributor_in_items_ex)) { echo $distributor_in_items_ex[$i]->margin_per; } ?>"/>
-
+                                                    <input type="hidden" class="form-control" name="cgst_ex[]" id="cgst_ex_<?php echo $i; ?>" placeholder="cgst" value="0" readonly />
+                                                    <input type="hidden" class="form-control" name="sgst_ex[]" id="sgst_ex_<?php echo $i; ?>" placeholder="sgst" value="0" readonly />
+                                                    <input type="hidden" class="form-control" name="igst_ex[]" id="igst_ex_<?php echo $i; ?>" placeholder="igst" value="0" readonly />
+                                                    <input type="hidden" class="form-control tax_per_ex" name="tax_per_ex[]" id="tax_per_ex_<?php echo $i; ?>" placeholder="tax_per" value="<?php if (isset($distributor_in_items_ex)) { echo $distributor_in_items_ex[$i]->tax_percentage; } ?>"/>
+                                                    <input type="hidden" class="form-control sell_margin_ex" name="sell_margin_ex[]" id="sell_margin_ex_<?php echo $i; ?>" placeholder="Sell Margin" value="<?php if (isset($distributor_in_items_ex)) { echo $distributor_in_items_ex[$i]->margin_per; } ?>"/>
+                                                    <input type="hidden" class="form-control promo_margin_ex" name="promo_margin_ex[]" id="promo_margin_ex_<?php echo $i; ?>" placeholder="Promotion Margin" value="<?php if (isset($distributor_in_items_ex)) { echo $distributor_in_items_ex[$i]->promo_margin; } ?>"/>
                                                     <input type="text" class="form-control sell_rate_ex" name="sell_rate_ex[]" id="sell_rate_ex_<?php echo $i; ?>" placeholder="Sell Rate" value="<?php if (isset($distributor_in_items_ex)) { echo $distributor_in_items_ex[$i]->sell_rate; } ?>"/>
                                                 </td>
                                                 <td style="display: none;">
@@ -588,7 +601,7 @@
                                                                  $style =  'display: block;';
                                                             }
                                                     ?>
-                                                    <a id="box_ex_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  style="<?=$style?>"></span></a>
+                                                    <a id="box_ex_<?php echo $i; ?>_row_delete" class="delete_row_new" href="#"><span class="fa trash fa-trash-o"  style="<?=$style?>"></span></a>
                                                 </td>
                                             </tr>
                                         <?php }} else { ?>
@@ -622,11 +635,12 @@
                                                     <input type="text" class="form-control rate_ex" name="rate_ex[]" id="rate_ex_<?php echo $i; ?>" placeholder="Rate" value="" readonly />
                                                 </td>
                                                 <td>
-                                                    <input type="hidden" class="form-control" name="cgst[]" id="cgst_ex_<?php echo $i; ?>" placeholder="cgst" value="0" readonly />
-                                                    <input type="hidden" class="form-control" name="sgst[]" id="sgst_ex_<?php echo $i; ?>" placeholder="sgst" value="0" readonly />
-                                                    <input type="hidden" class="form-control" name="igst[]" id="igst_ex_<?php echo $i; ?>" placeholder="igst" value="0" readonly />
-                                                    <input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_ex_<?php echo $i; ?>" placeholder="tax_per" value="0"/>
-                                                    <input type="hidden" class="form-control sell_margin" name="sell_margin_ex[]" id="sell_margin_ex_<?php echo $i; ?>" placeholder="Sell Margin" value="0"/>
+                                                    <input type="hidden" class="form-control" name="cgst_ex[]" id="cgst_ex_<?php echo $i; ?>" placeholder="cgst" value="0" readonly />
+                                                    <input type="hidden" class="form-control" name="sgst_ex[]" id="sgst_ex_<?php echo $i; ?>" placeholder="sgst" value="0" readonly />
+                                                    <input type="hidden" class="form-control" name="igst_ex[]" id="igst_ex_<?php echo $i; ?>" placeholder="igst" value="0" readonly />
+                                                    <input type="hidden" class="form-control tax_per_ex" name="tax_per_ex[]" id="tax_per_ex_<?php echo $i; ?>" placeholder="tax_per" value="0"/>
+                                                    <input type="hidden" class="form-control sell_margin_ex" name="sell_margin_ex[]" id="sell_margin_ex_<?php echo $i; ?>" placeholder="Sell Margin" value="0"/>
+                                                    <input type="hidden" class="form-control promo_margin_ex" name="promo_margin_ex[]" id="promo_margin_ex_<?php echo $i; ?>" placeholder="Promotion Margin" value="0"/>
                                                     <input type="text" class="form-control sell_rate_ex" name="sell_rate_ex[]" id="sell_rate_ex_<?php echo $i; ?>" placeholder="Sell Rate" value=""/>
                                                 </td>
                                                 <td style="display: none;">
@@ -680,7 +694,7 @@
                                                                  $style =  'display: block;';
                                                             }
                                                         ?>
-                                                    <a id="box_ex_<?php echo $i; ?>_row_delete" class="delete_row" href="#" style="<?=$style?>"><span class="fa trash fa-trash-o"  ></span></a>
+                                                    <a id="box_ex_<?php echo $i; ?>_row_delete" class="delete_row_new" href="javascript:void(0)" style="<?=$style?>"><span class="fa trash fa-trash-o"  ></span></a>
                                                 </td>
                                             </tr>
                                         <?php } ?>
@@ -735,7 +749,7 @@
                                             <div style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
                                                 <label class="col-md-2 col-sm-2 col-xs-12 control-label">Status <span class="asterisk_sign">*</span></label>
                                                 <div class="col-md-4 col-sm-4 col-xs-12">
-                                                    <select class="form-control" name="status">
+                                                    <select class="form-control" name="status" id="status">
                                                         <option value="Pending" <?php if(isset($data)) {if ($data[0]->status=='Pending') echo 'selected';}?>>Pending</option>
                                                         <option value="Deleted" <?php if(isset($data)) {if ($data[0]->status=='Deleted') echo 'selected';}?>>Deleted</option>
                                                         <option value="Rejected" <?php if(isset($data)) {if ($data[0]->status=='Rejected') echo 'selected';}?>>Rejected</option>
@@ -785,13 +799,11 @@
 
                                    <input type="submit" class="btn btn-success btn-sm" id="btn_submit" name="btn_submit" value="Submit For Approval" style="<?php if(isset($access)) {
                                     if(isset($data)) {
-                                        if($data[0]->freezed)
-                                            {
-                                                echo 'display: none;';
-                                            }else
-                                            {
-                                              if($access[0]->r_edit=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || $data[0]->status=='InActive')) echo ''; else echo 'display: none;';
-                                            }
+                                        if($data[0]->freezed) {
+                                            echo 'display: none;';
+                                        } else {
+                                          if($access[0]->r_edit=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || $data[0]->status=='InActive')) echo ''; else echo 'display: none;';
+                                        }
                                         
                                         } else if($access[0]->r_insert=='1') echo ''; else echo 'display: none;';} else echo 'display: none;'; 
                                     ?>" />
@@ -819,19 +831,33 @@
         <script type="text/javascript" src="<?php echo base_url(); ?>js/load_autocomplete.js"></script>
         <script type="text/javascript" src="<?php echo base_url(); ?>js/validations.js"></script>
         <script type="text/javascript">
+            $("#discount").change(function(){
+                $('#sell_out').val($("#discount").val());
+                // get_sell_rate();
+
+                $('.type').each(function(){
+                    show_item($(this));
+                    // console.log('show_item');
+                    // get_product_detail($(this));
+                });
+                get_sell_rate();
+            });
+
             function show_item(elem){
                 var id = elem.attr('id');
                 var index = id.substr(id.lastIndexOf('_')+1);
                 if(elem.val()=="Bar"){
                     $("#bar_"+index).show();
                     $("#box_"+index).hide();
+                    get_bar_details($("#bar_"+index));
                 } else {
                     $("#box_"+index).show();
                     $("#bar_"+index).hide();
+                    get_box_details($("#box_"+index));
                 }
 
-                $("#grams_"+index).val('');
-                $("#rate_"+index).val('');
+                // $("#grams_"+index).val('');
+                // $("#rate_"+index).val('');
 
                 // get_total();
             }
@@ -842,13 +868,15 @@
                 if(elem.val()=="Bar"){
                     $("#bar_ex_"+index).show();
                     $("#box_ex_"+index).hide();
+                    get_bar_details_ex($("#bar_ex_"+index));
                 } else {
                     $("#box_ex_"+index).show();
                     $("#bar_ex_"+index).hide();
+                    get_box_details_ex($("#box_ex_"+index));
                 }
 
-                $("#grams_ex_"+index).val('');
-                $("#rate_ex_"+index).val('');
+                // $("#grams_ex_"+index).val('');
+                // $("#rate_ex_"+index).val('');
 
                 // get_total();
             }
@@ -874,7 +902,7 @@
                 });
             }
 
-            function get_distributor_details(distributor_id){
+            function get_distributor_details(distributor_id, set_discount=true){
                 // var distributor_id = $('#distributor_id').val();
                 var sell_out = 0;
                 // console.log(distributor_id);
@@ -887,8 +915,15 @@
                     async:false,
                     success: function(data){
                         if(data.result==1){
-                            $('#sell_out').val(data.sell_out);
-                            $('#sales_rep_id').val(data.sales_rep_id);
+                            if(set_discount==true){
+                                $('#sell_out').val(data.sell_out);
+                                $('#discount').val(data.sell_out);
+                                sell_out = parseFloat(data.sell_out);
+                            }
+                            
+                            if (isNaN(sell_out)) sell_out=0;
+
+                            // $('#sales_rep_id').val(data.sales_rep_id);
                             $('#state').val(data.state);
 
                             var credit_period = data.credit_period;
@@ -906,9 +941,6 @@
                                 month='0'+month.toString();
                             }
                             $('#due_date').val(day + '/' + month + '/' + year);
-
-                            sell_out = parseFloat(data.sell_out);
-                            if (isNaN(sell_out)) sell_out=0;
 
                             // var cst = 0;
                             // if((data.state).toUpperCase()=="MAHARASHTRA"){
@@ -991,6 +1023,9 @@
                     if (isNaN(rate)) rate=0;
                     if (isNaN(sell_out)) sell_out=0;
                    
+                    sell_out = sell_out + parseFloat(get_number($("#sell_out").val(),2));
+                    if (isNaN(sell_out)) sell_out=0;
+
                     // var cst = parseFloat(get_number($("#cst").val(),2));
                     // var sell_rate = rate-((rate*sell_out)/100);
                     // sell_rate = sell_rate/(100+cst)*100;
@@ -1079,6 +1114,9 @@
                     if (isNaN(rate)) rate=0;
                     if (isNaN(sell_out)) sell_out=0;
 
+                    sell_out = sell_out + parseFloat(get_number($("#sell_out").val(),2));
+                    if (isNaN(sell_out)) sell_out=0;
+
                     // var cst = parseFloat(get_number($("#cst").val(),2));
                     // var sell_rate = rate-((rate*sell_out)/100);
                     // sell_rate = sell_rate/(100+cst)*100;
@@ -1130,15 +1168,19 @@
                 var index = id.substr(id.lastIndexOf('_')+1);
                 var qty = parseFloat(get_number($("#qty_"+index).val(),2));
                 var sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
-                if (isNaN(sell_out)) sell_out=0;
-                var grams_in_bar = 0;
-                var rate = 0;
-                var cost = 0;
+                var pro_margin = parseFloat(get_number($("#promo_margin_"+index).val(),2));
+                var tax_per = parseFloat(get_number($("#tax_per_"+index).val(),2));
+                var distributor_id = $("#distributor_id").val();
+                var rate = parseFloat(get_number($("#rate_"+index).val(),2));
+                var cost = parseFloat(get_number($("#cost_rate_"+index).val(),2));
+                var grams = parseFloat(get_number($("#grams_"+index).val(),2));
 
                 $.ajax({
-                    url:BASE_URL+'index.php/Product/get_data',
+                    // url:BASE_URL+'index.php/Product/get_data',
+                    url:BASE_URL+'index.php/distributor_in/get_product_details',
                     method:"post",
-                    data:{id:box_id},
+                    // data:{id:box_id},
+                    data:{id:box_id, distributor_id:distributor_id},
                     dataType:"json",
                     async:false,
                     success: function(data){
@@ -1146,6 +1188,9 @@
                             grams = parseFloat(data.grams);
                             rate = parseFloat(data.rate);
                             cost = parseFloat(data.cost);
+                            sell_out = parseFloat(data.inv_margin);
+                            tax_per = parseFloat(data.tax_percentage);
+                            pro_margin = parseFloat(data.pro_margin);
                         }
                     },
                     error: function (response) {
@@ -1160,19 +1205,25 @@
                 if (isNaN(grams)) grams=0;
                 if (isNaN(rate)) rate=0;
                 if (isNaN(cost)) cost=0;
+                if (isNaN(sell_out)) sell_out=0;
+                if (isNaN(tax_per)) tax_per=0;
+                if (isNaN(pro_margin)) pro_margin=0;
+
+                var discount = parseFloat(get_number($("#sell_out").val(),2));
+                if (isNaN(discount)) discount=0;
 
                 // console.log(rate);
 
                 // var cst = parseFloat(get_number($("#cst").val(),2));
                 // var sell_rate = rate-((rate*sell_out)/100);
                 // sell_rate = sell_rate/(100+cst)*100;
+                // var tax_per = parseFloat(get_number($("#tax_per_"+index).val(),2));
 
-                var tax_per = parseFloat(get_number($("#tax_per_"+index).val(),2));
                 var cgst = $("#cgst_"+index).val();
                 var sgst = $("#sgst_"+index).val();
                 var igst = $("#igst_"+index).val();
 
-                var sell_rate = rate-((rate*sell_out)/100);
+                var sell_rate = rate-((rate*(sell_out+discount))/100);
                 sell_rate = sell_rate/(100+tax_per)*100;
 
                 var cgst_amt = (qty*((sell_rate*cgst)/100)).toFixed(2);
@@ -1198,6 +1249,9 @@
 
                 $("#grams_"+index).val(grams);
                 $("#rate_"+index).val(rate);
+                $("#sell_margin_"+index).val(sell_out);
+                $("#promo_margin_"+index).val(pro_margin);
+                $("#tax_per_"+index).val(tax_per);
                 $("#sell_rate_"+index).val(Math.round(sell_rate*10000)/10000);
                 $("#amount_"+index).val(amount);
                 $("#cost_rate_"+index).val(Math.round(cost*100)/100);
@@ -1216,15 +1270,19 @@
                 var index = id.substr(id.lastIndexOf('_')+1);
                 var qty = parseFloat(get_number($("#qty_ex_"+index).val(),2));
                 var sell_out = parseFloat(get_number($("#sell_margin_ex_"+index).val(),2));
-                if (isNaN(sell_out)) sell_out=0;
-                var grams_in_bar = 0;
-                var rate = 0;
-                var cost = 0;
-                var grams=0;
+                var pro_margin = parseFloat(get_number($("#promo_margin_ex_"+index).val(),2));
+                var tax_per = parseFloat(get_number($("#tax_per_ex_"+index).val(),2));
+                var distributor_id = $("#distributor_id").val();
+                var rate = parseFloat(get_number($("#rate_ex_"+index).val(),2));
+                var cost = parseFloat(get_number($("#cost_rate_ex_"+index).val(),2));
+                var grams = parseFloat(get_number($("#grams_ex_"+index).val(),2));
+
                 $.ajax({
-                    url:BASE_URL+'index.php/Product/get_data',
+                    // url:BASE_URL+'index.php/Product/get_data',
+                    url:BASE_URL+'index.php/distributor_in/get_product_details',
                     method:"post",
-                    data:{id:box_id},
+                    // data:{id:box_id},
+                    data:{id:box_id, distributor_id:distributor_id},
                     dataType:"json",
                     async:false,
                     success: function(data){
@@ -1232,6 +1290,9 @@
                             grams = parseFloat(data.grams);
                             rate = parseFloat(data.rate);
                             cost = parseFloat(data.cost);
+                            sell_out = parseFloat(data.inv_margin);
+                            tax_per = parseFloat(data.tax_percentage);
+                            pro_margin = parseFloat(data.pro_margin);
                         }
                     },
                     error: function (response) {
@@ -1245,17 +1306,24 @@
                 if (isNaN(qty)) qty=0;
                 if (isNaN(grams)) grams=0;
                 if (isNaN(rate)) rate=0;
+                if (isNaN(cost)) cost=0;
+                if (isNaN(sell_out)) sell_out=0;
+                if (isNaN(tax_per)) tax_per=0;
+                if (isNaN(pro_margin)) pro_margin=0;
 
                 // var cst = parseFloat(get_number($("#cst").val(),2));
                 // var sell_rate = rate-((rate*sell_out)/100);
                 // sell_rate = sell_rate/(100+cst)*100;
 
-                var tax_per = parseFloat(get_number($("#tax_per_ex_"+index).val(),2));
+                var discount = parseFloat(get_number($("#sell_out").val(),2));
+                if (isNaN(discount)) discount=0;
+
+                // var tax_per = parseFloat(get_number($("#tax_per_ex_"+index).val(),2));
                 var cgst = $("#cgst_ex_"+index).val();
                 var sgst = $("#sgst_ex_"+index).val();
                 var igst = $("#igst_ex_"+index).val();
 
-                var sell_rate = rate-((rate*sell_out)/100);
+                var sell_rate = rate-((rate*(sell_out+discount))/100);
                 sell_rate = sell_rate/(100+tax_per)*100;
 
                 var cgst_amt = (qty*((sell_rate*cgst)/100)).toFixed(2);
@@ -1281,6 +1349,9 @@
 
                 $("#grams_ex_"+index).val(grams);
                 $("#rate_ex_"+index).val(rate);
+                $("#sell_margin_ex_"+index).val(sell_out);
+                $("#promo_margin_ex_"+index).val(pro_margin);
+                $("#tax_per_ex_"+index).val(tax_per);
                 $("#sell_rate_ex_"+index).val(Math.round(sell_rate*10000)/10000);
                 $("#amount_ex_"+index).val(amount);
                 $("#cost_rate_ex_"+index).val(Math.round(cost*100)/100);
@@ -1299,15 +1370,19 @@
                 var index = id.substr(id.lastIndexOf('_')+1);
                 var qty = parseFloat(get_number($("#qty_"+index).val(),2));
                 var sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
-                if (isNaN(sell_out)) sell_out=0;
-                var grams_in_bar = 0;
-                var rate = 0;
-                var cost = 0;
+                var pro_margin = parseFloat(get_number($("#promo_margin_"+index).val(),2));
+                var tax_per = parseFloat(get_number($("#tax_per_"+index).val(),2));
+                var distributor_id = $("#distributor_id").val();
+                var rate = parseFloat(get_number($("#rate_"+index).val(),2));
+                var cost = parseFloat(get_number($("#cost_rate_"+index).val(),2));
+                var grams = parseFloat(get_number($("#grams_"+index).val(),2));
 
                 $.ajax({
-                    url:BASE_URL+'index.php/Box/get_data',
+                    // url:BASE_URL+'index.php/Box/get_data',
+                    url:BASE_URL+'index.php/distributor_in/get_box_details',
                     method:"post",
-                    data:{id:box_id},
+                    // data:{id:box_id},
+                    data:{id:box_id, distributor_id:distributor_id},
                     dataType:"json",
                     async:false,
                     success: function(data){
@@ -1315,6 +1390,9 @@
                             grams = parseFloat(data.grams);
                             rate = parseFloat(data.rate);
                             cost = parseFloat(data.cost);
+                            sell_out = parseFloat(data.inv_margin);
+                            tax_per = parseFloat(data.tax_percentage);
+                            pro_margin = parseFloat(data.pro_margin);
                         }
                     },
                     error: function (response) {
@@ -1328,17 +1406,24 @@
                 if (isNaN(qty)) qty=0;
                 if (isNaN(grams)) grams=0;
                 if (isNaN(rate)) rate=0;
+                if (isNaN(cost)) cost=0;
+                if (isNaN(sell_out)) sell_out=0;
+                if (isNaN(tax_per)) tax_per=0;
+                if (isNaN(pro_margin)) pro_margin=0;
+
+                var discount = parseFloat(get_number($("#sell_out").val(),2));
+                if (isNaN(discount)) discount=0;
 
                 // var cst = parseFloat(get_number($("#cst").val(),2));
                 // var sell_rate = rate-((rate*sell_out)/100);
                 // sell_rate = sell_rate/(100+cst)*100;
 
-                var tax_per = parseFloat(get_number($("#tax_per_"+index).val(),2));
+                // var tax_per = parseFloat(get_number($("#tax_per_"+index).val(),2));
                 var cgst = $("#cgst_"+index).val();
                 var sgst = $("#sgst_"+index).val();
                 var igst = $("#igst_"+index).val();
 
-                var sell_rate = rate-((rate*sell_out)/100);
+                var sell_rate = rate-((rate*(sell_out+discount))/100);
                 sell_rate = sell_rate/(100+tax_per)*100;
 
                 var cgst_amt = (qty*((sell_rate*cgst)/100)).toFixed(2);
@@ -1364,6 +1449,9 @@
 
                 $("#grams_"+index).val(grams);
                 $("#rate_"+index).val(rate);
+                $("#sell_margin_"+index).val(sell_out);
+                $("#promo_margin_"+index).val(pro_margin);
+                $("#tax_per_"+index).val(tax_per);
                 $("#sell_rate_"+index).val(Math.round(sell_rate*10000)/10000);
                 $("#amount_"+index).val(amount);
                 $("#cost_rate_"+index).val(Math.round(cost*100)/100);
@@ -1376,166 +1464,25 @@
                 get_total();
             }
 
-            function get_product_detail(elem) {
-                /*alert('entered');*/
-                var box_id = elem.val();
-                var id = elem.attr('id');
-                var index = id.substr(id.lastIndexOf('_')+1);
-                var box = box_id;
-                var distributor_id = $("#distributor_id").val();  
-                if(distributor_id!="")
-                {
-                  $.ajax({
-                    url:BASE_URL+'index.php/Distributor_in/get_product_percentage/'+box+'/'+distributor_id,
-                    method:"GET",
-                    dataType:"json",
-                    async:false,
-                    success: function(data){
-                        if(data!=0)
-                        {
-                            var obj = data;
-                            var margin = parseFloat(obj.margin);
-                            /*alert(margin);*/
-                            $('#sell_margin_'+index).val(margin);
-                            var tax_percentage = parseFloat(obj.tax_percentage);
-                            $('#tax_per_'+index).val(tax_percentage); 
-                            // console.log(margin);
-                        }
-                        
-                    },
-                    error: function (response) {
-                        var r = jQuery.parseJSON(response.responseText);
-                        alert("Message: " + r.Message);
-                        alert("StackTrace: " + r.StackTrace);
-                        alert("ExceptionType: " + r.ExceptionType);
-                    }
-                });  
-                }  
-            }
-
-            function get_product_box_detail(elem) {
-                /*alert('entered');*/
-                var box_id = elem.val();
-                var id = elem.attr('id');
-                var index = id.substr(id.lastIndexOf('_')+1);
-                var box = box_id;
-                var distributor_id = $("#distributor_id").val();  
-                if(distributor_id!="")
-                {
-                  $.ajax({
-                    url:BASE_URL+'index.php/Distributor_in/get_box_percentage/'+box+'/'+distributor_id,
-                    method:"GET",
-                    dataType:"json",
-                    async:false,
-                    success: function(data){
-                        if(data!=0)
-                        {
-                            var obj = data;
-                            var margin = parseFloat(obj.margin);
-                            /*alert(margin);*/
-                            $('#sell_margin_'+index).val(margin);
-                            var tax_percentage = parseFloat(obj.tax_percentage);
-                            $('#tax_per_'+index).val(tax_percentage); 
-                        }
-                        
-                    },
-                    error: function (response) {
-                        var r = jQuery.parseJSON(response.responseText);
-                        alert("Message: " + r.Message);
-                        alert("StackTrace: " + r.StackTrace);
-                        alert("ExceptionType: " + r.ExceptionType);
-                    }
-                });  
-                }  
-            }
-
-            function get_product_detail_ex(elem) {
-                /*alert('entered');*/
-                var box_id = elem.val();
-                var id = elem.attr('id');
-                var index = id.substr(id.lastIndexOf('_')+1);
-                var box = box_id;
-                var distributor_id = $("#distributor_id").val();  
-                if(distributor_id!="")
-                {
-                  $.ajax({
-                    url:BASE_URL+'index.php/Distributor_in/get_product_percentage/'+box+'/'+distributor_id,
-                    method:"GET",
-                    dataType:"json",
-                    async:false,
-                    success: function(data){
-                        if(data!=0)
-                        {
-                            var obj = data;
-                            var margin = parseFloat(obj.margin);
-                            /*alert(margin);*/
-                            $('#sell_margin_ex_'+index).val(margin);
-                            var tax_percentage = parseFloat(obj.tax_percentage);
-                            $('#tax_per_ex_'+index).val(tax_percentage);  
-                        }
-                        
-                    },
-                    error: function (response) {
-                        var r = jQuery.parseJSON(response.responseText);
-                        alert("Message: " + r.Message);
-                        alert("StackTrace: " + r.StackTrace);
-                        alert("ExceptionType: " + r.ExceptionType);
-                    }
-                });  
-                }  
-            }
-
-            function get_product_box_detail_ex(elem) {
-                /*alert('entered');*/
-                var box_id = elem.val();
-                var id = elem.attr('id');
-                var index = id.substr(id.lastIndexOf('_')+1);
-                var box = box_id;
-                var distributor_id = $("#distributor_id").val();  
-                if(distributor_id!="")
-                {
-                  $.ajax({
-                    url:BASE_URL+'index.php/Distributor_in/get_box_percentage/'+box+'/'+distributor_id,
-                    method:"GET",
-                    dataType:"json",
-                    async:false,
-                    success: function(data){
-                        if(data!=0)
-                        {
-                            var obj = data;
-                            var margin = parseFloat(obj.margin);
-                            /*alert(margin);*/
-                            $('#sell_margin_ex_'+index).val(margin);
-                            var tax_percentage = parseFloat(obj.tax_percentage);
-                            $('#tax_per_ex_'+index).val(tax_percentage);  
-                        }
-                        
-                    },
-                    error: function (response) {
-                        var r = jQuery.parseJSON(response.responseText);
-                        alert("Message: " + r.Message);
-                        alert("StackTrace: " + r.StackTrace);
-                        alert("ExceptionType: " + r.ExceptionType);
-                    }
-                });  
-                }  
-            }
-
             function get_box_details_ex(elem){
                 var box_id = elem.val();
                 var id = elem.attr('id');
                 var index = id.substr(id.lastIndexOf('_')+1);
                 var qty = parseFloat(get_number($("#qty_ex_"+index).val(),2));
                 var sell_out = parseFloat(get_number($("#sell_margin_ex_"+index).val(),2));
-                if (isNaN(sell_out)) sell_out=0;
-                var grams_in_bar = 0;
-                var rate = 0;
-                var cost = 0;
+                var pro_margin = parseFloat(get_number($("#promo_margin_ex_"+index).val(),2));
+                var tax_per = parseFloat(get_number($("#tax_per_ex_"+index).val(),2));
+                var distributor_id = $("#distributor_id").val();
+                var rate = parseFloat(get_number($("#rate_ex_"+index).val(),2));
+                var cost = parseFloat(get_number($("#cost_rate_ex_"+index).val(),2));
+                var grams = parseFloat(get_number($("#grams_ex_"+index).val(),2));
 
                 $.ajax({
-                    url:BASE_URL+'index.php/Box/get_data',
+                    // url:BASE_URL+'index.php/Box/get_data',
+                    url:BASE_URL+'index.php/distributor_in/get_box_details',
                     method:"post",
-                    data:{id:box_id},
+                    // data:{id:box_id},
+                    data:{id:box_id, distributor_id:distributor_id},
                     dataType:"json",
                     async:false,
                     success: function(data){
@@ -1543,6 +1490,9 @@
                             grams = parseFloat(data.grams);
                             rate = parseFloat(data.rate);
                             cost = parseFloat(data.cost);
+                            sell_out = parseFloat(data.inv_margin);
+                            tax_per = parseFloat(data.tax_percentage);
+                            pro_margin = parseFloat(data.pro_margin);
                         }
                     },
                     error: function (response) {
@@ -1556,17 +1506,24 @@
                 if (isNaN(qty)) qty=0;
                 if (isNaN(grams)) grams=0;
                 if (isNaN(rate)) rate=0;
+                if (isNaN(cost)) cost=0;
+                if (isNaN(sell_out)) sell_out=0;
+                if (isNaN(tax_per)) tax_per=0;
+                if (isNaN(pro_margin)) pro_margin=0;
 
                 // var cst = parseFloat(get_number($("#cst").val(),2));
                 // var sell_rate = rate-((rate*sell_out)/100);
                 // sell_rate = sell_rate/(100+cst)*100;
 
-                var tax_per = parseFloat(get_number($("#tax_per_"+index).val(),2));
+                // var tax_per = parseFloat(get_number($("#tax_per_"+index).val(),2));
                 var cgst = $("#cgst_ex_"+index).val();
                 var sgst = $("#sgst_ex_"+index).val();
                 var igst = $("#igst_ex_"+index).val();
 
-                var sell_rate = rate-((rate*sell_out)/100);
+                var discount = parseFloat(get_number($("#sell_out").val(),2));
+                if (isNaN(discount)) discount=0;
+
+                var sell_rate = rate-((rate*(sell_out+discount))/100);
                 sell_rate = sell_rate/(100+tax_per)*100;
 
                 var cgst_amt = (qty*((sell_rate*cgst)/100)).toFixed(2);
@@ -1592,6 +1549,9 @@
 
                 $("#grams_ex_"+index).val(grams);
                 $("#rate_ex_"+index).val(rate);
+                $("#sell_margin_ex_"+index).val(sell_out);
+                $("#promo_margin_ex_"+index).val(pro_margin);
+                $("#tax_per_ex_"+index).val(tax_per);
                 $("#sell_rate_ex_"+index).val(Math.round(sell_rate*10000)/10000);
                 $("#amount_ex_"+index).val(amount);
                 $("#cgst_amt_ex_"+index).val(cgst_amt);
@@ -1602,6 +1562,166 @@
                 $("#cost_rate_ex_"+index).val(Math.round(cost*100)/100);
 
                 get_total_ex();
+            }
+
+            function get_product_detail(elem) {
+                /*alert('entered');*/
+                var box_id = elem.val();
+                var id = elem.attr('id');
+                var index = id.substr(id.lastIndexOf('_')+1);
+                var box = box_id;
+                var distributor_id = $("#distributor_id").val();  
+                if(distributor_id!="")
+                {
+                    $.ajax({
+                        url:BASE_URL+'index.php/Distributor_in/get_product_percentage/'+box+'/'+distributor_id,
+                        method:"GET",
+                        dataType:"json",
+                        async:false,
+                        success: function(data){
+                            if(data!=0)
+                            {
+                                var obj = data;
+                                var margin = parseFloat(obj.inv_margin);
+                                if (isNaN(margin)) margin=0;
+                                $('#sell_margin_'+index).val(margin);
+                                var pro_margin = parseFloat(obj.pro_margin);
+                                if (isNaN(pro_margin)) pro_margin=0;
+                                $('#promo_margin_'+index).val(pro_margin);
+                                var tax_percentage = parseFloat(obj.tax_percentage);
+                                if (isNaN(tax_percentage)) tax_percentage=0;
+                                $('#tax_per_'+index).val(tax_percentage);
+                            }
+                            
+                        },
+                        error: function (response) {
+                            var r = jQuery.parseJSON(response.responseText);
+                            alert("Message: " + r.Message);
+                            alert("StackTrace: " + r.StackTrace);
+                            alert("ExceptionType: " + r.ExceptionType);
+                        }
+                    });
+                }  
+            }
+
+            function get_product_box_detail(elem) {
+                /*alert('entered');*/
+                var box_id = elem.val();
+                var id = elem.attr('id');
+                var index = id.substr(id.lastIndexOf('_')+1);
+                var box = box_id;
+                var distributor_id = $("#distributor_id").val();  
+                if(distributor_id!="")
+                {
+                    $.ajax({
+                        url:BASE_URL+'index.php/Distributor_in/get_box_percentage/'+box+'/'+distributor_id,
+                        method:"GET",
+                        dataType:"json",
+                        async:false,
+                        success: function(data){
+                            if(data!=0)
+                            {
+                                var obj = data;
+                                var margin = parseFloat(obj.inv_margin);
+                                if (isNaN(margin)) margin=0;
+                                $('#sell_margin_'+index).val(margin);
+                                var pro_margin = parseFloat(obj.pro_margin);
+                                if (isNaN(pro_margin)) pro_margin=0;
+                                $('#promo_margin_'+index).val(pro_margin);
+                                var tax_percentage = parseFloat(obj.tax_percentage);
+                                if (isNaN(tax_percentage)) tax_percentage=0;
+                                $('#tax_per_'+index).val(tax_percentage);
+                            }
+                            
+                        },
+                        error: function (response) {
+                            var r = jQuery.parseJSON(response.responseText);
+                            alert("Message: " + r.Message);
+                            alert("StackTrace: " + r.StackTrace);
+                            alert("ExceptionType: " + r.ExceptionType);
+                        }
+                    });
+                }  
+            }
+
+            function get_product_detail_ex(elem) {
+                /*alert('entered');*/
+                var box_id = elem.val();
+                var id = elem.attr('id');
+                var index = id.substr(id.lastIndexOf('_')+1);
+                var box = box_id;
+                var distributor_id = $("#distributor_id").val();  
+                if(distributor_id!="")
+                {
+                    $.ajax({
+                        url:BASE_URL+'index.php/Distributor_in/get_product_percentage/'+box+'/'+distributor_id,
+                        method:"GET",
+                        dataType:"json",
+                        async:false,
+                        success: function(data){
+                            if(data!=0)
+                            {
+                                var obj = data;
+                                var margin = parseFloat(obj.inv_margin);
+                                if (isNaN(margin)) margin=0;
+                                $('#sell_margin_ex_'+index).val(margin);
+                                var pro_margin = parseFloat(obj.pro_margin);
+                                if (isNaN(pro_margin)) pro_margin=0;
+                                $('#promo_margin_ex_'+index).val(pro_margin);
+                                var tax_percentage = parseFloat(obj.tax_percentage);
+                                if (isNaN(tax_percentage)) tax_percentage=0;
+                                $('#tax_per_ex_'+index).val(tax_percentage);
+                            }
+                            
+                        },
+                        error: function (response) {
+                            var r = jQuery.parseJSON(response.responseText);
+                            alert("Message: " + r.Message);
+                            alert("StackTrace: " + r.StackTrace);
+                            alert("ExceptionType: " + r.ExceptionType);
+                        }
+                    });
+                }  
+            }
+
+            function get_product_box_detail_ex(elem) {
+                /*alert('entered');*/
+                var box_id = elem.val();
+                var id = elem.attr('id');
+                var index = id.substr(id.lastIndexOf('_')+1);
+                var box = box_id;
+                var distributor_id = $("#distributor_id").val();  
+                if(distributor_id!="")
+                {
+                    $.ajax({
+                        url:BASE_URL+'index.php/Distributor_in/get_box_percentage/'+box+'/'+distributor_id,
+                        method:"GET",
+                        dataType:"json",
+                        async:false,
+                        success: function(data){
+                            if(data!=0)
+                            {
+                                var obj = data;
+                                var margin = parseFloat(obj.inv_margin);
+                                if (isNaN(margin)) margin=0;
+                                $('#sell_margin_ex_'+index).val(margin);
+                                var pro_margin = parseFloat(obj.pro_margin);
+                                if (isNaN(pro_margin)) pro_margin=0;
+                                $('#promo_margin_ex_'+index).val(pro_margin);
+                                var tax_percentage = parseFloat(obj.tax_percentage);
+                                if (isNaN(tax_percentage)) tax_percentage=0;
+                                $('#tax_per_ex_'+index).val(tax_percentage);
+                            }
+                            
+                        },
+                        error: function (response) {
+                            var r = jQuery.parseJSON(response.responseText);
+                            alert("Message: " + r.Message);
+                            alert("StackTrace: " + r.StackTrace);
+                            alert("ExceptionType: " + r.ExceptionType);
+                        }
+                    });  
+                }  
             }
 
             function get_amount(elem){
@@ -2248,7 +2368,7 @@
                                                 '<input type="hidden" class="form-control" name="igst[]" id="igst_'+counter+'" placeholder="igst" value="0" readonly />' + 
                                                 '<input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_'+counter+'" placeholder="tax_per" value="0"/>' + 
                                                 '<input type="hidden" class="form-control sell_margin" name="sell_margin[]" id="sell_margin_'+counter+'" placeholder="Sell Margin" value="0"/>' + 
-                                                
+                                                '<input type="hidden" class="form-control promo_margin" name="promo_margin[]" id="promo_margin_'+counter+'" placeholder="Promo Margin" value="0"/>' + 
                                                 '<input type="text" class="form-control sell_rate" name="sell_rate[]" id="sell_rate_'+counter+'" placeholder="Sell Rate" value=""/>' + 
                                             '</td>' + 
                                             '<td style="display: none;">' + 
@@ -2291,7 +2411,7 @@
                                                 '<div id="err_batch_no_'+counter+'"></div>' + 
                                             '</td>' + 
                                             '<td style="text-align:center;" class="print_hide table_action">' + 
-                                                '<a id="box_'+counter+'_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>' + 
+                                                '<a id="box_'+counter+'_row_delete" class="delete_row_new" href="#"><span class="fa trash fa-trash-o"  ></span></a>' + 
                                             '</td>' + 
                                         '</tr>');
                     $('#box_details').append(newRow);
@@ -2321,8 +2441,8 @@
                     // $(".cost_rate").blur(function(){
                     //     get_amount($(this));
                     // });
-                    $('.delete_row').click(function(event){
-                        delete_row($(this));
+                    $('.delete_row_new').click(function(event){
+                        set_stock_validation('distributor_in','form_distributor_in_details',$(this));
                         get_total();
                     });
                     counter++;
@@ -2360,12 +2480,12 @@
                                                 '<input type="text" class="form-control rate_ex" name="rate_ex[]" id="rate_ex_'+counter+'" placeholder="Rate" value="" readonly />' + 
                                             '</td>' + 
                                             '<td>' +
-                                                '<input type="hidden" class="form-control" name="cgst[]" id="cgst_ex_'+counter+'" placeholder="cgst" value="0" readonly />' + 
-                                                '<input type="hidden" class="form-control" name="sgst[]" id="sgst_ex_'+counter+'" placeholder="sgst" value="0" readonly />' + 
-                                                '<input type="hidden" class="form-control" name="igst[]" id="igst_ex_'+counter+'" placeholder="igst" value="0" readonly />' + 
-                                                '<input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_ex_'+counter+'" placeholder="tax_per" value="0"/>' + 
-                                                '<input type="hidden" class="form-control sell_margin" name="sell_margin[]" id="sell_margin_ex_'+counter+'" placeholder="Sell Margin" value="0"/>' + 
-                                                 
+                                                '<input type="hidden" class="form-control" name="cgst_ex[]" id="cgst_ex_'+counter+'" placeholder="cgst" value="0" readonly />' + 
+                                                '<input type="hidden" class="form-control" name="sgst_ex[]" id="sgst_ex_'+counter+'" placeholder="sgst" value="0" readonly />' + 
+                                                '<input type="hidden" class="form-control" name="igst_ex[]" id="igst_ex_'+counter+'" placeholder="igst" value="0" readonly />' + 
+                                                '<input type="hidden" class="form-control tax_per_ex" name="tax_per_ex[]" id="tax_per_ex_'+counter+'" placeholder="tax_per" value="0"/>' + 
+                                                '<input type="hidden" class="form-control sell_margin_ex" name="sell_margin_ex[]" id="sell_margin_ex_'+counter+'" placeholder="Sell Margin" value="0"/>' + 
+                                                '<input type="hidden" class="form-control promo_margin_ex" name="promo_margin_ex[]" id="promo_margin_ex_'+counter+'" placeholder="Promotion Margin" value="0"/>' + 
                                                 '<input type="text" class="form-control sell_rate_ex" name="sell_rate_ex[]" id="sell_rate_ex_'+counter+'" placeholder="Sell Rate" value=""/>' + 
                                             '</td>' + 
                                             '<td style="display: none;">' + 
@@ -2408,7 +2528,7 @@
                                                 '<div id="err_batch_no_ex'+counter+'"></div>' + 
                                             '</td>' + 
                                             '<td style="text-align:center;" class="print_hide table_action">' + 
-                                                '<a id="box_ex_'+counter+'_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>' + 
+                                                '<a id="box_ex_'+counter+'_row_delete" class="delete_row_new" href="#"><span class="fa trash fa-trash-o"  ></span></a>' + 
                                             '</td>' + 
                                         '</tr>');
                     $('#box_details_ex').append(newRow);
@@ -2419,7 +2539,6 @@
                     $(".type_ex").change(function(){
                         show_item_ex($(this));
                     });
-
                     $(".bar_ex").change(function(){
                         get_bar_details_ex($(this));
                         get_product_detail_ex($(this));
@@ -2439,8 +2558,8 @@
                     // $(".cost_rate").blur(function(){
                     //     get_amount($(this));
                     // });
-                    $('.delete_row').click(function(event){
-                        delete_row($(this));
+                    $('.delete_row_new').click(function(event){
+                        set_stock_validation('distributor_in','form_distributor_in_details',$(this));
                         get_total_ex();
                     });
                     counter++;
@@ -2448,53 +2567,48 @@
             });
     
             $('.sales_type').on('change',function(){
-                if($(this).val()=='Invoice'){
+                if($(this).val()=='Invoice') {
                     $('#invoice_no_div').show();
                     var distributor_id = $('#distributor_id').val();
-                     $.ajax({
-                                url:BASE_URL+'index.php/credit_debit_note/get_invoice',
-                                method: 'post',
-                                data: {distributor_id: distributor_id},
-                                dataType: 'json',
-                                success: function(response){
-                                  $('#invoice_no').empty();
-                                  $('#invoice_no').append('<option value="">Select</option>');
-                                  $.each(response,function(index,data){
-                                     $('#invoice_no').append('<option value="'+data['invoice_no']+'">'+data['invoice_no']+'</option>');
-                                  });
-                                }
-                            });
-                }
-                else
-                {
+                    $.ajax({
+                            url:BASE_URL+'index.php/credit_debit_note/get_invoice',
+                            method: 'post',
+                            data: {distributor_id: distributor_id},
+                            dataType: 'json',
+                            success: function(response){
+                              $('#invoice_no').empty();
+                              $('#invoice_no').append('<option value="">Select</option>');
+                              $.each(response,function(index,data){
+                                 $('#invoice_no').append('<option value="'+data['invoice_no']+'">'+data['invoice_no']+'</option>');
+                              });
+                            }
+                        });
+                } else {
                     $('#invoice_no').empty();
                     $('#invoice_no_div').hide();
                 }
-                 
             });
 
             $('#distributor_id').change(function(){
-                if($('input[name="sales_type"]:checked').val()=='Invoice')
-                {
-                  var distributor_id = $('#distributor_id').val();
-                  $.ajax({
-                    url:BASE_URL+'index.php/credit_debit_note/get_invoice',
-                    method: 'post',
-                    data: {distributor_id: distributor_id},
-                    dataType: 'json',
-                    success: function(response){
-                      $('#invoice_no').empty();
-                      $('#invoice_no').append('<option value="">Select</option>');
-                      $.each(response,function(index,data){
-                         $('#invoice_no').append('<option value="'+data['invoice_no']+'">'+data['invoice_no']+'</option>');
-                      });
-                    }
-                 });
+                if($('input[name="sales_type"]:checked').val()=='Invoice'){
+                    var distributor_id = $('#distributor_id').val();
+                    $.ajax({
+                        url:BASE_URL+'index.php/credit_debit_note/get_invoice',
+                        method: 'post',
+                        data: {distributor_id: distributor_id},
+                        dataType: 'json',
+                        success: function(response){
+                            $('#invoice_no').empty();
+                            $('#invoice_no').append('<option value="">Select</option>');
+                            $.each(response,function(index,data){
+                                $('#invoice_no').append('<option value="'+data['invoice_no']+'">'+data['invoice_no']+'</option>');
+                            });
+                        }
+                    });
                 }
 
                 $(".bar").each(function(){
-                    if($(this).val()!="")
-                    {
+                    if($(this).val()!=""){
                         // get_product_detail($(this));   
                         // get_bar_details($(this));
                         // get_box_details($(this));
@@ -2506,8 +2620,7 @@
                     }
                 });
                 $(".box").each(function(){
-                    if($(this).val()!="")
-                    {
+                    if($(this).val()!=""){
                         // get_product_box_detail_ex($(this));
                         // get_bar_details_ex($(this));
                         // get_box_details_ex($(this));
@@ -2519,16 +2632,14 @@
                     }
                 });
                 $(".bar_ex").each(function(){
-                    if($(this).val()!="")
-                    {
+                    if($(this).val()!=""){
                         get_bar_details_ex($(this));
                         get_product_detail_ex($(this));
                         get_sell_rate_ex();
                     }
                 });
                 $(".box_ex").each(function(){
-                    if($(this).val()!="")
-                    {
+                    if($(this).val()!=""){
                         get_box_details_ex($(this));
                         get_product_box_detail_ex($(this));
                         get_sell_rate_ex();
@@ -2537,6 +2648,28 @@
             });
             
             $(document).ready(function(){
+
+                var previous;
+                var bool=0;
+                var lastSel = $("#depot_id option:selected");
+
+                $("#depot_id").change(function () { 
+                    
+                    var check_bar_qty = get_bar_qty('distributor_in','form_distributor_in_details','depochange'); 
+                    var check_box_qty = get_box_qty('distributor_in','form_distributor_in_details','depochange');    
+                    if(check_bar_qty==false || check_box_qty==false)
+                    {
+                        var previous_val = $("#prev_depo").val();
+                        $("#depot_id").val(previous_val);
+                    }
+                    else
+                    {
+                         $("#prev_depo").val($(this).val());
+                    }
+                });
+                
+
+
                 if(!$('#btn_submit').is(':visible')){
                     // $("input[type!='hidden']").attr("disabled", true);
                     $('input[type="text"').attr("readonly", true);
@@ -2557,8 +2690,7 @@
                 }
 
                 $(".bar").each(function(){
-                    if($(this).val()!="")
-                    {
+                    if($(this).val()!=""){
                         // get_product_detail($(this));   
                         // get_bar_details($(this));
                         // get_box_details($(this));
@@ -2570,8 +2702,7 @@
                     }
                 });
                 $(".box").each(function(){
-                    if($(this).val()!="")
-                    {
+                    if($(this).val()!=""){
                         // get_product_box_detail_ex($(this));
                         // get_bar_details_ex($(this));
                         // get_box_details_ex($(this));
@@ -2583,16 +2714,14 @@
                     }
                 });
                 $(".bar_ex").each(function(){
-                    if($(this).val()!="")
-                    {
+                    if($(this).val()!=""){
                         get_bar_details_ex($(this));
                         get_product_detail_ex($(this));
                         get_sell_rate_ex();
                     }
                 });
                 $(".box_ex").each(function(){
-                    if($(this).val()!="")
-                    {
+                    if($(this).val()!=""){
                         get_box_details_ex($(this));
                         get_product_box_detail_ex($(this));
                         get_sell_rate_ex();
@@ -2602,8 +2731,7 @@
                 $(".type").change(function(){
                     show_item($(this));
                     $(".bar").each(function(){
-                        if($(this).val()!="")
-                        {
+                        if($(this).val()!=""){
                             // get_product_detail($(this));   
                             // get_bar_details($(this));
                             // get_box_details($(this));
@@ -2615,8 +2743,7 @@
                         }
                     });
                     $(".box").each(function(){
-                        if($(this).val()!="")
-                        {
+                        if($(this).val()!=""){
                             // get_product_box_detail_ex($(this));
                             // get_bar_details_ex($(this));
                             // get_box_details_ex($(this));
@@ -2628,16 +2755,14 @@
                         }
                     });
                     $(".bar_ex").each(function(){
-                        if($(this).val()!="")
-                        {
+                        if($(this).val()!=""){
                             get_bar_details_ex($(this));
                             get_product_detail_ex($(this));
                             get_sell_rate_ex();
                         }
                     });
                     $(".box_ex").each(function(){
-                        if($(this).val()!="")
-                        {
+                        if($(this).val()!=""){
                             get_box_details_ex($(this));
                             get_product_box_detail_ex($(this));
                             get_sell_rate_ex();
@@ -2679,8 +2804,9 @@
                 $(".sell_rate_ex").blur(function(){
                     get_amount_ex($(this));
                 });
-                $('.delete_row').click(function(event){
-                    delete_row($(this));
+                $('.delete_row_new').click(function(event){
+                    
+                    set_stock_validation('distributor_in','form_distributor_in_details',$(this));
                     get_total();
                 });
                 // $('#distributor_id').click(function(event){
@@ -2691,10 +2817,9 @@
                 });
                 $('#depot_id').on('change', function(event){
                     get_depot_details($('#depot_id').val());
-                    get_distributor_details($('#distributor_id').val());
+                    get_distributor_details($('#distributor_id').val(), false);
                     $(".bar").each(function(){
-                        if($(this).val()!="")
-                        {
+                        if($(this).val()!=""){
                             // get_product_detail($(this));   
                             // get_bar_details($(this));
                             // get_box_details($(this));
@@ -2706,8 +2831,7 @@
                         }
                     });
                     $(".box").each(function(){
-                        if($(this).val()!="")
-                        {
+                        if($(this).val()!=""){
                             // get_product_box_detail_ex($(this));
                             // get_bar_details_ex($(this));
                             // get_box_details_ex($(this));
@@ -2719,16 +2843,14 @@
                         }
                     });
                     $(".bar_ex").each(function(){
-                        if($(this).val()!="")
-                        {
+                        if($(this).val()!=""){
                             get_bar_details_ex($(this));
                             get_product_detail_ex($(this));
                             get_sell_rate_ex();
                         }
                     });
                     $(".box_ex").each(function(){
-                        if($(this).val()!="")
-                        {
+                        if($(this).val()!=""){
                             get_box_details_ex($(this));
                             get_product_box_detail_ex($(this));
                             get_sell_rate_ex();
@@ -2765,10 +2887,91 @@
                 addMultiInputNamingRules('#form_distributor_in_details', 'input[name="qty_ex[]"]', { required: true }, "");
                 addMultiInputNamingRules('#form_distributor_in_details', 'input[name="sell_rate_ex[]"]', { required: true }, "");
 
-                get_distributor_details($('#distributor_id').val());
+                get_distributor_details($('#distributor_id').val(), false);
             });
             
             
+
+            function set_stock_validation(model_name,form_name,elem) {
+                    var id =  elem.attr('id');
+                    var myarr = id.split("_");
+                    var index = myarr[1];
+                    var validator = $("#"+form_name).validate();
+                    var valid = true;
+                    /*alert('status'+$('#status').val());*/
+                    if($('#status').val()=='Approved' || $('#ref_id').val()!='')
+                    {
+                        var entered_qty = 0; 
+                        
+                        var type = $('#type_'+index).val();
+                        var depot_id = $("#prev_depo").val();
+                        var ref_id = $("#ref_id").val();
+                        var pre_qty = parseInt($('#pre_qty_'+index).val());
+                        /*alert(type);*/
+                        var module='distributor_in';
+                         var qty = 0
+                        if(type=='Box')
+                        {
+                            var box = $('#box_'+index).val();
+                            var url = BASE_URL+'index.php/Stock/check_box_qty_availablity_for_depot';
+                            var data = 'id='+$("#id").val()+'&module='+model_name+'&depot_id='+depot_id+'&box_id='+box+'&qty='+qty+'&ref_id='+ref_id+'&get_stock=1';
+                        }
+                        else
+                        {
+                            var bar = $('#bar_'+index).val();
+                            var url = BASE_URL+'index.php/Stock/check_bar_qty_availablity_for_depot';
+                            var data  = 'id='+$("#id").val()+'&module='+module+'&depot_id='+depot_id+'&product_id='+bar+'&qty='+qty+'&ref_id='+ref_id+'&get_stock=1';
+
+                        }
+
+                        $.ajax({
+                            url: url,
+                            data: data,
+                            type: "POST",
+                            dataType: 'html',
+                            global: false,
+                            async: false,
+                            success: function (data) {
+                                /*console.log('data '+data);*/
+                                current_stock = parseInt(data);
+                            },
+                            error: function (xhr, ajaxOptions, thrownError) {
+                                alert(xhr.status);
+                                alert(thrownError);
+                            }
+                        });
+                        /*console.log('current_stock_box'+current_stock);*/
+                        if(current_stock!=undefined)
+                        {
+                            /*console.log('current_stock'+current_stock+'pre qty'+pre_qty);*/
+                            // var deducted_qty = current_stock-pre_qty;
+                            var final_qty = current_stock+entered_qty;
+                            /*console.log(final_qty);*/
+                            if(final_qty<0)
+                            {
+                                var id = 'qty_'+index;
+                                var errors = {};
+                                var name = $("#"+id).attr('name');
+                                errors[name] = 'Stock Will be negative By '+final_qty;
+                                validator.showErrors(errors);
+                                valid = false;
+                            }
+                            else
+                            {
+                                delete_row(elem);
+                            }
+
+                            return valid;
+                        }
+
+                    }
+                    else
+                    {
+                        delete_row(elem);
+                    }
+            }
+
+
             // $('#savedata').click(function(){
             //     var in_amt=$('#final_amount').val();
             //     var out_amt=$('#final_amount_ex').val();

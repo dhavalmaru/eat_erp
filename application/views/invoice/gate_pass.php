@@ -284,15 +284,13 @@
                                     <td><?php if (isset($invoice_details[$inv_cnt]['transport_type'])) echo $invoice_details[$inv_cnt]['transport_type']; ?></td>
                                 </tr>
                                
-								
-								 <tr>
+                                 <tr>
                                     <td>PO Number: </td>
                                     <td><?php if (isset($invoice_details[$inv_cnt]['order_no'])) echo $invoice_details[$inv_cnt]['order_no']; ?></td>
                                 </tr>
-								
                                 <tr>
                                     <td>Date of Supply: </td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['date_of_processing'])) echo (($invoice_details[$inv_cnt]['date_of_processing']!=null && $invoice_details[$inv_cnt]['date_of_processing']!='')?date('d-M-y',strtotime($invoice_details[$inv_cnt]['date_of_processing'])):''); ?></td>
+                                    <td><?php //if (isset($invoice_details[$inv_cnt]['date_of_processing'])) echo (($invoice_details[$inv_cnt]['date_of_processing']!=null && $invoice_details[$inv_cnt]['date_of_processing']!='')?date('d-M-y',strtotime($invoice_details[$inv_cnt]['date_of_processing'])):''); ?></td>
                                 </tr>
                                 <tr >
                                     <td>Place of Supply: </td>
@@ -393,10 +391,11 @@
         <table style="width:100%;" width="100%"  border="0" cellspacing="0" cellpadding="2" style="border-collapse: collapse;">
             <tr style="background:#ececec;">
                 <td width="20" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">Sr No.</td>
-                <td width="600" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">Name of Product / Service</td>
-                <td width="50" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">HSN ACS</td>
-                <td width="50" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">UOM</td>
-                <td width="20" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">Qty</td>
+                <td width="550" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">Name of Product / Service</td>
+                <td width="40" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">HSN ACS</td>
+                <td width="40" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">UOM</td>
+                <td width="60" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">Qty</td>
+                <td width="60"  align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">MRP</td>
                 <td width="60"  align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">Rate</td>
                 <td width="60" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;"> Amount </td>
                 <td width="60" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">Less Discount</td>
@@ -435,13 +434,16 @@
                 <td width="60" align="center" valign="middle" style="border-right:none;border-bottom:1px solid #666;">Total</td>
             </tr>
 
-            <?php if(isset($invoice_details[$inv_cnt]['description'])) { for($i=0; $i<count($invoice_details[$inv_cnt]['description']); $i++) { ?>
+            <?php if(isset($invoice_details[$inv_cnt]['description'])) { 
+                for($i=0; $i<count($invoice_details[$inv_cnt]['description']); $i++) { 
+            ?>
             <tr valign="top" style="border: none;">
                 <td valign="top" align="center" style="border-left:1px solid #666; border-top: none; border-bottom:none;border:none;border-right:1px solid #666; "><?php echo $i+1; ?></td>
                 <td valign="top" align="left" style="border-left:1px solid #666;  border-top: none; border-bottom:none;border:none;border-right:1px solid #666;"><?php echo $invoice_details[$inv_cnt]['description'][$i]['description']; ?></td>
                 <td width="130" valign="top" align="right" style="border-left:1px solid #666;  border-top: none; border-bottom:none;border:none;border-right:1px solid #666;"><p style="margin:0; "><?php echo $invoice_details[$inv_cnt]['description'][$i]['hsn_code']; ?></p></td>
                 <td width="130" valign="top" align="right" style="border-left:1px solid #666;  border-top: none; border-bottom:none;border:none;border-right:1px solid #666;"><p style="margin:0; "><?php echo $invoice_details[$inv_cnt]['description'][$i]['grams'] . 'gm'; ?></p></td>
                 <td valign="top" align="right" style="border-left:1px solid #666; border-top: none; border-bottom:none;border:none;border-right:1px solid #666; "><p style="margin:0; "><?php echo $invoice_details[$inv_cnt]['description'][$i]['qty']; ?></p></td>
+                <td valign="top" align="right" style="border-left:1px solid #666; border-top: none; border-bottom:none;border:none;border-right:1px solid #666;"><p style="margin:0; "><?php echo $invoice_details[$inv_cnt]['description'][$i]['mrp']; ?></p></td>
                 <td valign="top" align="right" style="border-left:1px solid #666; border-top: none; border-bottom:none;border:none;border-right:1px solid #666;"><p style="margin:0; "><?php echo $invoice_details[$inv_cnt]['description'][$i]['rate']; ?></p></td>
                 <td valign="top" align="right" style="border-left:1px solid #666; border-top: none; border-bottom:none;border:none;border-right:1px solid #666;"><p style="margin:0; "><?php echo $invoice_details[$inv_cnt]['description'][$i]['amount']; ?></p></td>
                 <td valign="top" align="right" style="border-left:1px solid #666; border-top: none; border-bottom:none;border:none;border-right:1px solid #666;"><p style="margin:0; "><?php echo round($invoice_details[$inv_cnt]['description'][$i]['discount'],2); ?></p></td>
@@ -483,59 +485,127 @@
         </tr>
 
         <tr style="border-top: 1px solid #666;">
-            <td colspan="3" rowspan="8" valign="top" style="padding:0;">
-                <p style="margin:0;text-align:center;line:height:20px;font-size:22px;">
-                    <span style="font-size:18px; font-weight:500; margin-top: 5px;display: block;" >Amount in words: <br/><br><br><br><br></span> 
+            <td colspan="4" rowspan="4" valign="top" style="padding:0;width:50%">
+                <p style="margin:0;text-align:center;font-size:22px;margin-bottom:8px">
+                    <span style="font-size:18px; font-weight:500; margin-top: 5px;display: block;" >Amount in words: <br/><br><br><br></span> 
                     <span style="line-height:25px;">
                     <?php if (isset($invoice_details[$inv_cnt]['total_amount_in_words'])) echo $invoice_details[$inv_cnt]['total_amount_in_words']; ?>
                     </span>
                 </p>
             </td>
-            <td colspan="2" valign="top" style="font-size:10px; font-weight:900;background:#ececec;">Total amount before Tax</td>
+            
+            <td colspan="1" valign="top" style="font-size:10px; font-weight:900;background:#ececec;">Total amount before Tax <br></td>
             <td style=" font-size:10px; font-weight:900;background:#ececec;"   >  
                 <span style="text-align:left; float:left"> &#8377; </span> 
                 <span style="text-align:right; float:right"><?php if (isset($invoice_details[$inv_cnt]['total_amount'])) echo $invoice_details[$inv_cnt]['total_amount']; ?></span> 
             </td>
         </tr>
         <tr>
-            <td colspan="2" valign="top" style="font-size:10px; font-weight:500;">Add: CGST</td>
+            <td colspan="1" valign="top" style="font-size:10px; font-weight:500;">Add: CGST</td>
             <td style=" font-size:10px; font-weight:500;" >  
                 <span style="text-align:left; float:left"> &#8377; </span> 
                 <span style="text-align:right; float:right"><?php if (isset($invoice_details[$inv_cnt]['cgst_amount'])) echo $invoice_details[$inv_cnt]['cgst_amount']; ?></span> 
             </td>
         </tr>
         <tr>
-            <td colspan="2" valign="top" style="font-size:10px; font-weight:500;">Add: SGST</td>
+            <td colspan="1" valign="top" style="font-size:10px; font-weight:500;">Add: SGST</td>
             <td style=" font-size:10px; font-weight:500;"  >  
                 <span style="text-align:left; float:left"> &#8377; </span> 
                 <span style="text-align:right; float:right"><?php if (isset($invoice_details[$inv_cnt]['sgst_amount'])) echo $invoice_details[$inv_cnt]['sgst_amount']; ?></span> 
             </td>
         </tr>
         <tr>
-            <td colspan="2" valign="top" style="font-size:10px; font-weight:500;">Add: IGST</td>
+            <td colspan="1" valign="top" style="font-size:10px; font-weight:500;">Add: IGST</td>
             <td style=" font-size:10px; font-weight:500;"  >  
                 <span style="text-align:left; float:left"> &#8377; </span> 
                 <span style="text-align:right; float:right"><?php if (isset($invoice_details[$inv_cnt]['igst_amount'])) echo $invoice_details[$inv_cnt]['igst_amount']; ?></span> 
             </td>
         </tr>
-        <tr style="background:#ececec;"> 
-            <td colspan="2" valign="middle" style="font-size:10px; font-weight:900;">
+        <tr style="font-size:10px;">
+            <?php 
+                $total_gram=0;
+                $tot_cgst_amt=0;
+                $tot_sgst_amt=0;
+                $tot_igst_amt=0;
+                $tot_gst_amt=0;
+
+                $tax_desc_body='<td width="840" colspan="4" rowspan="3" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;padding:0;">
+                    <table style="width: 100%;border-spacing: 0;height: 100%; min-height: 100%">
+                        <tr>
+                            <td colspan="2" style="border-right:1px solid #666;border-bottom:0px solid #666;text-align: center;font-weight:900;background:#ececec">CGST</td>
+                            <td colspan="2" style="border-right:1px solid #666;border-bottom:0px solid #666;text-align: center;font-weight:900;background:#ececec">SGST</td>
+                            <td colspan="2" style="border-right:1px solid #666;border-bottom:0px solid #666;text-align: center;font-weight:900;background:#ececec">IGST</td>
+                            <td rowspan="2" style="height:25px;vertical-align:middle;background:#ececec;font-weight:900;text-align:center" >Total Tax Value</td>
+                        </tr>
+                        <tr style="font-weight:900;background:#ececec">
+                            <td style="border-right:1px solid #666;border-bottom:0px solid #666;border-top: 1px solid #666;text-align: center;" width="15%">Rate</td>
+                            <td style="border-right:1px solid #666;border-bottom:0px solid #666;border-top: 1px solid #666;text-align: center;" width="15%">Amount</td>
+                            <td style="border-right:1px solid #666;border-bottom:0px solid #666;border-top: 1px solid #666;text-align: center;" width="15%">Rate</td>
+                            <td style="border-right:1px solid #666;border-bottom:0px solid #666;border-top: 1px solid #666;text-align: center;" width="15%">Amount</td>
+                            <td style="border-right:1px solid #666;border-bottom:0px solid #666;border-top: 1px solid #666;text-align: center;" width="15%">Rate</td>
+                            <td style="border-right:1px solid #666;border-bottom:0px solid #666;border-top: 1px solid #666;text-align: center;" width="10%">Amount</td>
+                        </tr>';
+
+                for($j=0; $j<count($invoice_details[$inv_cnt]['tax_desc']); $j++) { 
+                    $cgst=0; $sgst=0; $igst=0;
+                    $total_gram=$total_gram+$invoice_details[$inv_cnt]['tax_desc'][$j]['total_grams'];
+                    $cgst_amt=$invoice_details[$inv_cnt]['tax_desc'][$j]['cgst_amt'];
+                    $sgst_amt=$invoice_details[$inv_cnt]['tax_desc'][$j]['sgst_amt'];
+                    $igst_amt=$invoice_details[$inv_cnt]['tax_desc'][$j]['igst_amt'];
+                    $total_tax_amt=$cgst_amt+$sgst_amt+$igst_amt;
+                    $tot_cgst_amt=$tot_cgst_amt+$cgst_amt;
+                    $tot_sgst_amt=$tot_sgst_amt+$sgst_amt;
+                    $tot_igst_amt=$tot_igst_amt+$igst_amt;
+                    $tot_gst_amt=$tot_gst_amt+$cgst_amt+$sgst_amt+$igst_amt;
+
+                    if($cgst_amt>0) {
+                        $cgst=$invoice_details[$inv_cnt]['tax_desc'][$j]['tax_percentage']/2;
+                        $sgst=$invoice_details[$inv_cnt]['tax_desc'][$j]['tax_percentage']/2;
+                    } else {
+                        $igst=$invoice_details[$inv_cnt]['tax_desc'][$j]['tax_percentage'];
+                    }
+                    $tax_desc_body=$tax_desc_body.'<tr>
+                                <td style="border-right:1px solid #666;border-bottom:0px solid #666;border-top: 1px solid #666;text-align: center;" width="15%">'.$cgst.'</td>
+                                <td style="border-right:1px solid #666;border-bottom:0px solid #666;border-top: 1px solid #666;text-align: center;" width="15%">'.$cgst_amt.'</td>
+                                <td style="border-right:1px solid #666;border-bottom:0px solid #666;border-top: 1px solid #666;text-align: center;" width="15%">'.$sgst.'</td>
+                                <td style="border-right:1px solid #666;border-bottom:0px solid #666;border-top: 1px solid #666;text-align: center;" width="15%">'.$sgst_amt.'</td>
+                                <td style="border-right:1px solid #666;border-bottom:0px solid #666;border-top: 1px solid #666;text-align: center;" width="15%">'.$igst.'</td>
+                                <td style="border-right:1px solid #666;border-bottom:0px solid #666;border-top: 1px solid #666;text-align: center;" width="15%">'.$igst_amt.'</td>
+                                <td style="border-right:0px solid #666;border-bottom:0px solid #666;border-top: 1px solid #666;text-align: center;" width="10%">'.$total_tax_amt.'</td>
+                            </tr>';
+                }
+
+                $tax_desc_body=$tax_desc_body.'<tr style="font-weight:900;background:#ececec">
+                            <td style="border-right:1px solid #666;border-bottom:0px solid #666;border-top: 1px solid #666;text-align: center;" width="15%">Total</td>
+                            <td style="border-right:1px solid #666;border-bottom:0px solid #666;border-top: 1px solid #666;text-align: center;" width="15%"> ₹ &nbsp '.$tot_cgst_amt.'</td>
+                            <td style="border-right:1px solid #666;border-bottom:0px solid #666;border-top: 1px solid #666;text-align: center;" width="15%">Total</td>
+                            <td style="border-right:1px solid #666;border-bottom:0px solid #666;border-top: 1px solid #666;text-align: center;" width="15%"> ₹ &nbsp '.$tot_sgst_amt.'</td>
+                            <td style="border-right:1px solid #666;border-bottom:0px solid #666;border-top: 1px solid #666;text-align: center;" width="15%">Total</td>
+                            <td style="border-right:1px solid #666;border-bottom:0px solid #666;border-top: 1px solid #666;text-align: center;" width="15%"> ₹ &nbsp '.$tot_igst_amt.'</td>
+                            <td style="border-right:0px solid #666;border-bottom:0px solid #666;border-top: 1px solid #666;text-align: center;" width="10%"> ₹ &nbsp '.$tot_gst_amt.'</td>
+                        </tr>
+                    </table>
+                </td>';
+
+                echo $tax_desc_body;
+            ?>
+            <td colspan="1" valign="middle" style="font-size:10px; font-weight:900; background:#ececec;">
                 <p style="margin:0;"><span style="  font-size:10px; font-weight:900;" >Total Amount: GST</span></p>
             </td>
-            <td  style=" font-size:10px; font-weight:900;">  
+            <td style=" font-size:10px; font-weight:900; background:#ececec;">  
                 <span style="text-align:left; float:left"> &#8377; </span> 
-                <span style="text-align:right; float:right"><?php if (isset($invoice_details[$inv_cnt]['tax_amount'])) echo $invoice_details[$inv_cnt]['tax_amount']; ?></span> 
+                <span style="text-align:right; float:right"><?php if (isset($tot_gst_amt)) echo $tot_gst_amt; ?></span> 
             </td>
         </tr>
         <tr>
-            <td colspan="2" valign="top" style="font-size:10px; font-weight:500;">Round Off Amount</td>
+            <td colspan="1" valign="top" style="font-size:10px; font-weight:500;">Round Off Amount</td>
             <td style=" font-size:10px; font-weight:500;"  >  
                 <span style="text-align:left; float:left"> &#8377; </span> 
                 <span style="text-align:right; float:right"><?php if (isset($invoice_details[$inv_cnt]['round_off_amount'])) echo $invoice_details[$inv_cnt]['round_off_amount']; ?></span> 
             </td>
         </tr>
         <tr style="background:#ececec;"> 
-            <td colspan="2" valign="middle" style="font-size:10px; font-weight:900;">
+            <td colspan="1" valign="middle" style="font-size:10px; font-weight:900;">
                 <p style="margin:0;"><span style="  font-size:10px; font-weight:900;" >Total Amount After Tax</span></p>
             </td>
             <td  style=" font-size:10px; font-weight:900;" >  
@@ -543,8 +613,11 @@
                 <span style="text-align:right; float:right"><?php if (isset($invoice_details[$inv_cnt]['invoice_amount'])) echo $invoice_details[$inv_cnt]['invoice_amount']; ?></span> 
             </td>
         </tr>
-        <tr> 
-            <td colspan="2" valign="middle" style="font-size:10px; font-weight:900;">
+        <tr>
+            <td colspan="4" valign="middle" style="font-size:10px; font-weight:900;">
+                <p style="margin:0;"><span style="  font-size:10px; font-weight:900;" > Total weight in Kg  :-  <?=($total_gram/1000).'Kg';?></span></p>
+            </td>
+            <td colspan="1" valign="middle" style="font-size:10px; font-weight:900;">
                 <p style="margin:0;"><span style="  font-size:10px; font-weight:900;" >GST Payable on Reverse Charge</span></p>
             </td>
             <td  style=" font-size:10px; font-weight:900;background:#ececec;" >  
@@ -553,7 +626,7 @@
             </td>
         </tr>
         <tr>
-            <td colspan="3" valign="middle" style="padding:0;">
+            <td colspan="4" valign="middle" style="padding:0;">
                 <table width="100%" border="0" cellpadding="5" cellspacing="0">
                     <tr>
                         <td width="42%"><p style="margin:0;"><span style="  font-size:8px; font-weight:500;" >Bank Name </span></td>
@@ -573,7 +646,7 @@
                     </tr>
                 </table>
             </td>
-            <td colspan="3" align="center" valign="top" style=" font-size:8px; font-weight:500;"> For Wholsome Habits Pvt Ltd <br/> <img src="<?php echo base_url().'/assets/invoice/'; ?>stamp.jpg" height="50"  alt="Sign3 Rishit" /> <br/>Authorised Signatory</td>
+            <td colspan="2" align="center" valign="top" style=" font-size:8px; font-weight:500;"> For Wholsome Habits Pvt Ltd <br/> <img src="<?php echo base_url().'/assets/invoice/'; ?>stamp.jpg" height="50"  alt="Sign3 Rishit" /> <br/>Authorised Signatory</td>
         </tr>
         <tr>
             <td colspan="6" valign="top">
@@ -596,7 +669,7 @@
         <center style="width:100%;display:inline-block;margin:0 auto;">
             <img src="<?php echo base_url().'/assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:150px;" />
             <p style="font-size:12px;line-height:18px;margin:0;margin-bottom:10px;">
-                C/109, Hind Saurashtra Ind. Estate. 85/86, Andheri Kurla Road, Marol Naka, Andheri East. Mumbai 400059
+                B-505, Veena sur, Mahavir Nagar Kandivali-West,Mumbai - 67 
                 <br /> +91 8268000456 
                 <br><a href="mailto:cs@eatanytime.in">cs@eatanytime.in</a><br>
                 GSTIN: 27AABCW7811R1ZN
@@ -671,15 +744,13 @@
                                     <td width="30%">Transporter Mode:</td>
                                     <td><?php if (isset($invoice_details[$inv_cnt]['transport_type'])) echo $invoice_details[$inv_cnt]['transport_type']; ?></td>
                                 </tr>
-                                
-								 <tr>
+                                <tr>
                                     <td>PO Number: </td>
                                     <td><?php if (isset($invoice_details[$inv_cnt]['order_no'])) echo $invoice_details[$inv_cnt]['order_no']; ?></td>
                                 </tr>
-								
                                 <tr>
                                     <td>Date of Supply: </td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['date_of_processing'])) echo (($invoice_details[$inv_cnt]['date_of_processing']!=null && $invoice_details[$inv_cnt]['date_of_processing']!='')?date('d-M-y',strtotime($invoice_details[$inv_cnt]['date_of_processing'])):''); ?></td>
+                                    <td><?php //if (isset($invoice_details[$inv_cnt]['date_of_processing'])) echo (($invoice_details[$inv_cnt]['date_of_processing']!=null && $invoice_details[$inv_cnt]['date_of_processing']!='')?date('d-M-y',strtotime($invoice_details[$inv_cnt]['date_of_processing'])):''); ?></td>
                                 </tr>
                                 <tr >
                                     <td>Place of Supply: </td>
@@ -780,10 +851,11 @@
         <table style="width:100%;" width="100%"  border="0" cellspacing="0" cellpadding="2" style="border-collapse: collapse;">
             <tr style="background:#ececec;">
                 <td width="20" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">Sr No.</td>
-                <td width="600" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">Name of Product / Service</td>
-                <td width="50" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">HSN ACS</td>
-                <td width="50" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">UOM</td>
-                <td width="20" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">Qty</td>
+                <td width="550" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">Name of Product / Service</td>
+                <td width="40" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">HSN ACS</td>
+                <td width="40" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">UOM</td>
+                <td width="60" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">Qty</td>
+                <td width="60"  align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">MRP</td>
                 <td width="60"  align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">Rate</td>
                 <td width="60" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;"> Amount </td>
                 <td width="60" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">Less Discount</td>
@@ -822,13 +894,16 @@
                 <td width="60" align="center" valign="middle" style="border-right:none;border-bottom:1px solid #666;">Total</td>
             </tr>
 
-            <?php if(isset($invoice_details[$inv_cnt]['description'])) { for($i=0; $i<count($invoice_details[$inv_cnt]['description']); $i++) { ?>
+            <?php if(isset($invoice_details[$inv_cnt]['description'])) { 
+                for($i=0; $i<count($invoice_details[$inv_cnt]['description']); $i++) {
+            ?>
             <tr valign="top" style="border: none;">
                 <td valign="top" align="center" style="border-left:1px solid #666; border-top: none; border-bottom:none;border:none;border-right:1px solid #666; "><?php echo $i+1; ?></td>
                 <td valign="top" align="left" style="border-left:1px solid #666;  border-top: none; border-bottom:none;border:none;border-right:1px solid #666;"><?php echo $invoice_details[$inv_cnt]['description'][$i]['description']; ?></td>
                 <td width="130" valign="top" align="right" style="border-left:1px solid #666;  border-top: none; border-bottom:none;border:none;border-right:1px solid #666;"><p style="margin:0; "><?php echo $invoice_details[$inv_cnt]['description'][$i]['hsn_code']; ?></p></td>
                 <td width="130" valign="top" align="right" style="border-left:1px solid #666;  border-top: none; border-bottom:none;border:none;border-right:1px solid #666;"><p style="margin:0; "><?php echo $invoice_details[$inv_cnt]['description'][$i]['grams'] . 'gm'; ?></p></td>
                 <td valign="top" align="right" style="border-left:1px solid #666; border-top: none; border-bottom:none;border:none;border-right:1px solid #666; "><p style="margin:0; "><?php echo $invoice_details[$inv_cnt]['description'][$i]['qty']; ?></p></td>
+                <td valign="top" align="right" style="border-left:1px solid #666; border-top: none; border-bottom:none;border:none;border-right:1px solid #666;"><p style="margin:0; "><?php echo $invoice_details[$inv_cnt]['description'][$i]['mrp']; ?></p></td>
                 <td valign="top" align="right" style="border-left:1px solid #666; border-top: none; border-bottom:none;border:none;border-right:1px solid #666;"><p style="margin:0; "><?php echo $invoice_details[$inv_cnt]['description'][$i]['rate']; ?></p></td>
                 <td valign="top" align="right" style="border-left:1px solid #666; border-top: none; border-bottom:none;border:none;border-right:1px solid #666;"><p style="margin:0; "><?php echo $invoice_details[$inv_cnt]['description'][$i]['amount']; ?></p></td>
                 <td valign="top" align="right" style="border-left:1px solid #666; border-top: none; border-bottom:none;border:none;border-right:1px solid #666;"><p style="margin:0; "><?php echo round($invoice_details[$inv_cnt]['description'][$i]['discount'],2); ?></p></td>
@@ -869,60 +944,63 @@
           <td colspan="6"></td>
         </tr>
 
-        <tr style="border-top: 1px solid #666;">
-            <td colspan="3" rowspan="8" valign="top" style="padding:0;">
-                <p style="margin:0;text-align:center;line:height:20px;font-size:22px;">
-                    <span style="font-size:18px; font-weight:500; margin-top: 5px;display: block;" >Amount in words: <br/><br><br><br><br></span> 
+       <tr style="border-top: 1px solid #666;">
+            <td colspan="4" rowspan="4" valign="top" style="padding:0;width:50%">
+                <p style="margin:0;text-align:center;font-size:22px;margin-bottom:8px">
+                    <span style="font-size:18px; font-weight:500; margin-top: 5px;display: block;" >Amount in words: <br/><br><br><br></span> 
                     <span style="line-height:25px;">
                     <?php if (isset($invoice_details[$inv_cnt]['total_amount_in_words'])) echo $invoice_details[$inv_cnt]['total_amount_in_words']; ?>
                     </span>
                 </p>
             </td>
-            <td colspan="2" valign="top" style="font-size:10px; font-weight:900;background:#ececec;">Total amount before Tax</td>
+            
+            <td colspan="1" valign="top" style="font-size:10px; font-weight:900;background:#ececec;">Total amount before Tax <br></td>
             <td style=" font-size:10px; font-weight:900;background:#ececec;"   >  
                 <span style="text-align:left; float:left"> &#8377; </span> 
                 <span style="text-align:right; float:right"><?php if (isset($invoice_details[$inv_cnt]['total_amount'])) echo $invoice_details[$inv_cnt]['total_amount']; ?></span> 
             </td>
         </tr>
         <tr>
-            <td colspan="2" valign="top" style="font-size:10px; font-weight:500;">Add: CGST</td>
+        
+            <td colspan="1" valign="top" style="font-size:10px; font-weight:500;">Add: CGST</td>
             <td style=" font-size:10px; font-weight:500;" >  
                 <span style="text-align:left; float:left"> &#8377; </span> 
                 <span style="text-align:right; float:right"><?php if (isset($invoice_details[$inv_cnt]['cgst_amount'])) echo $invoice_details[$inv_cnt]['cgst_amount']; ?></span> 
             </td>
         </tr>
         <tr>
-            <td colspan="2" valign="top" style="font-size:10px; font-weight:500;">Add: SGST</td>
+            <td colspan="1" valign="top" style="font-size:10px; font-weight:500;">Add: SGST</td>
             <td style=" font-size:10px; font-weight:500;"  >  
                 <span style="text-align:left; float:left"> &#8377; </span> 
                 <span style="text-align:right; float:right"><?php if (isset($invoice_details[$inv_cnt]['sgst_amount'])) echo $invoice_details[$inv_cnt]['sgst_amount']; ?></span> 
             </td>
         </tr>
         <tr>
-            <td colspan="2" valign="top" style="font-size:10px; font-weight:500;">Add: IGST</td>
+            <td colspan="1" valign="top" style="font-size:10px; font-weight:500;">Add: IGST</td>
             <td style=" font-size:10px; font-weight:500;"  >  
                 <span style="text-align:left; float:left"> &#8377; </span> 
                 <span style="text-align:right; float:right"><?php if (isset($invoice_details[$inv_cnt]['igst_amount'])) echo $invoice_details[$inv_cnt]['igst_amount']; ?></span> 
             </td>
         </tr>
-        <tr style="background:#ececec;"> 
-            <td colspan="2" valign="middle" style="font-size:10px; font-weight:900;">
+        <tr style="font-size:10px">
+            <?php echo $tax_desc_body; ?>
+            <td colspan="1" valign="middle" style="font-size:10px; font-weight:900;background:#ececec;">
                 <p style="margin:0;"><span style="  font-size:10px; font-weight:900;" >Total Amount: GST</span></p>
             </td>
-            <td  style=" font-size:10px; font-weight:900;">  
+            <td  style=" font-size:10px; font-weight:900;background:#ececec;">  
                 <span style="text-align:left; float:left"> &#8377; </span> 
-                <span style="text-align:right; float:right"><?php if (isset($invoice_details[$inv_cnt]['tax_amount'])) echo $invoice_details[$inv_cnt]['tax_amount']; ?></span> 
+                <span style="text-align:right; float:right"><?php if (isset($tot_gst_amt)) echo $tot_gst_amt; ?></span> 
             </td>
         </tr>
         <tr>
-            <td colspan="2" valign="top" style="font-size:10px; font-weight:500;">Round Off Amount</td>
+            <td colspan="1" valign="top" style="font-size:10px; font-weight:500;">Round Off Amount</td>
             <td style=" font-size:10px; font-weight:500;"  >  
                 <span style="text-align:left; float:left"> &#8377; </span> 
                 <span style="text-align:right; float:right"><?php if (isset($invoice_details[$inv_cnt]['round_off_amount'])) echo $invoice_details[$inv_cnt]['round_off_amount']; ?></span> 
             </td>
         </tr>
         <tr style="background:#ececec;"> 
-            <td colspan="2" valign="middle" style="font-size:10px; font-weight:900;">
+            <td colspan="1" valign="middle" style="font-size:10px; font-weight:900;">
                 <p style="margin:0;"><span style="  font-size:10px; font-weight:900;" >Total Amount After Tax</span></p>
             </td>
             <td  style=" font-size:10px; font-weight:900;" >  
@@ -930,8 +1008,11 @@
                 <span style="text-align:right; float:right"><?php if (isset($invoice_details[$inv_cnt]['invoice_amount'])) echo $invoice_details[$inv_cnt]['invoice_amount']; ?></span> 
             </td>
         </tr>
-        <tr> 
-            <td colspan="2" valign="middle" style="font-size:10px; font-weight:900;">
+        <tr>
+            <td colspan="4" valign="middle" style="font-size:10px; font-weight:900;">
+                <p style="margin:0;"><span style="  font-size:10px; font-weight:900;" > Total weight in Kg  :-  <?=($total_gram/1000).'Kg';?></span></p>
+            </td>
+            <td colspan="1" valign="middle" style="font-size:10px; font-weight:900;">
                 <p style="margin:0;"><span style="  font-size:10px; font-weight:900;" >GST Payable on Reverse Charge</span></p>
             </td>
             <td  style=" font-size:10px; font-weight:900;background:#ececec;" >  
@@ -940,7 +1021,7 @@
             </td>
         </tr>
         <tr>
-            <td colspan="3" valign="middle" style="padding:0;">
+            <td colspan="4" valign="middle" style="padding:0;">
                 <table width="100%" border="0" cellpadding="5" cellspacing="0">
                     <tr>
                         <td width="42%"><p style="margin:0;"><span style="  font-size:8px; font-weight:500;" >Bank Name </span></td>
@@ -960,7 +1041,7 @@
                     </tr>
                 </table>
             </td>
-            <td colspan="3" align="center" valign="top" style=" font-size:8px; font-weight:500;"> For Wholsome Habits Pvt Ltd <br/> <img src="<?php echo base_url().'/assets/invoice/'; ?>stamp.jpg" height="50"  alt="Sign3 Rishit" /> <br/>Authorised Signatory</td>
+            <td colspan="2" align="center" valign="top" style=" font-size:8px; font-weight:500;"> For Wholsome Habits Pvt Ltd <br/> <img src="<?php echo base_url().'/assets/invoice/'; ?>stamp.jpg" height="50"  alt="Sign3 Rishit" /> <br/>Authorised Signatory</td>
         </tr>
         <tr>
             <td colspan="6" valign="top">
@@ -983,7 +1064,7 @@
         <center style="width:100%;display:inline-block;margin:0 auto;">
             <img src="<?php echo base_url().'/assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:150px;" />
             <p style="font-size:12px;line-height:18px;margin:0;margin-bottom:10px;">
-                C/109, Hind Saurashtra Ind. Estate. 85/86, Andheri Kurla Road, Marol Naka, Andheri East. Mumbai 400059
+                B-505, Veena sur, Mahavir Nagar Kandivali-West,Mumbai - 67 
                 <br /> +91 8268000456 
                 <br><a href="mailto:cs@eatanytime.in">cs@eatanytime.in</a><br>
                 GSTIN: 27AABCW7811R1ZN
@@ -1058,15 +1139,13 @@
                                     <td width="30%">Transporter Mode:</td>
                                     <td><?php if (isset($invoice_details[$inv_cnt]['transport_type'])) echo $invoice_details[$inv_cnt]['transport_type']; ?></td>
                                 </tr>
-                               
-								 <tr>
+                                <tr>
                                     <td>PO Number: </td>
                                     <td><?php if (isset($invoice_details[$inv_cnt]['order_no'])) echo $invoice_details[$inv_cnt]['order_no']; ?></td>
                                 </tr>
-								
                                 <tr>
                                     <td>Date of Supply: </td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['date_of_processing'])) echo (($invoice_details[$inv_cnt]['date_of_processing']!=null && $invoice_details[$inv_cnt]['date_of_processing']!='')?date('d-M-y',strtotime($invoice_details[$inv_cnt]['date_of_processing'])):''); ?></td>
+                                    <td><?php //if (isset($invoice_details[$inv_cnt]['date_of_processing'])) echo (($invoice_details[$inv_cnt]['date_of_processing']!=null && $invoice_details[$inv_cnt]['date_of_processing']!='')?date('d-M-y',strtotime($invoice_details[$inv_cnt]['date_of_processing'])):''); ?></td>
                                 </tr>
                                 <tr >
                                     <td>Place of Supply: </td>
@@ -1167,10 +1246,11 @@
         <table style="width:100%;" width="100%"  border="0" cellspacing="0" cellpadding="2" style="border-collapse: collapse;">
             <tr style="background:#ececec;">
                 <td width="20" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">Sr No.</td>
-                <td width="600" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">Name of Product / Service</td>
-                <td width="50" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">HSN ACS</td>
-                <td width="50" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">UOM</td>
-                <td width="20" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">Qty</td>
+                <td width="550" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">Name of Product / Service</td>
+                <td width="40" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">HSN ACS</td>
+                <td width="40" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">UOM</td>
+                <td width="60" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">Qty</td>
+                <td width="60"  align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">MRP</td>
                 <td width="60"  align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">Rate</td>
                 <td width="60" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;"> Amount </td>
                 <td width="60" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;">Less Discount</td>
@@ -1216,6 +1296,7 @@
                 <td width="130" valign="top" align="right" style="border-left:1px solid #666;  border-top: none; border-bottom:none;border:none;border-right:1px solid #666;"><p style="margin:0; "><?php echo $invoice_details[$inv_cnt]['description'][$i]['hsn_code']; ?></p></td>
                 <td width="130" valign="top" align="right" style="border-left:1px solid #666;  border-top: none; border-bottom:none;border:none;border-right:1px solid #666;"><p style="margin:0; "><?php echo $invoice_details[$inv_cnt]['description'][$i]['grams'] . 'gm'; ?></p></td>
                 <td valign="top" align="right" style="border-left:1px solid #666; border-top: none; border-bottom:none;border:none;border-right:1px solid #666; "><p style="margin:0; "><?php echo $invoice_details[$inv_cnt]['description'][$i]['qty']; ?></p></td>
+                <td valign="top" align="right" style="border-left:1px solid #666; border-top: none; border-bottom:none;border:none;border-right:1px solid #666;"><p style="margin:0; "><?php echo $invoice_details[$inv_cnt]['description'][$i]['mrp']; ?></p></td>
                 <td valign="top" align="right" style="border-left:1px solid #666; border-top: none; border-bottom:none;border:none;border-right:1px solid #666;"><p style="margin:0; "><?php echo $invoice_details[$inv_cnt]['description'][$i]['rate']; ?></p></td>
                 <td valign="top" align="right" style="border-left:1px solid #666; border-top: none; border-bottom:none;border:none;border-right:1px solid #666;"><p style="margin:0; "><?php echo $invoice_details[$inv_cnt]['description'][$i]['amount']; ?></p></td>
                 <td valign="top" align="right" style="border-left:1px solid #666; border-top: none; border-bottom:none;border:none;border-right:1px solid #666;"><p style="margin:0; "><?php echo round($invoice_details[$inv_cnt]['description'][$i]['discount'],2); ?></p></td>
@@ -1257,59 +1338,62 @@
         </tr>
 
         <tr style="border-top: 1px solid #666;">
-            <td colspan="3" rowspan="8" valign="top" style="padding:0;">
-                <p style="margin:0;text-align:center;line:height:20px;font-size:22px;">
-                    <span style="font-size:18px; font-weight:500; margin-top: 5px;display: block;" >Amount in words: <br/><br><br><br><br></span> 
+            <td colspan="4" rowspan="4" valign="top" style="padding:0;width:50%">
+                <p style="margin:0;text-align:center;font-size:22px;margin-bottom:8px">
+                    <span style="font-size:18px; font-weight:500; margin-top: 5px;display: block;" >Amount in words: <br/><br><br><br></span> 
                     <span style="line-height:25px;">
                     <?php if (isset($invoice_details[$inv_cnt]['total_amount_in_words'])) echo $invoice_details[$inv_cnt]['total_amount_in_words']; ?>
                     </span>
                 </p>
             </td>
-            <td colspan="2" valign="top" style="font-size:10px; font-weight:900;background:#ececec;">Total amount before Tax</td>
+            
+            <td colspan="1" valign="top" style="font-size:10px; font-weight:900;background:#ececec;">Total amount before Tax <br></td>
             <td style=" font-size:10px; font-weight:900;background:#ececec;"   >  
                 <span style="text-align:left; float:left"> &#8377; </span> 
                 <span style="text-align:right; float:right"><?php if (isset($invoice_details[$inv_cnt]['total_amount'])) echo $invoice_details[$inv_cnt]['total_amount']; ?></span> 
             </td>
         </tr>
         <tr>
-            <td colspan="2" valign="top" style="font-size:10px; font-weight:500;">Add: CGST</td>
+        
+            <td colspan="1" valign="top" style="font-size:10px; font-weight:500;">Add: CGST</td>
             <td style=" font-size:10px; font-weight:500;" >  
                 <span style="text-align:left; float:left"> &#8377; </span> 
                 <span style="text-align:right; float:right"><?php if (isset($invoice_details[$inv_cnt]['cgst_amount'])) echo $invoice_details[$inv_cnt]['cgst_amount']; ?></span> 
             </td>
         </tr>
         <tr>
-            <td colspan="2" valign="top" style="font-size:10px; font-weight:500;">Add: SGST</td>
+            <td colspan="1" valign="top" style="font-size:10px; font-weight:500;">Add: SGST</td>
             <td style=" font-size:10px; font-weight:500;"  >  
                 <span style="text-align:left; float:left"> &#8377; </span> 
                 <span style="text-align:right; float:right"><?php if (isset($invoice_details[$inv_cnt]['sgst_amount'])) echo $invoice_details[$inv_cnt]['sgst_amount']; ?></span> 
             </td>
         </tr>
         <tr>
-            <td colspan="2" valign="top" style="font-size:10px; font-weight:500;">Add: IGST</td>
+            <td colspan="1" valign="top" style="font-size:10px; font-weight:500;">Add: IGST</td>
             <td style=" font-size:10px; font-weight:500;"  >  
                 <span style="text-align:left; float:left"> &#8377; </span> 
                 <span style="text-align:right; float:right"><?php if (isset($invoice_details[$inv_cnt]['igst_amount'])) echo $invoice_details[$inv_cnt]['igst_amount']; ?></span> 
             </td>
         </tr>
-        <tr style="background:#ececec;"> 
-            <td colspan="2" valign="middle" style="font-size:10px; font-weight:900;">
+        <tr style="font-size:10px">
+            <?php echo $tax_desc_body; ?>
+            <td colspan="1" valign="middle" style="font-size:10px; font-weight:900;background:#ececec;">
                 <p style="margin:0;"><span style="  font-size:10px; font-weight:900;" >Total Amount: GST</span></p>
             </td>
-            <td  style=" font-size:10px; font-weight:900;">  
+            <td  style=" font-size:10px; font-weight:900;background:#ececec;">  
                 <span style="text-align:left; float:left"> &#8377; </span> 
-                <span style="text-align:right; float:right"><?php if (isset($invoice_details[$inv_cnt]['tax_amount'])) echo $invoice_details[$inv_cnt]['tax_amount']; ?></span> 
+                <span style="text-align:right; float:right"><?php if (isset($tot_gst_amt)) echo $tot_gst_amt; ?></span> 
             </td>
         </tr>
         <tr>
-            <td colspan="2" valign="top" style="font-size:10px; font-weight:500;">Round Off Amount</td>
+            <td colspan="1" valign="top" style="font-size:10px; font-weight:500;">Round Off Amount</td>
             <td style=" font-size:10px; font-weight:500;"  >  
                 <span style="text-align:left; float:left"> &#8377; </span> 
                 <span style="text-align:right; float:right"><?php if (isset($invoice_details[$inv_cnt]['round_off_amount'])) echo $invoice_details[$inv_cnt]['round_off_amount']; ?></span> 
             </td>
         </tr>
         <tr style="background:#ececec;"> 
-            <td colspan="2" valign="middle" style="font-size:10px; font-weight:900;">
+            <td colspan="1" valign="middle" style="font-size:10px; font-weight:900;">
                 <p style="margin:0;"><span style="  font-size:10px; font-weight:900;" >Total Amount After Tax</span></p>
             </td>
             <td  style=" font-size:10px; font-weight:900;" >  
@@ -1317,8 +1401,11 @@
                 <span style="text-align:right; float:right"><?php if (isset($invoice_details[$inv_cnt]['invoice_amount'])) echo $invoice_details[$inv_cnt]['invoice_amount']; ?></span> 
             </td>
         </tr>
-        <tr> 
-            <td colspan="2" valign="middle" style="font-size:10px; font-weight:900;">
+        <tr>
+            <td colspan="4" valign="middle" style="font-size:10px; font-weight:900;">
+                <p style="margin:0;"><span style="  font-size:10px; font-weight:900;" > Total weight in Kg  :-  <?=($total_gram/1000).'Kg';?></span></p>
+            </td>
+            <td colspan="1" valign="middle" style="font-size:10px; font-weight:900;">
                 <p style="margin:0;"><span style="  font-size:10px; font-weight:900;" >GST Payable on Reverse Charge</span></p>
             </td>
             <td  style=" font-size:10px; font-weight:900;background:#ececec;" >  
@@ -1327,7 +1414,7 @@
             </td>
         </tr>
         <tr>
-            <td colspan="3" valign="middle" style="padding:0;">
+            <td colspan="4" valign="middle" style="padding:0;">
                 <table width="100%" border="0" cellpadding="5" cellspacing="0">
                     <tr>
                         <td width="42%"><p style="margin:0;"><span style="  font-size:8px; font-weight:500;" >Bank Name </span></td>
@@ -1347,7 +1434,7 @@
                     </tr>
                 </table>
             </td>
-            <td colspan="3" align="center" valign="top" style=" font-size:8px; font-weight:500;"> For Wholsome Habits Pvt Ltd <br/> <img src="<?php echo base_url().'/assets/invoice/'; ?>stamp.jpg" height="50"  alt="Sign3 Rishit" /> <br/>Authorised Signatory</td>
+            <td colspan="2" align="center" valign="top" style=" font-size:8px; font-weight:500;"> For Wholsome Habits Pvt Ltd <br/> <img src="<?php echo base_url().'/assets/invoice/'; ?>stamp.jpg" height="50"  alt="Sign3 Rishit" /> <br/>Authorised Signatory</td>
         </tr>
         <tr>
             <td colspan="6" valign="top">

@@ -21,6 +21,7 @@ class Merchandiser_beat_plan extends CI_Controller{
         $this->load->model('Merchandiser_beat_plan_model');
         $this->load->model('product_model');
         $this->load->database();
+        $this->load->library('excel');
     }
 
     //index function
@@ -506,6 +507,7 @@ class Merchandiser_beat_plan extends CI_Controller{
             }
             else
             {
+                $unique_array = array();
                 for ($j=0; $j<count($batch_array); $j++) { 
 
                     $store_id = $batch_array[$j]['store_id'];
@@ -513,6 +515,20 @@ class Merchandiser_beat_plan extends CI_Controller{
                     $location_id = $batch_array[$j]['location_id'];
                     $sales_rep_id = $batch_array[$j]['sales_rep_id'];
                     $frequency = $batch_array[$j]['frequency'];
+                    /*If Frequency contain Every Push in array*/    
+                    if (strpos($frequency, 'Every') !== false) {
+
+                         /*Search Frequency and sales rep id in array if exsist dont push else push*/     
+
+                        if(array_search($frequency, array_column($unique_array, 'frequency')) !== false && array_search($sales_rep_id, array_column($unique_array, 'sales_rep_id')) !== false) {
+                             'value is in multidim array';
+                        }
+                        else {
+                            $unique_array[]=array("frequency"=>$frequency,"sales_rep_id"=>$sales_rep_id);
+                        }
+                    }
+                
+
 
                      $where_array = array(
                                              /*"store_id"=>$store_id,
@@ -522,14 +538,72 @@ class Merchandiser_beat_plan extends CI_Controller{
                                              //"sequence"=>$sequence,
                                              "frequency"=>$frequency
                                         );
-
+                    /*Check sales_rep_id and frequency and delete previous entries for Every*/      
                     $this->db->where($where_array)->delete('merchandiser_beat_plan');
                     $this->db->where($where_array)->delete('admin_merchendizer_beat_plan');
                 }
 
+                /*Insert Entries For Every Frequency*/
                 $this->db->insert_batch('merchandiser_beat_plan ',$batch_array);
                 $this->db->insert_batch('admin_merchendizer_beat_plan ',$batch_array);
+
+                $batch_unique_array = [];    
+                /*Unique array Run for loop to get data for every frequency beatplan*/
+				
+				
+                for ($k=0; $k<count($unique_array); $k++) { 
+                    $where_array = array(
+                                            "sales_rep_id"=>$unique_array[$k]['sales_rep_id'],
+                                             "frequency"=>$unique_array[$k]['frequency']
+                                            );
+                    $result = $this->db->select('*')->where($where_array)->get('merchandiser_beat_plan')->result();
+					echo '<br>'.$this->db->last_query();
+                   /*Fetched result from merchendiser beat plan for perticular sales_rep_id and frequency*/     
+
+
+                    for($l=0;$l<count($result);$l++)
+                    {
+                        /*batch_unique_array is created for ALternate Frequency */
+
+                        $sequence = $result[$l]->sequence;
+						$frequency = $result[$l]->frequency;
+                        $explode_frequency = explode(' ',$frequency);
+                        $new_frequency = 'Alternate '.$explode_frequency[1];
+
+                        $where_unique_array = array(
+                                            "sales_rep_id"=>$result[$l]->sales_rep_id,
+                                             "frequency"=>$new_frequency
+                                            );
+
+
+                        $this->db->where($where_unique_array)->delete('merchandiser_beat_plan');
+                        $this->db->where($where_unique_array)->delete('admin_merchendizer_beat_plan');
+                        
+                        $data = array(
+                                    'store_id' => $result[$l]->store_id,
+                                    'zone_id' => $result[$l]->zone_id,
+                                    'location_id' => $result[$l]->location_id,
+                                    'sales_rep_id' =>$result[$l]->sales_rep_id,
+                                    'frequency' => $new_frequency,
+                                    'sequence' => $sequence,
+                                    'status' => 'Approved',
+                                    'modified_by' => $curusr,
+                                    'modified_on' => $now
+                         );
+                        $data['created_by']=$curusr;
+                        $data['created_on']=$now;
+						
+												
+                        $batch_unique_array[] =$data; 
+                        /*Data is push in batch unique array */
+                    }
+                }
+
+                $this->db->insert_batch('merchandiser_beat_plan ',$batch_unique_array);
+                $this->db->insert_batch('admin_merchendizer_beat_plan',$batch_unique_array);
+                    
                 redirect(base_url().'index.php/Merchandiser_beat_plan');
+
             } 
     }
 
@@ -623,7 +697,7 @@ class Merchandiser_beat_plan extends CI_Controller{
             $sales_rep = $this->db->query("select * from sales_rep_master where sr_type='Merchandizer' and status='Approved' order by sales_rep_name desc")->result();
             if($id!="")
             {
-                $sql = "select Distinct G.* from (select E.*,F.sales_rep_name from(select C.*, D.google_address,D.latitude,D.longitude from (select A.*,B.store_name from 
+                $sql = "select Distinct G.*,B.location from (select E.*,F.sales_rep_name from(select C.*, D.google_address,D.latitude,D.longitude from (select A.*,B.store_name from 
                     (Select * from  merchandiser_beat_plan Where frequency='$frequency' and sales_rep_id=$id)  A 
                     left join 
                     (SELECT * FROM relationship_master where type_id ='4' or type_id='7') B 
@@ -634,11 +708,14 @@ class Merchandiser_beat_plan extends CI_Controller{
                      left join 
                     (select * from sales_rep_master where sr_type='Merchandizer' order by sales_rep_name desc ) F 
                     on (E.sales_rep_id=F.id))G
+                    left join
+                    (select * from location_master) B 
+                     on (G.location_id=B.id)
                     order by G.sequence asc,G.modified_on Desc
                     ";
                 $detailed_beat_plan = $this->db->query($sql)->result_array();
 
-                $sql = "select Distinct G.*  from (select E.*,F.sales_rep_name from(select C.*, D.google_address,D.latitude,D.longitude from (select A.*,B.store_name from 
+                $sql = "select Distinct G.* ,B.location  from (select E.*,F.sales_rep_name from(select C.*, D.google_address,D.latitude,D.longitude from (select A.*,B.store_name from 
                     (Select * from  admin_merchendizer_beat_plan Where frequency='$frequency' and sales_rep_id=$id) A 
                     left join 
                     (SELECT * FROM relationship_master where type_id ='4' or type_id='7') B 
@@ -649,6 +726,9 @@ class Merchandiser_beat_plan extends CI_Controller{
                      left join 
                     (select * from sales_rep_master where sr_type='Merchandizer' order by sales_rep_name desc ) F 
                     on (E.sales_rep_id=F.id))G
+                    left join
+                    (select * from location_master) B 
+                     on (G.location_id=B.id)
                     order by G.sequence asc,G.modified_on Desc
                     ";
                 $admin_merchendizer_beat_plan = $this->db->query($sql)->result_array(); 
@@ -728,16 +808,37 @@ class Merchandiser_beat_plan extends CI_Controller{
         }
 
        
-       $template_path=$this->config->item('template_path');
+       $objPHPExcel = new PHPExcel();
+       $objPHPExcel->setActiveSheetIndex(0);
+       $col_name[]=array();
+       for($i=0; $i<=30; $i++) {
+
+            $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
+
+       }
+       $col=0;
+       /*$template_path=$this->config->item('template_path');
        $file = $template_path.'merchandiser.xls';
        $this->load->library('excel');
        $objPHPExcel = PHPExcel_IOFactory::load($file);
-       $objPHPExcel->setActiveSheetIndex(0);
-       $row = 3;
+       $objPHPExcel->setActiveSheetIndex(0);*/
+       $row =1;
+       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Wholesome Habits Private Limited ");
+       $row=$row+1;
+       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Merchendiser Not Mapped");
+       $row=$row+2;
+       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Merchendiser");
+       $row = $row+1;
        foreach($result  as $dist)
         {
            $objPHPExcel->getActiveSheet()->setCellValue('A'.$row,$dist->sales_rep_name);
            $row = $row+1;
+        }
+
+        for($col = 0; $col < 1; $col++) {
+
+            $objPHPExcel->getActiveSheet()->getColumnDimension($col_name[$col])->setAutoSize(true);
+
         }
 
         if(count($result)>0)
@@ -751,7 +852,7 @@ class Merchandiser_beat_plan extends CI_Controller{
         }
     }
 	
-	  public function store_not_mapped($status='')
+	public function store_not_mapped($status='')
     {
         $result = $this->db->query('Select DISTINCT store_id from merchandiser_beat_plan')->result();
 
@@ -771,18 +872,40 @@ class Merchandiser_beat_plan extends CI_Controller{
            $this->db->last_query(); 
         }
        
-       $template_path=$this->config->item('template_path');
-       $file = $template_path.'store.xls';
+       $objPHPExcel = new PHPExcel();
+       $objPHPExcel->setActiveSheetIndex(0);
+       $col_name[]=array();
+       for($i=0; $i<=30; $i++) {
+
+            $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
+
+       }
+       $col=0;
+       /*$template_path=$this->config->item('template_path');
+       $file = $template_path.'merchandiser.xls';
        $this->load->library('excel');
        $objPHPExcel = PHPExcel_IOFactory::load($file);
-       $objPHPExcel->setActiveSheetIndex(0);
-       $row = 3;
+       $objPHPExcel->setActiveSheetIndex(0);*/
+       $row =1;
+       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Wholesome Habits Private Limited ");
+       $row=$row+1;
+       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Store Not Mapped");
+       $row=$row+2;
+       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Store");
+       $row = $row+1;
+
        foreach($result  as $dist)
         {
            $objPHPExcel->getActiveSheet()->setCellValue('A'.$row,$dist->store_name);
            $row = $row+1;
         }
 
+        for($col = 0; $col < 1; $col++) {
+
+            $objPHPExcel->getActiveSheet()->getColumnDimension($col_name[$col])->setAutoSize(true);
+
+        }
+        
         if(count($result)>0)
         {
             $filename='store.xls';
@@ -831,18 +954,38 @@ class Merchandiser_beat_plan extends CI_Controller{
         }
 
        
-       $template_path=$this->config->item('template_path');
-       $file = $template_path.'zone.xls';
+         $objPHPExcel = new PHPExcel();
+       $objPHPExcel->setActiveSheetIndex(0);
+       $col_name[]=array();
+       for($i=0; $i<=30; $i++) {
+
+            $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
+
+       }
+       $col=0;
+       /*$template_path=$this->config->item('template_path');
+       $file = $template_path.'merchandiser.xls';
        $this->load->library('excel');
        $objPHPExcel = PHPExcel_IOFactory::load($file);
-       $objPHPExcel->setActiveSheetIndex(0);
-       $row = 3;
+       $objPHPExcel->setActiveSheetIndex(0);*/
+       $row =1;
+       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Wholesome Habits Private Limited ");
+       $row=$row+1;
+       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Store Not Mapped");
+       $row=$row+2;
+       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Zone");
+       $row = $row+1;
+
        foreach($result  as $dist)
         {
            $objPHPExcel->getActiveSheet()->setCellValue('A'.$row,$dist->zone);
            $row = $row+1;
         }
+        for($col = 0; $col < 1; $col++) {
 
+            $objPHPExcel->getActiveSheet()->getColumnDimension($col_name[$col])->setAutoSize(true);
+
+        }
         if(count($result)>0)
         {
             $filename='zone.xls';
@@ -902,7 +1045,285 @@ class Merchandiser_beat_plan extends CI_Controller{
 				$objWriter->save('php://output');
 			}
 		}*/
+public function get_sales_rep_email(){
+		$frequency='';
+        $data = $this->Merchandiser_beat_plan_model->get_sales_rep_email($frequency);
+				
+        $data1 = $this->Merchandiser_beat_plan_model->get_sales_rep1_email($frequency);
+        $data2 = $this->Merchandiser_beat_plan_model->get_sales_rep2_email($frequency);
+        //$orders= $this-Merchandiser_beat_plan_model->get_sales_rep_order_email();
+        $total_visits = $this->Merchandiser_beat_plan_model->get_sales_rep_total_visits_email($frequency);
+		$tbody ='';
+		$from_email = 'cs@eatanytime.co.in';
+        $from_email_sender = 'Wholesome Habits Pvt Ltd';
+       
+		//$to_email = "mukesh@eatanytime.in,sulochana@eatanytime.co.in";
+		$to_email = "ashwini.patil@pecanreams.com";
+		// $bcc = "sangeeta.yadav@pecanreams.com, dhaval.maru@pecanreams.com";
+		//$bcc = "rishit.sanghvi@eatanytime.in, dhaval.maru@pecanreams.com, swapnil.darekar@eatanytime.in, mis@eatanytime.co.in, ashwini.patil@pecanreams.com, sangeeta.yadav@pecanreams.com ";
+	
+        $subject = 'Daily Performance Report For Merchandiser - '.date("d F Y",strtotime("now"));
 
+         $tbody ='<!DOCTYPE html">
+					<html>
+					<head>
+					<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+					 
+
+
+					  <style type="text/css">
+					  body {margin: 0; padding: 20px; min-width: 100%!important;font-family "Arial,Helvetica,sans-serif";}
+					  img {height: auto;}
+					  .content { max-width: 600px;}
+					  .header {padding:  20px;}
+					  .innerpadding {padding: 30px 30px 30px 30px;}
+					  .innerpadding1 {padding: 0px 30px 30px 30px;}
+					  
+					  .borderbottom {border-bottom: 1px solid #f2eeed;}
+					  .subhead {font-size: 15px; color: #ffffff; font-family: sans-serif; letter-spacing: 10px;}
+					  .h1, .h2, .bodycopy {color: #fff; font-family: sans-serif;}
+					  .h1 {font-size: 33px; line-height: 38px; font-weight: bold;}
+					  .h2 {padding: 0 0 15px 0; font-size: 24px; line-height: 28px; font-weight: bold;}
+					  .bodycopy {font-size: 16px; line-height: 22px;}
+					  .button {text-align: center; font-size: 18px; font-family: sans-serif; font-weight: bold; padding: 0 30px 0 30px;}
+					  .button a {color: #ffffff; text-decoration: none;}
+					  .footer {padding: 20px 30px 15px 30px;}
+					  .footercopy {font-family: sans-serif; font-size: 14px; color: #ffffff;}
+					  .footercopy a {color: #ffffff; text-decoration: underline;}
+
+					  @media only screen and (max-width: 550px), screen and (max-device-width: 550px) {
+					  body[yahoo] .hide {display: none!important;}
+					  body[yahoo] .buttonwrapper {background-color: transparent!important;}
+					  body[yahoo] .button {padding: 0px!important;}
+					  body[yahoo] .button a {background-color: #e05443; padding: 15px 15px 13px!important;}
+					  body[yahoo] .unsubscribe {display: block; margin-top: 20px; padding: 10px 50px; background: #2f3942; border-radius: 5px; text-decoration: none!important; font-weight: bold;}
+					  }
+
+					  /*@media only screen and (min-device-width: 601px) {
+						.content {width: 600px !important;}
+						.col425 {width: 425px!important;}
+						.col380 {width: 380px!important;}
+						}*/
+						table, th, td {
+					   
+						border-collapse: collapse;
+					}
+					th, td {
+						  padding: 3px;
+						text-align: left;
+						
+					}
+					.total
+						{
+							color: #333333;
+							font-size: 28px;
+							font-family: Arial,Helvetica,sans-serif;
+						}
+						.used
+						{
+							color: #666666;
+							font-size: 20px;
+							font-family: Arial,Helvetica,sans-serif;
+						}
+						.team_head
+						{
+							font-size:36px;
+							font-weight:normal;
+							color:#fff;
+							font-family: "Arial,Helvetica,sans-serif";
+						}
+						.date
+						{
+							font-size:16px;
+							color:#fff;
+						}
+						.upper_table td
+						{
+							border:1px solid #ddd;
+							text-align:center;
+								 padding: 10px;
+							
+						}
+						.body_table tbody 
+						{
+							border:1px solid #ddd;
+							background-color: #fdfbfb;
+							color: #656d78;
+						}
+					  </style>
+					</head>
+
+					<body yahoo bgcolor="#f6f8f1" style="margin-top:20px;"margin-bottom:20px;">
+					<table width="100%" bgcolor="#f6f8f1" border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
+					<tr>
+					  <td style="padding-top:30px; padding-bottom:30px;">
+						<!--[if (gte mso 9)|(IE)]>
+						  <table width="400" align="center" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse;">
+							<tr>
+							  <td style="padding-top:15px; padding-bottom:15px;>
+						<![endif]-->     
+						<table bgcolor="#ffffff" class="content" style="max-width: 400px;" align="center" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse;">
+						  <tr>
+							<td bgcolor="#0c2c4e" class="header" style="padding:20px;" colspan="20" >
+							 
+							  <!--[if (gte mso 9)|(IE)]>
+								<table width="425" align="left" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse;padding-top:15px; padding-bottom:15px;">
+								  <tr>
+									<td style="padding-top:15px; padding-bottom:15px;">
+							  <![endif]-->
+							  <table class="" align="left" border="0" cellpadding="0" cellspacing="0" style="width: 100%;"style="border-collapse: collapse;">  
+								<tr>
+								  <td height="70">
+									<table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-collapse: collapse;">
+									  <tr>
+										<td class="subhead" style="padding: 0 0 0 3px;width:30%;font-size: 15px; color: #ffffff; font-family: sans-serif; letter-spacing: 10px;">
+										   <img class="fix" src="https://www.eatanytime.in/test/img/white_logo.png" width="100" height="100" border="0" alt="" style=" height: auto;"/>
+										
+										</td>
+								   
+									 
+										<td  style="width:70%;text-align:right">
+											<span class="team_head" style="font-size:36px;font-weight:normal;color:#fff;">Team Activity Report</span><br>
+											<small class="date" style="font-size:16px;color:#fff;">';
+											$tbody.= date("d F Y",strtotime("now")).'</small>
+										</td>
+									  </tr>
+									</table>
+								  </td>
+								</tr>
+							  </table>
+							  <!--[if (gte mso 9)|(IE)]>
+									</td>
+								  </tr>
+							  </table>
+							  <![endif]-->
+							</td>
+						  </tr>
+						  <tr>
+							<td class="innerpadding " style="padding: 30px 30px 30px 30px;" >
+							   <table class="table upper_table" style="width:600px;border-collapse: collapse;" >
+									<tr>
+										 <td align="center" valign="top" style="border:1px solid #ddd;width:50%;text-align:center; padding: 10px;" ><span style="color:#333333;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:600;text-transform:Uppercase;">ATTENDANCE</span> <br><br> <span class="total" style="color: #333333;font-size: 28px;">' ;
+										 if(count($data2)>0)
+											{ 
+												 $tbody.=$data2[0]->present_merchandiser;
+											}
+										$tbody .='</span><span class="used" style="color: #666666;font-size: 20px;">/' ;
+										if(count($data1)>0)
+										{
+											
+											$tbody.=$data1[0]->total_merchandiser;
+										}
+										$tbody .='</span></td>
+													<td align="center" valign="top" style="border:1px solid #ddd;text-align:center; padding: 10px;"><span style="color:#333333;font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:600;text-transform:Uppercase;">Visits</span> <br><br> <span class="total" style="color: #333333;font-size: 28px;">'; 
+										if(count($total_visits)>=0)
+										{
+											
+											$tbody .=(isset($total_visits[0]->actual)?$total_visits[0]->actual:0);		
+										}
+										$tbody .='</span><span class="used" style="color: #666666;font-size: 20px;">/'; 	
+										if(count($total_visits)>=0)
+										{
+											
+											$tbody .=(isset($total_visits[0]->plan)?$total_visits[0]->plan:0);	
+										}
+										
+								$tbody .='</span></td>
+    
+					</tr>
+           
+            
+			</table>
+			</td>
+			</tr>
+    
+       <td class="innerpadding1 " style="padding: 0px 30px 30px 30px;">
+           <table  class="body_table" style="border-collapse: collapse;width:100%">
+			<thead>
+				<tr style=" background-color: #f3f3f3 ;border-bottom: 1px solid #ddd;font-weight: bold;">
+				 
+				  <th style="border-right: 1px solid #ddd;padding: 8px;text-align: left;width:150px">Name Of Employee</th>
+				  <th style="border-right: 1px solid #ddd;padding: 8px;text-align: left;">Attendence</th>
+				  <th style="border-right: 1px solid #ddd;padding: 8px;text-align: left;width:120px">Beat Name</th>
+				  <th style="border-right: 1px solid #ddd;padding: 8px;text-align: left;">Planned Vists</th>
+				  <th style="border-right: 1px solid #ddd;padding: 8px;text-align: left;">Acutal Vists</th>
+		
+				  <th style="border-right: 1px solid #ddd;padding: 8px;text-align: left;">Deviation %</th>
+				
+			
+				  
+				  
+				</tr>
+			</thead>
+			<tbody style="border:1px solid #ddd;
+							background-color: #fdfbfb;
+							color: #656d78;">
+          '; 
+				
+				if(count($data)>=0) {
+					for($i=0; $i<count($data); $i++)
+					{
+						if($data[$i]->sales_rep_id <>'')
+						{		
+								$div=($data[$i]->actual_count)/($data[$i]->planned_count);
+								if($div> 0 )
+								{
+									$deviation=(1-($data[$i]->actual_count)/($data[$i]->planned_count))*100;
+								}
+								else
+								{
+									$deviation='0';
+								}
+						
+								$tbody.= ' <tr>
+									
+									<td style="border-right: 1px solid #ddd;padding: 8px;text-align: left;color:#222;">'.$data[$i]->sales_rep_name.'
+									</td>
+									<td style="border-right: 1px solid #ddd;padding: 8px;text-align: left;color: #881818; text-transform: UPPERCASE;font-size: 12px;">'.$data[$i]->emp_status.'</td>
+									<td style="border-right: 1px solid #ddd;padding: 8px;text-align: left;color:#222">'.$data[$i]->frequency.'</td>
+									<td style="border-right: 1px solid #ddd;padding: 8px;text-align: left;color:#222">'.$data[$i]->planned_count.'</td>
+									<td style="border-right: 1px solid #ddd;padding: 8px;text-align: left;color:#222">'.$data[$i]->actual_count.'</td>
+								
+								
+									<td style="border-right: 1px solid #ddd;padding: 8px;text-align: left;color:#222">'.round($deviation,2).'%</td>
+								
+									</tr>';
+						  }
+					}
+				}
+            
+            $tbody.=   '</tbody>
+          </table>
+        </td>
+	  </tr>
+   
+   
+    </table>
+    <!--[if (gte mso 9)|(IE)]>
+          </td>
+        </tr>
+    </table>
+    <![endif]-->
+    </td>
+  </tr>
+</table>
+
+<!--analytics-->
+
+</body>
+</html>' ;
+
+//echo $tbody;
+            
+          echo 'mailsent'.$mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $tbody, $bcc);
+          if ($mailSent==1) {
+              echo "Send";
+          } else {
+              echo "NOT Send".$mailSent;
+          }
+
+        // load_view('invoice/emailer', $data);
+    }
    
 }
 ?>

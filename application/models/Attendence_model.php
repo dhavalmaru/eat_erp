@@ -61,7 +61,7 @@ public function get_employee_attendence($emp_no,$year,$month)
 			$cond = '';
 		}*/
 
-	$sql = "Select A.*,B.adjusted_late_marks,B.adjusted_late_marks_count,B.employee_adjusted_time,B.adjusted_effective_time from (Select A.emp_id,A.emp_no,A.emp_name,A.date,A.`first_in`,
+	$sql = "Select Distinct A.*,B.adjusted_late_marks,B.adjusted_late_marks_count,B.employee_adjusted_time,B.adjusted_effective_time from (Select A.emp_id,A.emp_no,A.emp_name,A.date,A.`first_in`,
 		A.`last_out`,A.emp_status,A.status,A.Late_marks,A.adjusted_in_time,A.adjusted_out_time,A.remark,A.department,B.email_id,B.email_id2,Case When Late_marks='L' Then (@cnt := @cnt + 1)  End as Late_marks_count,
 		Case When Late_marks='L' AND @cnt>3 AND CAST(effective_time As Time)>=CAST('10:00:00' As Time) THEN 0.66 
 		When Late_marks='L' AND @cnt>3 AND CAST(effective_time As Time)<CAST('10:00:00' As Time) THEN 0.5
@@ -113,7 +113,7 @@ public function get_employee_attendence($emp_no,$year,$month)
 			from employee_attendence  Where emp_no='$emp_no' and MONTH(date)='$month_date' and YEAR(date)='$year') A
 			CROSS JOIN (SELECT @cnt1 := 0) AS dummy
 			left JOIN
-			(SELECT emp_code,email_id,email_id2 from user_master) B on A.emp_no=B.emp_code ) B 
+			(SELECT emp_code,email_id,email_id2 from user_master Where status='Approved') B on A.emp_no=B.emp_code ) B 
 			on A.emp_no=B.emp_no and A.date=B.date ";
 			
 	$result = $this->db->query($sql)->result();
@@ -130,7 +130,7 @@ public function attendence_list($status,$year,$month)
 	else
 		$cond='';
 
-	if($this->session->userdata("user_name")!='rishit.sanghvi@otbconsulting.co.in')
+	if($this->session->userdata("user_name")!='rishit.sanghvi@otbconsulting.co.in' && $this->session->userdata("user_name")!='swapnil.darekar@eatanytime.in')
 	{
 		if($cond!='')
 		{
@@ -176,7 +176,7 @@ public function get_summary($status,$year,$month)
 
 	$session_email = $this->session->userdata("user_name");
 
-	if($this->session->userdata("user_name")!='rishit.sanghvi@otbconsulting.co.in')
+	if($this->session->userdata("user_name")!='rishit.sanghvi@otbconsulting.co.in' && $this->session->userdata("user_name")!='swapnil.darekar@eatanytime.in')
 	{
 		if($cond!='')
 		{

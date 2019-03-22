@@ -12,7 +12,7 @@ class Distributor_out extends CI_Controller{
         $this->load->helper('form');
         $this->load->library('session');
         $this->load->library('email');
-		 $this->load->library('form_validation');
+		$this->load->library('form_validation');
         $this->load->helper('common_functions');
         $this->load->model('distributor_out_model');
         $this->load->model('box_model');
@@ -50,8 +50,7 @@ class Distributor_out extends CI_Controller{
         }
     }
 
-    public function get_data($status)
-	{
+    public function get_data($status){
         // $status = 'Approved';
 
         $draw = intval($this->input->get("draw"));
@@ -60,10 +59,10 @@ class Distributor_out extends CI_Controller{
         // $status = intval($this->input->get("status"));
 
         $r = $this->distributor_out_model->get_distributor_out_data1($status);
-		// echo "<pre>";
-		// print_r($r[0]);
-		// echo "</pre>";
-		// die();
+        // echo "<pre>";
+        // print_r($r[0]);
+        // echo "</pre>";
+        // die();
         $data = array();
 
         for($i=0;$i<count($r);$i++){
@@ -109,15 +108,16 @@ class Distributor_out extends CI_Controller{
                 $data[] = array(
                             $ulr,
                             $i+1,
+                            
 
                             '<span style="display:none;">
                             <input type="hidden" id="date_of_processing_'.$i.'" name="date_of_processing[]" value="'.$r[$i]->date_of_processing.'" />'.
                                 (($r[$i]->date_of_processing!=null && $r[$i]->date_of_processing!='')?date('Ymd',strtotime($r[$i]->date_of_processing)):'')
                             .'</span>'.
                             (($r[$i]->date_of_processing!=null && $r[$i]->date_of_processing!='')?date('d/m/Y',strtotime($r[$i]->date_of_processing)):''),
-									  '<a href="'.base_url().'index.php/distributor_out/edit/'.$r[$i]->d_id.'" class=""><i class="fa fa-edit"></i></a>',
-							
-							  '<a href="'.($r[$i]->proof_of_delivery!=NULL?base_url('assets/uploads/delivery_proof').'/'.$r[$i]->proof_of_delivery:'javascript:void(0)').'" target="_blank"> 
+                                      '<a href="'.base_url().'index.php/distributor_out/edit/'.$r[$i]->d_id.'" class=""><i class="fa fa-edit"></i></a>',
+                            
+                              '<a href="'.($r[$i]->proof_of_delivery!=NULL?base_url('assets/uploads/delivery_proof').'/'.$r[$i]->proof_of_delivery:'javascript:void(0)').'" target="_blank"> 
                                 '.($r[$i]->proof_of_delivery!=NULL?'<span class="fa fa-file-pdf-o" style="font-size:20px;"></span>':'').'
                             </a>',
 
@@ -143,7 +143,7 @@ class Distributor_out extends CI_Controller{
 
                            
 
-                            ((strtoupper(trim($r[$i]->distributor_name))=='DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='AMAZON DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='NYKAA DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED')? $r[$i]->distributor_name . '-' . $r[$i]->client_name : $r[$i]->distributor_name),
+                            ((strtoupper(trim($r[$i]->distributor_name))=='DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='AMAZON DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='NYKAA DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($r[$i]->distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($r[$i]->distributor_name))=='PAYTM DIRECT')? $r[$i]->distributor_name . '-' . $r[$i]->client_name : $r[$i]->distributor_name),
 
                             $r[$i]->order_no,
 
@@ -161,7 +161,7 @@ class Distributor_out extends CI_Controller{
                             $r[$i]->delivery_status,
 
                             // $r[$i]->del_person_name,
-							// 
+                            // 
 
                             '<a href="'.
                                         ((strtotime($r[$i]->date_of_processing)<strtotime('2017-07-01'))?
@@ -171,8 +171,14 @@ class Distributor_out extends CI_Controller{
                             </a>',
 
                             '<a href="#"><span class="fa fa-eye">Resend Invoice</span></a>',
-							$r[$i]->tracking_id
-							 
+                            $r[$i]->tracking_id,
+                            
+                            
+                            
+                            '<a href="'.($r[$i]->credit_debit_note_id!=NULL?base_url('index.php/credit_debit_note/view_credit_debit_note/').'/'.$r[$i]->credit_debit_note_id:'javascript:void(0)').'" target="_blank"> 
+                                '.($r[$i]->credit_debit_note_id!=NULL?'<span class="fa fa-file-pdf-o" style="font-size:20px;"></span>':'').'
+                            </a>',
+                             
                         );
             } else {
                 $data[] = array(
@@ -180,6 +186,7 @@ class Distributor_out extends CI_Controller{
                             <input type="hidden" id="input_check_'.$i.'" name="check[]" value="false" />',
 
                             $i+1,
+                            
 
                             '<span style="display:none;">
                             <input type="hidden" id="date_of_processing_'.$i.'" name="date_of_processing[]" value="'.$r[$i]->date_of_processing.'" />'.
@@ -188,11 +195,11 @@ class Distributor_out extends CI_Controller{
                           
                                 (($r[$i]->date_of_processing!=null && $r[$i]->date_of_processing!='')?date('d/m/Y',strtotime($r[$i]->date_of_processing)):''),
                            
-								  '<a href="'.base_url().'index.php/distributor_out/edit/'.$r[$i]->d_id.'" class=""><i class="fa fa-edit"></i></a>',
-								 '<a href="'.($r[$i]->proof_of_delivery!=NULL?base_url('assets/uploads/delivery_proof').'/'.$r[$i]->proof_of_delivery:'javascript:void(0)').'" target="_blank"> 
+                                  '<a href="'.base_url().'index.php/distributor_out/edit/'.$r[$i]->d_id.'" class=""><i class="fa fa-edit"></i></a>',
+                                 '<a href="'.($r[$i]->proof_of_delivery!=NULL?base_url('assets/uploads/delivery_proof').'/'.$r[$i]->proof_of_delivery:'javascript:void(0)').'" target="_blank"> 
                                 '.($r[$i]->proof_of_delivery!=NULL?'<span class="fa fa-file-pdf-o" style="font-size:20px;"></span>':'').'
                             </a>',
-								  
+                                  
                             '<span style="display:none;">
                             <input type="hidden" id="invoice_no_'.$i.'" name="invoice_no[]" value="'.$r[$i]->invoice_no.'" />'.
                                 (isset($r[$i]->invoice_no)?str_pad(substr($r[$i]->invoice_no, strrpos($r[$i]->invoice_no, "/")+1),10,"0",STR_PAD_LEFT):'')
@@ -213,7 +220,7 @@ class Distributor_out extends CI_Controller{
                             (($r[$i]->invoice_date!=null && $r[$i]->invoice_date!='')?date('d/m/Y',strtotime($r[$i]->invoice_date)):''),
 
                           
-                            ((strtoupper(trim($r[$i]->distributor_name))=='DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='AMAZON DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='NYKAA DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED')? $r[$i]->distributor_name . '-' . $r[$i]->client_name : $r[$i]->distributor_name),
+                            ((strtoupper(trim($r[$i]->distributor_name))=='DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='AMAZON DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='NYKAA DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($r[$i]->distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($r[$i]->distributor_name))=='PAYTM DIRECT')? $r[$i]->distributor_name . '-' . $r[$i]->client_name : $r[$i]->distributor_name),
 
                             $r[$i]->order_no,
 
@@ -242,7 +249,11 @@ class Distributor_out extends CI_Controller{
                             </a>',
 
                             '<a href="#"><span class="fa fa-eye">Resend Invoice</span></a>',
-                           $r[$i]->tracking_id
+                           $r[$i]->tracking_id,
+                           '<a href="'.($r[$i]->credit_debit_note_id!=NULL?base_url('index.php/credit_debit_note/view_credit_debit_note/').'/'.$r[$i]->credit_debit_note_id:'javascript:void(0)').'" target="_blank"> 
+                                '.($r[$i]->credit_debit_note_id!=NULL?'<span class="fa fa-file-pdf-o" style="font-size:20px;"></span>':'').'
+                            </a>',
+
 
                         );
             }
@@ -363,9 +374,11 @@ class Distributor_out extends CI_Controller{
             $data['all']=count($count_data);
             $data['status']=$status;
             $data['sales_rep'] = $this->sales_rep_model->get_data('Approved');
-		$query=$this->db->query("SELECT * FROM sales_rep_master WHERE sr_type='Merchandizer'");
-        $result=$query->result();
-        $data['sales_rep1']=$result;
+
+    		$query=$this->db->query("SELECT * FROM sales_rep_master WHERE sr_type='Merchandizer'");
+            $result=$query->result();
+            $data['sales_rep1']=$result;
+            
             load_view('distributor_out/distributor_out_list', $data);
 
         } else {
@@ -483,8 +496,8 @@ class Distributor_out extends CI_Controller{
 
     public function update($id){
         $this->distributor_out_model->save_data($id);
-       // redirect(base_url().'index.php/distributor_out/checkstatus/pending_for_delivery');
-	      echo '<script>window.open("'.base_url().'index.php/distributor_out/checkstatus/pending_for_delivery", "_parent")</script>';
+        // redirect(base_url().'index.php/distributor_out/checkstatus/pending_for_delivery');
+        echo '<script>window.open("'.base_url().'index.php/distributor_out/checkstatus/pending_for_delivery", "_parent")</script>';
     }
     
     public function check_box_availablity(){
@@ -525,6 +538,10 @@ class Distributor_out extends CI_Controller{
 
     public function view_tax_invoice($id){
         $this->tax_invoice_model->generate_tax_invoice($id);
+    }
+
+    public function view_tax_invoice_test($id){
+        $this->tax_invoice_model->generate_tax_invoice_test($id);
     }
 
     public function generate_gate_pass(){
@@ -632,30 +649,30 @@ class Distributor_out extends CI_Controller{
     }
 
     // public function view_payment_details($id){
-    //     $result=$this->distributor_out_model->get_access();
-    //     if(count($result)>0) {
-    //         if($result[0]->r_view == 1 || $result[0]->r_edit == 1) {
-    //             $data['access'] = $this->distributor_out_model->get_access();
-    //             $data['data'] = $this->distributor_out_model->get_data('', $id);
-    //             $data['distributor_payment_details'] = $this->distributor_out_model->get_distributor_payment_details($id);
+        //     $result=$this->distributor_out_model->get_access();
+        //     if(count($result)>0) {
+        //         if($result[0]->r_view == 1 || $result[0]->r_edit == 1) {
+        //             $data['access'] = $this->distributor_out_model->get_access();
+        //             $data['data'] = $this->distributor_out_model->get_data('', $id);
+        //             $data['distributor_payment_details'] = $this->distributor_out_model->get_distributor_payment_details($id);
 
-    //             load_view('distributor_out/distributor_payment_details', $data);
-    //         } else {
-    //             echo "Unauthorized access";
-    //         }
-    //     } else {
-    //         echo "You donot have access to this page.";
-    //     }
+        //             load_view('distributor_out/distributor_payment_details', $data);
+        //         } else {
+        //             echo "Unauthorized access";
+        //         }
+        //     } else {
+        //         echo "You donot have access to this page.";
+        //     }
     // }
 
     // public function save_payment_details(){
-    //     $this->distributor_out_model->save_payment_details();
-    //     redirect(base_url().'index.php/distributor_out');
+        //     $this->distributor_out_model->save_payment_details();
+        //     redirect(base_url().'index.php/distributor_out');
     // }
 
     // public function update_payment_details($id){
-    //     $this->distributor_out_model->save_payment_details($id);
-    //     redirect(base_url().'index.php/distributor_out');
+        //     $this->distributor_out_model->save_payment_details($id);
+        //     redirect(base_url().'index.php/distributor_out');
     // }
     
     public function generate_invoice(){
@@ -739,10 +756,15 @@ class Distributor_out extends CI_Controller{
             $data['cost'] = $result[0]->cost;
             $data['anticipated_wastage'] = $result[0]->anticipated_wastage;
             $data['tax_percentage'] = $result[0]->tax_percentage;
-            $data['margin'] = $result[0]->margin;
+            $data['inv_margin'] = $result[0]->inv_margin;
+            $data['pro_margin'] = $result[0]->pro_margin;
         }
 
         echo json_encode($data);
+    }
+
+    public function set_invoice_debit_note(){
+        $this->distributor_out_model->set_debit_note('6527');
     }
 
     public function get_box_details(){
@@ -760,14 +782,14 @@ class Distributor_out extends CI_Controller{
             $data['rate'] = $result[0]->rate;
             $data['cost'] = $result[0]->cost;
             $data['tax_percentage'] = $result[0]->tax_percentage;
-            $data['margin'] = $result[0]->margin;
+            $data['inv_margin'] = $result[0]->inv_margin;
+            $data['pro_margin'] = $result[0]->pro_margin;
         }
 
         echo json_encode($data);
     }
 
-    public function get_comments()
-    {
+    public function get_comments(){
         $id=$this->input->post('id');
         $result = $this->distributor_out_model->get_comments($id);
         if(count($result)>0)
@@ -780,8 +802,7 @@ class Distributor_out extends CI_Controller{
         }
     }
 
-    public function add_comments()
-    {
+    public function add_comments(){
        $result = $this->distributor_out_model->save_comments();
        redirect($_SERVER['HTTP_REFERER']); 
     }

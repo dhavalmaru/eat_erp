@@ -276,7 +276,7 @@ function get_sales_rep_email($frequency=''){
 
 	
 	  $sql="
-			SELECT A.*,B.sales_rep_name, C.actual_count,D.planned_count,'Present' as emp_status from (SELECT DISTINCT sales_rep_id,frequency from merchandiser_detailed_beat_plan Where frequency='".$frequency."' and date(date_of_visit)=date(now())) A left join (SELECT sales_rep_name,id from sales_rep_master) B on B.id=A.sales_rep_id LEFT JOIN (SELECT count(*) as actual_count ,sales_rep_id from ( SELECT sales_rep_id,date_of_visit from merchandiser_detailed_beat_plan Where frequency='".$frequency."' and date(date_of_visit)=date(now()) and is_edit='edit') B GROUP BY sales_rep_id ) C on C.sales_rep_id=A.sales_rep_id LEFT JOIN ( SELECT count(*) as planned_count ,sales_rep_id from ( SELECT sales_rep_id,date_of_visit from merchandiser_detailed_beat_plan Where frequency='".$frequency."' and date(date_of_visit)=date(now()) ) B GROUP BY sales_rep_id ) D 
+			SELECT A.*,B.sales_rep_name, C.actual_count,D.planned_count,'Present' as emp_status from (SELECT DISTINCT sales_rep_id,frequency from merchandiser_detailed_beat_plan Where frequency='".$frequency."' and date(date_of_visit)=date(now())) A left join (SELECT sales_rep_name,id from sales_rep_master Where status='Approved') B on B.id=A.sales_rep_id LEFT JOIN (SELECT count(*) as actual_count ,sales_rep_id from ( SELECT sales_rep_id,date_of_visit from merchandiser_detailed_beat_plan Where frequency='".$frequency."' and date(date_of_visit)=date(now()) and is_edit='edit') B GROUP BY sales_rep_id ) C on C.sales_rep_id=A.sales_rep_id LEFT JOIN ( SELECT count(*) as planned_count ,sales_rep_id from ( SELECT sales_rep_id,date_of_visit from merchandiser_detailed_beat_plan Where frequency='".$frequency."' and date(date_of_visit)=date(now()) ) B GROUP BY sales_rep_id ) D 
                         on D.sales_rep_id=A.sales_rep_id
 						  UNION
             SELECT A.sales_rep_id,'' as frequency,B.sales_rep_name,'' as planned_count,
@@ -285,7 +285,7 @@ function get_sales_rep_email($frequency=''){
             (Select DISTINCT sales_rep_id 
                 from merchandiser_beat_plan Where frequency='".$frequency."' and sales_rep_id NOT IN(
                 SELECT DISTINCT sales_rep_id from merchandiser_detailed_beat_plan Where frequency='".$frequency."' and date(date_of_visit)=date(now()) ) )  A
-                join (SELECT sales_rep_name,id from sales_rep_master) B 
+                join (SELECT sales_rep_name,id from sales_rep_master Where status='Approved') B 
                 on B.id=A.sales_rep_id 
 			";
 		$query=$this->db->query($sql);

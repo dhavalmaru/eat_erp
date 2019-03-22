@@ -169,9 +169,9 @@
                                     </div>
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Margin On MRP (In %)<span class="asterisk_sign">*</span></label>
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Discount (In %)<span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="sell_out" placeholder="Margin On MRP" value="<?php if (isset($data)) { echo $data[0]->sell_out; } ?>"/>
+                                                <input type="text" class="form-control" name="sell_out" placeholder="Margin On MRP" value="<?php if (isset($data)) { if($data[0]->sell_out!=null && $data[0]->sell_out!='') echo $data[0]->sell_out; else echo '0'; } else echo '0'; ?>"/>
                                             </div>
                                         </div>
                                     </div>
@@ -294,8 +294,9 @@
                                       <table class="table table-bordered" style="margin-bottom: 0px; ">
                                             <thead>
                                                 <tr>
-                                                    <th style="width: 450px">Category<span class="asterisk_sign">*</span></th>
-                                                    <th style="width: 450px ">Margin On MRP (In %)</th>
+                                                    <th>Category<span class="asterisk_sign">*</span></th>
+                                                    <th>Invoice Margin (In %)</th>
+                                                    <th>Promotional Margin (In %)</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="category_details">
@@ -318,12 +319,14 @@
                                                 ?>
                                                    <tr>
                                                          <td>
-                                                            <input type="text" class="form-control margin" name="category[]" id="category_<?=$i?>" value="<?=$category_detail[$i]->category_name?>" readonly/>
-                                                            <input type="hidden" class="form-control margin" name="category_id[]" id="category_id_<?=$i?>" value="<?=$category_detail[$i]->id?>" />
-                                                        
+                                                            <input type="text" class="form-control" name="category[]" id="category_<?=$i?>" value="<?=$category_detail[$i]->category_name?>" readonly/>
+                                                            <input type="hidden" class="form-control" name="category_id[]" id="category_id_<?=$i?>" value="<?=$category_detail[$i]->id?>" />
                                                         </td>
                                                         <td>
-                                                            <input type="text" class="form-control margin" name="margin[]" id="margin_<?=$i?>" placeholder="Margin On MRP"  value="<?php if(isset($category_detail[$i]->margin)) echo $category_detail[$i]->margin; ?>" onkeypress="return StopNonNumeric(this,event)"/>
+                                                            <input type="text" class="form-control" name="inv_margin[]" id="inv_margin_<?=$i?>" placeholder="Invoice Margin"  value="<?php if(isset($category_detail[$i]->inv_margin)) echo $category_detail[$i]->inv_margin; ?>" onkeypress="return StopNonNumeric(this,event)"/>
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" class="form-control" name="pro_margin[]" id="pro_margin_<?=$i?>" placeholder="Promotional Margin"  value="<?php if(isset($category_detail[$i]->pro_margin)) echo $category_detail[$i]->pro_margin; ?>" onkeypress="return StopNonNumeric(this,event)"/>
                                                         </td>
                                                    </tr>
                                                 <?php }

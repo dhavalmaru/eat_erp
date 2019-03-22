@@ -43,6 +43,35 @@ function get_data($status='', $id=''){
     return $query->result();
 }
 
+function get_mt_data($status='', $id=''){
+    if($status!=""){
+        $cond=" where status='".$status."'";
+    } else {
+        $cond="";
+    }
+
+    if($id!=""){
+        if($cond=="") {
+            $cond=" where id='".$id."'";
+        } else {
+            $cond=$cond." and id='".$id."'";
+        }
+    }
+
+    $sales_rep_id=$this->session->userdata('sales_rep_id');
+    if($sales_rep_id!=""){
+        if($cond=="") {
+            $cond=" where m_id='".$sales_rep_id."'";
+        } else {
+            $cond=$cond." and m_id='".$sales_rep_id."'";
+        }
+    }
+
+    $sql = "select * , id as mid,'Old' as distributor_type,dist_id as store_id from merchandiser_stock ".$cond."  order by modified_on desc";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
 function get_data_qty($status='', $id=''){
     $sql = "select * from sales_rep_distributor_opening_stock where sales_rep_loc_id='$id'";
     $query=$this->db->query($sql);
@@ -93,6 +122,8 @@ function save_data($id='',$status=''){
         'chocopeanut_bar' => (($this->input->post('chocopeanut_bar')=='')?'0':$this->input->post('chocopeanut_bar')),
         'bambaiyachaat_bar' => (($this->input->post('bambaiyachaat_bar')=='')?'0':$this->input->post('bambaiyachaat_bar')),
         'mangoginger_bar' => (($this->input->post('mangoginger_bar')=='')?'0':$this->input->post('mangoginger_bar'))
+        ,
+        'mangoginger_bar' => (($this->input->post('mangoginger_bar')=='')?'0':$this->input->post('mangoginger_bar'))
     );
 
     if($id==''){
@@ -120,6 +151,23 @@ function save_data($id='',$status=''){
     $logarray['action']=$action;
     $this->user_access_log_model->insertAccessLog($logarray);
 }
+
+function save_orders(){
+    $now=date('Y-m-d H:i:s');
+    $curusr=$this->session->userdata('session_id');
+    $sales_rep_id=$this->session->userdata('sales_rep_id');
+
+    $date_of_processing=$this->input->post('date_of_processing');
+    if($date_of_processing==''){
+        $date_of_processing=NULL;
+    } else {
+        $date_of_processing=formatdate($date_of_processing);
+    }
+
+    
+
+}
+
 
 function check_date_of_visit(){
     $id=$this->input->post('id');
@@ -160,29 +208,51 @@ function get_location(){
     return $query->result();
 }
 
-function get_zone(){
+function get_zone($id='', $channel=''){
     $sales_rep_id = $this->session->userdata('sales_rep_id');
-    $sql = "select distinct A.zone_id, B.zone from sr_mapping A left join zone_master B on (A.zone_id = B.id) 
+    /*$sql = "select distinct A.zone_id, B.zone from sr_mapping A left join zone_master B on (A.zone_id = B.id) 
             where (A.reporting_manager_id = '$sales_rep_id' or A.sales_rep_id1 = '$sales_rep_id' or A.sales_rep_id2 = '$sales_rep_id') 
-                    and B.type_id = '3'";
+                    and B.type_id = '3'";*/
+    $cond='';
+    if($id!='')
+    {
+        $cond = ' And id='.$id;
+    }
+	if($channel!='')
+    {
+		if($channel=="GT") {
+			$cond = ' And type_id=3';
+		}
+		else {
+			$cond = ' And type_id=7';
+		}
+    }
+    $sql = "SELECT id as zone_id, zone from zone_master Where `status`='Approved' ".$cond;
     $query=$this->db->query($sql);
     return $query->result();
 }
 
-function get_area($zone_id=''){
+function get_area($zone_id='',$id=''){
     $cond = '';
     if($zone_id!=''){
-        $cond = $cond . " and B.zone_id = '$zone_id'";
+        $cond = $cond . " and zone_id = '$zone_id'";
     }
+
+    if($id!='')
+    {
+        $cond.= ' And id='.$id;
+    }
+
     $sales_rep_id = $this->session->userdata('sales_rep_id');
-    $sql = "select distinct A.area_id, B.area from sr_mapping A left join area_master B on (A.area_id = B.id) 
+    /*$sql = "select distinct A.area_id, B.area from sr_mapping A left join area_master B on (A.area_id = B.id) 
             where (A.reporting_manager_id = '$sales_rep_id' or A.sales_rep_id1 = '$sales_rep_id' or A.sales_rep_id2 = '$sales_rep_id') 
-                    and B.type_id = '3'" . $cond;
+                    and B.type_id = '3'" . $cond;*/
+    $sql = "SELECT id as area_id , area from area_master Where `status`='Approved' and type_id IN (3,7) ".$cond;
     $query=$this->db->query($sql);
     return $query->result();
 }
 
-function get_locations($zone_id='', $area_id=''){
+function get_locations($zone_id='', $area_id='',$id='',$channel_type=''){
     $cond = '';
     if($zone_id!=''){
         $cond = $cond . " and zone_id = '$zone_id'";
@@ -190,12 +260,46 @@ function get_locations($zone_id='', $area_id=''){
     if($area_id!=''){
         $cond = $cond . " and area_id = '$area_id'";
     }
-    $sql = "select * from location_master where status = 'Approved' and type_id = '3'" . $cond;
+
+    if($id!='')
+    {
+        $cond.= ' And id='.$id;
+    }
+
+    if($channel_type=="MT" || $id!='')
+    {
+        $sql = "select * from location_master where status = 'Approved'" . $cond; 
+    }
+    else
+    {
+        $sql = "select * from location_master where status = 'Approved' and type_id IN (3,7)" . $cond;
+    }
+
+    /*$sql = "select * from location_master where status = 'Approved' and type_id IN (3,7)" . $cond;*/
+
+   
     $query=$this->db->query($sql);
     return $query->result();
 }
 
-function get_distributors($zone_id='', $area_id=''){
+function get_location_data($store_id,$zone_id,$id){
+    $cond = '';
+    if($id=='')
+    {
+      $cond = ' and type_id IN (3,7)';
+    }
+
+    $sql = "Select  A.*,D.location from 
+            (select * from store_master Where status='Approved') A 
+            left join 
+            (select * from location_master Where status='Approved' ".$cond." ) D 
+            on (A.location_id=D.id)
+            where A.store_id='".$store_id  ."' and  A.zone_id='". $zone_id ."' and D.location IS NOT NULL  ";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_sales_rep_distributors($zone_id='', $area_id='',$id='',$location_id=''){
     $cond = '';
     if($zone_id!=''){
         $cond = $cond . " and zone_id = '$zone_id'";
@@ -204,8 +308,61 @@ function get_distributors($zone_id='', $area_id=''){
         $cond = $cond . " and area_id = '$area_id'";
     }
 
+    if($id!='')
+    {
+        $cond.= ' And id='.$id;
+    }
+
+	if($location_id!=''){
+        $cond = $cond . " and location_id = '$location_id'";
+    }
+    $sql = "select * from sales_rep_distributors" . $cond;
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_retailers($status='', $id=''){
+    if($status!=""){
+        $cond=" and status='".$status."'";
+    } else {
+        $cond="";
+    }
+
+    if($id!=""){
+        if($cond=="") {
+            $cond=" and id='".$id."'";
+        } else {
+            $cond=$cond." and id='".$id."'";
+        }
+    }
+
+    $sql = "select A.* from 
+            (select concat('d_',id) as id, distributor_name, sell_out, status, sales_rep_id from distributor_master 
+            union all 
+            select concat('s_',id) as id, distributor_name, margin as sell_out, status, sales_rep_id from sales_rep_distributors) A 
+            Where distributor_name is not null
+            ".$cond." order by A.distributor_name asc";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_distributors($zone_id='', $area_id='',$id=''){
+    $cond = '';
+    /*if($zone_id!=''){
+        $cond = $cond . " and zone_id = '$zone_id'";
+    }*/
+    /*
+    if($area_id!=''){
+        $cond = $cond . " and area_id = '$area_id'";
+    }*/
+
+    if($id!=''){
+        $cond = $cond . " and id = '$id'";
+    }
+
+    //and class = 'super stockist'
     $sales_rep_id = $this->session->userdata('sales_rep_id');
-    $sql = "select * from distributor_master where status = 'approved' and class = 'super stockist'" . $cond;
+    $sql = "select * from distributor_master where status = 'approved' and class = 'super stockist'  and distributor_name!=''" . $cond;
     $query=$this->db->query($sql);
     return $query->result();
 }
@@ -260,6 +417,21 @@ function get_closing_stock(){
     // $data['result'] = 1;
 
     return $data;
+}
+
+
+public function get_store_name($id='',$zone_id='')
+{
+    if($id!='')
+        $cond = 'Where A.store_id='.$id;
+
+    if($zone_id!='')
+        $cond .= ' And  A.zone_id='.$zone_id;
+
+    $sql = "select * from (SELECT store_name,s.id as store_id,location_id,zone_id from   store_master s JOIN relationship_master rm on s.store_id=rm.id) A ".$cond;
+
+    $result = $this->db->query($sql)->result();
+    return $result;
 }
 
 }

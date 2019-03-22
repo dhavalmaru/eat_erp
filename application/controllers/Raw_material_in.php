@@ -103,8 +103,20 @@ class Raw_material_in extends CI_Controller{
                 $data['vendor'] = $this->vendor_model->get_data('Approved');
                 $data['depot'] = $this->depot_model->get_data('Approved');
                 $data['raw_material'] = $this->raw_material_model->get_data('Approved');
-                $data['purchase_order'] = $this->purchase_order_model->get_data('Approved');
                 $data['raw_material_stock'] = $this->raw_material_in_model->get_raw_material_stock($id);
+
+                $vendor_id = '';
+                $po_id = '';
+                if(count($data['data'])>0){
+                    $vendor_id = $data['data'][0]->vendor_id;
+                    $po_id = $data['data'][0]->purchase_order_id;
+                }
+
+                if($vendor_id==''){
+                    $data['purchase_order'] = $this->purchase_order_model->get_data('Approved');
+                } else {
+                    $data['purchase_order'] = $this->purchase_order_model->get_purchase_order_nos($vendor_id, $po_id);
+                }
 
                 load_view('raw_material_in/raw_material_in_details', $data);
             } else {

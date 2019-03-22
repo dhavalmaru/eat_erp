@@ -20,9 +20,18 @@ class Dashboard_sales_rep extends CI_Controller
         $this->load->model('sales_rep_location_model');
         $this->load->model('sales_rep_payment_receivable_model');
 		$this->load->model('store_model');
+        $this->load->model('store_model');
       //	$this->load->model('Sr_beat_plan_model');
         $this->load->model('product_model');
         $this->load->database();
+        $this->load->model('Sales_Attendence_model');
+        $result = $this->Sales_Attendence_model->get_todays_attendence();
+
+        if(count($result)==0)
+        {
+            redirect(base_url().'index.php/Sales_Attendence');
+        }
+        
     }
 
     //index function
@@ -31,17 +40,69 @@ class Dashboard_sales_rep extends CI_Controller
     }
 
     public function index(){
-		  $day = date('l');
-      
-          
-			 $this->checkstatus($day);
-			
+
+        /*if ($this->session->userdata('role_id')!=5){
+             redirect(base_url().'index.php/merchandiser_location');
+        }
+        else
+        {
+           
+            
+        }*/
+
+        $day = date('l');
+        $this->checkstatus($day);
+		 
+		$this->session->unset_userdata('visit_detail');
+        $this->session->unset_userdata('retailer_detail');
+        $this->session->unset_userdata('temp_stock_details');
+        $this->session->unset_userdata('merchandiser_stock_details');
+        $this->session->unset_userdata('merchandiser_stock_details');	
           
 
-            // load_view('dashboard/dashboard_sales_rep_details', $data);
+        // load_view('dashboard/dashboard_sales_rep_details', $data);
        
     }
 	    public function checkstatus($frequency=''){
+
+        /*$day = $frequency;
+        $m = date('F');
+        $year = date('Y');
+        $get_alternate  = $this->get_alternate($day,$m,$year);
+        if($get_alternate)
+        {
+            $frequency = 'Alternate '.$day;
+        }
+        else
+        {
+            $frequency = 'Every '.$day;
+        }*/
+
+
+        switch ($frequency) {
+            case 'Monday':
+                $temp_date = $mon = date('Y-m-d', strtotime('Monday this week'));
+                break;
+            case 'Tuesday':
+                $temp_date = $mon = date('Y-m-d', strtotime('Tuesday this week'));
+                break;
+            case 'Wednesday':
+                $temp_date = $mon = date('Y-m-d', strtotime('Wednesday this week'));
+                break;  
+            case 'Thursday':
+                $temp_date = $mon = date('Y-m-d', strtotime('Thursday this week'));
+                break;  
+            case 'Friday':
+                $temp_date = $mon = date('Y-m-d', strtotime('Friday this week'));
+                break;
+            case 'Saturday':
+                $temp_date = $mon = date('Y-m-d', strtotime('Saturday this week'));
+                break; 
+            default:
+                case $frequency:
+                $temp_date = $mon = date('Y-m-d', strtotime($frequency.' this week'));
+                break;
+        }
 
         $day = $frequency;
         $m = date('F');
@@ -59,7 +120,13 @@ class Dashboard_sales_rep extends CI_Controller
         $result=$this->Sales_location_model->get_access();
         if(count($result)>0) {
             $data['access']=$result;
-            $data['data3']=$this->Sales_location_model->get_data('Approved','',$frequency);
+            $data['data']=$this->Sales_location_model->get_data('Approved','',$frequency,$temp_date);
+            
+            $data['merchendizer']=$result2=$this->Sales_location_model->get_merchendiser_data('Approved','',$frequency,$temp_date);
+            $data['mt_followup']=$this->Sales_location_model->get_mtfollowup('',$temp_date);
+            $data['gt_followup']=$this->Sales_location_model->get_gtfollowup('',$temp_date);
+            $data['checkstatus'] = $frequency;
+            $data['current_day'] = date('l');
 			//$data['data1'] = $this->Sales_location_model->get_data1();
 			  $data['total_receivable']=$this->dashboard_sales_rep_model->get_total_receivable();
             $data['target']=$this->dashboard_sales_rep_model->get_target();
@@ -67,7 +134,9 @@ class Dashboard_sales_rep extends CI_Controller
 			//$data['data1'] = $this->dashboard_sales_rep_model->get_data_dist();
 			$data['data2'] = $this->sales_rep_order_model->get_data();
 			$data['data1'] = $this->sales_rep_distributor_model->get_data();
-			  $data['sales_rep_id']=$this->session->userdata('sales_rep_id');
+            $data['orders'] = $this->Sales_location_model->get_todaysorder();
+            $data['pendingsorder'] = $this->Sales_location_model->get_pendingsorder();
+			$data['sales_rep_id']=$this->session->userdata('sales_rep_id');
 			$data['checkstatus'] = $frequency;
 
               load_view('dashboard/dashboard_sales_rep_details', $data);

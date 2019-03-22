@@ -41,14 +41,26 @@ class Purchase_order extends CI_Controller{
             $count_data=$this->purchase_order_model->get_data();
             $approved=0;
             $pending=0;
+            $open=0;
+            $payment_pending=0;
+            $advance=0;
             $rejected=0;
             $inactive=0;
 
             if (count($result)>0){
                 for($i=0;$i<count($count_data);$i++){
-                    if (strtoupper(trim($count_data[$i]->status))=="APPROVED")
+                    if (strtoupper(trim($count_data[$i]->status))=="APPROVED") {
                         $approved=$approved+1;
-                    else if (strtoupper(trim($count_data[$i]->status))=="PENDING" || strtoupper(trim($count_data[$i]->status))=="DELETED")
+
+                        if (strtoupper(trim($count_data[$i]->po_status))!="CLOSED")
+                            $open=$open+1;
+
+                        if (strtoupper(trim($count_data[$i]->po_status))=="ADVANCE")
+                            $advance=$advance+1;
+                        else if (strtoupper(trim($count_data[$i]->po_status))=="RAW MATERIAL IN")
+                            $payment_pending=$payment_pending+1;
+
+                    } else if (strtoupper(trim($count_data[$i]->status))=="PENDING" || strtoupper(trim($count_data[$i]->status))=="DELETED")
                         $pending=$pending+1;
                     else if (strtoupper(trim($count_data[$i]->status))=="REJECTED")
                         $rejected=$rejected+1;
@@ -57,6 +69,9 @@ class Purchase_order extends CI_Controller{
                 }
             }
 
+            $data['open']=$open;
+            $data['advance']=$advance;
+            $data['payment_pending']=$payment_pending;
             $data['approved']=$approved;
             $data['pending']=$pending;
             $data['rejected']=$rejected;
@@ -143,9 +158,10 @@ class Purchase_order extends CI_Controller{
 
     public function get_purchase_order_nos(){
         $vendor_id=$this->input->post('vendor_id');
+        $po_id=$this->input->post('po_id');
         // $vendor_id=3;
 
-        $result=$this->purchase_order_model->get_purchase_order_nos($vendor_id);
+        $result=$this->purchase_order_model->get_purchase_order_nos($vendor_id, $po_id);
         $data['result'] = 0;
         if(count($result)>0) {
             $data['result'] = 1;

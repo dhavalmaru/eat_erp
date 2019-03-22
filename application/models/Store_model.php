@@ -29,7 +29,9 @@ function get_data($status='', $id=''){
         }
     }
 	
-		$sql = "Select  G.*,H.store_name from(Select  E.*,F.location from(Select  A.*,D.zone from 
+		$sql = "Select  G.*,H.store_name from 
+            (Select  E.*,F.location from 
+            (Select  A.*,D.zone from 
             (select * from store_master".$cond.") A 
             left join 
             (select * from zone_master)D
@@ -57,10 +59,11 @@ function save_data($id=''){
         'store_id' => $this->input->post('store_id'),
         'zone_id' => $this->input->post('zone_id'),
         'location_id' => $this->input->post('location_id'),
-		'google_address' => $this->input->post('google_address'),
+		'category' => $this->input->post('category'),
+        'google_address' => $this->input->post('google_address'),
 		'latitude' => $this->input->post('st_latitude'),
         'longitude' => $this->input->post('st_longitude'),
-       // 'area_id' => $this->input->post('area_id'),
+        // 'area_id' => $this->input->post('area_id'),
         'status' => $this->input->post('status'),
         'remarks' => $this->input->post('remarks'),
         'modified_by' => $curusr,

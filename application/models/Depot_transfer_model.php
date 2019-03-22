@@ -67,6 +67,7 @@ function save_data($id=''){
         'chalan_no' => $this->input->post('chalan_no'),
         'status' => $this->input->post('status'),
         'remarks' => $this->input->post('remarks'),
+        'production_id' => $this->input->post('production_id'),
         'modified_by' => $curusr,
         'modified_on' => $now
     );
@@ -120,6 +121,17 @@ function save_data($id=''){
     $logarray['cnt_name']='Depot_transfer';
     $logarray['action']=$action;
     $this->user_access_log_model->insertAccessLog($logarray);
+    
+    $module = $this->input->post('module');
+    $production_id = $this->input->post('production_id');
+    if($module=='production'){
+        $sql = "update production_details set depot_transfer = '1' where id = '$production_id'";
+        $this->db->query($sql);
+
+        redirect(base_url().'index.php/production/post_details/'.$production_id);
+    } else {
+        redirect(base_url().'index.php/depot_transfer');
+    }
 }
 
 function check_raw_material_availablity(){

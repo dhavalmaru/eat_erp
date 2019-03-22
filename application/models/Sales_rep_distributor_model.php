@@ -193,26 +193,54 @@ function get_data1($status='', $id=''){
     return $query->result();
 }
 
-function get_data2($status='', $id=''){
-
+function get_data2($status='',$id='', $zone_id='', $area_id='', $location_id=''){
+	
+	$cond = '';
+	if($id!=""){
+        if($cond=="") {
+            $cond=" and id='".$id."'";
+        } else {
+            $cond=$cond." and id='".$id."'";
+        }
+    }
+	
+	if($status!=""){
+        if($cond=="") {
+            $cond=" and status='".$status."'";
+        } else {
+            $cond=$cond." and status='".$status."'";
+        }
+    }
+	if($zone_id!=""){
+        if($cond=="") {
+            $cond=" and zone_id='".$zone_id."'";
+        } else {
+            $cond=$cond." and zone_id='".$zone_id."'";
+        }
+    }
+	
+    if($area_id!=''){
+        $cond = $cond . " and area_id = '$area_id'";
+    }
+	 if($location_id!=''){
+        $cond = $cond . " and location_id = '$location_id'";
+    }
+	
     $sales_rep_id=$this->session->userdata('sales_rep_id');
-	$sql = "SELECT  Distinct concat('d_',A.id) as id, A.sales_rep_id, A.distributor_name, 
+	$sql = "Select * from (select * from (
+        SELECT  Distinct concat('d_',A.id) as id, A.sales_rep_id, A.distributor_name, 
             A.address, A.city, A.pincode, A.state, 
             A.country, A.tin_number as vat_no, A.sell_out as margin, 
-            null as doc_document, null as document_name, A.area_id, A.status, A.remarks, 
+            null as doc_document, null as document_name, A.area_id, A.status, A.remarks,A.zone_id, A.location_id, 
             A.modified_by, A.modified_on FROM distributor_master A 
-            LEFT JOIN sr_mapping B ON (A.area_id = B.area_id and A.zone_id = B.zone_id and  A.type_id = B.type_id) 
-            where A.status='approved' and A.type_id=3  and A.class='normal' and 
-		      (B.reporting_manager_id=".$sales_rep_id." OR B.sales_rep_id1=".$sales_rep_id." OR B.sales_rep_id2=".$sales_rep_id." )
+            where  A.type_id=3  and A.class='normal' and A.distributor_name<>'' 
         Union All
-        select concat('s_',id) as id, B.sales_rep_id, B.distributor_name, 
+        select Distinct concat('s_',id) as id, B.sales_rep_id, B.distributor_name, 
             B.address, B.city, B.pincode, B.state, 
             B.country, '' as vat_no, '' as margin, 
-            null as doc_document, null as document_name, B.area_id, B.status, B.remarks,
+            null as doc_document, null as document_name, B.area_id, B.status, B.remarks,B.zone_id, B.location_id,
             B.modified_by, B.modified_on 
-                from sales_rep_distributors B
-        order by distributor_name asc
-              ";
+                from sales_rep_distributors B where B.distributor_name<>''  ) A  where A.distributor_name<>''   ) A Where A.distributor_name<>'' ".$cond;
     $query=$this->db->query($sql);
     return $query->result();
 }
@@ -236,7 +264,7 @@ function save_data($id=''){
         'margin' => $this->input->post('margin'),
         'doc_document' => $this->input->post('doc_document'),
         'document_name' => $this->input->post('document_name'),
-        /*'status' => $this->input->post('status'),*/
+        'status' => 'Approved',
         'remarks' => $this->input->post('remarks'),
         'modified_by' => $curusr,
         'modified_on' => $now,
@@ -317,6 +345,26 @@ function save_data($id=''){
     $this->user_access_log_model->insertAccessLog($logarray);
 
     return $id;
+}
+
+
+function check_distributor_availablity(){
+    $id=$this->input->post('id');
+    $distributor_name=$this->input->post('distributor_name');
+    $zone_id=$this->input->post('zone_id');
+    $area_id=$this->input->post('area_id');
+    $location_id=$this->input->post('location_id');
+
+    // $id="";
+
+    $query=$this->db->query("SELECT * FROM sales_rep_distributors WHERE id!='".$id."' and distributor_name='".$distributor_name."' and  zone_id ='".$zone_id."' and area_id ='".$area_id."' and  location_id='".$location_id."' ");
+    $result=$query->result();
+
+    if (count($result)>0){
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 }

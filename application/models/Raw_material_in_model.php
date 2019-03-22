@@ -45,8 +45,8 @@ function get_data($status='', $id=''){
         }
     }
     //,(select other_charges_amount from purchase_order Where id='purchase_order_id') as other_charges_amount
-    $sql = "select C.*, D.depot_name from 
-            (select A.*, B.vendor_name from 
+    $sql = "select C.*, D.depot_name, D.state as depot_state from 
+            (select A.*, B.vendor_name, B.state as vendor_state from 
             (Select A.*, B.other_charges_amount, B.po_status, B.po_no, B.approved_on as raw_approved from 
             (select A.*, concat(B.first_name, ' ', B.last_name) as createdby, 
                 concat(C.first_name, ' ', C.last_name) as modifiedby, 
@@ -119,7 +119,7 @@ function save_data($id=''){
             if($id!='' || $ref_id!=''){
                 if($ref_no==null || $ref_no=='')
                     {
-                        echo "ref_no".$ref_no;
+                        // echo "ref_no".$ref_no;
 
                         $sql="select * from series_master where type='Raw_Material_In'";
                         $query=$this->db->query($sql);
@@ -142,10 +142,10 @@ function save_data($id=''){
 
                 if($ref_id!=null && $ref_id!=''){  
 
-                    $res1 = $this->db->select('purchase_order_id')->where('id',$ref_id)->get('raw_material_in')->result();
+                    $res1 = $this->db->select('purchase_order_id')->where('id',$id)->get('raw_material_in')->result();
                     if(count($res1)>0)
                     {
-                        echo 'purchase_order_id'.$purchase_order_id = $res1[0]->purchase_order_id;
+                        $purchase_order_id = $res1[0]->purchase_order_id;
                         $res = $this->db->select('po_status')->where('id',$purchase_order_id)->get('purchase_order')->result();
 
                         if(count($res)>0)
@@ -171,7 +171,9 @@ function save_data($id=''){
                     }
 
                     $sql = "Update raw_material_in A, raw_material_in B 
-                            Set A.date_of_receipt=B.date_of_receipt, A.purchase_order_id=B.purchase_order_id, A.vendor_id=B.vendor_id,
+                            Set A.date_of_receipt=B.date_of_receipt, 
+                                A.purchase_order_id=B.purchase_order_id, 
+                                A.vendor_id=B.vendor_id,
                                 A.depot_id=B.depot_id,
                                 A.vat=B.vat,
                                 A.cst=B.cst,
@@ -186,7 +188,8 @@ function save_data($id=''){
                                 A.status='$status', A.remarks='$remarks', 
                                 A.modified_by=B.modified_by, A.modified_on=B.modified_on, 
                                 A.approved_by='$curusr',
-                                A.approved_on='$now' 
+                                A.approved_on='$now', 
+                                A.doc_document=B.doc_document, A.document_name=B.document_name 
                             WHERE A.id = '$ref_id' and B.id = '$id'";
                     $this->db->query($sql);
                                        
@@ -231,7 +234,7 @@ function save_data($id=''){
                             $this->db->query($sql);
                         }
 
-                        echo $this->db->last_query();   
+                        // echo $this->db->last_query();
                     }
 
                     $sql = "Update raw_material_in A 
@@ -244,7 +247,7 @@ function save_data($id=''){
 
             }
         }
-    }else {
+    } else {
         if($this->input->post('btn_delete')!=null){
             if($this->input->post('status')=="Approved"){
                 $status = 'Deleted';
@@ -285,7 +288,9 @@ function save_data($id=''){
             'ref_id' => $ref_id,
             'status' => $status,
             'gate_pass_no'=>$this->input->post('gate_pass_no'),
-            'row_material_in_no'=>$ref_no
+            'row_material_in_no'=>$ref_no,
+            'doc_document' => $this->input->post('doc_document'),
+            'document_name' => $this->input->post('document_name')
         );
 
         if($id==''){
@@ -299,6 +304,49 @@ function save_data($id=''){
             $this->db->where('id', $id);
             $this->db->update('raw_material_in',$data);
             $action='Raw Material In Entry Modified.';
+        }
+
+        if(isset($_FILES['doc_file']['name'])) {
+            $filePath='uploads/Raw_Material_In/';
+            $upload_path = './' . $filePath;
+            if(!is_dir($upload_path)) {
+                mkdir($upload_path, 0777, TRUE);
+            }
+
+            $filePath='uploads/Raw_Material_In/Raw_Material_In_'.$id.'/';
+            $upload_path = './' . $filePath;
+            if(!is_dir($upload_path)) {
+                mkdir($upload_path, 0777, TRUE);
+            }
+
+            $confi['upload_path']=$upload_path;
+            $confi['allowed_types']='*';
+            $this->load->library('upload', $confi);
+            $this->upload->initialize($confi);
+            $extension="";
+
+            $file_nm='doc_file';
+
+            if(!empty($_FILES[$file_nm]['name'])) {
+                if($this->upload->do_upload($file_nm)) {
+                    // echo "Uploaded <br>";
+                } else {
+                    // echo "Failed<br>";
+                    // echo $this->upload->data();
+                }   
+
+                $upload_data=$this->upload->data();
+                $fileName=$upload_data['file_name'];
+                $extension=$upload_data['file_ext'];
+                    
+                $data = array(
+                    'doc_document' => $filePath.$fileName,
+                    'document_name' => $fileName
+                );
+
+                $this->db->where('id', $id);
+                $this->db->update('raw_material_in',$data);
+            }
         }
 
         $this->db->where('raw_material_in_id', $id);
@@ -331,7 +379,7 @@ function save_data($id=''){
                             'raw_material_in_id' => $id,
                             'raw_material_id' => $raw_material_id[$k],
                             'qty' => format_number($qty[$k],2),
-                            'rate' => format_number($rate[$k],2),
+                            'rate' => format_number($rate[$k],4),
                             'hsn_code'=>$hsn_code[$k],
                             'tax_per' => format_number($tax_per[$k],2),
                             'amount' => format_number($amount[$k],2),

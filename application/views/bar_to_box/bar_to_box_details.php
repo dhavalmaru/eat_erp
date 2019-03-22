@@ -56,6 +56,28 @@
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control datepicker1" name="date_of_processing" id="date_of_processing" placeholder="Date Of Processing" value="<?php if(isset($data)) echo (($data[0]->date_of_processing!=null && $data[0]->date_of_processing!='')?date('d/m/Y',strtotime($data[0]->date_of_processing)):date('d/m/Y')); else echo date('d/m/Y'); ?>"/>
                                                 <input type="hidden" class="form-control" name="id" id="id" placeholder="Id" value="<?php if (isset($data)) { echo $data[0]->id; } ?>"/>
+                                                <input type="hidden" class="form-control" name="module" id="module" value="<?php if(isset($module)) echo $module;?>"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" style="display: none;">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Production <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <select name="production_id" id="production_id" class="form-control select2">
+                                                    <option value="">Select</option>
+                                                    <?php 
+                                                        $production_id = '';
+                                                        if(isset($data)) $production_id = $data[0]->production_id;
+                                                        if($production_id==''){
+                                                            if(isset($p_id)) $production_id = $p_id;
+                                                        }
+
+                                                        if(isset($production)) { for ($k=0; $k < count($production) ; $k++) { 
+                                                    ?>
+                                                        <option value="<?php echo $production[$k]->id; ?>" <?php if(isset($production_id)) { if($production[$k]->id==$production_id) echo 'selected'; } ?> ><?php echo $production[$k]->p_id; ?></option>
+                                                    <?php }} ?>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -63,12 +85,14 @@
 										<div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Depot <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="depot_id" id="depot_id" class="form-control select2">
+                                                <select name="depot_id" id="depot_id" class="form-control ">
                                                     <option value="">Select</option>
                                                     <?php if(isset($depot)) { for ($k=0; $k < count($depot) ; $k++) { ?>
                                                             <option value="<?php echo $depot[$k]->id; ?>" <?php if(isset($data)) { if($depot[$k]->id==$data[0]->depot_id) { echo 'selected'; } } ?>><?php echo $depot[$k]->depot_name; ?></option>
                                                     <?php }} ?>
                                                 </select>
+                                                <input type="hidden" name="prev_depo" id="prev_depo" value="<?php if(isset($data)) { echo  $data[0]->depot_id; } ?>"/>
+
                                                 <!-- <input type="hidden" name="depot_id" id="depot_id" value="<?php //if(isset($data)) { echo  $data[0]->depot_id; } ?>"/>
                                                 <input type="text" class="form-control load_depot" name="depot" id="depot" placeholder="Type To Select Depot...." value="<?php //if(isset($data)) { echo  $data[0]->depot_name; } ?>"/> -->
                                             </div>
@@ -139,7 +163,7 @@
                                                     <div id="err_batch_no_<?php echo $i;?>"></div>
                                                </td> 
                                                   <td style="text-align:center;     vertical-align: middle;">
-                                                    <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>
+                                                    <a id="box_<?php echo $i; ?>_row_delete" class="delete_row_new" href="#"><span class="fa trash fa-trash-o"  ></span></a>
                                                 </td>
                                             </tr>
                                         <?php }} else { ?>
@@ -174,7 +198,7 @@
                                                     <div id="err_batch_no_<?php echo $i;?>"></div>
                                                </td>
                                                  <td style="text-align:center;     vertical-align: middle;">
-                                                    <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>
+                                                    <a id="box_<?php echo $i; ?>_row_delete" class="delete_row_new" href="#"><span class="fa trash fa-trash-o"  ></span></a>
                                                 </td>
                                             </tr>
                                         <?php } ?>
@@ -234,7 +258,14 @@
 							    </div>
 								</div>
 								<div class="panel-footer">
-									<a href="<?php echo base_url(); ?>index.php/bar_to_box" class="btn btn-danger" type="reset" id="reset">Cancel</a>
+                                    <?php 
+                                        $action = '';
+                                        if(isset($module)) { if($module=='production') $action = base_url().'index.php/production/post_details/'.$production_id; }
+                                        if($action==''){
+                                            $action = base_url().'index.php/batch_master';
+                                        }
+                                    ?>
+									<a href="<?php echo $action; ?>" class="btn btn-danger" type="reset" id="reset">Cancel</a>
                                     <button class="btn btn-success pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</button>
                                 </div>
 							</form>
@@ -258,19 +289,38 @@
         <script type="text/javascript" src="<?php echo base_url(); ?>js/validations.js"></script>
         <script type="text/javascript">
             $(document).ready(function(){
+
+               /* $("#depot_id").change(function () { 
+                    
+                });*/
+
                 $(".box").change(function(){
                     get_box_details($(this));
                 });
                 $(".qty").change(function(){
                     get_amount($(this));
                 });
-                $('.delete_row').click(function(event){
-                    delete_row($(this));
+                $('.delete_row_new').click(function(event){
+                   set_stock_validation('bar_to_box','form_bar_to_box_details',$(this));
                     get_total();
                 });
+
                 $("#depot_id").change(function(){
-                    get_bar_details();
+                    var check_bar_qty = get_bar_qty('bar_to_box','form_bar_to_box_details','depochange'); 
+                    var check_box_qty = get_box_qty('bar_to_box','form_bar_to_box_details','depochange');    
+                    if(check_bar_qty==false || check_box_qty==false)
+                    {
+                        var previous_val = $("#prev_depo").val();
+                        $("#depot_id").val(previous_val);
+                    }
+                    else
+                    {
+                       $("#prev_depo").val($(this).val());
+                       get_bar_details();
+                    }
+                   
                 });
+                
                 $(".datepicker1").datepicker({ maxDate: 0,changeMonth: true,yearRange:'-100:+0',changeYear: true });
                 
                 addMultiInputNamingRules('#form_bar_to_box_details', 'select[name="box[]"]', { required: true }, "");
@@ -514,7 +564,7 @@
                                                 '<div id="err_batch_no_'+counter+'"></div>' + 
                                             '</td>' +
                                             '  <td style="text-align:center;     vertical-align: middle;">'+
-                                                '<a id="box_'+counter+'_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>'+
+                                                '<a id="box_'+counter+'_row_delete" class="delete_row_new" href="#"><span class="fa trash fa-trash-o"  ></span></a>'+
                                             '</td>'+
                                         '</tr>');
                     $('#box_details').append(newRow);
@@ -528,13 +578,80 @@
                     $(".qty").blur(function(){
                         get_amount($(this));
                     });
-                    $('.delete_row').click(function(event){
-                        delete_row($(this));
+                    $('.delete_row_new').click(function(event){
+                        set_stock_validation('bar_to_box','form_bar_to_box_details',$(this));
                         get_total();
                     });
                     counter++;
                 });
             });
+
+            function set_stock_validation(model_name,form_name,elem) {
+                    var id =  elem.attr('id');
+                    var myarr = id.split("_");
+                    var index = myarr[1];
+                    var validator = $("#"+form_name).validate();
+                    var valid = true;
+                    /*alert('status'+$('#status').val());*/
+                    if($('#id').val()!='')
+                    {
+                        var entered_qty = 0; 
+                        var depot_id = $("#prev_depo").val();
+                        var ref_id = $("#ref_id").val();
+                        var pre_qty = parseInt($('#pre_qty_'+index).val());
+                        /*alert(type);*/
+                        var module=model_name;
+                         var qty = 0
+                       var box = $('#box_'+index).val();
+                        var url = BASE_URL+'index.php/Stock/check_box_qty_availablity_for_depot';
+                        var data = 'id='+$("#id").val()+'&module='+model_name+'&depot_id='+depot_id+'&box_id='+box+'&qty='+qty+'&get_stock=1';
+
+                        $.ajax({
+                            url: url,
+                            data: data,
+                            type: "POST",
+                            dataType: 'html',
+                            global: false,
+                            async: false,
+                            success: function (data) {
+                                /*console.log('data '+data);*/
+                                current_stock = parseInt(data);
+                            },
+                            error: function (xhr, ajaxOptions, thrownError) {
+                                alert(xhr.status);
+                                alert(thrownError);
+                            }
+                        });
+                        /*console.log('current_stock_box'+current_stock);*/
+                        if(current_stock!=undefined)
+                        {
+                            /*console.log('current_stock'+current_stock+'pre qty'+pre_qty);*/
+                            // var deducted_qty = current_stock-pre_qty;
+                            var final_qty = current_stock+entered_qty;
+                            /*console.log(final_qty);*/
+                            if(final_qty<0)
+                            {
+                                var id = 'qty_'+index;
+                                var errors = {};
+                                var name = $("#"+id).attr('name');
+                                errors[name] = 'Stock Will be negative By '+final_qty;
+                                validator.showErrors(errors);
+                                valid = false;
+                            }
+                            else
+                            {
+                                delete_row(elem);
+                            }
+
+                            return valid;
+                        }
+
+                    }
+                    else
+                    {
+                        delete_row(elem);
+                    }
+            }
         </script>
     <!-- END SCRIPTS -->      
     </body>

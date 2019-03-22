@@ -7,6 +7,7 @@ function __Construct(){
     parent :: __construct();
     $this->load->helper('common_functions');
     $this->load->model('tax_invoice_model');
+    $this->load->model('distributor_out_model');
 }
 
 function get_access(){
@@ -475,7 +476,7 @@ function save_data($id=''){
                             select date_of_po, '$invoice_no', depot_id, distributor_id, amount, tax, tax_per, tax_amount, final_amount, po_number, date_of_po, 'pending', '$remarks', created_by, '$now', modified_by, '$now', '$curusr', '$now', state, discount, 'Pending', cgst, sgst, igst, cgst_amount, sgst_amount, igst_amount, state_code, round_off_amount, invoice_amount,  '$id' ,shipping_address ,distributor_consignee_id ,con_name ,con_address,con_city,con_pincode,con_state,con_country,con_state_code,con_gst_number,basis_of_sales,email_from,email_approved_by,email_date_time
                             from distributor_po where id='$id'";
                         $this->db->query($sql);
-                        $distributor_out_id=$this->db->insert_id();
+                        $distributor_out_id=$this->db->insert_id();                       
                     } else {
                         $sql = "update distributor_out A, distributor_po B set A.date_of_processing=B.date_of_po, A.invoice_no = '$invoice_no', A.depot_id=B.depot_id, A.distributor_id=B.distributor_id, A.amount=B.amount, A.tax=B.tax, A.tax_per=B.tax_per, A.tax_amount=B.tax_amount, A.final_amount=B.final_amount, A.order_no=B.po_number, A.order_date=B.date_of_po, A.modified_by=B.modified_by, A.modified_on=B.modified_on, A.approved_by=B.approved_by, A.approved_on=B.approved_on, A.state=B.state, A.discount=B.discount, A.cgst=B.cgst, A.sgst=B.sgst, A.igst=B.igst, A.cgst_amount=B.cgst_amount, A.sgst_amount=B.sgst_amount, A.igst_amount=B.igst_amount, A.state_code=B.state_code, A.round_off_amount=B.round_off_amount, A.invoice_amount=B.invoice_amount, 
                             A.shipping_address=B.shipping_address,
@@ -492,8 +493,10 @@ function save_data($id=''){
                     $sql = "delete from distributor_out_items where distributor_out_id = '$distributor_out_id'";
                     $this->db->query($sql);
 
-                    $sql = "insert into distributor_out_items (distributor_out_id, type, item_id, qty, sell_rate, grams, rate, amount, cgst_amt, sgst_amt, igst_amt, tax_amt, total_amt,margin_per,tax_percentage) select '$distributor_out_id', type, item_id, qty, sell_rate, grams, rate, amount, cgst_amt, sgst_amt, igst_amt, tax_amt, total_amt,margin_per,tax_percentage from distributor_po_items where distributor_po_id = '$id'";
+                    $sql = "insert into distributor_out_items (distributor_out_id, type, item_id, qty, sell_rate, grams, rate, amount, cgst_amt, sgst_amt, igst_amt, tax_amt, total_amt,margin_per,tax_percentage,promo_margin ) select '$distributor_out_id', type, item_id, qty, sell_rate, grams, rate, amount, cgst_amt, sgst_amt, igst_amt, tax_amt, total_amt,margin_per,tax_percentage,promo_margin from distributor_po_items where distributor_po_id = '$id'";
                     $this->db->query($sql);
+
+                     /*$this->distributor_out_model->set_credit_note($distributor_out_id);*/
                 }
                 
 
@@ -632,6 +635,7 @@ function save_data($id=''){
         $igst_amt=$this->input->post('igst_amt[]');
         $tax_amt=$this->input->post('tax_amt[]');
         $total_amt=$this->input->post('total_amt[]');
+        $promo_margin=$this->input->post('promo_margin[]');
 
         for ($k=0; $k<count($type); $k++) {
             if(isset($type[$k]) and $type[$k]!="") {
@@ -655,6 +659,7 @@ function save_data($id=''){
                             'tax_amt' => format_number($tax_amt[$k],2),
                             'total_amt' => format_number($total_amt[$k],2),
                             'margin_per' => $sell_margin[$k],
+                            'promo_margin' => $promo_margin[$k],
                             'tax_percentage' => $tax_per[$k]
                         );
                 $this->db->insert('distributor_po_items', $data);
@@ -692,6 +697,11 @@ function set_delivery_status() {
     $invoice_number=$this->input->post('invoice_number');
     $remarks=$this->input->post('remarks');
     $delivery_remarks=$this->input->post('delivery_remarks');
+		if($delivery_remarks=='')
+		{
+			$delivery_remarks=$this->input->post('cancellation_reason');
+		}
+
     $cancellation_date=$this->input->post('cancellation_date');
 
     if($cancellation_date==''){
@@ -744,12 +754,13 @@ function set_delivery_status() {
 function generate_po_delivery_report() {
     $sql = "Select Distinct * from (Select * from 
     (select AA.id, AA.date_of_po, AA.po_expiry_date, AA.order_no as po_number, AA.status, AA.remarks, 
-        AA.estimate_delivery_date, AA.tracking_id, AA.dispatch_date, Case When 
-            (AA.delivery_status='Delivered Not Complete' and AA.status='Approved') Then 'Delivered' 
+        AA.estimate_delivery_date, AA.tracking_id, AA.dispatch_date, 
+        Case When (AA.delivery_status='Delivered Not Complete' and AA.status='Approved') Then 'Delivered' 
             When ((AA.delivery_status='Pending' and AA.status='Approved') OR (AA.delivery_status='Pending' and AA.status='pending')) Then 'Inprocess'
             When (AA.status='Inactive' OR AA.status='Rejected' and distributor_po_id IS NOT NULL) Then 'Cancelled'
             Else AA.delivery_status end as delivery_status, AA.delivery_through, 
-        AA.delivery_date, AA.delivery_remarks, AA.days_to_expiry, AA.distributor_id, AA.distributor_name, 
+        AA.delivery_date, case when AA.delivery_remarks is null or AA.delivery_remarks = '' then AA.remarks else AA.delivery_remarks end as delivery_remarks, 
+        AA.days_to_expiry, AA.distributor_id, AA.distributor_name, 
         '' as store_name , AA.location, AA.item_type, AA.item_id,
         Case When (AA.status='Inactive' OR AA.status='Rejected' and distributor_po_id IS NOT NULL) Then AA.modified_on Else AA.cancelled_date end as cancelled_date, 
         sum(AA.item_qty) as tot_qty , AA.date_of_processing,AA.distributor_po_id,AA.comments from 
@@ -820,6 +831,8 @@ function generate_po_delivery_report() {
         $steward_row = 9;
         $amoha_row = 9;
         $articolo_row = 9;
+        $preduence_row = 9;
+        $kosher_row = 9;
 
         $col_name[]=array();
         for($i=0; $i<=50; $i++) {
@@ -998,6 +1011,18 @@ function generate_po_delivery_report() {
                         $articolo_row = $articolo_row + 1;
                         $row = $articolo_row;
                     }
+                    else if($distributor_id=='1303'){
+                        $objPHPExcel->setActiveSheetIndexByName('Prudencee Beverages');
+                        $preduence_row = $preduence_row + 1;
+                        $row = $preduence_row;
+                    }
+                    else if($distributor_id=='1302'){
+                        $objPHPExcel->setActiveSheetIndexByName('Kosher Beverages');
+                        $kosher_row = $kosher_row + 1;
+                        $row = $kosher_row;
+                    }
+
+                    
 
                     
                     $date_of_po = '';
@@ -1215,7 +1240,25 @@ function generate_po_delivery_report() {
         ));
 
         $objPHPExcel->setActiveSheetIndexByName('Articolo');
-        $objPHPExcel->getActiveSheet()->getStyle('A9:'.$col_name[$col+26].$amoha_row)->applyFromArray(array(
+        $objPHPExcel->getActiveSheet()->getStyle('A9:'.$col_name[$col+26].$articolo_row)->applyFromArray(array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+            )
+        ));
+
+        $objPHPExcel->setActiveSheetIndexByName('Prudencee Beverages');
+        $objPHPExcel->getActiveSheet()->getStyle('A9:'.$col_name[$col+26].$preduence_row)->applyFromArray(array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+            )
+        ));
+
+        $objPHPExcel->setActiveSheetIndexByName('Kosher Beverages');
+        $objPHPExcel->getActiveSheet()->getStyle('A9:'.$col_name[$col+26].$kosher_row)->applyFromArray(array(
             'borders' => array(
                 'allborders' => array(
                     'style' => PHPExcel_Style_Border::BORDER_THIN
@@ -1322,6 +1365,8 @@ function send_po_delivery_report() {
         $steward_row = 9;
         $amoha_row = 9;
         $articolo_row = 9;
+        $preduence_row = 9;
+        $kosher_row = 9;
 
         $col_name[]=array();
         for($i=0; $i<=50; $i++) {
@@ -1500,7 +1545,16 @@ function send_po_delivery_report() {
                         $articolo_row = $articolo_row + 1;
                         $row = $articolo_row;
                     }
-
+                    else if($distributor_id=='1303'){
+                        $objPHPExcel->setActiveSheetIndexByName('Prudencee Beverages');
+                        $preduence_row = $preduence_row + 1;
+                        $row = $preduence_row;
+                    }
+                    else if($distributor_id=='1302'){
+                        $objPHPExcel->setActiveSheetIndexByName('Kosher Beverages');
+                        $kosher_row = $kosher_row + 1;
+                        $row = $kosher_row;
+                    }
                     
                     $date_of_po = '';
                     $po_expiry_date = '';
@@ -1739,7 +1793,7 @@ function send_po_delivery_report() {
         $objWriter->save($path.$filename); 
         $attachment = $path.$filename;
 
-		$to_email = 'priti.tripathi@eatanytime.in,operations@eatanytime.in,rishit.sanghvi@eatanytime.in,dhaval.maru@pecanreams.com,swapnil.darekar@eatanytime.in';
+		 $to_email = 'priti.tripathi@eatanytime.in,operations@eatanytime.in,rishit.sanghvi@eatanytime.in,dhaval.maru@pecanreams.com,swapnil.darekar@eatanytime.in, ashwini.patil@pecanreams.com';
         /*$to_email = 'sangeeta.yadav@pecanreams.com';*/
         $from_email = 'cs@eatanytime.co.in';
         $from_email_sender = 'Wholesome Habits Pvt Ltd';
@@ -1937,7 +1991,7 @@ public function get_relationship_product_details($status='', $id='', $relationsh
         $cond2 = " and (B.relationship_id is null)";
     }
 
-    $sql = "select A.*, B.margin from product_master A left join relationship_category_margin B 
+    $sql = "select A.*, B.margin ,'0' as pro_margin from product_master A left join relationship_category_margin B 
             on(A.category_id=B.category_id ".$cond2.") 
             ".$cond." order by A.product_name";
     $query=$this->db->query($sql);
@@ -1967,7 +2021,7 @@ public function get_relationship_box_details($status='', $id='', $relationship_i
         $cond2 = " and (B.relationship_id is null)";
     }
 
-    $sql = "select A.*, B.margin from box_master A left join relationship_category_margin B 
+    $sql = "select A.*, B.margin,'0' as pro_margin from box_master A left join relationship_category_margin B 
             on(A.category_id=B.category_id ".$cond2.") 
             ".$cond." order by A.box_name";
     $query=$this->db->query($sql);
@@ -2000,7 +2054,7 @@ public function get_distributor_product_details($status='', $id='', $distributor
         $cond2 = " and (B.distributor_id is null)";
     }
 
-    $sql = "select A.*, B.margin from product_master A left join distributor_category_margin B 
+    $sql = "select A.*, B.inv_margin,B.pro_margin from product_master A left join distributor_category_margin B 
             on(A.category_id=B.category_id ".$cond2.") 
             ".$cond." order by A.product_name";
     $query=$this->db->query($sql);
@@ -2034,7 +2088,7 @@ public function get_distributor_box_details($status='', $id='', $distributor_id=
         $cond2 = " and (B.distributor_id is null)";
     }
 
-    $sql = "select A.*, B.margin from box_master A left join distributor_category_margin B 
+    $sql = "select A.*, B.inv_margin,B.pro_margin from box_master A left join distributor_category_margin B 
             on(A.category_id=B.category_id ".$cond2.") 
             ".$cond." order by A.box_name";
     $query=$this->db->query($sql);
@@ -2657,6 +2711,42 @@ public function save_comments()
       $this->db->where('id', $id);
       $this->db->update('distributor_po',$data);
    }
+}
+
+function check_po_number_availablity(){
+    $id=$this->input->post('id');
+    $po_number=$this->input->post('po_number');
+    $ref_id=$this->input->post('ref_id');
+
+    // $id="";
+
+    $query=$this->db->query("select * from distributor_po where id!='".$id."' and po_number='".$po_number."' and id!='".$ref_id."' and status!='InActive' and status!='Rejected'");
+    $result=$query->result();
+
+    if (count($result)>0){
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+
+function check_po_number_availablity_whpl(){
+    $id=$this->input->post('id');
+    $order_no=$this->input->post('order_no');
+    $ref_id=$this->input->post('ref_id');
+
+    // $id="";
+
+    $query=$this->db->query("select * from distributor_out where id!='".$id."' and order_no='".$order_no."' and id!='".$ref_id."' and status!='InActive' and status!='Rejected'");
+    $result=$query->result();
+	
+
+    if (count($result)>0){
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 }

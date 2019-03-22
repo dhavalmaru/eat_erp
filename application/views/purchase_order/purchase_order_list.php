@@ -94,7 +94,15 @@
 					 
 					  <div class="heading-h3-heading">
 					  <div class="pull-right btn-margin">	
-								<?php $this->load->view('templates/download');?>	
+								<div class="btn-group pull-right"  >
+                                    <?php if(isset($access)) { if($access[0]->r_export == 1) { ?>
+                                        <button class="btn btn-danger btn-padding dropdown-toggle" data-toggle="dropdown"><i class="fa fa-download"></i> &nbsp;Download</button>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="#" onClick ="$('#customers10').tableExport({type:'csv',escape:'false'});"><img src='<?php echo base_url(); ?>img/icons/csv.png' width="24"/> CSV</a></li>
+                                            <li><a href="#" onClick ="$('#customers10').tableExport({type:'excel',escape:'false'});"><img src='<?php echo base_url(); ?>img/icons/xls.png' width="24"/> XLS</a></li>
+                                        </ul>
+                                    <?php } } ?>
+                                </div>	
 								</div>	
                     	<div class="pull-right btn-margin  btn-bottom "  style="<?php if($access[0]->r_insert=='0') echo 'display: none;';?>">
 									<a class="btn btn-success btn-block btn-padding" href="<?php echo base_url() . 'index.php/purchase_order/add'; ?>">
@@ -133,6 +141,27 @@
     									<span id="approved"> (<?php echo $pending; ?>) </span>
     								</a>
     							</li>
+
+                                <li class="open">
+                                    <a  href="<?php echo base_url(); ?>index.php/Purchase_order/checkstatus/open">
+                                        <span class="ng-binding">Open</span>
+                                        <span id="approved"> (<?php echo $open; ?>) </span>
+                                    </a>
+                                </li>
+
+                                <li class="payment_pending">
+                                    <a  href="<?php echo base_url(); ?>index.php/Purchase_order/checkstatus/payment_pending">
+                                        <span class="ng-binding">Payment Pending</span>
+                                        <span id="approved"> (<?php echo $payment_pending; ?>) </span>
+                                    </a>
+                                </li>
+
+                                <li class="advance">
+                                    <a  href="<?php echo base_url(); ?>index.php/Purchase_order/checkstatus/advance">
+                                        <span class="ng-binding">Advance</span>
+                                        <span id="approved"> (<?php echo $advance; ?>) </span>
+                                    </a>
+                                </li>
 
                                 <li class="rejected">
                                     <a  href="<?php echo base_url(); ?>index.php/Purchase_order/checkstatus/Rejected">
@@ -209,21 +238,23 @@
             var url = window.location.href;
             if(url.includes('All')){
                 $('.all').attr('class','active');
-            }
-            else  if(url.includes('InActive')){
+            } else  if(url.includes('InActive')){
                 $('.inactive').attr('class','active');
-            }
-            else  if(url.includes('Approved')){
+            } else  if(url.includes('Approved')){
                 $('.approved').attr('class','active');
-            }
-            else  if(url.includes('Pending')){
+            } else  if(url.includes('Pending')){
                 // console.log('pending');
                 $('.pending').attr('class','active');
-            }else  if(url.includes('Rejected')){
+            } else  if(url.includes('Rejected')){
                 // console.log('pending');
                 $('.rejected').attr('class','active');
-            }
-            else {
+            } else  if(url.includes('open')){
+                $('.open').attr('class','active');
+            } else  if(url.includes('payment_pending')){
+                $('.payment_pending').attr('class','active');
+            } else  if(url.includes('advance')){
+                $('.advance').attr('class','active');
+            } else {
                 $('.approved').attr('class','active');
             }
             $('.ahrefall').click(function(){
@@ -237,11 +268,11 @@
             $(document).ready(function() {
                 
                 var len=10;
-columnDefs = [
-    
-  
-   { className: "dt-body-center", targets: [ 0, 2, 3,7,8 ] }
-];
+                columnDefs = [
+                    
+                  
+                   { className: "dt-body-center", targets: [ 0, 2, 3,7,8 ] }
+                ];
                 table =  $('#customers10');
                 var tableOptions = {
                     'bPaginate': true,

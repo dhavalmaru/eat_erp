@@ -140,6 +140,31 @@
                                     </div>
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Zone </label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <select class="form-control" name="zone" id="zone"> <?php if(isset($data)) {if ($data[0]->sr_type=='Promoter') echo 'selected';}?>
+                                                    <option value="">Select</option>
+                                                    <?php
+                                                     if(isset($zone)) {
+                                                      for ($k=0; $k < count($zone) ; $k++) { ?>
+                                                           <option value="<?php echo $zone[$k]->zone; ?>" 
+                                                            <?php 
+                                                             if(isset($data[0]->zone))
+                                                                {
+                                                                  if($zone[$k]->zone==$data[0]->zone ) { echo 'selected'; } 
+                                                                }
+                                                            ?>
+                                                            >
+                                                            <?php echo $zone[$k]->zone; ?>
+                                                           </option>
+                                                      <?php }
+                                                    } ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Remarks </label>
                                             <div class="col-md-10 col-sm-10 col-xs-12">
                                                 <textarea class="form-control" name="remarks"><?php if(isset($data)) echo $data[0]->remarks;?></textarea>

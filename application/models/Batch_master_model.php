@@ -36,7 +36,7 @@ function get_data($status='', $id=''){
 
  function get_batch_doc($id){
     $query=$this->db->query("SELECT * FROM batch_master_doc WHERE batch_master_id = '$id'");
-               return $query->result();
+    return $query->result();
  }
 
 function save_data($id=''){
@@ -52,6 +52,7 @@ function save_data($id=''){
     
     $data = array(
         'batch_no' => $this->input->post('batch_no'),
+        'production_id' => $this->input->post('production_id'),
         'date_of_processing' => $date_of_processing,
         'status' => $this->input->post('status'),
         'remarks' => $this->input->post('remarks'),
@@ -72,10 +73,10 @@ function save_data($id=''){
         $action='Batch No Modified.';
     }
 
-if($id!="") {
+    if($id!="") {
 	   $this->db->where('batch_master_id', $id);
        $this->db->delete('batch_master_doc');
-}
+    }
 	
 	$title=$this->input->post('title[]');
     $image_path=$this->input->post('image_path[]');
@@ -126,8 +127,7 @@ if($id!="") {
                         );
 
                 $this->db->insert('batch_master_doc', $data);
-            } 
-			else {
+            } else {
                 $data = array(
                             'batch_master_id'=> $id,    
                             'doc_img' => $image_path[$k],
@@ -140,16 +140,22 @@ if($id!="") {
         }
     }
 	
-	
-	
-	
-	
-	
     $logarray['table_id']=$id;
     $logarray['module_name']='Batch_Master';
     $logarray['cnt_name']='Batch_Master';
     $logarray['action']=$action;
     $this->user_access_log_model->insertAccessLog($logarray);
+
+    $module = $this->input->post('module');
+    $production_id = $this->input->post('production_id');
+    if($module=='production'){
+        $sql = "update production_details set batch_master = '1' where id = '$production_id'";
+        $this->db->query($sql);
+
+        redirect(base_url().'index.php/production/post_details/'.$production_id);
+    } else {
+        redirect(base_url().'index.php/batch_master');
+    }
 }
 
 function check_batch_id_availablity(){
