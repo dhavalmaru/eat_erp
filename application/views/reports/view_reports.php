@@ -173,6 +173,7 @@
 										
 										<a href="<?php echo base_url() . 'index.php/export/set_report_criteria/28'?>" id="report_28" class="list-group-item-reports" <?php if(isset($rep_13)) {if($rep_13==0) echo 'style="display: none;"';} else echo 'style="display: none;"'; ?>><span class="fa fa-external-link"></span> GT Stock Tracker </a>
                                         <a href="<?php echo base_url() . 'index.php/export/set_report_criteria/29'?>" id="report_28" class="list-group-item-reports" ><span class="fa fa-external-link"></span>Sales Attendence </a>
+                                        <a href="<?php echo base_url() . 'index.php/export/set_report_criteria/30'?>" id="report_28" class="list-group-item-reports" ><span class="fa fa-external-link"></span>GT Store Health Report </a>
                                     <!-- END CONTACTS WITH CONTROLS -->
                                     </div>
 								</div>

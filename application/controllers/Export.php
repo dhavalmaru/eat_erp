@@ -186,6 +186,11 @@ class Export extends CI_Controller {
              $data['report_name'] = 'Sales Attendence Report';
              $data['sample_report_name'] = 'sales_attendence.xls';
         }
+        else if($rep_id==30){
+             $data['report_type'] = 'gt_store';
+             $data['report_name'] = 'GT Store Health Report';
+             $data['sample_report_name'] = 'store_wise_sales.xls';
+        }
 
         if($rep_id==16 || $rep_id==17){
             $this->getledgerreport();
@@ -197,6 +202,7 @@ class Export extends CI_Controller {
             $data['ledger'] = $this->accountledger_model->get_ledger_data('Approved');
             $data['depot'] = $this->depot_model->get_data('Approved');
             $data['upload_telly_report'] = $this->export_model->get_upload_telly_report();
+            $data['location'] = $this->export_model->get_gt_location();
             load_view('reports/download_report',$data);
         }
     }
@@ -733,6 +739,10 @@ class Export extends CI_Controller {
 		}
         else if($rep_id==29) {
              $this->export_model->generate_sales_attendence_report();
+        }
+        else if($rep_id==30) {
+             $location = $this->input->post("location");
+             $this->export_model->gt_store_report('save',$location);
         }
         
         $this->set_report_criteria($rep_id);

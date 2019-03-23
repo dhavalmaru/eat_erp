@@ -144,6 +144,21 @@ tfoot tr th:last-child {
                                             </div>
                                         </div>
                                     </div>
+                                        <div class="form-group" style="border-top:1px solid #ddd; border-bottom:none; <?php if($report_id !='30') echo 'display:none;';?>">
+                                      <div class="col-md-6  col-sm-6 col-xs-12">
+                                          <div class="">
+                                             <label class="col-md-4 col-sm-4 col-xs-12  control-label">Select Region</label>
+                                             <div class="col-md-6 col-sm-6  col-xs-12">
+                                                  <select name="location[]" id="location" class="form-control select2" multiple>
+                                                  <option value="ALL" selected>ALL</option>
+                                                  <?php if(isset($location)) { for ($k=0; $k < count($location) ; $k++) { ?>
+                                                          <option value="<?php echo trim($location[$k]->location); ?>" ?><?php echo $location[$k]->location; ?></option>
+                                                  <?php }} ?>
+                                              </select>
+                                             </div>
+                                          </div>
+                                       </div>
+                                    </div>
                                     <div class="form-group" style="border-top:1px solid #ddd; border-bottom:none; <?php if($report_id !='27') echo 'display:none;';?>">
                                       <div class="col-md-6  col-sm-6 col-xs-12">
                                           <div class="">
@@ -338,7 +353,7 @@ tfoot tr th:last-child {
 										</div>
                                     </div>
 
-                                    <div class="form-group" style="border-top:1px solid #ddd; <?php if($report_type=='Aging Wise' || $report_type=='MT Stock Tracker') echo 'display:none;';?>">
+                                    <div class="form-group" style="border-top:1px solid #ddd; <?php if($report_type=='Aging Wise' || $report_type=='MT Stock Tracker' || $report_type=='gt_store') echo 'display:none;';?>">
 										  <div class="col-md-6  col-sm-6 col-xs-12">
 											<label class="col-md-4  col-sm-4 col-xs-12 control-label" >From</label>
 											<div class="col-md-6  col-sm-6 col-xs-12">                                                                  
@@ -351,7 +366,7 @@ tfoot tr th:last-child {
                                         <div class="col-md-6  col-sm-6 col-xs-12">
 											<label class="col-md-4  col-sm-4 col-xs-12 control-label">To</label>
 											<div class="col-md-6  col-sm-6 col-xs-12">
-											    <div class="input-group" style="display:block" >
+											    <div class="input-group" style="<?php if($report_type=='gt_store') echo 'display:none;';?>" >
                                             		<input type="text" class="form-control datepicker" id="to_date" name="to_date" value="<?php echo date('d/m/Y')?>">
                                                <!--<span class="input-group-addon"><span class="fa fa-calendar"></span></span>-->
                                         		</div>

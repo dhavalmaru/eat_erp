@@ -15628,8 +15628,39 @@ public function sales_rep_exception_report()
         $objWriter->save('php://output');*/
 }
 
-public function gt_store_report()
+public function gt_store_report($save='',$region=array())
 {
+    $cond='';
+    if(count($region)>0){
+      if(count($region)==1 && in_array('ALL',$region))
+        {
+            $cond='';
+        }
+        else
+        {   
+            if(in_array('ALL',$region) )
+            {
+                unset($region[0]); 
+                $region = "'" . implode ( "', '", $region ) . "'";
+                $cond=' Where L.location IN ('.$region.')';  
+            }
+            else
+            {
+                $region = "'" . implode ( "', '", $region ) . "'";
+                $cond=' Where L.location IN ('.$region.')'; 
+            }
+        }  
+    }
+    
+    /*if(!in_array('ALL',$region))
+    {   
+        $region = "'" . implode ( "', '", $region ) . "'";
+        $cond=' Where L.location IN ('.$region.')';
+    }*/
+
+   /* if($region!='' && $region!='ALL')
+        $cond=' Where L.location="'.$region.'"';*/
+   
     $sql = "Select A.*,L.location,E.area from (
                 Select * from 
                 (Select id as dist_id,distributor_name,A.sales_rep_id,order_id,DATEDIFF(CURRENT_DATE(),order_date)  as  order_place_aging,order_date,sales_rep_name,item_qty,
@@ -15797,10 +15828,13 @@ public function gt_store_report()
             (Select * from location_master) L ON A.location_id=L.id
             Left Join
             (Select * from area_master ) E On A.area_id=E.id
+            ".$cond."
             ORDER By d_type ASC;
     ";
     $data = $this->db->query($sql)->result();
     
+    /*echo $this->db->last_query();
+    die();*/
 
     $template_path=$this->config->item('template_path');
     $file = $template_path.'store_wise_sales.xls';
@@ -15971,42 +16005,60 @@ public function gt_store_report()
     /*die();*/
     $date1 = date('d-m-Y_H-i-A');
     $filename='Store_wise_sales_'.$date1.'.xls';
-    $path  ='/home/eatangcp/public_html/eat_erp/assets/uploads/exception_reports/';
+    if($save=='')
+    {
+        $path  ='/home/eatangcp/public_html/eat_erp/assets/uploads/exception_reports/';
 
-    $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
-    $objWriter->save($path.$filename);
-    $attachment = $path.$filename;
-    $to_email = "sangeeta.yadav@pecanreams.com";
-    $bcc = "";
-    $cc = "";
-    $from_email = 'cs@eatanytime.co.in';
-    $from_email_sender = 'Wholesome Habits Pvt Ltd';
-    $subject='GT Store Report';
-    $report_date = date('d-m-Y');
-    $message = '<html>
-                <body>
-                    <h3>Wholesome Habits Private Limited</h3>
-                    <h4>GT Store Report</h4>
-                    <p>Reporting Date - '.$report_date.'</p>
-                    <p>PFA</p>
-                    <br/><br/>
-                    Regards,
-                    <br/><br/>
-                    CS
-                </body>
-                </html>';
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+        $objWriter->save($path.$filename);
+        $attachment = $path.$filename;
+        $to_email = "sangeeta.yadav@pecanreams.com";
+        $bcc = "";
+        $cc = "";
+        $from_email = 'cs@eatanytime.co.in';
+        $from_email_sender = 'Wholesome Habits Pvt Ltd';
+        $subject='GT Store Report';
+        $report_date = date('d-m-Y');
+        $message = '<html>
+                    <body>
+                        <h3>Wholesome Habits Private Limited</h3>
+                        <h4>GT Store Report</h4>
+                        <p>Reporting Date - '.$report_date.'</p>
+                        <p>PFA</p>
+                        <br/><br/>
+                        Regards,
+                        <br/><br/>
+                        CS
+                    </body>
+                    </html>';
 
-    $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc, $cc, $attachment);
-    if($mailSent==1){
-        unlink($attachment);
+        $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc, $cc, $attachment);
+        if($mailSent==1){
+            unlink($attachment);
+        }
     }
-
+    else
+    {
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="'.$filename.'"');
+        header('Cache-Control: max-age=0'); 
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+        $objWriter->save('php://output');
+    }
+    
     /*header('Content-Type: application/vnd.ms-excel');
     header('Content-Disposition: attachment;filename="'.$filename.'"');
     header('Cache-Control: max-age=0'); 
     $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
     $objWriter->save('php://output');*/
 }
+
+public function get_gt_location()
+{
+   $result = $this->db->query('Select Distinct location from location_master Where type_id=3')->result();
+   return $result;
+}
+
 
 }
 ?>
