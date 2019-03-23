@@ -15604,7 +15604,7 @@ public function sales_rep_exception_report()
         $date1 = date('d-m-Y_H-i-A');
         $filename='Sales_Exception_Report_'.$date1.'.xls';
         /*$path  = 'C:/xampp/htdocs/eat_erp_server/assets/uploads/exception_reports';*/
-        $path  ='/home/eatangcp/public_html/test/assets/uploads/exception_reports/';
+        $path  ='/home/eatangcp/public_html/eat_erp/assets/uploads/exception_reports/';
        /* $path  ='/home/eatangcp/public_html/eat_erp/assets/uploads/exception_reports/';*/
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
         $objWriter->save($path.$filename);
@@ -15626,6 +15626,386 @@ public function sales_rep_exception_report()
         header('Cache-Control: max-age=0');
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
         $objWriter->save('php://output');*/
+}
+
+public function gt_store_report()
+{
+    $sql = "Select A.*,L.location,E.area from (
+                Select * from 
+                (Select id as dist_id,distributor_name,A.sales_rep_id,order_id,DATEDIFF(CURRENT_DATE(),order_date)  as  order_place_aging,order_date,sales_rep_name,item_qty,
+                sales_rep_order_id,item_id,A.location_id,A.area_id,S.last_date_of_visit,S.last_date_aging,S.remarks,S.orange,S.butterscotch,S.chocopeanut,S.mangoginger,S.berry_blast,
+                S.chyawanprash,S.dark_chocolate_cookies,S.chocolate_cookies,S.cranberry_cookies,S.cranberry_orange,S.papaya_pineapple,S.fig_raisins,1 as 'd_type'
+                 from 
+                (SELECT A.*,B.sales_rep_name from (
+                    Select B.*,C.sales_rep_id,C.order_id,O.order_date from (
+                            Select concat('d_',A.id) as id , A.distributor_name,A.area_id,A.location_id FROM
+                            (Select * from distributor_master )A
+                            LEFT JOIN sr_mapping B ON (A.area_id = B.area_id and A.zone_id = B.zone_id and  A.type_id = B.type_id) 
+                            Where A.status='approved' and A.class='normal'
+                    ) B 
+                    LEFT Join
+                    (   
+                        SELECT A.distributor_id , max(A.date_of_processing) as order_date ,A.area_id,A.location_id from 
+                        (SELECT A.distributor_id,A.date_of_processing,B.area_id,B.location_id,A.visit_id from 
+                        (SELECT distributor_id,date_of_processing,visit_id from sales_rep_orders 
+                        Where id IN (Select sales_rep_order_id From sales_rep_order_items Where qty IS NOT NULL) ) A
+                        Left join
+                        (SELECT * from sales_rep_location ) B On A.visit_id=B.id ) A
+                        Group By distributor_id,area_id,location_id 
+                    ) O On (O.distributor_id=B.id and O.location_id=B.location_id and O.area_id=B.area_id)
+                    left join
+                    (
+                        SELECT id as order_id,sales_rep_id, A.distributor_id ,A.date_of_processing,A.area_id,A.location_id from
+                        (
+                        SELECT A.id,A.distributor_id,A.date_of_processing,B.area_id,B.location_id,A.visit_id,A.sales_rep_id
+                            from 
+                            (
+                                SELECT distributor_id,date_of_processing,visit_id,id,sales_rep_id from sales_rep_orders 
+                                Where id IN (Select sales_rep_order_id From sales_rep_order_items Where qty IS NOT NULL) 
+                            ) A
+                        Left join
+                        (SELECT * from sales_rep_location ) B On A.visit_id=B.id ) A
+                        Group By distributor_id,area_id,location_id 
+                    ) 
+                    C ON ((O.distributor_id=C.distributor_id) and (O.order_date=C.date_of_processing) and (O.area_id=C.area_id) and (O.location_id=C.location_id) )
+                    Order By sales_rep_id DESC
+                ) A
+                Left Join
+                (Select * from sales_rep_master ) B On A.sales_rep_id=B.id
+                ORDER By sales_rep_id DESC ) A
+                Left join
+                (
+                     Select SUM(item_qty) as item_qty ,sales_rep_order_id ,item_id from 
+                        (
+                            SELECT case when E.type='Bar' then E.qty else (E.qty*F.qty) end  as item_qty ,
+                            E.sales_rep_order_id ,case when E.type='Bar' then E.item_id else F.product_id end  as item_id
+                            from 
+                            (select * from sales_rep_order_items)E
+                            left join box_product F On (E.type='Box' and (E.item_id=F.box_id))
+                            left join product_master G On (E.type='Bar' and (E.item_id=G.id)) 
+                        ) A GROUP By sales_rep_order_id ,item_id
+                ) B ON (A.order_id=B.sales_rep_order_id)
+                Left Join 
+                (
+                    SELECT A.date_of_visit as last_date_of_visit,DATEDIFF(CURRENT_DATE(),A.date_of_visit)  as  last_date_aging,A.distributor_id,A.sales_rep_id,A.sales_rep_loc_id,
+                    ((Case When B.orange_bar IS NOT NULL Then B.orange_bar else 0 end )+(CASE WHEN B.orange_box IS NOT NULL THEN orange_box*6 else 0 end)) as orange,
+                    ((Case When B.butterscotch_bar IS NOT NULL Then B.butterscotch_bar else 0 end )+(Case When butterscotch_box IS NOT NULL THEN butterscotch_box*6 else 0 end)) as butterscotch,
+                    ((CAse When B.chocopeanut_bar IS NOT NULL Then B.chocopeanut_bar else 0 end)+Case When B.chocopeanut_box IS NOT NULL Then chocopeanut_box*6 else 0 end ) as chocopeanut ,
+                    ((Case When B.bambaiyachaat_bar IS NOT NULL Then B.bambaiyachaat_bar else 0 end )+Case WHEN B.bambaiyachaat_box IS NOT NULL THen B.bambaiyachaat_box*6 else 0 end) as bambaiyachaat,
+                    ((Case When B.mangoginger_bar IS NOT NULL then B.mangoginger_bar else 0 end )+ Case When B.mangoginger_box IS NOT NULL THEN B.mangoginger_box*6 else 0 end ) as mangoginger,
+                    ((Case When B.berry_blast_bar IS NOT NULL then B.berry_blast_bar else 0 end )+ Case When B.berry_blast_box IS NOT NULL Then B.berry_blast_box*6 else 0 end) as berry_blast,
+                    ((CAse When B.chyawanprash_bar IS NOT NULL THen B.chyawanprash_bar else 0 end )+ Case When B.chyawanprash_box IS NOT NULL THen B.chyawanprash_box*6 else 0 end) as chyawanprash,
+                    (Case When B.chocolate_cookies_box IS NOT NULL THEN B.chocolate_cookies_box*4 else 0 end) as chocolate_cookies,
+                    (Case When B.cranberry_orange_box IS NOT NULL Then B.cranberry_orange_box*4  else 0 end ) as cranberry_orange,
+                    (Case When B.dark_chocolate_cookies_box IS NOT NULL THEN B.dark_chocolate_cookies_box*8 else 0 end ) as dark_chocolate_cookies,
+                    (Case When B.fig_raisins_box IS NOT NULL Then B.fig_raisins_box*2 else 0 end) as fig_raisins ,
+                    (Case When B.papaya_pineapple_box IS NOT NULL Then B.papaya_pineapple_box*2 Else 0 end ) as papaya_pineapple,
+                    B.variety_box,B.mint_box,(Case When B.cranberry_cookies_box IS NOT NULL Then B.cranberry_cookies_box*4 else 0 end ) as cranberry_cookies,A.remarks,A.location_id,A.area_id  from (
+                    Select A.date_of_visit,A.distributor_id,B.sales_rep_id,B.id as sales_rep_loc_id,A.location_id,A.area_id,B.remarks from
+                    (SELECT max(date_of_visit) as date_of_visit,distributor_id,location_id,area_id  from sales_rep_location 
+                    GROUP By distributor_id ) A
+                    Left Join
+                    (SELECT id,date_of_visit,distributor_id,sales_rep_id,location_id,area_id,remarks  from sales_rep_location ) B On 
+                    (date(A.date_of_visit)=date(B.date_of_visit) and (A.distributor_id=B.distributor_id and A.location_id=B.location_id and A.area_id=B.area_id)) 
+                    )A
+                    Left Join
+                    (Select * from sales_rep_distributor_opening_stock)  B on(A.sales_rep_loc_id=B.sales_rep_loc_id)
+                    Where (A.distributor_id IS NOT NULL and A.distributor_id<>'')
+                ) S On (A.id=S.distributor_id and A.location_id=S.location_id and A.area_id=S.area_id)
+                UNION
+                Select id as dist_id,distributor_name,A.sales_rep_id,order_id,DATEDIFF(CURRENT_DATE(),order_date)  as  order_place_aging,order_date,sales_rep_name,item_qty,
+                sales_rep_order_id,item_id,A.location_id,A.area_id,S.last_date_of_visit,S.last_date_aging,S.remarks,S.orange,S.butterscotch,S.chocopeanut,
+                S.mangoginger,S.berry_blast,S.chyawanprash,S.dark_chocolate_cookies,S.chocolate_cookies,S.cranberry_cookies,S.cranberry_orange,S.papaya_pineapple,S.fig_raisins,2 as 'd_type'
+                 from 
+                (SELECT A.*,B.sales_rep_name from (
+                    Select B.*,C.sales_rep_id,C.order_id,O.order_date from (
+                            Select concat('s_',A.id) as id , A.distributor_name,A.area_id,A.location_id FROM
+                            (Select * from sales_rep_distributors)A
+                    ) B 
+                    left Join
+                    (   
+                        SELECT A.distributor_id , max(A.date_of_processing) as order_date ,A.area_id,A.location_id from 
+                        (SELECT A.distributor_id,A.date_of_processing,B.area_id,B.location_id,A.visit_id from 
+                        (SELECT distributor_id,date_of_processing,visit_id from sales_rep_orders 
+                        Where id IN (Select sales_rep_order_id From sales_rep_order_items Where qty IS NOT NULL) ) A
+                        Left join
+                        (SELECT * from sales_rep_location ) B On A.visit_id=B.id ) A
+                        Group By distributor_id,area_id,location_id 
+                    ) O On (O.distributor_id=B.id and O.location_id=B.location_id and O.area_id=B.area_id)
+                    left join
+                    (
+                        SELECT id as order_id,sales_rep_id, A.distributor_id ,A.date_of_processing,A.area_id,A.location_id from
+                        (
+                        SELECT A.id,A.distributor_id,A.date_of_processing,B.area_id,B.location_id,A.visit_id,A.sales_rep_id
+                            from 
+                            (
+                                SELECT distributor_id,date_of_processing,visit_id,id,sales_rep_id from sales_rep_orders 
+                                Where id IN (Select sales_rep_order_id From sales_rep_order_items Where qty IS NOT NULL) 
+                            ) A
+                        Left join
+                        (SELECT * from sales_rep_location ) B On A.visit_id=B.id ) A
+                        Group By distributor_id,area_id,location_id 
+                    ) 
+                    C ON ((O.distributor_id=C.distributor_id) and (O.order_date=C.date_of_processing) and (O.area_id=C.area_id) and (O.location_id=C.location_id) )
+                    Order By sales_rep_id DESC
+                ) A
+                Left Join
+                (Select * from sales_rep_master ) B On A.sales_rep_id=B.id
+                ORDER By sales_rep_id DESC ) A
+                Left join
+                (      
+                        Select SUM(item_qty) as item_qty ,sales_rep_order_id ,item_id from 
+                        (
+                            SELECT case when E.type='Bar' then E.qty else (E.qty*F.qty) end  as item_qty ,
+                            E.sales_rep_order_id ,case when E.type='Bar' then E.item_id else F.product_id end  as item_id
+                            from 
+                            (select * from sales_rep_order_items)E
+                            left join box_product F On (E.type='Box' and (E.item_id=F.box_id))
+                            left join product_master G On (E.type='Bar' and (E.item_id=G.id)) 
+                        ) A GROUP By sales_rep_order_id ,item_id
+                ) B ON (A.order_id=B.sales_rep_order_id)
+                Left Join 
+                (
+                    SELECT A.date_of_visit as last_date_of_visit,DATEDIFF(CURRENT_DATE(),A.date_of_visit)  as  last_date_aging,A.distributor_id,A.sales_rep_id,A.sales_rep_loc_id,
+                    ((Case When B.orange_bar IS NOT NULL Then B.orange_bar else 0 end )+(CASE WHEN B.orange_box IS NOT NULL THEN orange_box*6 else 0 end)) as orange,
+                    ((Case When B.butterscotch_bar IS NOT NULL Then B.butterscotch_bar else 0 end )+(Case When butterscotch_box IS NOT NULL THEN butterscotch_box*6 else 0 end)) as butterscotch,
+                    ((CAse When B.chocopeanut_bar IS NOT NULL Then B.chocopeanut_bar else 0 end)+Case When B.chocopeanut_box IS NOT NULL Then chocopeanut_box*6 else 0 end ) as chocopeanut ,
+                    ((Case When B.bambaiyachaat_bar IS NOT NULL Then B.bambaiyachaat_bar else 0 end )+Case WHEN B.bambaiyachaat_box IS NOT NULL THen B.bambaiyachaat_box*6 else 0 end) as bambaiyachaat,
+                    ((Case When B.mangoginger_bar IS NOT NULL then B.mangoginger_bar else 0 end )+ Case When B.mangoginger_box IS NOT NULL THEN B.mangoginger_box*6 else 0 end ) as mangoginger,
+                    ((Case When B.berry_blast_bar IS NOT NULL then B.berry_blast_bar else 0 end )+ Case When B.berry_blast_box IS NOT NULL Then B.berry_blast_box*6 else 0 end) as berry_blast,
+                    ((CAse When B.chyawanprash_bar IS NOT NULL THen B.chyawanprash_bar else 0 end )+ Case When B.chyawanprash_box IS NOT NULL THen B.chyawanprash_box*6 else 0 end) as chyawanprash,
+                    (Case When B.chocolate_cookies_box IS NOT NULL THEN B.chocolate_cookies_box*4 else 0 end) as chocolate_cookies,
+                    (Case When B.cranberry_orange_box IS NOT NULL Then B.cranberry_orange_box*4  else 0 end ) as cranberry_orange,
+                    (Case When B.dark_chocolate_cookies_box IS NOT NULL THEN B.dark_chocolate_cookies_box*8 else 0 end ) as dark_chocolate_cookies,
+                    (Case When B.fig_raisins_box IS NOT NULL Then B.fig_raisins_box*2 else 0 end) as fig_raisins ,
+                    (Case When B.papaya_pineapple_box IS NOT NULL Then B.papaya_pineapple_box*2 Else 0 end ) as papaya_pineapple,
+                    B.variety_box,B.mint_box,(Case When B.cranberry_cookies_box IS NOT NULL Then B.cranberry_cookies_box*4 else 0 end ) as cranberry_cookies,A.remarks,A.location_id,A.area_id  from (
+                    Select A.date_of_visit,A.distributor_id,B.sales_rep_id,B.id as sales_rep_loc_id,A.location_id,A.area_id,B.remarks from
+                    (SELECT max(date_of_visit) as date_of_visit,distributor_id,location_id,area_id  from sales_rep_location 
+                    GROUP By distributor_id ) A
+                    Left Join
+                    (SELECT id,date_of_visit,distributor_id,sales_rep_id,location_id,area_id,remarks  from sales_rep_location ) B On 
+                    (date(A.date_of_visit)=date(B.date_of_visit) and (A.distributor_id=B.distributor_id and A.location_id=B.location_id and A.area_id=B.area_id)) 
+                    )A
+                    Left Join
+                    (Select * from sales_rep_distributor_opening_stock)  B on(A.sales_rep_loc_id=B.sales_rep_loc_id)
+                    Where (A.distributor_id IS NOT NULL and A.distributor_id<>'')
+                ) S On (A.id=S.distributor_id and A.location_id=S.location_id and A.area_id=S.area_id)
+                Where (S.last_date_of_visit IS NOT NULL OR A.order_date IS NOT NULL)
+            ) A ORDER By sales_rep_order_id ASC ) A
+            Left Join 
+            (Select * from location_master) L ON A.location_id=L.id
+            Left Join
+            (Select * from area_master ) E On A.area_id=E.id
+            ORDER By d_type ASC;
+    ";
+    $data = $this->db->query($sql)->result();
+    
+
+    $template_path=$this->config->item('template_path');
+    $file = $template_path.'store_wise_sales.xls';
+    $this->load->library('excel');
+    $objPHPExcel = PHPExcel_IOFactory::load($file);
+    $col_name[]=array();
+
+    for($i=0; $i<=47; $i++) {
+        $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
+    }
+
+    $col = 0;
+    $row = 3;
+    $dist_id='';
+    $area_id='';
+    $location_id='';
+    $nooforder=0;
+    $j=0;    
+    for($i=0;$i<count($data);$i++){
+        /* echo $dist_id."<br>Test".$data[$i]->dist_id;*/
+        if($dist_id!=$data[$i]->dist_id && $location_id!=$data[$i]->location_id)
+        {
+           $data[$i]->dist_id;
+           if($dist_id!='')
+                $row = $row+1;
+
+           $nooforder=0;
+           $dist_id = $data[$i]->dist_id;
+           $area_id = $data[$i]->area_id;
+           $location_id = $data[$i]->location_id;
+
+           $j = $j+1;
+
+           for ($k=5; $k<=40 ; $k++) { 
+               $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+$k].$row,0);  
+           }
+
+           $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row,$j);     
+           $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $data[$i]->distributor_name);  
+           $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, $data[$i]->location); 
+           $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $data[$i]->area); 
+           $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $data[$i]->sales_rep_name); 
+           
+           $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+42].$row, ($data[$i]->order_place_aging!=''?$data[$i]->order_place_aging:''));
+           $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+43].$row, ($data[$i]->last_date_aging!=''?$data[$i]->last_date_aging:''));
+           if($data[$i]->last_date_of_visit!=''){
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+44].$row, date("d-m-Y",strtotime($data[$i]->last_date_of_visit))); 
+                $objPHPExcel->getActiveSheet()->getStyle($col_name[$col+44].$row)->getNumberFormat()->setFormatCode('dd/mm/yyyy');
+           }
+           $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+45].$row, $data[$i]->remarks);
+
+           if($data[$i]->orange!=NULL)
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+29].$row, $data[$i]->orange);
+           if($data[$i]->butterscotch!=NULL)
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+30].$row, $data[$i]->butterscotch);
+           if($data[$i]->chocopeanut!=NULL)
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+31].$row, $data[$i]->chocopeanut);
+           if($data[$i]->mangoginger!=NULL)
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+32].$row, $data[$i]->mangoginger);
+           if($data[$i]->berry_blast!=NULL)
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+33].$row, $data[$i]->berry_blast);
+           if($data[$i]->chyawanprash!=NULL)
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+34].$row, $data[$i]->chyawanprash);
+           if($data[$i]->dark_chocolate_cookies!=NULL)
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+35].$row, $data[$i]->dark_chocolate_cookies);
+           if($data[$i]->chocolate_cookies!=NULL)
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+36].$row, $data[$i]->chocolate_cookies);
+           if($data[$i]->cranberry_cookies!=NULL)
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+37].$row, $data[$i]->cranberry_cookies);
+           if($data[$i]->cranberry_orange!=NULL)
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+38].$row, $data[$i]->cranberry_orange);
+           if($data[$i]->papaya_pineapple!=NULL)
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+39].$row, $data[$i]->papaya_pineapple);
+           if($data[$i]->fig_raisins!=NULL)
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+40].$row, $data[$i]->fig_raisins);
+        }
+        
+        if($data[$i]->item_id==1)
+        {
+            $nooforder = $nooforder+$data[$i]->item_qty;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, $data[$i]->item_qty);
+        }
+
+        if($data[$i]->item_id==3)
+        {
+            $nooforder = $nooforder+$data[$i]->item_qty;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, $data[$i]->item_qty);
+        }
+
+        if($data[$i]->item_id==5)
+        {
+            $nooforder = $nooforder+$data[$i]->item_qty;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, $data[$i]->item_qty);
+        }
+
+        if($data[$i]->item_id==6)
+        {
+            $nooforder = $nooforder+$data[$i]->item_qty;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+8].$row, $data[$i]->item_qty);
+        }
+
+        if($data[$i]->item_id==9)
+        {
+            $nooforder = $nooforder+$data[$i]->item_qty;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+9].$row, $data[$i]->item_qty);
+        }
+
+        if($data[$i]->item_id==10)
+        {
+            $nooforder = $nooforder+$data[$i]->item_qty;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+10].$row, $data[$i]->item_qty);
+        }
+
+        if($data[$i]->item_id==45)
+        {
+            $nooforder = $nooforder+$data[$i]->item_qty;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+11].$row, $data[$i]->item_qty);
+        }
+
+        if($data[$i]->item_id==37)
+        {
+            $nooforder = $nooforder+$data[$i]->item_qty;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+12].$row, $data[$i]->item_qty);
+        }
+
+        if($data[$i]->item_id==39)
+        {
+            $nooforder = $nooforder+$data[$i]->item_qty;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+13].$row, $data[$i]->item_qty);
+        }
+
+        if($data[$i]->item_id==42)
+        {
+            $nooforder = $nooforder+$data[$i]->item_qty;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+14].$row, $data[$i]->item_qty);
+        }
+
+        if($data[$i]->item_id==41)
+        {
+            $nooforder = $nooforder+$data[$i]->item_qty;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+15].$row, $data[$i]->item_qty);
+        }
+
+        if($data[$i]->item_id==40)
+        {
+            $nooforder = $nooforder+$data[$i]->item_qty;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+16].$row, $data[$i]->item_qty);
+        }
+
+
+        /*if(!isset($nooforder))
+        {
+            echo '<br>'.$i;
+
+            die();
+        }*/
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+41].$row, $nooforder); 
+    }
+        
+
+    for($col = 0; $col < 42; $col++) {
+            $objPHPExcel->getActiveSheet()->getColumnDimension($col_name[$col])->setAutoSize(true);
+    }
+
+    $objPHPExcel->getActiveSheet()->getColumnDimension($col_name[45])->setAutoSize(true);
+    $objPHPExcel->getActiveSheet()->getColumnDimension($col_name[44])->setAutoSize(true);
+
+    /*die();*/
+    $date1 = date('d-m-Y_H-i-A');
+    $filename='Store_wise_sales_'.$date1.'.xls';
+    $path  ='/home/eatangcp/public_html/eat_erp/assets/uploads/exception_reports/';
+
+    $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+    $objWriter->save($path.$filename);
+    $attachment = $path.$filename;
+    $to_email = "sangeeta.yadav@pecanreams.com";
+    $bcc = "";
+    $cc = "";
+    $from_email = 'cs@eatanytime.co.in';
+    $from_email_sender = 'Wholesome Habits Pvt Ltd';
+    $subject='GT Store Report';
+    $report_date = date('d-m-Y');
+    $message = '<html>
+                <body>
+                    <h3>Wholesome Habits Private Limited</h3>
+                    <h4>GT Store Report</h4>
+                    <p>Reporting Date - '.$report_date.'</p>
+                    <p>PFA</p>
+                    <br/><br/>
+                    Regards,
+                    <br/><br/>
+                    CS
+                </body>
+                </html>';
+
+    $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc, $cc, $attachment);
+    if($mailSent==1){
+        unlink($attachment);
+    }
+
+    /*header('Content-Type: application/vnd.ms-excel');
+    header('Content-Disposition: attachment;filename="'.$filename.'"');
+    header('Cache-Control: max-age=0'); 
+    $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+    $objWriter->save('php://output');*/
 }
 
 }

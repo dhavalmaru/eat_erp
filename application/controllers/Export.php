@@ -1402,5 +1402,10 @@ class Export extends CI_Controller {
     public function send_sales_rep_exception_report() {
         $this->export_model->sales_rep_exception_report();
     }
+
+    public function gt_store_report()
+    {
+      $this->export_model->gt_store_report();
+    }
 } 
 ?>

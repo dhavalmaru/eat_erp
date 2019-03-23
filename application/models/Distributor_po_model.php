@@ -910,8 +910,8 @@ function generate_po_delivery_report() {
                 }
             }
 
-            if(($data[$i]->status='Approved' OR $data[$i]->status='Inactive') && strtoupper(trim($data[$i]->delivery_status))=='DELIVERED' || strtoupper(trim($data[$i]->delivery_status))=='PENDING' || strtoupper(trim($data[$i]->delivery_status))=='CANCELLED'){
-                if(strtoupper(trim($data[$i]->item_type))=='BOX' && (strtoupper(trim($data[$i]->delivery_status))=='DELIVERED' || strtoupper(trim($data[$i]->delivery_status))=='PENDING') && ($data[$i]->item_id=='26' || $data[$i]->item_id=='27'  || $data[$i]->item_id=='13'  || $data[$i]->item_id=='14'  || $data[$i]->item_id=='32'  || $data[$i]->item_id=='4' )){
+            if(($data[$i]->status=='Approved' || strtoupper(trim($data[$i]->status))=='INACTIVE') && strtoupper(trim($data[$i]->delivery_status))=='DELIVERED' || strtoupper(trim($data[$i]->delivery_status))=='PENDING' || strtoupper(trim($data[$i]->delivery_status))=='CANCELLED'){
+                if(strtoupper(trim($data[$i]->item_type))=='BOX' && (strtoupper(trim($data[$i]->delivery_status))=='DELIVERED' || strtoupper(trim($data[$i]->delivery_status))=='PENDING'|| strtoupper(trim($data[$i]->delivery_status))=='CANCELLED') && ($data[$i]->item_id=='26' || $data[$i]->item_id=='27'  || $data[$i]->item_id=='13'  || $data[$i]->item_id=='14'  || $data[$i]->item_id=='32'  || $data[$i]->item_id=='4' )){
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+14].$row, $data[$i]->tot_qty);
                 } else if(strtoupper(trim($data[$i]->item_type))=='BOX' && (strtoupper(trim($data[$i]->delivery_status))=='DELIVERED' || strtoupper(trim($data[$i]->delivery_status))=='PENDING') && ($data[$i]->item_id=='26' || $data[$i]->item_id=='27'  || $data[$i]->item_id=='13'  || $data[$i]->item_id=='14'  || $data[$i]->item_id=='32'  || $data[$i]->item_id=='4' )){
                     $tot_qty = $objPHPExcel->getActiveSheet()->getCell($col_name[$col+15].$row)->getValue();
@@ -1444,8 +1444,8 @@ function send_po_delivery_report() {
                 }
             }
 
-            if(($data[$i]->status='Approved' OR $data[$i]->status='Inactive') && strtoupper(trim($data[$i]->delivery_status))=='DELIVERED' || strtoupper(trim($data[$i]->delivery_status))=='PENDING' || strtoupper(trim($data[$i]->delivery_status))=='CANCELLED'){
-                if(strtoupper(trim($data[$i]->item_type))=='BOX' && (strtoupper(trim($data[$i]->delivery_status))=='DELIVERED' || strtoupper(trim($data[$i]->delivery_status))=='PENDING') && ($data[$i]->item_id=='26' || $data[$i]->item_id=='27'  || $data[$i]->item_id=='13'  || $data[$i]->item_id=='14'  || $data[$i]->item_id=='32'  || $data[$i]->item_id=='4' )){
+            if(($data[$i]->status=='Approved' || strtoupper(trim($data[$i]->status))=='INACTIVE') && strtoupper(trim($data[$i]->delivery_status))=='DELIVERED' || strtoupper(trim($data[$i]->delivery_status))=='PENDING' || strtoupper(trim($data[$i]->delivery_status))=='CANCELLED'){
+                if(strtoupper(trim($data[$i]->item_type))=='BOX' && (strtoupper(trim($data[$i]->delivery_status))=='DELIVERED' || strtoupper(trim($data[$i]->delivery_status))=='PENDING' || strtoupper(trim($data[$i]->delivery_status))=='CANCELLED') && ($data[$i]->item_id=='26' || $data[$i]->item_id=='27'  || $data[$i]->item_id=='13'  || $data[$i]->item_id=='14'  || $data[$i]->item_id=='32'  || $data[$i]->item_id=='4' )){
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+14].$row, $data[$i]->tot_qty);
                 } else if(strtoupper(trim($data[$i]->item_type))=='BOX' && (strtoupper(trim($data[$i]->delivery_status))=='DELIVERED' || strtoupper(trim($data[$i]->delivery_status))=='PENDING') && ($data[$i]->item_id=='26' || $data[$i]->item_id=='27'  || $data[$i]->item_id=='13'  || $data[$i]->item_id=='14'  || $data[$i]->item_id=='32'  || $data[$i]->item_id=='4' )){
                     $tot_qty = $objPHPExcel->getActiveSheet()->getCell($col_name[$col+15].$row)->getValue();
