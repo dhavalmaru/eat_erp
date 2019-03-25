@@ -345,7 +345,7 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
 
                     $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, $data[$i]->distributor_type);
 
-                   if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT')
+                   if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT')
                          {
                                 $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->state_code);
                                 $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->state);
@@ -1210,7 +1210,7 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
 
                     $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->distributor_type);
                     $distributor_name = $data[$i]->distributor_name;
-                    if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT') {
+                    if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT') {
                         $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->state_code);
                         $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->state);
                     } else {
@@ -2269,7 +2269,7 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                         $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->con_state);
                         $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->con_gst_number);
                     } else {
-                       if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT')
+                       if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT')
 						 {
 								$objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->state_code);
 								$objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->state);
@@ -13948,7 +13948,7 @@ public function get_mt_stock_report($date='', $action='save', $r_zone_id='') {
             $sql = "select distinct A.sales_rep_id, B.sales_rep_name 
                     from merchandiser_beat_plan A 
                     left join sales_rep_master B on (A.sales_rep_id=B.id) 
-                    where A.zone_id = '$r_zone_id' and B.sales_rep_name is not null 
+                    where A.zone_id = '$r_zone_id' and B.sales_rep_name is not null and B.sr_type = 'Merchandizer' 
                     order by B.sales_rep_name";
             $query = $this->db->query($sql);
             $result2 = $query->result();
@@ -14125,7 +14125,7 @@ public function get_mt_stock_report($date='', $action='save', $r_zone_id='') {
 
                     $sql = "select A.*, B.sales_rep_name from merchandiser_beat_plan A 
                             left join sales_rep_master B on (A.sales_rep_id=B.id) 
-                            where A.zone_id = '$zone_id' and A.store_id = '$store_id' and A.location_id = '$location_id' 
+                            where A.zone_id = '$zone_id' and A.store_id = '$store_id' and A.location_id = '$location_id' and B.sr_type = 'Merchandizer' 
                             order by A.modified_on desc";
                     $query = $this->db->query($sql);
                     $result2 = $query->result();

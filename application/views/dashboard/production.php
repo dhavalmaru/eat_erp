@@ -239,394 +239,384 @@
         <!-- PAGE CONTENT -->
         <?php $this->load->view('templates/menus');?>
         <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
-        <div class="heading-h3"> 
-            <div class="heading-h3-heading">
-                <a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a>
-            </div>
-            <div class="heading-h3-heading">
-                <?php 
-                    $role_id=$this->session->userdata('role_id');
-                    if($this->session->userdata('role_id')=='1'){
-                ?>
-                <div class="dropdown pull-right">
-                    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
-                        Select Dashboard
-                        <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a href="<?php echo base_url()?>index.php/Dashboard"> Sales Dashboard </a></li>
-                        <li><a href="<?php echo base_url()?>index.php/Dashboard/production"> Production Dashboard </a></li>
-                    </ul>
+            <div class="heading-h3"> 
+                <div class="heading-h3-heading">
+                    <a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a>
                 </div>
-                <?php } ?>
+                <div class="heading-h3-heading">
+                    <?php 
+                        $role_id=$this->session->userdata('role_id');
+                        if($this->session->userdata('role_id')=='1'){
+                    ?>
+                    <div class="dropdown pull-right">
+                        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+                            Select Dashboard
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a href="<?php echo base_url()?>index.php/Dashboard"> Sales Dashboard </a></li>
+                            <li><a href="<?php echo base_url()?>index.php/Dashboard/production"> Production Dashboard </a></li>
+                        </ul>
+                    </div>
+                    <?php } ?>
+                </div>
             </div>
-        </div>
-        
-        <!-- PAGE CONTENT WRAPPER -->
-        <div class="page-content-wrap" style="margin-top: 0px;">
-            <div class="row main-wrapper">
-                <div class="main-container">           
-                    <div class="box-shadow">
-                        <div class="box-shadow-inside">
-                            <div class="col-md-12 custom-padding" style="padding:0;" >
-                                <div class="panel panel-default" style="background:none!important">
-                                    <div class="panel-body" style="background:none!important">
-                                        <div class="row">
-										  <div class="col-md-12">
-										  
-										    <div class="x_panel">
-                                                    <div class="x_title">
-                                                        <div class="  pull-left">
-                                                            <h2> Other Pending Task</h2> 
-                                                        </div>
-                                                        <div class="clearfix"></div>
-                                                    </div>
-                                                    <div class="x_content" >
-                                                        <div class="table-responsive">
-                                                            <table id="customers2" class="table datatable table-bordered black_header" >
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th width="55px">Sr. No.</th>
-                                                                        <th>Task Name</th>
-                                                                        <th>Assign To </th>
-                                                                        <th>Priority </th>
-																		<th>Due Date</th>
-                                                                        <th>Status</th>
-                                                                        <th style="text-align:center">Action</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    <?php 
-                                                                    for ($i=0; $i < count($tasklist); $i++) { 
-                                                                    ?>
-                                                                        <tr>
-                                                                           <td><?php echo $i+1; ?></td>
-                                                                            <td><?php echo $tasklist[$i]->subject_detail; ?></td>
-                                                                            <td><?php echo (($tasklist[$i]->name=='')?'Self':$tasklist[$i]->name); ?></td>
-                                                                            <td><?php echo $tasklist[$i]->priority; ?></td>
-    																		<td><?php echo date('d/m/Y',strtotime($tasklist[$i]->due_date)); ?></td>
-                                                                            <td><?php echo $tasklist[$i]->task_status; ?></td>
-                                                                            <td style="text-align:center;width: 180px;"> <a href="<?php echo base_url(); ?>index.php/Task/task_view/<?php echo urlencode($tasklist[$i]->id); ?>" style="color:#4aa90a!important;">Action</a> </td>
-                                                                        </tr>
-                                                                    <?php } ?>
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                </div>
-											<div class="x_panel">
-                                                    <div class="x_title">
-                                                        <div class="  pull-left">
-                                                            <h2>  Purchase Order</h2> 
-                                                        </div> 
-                                                        <div class="clearfix"></div>
-                                                    </div>
-												<div class="x_content" >
-													
-										
-										
-												<div class="col-md-2">
-													<div class="zoom">
-														<a class="zoom-fab zoom-btn-large" id="zoomBtn"><i style="" class="fa fa-plus"></i></a>
-                                                        <ul class="zoom-menu">
-                                                            <li><a tooltip="Share" class="zoom-fab zoom-btn-sm zoom-btn-person scale-transition scale-out"  href="<?php echo base_url() . 'index.php/Purchase_order/add'; ?>">Raise PO</a></li>
-                                                            <li><a class="zoom-fab zoom-btn-sm zoom-btn-doc scale-transition scale-out" href="<?php echo base_url() . 'index.php/Payment/add'; ?>" >Payment</a></li>
-                                                            <li><a class="zoom-fab zoom-btn-sm zoom-btn-tangram scale-transition scale-out"  href="<?php echo base_url() . 'index.php/Raw_material_in/add'; ?>" >Raw Material In</a></li>
-                                                        </ul>
-													
-												<div class="zoom-card scale-transition scale-out">
-												  <ul class="zoom-card-content">
-												  <li>Content</li>
-												  
-												
-												  </ul>
-												</div>
- 
-													</div>
-												</div>
-													<div class="col-md-3">
-                                                        <div class="widget widget-blue  widget-item-icon widget-carousel animated flipInY">
-                                                            <div>
-                                                                <a href="<?php echo base_url(); ?>index.php/Purchase_order/checkstatus/Pending" style="color: #fafbfc;">
-                                                                <div class="widget-data" style="padding-left:0px!important;">
-                                                                    <div class="widget-title">Approval Pending</div>
-                                                                    <div class="widget-int"><span data-toggle="counter"><?php if(isset($po_count)) echo $po_count[0]->pending_cnt; ?></span></div>
-                                                                    <div class="widget-subtitle  subtitle1  ">(View All)</div>
-                                                                </div>
-                                                                </a>
+            
+            <!-- PAGE CONTENT WRAPPER -->
+            <div class="page-content-wrap" style="margin-top: 0px;">
+                <div class="row main-wrapper">
+                    <div class="main-container">           
+                        <div class="box-shadow">
+                            <div class="box-shadow-inside">
+                                <div class="col-md-12 custom-padding" style="padding:0;">
+                                    <div class="panel panel-default" style="background:none!important">
+                                        <div class="panel-body" style="background:none!important">
+                                            <div class="row">
+                                                <div class="col-md-12">
+        										    <div class="x_panel">
+                                                        <div class="x_title">
+                                                            <div class="  pull-left">
+                                                                <h2> Other Pending Task</h2> 
                                                             </div>
+                                                            <div class="clearfix"></div>
                                                         </div>
-													</div>
-													<div class="col-md-2">
-                                                        <div class="widget widget-info  widget-item-icon widget-carousel animated flipInY">
-                                                            <div>
-                                                                <a href="<?php echo base_url(); ?>index.php/Purchase_order/checkstatus/open" style="color: #fafbfc;">
-                                                                <div class="widget-data" style="padding-left:0px!important;">
-                                                                    <div class="widget-title">Open</div>
-                                                                    <div class="widget-int"> <span data-toggle="counter"><?php if(isset($po_count)) echo $po_count[0]->open_cnt; ?></span></div>
-																    <div class="widget-subtitle  subtitle1  ">(View All)</div>
+                                                        <div class="x_content" >
+                                                            <div class="col-md-2">
+                                                                <div class="zoom">
+                                                                    <a class="zoom-fab zoom-btn-large" href="<?php echo base_url() . 'index.php/task/task_edit'; ?>"><i style="" class="fa fa-plus"></i></a>
                                                                 </div>
-                                                                </a>
                                                             </div>
-                                                        </div>
-													</div>
-													
-													<div class="col-md-3">
-														<div class="widget widget-yellow  widget-item-icon widget-carousel animated flipInY">
-															<div>
-                                                                <a href="<?php echo base_url(); ?>index.php/Purchase_order/checkstatus/payment_pending" style="color: #fafbfc;">
-                                                                <div class="widget-data" style="padding-left:0px!important;">
-                                                                    <div class="widget-title">Payment Pending</div>
-                                                                    <div class="widget-int"> <span data-toggle="counter"><?php if(isset($po_count)) echo $po_count[0]->pending_payment_cnt; ?></span></div>
-                                                                    <div class="widget-subtitle  subtitle1  ">(View All)</div>
-                                                                </div>
-                                                                </a>
-															</div>
-														</div>
-													</div>
-
-													<div class="col-md-2">
-														<div class="widget widget-red  widget-item-icon widget-carousel animated flipInY">
-                                                            <div>
-                                                                <a href="<?php echo base_url(); ?>index.php/Purchase_order/checkstatus/advance" style="color: #fafbfc;">
-                                                                <div class="widget-data" style="padding-left:0px!important;">
-                                                                    <div class="widget-title">Advance</div>
-                                                                    <div class="widget-int"> <span data-toggle="counter"><?php if(isset($po_count)) echo $po_count[0]->advance_payment_cnt; ?></span></div>
-                                                                    <div class="widget-subtitle  subtitle1  ">(View All)</div>
-                                                                </div>
-                                                                </a>
-															</div>
-														</div>
-													</div>
-
-                                          
-												</div>
-											</div>
-										</div>
-										</div>
-                                          
-										<div class="row">
-                                            <div class="col-md-12">
-                                                <div class="x_panel">
-                                                    <div class="x_title">
-                                                        <div class="  pull-left">
-                                                            <h2>  Pre-Producation Task</h2> 
-                                                        </div> 
-                                                        <div class="clearfix"></div>
-                                                    </div>
-                                                    <div class="x_content">
-    													<div class="col-md-2">
-                                                            <div class="zoom">
-        														<a class="zoom-fab zoom-btn-large" id="zoomBtn1"><i class="fa fa-plus"></i></a>
-        														<ul class="zoom-menu " id="zoom-menu1">
-                                                                    <li><a class="zoom-fab zoom-btn-sm1 zoom-btn-person scale-transition scale-out1" href="<?php echo base_url() . 'index.php/production/add'; ?>">Raise Production</a></li>
-                                                                    <!-- <li><a class="zoom-fab zoom-btn-sm1 zoom-btn-doc scale-transition scale-out1" href="<?php //echo base_url() . 'index.php/Purchase_order/add'; ?>">Email</a></li> -->
-                                                                </ul>
-    														</div>
-    													</div>
-														<div class="col-md-10">
-                                                        <div class="table-responsive">
-                                                            <table id="" class="table datatable table-bordered black_header" >
-                                                                <thead>
-                                                                    <tr>
-																		<th style="width: 60px;">Sr. No.</th>
-                                                                        <!-- <th>Date</th> -->
-                                                                        <th>Ref Id</th>
-                                                                        <th style="width: 200px;">Manufacturer</th>
-                                                                        <th>From Date</th>
-                                                                        <th>To Date</th>
-                                                                        <th style="width: 200px;">Description</th>
-                                                                        <th style="width: 200px;">Status</th>
-                                                                        <th style="width: 90px; text-align: center;">Action</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    <?php for($i=0; $i<count($pre_production); $i++) { ?>
-                                                                    <tr>
-                                                                        <td><?php echo $i+1; ?></td>
-                                                                        <!--<td><?php //echo (($pre_production[$i]->notification_date!=null && $pre_production[$i]->notification_date!='')?date('d/m/Y',strtotime($pre_production[$i]->notification_date)):'');?></td>-->
-                                                                        <td><?php echo $pre_production[$i]->p_id; ?></td>
-                                                                        <td><?php echo $pre_production[$i]->depot_name; ?></td>
-                                                                        <td><?php if($pre_production[$i]->notification_id=='2') echo date('d/m/Y', strtotime($pre_production[$i]->from_date)); else echo date('d/m/Y', strtotime($pre_production[$i]->confirm_from_date)); ?></td>
-                                                                        <td><?php if($pre_production[$i]->notification_id=='2') echo date('d/m/Y', strtotime($pre_production[$i]->to_date)); else echo date('d/m/Y', strtotime($pre_production[$i]->confirm_to_date)); ?></td>
-                                                                        <td><?php echo $pre_production[$i]->notification; ?></td>
-                                                                        <td><?php echo $pre_production[$i]->p_status; ?></td>
-                                                                        <td style="text-align:center;"> 
+                                                            <div class="col-md-10">
+                                                                <div class="table-responsive">
+                                                                    <table id="customers2" class="table datatable table-bordered black_header" >
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th width="55px">Sr. No.</th>
+                                                                                <th>Task Name</th>
+                                                                                <th>Assign To </th>
+                                                                                <th>Priority </th>
+            																	<th>Due Date</th>
+                                                                                <th>Status</th>
+                                                                                <th style="text-align:center">Action</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
                                                                             <?php 
-                                                                                $url = "";
-                                                                                if($pre_production[$i]->notification_id=='3') {
-                                                                                    $url = base_url(). "index.php/production/edit/preliminary_check/" . $pre_production[$i]->reference_id;
-                                                                                } else if(strtoupper(trim($pre_production[$i]->p_status))=='REQUESTED') {
-                                                                                    $url = base_url(). "index.php/production/edit/confirmed/" . $pre_production[$i]->reference_id;
-                                                                                } else if(strtoupper(trim($pre_production[$i]->p_status))=='CONFIRMED') {
-                                                                                    $url = base_url(). "index.php/production/edit/batch_confirmed/" . $pre_production[$i]->reference_id;
-                                                                                } else if(strtoupper(trim($pre_production[$i]->p_status))=='BATCH CONFIRMED') {
-                                                                                    $url = base_url(). "index.php/production/edit/raw_material_confirmed/" . $pre_production[$i]->reference_id;
-                                                                                } else if(strtoupper(trim($pre_production[$i]->p_status))=='RAW MATERIAL CONFIRMED') {
-                                                                                    $url = base_url(). "index.php/production/edit/raw_material_confirmed/" . $pre_production[$i]->reference_id;
-                                                                                } 
+                                                                            for ($i=0; $i < count($tasklist); $i++) { 
                                                                             ?>
-                                                                            <a href="<?php echo $url; ?>" style="color:#4aa90a!important;"><span class="actions">Confirm</span></a>
-                                                                        </td>
-                                                                    </tr>
-                                                                    <?php } ?>
-                                                                    <!-- <tr>
-                                                                        <td>2018-12-13 11:56</td>
-                                                                        <td>Production Report Upload</td>
-                                                                        <td class="processed">Processed</td>
-                                                                        <td style="text-align:center;width: 180px;"> <span class="actions"><i class="fa fa-paper-plane "></i></span> <span class="actions"><i class="fa fa-trash-o "></span></i> <span class="actions"> <i class="fa fa-pencil "></i></span> <span class="actions"><i class="fa fa-ellipsis-h "></i></span> </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>2018-12-13 11:56</td>
-                                                                        <td >Bar Conversion</td>
-                                                                        <td class="denied">Denied</td>
-                                                                        <td style="text-align:center;width: 180px;"> <span class="actions"><i class="fa fa-paper-plane "></i></span> <span class="actions"><i class="fa fa-trash-o "></span></i> <span class="actions"> <i class="fa fa-pencil "></i></span> <span class="actions"><i class="fa fa-ellipsis-h "></i></span> </td>
-                                                                    </tr> -->
-                                                                </tbody>
-                                                            </table>
+                                                                                <tr>
+                                                                                   <td><?php echo $i+1; ?></td>
+                                                                                    <td><?php echo $tasklist[$i]->subject_detail; ?></td>
+                                                                                    <td><?php echo (($tasklist[$i]->name=='')?'Self':$tasklist[$i]->name); ?></td>
+                                                                                    <td><?php echo $tasklist[$i]->priority; ?></td>
+            																		<td><?php echo date('d/m/Y',strtotime($tasklist[$i]->due_date)); ?></td>
+                                                                                    <td><?php echo $tasklist[$i]->task_status; ?></td>
+                                                                                    <td style="text-align:center;width: 180px;"> <a href="<?php echo base_url(); ?>index.php/Task/task_view/<?php echo urlencode($tasklist[$i]->id); ?>" style="color:#4aa90a!important;">Action</a> </td>
+                                                                                </tr>
+                                                                            <?php } ?>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
+        											<div class="x_panel">
+                                                        <div class="x_title">
+                                                            <div class="  pull-left">
+                                                                <h2>  Purchase Order</h2> 
+                                                            </div> 
+                                                            <div class="clearfix"></div>
+                                                        </div>
+        												<div class="x_content">
+            												<div class="col-md-2">
+            													<div class="zoom">
+            														<a class="zoom-fab zoom-btn-large" id="zoomBtn"><i style="" class="fa fa-plus"></i></a>
+                                                                    <ul class="zoom-menu">
+                                                                        <li><a tooltip="Share" class="zoom-fab zoom-btn-sm zoom-btn-person scale-transition scale-out"  href="<?php echo base_url() . 'index.php/Purchase_order/add'; ?>">Raise PO</a></li>
+                                                                        <li><a class="zoom-fab zoom-btn-sm zoom-btn-doc scale-transition scale-out" href="<?php echo base_url() . 'index.php/Payment/add'; ?>" >Payment</a></li>
+                                                                        <li><a class="zoom-fab zoom-btn-sm zoom-btn-tangram scale-transition scale-out"  href="<?php echo base_url() . 'index.php/Raw_material_in/add'; ?>" >Raw Material In</a></li>
+                                                                    </ul>
+                                                                    <div class="zoom-card scale-transition scale-out">
+                                                                        <ul class="zoom-card-content">
+                                                                            <li>Content</li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+            												</div>
+        													<div class="col-md-3">
+                                                                <div class="widget widget-blue  widget-item-icon widget-carousel animated flipInY">
+                                                                    <div>
+                                                                        <a href="<?php echo base_url(); ?>index.php/Purchase_order/checkstatus/Pending" style="color: #fafbfc;">
+                                                                        <div class="widget-data" style="padding-left:0px!important;">
+                                                                            <div class="widget-title">Approval Pending</div>
+                                                                            <div class="widget-int"><span data-toggle="counter"><?php if(isset($po_count)) echo $po_count[0]->pending_cnt; ?></span></div>
+                                                                            <div class="widget-subtitle  subtitle1  ">(View All)</div>
+                                                                        </div>
+                                                                        </a>
+                                                                    </div>
+                                                                </div>
+        													</div>
+        													<div class="col-md-2">
+                                                                <div class="widget widget-info  widget-item-icon widget-carousel animated flipInY">
+                                                                    <div>
+                                                                        <a href="<?php echo base_url(); ?>index.php/Purchase_order/checkstatus/open" style="color: #fafbfc;">
+                                                                        <div class="widget-data" style="padding-left:0px!important;">
+                                                                            <div class="widget-title">Open</div>
+                                                                            <div class="widget-int"> <span data-toggle="counter"><?php if(isset($po_count)) echo $po_count[0]->open_cnt; ?></span></div>
+        																    <div class="widget-subtitle  subtitle1  ">(View All)</div>
+                                                                        </div>
+                                                                        </a>
+                                                                    </div>
+                                                                </div>
+        													</div>
+        													<div class="col-md-3">
+        														<div class="widget widget-yellow  widget-item-icon widget-carousel animated flipInY">
+        															<div>
+                                                                        <a href="<?php echo base_url(); ?>index.php/Purchase_order/checkstatus/payment_pending" style="color: #fafbfc;">
+                                                                        <div class="widget-data" style="padding-left:0px!important;">
+                                                                            <div class="widget-title">Payment Pending</div>
+                                                                            <div class="widget-int"> <span data-toggle="counter"><?php if(isset($po_count)) echo $po_count[0]->pending_payment_cnt; ?></span></div>
+                                                                            <div class="widget-subtitle  subtitle1  ">(View All)</div>
+                                                                        </div>
+                                                                        </a>
+        															</div>
+        														</div>
+        													</div>
+        													<div class="col-md-2">
+        														<div class="widget widget-red  widget-item-icon widget-carousel animated flipInY">
+                                                                    <div>
+                                                                        <a href="<?php echo base_url(); ?>index.php/Purchase_order/checkstatus/advance" style="color: #fafbfc;">
+                                                                        <div class="widget-data" style="padding-left:0px!important;">
+                                                                            <div class="widget-title">Advance</div>
+                                                                            <div class="widget-int"> <span data-toggle="counter"><?php if(isset($po_count)) echo $po_count[0]->advance_payment_cnt; ?></span></div>
+                                                                            <div class="widget-subtitle  subtitle1  ">(View All)</div>
+                                                                        </div>
+                                                                        </a>
+        															</div>
+        														</div>
+        													</div>
+        												</div>
+        											</div>
+        										</div>
+    										</div>
+                                              
+    										<div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="x_panel">
+                                                        <div class="x_title">
+                                                            <div class="  pull-left">
+                                                                <h2>  Pre-Producation Task</h2> 
+                                                            </div> 
+                                                            <div class="clearfix"></div>
+                                                        </div>
+                                                        <div class="x_content">
+        													<div class="col-md-2">
+                                                                <div class="zoom">
+            														<a class="zoom-fab zoom-btn-large" id="zoomBtn1"><i class="fa fa-plus"></i></a>
+            														<ul class="zoom-menu " id="zoom-menu1">
+                                                                        <li><a class="zoom-fab zoom-btn-sm1 zoom-btn-person scale-transition scale-out1" href="<?php echo base_url() . 'index.php/production/add'; ?>">Raise Production</a></li>
+                                                                        <!-- <li><a class="zoom-fab zoom-btn-sm1 zoom-btn-doc scale-transition scale-out1" href="<?php //echo base_url() . 'index.php/Purchase_order/add'; ?>">Email</a></li> -->
+                                                                    </ul>
+        														</div>
+        													</div>
+    														<div class="col-md-10">
+                                                            <div class="table-responsive">
+                                                                <table id="" class="table datatable table-bordered black_header" >
+                                                                    <thead>
+                                                                        <tr>
+    																		<th style="width: 60px;">Sr. No.</th>
+                                                                            <!-- <th>Date</th> -->
+                                                                            <th>Ref Id</th>
+                                                                            <th style="width: 200px;">Manufacturer</th>
+                                                                            <th>From Date</th>
+                                                                            <th>To Date</th>
+                                                                            <th style="width: 200px;">Description</th>
+                                                                            <th style="width: 200px;">Status</th>
+                                                                            <th style="width: 90px; text-align: center;">Action</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        <?php for($i=0; $i<count($pre_production); $i++) { ?>
+                                                                        <tr>
+                                                                            <td><?php echo $i+1; ?></td>
+                                                                            <!--<td><?php //echo (($pre_production[$i]->notification_date!=null && $pre_production[$i]->notification_date!='')?date('d/m/Y',strtotime($pre_production[$i]->notification_date)):'');?></td>-->
+                                                                            <td><?php echo $pre_production[$i]->p_id; ?></td>
+                                                                            <td><?php echo $pre_production[$i]->depot_name; ?></td>
+                                                                            <td><?php if($pre_production[$i]->notification_id=='2') echo date('d/m/Y', strtotime($pre_production[$i]->from_date)); else echo date('d/m/Y', strtotime($pre_production[$i]->confirm_from_date)); ?></td>
+                                                                            <td><?php if($pre_production[$i]->notification_id=='2') echo date('d/m/Y', strtotime($pre_production[$i]->to_date)); else echo date('d/m/Y', strtotime($pre_production[$i]->confirm_to_date)); ?></td>
+                                                                            <td><?php echo $pre_production[$i]->notification; ?></td>
+                                                                            <td><?php echo $pre_production[$i]->p_status; ?></td>
+                                                                            <td style="text-align:center;"> 
+                                                                                <?php 
+                                                                                    $url = "";
+                                                                                    if($pre_production[$i]->notification_id=='3') {
+                                                                                        $url = base_url(). "index.php/production/edit/preliminary_check/" . $pre_production[$i]->reference_id;
+                                                                                    } else if(strtoupper(trim($pre_production[$i]->p_status))=='REQUESTED') {
+                                                                                        $url = base_url(). "index.php/production/edit/confirmed/" . $pre_production[$i]->reference_id;
+                                                                                    } else if(strtoupper(trim($pre_production[$i]->p_status))=='CONFIRMED') {
+                                                                                        $url = base_url(). "index.php/production/edit/batch_confirmed/" . $pre_production[$i]->reference_id;
+                                                                                    } else if(strtoupper(trim($pre_production[$i]->p_status))=='BATCH CONFIRMED') {
+                                                                                        $url = base_url(). "index.php/production/edit/raw_material_confirmed/" . $pre_production[$i]->reference_id;
+                                                                                    } else if(strtoupper(trim($pre_production[$i]->p_status))=='RAW MATERIAL CONFIRMED') {
+                                                                                        $url = base_url(). "index.php/production/edit/raw_material_confirmed/" . $pre_production[$i]->reference_id;
+                                                                                    } 
+                                                                                ?>
+                                                                                <a href="<?php echo $url; ?>" style="color:#4aa90a!important;"><span class="actions">Confirm</span></a>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <?php } ?>
+                                                                        <!-- <tr>
+                                                                            <td>2018-12-13 11:56</td>
+                                                                            <td>Production Report Upload</td>
+                                                                            <td class="processed">Processed</td>
+                                                                            <td style="text-align:center;width: 180px;"> <span class="actions"><i class="fa fa-paper-plane "></i></span> <span class="actions"><i class="fa fa-trash-o "></span></i> <span class="actions"> <i class="fa fa-pencil "></i></span> <span class="actions"><i class="fa fa-ellipsis-h "></i></span> </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>2018-12-13 11:56</td>
+                                                                            <td >Bar Conversion</td>
+                                                                            <td class="denied">Denied</td>
+                                                                            <td style="text-align:center;width: 180px;"> <span class="actions"><i class="fa fa-paper-plane "></i></span> <span class="actions"><i class="fa fa-trash-o "></span></i> <span class="actions"> <i class="fa fa-pencil "></i></span> <span class="actions"><i class="fa fa-ellipsis-h "></i></span> </td>
+                                                                        </tr> -->
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                                <div class="x_panel">
-                                                    <div class="x_title">
-                                                        <div class="  pull-left">
-                                                            <h2>  Post-Producation Task</h2> 
-                                                        </div> 
-                                                        <div class="clearfix"></div>
-                                                    </div>
-                                                    <div class="x_content" >
-													
-													<div class="col-md-2">
-														<div class="zoom">
-															<a class="zoom-fab zoom-btn-large" id="zoomBtn2"><i class="fa fa-plus"></i></a>
-															<ul class="zoom-menu">
-															  <li><a class="zoom-fab zoom-btn-sm2 zoom-btn-person scale-transition scale-out2" ><i style="" class="fa fa-user"></i></a></li>
-															  <li><a class="zoom-fab zoom-btn-sm2 zoom-btn-doc scale-transition scale-out2" href="#" ><i class="fa fa-book"></i></a></li>
-															  <li><a class="zoom-fab zoom-btn-sm2 zoom-btn-tangram scale-transition scale-out2" ><i class="fa fa-dashboard"></i></a></li>
-															 
-															</ul>
- 
-														</div>
-													</div>
-														<div class="col-md-10">
-                                                        <div class="table-responsive">
-                                                            <table id="" class="table datatable table-bordered black_header" >
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th style="width: 60px;">Sr. No.</th>
-                                                                        <!-- <th>Date</th> -->
-                                                                        <th>Ref Id</th>
-                                                                        <th style="width: 200px;">Manufacturer</th>
-                                                                        <th>From Date</th>
-                                                                        <th>To Date</th>
-                                                                        <th style="width: 200px;">Description</th>
-                                                                        <th style="width: 200px;">Status</th>
-                                                                        <th style="width: 90px; text-align: center;">Action</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    <?php for($i=0; $i<count($post_production); $i++) { ?>
-                                                                    <tr>
-                                                                        <td><?php echo $i+1; ?></td>
-                                                                        <!--<td><?php //echo (($post_production[$i]->notification_date!=null && $post_production[$i]->notification_date!='')?date('d/m/Y',strtotime($post_production[$i]->notification_date)):'');?></td>-->
-                                                                        <td><?php echo $post_production[$i]->p_id; ?></td>
-                                                                        <td><?php echo $post_production[$i]->depot_name; ?></td>
-                                                                        <td><?php echo date('d/m/Y', strtotime($post_production[$i]->confirm_from_date)); ?></td>
-                                                                        <td><?php echo date('d/m/Y', strtotime($post_production[$i]->confirm_to_date)); ?></td>
-                                                                        <td><?php echo $post_production[$i]->notification; ?></td>
-                                                                        <td>
-                                                                            <?php 
-                                                                                if($post_production[$i]->batch_master==null || $post_production[$i]->batch_master=='0') 
-                                                                                    echo 'Confirm Batch Nos.';
-                                                                                else if($post_production[$i]->production_details==null || $post_production[$i]->production_details=='0') 
-                                                                                    echo 'Confirm Production Details.';
-                                                                                else if($post_production[$i]->bar_conversion==null || $post_production[$i]->bar_conversion=='0') 
-                                                                                    echo 'Perform Bar Conversion.';
-                                                                                else if($post_production[$i]->depot_transfer==null || $post_production[$i]->depot_transfer=='0') 
-                                                                                    echo 'Perform Depot Transfer.';
-                                                                                else if($post_production[$i]->documents_upload==null || $post_production[$i]->documents_upload=='0') 
-                                                                                    echo 'Perform Documents Upload.';
-                                                                                else if($post_production[$i]->raw_material_recon==null || $post_production[$i]->raw_material_recon=='0') 
-                                                                                    echo 'Perform Raw Material Recon.';
-                                                                                else if($post_production[$i]->report_approved==null || $post_production[$i]->report_approved=='0') {
-                                                                                    if($post_production[$i]->report_status==null || $post_production[$i]->report_status==''){
-                                                                                        echo 'Submit Production Report For Approval.';
-                                                                                    } else if(strtoupper(trim($post_production[$i]->report_status))=='PENDING'){
-                                                                                        echo 'Approve Production Report.';
-                                                                                    } else if(strtoupper(trim($post_production[$i]->report_status))=='REJECTED'){
-                                                                                        echo 'Production Report Rejected.';
-                                                                                    } else {
-                                                                                        echo 'Approve Report.';
-                                                                                    }
+
+                                            <div class="x_panel">
+                                                <div class="x_title">
+                                                    <div class="  pull-left">
+                                                        <h2>  Post-Producation Task</h2> 
+                                                    </div> 
+                                                    <div class="clearfix"></div>
+                                                </div>
+                                                <div class="x_content">
+    											<div class="col-md-2">
+    												<div class="zoom">
+    													<a class="zoom-fab zoom-btn-large" id="zoomBtn2"><i class="fa fa-plus"></i></a>
+    													<ul class="zoom-menu">
+                                                            <li><a class="zoom-fab zoom-btn-sm2 zoom-btn-person scale-transition scale-out2" ><i style="" class="fa fa-user"></i></a></li>
+                                                            <li><a class="zoom-fab zoom-btn-sm2 zoom-btn-doc scale-transition scale-out2" href="#" ><i class="fa fa-book"></i></a></li>
+                                                            <li><a class="zoom-fab zoom-btn-sm2 zoom-btn-tangram scale-transition scale-out2" ><i class="fa fa-dashboard"></i></a></li>
+    													</ul>
+    												</div>
+    											</div>
+    											<div class="col-md-10">
+                                                    <div class="table-responsive">
+                                                        <table id="" class="table datatable table-bordered black_header" >
+                                                            <thead>
+                                                                <tr>
+                                                                    <th style="width: 60px;">Sr. No.</th>
+                                                                    <!-- <th>Date</th> -->
+                                                                    <th>Ref Id</th>
+                                                                    <th style="width: 200px;">Manufacturer</th>
+                                                                    <th>From Date</th>
+                                                                    <th>To Date</th>
+                                                                    <th style="width: 200px;">Description</th>
+                                                                    <th style="width: 200px;">Status</th>
+                                                                    <th style="width: 90px; text-align: center;">Action</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <?php for($i=0; $i<count($post_production); $i++) { ?>
+                                                                <tr>
+                                                                    <td><?php echo $i+1; ?></td>
+                                                                    <!--<td><?php //echo (($post_production[$i]->notification_date!=null && $post_production[$i]->notification_date!='')?date('d/m/Y',strtotime($post_production[$i]->notification_date)):'');?></td>-->
+                                                                    <td><?php echo $post_production[$i]->p_id; ?></td>
+                                                                    <td><?php echo $post_production[$i]->depot_name; ?></td>
+                                                                    <td><?php echo date('d/m/Y', strtotime($post_production[$i]->confirm_from_date)); ?></td>
+                                                                    <td><?php echo date('d/m/Y', strtotime($post_production[$i]->confirm_to_date)); ?></td>
+                                                                    <td><?php echo $post_production[$i]->notification; ?></td>
+                                                                    <td>
+                                                                        <?php 
+                                                                            if($post_production[$i]->batch_master==null || $post_production[$i]->batch_master=='0') 
+                                                                                echo 'Confirm Batch Nos.';
+                                                                            else if($post_production[$i]->production_details==null || $post_production[$i]->production_details=='0') 
+                                                                                echo 'Confirm Production Details.';
+                                                                            else if($post_production[$i]->bar_conversion==null || $post_production[$i]->bar_conversion=='0') 
+                                                                                echo 'Perform Bar Conversion.';
+                                                                            else if($post_production[$i]->depot_transfer==null || $post_production[$i]->depot_transfer=='0') 
+                                                                                echo 'Perform Depot Transfer.';
+                                                                            else if($post_production[$i]->documents_upload==null || $post_production[$i]->documents_upload=='0') 
+                                                                                echo 'Perform Documents Upload.';
+                                                                            else if($post_production[$i]->raw_material_recon==null || $post_production[$i]->raw_material_recon=='0') 
+                                                                                echo 'Perform Raw Material Recon.';
+                                                                            else if($post_production[$i]->report_approved==null || $post_production[$i]->report_approved=='0') {
+                                                                                if($post_production[$i]->report_status==null || $post_production[$i]->report_status==''){
+                                                                                    echo 'Submit Production Report For Approval.';
+                                                                                } else if(strtoupper(trim($post_production[$i]->report_status))=='PENDING'){
+                                                                                    echo 'Approve Production Report.';
+                                                                                } else if(strtoupper(trim($post_production[$i]->report_status))=='REJECTED'){
+                                                                                    echo 'Production Report Rejected.';
+                                                                                } else {
+                                                                                    echo 'Approve Report.';
                                                                                 }
-                                                                                else echo $post_production[$i]->p_status;
-                                                                            ?>
-                                                                        </td>
-                                                                        <td style="text-align:center;"> 
-                                                                            <?php 
-                                                                                $url = base_url(). "index.php/production/post_details/" . $post_production[$i]->reference_id;
-                                                                                // if(strtoupper(trim($post_production[$i]->p_status))=='REQUESTED') {
-                                                                                //     $url = base_url(). "index.php/production/edit/confirmed/" . $post_production[$i]->reference_id;
-                                                                                // } else if(strtoupper(trim($post_production[$i]->p_status))=='CONFIRMED') {
-                                                                                //     $url = base_url(). "index.php/production/edit/batch_confirmed/" . $post_production[$i]->reference_id;
-                                                                                // } else if(strtoupper(trim($post_production[$i]->p_status))=='BATCH CONFIRMED') {
-                                                                                //     $url = base_url(). "index.php/production/edit/raw_material_confirmed/" . $post_production[$i]->reference_id;
-                                                                                // } else if(strtoupper(trim($post_production[$i]->p_status))=='RAW MATERIAL CONFIRMED') {
-                                                                                //     $url = base_url(). "index.php/production/edit/raw_material_confirmed/" . $post_production[$i]->reference_id;
-                                                                                // } 
-                                                                            ?>
-                                                                            <a href="<?php echo $url; ?>" style="color:#4aa90a!important"><span class="actions"> Confirm</span></a>
-                                                                        </td>
-                                                                    </tr>
-                                                                    <?php } ?>
-                                                                    <!-- <tr>
-                                                                        <td>2018-12-13 11:56</td>
-                                                                        <td>Production Report Upload</td>
-                                                                        <td class="processed">Processed</td>
-                                                                        <td style="text-align:center;width: 180px;"> <span class="actions"><i class="fa fa-paper-plane "></i></span> <span class="actions"><i class="fa fa-trash-o "></span></i> <span class="actions"> <i class="fa fa-pencil "></i></span> <span class="actions"><i class="fa fa-ellipsis-h "></i></span> </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>2018-12-13 11:56</td>
-                                                                        <td >Bar Conversion</td>
-                                                                        <td class="denied">Denied</td>
-                                                                        <td style="text-align:center;width: 180px;"> <span class="actions"><i class="fa fa-paper-plane "></i></span> <span class="actions"><i class="fa fa-trash-o "></span></i> <span class="actions"> <i class="fa fa-pencil "></i></span> <span class="actions"><i class="fa fa-ellipsis-h "></i></span> </td>
-                                                                    </tr> -->
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
+                                                                            }
+                                                                            else if($post_production[$i]->report_approved=='1') 
+                                                                                echo 'Approved.';
+                                                                            else echo $post_production[$i]->p_status;
+                                                                        ?>
+                                                                    </td>
+                                                                    <td style="text-align:center;"> 
+                                                                        <?php 
+                                                                            $url = base_url(). "index.php/production/post_details/" . $post_production[$i]->reference_id;
+                                                                            // if(strtoupper(trim($post_production[$i]->p_status))=='REQUESTED') {
+                                                                            //     $url = base_url(). "index.php/production/edit/confirmed/" . $post_production[$i]->reference_id;
+                                                                            // } else if(strtoupper(trim($post_production[$i]->p_status))=='CONFIRMED') {
+                                                                            //     $url = base_url(). "index.php/production/edit/batch_confirmed/" . $post_production[$i]->reference_id;
+                                                                            // } else if(strtoupper(trim($post_production[$i]->p_status))=='BATCH CONFIRMED') {
+                                                                            //     $url = base_url(). "index.php/production/edit/raw_material_confirmed/" . $post_production[$i]->reference_id;
+                                                                            // } else if(strtoupper(trim($post_production[$i]->p_status))=='RAW MATERIAL CONFIRMED') {
+                                                                            //     $url = base_url(). "index.php/production/edit/raw_material_confirmed/" . $post_production[$i]->reference_id;
+                                                                            // } 
+                                                                        ?>
+                                                                        <a href="<?php echo $url; ?>" style="color:#4aa90a!important"><span class="actions"> Confirm</span></a>
+                                                                    </td>
+                                                                </tr>
+                                                                <?php } ?>
+                                                                <!-- <tr>
+                                                                    <td>2018-12-13 11:56</td>
+                                                                    <td>Production Report Upload</td>
+                                                                    <td class="processed">Processed</td>
+                                                                    <td style="text-align:center;width: 180px;"> <span class="actions"><i class="fa fa-paper-plane "></i></span> <span class="actions"><i class="fa fa-trash-o "></span></i> <span class="actions"> <i class="fa fa-pencil "></i></span> <span class="actions"><i class="fa fa-ellipsis-h "></i></span> </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>2018-12-13 11:56</td>
+                                                                    <td >Bar Conversion</td>
+                                                                    <td class="denied">Denied</td>
+                                                                    <td style="text-align:center;width: 180px;"> <span class="actions"><i class="fa fa-paper-plane "></i></span> <span class="actions"><i class="fa fa-trash-o "></span></i> <span class="actions"> <i class="fa fa-pencil "></i></span> <span class="actions"><i class="fa fa-ellipsis-h "></i></span> </td>
+                                                                </tr> -->
+                                                            </tbody>
+                                                        </table>
                                                     </div>
                                                 </div>
-
-                                              
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <br clear="all"/>
                             </div>
+                            <br clear="all"/>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <!-- END PAGE CONTENT WRAPPER -->
-        </div>            
-        <!-- END PAGE CONTENT -->	
-        </div>
-        <!-- END PAGE CONTAINER -->
+            <!-- END PAGE CONTENT WRAPPER -->
 
- <script src="<?php echo base_url(); ?>dashboard/src/js/index.js" type="text/javascript"></script> 
+        </div>
+        <!-- END PAGE CONTENT -->
+        </div>
 
+        <script src="<?php echo base_url(); ?>dashboard/src/js/index.js" type="text/javascript"></script>
         <?php $this->load->view('templates/footer');?>
-<script>
-$(document).ready(function(){
-  $('[data-toggle="tooltip"]').tooltip(); 
-});
-</script>
+        <script>
+            $(document).ready(function(){
+              $('[data-toggle="tooltip"]').tooltip(); 
+            });
+        </script>
         <!-- END SCRIPTS -->      
     </body>
 </html>

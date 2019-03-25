@@ -52,6 +52,9 @@ class Depot_transfer extends CI_Controller{
                 $data['p_id'] = $p_id;
                 $data['production'] = $this->production_model->get_data('Approved');
                 $data['module'] = $module;
+                if($p_id!=''){
+                    $data['p_data'] = $this->production_model->get_data('', $p_id);
+                }
 
                 load_view('depot_transfer/depot_transfer_details', $data);
             } else {

@@ -1394,6 +1394,18 @@ $.validator.addMethod("check_batch_id_availablity", function (value, element) {
 
 
 
+var add_loader = function() {
+    console.log('add_loader');
+    $('body').append('<div id="cover"></div>');
+    setTimeout(removeLoader, 1000);
+}
+
+var remove_loader = function() {
+    $( "#cover" ).fadeOut(500, function() {
+        $( "#cover" ).remove();
+    });
+    console.log('remove_loader');
+}
 
 // ----------------- BATCH PROCESSING DETAILS FORM VALIDATION -------------------------------------
 $("#form_batch_processing_details").validate({
@@ -1456,6 +1468,8 @@ $("#form_batch_processing_details").validate({
 });
 
 $('#form_batch_processing_details').submit(function() {
+    // add_loader();
+
     removeMultiInputNamingRules('#form_batch_processing_details', 'select[alt="raw_material_id[]"]');
     removeMultiInputNamingRules('#form_batch_processing_details', 'input[alt="qty[]"]');
 

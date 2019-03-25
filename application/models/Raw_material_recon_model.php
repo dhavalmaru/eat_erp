@@ -310,9 +310,17 @@ function set_raw_material_in_out($id='') {
     $sql = "delete from raw_material_in_out where production_id = '$id'";
     $this->db->query($sql);
 
+    $p_id = '';
+    $sql = "select * from production_details where id = '$id'";
+    $result = $this->db->query($sql)->result();
+    if(count($result)>0){
+        $p_id = $result[0]->p_id;
+    }
+
     $sql = "insert into raw_material_in_out (date_of_processing, depot_id, status, type, remarks, 
             created_by, created_on, modified_by, modified_on, approved_by, approved_on, production_id) 
-            select date_of_processing, depot_id, status, 'Adjustment', remarks, created_by, created_on, 
+            select date_of_processing, depot_id, status, 'Adjustment', 
+            'System generated adjustment entry for Production - ".$p_id.".', created_by, created_on, 
             modified_by, modified_on, approved_by, approved_on, '$id' from raw_material_recon where id = '$id'";
     $this->db->query($sql);
 

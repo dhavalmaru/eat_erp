@@ -64,8 +64,8 @@
 <div class="debit_note">
     <div class="header-section">
         <center style="width:100%;display:inline-block;margin:0 auto;">
-            <img src="<?php echo base_url().'/assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
-            <img src="<?php echo base_url().'/img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
+            <img src="<?php echo base_url().'assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
+            <img src="<?php echo base_url().'img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
         </center>
     </div>
 
@@ -80,7 +80,7 @@
         </tr>
 		<tr style="border-bottom:1px solid #666; font-size:15px; font-weight:500;">
             <td valign="top" align="center" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;font-size:18px;font-weight:700;">Prepared By</td>
-            <td valign="top" align="left" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><?php if(isset($data)) echo $data[0]->modifiedby; ?></td>
+            <td valign="top" align="left" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><?php if(isset($data)) echo ucwords(strtolower($data[0]->modifiedby)); ?></td>
             <td valign="top" align="left" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><?php if(isset($data)) echo (($data[0]->modified_on!=null && $data[0]->modified_on!='')?date('d-m-Y',strtotime($data[0]->modified_on)):''); ?></td>
             <td valign="top" align="left" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"></td>
         </tr>
@@ -92,7 +92,7 @@
         </tr>
 		<tr style="border-bottom:1px solid #666; font-size:15px; font-weight:500;">
             <td valign="top" align="center" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;font-size:18px;font-weight:700;">Approved By</td>
-            <td valign="top" align="left" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><?php if(isset($data)) echo $data[0]->approvedby; ?></td>
+            <td valign="top" align="left" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><?php if(isset($data)) echo ucwords(strtolower($data[0]->approvedby)); ?></td>
             <td valign="top" align="left" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><?php if(isset($data)) echo (($data[0]->approved_on!=null && $data[0]->approved_on!='')?date('d-m-Y',strtotime($data[0]->approved_on)):''); ?></td>
             <td valign="top" align="left" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"></td>
         </tr>
@@ -123,8 +123,8 @@
 	
     <div class="header-section">
         <center style="width:100%;display:inline-block;margin:0 auto;">
-            <img src="<?php echo base_url().'/assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
-            <img src="<?php echo base_url().'/img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
+            <img src="<?php echo base_url().'assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
+            <img src="<?php echo base_url().'img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
         </center>
     </div>
 
@@ -185,7 +185,7 @@
         ?>
             <tr style="border-bottom:1px solid #666; font-size:15px; font-weight:500;">
                 <td valign="top" align="center" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;font-size:15px;"><?php echo ($i+1); ?></td>
-                <td valign="top" align="left" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;font-size:15px;"><?php echo $purchased_rm[$i]->rm_name; ?></td>
+                <td valign="top" align="left" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;font-size:15px;"><?php echo ucwords(strtolower($purchased_rm[$i]->rm_name)); ?></td>
                 <td valign="top" align="center" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><?php echo format_money($purchased_rm[$i]->qty, 2); ?></td>
                 <td valign="top" align="center" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><?php echo (($purchased_rm[$i]->date_of_receipt!=null && $purchased_rm[$i]->date_of_receipt!='')?date('d-m-Y',strtotime($purchased_rm[$i]->date_of_receipt)):''); ?></td>
                 <td valign="top" align="center" style="border-left:1px solid #666; border-right:1px solid #666; border-top: none; border-bottom:none;"><?php echo $purchased_rm[$i]->rm_status; ?></td>
@@ -231,8 +231,8 @@
 
  	<div class="header-section">
 		<center style="width:100%;display:inline-block;margin:0 auto;">
-			<img src="<?php echo base_url().'/assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
-			<img src="<?php echo base_url().'/img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
+			<img src="<?php echo base_url().'assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
+			<img src="<?php echo base_url().'img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
 		</center>
 	</div>
 
@@ -373,8 +373,8 @@
 	
     <div class="header-section">
 		<center style="width:100%;display:inline-block;margin:0 auto;">
-			<img src="<?php echo base_url().'/assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
-			<img src="<?php echo base_url().'/img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
+			<img src="<?php echo base_url().'assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
+			<img src="<?php echo base_url().'img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
 		</center>
 	</div>
 
@@ -461,8 +461,8 @@
     
     <div class="header-section">
         <center style="width:100%;display:inline-block;margin:0 auto;">
-            <img src="<?php echo base_url().'/assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
-            <img src="<?php echo base_url().'/img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
+            <img src="<?php echo base_url().'assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
+            <img src="<?php echo base_url().'img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
         </center>
     </div>
     <table width="100%" border="0" cellspacing="0" class="table " style="border-collapse:collapse; ">
@@ -493,8 +493,8 @@
 
     <!-- <div class="header-section">
         <center style="width:100%;display:inline-block;margin:0 auto;">
-            <img src="<?php //echo base_url().'/assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
-            <img src="<?php //echo base_url().'/img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
+            <img src="<?php //echo base_url().'assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
+            <img src="<?php //echo base_url().'img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
         </center>
     </div> -->
     <table width="100%" border="0" cellspacing="0" class="table " style="border-collapse:collapse; ">
@@ -525,8 +525,8 @@
     
     <!-- <div class="header-section">
         <center style="width:100%;display:inline-block;margin:0 auto;">
-            <img src="<?php //echo base_url().'/assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
-            <img src="<?php //echo base_url().'/img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
+            <img src="<?php //echo base_url().'assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
+            <img src="<?php //echo base_url().'img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
         </center>
     </div> -->
     <table width="100%" border="0" cellspacing="0" class="table " style="border-collapse:collapse; ">
@@ -557,8 +557,8 @@
     
     <!-- <div class="header-section">
         <center style="width:100%;display:inline-block;margin:0 auto;">
-            <img src="<?php //echo base_url().'/assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
-            <img src="<?php //echo base_url().'/img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
+            <img src="<?php //echo base_url().'assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
+            <img src="<?php //echo base_url().'img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
         </center>
     </div> -->
     <table width="100%" border="0" cellspacing="0" class="table " style="border-collapse:collapse; ">
@@ -589,8 +589,8 @@
     
     <!-- <div class="header-section">
         <center style="width:100%;display:inline-block;margin:0 auto;">
-            <img src="<?php //echo base_url().'/assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
-            <img src="<?php //echo base_url().'/img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
+            <img src="<?php //echo base_url().'assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
+            <img src="<?php //echo base_url().'img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
         </center>
     </div> -->
     <table width="100%" border="0" cellspacing="0" class="table " style="border-collapse:collapse; ">
@@ -621,8 +621,8 @@
     
     <div class="header-section">
         <center style="width:100%;display:inline-block;margin:0 auto;">
-            <img src="<?php echo base_url().'/assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
-            <img src="<?php echo base_url().'/img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
+            <img src="<?php echo base_url().'assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
+            <img src="<?php echo base_url().'img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
         </center>
     </div>
     <table width="100%" border="0" cellspacing="0" class="table " style="border-collapse:collapse; ">
@@ -653,8 +653,8 @@
     
     <!-- <div class="header-section">
         <center style="width:100%;display:inline-block;margin:0 auto;">
-            <img src="<?php //echo base_url().'/assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
-            <img src="<?php //echo base_url().'/img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
+            <img src="<?php //echo base_url().'assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
+            <img src="<?php //echo base_url().'img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
         </center>
     </div> -->
     <table width="100%" border="0" cellspacing="0" class="table " style="border-collapse:collapse; ">
@@ -685,8 +685,8 @@
 
     <!-- <div class="header-section">
         <center style="width:100%;display:inline-block;margin:0 auto;">
-            <img src="<?php //echo base_url().'/assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
-            <img src="<?php //echo base_url().'/img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
+            <img src="<?php //echo base_url().'assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
+            <img src="<?php //echo base_url().'img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
         </center>
     </div> -->
     <table width="100%" border="0" cellspacing="0" class="table " style="border-collapse:collapse; ">
@@ -717,8 +717,8 @@
 
     <!-- <div class="header-section">
         <center style="width:100%;display:inline-block;margin:0 auto;">
-            <img src="<?php //echo base_url().'/assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
-            <img src="<?php //echo base_url().'/img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
+            <img src="<?php //echo base_url().'assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
+            <img src="<?php //echo base_url().'img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
         </center>
     </div> -->
     <table width="100%" border="0" cellspacing="0" class="table " style="border-collapse:collapse; ">
@@ -750,8 +750,8 @@
     
     <div class="header-section">
         <center style="width:100%;display:inline-block;margin:0 auto;">
-            <img src="<?php echo base_url().'/assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
-            <img src="<?php echo base_url().'/img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
+            <img src="<?php echo base_url().'assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
+            <img src="<?php echo base_url().'img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
         </center>
     </div>
     <table width="100%" border="0" cellspacing="0" class="table " style="border-collapse:collapse; ">
@@ -1026,8 +1026,8 @@
 	
     <div class="header-section">
         <center style="width:100%;display:inline-block;margin:0 auto;">
-            <img src="<?php echo base_url().'/assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
-            <img src="<?php echo base_url().'/img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
+            <img src="<?php echo base_url().'assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:200px;float:right" />
+            <img src="<?php echo base_url().'img/'; ?>eat-blue.png" alt=""  style="vertical-align: top;margin-top: 0px;width:100px;float:left" />
         </center>
     </div>
     <table width="100%" border="0" cellspacing="0" class="table " style="border-collapse:collapse; ">
@@ -1049,7 +1049,7 @@
         </tr>
         <tr style="background:#b3e0f3">
             <td colspan="<?php echo $erp_upd_span; ?>" style="text-align: center;font-size:20px;">ERP Updating </td>
-            <td colspan="2" style="text-align: center;"> <img src="<?php echo base_url().'/assets/invoice/'; ?>logo.png" style="width:160px;position: relative;" /></td>
+            <td colspan="2" style="text-align: center;"> <img src="<?php echo base_url().'assets/invoice/'; ?>logo.png" style="width:160px;position: relative;" /></td>
         </tr>										
         <tr style="border-bottom:1px solid #666;font-size:15px; font-weight:500;">
             <td style="text-align: center;">SKU </td>
@@ -1098,6 +1098,7 @@
                 <div class="col-md-12 col-sm-12 col-xs-12">
                     <label class="col-md-2 col-sm-2 col-xs-12 control-label">Remarks:- </label>
                     <div class="col-md-10 col-sm-10 col-xs-12">
+                        <input type="hidden" name="report_status" id="report_status" value="<?php if(isset($data)) echo $data[0]->report_status;?>" />
                         <textarea class="form-control" name="report_remarks" cols="100" rows="5"><?php if(isset($data)) echo $data[0]->report_remarks;?></textarea>
                     </div>
                 </div>
@@ -1109,9 +1110,9 @@
             <br/>
             <a href="<?php echo $action; ?>" class="btn btn-danger btn-sm pull-right" type="reset" id="reset" style="float: left;">Cancel</a>
             <?php $curusr=$this->session->userdata('session_id'); ?>
-            <input type="submit" class="btn btn-success btn-sm" id="btn_submit" name="btn_submit" value="Submit For Approval" style="float: right; <?php if(isset($access)) {if(isset($data)) {if($access[0]->r_edit=='1' && ($data[0]->modified_by==$curusr || $data[0]->report_status=='Approved' || $data[0]->report_status=='InActive')) echo ''; else echo 'display: none;';} else if($access[0]->r_insert=='1') echo ''; else echo 'display: none;';} else echo 'display: none;'; ?>" />
-            <input type="submit" class="btn btn-danger btn-sm" id="btn_reject" name="btn_reject" value="Reject" style="float: right; margin-left: 10px; <?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->report_status!='Approved' && $data[0]->report_status!='InActive')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
-            <input type="submit" class="btn btn-success btn-sm" id="btn_approve" name="btn_approve" value="Approve" style="float: right; <?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->report_status!='Approved' && $data[0]->report_status!='InActive')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+            <input type="submit" class="btn btn-success btn-sm" id="btn_submit" name="btn_submit" value="Submit For Approval" style="float: right; <?php if(isset($access)) {if(isset($data)) {if($access[0]->r_edit=='1' && ($data[0]->modified_by==$curusr || $data[0]->report_status==null || $data[0]->report_status=='Approved' || $data[0]->report_status=='InActive')) echo ''; else echo 'display: none;';} else if($access[0]->r_insert=='1') echo ''; else echo 'display: none;';} else echo 'display: none;'; ?>" />
+            <input type="submit" class="btn btn-danger btn-sm" id="btn_reject" name="btn_reject" value="Reject" style="float: right; margin-left: 10px; <?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->report_status!=null && $data[0]->report_status!='Approved' && $data[0]->report_status!='InActive')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+            <input type="submit" class="btn btn-success btn-sm" id="btn_approve" name="btn_approve" value="Approve" style="float: right; <?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->report_status!=null && $data[0]->report_status!='Approved' && $data[0]->report_status!='InActive')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
             <br/><br/><br/>
         </div>
         </form>

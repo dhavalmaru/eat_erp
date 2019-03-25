@@ -93,6 +93,8 @@
                                                     echo 'Perform Raw Material Recon.';
                                                 else if($data[$i]->report_approved==null || $data[$i]->report_approved=='0') 
                                                     echo 'Approve Report.';
+                                                else if($data[$i]->report_approved=='1') 
+                                                    echo 'Approved.';
                                                 else echo $data[$i]->p_status;
                                             ?>
                                             </td>
