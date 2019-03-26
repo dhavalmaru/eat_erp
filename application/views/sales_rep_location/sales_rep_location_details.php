@@ -17,7 +17,7 @@
       <link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/owl.transitions.css">
       <link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/style.css">
       <link rel="stylesheet" href="<?php echo base_url(); ?>css/logout/popModal.css">
-	   <link rel="stylesheet" href="<?php echo base_url(); ?>css/select2/css/select2.min.css">
+      <link rel="stylesheet" href="<?php echo base_url(); ?>css/select2/css/select2.min.css">
       <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
       <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/font/material-design-icons/Material-Design-Icons.woff" rel="stylesheet">
       <style>
@@ -91,39 +91,39 @@
          {
          margin-top: 25px;
          }
-   		 [type="radio"]:not(:checked)+label, [type="radio"]:checked+label
-   		 {
-   			     padding-left: 22px!important;
-   		 }
-   		 .collapsible-header
-   		 {
-   			   border-top: 3px solid #0c2c4e!important;
-   			   color:#0c2c4e!important;
-   		 }
-   		  #stock_entry 
-   		  {
-   			  width:100%!important;
-   		  }
-		   .select2-container--default .select2-selection--single .select2-selection__rendered
-		  {
-			  color:#888;
-			  line-height:2.8rem;
-		  }
-		  .select2-container--default .select2-selection--single
-		  {
-			  height:3rem;
-			  border:1px solid #f2f2f2!important;
-		  }
-		  .select2-container
-		  {
-			  display:inline-block;
-			  z-index:0;
-		  }
-		  .select2-container--default .select2-selection--single .select2-selection__arrow
-		  {
-			line-height:2.8rem!important;
+          [type="radio"]:not(:checked)+label, [type="radio"]:checked+label
+          {
+                 padding-left: 22px!important;
+          }
+          .collapsible-header
+          {
+               border-top: 3px solid #0c2c4e!important;
+               color:#0c2c4e!important;
+          }
+           #stock_entry 
+           {
+              width:100%!important;
+           }
+         .select2-container--default .select2-selection--single .select2-selection__rendered
+        {
+           color:#888;
+           line-height:2.8rem;
+        }
+        .select2-container--default .select2-selection--single
+        {
+           height:3rem;
+           border:1px solid #f2f2f2!important;
+        }
+        .select2-container
+        {
+           display:inline-block;
+           z-index:0;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow
+        {
+         line-height:2.8rem!important;
 
-		  }
+        }
       </style>
    <body>
       <div id="loading" style="display: none"></div>
@@ -393,7 +393,7 @@
                                  </div>
                               </div>
                            </div>
-						   <div class="row retailer_div" id="retailer_div">
+                     <div class="row retailer_div" id="retailer_div">
                               <div class="col s12">
                                  <div class="input-field col s3">
                                     <label id="s_type">Retailer <span class="asterisk_sign">*</span></label>
@@ -927,8 +927,7 @@
                                  <div class="row">
                                     <div class="col s12">
                                        <a href="<?php echo base_url(); ?>index.php/Sales_rep_store_plan/clear_session" class="button left shadow btn_color1 " type="reset" id="reset" style=" float: left;margin-left: 22px;">Cancel</a>
-                                       <input type="submit" value="Save" id="Saver" name="srld" class="right button shadow btn_color2 " 
-                                          style="margin-right: 10%;" />
+                                       <input type="button" value="Save" id="Saver" name="srld" class="right button shadow btn_color2" style="margin-right: 10%;" />
                                     </div>
                                  </div>
                               </div>
@@ -965,9 +964,9 @@
       <div id="confirm_content" style="display:none">
          <div class="logout-containerr">
             <button type="button" class="close" data-confirmmodal-but="close">×</button>
-            <div class="confirmModal_header"> <span class="fa fa-sign-out"></span> Route Sequence? </div>
+            <div class="confirmModal_header"> <span class="fa fa-sign-out"></span> Permanent Route? </div>
             <div class="confirmModal_content">
-               <p>Are You want this route permenant??</p>
+               <p>Do You want this in permanent route?</p>
             </div>
             <div class="confirmModal_footer">
                <!-- <a href="<?php echo base_url();?>index.php/login/logout" class="btn btn-success ">Yes</a> -->
@@ -995,58 +994,54 @@
          var BASE_URL="<?php echo base_url()?>";
       </script>
       <script type="text/javascript" src="<?php echo base_url(); ?>js/validations.js"></script>
-	        <script src="<?php echo base_url(); ?>css/select2/js/select2.full.min.js"></script> 
+           <script src="<?php echo base_url(); ?>css/select2/js/select2.full.min.js"></script> 
 
       <!-- <script src="<?php echo base_url(); ?>sales_rep/js/loading.js"></script> -->
       <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyATsgOOC1sMElGnhJq4wDvR2jnqgcCCamw"></script>
       <script>
          $('document').ready(function(){
-         if(navigator.geolocation) {
-         var location_timeout = setTimeout("geolocFail()", 500000);
-         
-         navigator.geolocation.getCurrentPosition(function(location) {
-         clearTimeout(location_timeout);
-         
-         $("#latitude").val(location.coords.latitude);
-         $("#longitude").val(location.coords.longitude);
-         
-         console.log('latitude'+location.coords.latitude);
-         console.log('longitude'+location.coords.longitude);
-         // document.getElementById("Saver").disabled = false;
-         // document.getElementById("followup_anc").style.display = "block";
-         // document.getElementById("pl_ord").disabled = false;
-         
-         }, function(error) {
-         clearTimeout(location_timeout);
-         geolocFail();
-         });
-         
-         }
-         else {
-         geolocFail();
-         //document.getElementById("Saver").disabled = true;
-         //document.getElementById("followup_anc").disabled = true;
-         //document.getElementById("pl_ord").style.display = "none";
-         
-         
-         }
-         
-             // get_closing_stock();
-             distributor_type_change();
+            if(navigator.geolocation) {
+               var location_timeout = setTimeout("geolocFail()", 500000);
+
+               navigator.geolocation.getCurrentPosition(function(location) {
+                  clearTimeout(location_timeout);
+
+                  $("#latitude").val(location.coords.latitude);
+                  $("#longitude").val(location.coords.longitude);
+
+                  console.log('latitude'+location.coords.latitude);
+                  console.log('longitude'+location.coords.longitude);
+                  // document.getElementById("Saver").disabled = false;
+                  // document.getElementById("followup_anc").style.display = "block";
+                  // document.getElementById("pl_ord").disabled = false;
+
+               }, function(error) {
+                  clearTimeout(location_timeout);
+                  geolocFail();
+               });
+            } else {
+               geolocFail();
+               //document.getElementById("Saver").disabled = true;
+               //document.getElementById("followup_anc").disabled = true;
+               //document.getElementById("pl_ord").style.display = "none";
+            }
+
+            // get_closing_stock();
+            distributor_type_change();
          });
          
          function geolocFail() {
-         alert("Please switch on GPS!!!");
-         // document.getElementById("Saver").disabled = true;
-         // document.getElementById("followup_anc").disabled = true;
-         // document.getElementById("pl_ord").disabled = true;
+            alert("Please switch on GPS!!!");
+            // document.getElementById("Saver").disabled = true;
+            // document.getElementById("followup_anc").disabled = true;
+            // document.getElementById("pl_ord").disabled = true;
          }
          
          $('#distributor_type').change(function(){
-             distributor_type_change();
+            distributor_type_change();
          });
          
-        /*  $('#distributor_id').change(function(){
+         /*  $('#distributor_id').change(function(){
              $('#distributor_name').val($('#distributor_id option:selected').text());
 
               var distributor_id = $('#distributor_id').val();
@@ -1062,7 +1057,7 @@
                       dataType: 'json',
                       async: false,
                       success: function(response){
-//console.log(response);
+                        //console.log(response);
                          if(response.length>0){
                             $('#zone_id').val(response[0].zone_id);
                             get_area();
@@ -1076,36 +1071,35 @@
           });*/
          
          function distributor_type_change() {
-         
-             if($('#distributor_type').val()=="Old"){
-                 $('#distributor_id').show();
-                $('.distributor_field').show();
-                 $('#distributor_name').hide();
-                 $('.ava_qty').show();
-                 $('.disstatus').hide();
-                  $('#stock_entry').show();
-         
-                 /*$('.old_dist_details').hide();*/
-             } else {
-                 $('#distributor_id').hide();
-                 $('.distributor_field').hide();
-                 $('#distributor_name').show();
-                 $('.ava_qty').hide();
-                 $('.disstatus').hide();
-                 $('#stock_entry').hide();
-                 /*$('.old_dist_details').show();*/
-             }
+            if($('#distributor_type').val()=="Old"){
+               $('#distributor_id').show();
+               $('.distributor_field').show();
+               $('#distributor_name').hide();
+               $('.ava_qty').show();
+               $('.disstatus').hide();
+               $('#stock_entry').show();
+
+               /*$('.old_dist_details').hide();*/
+            } else {
+               $('#distributor_id').hide();
+               $('.distributor_field').hide();
+               $('#distributor_name').show();
+               $('.ava_qty').hide();
+               $('.disstatus').hide();
+               $('#stock_entry').hide();
+               /*$('.old_dist_details').show();*/
+            }
          }
          
          $('#btn_save').click(function(){
-             $('#myModal').modal('toggle');
-             blFlag = true;
+            $('#myModal').modal('toggle');
+            blFlag = true;
          });
          
          var get_area = function(){
-             var zone_id = $('#zone_id').val();
+            var zone_id = $('#zone_id').val();
          
-             $.ajax({
+            $.ajax({
                      url:'<?=base_url()?>index.php/Sales_rep_location/get_area',
                      method: 'post',
                      data: {zone_id: zone_id},
@@ -1114,16 +1108,16 @@
                      success: function(response){
                          $('#area_id').html(response);
                      }
-             });
+            });
          
-             get_location();
+            get_location();
          }
          
-			var get_location = function(){
-             var zone_id = $('#zone_id').val();
-             var area_id = $('#area_id').val();
-             var location_id = $('#location_id').val();
-             $.ajax({
+         var get_location = function(){
+            var zone_id = $('#zone_id').val();
+            var area_id = $('#area_id').val();
+            var location_id = $('#location_id').val();
+            $.ajax({
                      url:'<?=base_url()?>index.php/Sales_rep_location/get_locations',
                      method: 'post',
                      data: {zone_id: zone_id, area_id: area_id},
@@ -1133,20 +1127,20 @@
                          $('#location_id').html(response);
                          $('#location_id').val(location_id);
                      }
-             });
-			 
-				//get_retailer();
+            });
+            
+            //get_retailer();
          }
-		 
-		 
-		 var get_retailer = function(){
-             var zone_id = $('#zone_id').val();
-             var area_id = $('#area_id').val();
-             var location_id = $('#location_id').val();
-             var distributor_id = $('#distributor_id').val();
-			 var dist_type = $("#distributor_type").val();
-			// alert(dist_type);
-             $.ajax({
+       
+       
+         var get_retailer = function(){
+            var zone_id = $('#zone_id').val();
+            var area_id = $('#area_id').val();
+            var location_id = $('#location_id').val();
+            var distributor_id = $('#distributor_id').val();
+            var dist_type = $("#distributor_type").val();
+            // alert(dist_type);
+            $.ajax({
                      url:'<?=base_url()?>index.php/Sales_rep_location/get_retailer',
                      method: 'post',
                      data: {zone_id: zone_id, area_id: area_id ,location_id:location_id,dist_type:dist_type,distributor_id:distributor_id},
@@ -1215,10 +1209,41 @@
       <script>
          $(document).ready(function(){
             $('.modal').modal();
-			$('.select2').select2({width: "100%"});
+         $('.select2').select2({width: "100%"});
 
          });
       </script>
+
+      <script>
+         $('#Saver').on('click', function(){
+            if ($("#form_sales_rep_location_details").valid()) {
+               // console.log('confirm modal');
+
+               var dist_type = $('#distributor_type').val();
+
+               if($('#mid').val()=="" && $('#channel_type').val()=="GT" && dist_type=='New'){
+                  $('#confirm_content').confirmModal({
+                        topOffset: 0,
+                        onOkBut: function() {
+                           $("#loading").show();
+                           $('#ispermenant').val('Yes');
+                           $("#form_sales_rep_location_details").submit();
+                        },
+                        onCancelBut: function() {
+                           $("#loading").show();
+                           $('#place_order').val("No");
+                           $('#ispermenant').val('No');
+                           $("#form_sales_rep_location_details").submit();
+                        },   
+                        onLoad: function() {},
+                        onClose: function() {}
+                  });
+                  return false;
+               }
+            }
+         });
+      </script>
+
       <script>
          $("#pl_ord").on('click',function(){
                       if (!$("#form_sales_rep_location_details").valid()) {

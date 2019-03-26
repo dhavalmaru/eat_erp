@@ -3122,8 +3122,9 @@ class Sales_rep_store_plan extends CI_Controller{
                                 {   
                                     if($retailer_id)
                                     { 
-                                        if($save=='')
+                                        if($ispermenant=='Yes' || $save=='')
                                         {
+
                                                 /*$sql = "select * from sales_rep_beat_plan Where sales_rep_id=$sales_rep_id and frequency='$frequency' and sequence>=$visited_sequence";
                                                     $result = $this->db->query($sql)->result_array();
                                                   $this->db->last_query();
@@ -3296,8 +3297,60 @@ class Sales_rep_store_plan extends CI_Controller{
                                                     $data2['is_edit']='edit';
                                                     $this->db->insert('sales_rep_detailed_beat_plan',$data2);
                                                     $detailed_insert_id = $this->db->insert_id();
-                                                } 
+                                                }
+
+
+                                                
+                                                $count_spdb_sql = "select count(*) as count from sales_rep_detailed_beat_plan Where sales_rep_id=$sales_rep_id and frequency='$frequency' and bit_plan_id=0 and date(date_of_visit)=date(now())";
+                                                $result_spdb_count = $this->db->query($count_spdb_sql)->result_array();
+
+                                                if($result_spdb_count[0]['count']>0)
+                                                {
+                                                    $count = $result_spdb_count[0]['count'];
+                                                    $sequence_spdb_sql = "select sequence,id from sales_rep_detailed_beat_plan Where sales_rep_id=$sales_rep_id and frequency='$frequency' and bit_plan_id=0  order by id asc Limit 0,1";
+                                                    $sequence_result = $this->db->query($sequence_spdb_sql)->result_array();
+                                                    $sequence_spdb = $sequence_result[0]['sequence'];  
+
+                                                    $condition  = "Case When m2.sequence>=$sequence_spdb Then (m2.sequence-$count) Else  m2.sequence end ";
+                                                }
+                                                else
+                                                {
+                                                    $condition = "m2.sequence";    
+                                                }
+
+                                                $sql = "UPDATE sales_rep_beat_plan m1
+                                                        INNER JOIN sales_rep_detailed_beat_plan m2 ON 
+                                                        m1.id=m2.bit_plan_id
+                                                        SET m1.sequence=$condition
+                                                        Where m1.sales_rep_id=$sales_rep_id 
+                                                        and m1.frequency='$frequency' and bit_plan_id<>0
+                                                        and date(m2.date_of_visit)=date(now())";
+                                                $result = $this->db->query($sql);      
+                                                
+
+                                                $this->db->last_query();
                                         }
+                                        else
+                                        {
+                                            $data2 = array('sales_rep_id'=>$sales_rep_id,
+                                                  'sequence'=>$visited_sequence,
+                                                  'frequency'=>$frequency,
+                                                  'modified_on'=>$now,
+                                                  'store_id'=>$retailer_id,
+                                                  'status'=>'Approved',
+                                                  'modified_on'=>$now,
+                                                  'date_of_visit' => $now,
+                                                  'location_id' => $visit_detail['location_id'],
+                                                 'zone_id' =>     $visit_detail['zone_id'],
+                                                 'area_id' =>     $visit_detail['area_id'],
+                                              );
+                                            $data2['bit_plan_id']=0;    
+                                            $data2['is_edit']='edit';
+                                            $this->db->insert('sales_rep_detailed_beat_plan',$data2);
+                                            $detailed_insert_id = $this->db->insert_id();
+                                            $this->db->last_query();
+                                        }
+                                        
                                         /*else
                                         {
 
@@ -3364,111 +3417,6 @@ class Sales_rep_store_plan extends CI_Controller{
 
                                 $this->db->insert('sales_rep_distributor_opening_stock',$sales_rep_stock_detail);
                            }
-                       /* IF Not Intrested Add in visit table if other entry is updated Update detailed beat plans*/
-                       if($save!='' && $save!='Follow Up')
-                       {
-
-                            if($visited_sequence==1)
-                            {
-                                $sql = "select * from sales_rep_beat_plan Where sales_rep_id=$sales_rep_id and frequency='$frequency'";
-                                $result = $this->db->query($sql)->result_array();
-                                for ($j=0; $j < count($result); $j++) 
-                                  {
-                                    $new_id = $result[$j]['id'];
-                                    $store_id1 = $result[$j]['store_id'];
-                                    $zone_id = $result[$j]['zone_id'];
-                                    $area_id = $result[$j]['area_id'];
-                                    $location_id = $result[$j]['location_id'];
-                                    $newsequence = $result[$j]['sequence']+1;
-                                    $data22 = array('date_of_visit'=> $now,
-                                          'sales_rep_id'=>$sales_rep_id,
-                                          'sequence'=>$newsequence,
-                                          'frequency'=>$frequency,
-                                          'modified_on'=>$now,
-                                          'bit_plan_id'=>$new_id,
-                                          'store_id'=>$store_id1,
-                                          'location_id' => $location_id,
-                                           'zone_id' => $zone_id,
-                                           'area_id' => $area_id,
-                                          'status'=>'Approved');
-                                    $this->db->insert('sales_rep_detailed_beat_plan',$data22);
-                                    $this->db->last_query();
-                                    
-                                  }
-
-                            }
-                            else
-                            {
-                                $sql = "select * from sales_rep_detailed_beat_plan Where sales_rep_id=$sales_rep_id and frequency='$frequency' and date(date_of_visit)=date(now()) and sequence>=$visited_sequence";
-                                $result = $this->db->query($sql)->result_array();
-                                  $this->db->last_query();
-                                  for ($j=0; $j < count($result); $j++) 
-                                  {   
-                                    $newsequence = $result[$j]['sequence']+1;
-                                    $new_id = $result[$j]['id'];
-                                     $data1 = array('sequence'=>$newsequence,
-                                                    'modified_on'=>$now);
-                                    $this->db->where('id', $new_id);
-                                    $this->db->update('sales_rep_detailed_beat_plan',$data1);
-                                    $this->db->last_query();
-                                 }
-                            }
-
-                            $data2 = array('sales_rep_id'=>$sales_rep_id,
-                                          'sequence'=>$visited_sequence,
-                                          'frequency'=>$frequency,
-                                          'modified_on'=>$now,
-                                          'store_id'=>$retailer_id,
-                                          'status'=>'Approved',
-                                          'modified_on'=>$now,
-                                          'date_of_visit' => $now,
-                                          'location_id' => $visit_detail['location_id'],
-                                         'zone_id' =>     $visit_detail['zone_id'],
-                                         'area_id' =>     $visit_detail['area_id'],
-                                      );
-                            $data2['bit_plan_id']=0;    
-                            $data2['is_edit']='edit';
-                            $this->db->insert('sales_rep_detailed_beat_plan',$data2);
-                            $detailed_insert_id = $this->db->insert_id();
-                            $this->db->last_query();
-                            //die();
-                       }
-                       else
-                       {
-                            $ispermenant  ='Yes';    
-                            if($ispermenant=='Yes' || $place_order=='Yes')
-                            {
-                                
-                                $count_spdb_sql = "select count(*) as count from sales_rep_detailed_beat_plan Where sales_rep_id=$sales_rep_id and frequency='$frequency' and bit_plan_id=0 and date(date_of_visit)=date(now())";
-                                $result_spdb_count = $this->db->query($count_spdb_sql)->result_array();
-
-                                if($result_spdb_count[0]['count']>0)
-                                {
-                                    $count = $result_spdb_count[0]['count'];
-                                    $sequence_spdb_sql = "select sequence,id from sales_rep_detailed_beat_plan Where sales_rep_id=$sales_rep_id and frequency='$frequency' and bit_plan_id=0  order by id asc Limit 0,1";
-                                    $sequence_result = $this->db->query($sequence_spdb_sql)->result_array();
-                                    $sequence_spdb = $sequence_result[0]['sequence'];  
-
-                                    $condition  = "Case When m2.sequence>=$sequence_spdb Then (m2.sequence-$count) Else  m2.sequence end ";
-                                }
-                                else
-                                {
-                                    $condition = "m2.sequence";    
-                                }
-
-                                $sql = "UPDATE sales_rep_beat_plan m1
-                                        INNER JOIN sales_rep_detailed_beat_plan m2 ON 
-                                        m1.id=m2.bit_plan_id
-                                        SET m1.sequence=$condition
-                                        Where m1.sales_rep_id=$sales_rep_id 
-                                        and m1.frequency='$frequency' and bit_plan_id<>0
-                                        and date(m2.date_of_visit)=date(now())";
-                                $result = $this->db->query($sql);      
-                                
-
-                                $this->db->last_query();
-                            }
-                       }
                     }
 
                     if($detailed_insert_id!=0)

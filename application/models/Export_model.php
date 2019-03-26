@@ -13926,11 +13926,11 @@ public function get_mt_stock_report($date='', $action='save', $r_zone_id='') {
                 (Select  E.*, F.location from 
                 (Select  J.*, D.zone from 
                 (Select I.*, A.category from
-				(select distinct store_id, location_id, zone_id from merchandiser_beat_plan 
+                (select distinct store_id, location_id, zone_id from merchandiser_beat_plan 
                 where status='Approved' and zone_id='".$r_zone_id."') I
-				left join
-				(select * from store_master where status='Approved' and zone_id='".$r_zone_id."') A
-				on (I.store_id=A.store_id and I.location_id=A.location_id and I.zone_id=A.zone_id)) J
+                left join
+                (select * from store_master where status='Approved' and zone_id='".$r_zone_id."') A
+                on (I.store_id=A.store_id and I.location_id=A.location_id and I.zone_id=A.zone_id)) J
                 left join 
                 (select * from zone_master) D 
                 on (J.zone_id=D.id)) E 
@@ -14009,10 +14009,13 @@ public function get_mt_stock_report($date='', $action='save', $r_zone_id='') {
                 $t_cranb_cnt = 0;
                 $t_fig_cnt = 0;
                 $t_papaya_cnt = 0;
+                $user_name = '';
 
-                $sql = "select * from merchandiser_stock where dist_id = '$store_id' and location_id = '$location_id' and 
-                        date(date_of_visit)<=date('".$date."') 
-                        order by date_of_visit desc";
+                $sql = "select A.*, concat(ifnull(B.first_name,''), ' ',ifnull(B.last_name,'')) as user_name 
+                        from merchandiser_stock A left join user_master B on (A.created_by=B.id) 
+                        where A.dist_id = '$store_id' and A.location_id = '$location_id' and 
+                            date(A.date_of_visit)<=date('".$date."') 
+                        order by A.date_of_visit desc";
                 $query = $this->db->query($sql);
                 $result2 = $query->result();
                 if(count($result2)>0){
@@ -14022,6 +14025,7 @@ public function get_mt_stock_report($date='', $action='save', $r_zone_id='') {
                             $date_of_visit = date('d-m-Y',strtotime($result2[0]->date_of_visit));
                         }
                     }
+                    $user_name = ucwords(trim($result2[0]->user_name));
 
                     // $sql = "select AA.merchandiser_stock_id, AA.item_id, sum(AA.qty) as qty from 
                     //         (select A.merchandiser_stock_id, case when A.type = 'Bar' then A.item_id else B.product_id end as item_id, 
@@ -14161,10 +14165,12 @@ public function get_mt_stock_report($date='', $action='save', $r_zone_id='') {
                     if($date_of_visit!=''){
                         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $date_of_visit);
                         $col = $col + 1;
-                        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+$'.$col_name[$col].'$'.$start_row.'-'.$col_name[$col-1].$row);
+                        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $user_name);
+                        $col = $col + 1;
+                        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+$'.$col_name[$col-1].'$'.$start_row.'-'.$col_name[$col-2].$row);
                         $col = $col + 1;
                     } else {
-                        $col = $col + 2;
+                        $col = $col + 3;
                     }
                     
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $butterscotch_cnt);
@@ -14404,7 +14410,7 @@ public function get_mt_stock_report($date='', $action='save', $r_zone_id='') {
         ));
 
         $col = $col + 2;
-        $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$start_row.':'.$col_name[$col+15].$row)->applyFromArray(array(
+        $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$start_row.':'.$col_name[$col+16].$row)->applyFromArray(array(
             'borders' => array(
                 'allborders' => array(
                     'style' => PHPExcel_Style_Border::BORDER_THIN
@@ -14412,7 +14418,7 @@ public function get_mt_stock_report($date='', $action='save', $r_zone_id='') {
             )
         ));
         
-        $col = $col + 18;
+        $col = $col + 19;
         $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$start_row.':'.$col_name[$col+15].$row)->applyFromArray(array(
             'borders' => array(
                 'allborders' => array(
