@@ -13770,7 +13770,7 @@ public function generate_mt_stock_report() {
 }
 
 public function send_mt_stock_tracker() {
-    // $date = '2019-02-12';
+    // $date = '2019-03-26';
     $date = date('Y-m-d');
 
     $zone_id_array = ['9', '10', '12', '16', '18', '29', '30'];
@@ -13810,7 +13810,7 @@ public function send_mt_stock_tracker() {
             $cc="sangeeta.yadav@pecanreams.com";
             $bcc="yadavsangeeta521@gmail.com";*/
             
-            // $to_email = "dhaval.maru@pecanreams.com";
+            // $to_email = "prasad.bhisale@pecanreams.com";
             // $cc = 'prasad.bhisale@pecanreams.com';
             // $bcc = 'prasad.bhisale@pecanreams.com';
 
@@ -13822,6 +13822,8 @@ public function send_mt_stock_tracker() {
             
             $cc = 'rishit.sanghvi@eatanytime.in,swapnil.darekar@eatanytime.in,dhaval.maru@pecanreams.com,prasad.bhisale@pecanreams.com';
             $bcc = 'sangeeta.yadav@pecanreams.com';
+
+            sleep(5);
 
             echo $attachment = $reportpath;
             echo '<br/><br/>';
@@ -15087,10 +15089,10 @@ public function get_task_cnt(){
             (select A.*,B.open_task from 
             (select distinct(user_id) as user_id from user_task_detail) A 
             left join
-            (SELECT user_id,count(*) as open_task FROM `user_task_detail` WHERE task_status<>'completed' GROUP by user_id) B
+            (SELECT user_id,count(*) as open_task FROM `user_task_detail` WHERE status='1' and follower='No' and due_date<=date(now()) and task_status<>'completed' GROUP by user_id) B
             on(A.user_id=B.user_id)) C
             left join
-            (SELECT user_id,count(*) as overdue FROM `user_task_detail` WHERE  due_date< date(now()) and task_status<>'completed' GROUP by user_id) D
+            (SELECT user_id,count(*) as overdue FROM `user_task_detail` WHERE status='1' and follower='No' and due_date< date(now()) and task_status<>'completed' GROUP by user_id) D
             on (C.user_id=D.user_id)) E
             LEFT JOIN
             (select * from user_master) F
@@ -15132,47 +15134,67 @@ public function get_post_production_cnt(){
 }
 
 public function get_task_dtl(){
-    $sql="select distinct C.*, concat(ifnull(D.first_name,''),' ',ifnull(D.last_name,'')) as user_name from 
-            (select id, user_id, subject_detail, due_date from user_task_detail where task_status<>'completed' 
-            union all 
-            select id, user_id, subject_detail, due_date from user_task_detail where due_date<date(now()) and task_status<>'completed') C 
-            left join 
-            (select * from user_master) D 
-            on (C.user_id=D.id) order by C.id";
+    $sql="select E.* from 
+        (select C.task_id, C.subject_detail, C.priority, C.status, C.due_date, min(C.id) as id, 
+            group_concat(distinct D.user_name) as user_name from 
+        (select task_id, id, user_id, subject_detail, due_date, priority, status from user_task_detail 
+            where status='1' and follower='No' and due_date<=date(now()) and task_status<>'completed') C 
+        left join 
+        (select id, concat(ifnull(first_name,''),' ',ifnull(last_name,'')) as user_name from user_master) D 
+        on (C.user_id=D.id) 
+        group by C.task_id, C.subject_detail, C.priority, C.status, C.due_date) E 
+        order by E.task_id, E.id";
     $query=$this->db->query($sql);
     return $query->result();
 }
  
 public function get_pre_production_dtl(){
-    $sql="select distinct C.*, D.p_id from 
+    $sql="select distinct C.*, D.p_id, D.manufacturer_id, D.from_date, D.to_date, D.confirm_from_date, 
+                D.confirm_to_date, D.p_status, D.batch_master, D.production_details, D.bar_conversion, 
+                D.depot_transfer, D.documents_upload, D.raw_material_recon, D.report_approved, 
+                D.report_status, E.depot_name from 
             (select reference_id, notification, date_format(notification_date, '%d-%m-%Y') as notification_date from notifications where notification_type='Pre Production' and date(now()) between date(notification_date) and (date(notification_date) + INTERVAL 2 DAY) 
             union all 
             select reference_id, notification, date_format(notification_date, '%d-%m-%Y') as notification_date from notifications where notification_type='Pre Production' and date(now())>(date(notification_date) + INTERVAL 2 DAY)) C 
             left join 
-            (select * from production_details) D 
-            on (C.reference_id=D.id) order by D.p_id";
+            (select * from production_details) D on (C.reference_id=D.id) 
+            left join 
+            (select * from depot_master) E on (D.manufacturer_id=E.id) order by D.p_id";
     $query=$this->db->query($sql);
     return $query->result();
 }
  
 public function get_post_production_dtl(){
-    $sql="select distinct C.*, D.p_id from 
+    $sql="select distinct C.*, D.p_id, D.manufacturer_id, D.from_date, D.to_date, D.confirm_from_date, 
+                D.confirm_to_date, D.p_status, D.batch_master, D.production_details, D.bar_conversion, 
+                D.depot_transfer, D.documents_upload, D.raw_material_recon, D.report_approved, 
+                D.report_status, E.depot_name from 
             (select reference_id, notification, date_format(notification_date, '%d-%m-%Y') as notification_date from notifications where notification_type='Post Production' and date(now()) between date(notification_date) and (date(notification_date) + INTERVAL 2 DAY) 
             union all 
             select reference_id, notification, date_format(notification_date, '%d-%m-%Y') as notification_date from notifications where notification_type='Post Production' and date(now())>(date(notification_date) + INTERVAL 2 DAY)) C 
             left join 
-            (select * from production_details) D 
-            on (C.reference_id=D.id) order by D.p_id";
+            (select * from production_details) D on (C.reference_id=D.id) 
+            left join 
+            (select * from depot_master) E on (D.manufacturer_id=E.id) order by D.p_id";
     $query=$this->db->query($sql);
     return $query->result();
 }
 
-public function generate_sales_attendence_report()
-{   
-      $from_date = formatdate($this->input->post('from_date'));
-      $to_date = formatdate($this->input->post('to_date'));
+function get_po_count() {
+    $sql = "select sum(case when status = 'Pending' then 1 else 0 end) as pending_cnt, 
+                    sum(case when status = 'Approved' and po_status <> 'Closed' then 1 else 0 end) as open_cnt, 
+                    sum(case when status = 'Approved' and po_status = 'Raw Material In' then 1 else 0 end) as pending_payment_cnt, 
+                    sum(case when status = 'Approved' and po_status = 'Advance' then 1 else 0 end) as advance_payment_cnt 
+            from purchase_order where status in ('Pending', 'Approved')";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
 
-      $sql="Select  A.sales_rep_name,Case When (check_in_time IS NULL OR working_status='Absent') THEN 'Absent' Else 'Present' end as emp_status,
+public function generate_sales_attendence_report(){   
+    $from_date = formatdate($this->input->post('from_date'));
+    $to_date = formatdate($this->input->post('to_date'));
+
+    $sql="Select  A.sales_rep_name,Case When (check_in_time IS NULL OR working_status='Absent') THEN 'Absent' Else 'Present' end as emp_status,
             Case When CAST(check_in_time As Time)>CAST('10:00:00' As Time) AND CAST(check_in_time As Time)<CAST('11:00:00' As Time )  AND check_in_time IS NOT NULL Then 'L'
             When  check_in_time IS NULL Then 'A' else 'O' end as  emp_time,check_in_time,check_out_time,selected_date,
             Case
@@ -15202,93 +15224,88 @@ public function generate_sales_attendence_report()
             ) A
             ORDER By selected_date DESC,emp_status DESC";
 
-        $result = $this->db->query($sql)->result();
-        $objPHPExcel = new PHPExcel();
-        $objPHPExcel->setActiveSheetIndex(0);
-       for($i=0; $i<=7; $i++) {
-          $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
-       }
+    $result = $this->db->query($sql)->result();
+    $objPHPExcel = new PHPExcel();
+    $objPHPExcel->setActiveSheetIndex(0);
+    for($i=0; $i<=7; $i++) {
+        $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
+    }
 
-       $row = 1;
-       $col = 0;
-       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Wholesome Habits Private Limited ");
-       $objPHPExcel->getActiveSheet()->getStyle('A'.$row)->getFont()->setBold(true);
-       $row=$row+1;
-       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Sales Attendence");
-       $row=$row+1;
-       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "From Date");
-       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $from_date);
-        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, "To Date");
-       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $to_date);
-       $row=$row+1;
-        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Lengends ");
-       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, "L-Late");
-       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, "O-On Time");
-       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, "A-Absent");
+    $row = 1;
+    $col = 0;
+    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Wholesome Habits Private Limited ");
+    $objPHPExcel->getActiveSheet()->getStyle('A'.$row)->getFont()->setBold(true);
+    $row=$row+1;
+    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Sales Attendence");
+    $row=$row+1;
+    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "From Date");
+    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $from_date);
+    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, "To Date");
+    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $to_date);
+    $row=$row+1;
+    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Lengends ");
+    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, "L-Late");
+    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, "O-On Time");
+    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, "A-Absent");
 
-       /*$objPHPExcel->getActiveSheet()->getStyle('A'.$row)->getFont()->setBold(true);*/
-       $row=$row+2;
-       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Name");
-       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, "Status");
-       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, "Date");
-       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, "Week Day");
-       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, "Check In Time");
-       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, "Check Out Time");
-       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, "Late Marks");
-       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, "Effective Hours");
-       $objPHPExcel->getActiveSheet()->getStyle('A'.$row.':H'.$row)->getFont()->setBold(true);
-       $row = $row+1;
+    /*$objPHPExcel->getActiveSheet()->getStyle('A'.$row)->getFont()->setBold(true);*/
+    $row=$row+2;
+    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Name");
+    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, "Status");
+    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, "Date");
+    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, "Week Day");
+    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, "Check In Time");
+    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, "Check Out Time");
+    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, "Late Marks");
+    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, "Effective Hours");
+    $objPHPExcel->getActiveSheet()->getStyle('A'.$row.':H'.$row)->getFont()->setBold(true);
+    $row = $row+1;
 
-        foreach($result  as $dist)
-        {
-           if($dist->check_in_time!=null)
-              $in_time = date("H:i A",strtotime($dist->check_in_time));
-           else
-              $in_time = '';
+    foreach($result  as $dist) {
+        if($dist->check_in_time!=null)
+            $in_time = date("H:i A",strtotime($dist->check_in_time));
+        else
+            $in_time = '';
 
-          if($dist->check_out_time!=null)
-              $out_time = date("H:i A",strtotime($dist->check_out_time));
-           else
-              $out_time = '';
+        if($dist->check_out_time!=null)
+            $out_time = date("H:i A",strtotime($dist->check_out_time));
+        else
+            $out_time = '';
 
-          /*$dateValue = PHPExcel_Shared_Date::PHPToExcel( 
-                DateTime::createFromFormat('d/m/Y', ) 
-            );*/
-          /*$dateValue = PHPExcel_Style_NumberFormat::toFormattedString(date('d-m-Y',strtotime($dist->selected_date)), 'YYYY-MM-DD');*/
+        /*$dateValue = PHPExcel_Shared_Date::PHPToExcel( 
+        DateTime::createFromFormat('d/m/Y', ) 
+        );*/
+        /*$dateValue = PHPExcel_Style_NumberFormat::toFormattedString(date('d-m-Y',strtotime($dist->selected_date)), 'YYYY-MM-DD');*/
 
-          $dateValue = PHPExcel_Style_NumberFormat::toFormattedString($dist->selected_date,PHPExcel_Style_NumberFormat::FORMAT_DATE_YYYYMMDD);
+        $dateValue = PHPExcel_Style_NumberFormat::toFormattedString($dist->selected_date,PHPExcel_Style_NumberFormat::FORMAT_DATE_YYYYMMDD);
 
-           $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row,$dist->sales_rep_name);
-           $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row,$dist->emp_status);
-           $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row,$dateValue);
-           $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row,$dist->week_day);
-           $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row,$in_time);
-           $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row,$out_time );
-           $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row,$dist->emp_time );
-           $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row,$dist->effective_time );
-           $objPHPExcel->getActiveSheet()->getStyle($col_name[$col+2].$row)->getNumberFormat()->setFormatCode('dd/mm/yyyy');
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row,$dist->sales_rep_name);
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row,$dist->emp_status);
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row,$dateValue);
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row,$dist->week_day);
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row,$in_time);
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row,$out_time );
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row,$dist->emp_time );
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row,$dist->effective_time );
+        $objPHPExcel->getActiveSheet()->getStyle($col_name[$col+2].$row)->getNumberFormat()->setFormatCode('dd/mm/yyyy');
 
-           $row = $row+1;
-        }
+        $row = $row+1;
+    }
 
-        for($col = 0; $col <=7; $col++) {
-                $objPHPExcel->getActiveSheet()->getColumnDimension($col_name[$col])->setAutoSize(true);
-            }
+    for($col = 0; $col <=7; $col++) {
+        $objPHPExcel->getActiveSheet()->getColumnDimension($col_name[$col])->setAutoSize(true);
+    }
 
-
-
-        
-        $date1 = date('d-m-Y_H-i-A');
-        $filename='Sales_Attendence_Report_'.$date1.'.xls';
-        header('Content-Type: application/vnd.ms-excel');
-        header('Content-Disposition: attachment;filename="'.$filename.'"');
-        header('Cache-Control: max-age=0');
-        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
-        $objWriter->save('php://output');
+    $date1 = date('d-m-Y_H-i-A');
+    $filename='Sales_Attendence_Report_'.$date1.'.xls';
+    header('Content-Type: application/vnd.ms-excel');
+    header('Content-Disposition: attachment;filename="'.$filename.'"');
+    header('Cache-Control: max-age=0');
+    $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+    $objWriter->save('php://output');
 }
 
-public function sales_rep_exception_report()
-{
+public function sales_rep_exception_report(){
     $sql="Select    not_mapped,mapped,A.type from 
         (SELECT count(*) as not_mapped ,'Store' as type from 
         (Select A.store_name,Z.zone, L.location from 
@@ -15449,193 +15466,192 @@ public function sales_rep_exception_report()
                 </body>
                 </html>';
 
-       $message ;
+    $message ;
 
-       $objPHPExcel = new PHPExcel();
-       $objPHPExcel->setActiveSheetIndex(0);
-       $objPHPExcel->getActiveSheet()->setTitle("Merchandiser");
-       $col_name[]=array();
+    $objPHPExcel = new PHPExcel();
+    $objPHPExcel->setActiveSheetIndex(0);
+    $objPHPExcel->getActiveSheet()->setTitle("Merchandiser");
+    $col_name[]=array();
 
-       /* Left join 
-                (Select sales_rep_name,'Merchendiser' as type from sales_rep_master Where status='Approved' and sr_type='Merchandizer' and id NOT IN(Select DISTINCT sales_rep_id from merchandiser_beat_plan) 
-               ) B On A.type=B.type*/
+    /* Left join 
+            (Select sales_rep_name,'Merchendiser' as type from sales_rep_master Where status='Approved' and sr_type='Merchandizer' and id NOT IN(Select DISTINCT sales_rep_id from merchandiser_beat_plan) 
+           ) B On A.type=B.type*/
 
-       $sql = "Select sales_rep_name ,'Merchandiser' as type,B.* from 
-            (select * from sales_rep_master where sr_type='Merchandizer' and status='Approved' order by sales_rep_name desc)A
-            Left Join
-            (Select 
-             Concat((Case When mon=0 Then 'Monday , ' Else '' end),(Case When tue=0 Then 'Tuesday , ' Else '' end)
-             ,(Case When wed=0 Then 'Wednesday , ' Else '' end),(Case When thur=0 Then 'Thursday , ' Else '' end)
-            ,(Case When fri=0 Then 'Friday , ' Else '' end),(Case When sat=0 Then 'Saturday , ' Else '' end)) as fet_fre,sales_rep_id
-            from
-            (
-            Select sales_rep_id ,
-            Sum(Case When frequency Like '%Mon%' Then 1 Else 0 end) as mon,
-            Sum(Case When frequency Like '%Tue%' Then 1 Else 0 end) as tue,
-            Sum(Case When frequency Like '%Wed%' Then 1 Else 0 end) as wed,
-            Sum(Case When frequency Like '%Thur%' Then 1 Else 0 end) as thur,
-            Sum(Case When frequency Like '%Fri%' Then 1 Else 0 end) as fri,
-            Sum(Case When frequency Like '%Sat%' Then 1 Else 0 end) as sat 
-            from merchandiser_beat_plan   GROUP By sales_rep_id 
-            )A) B On A.id=B.sales_rep_id
-            Where B.sales_rep_id IS NULL OR fet_fre<>''
-               ";
-       $result2 = $this->db->query($sql)->result();
+    $sql = "Select sales_rep_name ,'Merchandiser' as type,B.* from 
+        (select * from sales_rep_master where sr_type='Merchandizer' and status='Approved' order by sales_rep_name desc)A
+        Left Join
+        (Select 
+         Concat((Case When mon=0 Then 'Monday , ' Else '' end),(Case When tue=0 Then 'Tuesday , ' Else '' end)
+         ,(Case When wed=0 Then 'Wednesday , ' Else '' end),(Case When thur=0 Then 'Thursday , ' Else '' end)
+        ,(Case When fri=0 Then 'Friday , ' Else '' end),(Case When sat=0 Then 'Saturday , ' Else '' end)) as fet_fre,sales_rep_id
+        from
+        (
+        Select sales_rep_id ,
+        Sum(Case When frequency Like '%Mon%' Then 1 Else 0 end) as mon,
+        Sum(Case When frequency Like '%Tue%' Then 1 Else 0 end) as tue,
+        Sum(Case When frequency Like '%Wed%' Then 1 Else 0 end) as wed,
+        Sum(Case When frequency Like '%Thur%' Then 1 Else 0 end) as thur,
+        Sum(Case When frequency Like '%Fri%' Then 1 Else 0 end) as fri,
+        Sum(Case When frequency Like '%Sat%' Then 1 Else 0 end) as sat 
+        from merchandiser_beat_plan   GROUP By sales_rep_id 
+        )A) B On A.id=B.sales_rep_id
+        Where B.sales_rep_id IS NULL OR fet_fre<>''
+           ";
+    $result2 = $this->db->query($sql)->result();
 
-       $sql = "Select Z.zone, L.location,CONCAT(A.store_name,' (',IFNULL(Z.zone,''),'-',IFNULL(L.location,'') ,')') as store_name from 
-            (SELECT F.store_name,D.zone_id,D.store_id,D.location_id from 
-             (select * from store_master) D
-             left join 
-             (select * from relationship_master Where type_id=7)F
-             on (D.store_id=F.id)
-             Where store_name is not null ) A
-            Left JOIN location_master L On A.location_id=L.id
-            Left JOIN zone_master Z On A.zone_id=Z.id
-            Left Join (Select Distinct zone_id,store_id,location_id from merchandiser_beat_plan) B 
-            ON (A.zone_id=B.zone_id AND A.store_id=B.store_id AND A.location_id=B.location_id)
-            Where B.store_id is null  and store_name is not null
-               ";
-       $result = $this->db->query($sql)->result();
+    $sql = "Select Z.zone, L.location,CONCAT(A.store_name,' (',IFNULL(Z.zone,''),'-',IFNULL(L.location,'') ,')') as store_name from 
+        (SELECT F.store_name,D.zone_id,D.store_id,D.location_id from 
+         (select * from store_master) D
+         left join 
+         (select * from relationship_master Where type_id=7)F
+         on (D.store_id=F.id)
+         Where store_name is not null ) A
+        Left JOIN location_master L On A.location_id=L.id
+        Left JOIN zone_master Z On A.zone_id=Z.id
+        Left Join (Select Distinct zone_id,store_id,location_id from merchandiser_beat_plan) B 
+        ON (A.zone_id=B.zone_id AND A.store_id=B.store_id AND A.location_id=B.location_id)
+        Where B.store_id is null  and store_name is not null
+           ";
+    $result = $this->db->query($sql)->result();
 
-       for($i=0; $i<=3; $i++) {
-          $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
-       }
+    for($i=0; $i<=3; $i++) {
+        $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
+    }
 
-       $row = 1;
-       $col = 0;
-       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Wholesome Habits Private Limited ");
-       $objPHPExcel->getActiveSheet()->getStyle('A'.$row)->getFont()->setBold(true);
-       $row=$row+1;
-       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Store/Merchandizer Not Mapped");
-       $objPHPExcel->getActiveSheet()->getStyle('A'.$row)->getFont()->setBold(true);
-       $row=$row+2;
-       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Store Not Mapped");
-       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, "Merchendiser Not Mapped ");
-       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, "Days Not Mapped");
-       $objPHPExcel->getActiveSheet()->getStyle('A'.$row.':C'.$row)->getFont()->setBold(true);
+    $row = 1;
+    $col = 0;
+    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Wholesome Habits Private Limited ");
+    $objPHPExcel->getActiveSheet()->getStyle('A'.$row)->getFont()->setBold(true);
+    $row=$row+1;
+    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Store/Merchandizer Not Mapped");
+    $objPHPExcel->getActiveSheet()->getStyle('A'.$row)->getFont()->setBold(true);
+    $row=$row+2;
+    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Store Not Mapped");
+    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, "Merchendiser Not Mapped ");
+    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, "Days Not Mapped");
+    $objPHPExcel->getActiveSheet()->getStyle('A'.$row.':C'.$row)->getFont()->setBold(true);
+    $row = $row+1;
+
+    foreach($result  as $dist)
+    {
+       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row,$dist->store_name);
        $row = $row+1;
+    }
 
-        foreach($result  as $dist)
-        {
-           $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row,$dist->store_name);
-           $row = $row+1;
-        }
+    $row = 5;
+    foreach($result2  as $dist)
+    {
+       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row,$dist->sales_rep_name);
+       $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row,rtrim($dist->fet_fre,' ,'));
+       $row = $row+1;
+    }
 
-        $row = 5;
-        foreach($result2  as $dist)
-        {
-           $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row,$dist->sales_rep_name);
-           $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row,rtrim($dist->fet_fre,' ,'));
-           $row = $row+1;
-        }
-
-        for($col = 0; $col < 3; $col++) {
-            $objPHPExcel->getActiveSheet()->getColumnDimension($col_name[$col])->setAutoSize(true);
-        }
+    for($col = 0; $col < 3; $col++) {
+        $objPHPExcel->getActiveSheet()->getColumnDimension($col_name[$col])->setAutoSize(true);
+    }
 
 
-        $objPHPExcel->createSheet(1);
-        $objPHPExcel->setActiveSheetIndex(1);
-        $objPHPExcel->getActiveSheet()->setTitle("Sales Representative");
-        $col2_name1 = array();
-        $col2 = 0;
-        $row=1;
-        $sql = "SELECT CONCAT(distributor_name,' (',IFNULL(Z.zone,'') ,'-',IFNULL(L.location,'') ,'-',IFNULL(A.area,'') ,')') as distributor_name ,Z.zone, L.location,A.area from 
-            (select *,concat('d_',id) as store_id from distributor_master Where  type_id=3  and class='normal' and distributor_name<>'') D
-            Left JOIN location_master L On D.location_id=L.id
-            Left JOIN zone_master Z On D.zone_id=Z.id
-            Left JOIN area_master A On D.area_id=A.id
-            Left Join (Select Distinct zone_id,store_id,location_id,area_id from sales_rep_beat_plan) B 
-            ON (D.zone_id=B.zone_id AND B.store_id=D.store_id COLLATE utf8_unicode_ci AND D.location_id=B.location_id)
-            Where B.store_id is null and distributor_name is not null";
-        $result2 = $this->db->query($sql)->result();
+    $objPHPExcel->createSheet(1);
+    $objPHPExcel->setActiveSheetIndex(1);
+    $objPHPExcel->getActiveSheet()->setTitle("Sales Representative");
+    $col2_name1 = array();
+    $col2 = 0;
+    $row=1;
+    $sql = "SELECT CONCAT(distributor_name,' (',IFNULL(Z.zone,'') ,'-',IFNULL(L.location,'') ,'-',IFNULL(A.area,'') ,')') as distributor_name ,Z.zone, L.location,A.area from 
+        (select *,concat('d_',id) as store_id from distributor_master Where  type_id=3  and class='normal' and distributor_name<>'') D
+        Left JOIN location_master L On D.location_id=L.id
+        Left JOIN zone_master Z On D.zone_id=Z.id
+        Left JOIN area_master A On D.area_id=A.id
+        Left Join (Select Distinct zone_id,store_id,location_id,area_id from sales_rep_beat_plan) B 
+        ON (D.zone_id=B.zone_id AND B.store_id=D.store_id COLLATE utf8_unicode_ci AND D.location_id=B.location_id)
+        Where B.store_id is null and distributor_name is not null";
+    $result2 = $this->db->query($sql)->result();
 
 
-        $sql = "Select sales_rep_name ,'Sales Representative' as type,B.* from 
-            (select * from sales_rep_master where sr_type='Sales Representative' and status='Approved' order by sales_rep_name desc)A
-            Left Join
-            (Select 
-             Concat((Case When mon=0 Then 'Monday , ' Else '' end),(Case When tue=0 Then 'Tuesday , ' Else '' end)
-             ,(Case When wed=0 Then 'Wednesday , ' Else '' end),(Case When thur=0 Then 'Thursday , ' Else '' end)
-            ,(Case When fri=0 Then 'Friday , ' Else '' end),(Case When sat=0 Then 'Saturday , ' Else '' end)) as fet_fre,sales_rep_id
-            from
-            (
-            Select sales_rep_id ,
-            Sum(Case When frequency Like '%Mon%' Then 1 Else 0 end) as mon,
-            Sum(Case When frequency Like '%Tue%' Then 1 Else 0 end) as tue,
-            Sum(Case When frequency Like '%Wed%' Then 1 Else 0 end) as wed,
-            Sum(Case When frequency Like '%Thur%' Then 1 Else 0 end) as thur,
-            Sum(Case When frequency Like '%Fri%' Then 1 Else 0 end) as fri,
-            Sum(Case When frequency Like '%Sat%' Then 1 Else 0 end) as sat 
-            from sales_rep_beat_plan   GROUP By sales_rep_id 
-            )A) B On A.id=B.sales_rep_id
-            Where B.sales_rep_id IS NULL OR fet_fre<>''";
-        $result = $this->db->query($sql)->result();
+    $sql = "Select sales_rep_name ,'Sales Representative' as type,B.* from 
+        (select * from sales_rep_master where sr_type='Sales Representative' and status='Approved' order by sales_rep_name desc)A
+        Left Join
+        (Select 
+         Concat((Case When mon=0 Then 'Monday , ' Else '' end),(Case When tue=0 Then 'Tuesday , ' Else '' end)
+         ,(Case When wed=0 Then 'Wednesday , ' Else '' end),(Case When thur=0 Then 'Thursday , ' Else '' end)
+        ,(Case When fri=0 Then 'Friday , ' Else '' end),(Case When sat=0 Then 'Saturday , ' Else '' end)) as fet_fre,sales_rep_id
+        from
+        (
+        Select sales_rep_id ,
+        Sum(Case When frequency Like '%Mon%' Then 1 Else 0 end) as mon,
+        Sum(Case When frequency Like '%Tue%' Then 1 Else 0 end) as tue,
+        Sum(Case When frequency Like '%Wed%' Then 1 Else 0 end) as wed,
+        Sum(Case When frequency Like '%Thur%' Then 1 Else 0 end) as thur,
+        Sum(Case When frequency Like '%Fri%' Then 1 Else 0 end) as fri,
+        Sum(Case When frequency Like '%Sat%' Then 1 Else 0 end) as sat 
+        from sales_rep_beat_plan   GROUP By sales_rep_id 
+        )A) B On A.id=B.sales_rep_id
+        Where B.sales_rep_id IS NULL OR fet_fre<>''";
+    $result = $this->db->query($sql)->result();
 
-        for($i=0; $i<=3; $i++) {
-          $col2_name1[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
-        }
+    for($i=0; $i<=3; $i++) {
+      $col2_name1[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
+    }
 
-        $objPHPExcel->getActiveSheet()->setCellValue($col2_name1[$col2].$row, "Wholesome Habits Private Limited ");
-        $objPHPExcel->getActiveSheet()->getStyle('A'.$row)->getFont()->setBold(true);
-        $row=$row+1;
-        $objPHPExcel->getActiveSheet()->setCellValue($col2_name1[$col2].$row, "Retailer/Representative Not Mapped");
-        $objPHPExcel->getActiveSheet()->getStyle('A'.$row)->getFont()->setBold(true);
-        $row=$row+2;
-        $objPHPExcel->getActiveSheet()->setCellValue($col2_name1[$col2].$row, "Retailer Not Mapped");
-        $objPHPExcel->getActiveSheet()->setCellValue($col2_name1[$col2+1].$row, "Sales Representative Not Mapped ");
-        $objPHPExcel->getActiveSheet()->setCellValue($col2_name1[$col2+2].$row, "Days Not Mapped");
-        $objPHPExcel->getActiveSheet()->getStyle('A'.$row.':C'.$row)->getFont()->setBold(true);
+    $objPHPExcel->getActiveSheet()->setCellValue($col2_name1[$col2].$row, "Wholesome Habits Private Limited ");
+    $objPHPExcel->getActiveSheet()->getStyle('A'.$row)->getFont()->setBold(true);
+    $row=$row+1;
+    $objPHPExcel->getActiveSheet()->setCellValue($col2_name1[$col2].$row, "Retailer/Representative Not Mapped");
+    $objPHPExcel->getActiveSheet()->getStyle('A'.$row)->getFont()->setBold(true);
+    $row=$row+2;
+    $objPHPExcel->getActiveSheet()->setCellValue($col2_name1[$col2].$row, "Retailer Not Mapped");
+    $objPHPExcel->getActiveSheet()->setCellValue($col2_name1[$col2+1].$row, "Sales Representative Not Mapped ");
+    $objPHPExcel->getActiveSheet()->setCellValue($col2_name1[$col2+2].$row, "Days Not Mapped");
+    $objPHPExcel->getActiveSheet()->getStyle('A'.$row.':C'.$row)->getFont()->setBold(true);
 
-        $row = $row+1;
+    $row = $row+1;
 
-        foreach($result2  as $dist)
-        {
-           $objPHPExcel->getActiveSheet()->setCellValue($col2_name1[$col2].$row,$dist->distributor_name);
-           $row = $row+1;
-        }
+    foreach($result2  as $dist)
+    {
+       $objPHPExcel->getActiveSheet()->setCellValue($col2_name1[$col2].$row,$dist->distributor_name);
+       $row = $row+1;
+    }
 
-        $row = 5;
-        foreach($result  as $dist)
-        {
-           $objPHPExcel->getActiveSheet()->setCellValue($col2_name1[$col2+1].$row,$dist->sales_rep_name);
-           $objPHPExcel->getActiveSheet()->setCellValue($col2_name1[$col2+2].$row,rtrim($dist->fet_fre,' ,'));
-           $row = $row+1;
-        }
+    $row = 5;
+    foreach($result  as $dist)
+    {
+       $objPHPExcel->getActiveSheet()->setCellValue($col2_name1[$col2+1].$row,$dist->sales_rep_name);
+       $objPHPExcel->getActiveSheet()->setCellValue($col2_name1[$col2+2].$row,rtrim($dist->fet_fre,' ,'));
+       $row = $row+1;
+    }
 
-        for($col2 = 0; $col2 < 3; $col2++) {
-            $objPHPExcel->getActiveSheet()->getColumnDimension($col2_name1[$col2])->setAutoSize(true);
-        }
+    for($col2 = 0; $col2 < 3; $col2++) {
+        $objPHPExcel->getActiveSheet()->getColumnDimension($col2_name1[$col2])->setAutoSize(true);
+    }
 
-        $date1 = date('d-m-Y_H-i-A');
-        $filename='Sales_Exception_Report_'.$date1.'.xls';
-        /*$path  = 'C:/xampp/htdocs/eat_erp_server/assets/uploads/exception_reports';*/
-        $path  ='/home/eatangcp/public_html/eat_erp/assets/uploads/exception_reports/';
-       /* $path  ='/home/eatangcp/public_html/eat_erp/assets/uploads/exception_reports/';*/
-        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
-        $objWriter->save($path.$filename);
-        $attachment = $path.$filename;
-        $to_email = "sangeeta.yadav@pecanreams.com";
-        $bcc = "dhaval.maru@pecanreams.com,ashwini.patil@pecanreams.com";
-        $cc = "prasad.bhisale@pecanreams.com";
-        $from_email = 'cs@eatanytime.co.in';
-        $from_email_sender = 'Wholesome Habits Pvt Ltd';
+    $date1 = date('d-m-Y_H-i-A');
+    $filename='Sales_Exception_Report_'.$date1.'.xls';
+    /*$path  = 'C:/xampp/htdocs/eat_erp_server/assets/uploads/exception_reports';*/
+    $path  ='/home/eatangcp/public_html/eat_erp/assets/uploads/exception_reports/';
+   /* $path  ='/home/eatangcp/public_html/eat_erp/assets/uploads/exception_reports/';*/
+    $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+    $objWriter->save($path.$filename);
+    $attachment = $path.$filename;
+    $to_email = "sangeeta.yadav@pecanreams.com";
+    $bcc = "dhaval.maru@pecanreams.com,ashwini.patil@pecanreams.com";
+    $cc = "prasad.bhisale@pecanreams.com";
+    $from_email = 'cs@eatanytime.co.in';
+    $from_email_sender = 'Wholesome Habits Pvt Ltd';
 
-        $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc, $cc, $attachment);
-        if($mailSent==1){
-            unlink($attachment);
-        }
+    $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc, $cc, $attachment);
+    if($mailSent==1){
+        unlink($attachment);
+    }
 
-        /*$filename='merchandiser.xls';
-        header('Content-Type: application/vnd.ms-excel');
-        header('Content-Disposition: attachment;filename="'.$filename.'"');
-        header('Cache-Control: max-age=0');
-        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
-        $objWriter->save('php://output');*/
+    /*$filename='merchandiser.xls';
+    header('Content-Type: application/vnd.ms-excel');
+    header('Content-Disposition: attachment;filename="'.$filename.'"');
+    header('Cache-Control: max-age=0');
+    $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+    $objWriter->save('php://output');*/
 }
 
-public function gt_store_report($save='',$region=array())
-{
+public function gt_store_report($save='',$region=array()){
     $cond='';
     if(count($region)>0){
       if(count($region)==1 && in_array('ALL',$region))
@@ -16059,8 +16075,7 @@ public function gt_store_report($save='',$region=array())
     $objWriter->save('php://output');*/
 }
 
-public function get_gt_location()
-{
+public function get_gt_location(){
    $result = $this->db->query('Select Distinct location from location_master Where type_id=3')->result();
    return $result;
 }

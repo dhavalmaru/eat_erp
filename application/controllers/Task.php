@@ -31,7 +31,7 @@ class Task extends CI_Controller
             $data['myTask']=count($myTask);
             $data['pendingTask']=count($pendingTask);
 
-            $data['tasklist']=$this->task_model->getTaskList($curusr, $tasktype);
+            // $data['tasklist']=$this->task_model->getTaskList($curusr, $tasktype);
 
             $data['status']=$tasktype;
 
@@ -54,16 +54,27 @@ class Task extends CI_Controller
 
         $records = array();
         for ($i=0; $i < count($data); $i++) { 
-                $records[] =  array(
-                        $i+1,                       
-                        '<a href="'.base_url().'index.php/Task/task_view/'.urlencode($data[$i]->id).'">'.$data[$i]->subject_detail.'</a>',
-                        ''.(($data[$i]->name=="")?"Self":$data[$i]->name).'',
-                        ''.$data[$i]->priority.'',
-                        ''.date('d/m/Y',strtotime($data[$i]->due_date)).'',
-                        ''.date('d/m/Y',strtotime($data[$i]->from_date)).'',
-                        ''.date('d/m/Y',strtotime($data[$i]->to_date)).'',
-                        ''.$data[$i]->task_status.''
-                    );
+            if(strtoupper(trim($tasktype))=='ALL'){
+                if($curusr == $data[$i]->created_by){
+                    $link = '<a href="'.base_url().'index.php/Task/task_edit/'.urlencode($data[$i]->id).'">'.$data[$i]->subject_detail.'</a>';
+                } else {
+                    $link = $data[$i]->subject_detail;
+                }
+            } else {
+                $link = '<a href="'.base_url().'index.php/Task/task_view/'.urlencode($data[$i]->id).'">'.$data[$i]->subject_detail.'</a>';
+            }
+            
+            $records[] =  array(
+                                $i+1,
+                                $link,
+                                ''.(($data[$i]->name=="")?"Self":$data[$i]->name).'',
+                                ''.$data[$i]->followers.'',
+                                ''.$data[$i]->priority.'',
+                                ''.date('d/m/Y',strtotime($data[$i]->due_date)).'',
+                                ''.date('d/m/Y',strtotime($data[$i]->from_date)).'',
+                                ''.date('d/m/Y',strtotime($data[$i]->to_date)).'',
+                                ''.$data[$i]->task_status.''
+                            );
         }
 
         $output = array(
@@ -190,8 +201,8 @@ class Task extends CI_Controller
     }
 
     function completeTask(){
-        $task_id=$this->input->post('task_id');
-        $response=$this->task_model->completeTask($task_id);
+        $id=$this->input->post('id');
+        $response=$this->task_model->completeTask($id);
         echo json_encode($response);
     }
 

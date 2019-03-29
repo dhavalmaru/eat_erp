@@ -173,7 +173,8 @@
                 <div class="heading-h2 responsive-heading"><a href="<?php echo base_url().'index.php/dashboard'; ?>">  Dashboard  </a> &nbsp; &#10095; &nbsp; <a href="<?php echo base_url().'index.php/Task'; ?>" > Task </a>  &nbsp; &#10095; &nbsp; Task Details </div>
                 <div class="pull-right btn-top-margin responsive-margin">
                     <!--<a class="printdiv btn-margin"> <span class="btn btn-warning pull-right btn-font"> Print </span>  </a> -->
-                    <a class="btn-margin"  href="<?php echo base_url(); ?>index.php/task/task_edit/<?php echo $taskdetail->id;?>"  ><span class="btn btn-success pull-right btn-font"> Edit </span>  </a>
+                    <?php $curusr = $this->session->userdata('session_id'); ?>
+                    <a class="btn-margin"  href="<?php echo base_url(); ?>index.php/task/task_edit/<?php echo $taskdetail->id;?>" style="<?php if($taskdetail->created_by==$curusr) echo ''; else echo 'display: none;'; ?>" ><span class="btn btn-success pull-right btn-font"> Edit </span>  </a>
                     <a class="btn-margin" href="<?php echo base_url()?>index.php/task"> <span class="btn btn-danger pull-right btn-font" style="margin-right: 10px;"> Cancel </span>  </a> 
                 </div>
                 <div class="page-content-wrap">
@@ -324,7 +325,7 @@
                             <div class="" >
                                 <div class="col-md-12 btn-container"  style=" background: #fcfdfd;" >   
                                     <button id="cooment" class="btn btn-success pull-left" type="button"   onclick="addComment('<?php echo $taskdetail->id;?>')">Comment</button>                                           
-                                    <button id="delete_btn" class="btn btn-danger pull-right" type="button" onclick="deleteRecord('<?php echo $taskdetail->id;?>')">Delete</button>
+                                    <button id="delete_btn" class="btn btn-danger pull-right" type="button" style="<?php if($taskdetail->created_by==$curusr) echo ''; else echo 'display: none;'; ?>" onclick="deleteRecord('<?php echo $taskdetail->id;?>')">Delete</button>
                                     <?php if($taskdetail->follower !='Yes'){?>  
                                     <button id="complete_btn" class="btn pull-right btn-success" type="button" onclick="completeTask('<?php echo $taskdetail->id;?>')" style="margin-right: 10px;">Complete</button>
                                     <?php } ?>  
