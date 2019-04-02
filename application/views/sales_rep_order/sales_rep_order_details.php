@@ -747,7 +747,7 @@
                                        <hr>  
                                        <div class="row">
                                        <div class="col s12">
-                                       <div class="input-field col s8">
+                                       <div class="input-field col s6">
                                        <label class="">Cranberry & Orange  <span class="asterisk_sign">*</span></label>
                                        </div> 
                                        <div class="input-field col s4">
@@ -763,7 +763,7 @@
                                        </div>
                                        </div>
                                        <div class="col s12">
-                                       <div class="input-field col s8">
+                                       <div class="input-field col s6">
                                        <label class="">Fig & Raisins <span class="asterisk_sign">*</span></label>
                                        </div> 
                                        <div class="input-field col s4">
@@ -779,7 +779,7 @@
                                        </div>
                                        </div>
                                        <div class="col s12">
-                                       <div class="input-field col s8">
+                                       <div class="input-field col s6">
                                        <label class="">Papaya & pineapple<span class="asterisk_sign">*</span></label>
                                        </div> 
                                        <div class="input-field col s4">
