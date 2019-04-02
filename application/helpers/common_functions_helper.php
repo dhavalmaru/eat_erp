@@ -413,7 +413,7 @@
         try {
             $CI =& get_instance();
 
-            $from_email = 'info@eatanytime.co.in';
+            $from_email = 'contact@eatanytime.co.in';
 
             //configure email settings
             $config['protocol'] = 'smtp';

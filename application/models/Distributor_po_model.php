@@ -315,8 +315,37 @@ function get_distributor_po_data($status='', $id=''){
     return $query->result();
 }
 
+function get_email_details($id=''){
+    $tbl_name = 'email_master';
+    $cond = " where email_type = 'distributor_po_mismatch'";
+    if($id!=''){
+        $tbl_name = 'email_details';
+        $cond = $cond . " and email_ref_id = '$id'";
+    }
+
+    $sql = "select * from ".$tbl_name.$cond. " order by id desc";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
 function get_distributor_po_items($id){
     $sql = "select * from distributor_po_items where distributor_po_id = '$id'";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_distributor_po_recon_items($id){
+    $sql = "select A.*, case when B.qty is null then A.qty else B.qty end as d_qty, 
+                case when B.sell_rate is null then A.sell_rate else B.sell_rate end as d_sell_rate, 
+                case when B.amount is null then A.amount else B.amount end as d_amount, 
+                case when B.cgst_amt is null then A.cgst_amt else B.cgst_amt end as d_cgst_amt, 
+                case when B.sgst_amt is null then A.sgst_amt else B.sgst_amt end as d_sgst_amt, 
+                case when B.igst_amt is null then A.igst_amt else B.igst_amt end as d_igst_amt, 
+                case when B.tax_amt is null then A.tax_amt else B.tax_amt end as d_tax_amt, 
+                case when B.total_amt is null then A.total_amt else B.total_amt end as d_total_amt 
+            from distributor_po_items A left join distributor_po_delivered_items B 
+                on (A.distributor_po_id=B.distributor_po_id and A.type=B.type and A.item_id=B.item_id) 
+            where A.distributor_po_id = '$id'";
     $query=$this->db->query($sql);
     return $query->result();
 }
@@ -427,9 +456,8 @@ function save_data($id=''){
                                 A.con_name=B.con_name,A.con_address=B.con_address,A.con_city=B.con_city,
                                 A.con_pincode=B.con_pincode,A.con_state=B.con_state,A.con_country=B.con_country,A.con_state_code=B.con_state_code,A.con_gst_number=B.con_gst_number,
                                 A.person_name=B.person_name,A.invoice_no=B.invoice_no,A.basis_of_sales=B.basis_of_sales,
-                                A.email_from=B.email_from,
-                                A.email_approved_by=B.email_approved_by,
-                                A.email_date_time=B.email_date_time
+                                A.email_from=B.email_from, A.email_approved_by=B.email_approved_by, A.email_date_time=B.email_date_time,
+                                A.doc_document=B.doc_document, A.document_name=B.document_name 
                                 WHERE A.id = '$ref_id' and B.id = '$id'";
                     $this->db->query($sql);
 
@@ -526,7 +554,7 @@ function save_data($id=''){
             $ref_id = null;
         }
 
-        $distributor_consignee_id = $this->input->post('distributor_consignee_id');
+        $distributor_consignee_id = ($this->input->post('distributor_consignee_id')==''?Null:$this->input->post('distributor_consignee_id'));
         $con_name = null;
         $con_address = null;
         $con_city = null;
@@ -554,7 +582,7 @@ function save_data($id=''){
             'date_of_po' => $date_of_po,
             'po_expiry_date' => $po_expiry_date,
             'po_number' => $this->input->post('po_number'),
-            'depot_id' => $this->input->post('depot_id'),
+            'depot_id' => ($this->input->post('depot_id')==''?Null:$this->input->post('depot_id')),
             'delivery_through' => $this->input->post('delivery_through'),
             'distributor_id' => $this->input->post('distributor_id'),
             'type_id' => $this->input->post('type_id'),
@@ -601,7 +629,9 @@ function save_data($id=''){
             'basis_of_sales' => $this->input->post('basis_of_sales'),
             'email_from' => $this->input->post('email_from'),
             'email_approved_by' => $this->input->post('email_approved_by'),
-
+            'doc_document' => $this->input->post('doc_document'),
+            'document_name' => $this->input->post('document_name'),
+            'entered_invoice_amount' => format_number($this->input->post('entered_invoice_amount'),2)
         );
 
         if($id==''){
@@ -626,6 +656,9 @@ function save_data($id=''){
         $qty=$this->input->post('qty[]');
         $sell_rate=$this->input->post('sell_rate[]');
         $sell_margin=$this->input->post('sell_margin[]');
+        $cgst=$this->input->post('cgst[]');
+        $sgst=$this->input->post('sgst[]');
+        $igst=$this->input->post('igst[]');
         $tax_per=$this->input->post('tax_per[]');
         $grams=$this->input->post('grams[]');
         $rate=$this->input->post('rate[]');
@@ -660,16 +693,208 @@ function save_data($id=''){
                             'total_amt' => format_number($total_amt[$k],2),
                             'margin_per' => $sell_margin[$k],
                             'promo_margin' => $promo_margin[$k],
-                            'tax_percentage' => $tax_per[$k]
+                            'tax_percentage' => $tax_per[$k],
+                            'cgst' => $cgst[$k],
+                            'sgst' => $sgst[$k],
+                            'igst' => $igst[$k]
                         );
                 $this->db->insert('distributor_po_items', $data);
+            }
+        }
+
+        if(isset($_FILES['doc_file']['name'])) {
+            $filePath='uploads/Distributor/';
+            $upload_path = './' . $filePath;
+            if(!is_dir($upload_path)) {
+                mkdir($upload_path, 0777, TRUE);
+            }
+
+            $filePath='uploads/Distributor_PO/Distributor_PO_'.$id.'/';
+            $upload_path = './' . $filePath;
+            if(!is_dir($upload_path)) {
+                mkdir($upload_path, 0777, TRUE);
+            }
+
+            $confi['upload_path']=$upload_path;
+            $confi['allowed_types']='*';
+            $this->load->library('upload', $confi);
+            $this->upload->initialize($confi);
+            $extension="";
+
+            $file_nm='doc_file';
+
+            if(!empty($_FILES[$file_nm]['name'])) {
+                if($this->upload->do_upload($file_nm)) {
+                    // echo "Uploaded <br>";
+                } else {
+                    // echo "Failed<br>";
+                    // echo $this->upload->data();
+                }   
+
+                $upload_data=$this->upload->data();
+                $fileName=$upload_data['file_name'];
+                $extension=$upload_data['file_ext'];
+                    
+                $data = array(
+                    'doc_document' => $filePath.$fileName,
+                    'document_name' => $fileName
+                );
+
+                $this->db->where('id', $id);
+                $this->db->update('distributor_po',$data);
             }
         }
     }
 
     $logarray['table_id']=$id;
-    $logarray['module_name']='Distributor_Out';
-    $logarray['cnt_name']='Distributor_Out';
+    $logarray['module_name']='Distributor_PO';
+    $logarray['cnt_name']='Distributor_PO';
+    $logarray['action']=$action;
+    $this->user_access_log_model->insertAccessLog($logarray);
+}
+
+function update_recon($id=''){
+    $now=date('Y-m-d H:i:s');
+    $curusr=$this->session->userdata('session_id');
+
+    $delivery_status = $this->input->post('delivery_status');
+    if($delivery_status=='' || $delivery_status==null){
+        $delivery_status = 'Pending';
+    }
+
+    $remarks = $this->input->post('remarks');
+    $status=$this->input->post('status');
+
+    $delivery_date=$this->input->post('delivery_date');
+    if($delivery_date==''){
+        $delivery_date=NULL;
+    } else {
+        $delivery_date=formatdate($delivery_date);
+    }
+
+    $dispatch_date=$this->input->post('dispatch_date');
+    if($dispatch_date==''){
+        $dispatch_date=NULL;
+    } else {
+        $dispatch_date=formatdate($dispatch_date);
+    }
+
+
+    $person_name=$this->input->post('person_name');
+    $invoice_no=$this->input->post('invoice_no');
+    $remarks=$this->input->post('remarks');
+    
+    // $delivery_remarks=$this->input->post('delivery_remarks');
+    // if($delivery_remarks==''){
+    //     $delivery_remarks=$this->input->post('cancellation_reason');
+    // }
+    
+    // $cancellation_date=$this->input->post('cancellation_date');
+    // if($cancellation_date==''){
+    //     $cancellation_date=NULL;
+    // } else {
+    //     $cancellation_date=formatdate($cancellation_date);
+    // }
+
+    // if($delivery_status=="Cancelled"){
+    //     $status = "InActive";
+    // }
+
+    // if($delivery_status=="Cancelled"){
+    //     $sql = "update distributor_po set delivery_status = '$delivery_status', cancelled_date = '$cancellation_date',
+    //             status = '$status', modified_by = '$curusr', modified_on = '$now', 
+    //             remarks = concat(remarks, '$remarks'), delivery_remarks = '$delivery_remarks' 
+    //             where id = '$id'";
+    // } else {
+    //     $sql = "update distributor_po set delivery_status = '$delivery_status', delivery_date = '$delivery_date',
+    //             dispatch_date='$dispatch_date', person_name='$person_name', invoice_no='$invoice_no', 
+    //             modified_by = '$curusr', modified_on = '$now', remarks = concat(remarks, '$remarks') 
+    //             where  id = '$id'";
+    // }
+    
+    // $this->db->query($sql);
+
+    $data = array(
+        'd_amount' => format_number($this->input->post('total_amount'),2),
+        'd_cgst_amount' => format_number($this->input->post('cgst_amount'),2),
+        'd_sgst_amount' => format_number($this->input->post('sgst_amount'),2),
+        'd_igst_amount' => format_number($this->input->post('igst_amount'),2),
+        'd_tax_amount' => format_number($this->input->post('tax_amount'),2),
+        'd_final_amount' => format_number($this->input->post('final_amount'),2),
+        'd_round_off_amount' => format_number($this->input->post('round_off_amount'),2),
+        'd_invoice_amount' => format_number($this->input->post('invoice_amount'),2),
+        'delivery_status' => $delivery_status,
+        'delivery_date' => $delivery_date,
+        'dispatch_date' => $dispatch_date,
+        'person_name' => $person_name,
+        'invoice_no' => $invoice_no,
+        'remarks' => $this->input->post('remarks'),
+        'modified_by' => $curusr,
+        'modified_on' => $now
+    );
+
+    $this->db->where('id', $id);
+    $this->db->update('distributor_po',$data);
+    $action='Distributor PO Entry Modified. Delivery Status: ' . $delivery_status;
+
+    $this->db->where('distributor_po_id', $id);
+    $this->db->delete('distributor_po_delivered_items');
+
+    $type=$this->input->post('type[]');
+    $bar=$this->input->post('bar[]');
+    $box=$this->input->post('box[]');
+    $qty=$this->input->post('qty[]');
+    $sell_rate=$this->input->post('sell_rate[]');
+    $sell_margin=$this->input->post('sell_margin[]');
+    $cgst=$this->input->post('cgst[]');
+    $sgst=$this->input->post('sgst[]');
+    $igst=$this->input->post('igst[]');
+    $tax_per=$this->input->post('tax_per[]');
+    $grams=$this->input->post('grams[]');
+    $rate=$this->input->post('rate[]');
+    $amount=$this->input->post('amount[]');
+    $cgst_amt=$this->input->post('cgst_amt[]');
+    $sgst_amt=$this->input->post('sgst_amt[]');
+    $igst_amt=$this->input->post('igst_amt[]');
+    $tax_amt=$this->input->post('tax_amt[]');
+    $total_amt=$this->input->post('total_amt[]');
+    $promo_margin=$this->input->post('promo_margin[]');
+
+    for ($k=0; $k<count($type); $k++) {
+        if(isset($type[$k]) and $type[$k]!="") {
+            if($type[$k]=="Bar"){
+                $item_id=$bar[$k];
+            } else {
+                $item_id=$box[$k];
+            }
+            $data = array(
+                        'distributor_po_id' => $id,
+                        'type' => $type[$k],
+                        'item_id' => $item_id,
+                        'qty' => format_number($qty[$k],2),
+                        'sell_rate' => format_number($sell_rate[$k],2),
+                        'grams' => format_number($grams[$k],2),
+                        'rate' => format_number($rate[$k],2),
+                        'amount' => format_number($amount[$k],2),
+                        'cgst_amt' => format_number($cgst_amt[$k],2),
+                        'sgst_amt' => format_number($sgst_amt[$k],2),
+                        'igst_amt' => format_number($igst_amt[$k],2),
+                        'tax_amt' => format_number($tax_amt[$k],2),
+                        'total_amt' => format_number($total_amt[$k],2),
+                        'margin_per' => $sell_margin[$k],
+                        'promo_margin' => $promo_margin[$k],
+                        'tax_percentage' => $tax_per[$k],
+                        'cgst' => $cgst[$k],
+                        'sgst' => $sgst[$k],
+                        'igst' => $igst[$k]
+                    );
+            $this->db->insert('distributor_po_delivered_items', $data);
+        }
+    }
+
+    $logarray['table_id']=$id;
+    $logarray['module_name']='Distributor_PO';
+    $logarray['cnt_name']='Distributor_PO';
     $logarray['action']=$action;
     $this->user_access_log_model->insertAccessLog($logarray);
 }
@@ -693,8 +918,8 @@ function set_delivery_status() {
     }
 
 
-    $person_receving=$this->input->post('person_receving');
-    $invoice_number=$this->input->post('invoice_number');
+    $person_name=$this->input->post('person_name');
+    $invoice_no=$this->input->post('invoice_no');
     $remarks=$this->input->post('remarks');
     $delivery_remarks=$this->input->post('delivery_remarks');
 		if($delivery_remarks=='')
@@ -734,14 +959,14 @@ function set_delivery_status() {
             $status = "InActive";
         }
 
-        //,person_name='$person_receving',invoice_no='$invoice_number'
+        //,person_name='$person_name',invoice_no='$invoice_no'
         if($delivery_status=="Cancelled"){
             $sql = "update distributor_po set delivery_status = '$delivery_status', cancelled_date = '$cancellation_date',
                     status = '$status', modified_by = '$curusr', modified_on = '$now', 
                     remarks = concat(remarks, '$remarks'), delivery_remarks = '$delivery_remarks' 
                     where id in (".$distributor_po_id.")";
         } else {
-            $sql = "update distributor_po set delivery_status = '$delivery_status', delivery_date = '$delivery_date',person_name='$person_receving',invoice_no='$invoice_number',
+            $sql = "update distributor_po set delivery_status = '$delivery_status', delivery_date = '$delivery_date',person_name='$person_name',invoice_no='$invoice_no',
                     status = '$status', modified_by = '$curusr', modified_on = '$now', 
                     remarks = concat(remarks, '$remarks'), delivery_remarks = '$delivery_remarks' , dispatch_date='$dispatch_date'
                     where id in (".$distributor_po_id.")";
@@ -1967,6 +2192,85 @@ function reject_records() {
     }
 }
 
+function send_email() {
+    $now=date('Y-m-d H:i:s');
+    $curusr=$this->session->userdata('session_id');
+    $login_name = $this->session->userdata('login_name');
+    $email_sender = 'Wholesome Habits Pvt Ltd';
+
+    $email_ref_id = $this->input->post('email_ref_id');
+    $email_type = $this->input->post('email_type');
+    $email_from = $this->input->post('email_from');
+    $email_to = $this->input->post('email_to');
+    $email_cc = $this->input->post('email_cc');
+    $email_bcc = $this->input->post('email_bcc');
+    $email_subject = $this->input->post('email_subject');
+    $email_body = $this->input->post('email_body');
+
+    // $email_ref_id = '';
+    // $email_type = 'distributor_po_mismatch';
+    // $email_from = 'cs@eatanytime.in';
+    // $email_to = 'prasad.bhisale@pecanreams.com';
+    // $email_cc = 'prasad.bhisale@pecanreams.com';
+    // $email_bcc = 'prasad.bhisale@pecanreams.com';
+    // $email_subject = 'PO Amount Mismatch';
+    // $email_body = 'Hi, 
+
+    //                 PO Amount Mismatch
+
+    //                 Regards,
+
+    //                 Team EatAnyTime';
+
+    $message = '<html>
+                    <head>
+                    <style type="text/css">
+                        pre {
+                            font: small/1.5 Arial,Helvetica,sans-serif;
+                        }
+                    </style>
+                    </head>
+                    <body><pre>'.$email_body.'</pre><br/><br/>
+                    Team EAT Anytime<br/><br/>'.ucwords(trim($login_name)).'
+                    </body>
+                    </html>';
+
+    $mailSent=send_email_new($email_from,  $email_sender, $email_to, $email_subject, $message, $email_bcc, $email_cc);
+
+    if($mailSent==1){
+        $status = 1;
+        $action='Distributor Po amount mismatch mail sent.';
+    } else {
+        $status = 0;
+        $action='Distributor Po amount mismatch mail sending failed.';
+    }
+    $data = array(
+        'email_ref_id' => ($email_ref_id==''?Null:$email_ref_id),
+        'email_type' => $email_type,
+        'email_from' => $email_from,
+        'email_to' => $email_to,
+        'email_cc' => $email_cc,
+        'email_bcc' => $email_bcc,
+        'email_subject' => $email_subject,
+        'email_body' => $email_body,
+        'status' => $status,
+        'created_by' => $curusr,
+        'created_on' => $now,
+        'modified_by' => $curusr,
+        'modified_on' => $now
+    );
+
+    $this->db->insert('email_details',$data);
+    $id=$this->db->insert_id();
+
+    $logarray['table_id']=$id;
+    $logarray['module_name']='Distributor_PO';
+    $logarray['cnt_name']='Distributor_PO';
+    $logarray['action']=$action;
+    $this->user_access_log_model->insertAccessLog($logarray);
+
+    return $status;
+}
 
 public function get_relationship_product_details($status='', $id='', $relationship_id=''){
     if($status!=""){
@@ -2139,8 +2443,7 @@ function get_distributor($status='', $id='', $class=''){
 }
 
 
-public function po_summary_report()
-{
+public function po_summary_report(){
     //(A.status='Inactive' and distributor_po_id IS NOT NULL)  
     $sql = "Select * from (Select * from 
     (select AA.id, AA.date_of_po, AA.po_expiry_date, AA.order_no as po_number, AA.status, AA.remarks, 
@@ -2690,15 +2993,12 @@ public function po_summary_report()
     return $table;
 }
 
-
-public function get_comments($id)
-{
+public function get_comments($id){
     $result = $this->db->select('comments')->where('id',$id)->get('distributor_po')->result();
     return $result;
 }
 
-public function save_comments()
-{
+public function save_comments(){
    $id=$this->input->post('delivery_comments_id');
    echo $delivery_comments=$this->input->post('delivery_comments');
   
@@ -2729,7 +3029,6 @@ function check_po_number_availablity(){
         return 0;
     }
 }
-
 
 function check_po_number_availablity_whpl(){
     $id=$this->input->post('id');

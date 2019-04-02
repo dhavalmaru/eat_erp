@@ -5814,37 +5814,46 @@ $("#form_distributor_po_details").validate({
                 }
             }
         },
-         basis_of_sales: {
-                required: true
-                
-            },
-             po_number: {
-                required: {
-                    depends: function() {
-                        return (clkBtn!='btn_reject');
-                    }
-                },
-                check_po_number_availablity: {
-                  required: {
-                    depends: function() {
-                            return (clkBtn!='btn_reject');
-                        }
-                    }  
+        basis_of_sales: {
+            required: true
+            
+        },
+        po_number: {
+            required: {
+                depends: function() {
+                    return (clkBtn!='btn_reject');
                 }
             },
-            email_from: {
-                required: true,
-                checkemail: true
-            },
-            email_date_time:{
-                required: true
-            },
+            check_po_number_availablity: {
+              required: {
+                depends: function() {
+                        return (clkBtn!='btn_reject');
+                    }
+                }  
+            }
+        },
+        email_from: {
+            required: true,
+            checkemail: true
+        },
+        email_date_time:{
+            required: true
+        },
         remarks: {
             required: {
                 depends: function() {
                     return (d_status == "Approved");
                 }
             }
+        },
+        delivery_status:{
+            required: true     
+        },
+        delivery_date:{
+            required: true     
+        },
+        person_receving:{
+            required: true     
         }
     },
 
@@ -5887,7 +5896,7 @@ $.validator.addMethod("check_po_number_availablity", function (value, element) {
         async: false,
         success: function (data) {
             result = parseInt(data);
-			console.log('result'+result);
+			// console.log('result'+result);
 			
 	//console.log('Distributorssssssssss'+$("#delivery_through").val());
         },
@@ -5955,15 +5964,22 @@ $("#form_distributor_po_list").validate({
 
 function check_po_invoice_amount() {
     var validator = $("#form_distributor_po_details").validate();
-    var valid = true;
+    var valid = false;
 
-    if(parseFloat(get_number($('#entered_invoice_amount').val()))!=parseFloat(get_number($('#invoice_amount').val())))
-    {
-        var errors = {};
-        var name = $('#entered_invoice_amount').attr('name');
-        errors[name] = "Please Enter Correct amount";
-        validator.showErrors(errors);
+    // if(parseFloat(get_number($('#entered_invoice_amount').val()))!=parseFloat(get_number($('#invoice_amount').val())))
+    // {
+    //     var errors = {};
+    //     var name = $('#entered_invoice_amount').attr('name');
+    //     errors[name] = "Please Enter Correct amount";
+    //     validator.showErrors(errors);
+    //     valid = false;
+    // }
+    if($("#modal_result").val()==""){
+        $("#mi-modal").modal('show');
+    } else if($("#modal_result").val()=="No"){
         valid = false;
+    } else {
+        valid = true;
     }
 
     return valid;
@@ -5984,7 +6000,7 @@ $('#form_distributor_po_details').submit(function() {
     if (!$("#form_distributor_po_details").valid()) {
         return false;
     } else {
-         if (check_po_invoice_amount()==false) {
+        if (check_po_invoice_amount()==false) {
             return false;
         }
 
@@ -5998,8 +6014,7 @@ $('#form_distributor_po_details').submit(function() {
     }
 });
 
-function StopNonNumeric(el, evt)
-{
+function StopNonNumeric(el, evt) {
     //var r=e.which?e.which:event.keyCode;
     //return (r>31)&&(r!=46)&&(48>r||r>57)?!1:void 0
     var charCode = (evt.which) ? evt.which : event.keyCode;
@@ -6009,7 +6024,7 @@ function StopNonNumeric(el, evt)
     }
     //just one dot (thanks ddlab)
     if(number.length>1 && charCode == 46){
-         return false;
+        return false;
     }
     //get the carat position
     var dotPos = el.value.indexOf(".");

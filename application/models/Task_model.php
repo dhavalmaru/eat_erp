@@ -14,7 +14,7 @@ function get_access(){
 }
 
 function get_user_list(){
-	$sql="select * from user_master where status = 'Approved' order by first_name, id";
+	$sql="select * from user_master where status = 'Approved' and role_id not in (5, 8) order by first_name, id";
 	$query=$this->db->query($sql);
 	return $query->result();
 }

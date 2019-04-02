@@ -3,3 +3,6 @@ uploads/
 
 # Ignore folder named `assets/uploads`
 assets/uploads/
+
+# Ignore file named `application/config/config.php`
+application/config/config.php

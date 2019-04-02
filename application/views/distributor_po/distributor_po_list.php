@@ -159,31 +159,41 @@
                                         <span id="approved">  (<?php //echo $all; ?>)  </span>
                                     </a>
                                 </li>-->
-
+                                
+                                <li class="mismatch">
+                                    <a  href="<?php echo base_url(); ?>index.php/distributor_po/checkstatus/mismatch">
+                                        <span class="ng-binding">Mismatch</span>
+                                        <span id="mismatch"> (<?php echo $mismatch; ?>) </span>
+                                    </a>
+                                </li>
+                                <li class="pending_for_approval">
+                                    <a  href="<?php echo base_url(); ?>index.php/distributor_po/checkstatus/pending_for_approval">
+                                        <span class="ng-binding">Pending</span>
+                                        <span id="pending_for_approval"> (<?php echo $pending_for_approval; ?>) </span>
+                                    </a>
+                                </li>
                                 <li class="delivery">
                                     <a  href="<?php echo base_url(); ?>index.php/distributor_po/checkstatus/pending_for_delivery">
-                                        <span class="ng-binding">Delivery Pending</span>
-                                        <span id="approved"> (<?php echo $pending_for_delivery; ?>) </span>
+                                        <span class="ng-binding">MT DP</span>
+                                        <span id="pending_for_delivery"> (<?php echo $pending_for_delivery; ?>) </span>
+                                    </a>
+                                </li>
+                                <li class="gt_dp">
+                                    <a  href="<?php echo base_url(); ?>index.php/distributor_po/checkstatus/pending_for_delivery">
+                                        <span class="ng-binding">GT DP</span>
+                                        <span id="gt_pending_for_delivery"> (<?php echo $pending_for_delivery; ?>) </span>
                                     </a>
                                 </li>
                                 <li class="pending_merchendiser">
                                     <a  href="<?php echo base_url(); ?>index.php/distributor_po/checkstatus/pending_merchendiser_delivery">
-                                        <span class="ng-binding">Delivered Pending Merchandiser Approval</span>
-                                        <span id="approved"> (<?php echo $pending_merchendiser_delivery; ?>) </span>
+                                        <span class="ng-binding">Delivered Not Conf</span>
+                                        <span id="pending_merchendiser_delivery"> (<?php echo $pending_merchendiser_delivery; ?>) </span>
                                     </a>
                                 </li>
-
                                 <li class="completed">
                                     <a  href="<?php echo base_url(); ?>index.php/distributor_po/checkstatus/delivered">
                                         <span class="ng-binding">Completed</span>
-                                        <span id="approved"> (<?php echo $delivered; ?>) </span>
-                                    </a>
-                                </li>
-                                
-                                <li class="pending_for_approval">
-                                    <a  href="<?php echo base_url(); ?>index.php/distributor_po/checkstatus/pending_for_approval">
-                                        <span class="ng-binding">Approval Pending</span>
-                                        <span id="approved"> (<?php echo $pending_for_approval; ?>) </span>
+                                        <span id="delivered"> (<?php echo $delivered; ?>) </span>
                                     </a>
                                 </li>
                                 <li class="approved" >
@@ -192,14 +202,12 @@
                                         <span id="approved"> (<?php echo $active; ?>)</span>
                                     </a>
                                 </li>
-
                                 <li class="inactive">
                                     <a  href="<?php echo base_url(); ?>index.php/distributor_po/checkstatus/InActive">
                                         <span class="ng-binding">Cancelled</span>
-                                        <span id="approved"> (<?php echo $inactive; ?>) </span>
+                                        <span id="inactive"> (<?php echo $inactive; ?>) </span>
                                     </a>
                                 </li>
-
                             </ul>
                             
                         </div>
@@ -277,11 +285,11 @@
                                 <br/>
                                 <label class="control-label">Person Name </label>
                                 <div class="">
-                                   <input type="text" class="form-control" name="person_receving" id="person_receving" value="" />
+                                   <input type="text" class="form-control" name="person_name" id="person_name" value="" />
                                 </div>
                                 <label class="control-label">Invoice Number</label>
                                 <div class="">
-                                    <input type="text" class="form-control" name="invoice_number" id="invoice_number" value="" />
+                                    <input type="text" class="form-control" name="invoice_no" id="invoice_no" value="" />
                                 </div>
                             </div>
                             <div id="cancellation_div" style="display: none;">

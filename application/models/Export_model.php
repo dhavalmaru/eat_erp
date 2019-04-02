@@ -13770,8 +13770,8 @@ public function generate_mt_stock_report() {
 }
 
 public function send_mt_stock_tracker() {
-    // $date = '2019-03-26';
-    $date = date('Y-m-d');
+    $date = '2019-03-31';
+    // $date = date('Y-m-d');
 
     $zone_id_array = ['9', '10', '12', '16', '18', '29', '30'];
     $zone_array = ['Chennai', 'Pune', 'Hyderbad', 'Mumbai', 'Banglore', 'Ahmedabad', 'Delhi'];

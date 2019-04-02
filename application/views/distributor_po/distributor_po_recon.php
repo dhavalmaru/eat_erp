@@ -73,7 +73,7 @@
                     <div class="row main-wrapper">
                         <div class="main-container">           
                         <div class="box-shadow">   
-                            <form id="form_distributor_po_details" role="form" class="form-horizontal" method="post" enctype="multipart/form-data" action="<?php if (isset($data)) echo base_url(). 'index.php/distributor_po/update/' . $data[0]->id; else echo base_url().'index.php/distributor_po/save'; ?>">
+                            <form id="form_distributor_po_details" role="form" class="form-horizontal" method="post" enctype="multipart/form-data" action="<?php if (isset($data)) echo base_url(). 'index.php/distributor_po/update_recon/' . $data[0]->id; ?>">
                             <div class="box-shadow-inside">
                                 <div class="col-md-12 custom-padding" style="padding:0;" >
                                 <div class="panel panel-default">
@@ -84,7 +84,7 @@
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id; ?>"/>
                                                 <input type="hidden" class="form-control" name="ref_id" id="ref_id" value="<?php if(isset($data)) echo $data[0]->ref_id; ?>"/>
-                                                <input type="text" class="form-control datepicker1" name="date_of_po" id="date_of_po" placeholder="Date" value="<?php if(isset($data)) echo (($data[0]->date_of_po!=null && $data[0]->date_of_po!='')?date('d/m/Y',strtotime($data[0]->date_of_po)):date('d/m/Y')); else echo date('d/m/Y'); ?>"/>
+                                                <input type="text" class="form-control" name="date_of_po" id="date_of_po" placeholder="Date" value="<?php if(isset($data)) echo (($data[0]->date_of_po!=null && $data[0]->date_of_po!='')?date('d/m/Y',strtotime($data[0]->date_of_po)):date('d/m/Y')); else echo date('d/m/Y'); ?>" readonly />
                                             </div>
                                         </div>
                                     </div>
@@ -92,7 +92,7 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">PO Expiry Date <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control datepicker" name="po_expiry_date" id="po_expiry_date" placeholder="Date" value="<?php if(isset($data)) echo (($data[0]->po_expiry_date!=null && $data[0]->po_expiry_date!='')?date('d/m/Y',strtotime($data[0]->po_expiry_date)):date('d/m/Y')); else echo date('d/m/Y'); ?>"/>
+                                                <input type="text" class="form-control" name="po_expiry_date" id="po_expiry_date" placeholder="Date" value="<?php if(isset($data)) echo (($data[0]->po_expiry_date!=null && $data[0]->po_expiry_date!='')?date('d/m/Y',strtotime($data[0]->po_expiry_date)):date('d/m/Y')); else echo date('d/m/Y'); ?>" readonly />
                                             </div>
                                         </div>
                                     </div>
@@ -102,8 +102,8 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Delivery Through <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="radio" name="delivery_through" id="delivery_through_whpl" value="WHPL" data-error="#err_delivery_through" onChange="get_distributors(this);delivery(this)" <?php if (isset($data)) { if($data[0]->delivery_through=='WHPL') echo 'checked'; } ?> />&nbsp;&nbsp; WHPL &nbsp;&nbsp;
-                                                <input type="radio" name="delivery_through" id="delivery_through_distributor" value="Distributor" data-error="#err_delivery_through" onChange="get_distributors(this);delivery(this)" <?php if (isset($data)) { if($data[0]->delivery_through=='Distributor') echo 'checked'; } ?> />&nbsp;&nbsp; Distributor
+                                                <input type="radio" name="delivery_through" id="delivery_through_whpl" value="WHPL" data-error="#err_delivery_through" onChange="get_distributors(this);delivery(this)" <?php if (isset($data)) { if($data[0]->delivery_through=='WHPL') echo 'checked'; } ?> disabled />&nbsp;&nbsp; WHPL &nbsp;&nbsp;
+                                                <input type="radio" name="delivery_through" id="delivery_through_distributor" value="Distributor" data-error="#err_delivery_through" onChange="get_distributors(this);delivery(this)" <?php if (isset($data)) { if($data[0]->delivery_through=='Distributor') echo 'checked'; } ?> disabled />&nbsp;&nbsp; Distributor
                                                 <div id="err_delivery_through"></div>
                                             </div>
                                         </div>
@@ -124,7 +124,7 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">PO Number </label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="po_number" id="po_number" placeholder="PO Number" value="<?php if (isset($data)) { echo $data[0]->po_number; } ?>" />
+                                                <input type="text" class="form-control" name="po_number" id="po_number" placeholder="PO Number" value="<?php if (isset($data)) { echo $data[0]->po_number; } ?>" readonly />
                                             </div>
                                         </div>
                                     </div>
@@ -174,7 +174,7 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Distributor <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="distributor_id" id="distributor_id" class="form-control select2">
+                                                <select name="distributor_id" id="distributor_id" class="form-control select2" disabled>
                                                     <option value="">Select</option>
                                                     <?php if(isset($distributor)) { for ($k=0; $k < count($distributor) ; $k++) { ?>
                                                             <option value="<?php echo $distributor[$k]->id; ?>" <?php if(isset($data)) { if($distributor[$k]->id==$data[0]->distributor_id) { echo 'selected'; } } ?>><?php echo $distributor[$k]->distributor_name; ?></option>
@@ -192,7 +192,7 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Type <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="type_id" id="type_id" class="form-control select2" onchange="get_zones();">
+                                                <select name="type_id" id="type_id" class="form-control select2" onchange="get_zones();" disabled>
                                                     <option value="">Select</option>
                                                     <?php if(isset($type)) { for ($k=0; $k < count($type) ; $k++) { ?>
                                                             <option value="<?php echo $type[$k]->id; ?>" <?php if(isset($data)) { if($type[$k]->id==$data[0]->type_id) { echo 'selected'; } } ?>><?php echo $type[$k]->distributor_type; ?></option>
@@ -205,7 +205,7 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Zone <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="zone_id" id="zone_id" class="form-control select2" onchange="get_stores();">
+                                                <select name="zone_id" id="zone_id" class="form-control select2" onchange="get_stores();" disabled>
                                                     <option value="">Select</option>
                                                     <?php if(isset($zone)) { for ($k=0; $k < count($zone) ; $k++) { ?>
                                                             <option value="<?php echo $zone[$k]->id; ?>" <?php if(isset($data)) { if($zone[$k]->id==$data[0]->zone_id) { echo 'selected'; } } ?>><?php echo $zone[$k]->zone; ?></option>
@@ -218,7 +218,7 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Store <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="store_id" id="store_id" class="form-control select2" onchange="get_locations();">
+                                                <select name="store_id" id="store_id" class="form-control select2" onchange="get_locations();" disabled>
                                                     <option value="">Select</option>
                                                     <?php if(isset($store)) { for ($k=0; $k < count($store) ; $k++) { ?>
                                                             <option value="<?php echo $store[$k]->store_id; ?>" <?php if(isset($data)) { if($store[$k]->store_id==$data[0]->store_id) { echo 'selected'; } } ?>><?php echo $store[$k]->store_name; ?></option>
@@ -231,7 +231,7 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Location <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="location_id" id="location_id" class="form-control select2">
+                                                <select name="location_id" id="location_id" class="form-control select2" disabled>
                                                     <option value="">Select</option>
                                                     <?php if(isset($location)) { for ($k=0; $k < count($location) ; $k++) { ?>
                                                             <option value="<?php echo $location[$k]->location_id; ?>" <?php if(isset($data)) { if($location[$k]->location_id==$data[0]->location_id) { echo 'selected'; } } ?>><?php echo $location[$k]->location; ?></option>
@@ -256,7 +256,7 @@
                                             <input type="text" class="form-control" name="discount" id="discount" placeholder="Discount" value="<?php if(isset($data)) { echo $data[0]->discount; } ?>" />
                                         </div>
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group" style="display: none;">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Tax <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4  col-sm-4 col-xs-12 option-line-height">
@@ -280,19 +280,32 @@
                                         <table class="table table-bordered" style="margin-bottom: 0px; ">
                                         <thead>
                                             <tr>
+                                                <th colspan="6">As Per PO</th>
+                                                <th colspan="3">As Per Delivery</th>
+                                                <th style="display: none;"></th>
+                                            </tr>
+                                            <tr>
                                                 <th style="width: 100px">Type <span class="asterisk_sign">*</span></th>
                                                 <th style="width: 250px">Item <span class="asterisk_sign">*</span></th>
                                                 <th>Qty <span class="asterisk_sign">*</span></th>
                                                 <th>Rate (In Rs) </th>
                                                 <th>Sell Rate (In Rs) <span class="asterisk_sign">*</span></th>
                                                 <th style="display: none;">Grams</th>
-                                                <th>Amount (In Rs)</th>
-                                                <th>CGST (In Rs)</th>
-                                                <th>SGST (In Rs)</th>
-                                                <th>IGST (In Rs)</th>
-                                                <th>Tax (In Rs)</th>
+                                                <th style="display: none;">Amount (In Rs)</th>
+                                                <th style="display: none;">CGST (In Rs)</th>
+                                                <th style="display: none;">SGST (In Rs)</th>
+                                                <th style="display: none;">IGST (In Rs)</th>
+                                                <th style="display: none;">Tax (In Rs)</th>
                                                 <th>Total Amount (In Rupees)</th>
-                                                <th class="table_action">Action</th>
+                                                <th>Qty <span class="asterisk_sign">*</span></th>
+                                                <th>Sell Rate (In Rs) <span class="asterisk_sign">*</span></th>
+                                                <th style="display: none;">Amount (In Rs)</th>
+                                                <th style="display: none;">CGST (In Rs)</th>
+                                                <th style="display: none;">SGST (In Rs)</th>
+                                                <th style="display: none;">IGST (In Rs)</th>
+                                                <th style="display: none;">Tax (In Rs)</th>
+                                                <th>Total Amount (In Rupees)</th>
+                                                <th class="table_action" style="display: none;">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody id="box_details">
@@ -302,62 +315,89 @@
                                                 <td>
                                                     <select name="type[]" class="form-control type" id="type_<?php echo $i;?>">
                                                         <option value="">Select</option>
-                                                        <option value="Bar" <?php if($distributor_po_items[$i]->type=="Bar") { echo 'selected'; } ?>>Bar</option>
-                                                        <option value="Box" <?php if($distributor_po_items[$i]->type=="Box") { echo 'selected'; } ?>>Box</option>
+                                                        <?php if($distributor_po_items[$i]->type=="Bar") { ?>
+                                                        <option value="Bar" selected >Bar</option>
+                                                        <?php } else if($distributor_po_items[$i]->type=="Box") { ?>
+                                                        <option value="Box" selected >Box</option>
+                                                        <?php } ?>
                                                     </select>
                                                 </td>
                                                 <td>
                                                     <select name="bar[]" class="form-control bar" id="bar_<?php echo $i;?>" data-error="#err_item_<?php echo $i;?>" style="<?php if($distributor_po_items[$i]->type=="Box") { echo 'display: none;'; } ?>">
                                                         <option value="">Select</option>
-                                                        <?php if(isset($bar)) { for ($k=0; $k < count($bar) ; $k++) { ?>
-                                                                <option value="<?php echo $bar[$k]->id; ?>" <?php if($distributor_po_items[$i]->type=="Bar" && $bar[$k]->id==$distributor_po_items[$i]->item_id) { echo 'selected'; } ?>><?php echo $bar[$k]->product_name; ?></option>
-                                                        <?php }} ?>
+                                                        <?php if(isset($bar)) { for ($k=0; $k < count($bar) ; $k++) { if($distributor_po_items[$i]->type=="Bar" && $bar[$k]->id==$distributor_po_items[$i]->item_id) { ?>
+                                                            <option value="<?php echo $bar[$k]->id; ?>" selected ><?php echo $bar[$k]->product_name; ?></option>
+                                                        <?php }}} ?>
                                                     </select>
                                                     <select name="box[]" class="form-control box" id="box_<?php echo $i;?>" data-error="#err_item_<?php echo $i;?>" style="<?php if($distributor_po_items[$i]->type=="Bar") { echo 'display: none;'; } ?>">
                                                         <option value="">Select</option>
-                                                        <?php if(isset($box)) { for ($k=0; $k < count($box) ; $k++) { ?>
-                                                                <option value="<?php echo $box[$k]->id; ?>" <?php if($distributor_po_items[$i]->type=="Box" && $box[$k]->id==$distributor_po_items[$i]->item_id) { echo 'selected'; } ?>><?php echo $box[$k]->box_name; ?></option>
-                                                        <?php }} ?>
+                                                        <?php if(isset($box)) { for ($k=0; $k < count($box) ; $k++) { if($distributor_po_items[$i]->type=="Box" && $box[$k]->id==$distributor_po_items[$i]->item_id) { ?>
+                                                            <option value="<?php echo $box[$k]->id; ?>" selected ><?php echo $box[$k]->box_name; ?></option>
+                                                        <?php }}} ?>
                                                     </select>
                                                     <div id="err_item_<?php echo $i;?>"></div>
                                                 </td>
                                                 <td>
-                                                    <input type="text" class="form-control qty" name="qty[]" id="qty_<?php echo $i; ?>" placeholder="Qty" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->qty; } ?>"/>
+                                                    <input type="text" class="form-control po_qty" name="po_qty[]" id="po_qty_<?php echo $i; ?>" placeholder="Qty" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->qty; } ?>" readonly />
                                                 </td>
                                                 <td>
                                                     <input type="text" class="form-control rate" name="rate[]" id="rate_<?php echo $i; ?>" placeholder="Rate" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->rate; } ?>" readonly />
                                                 </td>
                                                 <td>
-                                                    <input type="hidden" class="form-control" name="cgst[]" id="cgst_<?php echo $i; ?>" placeholder="cgst" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->cgst; } else echo '0'; ?>" readonly />
-                                                    <input type="hidden" class="form-control" name="sgst[]" id="sgst_<?php echo $i; ?>" placeholder="sgst" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->sgst; } else echo '0'; ?>" readonly />
-                                                    <input type="hidden" class="form-control" name="igst[]" id="igst_<?php echo $i; ?>" placeholder="igst" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->igst; } else echo '0'; ?>" readonly />
+                                                    <input type="hidden" class="form-control" name="cgst[]" id="cgst_<?php echo $i; ?>" placeholder="cgst" value="0" readonly />
+                                                    <input type="hidden" class="form-control" name="sgst[]" id="sgst_<?php echo $i; ?>" placeholder="sgst" value="0" readonly />
+                                                    <input type="hidden" class="form-control" name="igst[]" id="igst_<?php echo $i; ?>" placeholder="igst" value="0" readonly />
                                                     <input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_<?php echo $i; ?>" placeholder="tax_per" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->tax_percentage; } ?>"/>
                                                     <input type="hidden" class="form-control sell_margin" name="sell_margin[]" id="sell_margin_<?php echo $i; ?>" placeholder="Sell Margin" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->margin_per; } ?>"/>
-                                                    <input type="text" class="form-control sell_rate" name="sell_rate[]" id="sell_rate_<?php echo $i; ?>" placeholder="Sell Rate" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->sell_rate; } ?>"/>
-                                                    <input type="hidden" class="form-control promo_margin" name="promo_margin[]" id="promo_margin_<?php echo $i; ?>" placeholder="Promotion Margin" value="0"/>
+                                                    <input type="hidden" class="form-control promo_margin" name="promo_margin[]" id="promo_margin_<?php echo $i; ?>" placeholder="Promotion Margin" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->promo_margin; } ?>"/>
+                                                    <input type="text" class="form-control po_sell_rate" name="po_sell_rate[]" id="po_sell_rate_<?php echo $i; ?>" placeholder="Sell Rate" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->sell_rate; } ?>" readonly />
                                                 </td>
                                                 <td style="display: none;">
                                                     <input type="text" class="form-control grams" name="grams[]" id="grams_<?php echo $i; ?>" placeholder="Grams" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->grams; } ?>" readonly />
                                                 </td>
-                                                <td>
-                                                    <input type="text" class="form-control amount" name="amount[]" id="amount_<?php echo $i; ?>" placeholder="Amount" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->amount; } ?>" readonly />
+                                                <td style="display: none;">
+                                                    <input type="text" class="form-control po_amount" name="po_amount[]" id="po_amount_<?php echo $i; ?>" placeholder="Amount" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->amount; } ?>" readonly />
+                                                </td>
+                                                <td style="display: none;">
+                                                    <input type="text" class="form-control po_cgst_amt" name="po_cgst_amt[]" id="po_cgst_amt_<?php echo $i; ?>" placeholder="CGST Amount" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->cgst_amt; } ?>" readonly />
+                                                </td>
+                                                <td style="display: none;">
+                                                    <input type="text" class="form-control po_sgst_amt" name="po_sgst_amt[]" id="po_sgst_amt_<?php echo $i; ?>" placeholder="SGST Amount" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->sgst_amt; } ?>" readonly />
+                                                </td>
+                                                <td style="display: none;">
+                                                    <input type="text" class="form-control po_igst_amt" name="po_igst_amt[]" id="po_igst_amt_<?php echo $i; ?>" placeholder="IGST Amount" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->igst_amt; } ?>" readonly />
+                                                </td>
+                                                <td style="display: none;">
+                                                    <input type="text" class="form-control po_tax_amt" name="po_tax_amt[]" id="po_tax_amt_<?php echo $i; ?>" placeholder="Tax Amount" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->tax_amt; } ?>" readonly />
                                                 </td>
                                                 <td>
-                                                    <input type="text" class="form-control cgst_amt" name="cgst_amt[]" id="cgst_amt_<?php echo $i; ?>" placeholder="CGST Amount" value="" readonly />
+                                                    <input type="text" class="form-control po_total_amt" name="po_total_amt[]" id="po_total_amt_<?php echo $i; ?>" placeholder="Amount" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->total_amt; } ?>" readonly />
                                                 </td>
                                                 <td>
-                                                    <input type="text" class="form-control sgst_amt" name="sgst_amt[]" id="sgst_amt_<?php echo $i; ?>" placeholder="SGST Amount" value="" readonly />
+                                                    <input type="text" class="form-control qty" name="qty[]" id="qty_<?php echo $i; ?>" placeholder="Qty" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->d_qty; } ?>"/>
                                                 </td>
                                                 <td>
-                                                    <input type="text" class="form-control igst_amt" name="igst_amt[]" id="igst_amt_<?php echo $i; ?>" placeholder="IGST Amount" value="" readonly />
+                                                    <input type="text" class="form-control sell_rate" name="sell_rate[]" id="sell_rate_<?php echo $i; ?>" placeholder="Sell Rate" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->d_sell_rate; } ?>"/>
+                                                </td>
+                                                <td style="display: none;">
+                                                    <input type="text" class="form-control amount" name="amount[]" id="amount_<?php echo $i; ?>" placeholder="Amount" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->d_amount; } ?>" readonly />
+                                                </td>
+                                                <td style="display: none;">
+                                                    <input type="text" class="form-control cgst_amt" name="cgst_amt[]" id="cgst_amt_<?php echo $i; ?>" placeholder="CGST Amount" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->d_cgst_amt; } ?>" readonly />
+                                                </td>
+                                                <td style="display: none;">
+                                                    <input type="text" class="form-control sgst_amt" name="sgst_amt[]" id="sgst_amt_<?php echo $i; ?>" placeholder="SGST Amount" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->d_sgst_amt; } ?>" readonly />
+                                                </td>
+                                                <td style="display: none;">
+                                                    <input type="text" class="form-control igst_amt" name="igst_amt[]" id="igst_amt_<?php echo $i; ?>" placeholder="IGST Amount" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->d_igst_amt; } ?>" readonly />
+                                                </td>
+                                                <td style="display: none;">
+                                                    <input type="text" class="form-control tax_amt" name="tax_amt[]" id="tax_amt_<?php echo $i; ?>" placeholder="Tax Amount" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->d_tax_amt; } ?>" readonly />
                                                 </td>
                                                 <td>
-                                                    <input type="text" class="form-control tax_amt" name="tax_amt[]" id="tax_amt_<?php echo $i; ?>" placeholder="Tax Amount" value="" readonly />
+                                                    <input type="text" class="form-control total_amt" name="total_amt[]" id="total_amt_<?php echo $i; ?>" placeholder="Amount" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->d_total_amt; } ?>" readonly />
                                                 </td>
-                                                <td>
-                                                    <input type="text" class="form-control total_amt" name="total_amt[]" id="total_amt_<?php echo $i; ?>" placeholder="Amount" value="" readonly />
-                                                </td>
-                                                 <td class="table_action" style="text-align:center; vertical-align: middle;">
+                                                <td class="table_action" style="text-align:center; vertical-align: middle; display: none;">
                                                        <?php  
                                                             $style = '';
                                                             if(isset($data[0]->freezed)){
@@ -373,86 +413,11 @@
                                                     <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  style="<?=$style?>"></span></a>
                                                 </td>
                                             </tr>
-                                        <?php }} else { ?>
-                                            <tr id="box_<?php echo $i; ?>_row">
-                                                <td>
-                                                    <select name="type[]" class="form-control type" id="type_<?php echo $i;?>">
-                                                        <option value="">Select</option>
-                                                        <option value="Bar">Bar</option>
-                                                        <option value="Box">Box</option>
-                                                    </select>
-                                                </td>
-                                                <td>
-                                                    <select name="bar[]" class="form-control bar" id="bar_<?php echo $i;?>" data-error="#err_item_<?php echo $i;?>" style="">
-                                                        <option value="">Select</option>
-                                                        <?php if(isset($bar)) { for ($k=0; $k < count($bar) ; $k++) { ?>
-                                                                <option value="<?php echo $bar[$k]->id; ?>"><?php echo $bar[$k]->product_name; ?></option>
-                                                        <?php }} ?>
-                                                    </select>
-                                                    <select name="box[]" class="form-control box" id="box_<?php echo $i;?>" data-error="#err_item_<?php echo $i;?>" style="display: none;">
-                                                        <option value="">Select</option>
-                                                        <?php if(isset($box)) { for ($k=0; $k < count($box) ; $k++) { ?>
-                                                                <option value="<?php echo $box[$k]->id; ?>"><?php echo $box[$k]->box_name; ?></option>
-                                                        <?php }} ?>
-                                                    </select>
-                                                    <div id="err_item_<?php echo $i;?>"></div>
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control qty" name="qty[]" id="qty_<?php echo $i; ?>" placeholder="Qty" value=""/>
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control rate" name="rate[]" id="rate_<?php echo $i; ?>" placeholder="Rate" value="" readonly />
-                                                </td>
-                                                 <td>
-                                                    <input type="hidden" class="form-control" name="cgst[]" id="cgst_<?php echo $i; ?>" placeholder="cgst" value="0" readonly />
-                                                    <input type="hidden" class="form-control" name="sgst[]" id="sgst_<?php echo $i; ?>" placeholder="sgst" value="0" readonly />
-                                                    <input type="hidden" class="form-control" name="igst[]" id="igst_<?php echo $i; ?>" placeholder="igst" value="0" readonly />
-                                                    <input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_<?php echo $i; ?>" placeholder="tax_per" value="0"/>
-                                                    <input type="hidden" class="form-control sell_margin" name="sell_margin[]" id="sell_margin_<?php echo $i; ?>" placeholder="Sell Margin" value="0"/>
-                                                    <input type="text" class="form-control sell_rate" name="sell_rate[]" id="sell_rate_<?php echo $i; ?>" placeholder="Sell Rate" value="0"/>
-                                                    <input type="hidden" class="form-control promo_margin" name="promo_margin[]" id="promo_margin_<?php echo $i; ?>" placeholder="Promotion Margin" value="0"/>
-                                                </td>
-                                                <td style="display: none;">
-                                                    <input type="text" class="form-control grams" name="grams[]" id="grams_<?php echo $i; ?>" placeholder="Grams" value="" readonly />
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control amount" name="amount[]" id="amount_<?php echo $i; ?>" placeholder="Amount" value="" readonly />
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control cgst_amt" name="cgst_amt[]" id="cgst_amt_<?php echo $i; ?>" placeholder="CGST Amount" value="" readonly />
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control sgst_amt" name="sgst_amt[]" id="sgst_amt_<?php echo $i; ?>" placeholder="SGST Amount" value="" readonly />
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control igst_amt" name="igst_amt[]" id="igst_amt_<?php echo $i; ?>" placeholder="IGST Amount" value="" readonly />
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control tax_amt" name="tax_amt[]" id="tax_amt_<?php echo $i; ?>" placeholder="Tax Amount" value="" readonly />
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control total_amt" name="total_amt[]" id="total_amt_<?php echo $i; ?>" placeholder="Total Amount" value="" readonly />
-                                                </td>
-                                                <td class="table_action" style="text-align:center; vertical-align: middle;">
-                                                    <?php  
-                                                        if(isset($data[0]->freezed)){
-                                                            if($data[0]->freezed==1){
-                                                                $style =  'display: none;';
-                                                            }
-                                                        }else
-                                                            {
-                                                                 $style =  'display: block;';
-                                                            }
-                                                    ?>
-
-                                                    <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  style="<?=$style?>"></span></a>
-                                                </td>
-                                            </tr>
-                                        <?php } ?>
+                                        <?php }} ?>
                                         </tbody>
-                                        <tfoot>
+                                        <tfoot style="display: none;">
                                             <tr>
-                                                <td colspan="12">
+                                                <td colspan="21">
                                                     <button type="button" class="btn btn-success" id="repeat-box"  >+</button>
                                                 </td>
                                             </tr>
@@ -462,21 +427,17 @@
                                     </div>
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-6 col-sm-6 col-xs-12 control-label">Round Off Amount (In Rs)<span class="asterisk_sign">*</span>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span id="round_off_amount1"> <?php if (isset($data)) { echo $data[0]->round_off_amount; } ?></span></label>
-                                            <input type="hidden" class="form-control" name="round_off_amount" id="round_off_amount" placeholder="Round Off Amount" value="<?php if (isset($data)) { echo $data[0]->round_off_amount; } ?>" readonly />
-                                            <label class="col-md-6 col-sm-6 col-xs-12 control-label" id="">Invoice Amount (In Rs)<span class="asterisk_sign">*</span>: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span id="invoice_amount1">  <?php if (isset($data)) { echo $data[0]->invoice_amount; } ?></span></label>
-                                            <input type="hidden" class="form-control" name="invoice_amount" id="invoice_amount" placeholder="Invoice Amount" value="<?php if (isset($data)) { echo $data[0]->invoice_amount; } ?>" readonly />
+                                            <label class="col-md-6 col-sm-6 col-xs-12 control-label">Round Off Amount (In Rs)<span class="asterisk_sign">*</span>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span id="po_round_off_amount1"> <?php if (isset($data)) { echo $data[0]->round_off_amount; } ?></span></label>
+                                            <input type="hidden" class="form-control" name="po_round_off_amount" id="po_round_off_amount" placeholder="Round Off Amount" value="<?php if (isset($data)) { echo $data[0]->round_off_amount; } ?>" readonly />
+                                            <label class="col-md-6 col-sm-6 col-xs-12 control-label" id="">Invoice Amount (In Rs)<span class="asterisk_sign">*</span>: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span id="po_invoice_amount1">  <?php if (isset($data)) { echo $data[0]->invoice_amount; } ?></span></label>
+                                            <input type="hidden" class="form-control" name="po_invoice_amount" id="po_invoice_amount" placeholder="Invoice Amount" value="<?php if (isset($data)) { echo $data[0]->invoice_amount; } ?>" readonly />
                                         </div>
                                     </div>
                                      <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Enter PO Amount</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="entered_invoice_amount" id="entered_invoice_amount" placeholder="PO Amount" value="<?php if(isset( $data[0]->entered_invoice_amount)) echo $data[0]->entered_invoice_amount; ?>" onchange="check_amount();" />
-                                            </div>
-                                            <div id="mismatch_div" style="display: none;">
-                                                <label class="col-md-2 col-sm-2 col-xs-12 control-label" style="color: #FF0000; display: none;">Amount Mismatch</label>
-                                                <button type="button" class="btn btn-default" id="btn_send_email">Send Mismatch Email</button>
+                                                <input type="text" class="form-control" name="entered_invoice_amount" id="entered_invoice_amount" placeholder="PO Amount" value="<?php if(isset( $data[0]->invoice_amount)) echo $data[0]->invoice_amount; ?>" readonly />
                                             </div>
                                         </div>
                                     </div>
@@ -488,6 +449,14 @@
                                                 <input type="radio" name="shipping_address"  value="no" id="shipping_address_no" data-error="#err_shipping_address" <?php if (isset($data)) { if($data[0]->shipping_address=='no') echo 'checked'; } ?>/>&nbsp;&nbsp;No&nbsp;&nbsp;&nbsp;
                                                 <div id="err_shipping_address"></div>
                                             </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-6 col-sm-6 col-xs-12 control-label">As Per Delivery Round Off Amount (In Rs)<span class="asterisk_sign">*</span>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span id="round_off_amount1"> <?php if (isset($data)) { echo $data[0]->round_off_amount; } ?></span></label>
+                                            <input type="hidden" class="form-control" name="round_off_amount" id="round_off_amount" placeholder="Round Off Amount" value="<?php if (isset($data)) { echo $data[0]->round_off_amount; } ?>" readonly />
+                                            <label class="col-md-6 col-sm-6 col-xs-12 control-label" id="">As Per Delivery Invoice Amount (In Rs)<span class="asterisk_sign">*</span>: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span id="invoice_amount1">  <?php if (isset($data)) { echo $data[0]->invoice_amount; } ?></span></label>
+                                            <input type="hidden" class="form-control" name="invoice_amount" id="invoice_amount" placeholder="Invoice Amount" value="<?php if (isset($data)) { echo $data[0]->invoice_amount; } ?>" readonly />
                                         </div>
                                     </div>
                                     <div class="form-group depo" id="shipping_address_div" style="<?php if (isset($data)) { if($data[0]->delivery_through=='WHPL' && $data[0]->shipping_address=='No') echo 'display: block'; else  echo 'display: none'; } else echo 'display: none;'; ?>">
@@ -520,19 +489,11 @@
                                     </div>
                                     <div class="form-group" style="display: none">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Date Of Dispatch</label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control datepicker" name="dispatch_date" id="dispatch_date" placeholder="Date Of Dispatch" value="<?php if(isset($data)) echo (($data[0]->dispatch_date!=null && $data[0]->dispatch_date!='')?date('d/m/Y',strtotime($data[0]->dispatch_date)):''); ?>" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group" style="display: none">
-                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Delivery Status *</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <select class="form-control" name="delivery_status" id="delivery_status"  style="color:#000;">
                                                     <option value="">Select</option>
-                                                    <option value="Pending" <?php if(isset($data)) {if ($data[0]->delivery_status=='Pending') echo 'selected';}?>>Pending</option>
+                                                    <option value="Pending" <?php if(isset($data)) {if ($data[0]->delivery_status=='Pending') echo 'selected';}?>>Delivered Pending Merchandiser Approval</option>
                                                     <option value="GP Issued" <?php if(isset($data)) {if ($data[0]->delivery_status=='GP Issued') echo 'selected';}?>>GP Issued</option>
                                                     <option value="Delivered Not Complete" <?php if(isset($data)) {if ($data[0]->delivery_status=='Delivered Not Complete') echo 'selected';}?>>Delivered Not Complete</option>
                                                     <option value="Delivered" <?php if(isset($data)) {if ($data[0]->delivery_status=='Delivered') echo 'selected';}?>>Delivered</option>
@@ -541,7 +502,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group" style="display: none">
+                                    <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Delivery Date *</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
@@ -551,8 +512,32 @@
                                     </div>
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Date Of Dispatch</label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control datepicker" name="dispatch_date" id="dispatch_date" placeholder="Date Of Dispatch" value="<?php if(isset($data)) echo (($data[0]->dispatch_date!=null && $data[0]->dispatch_date!='')?date('d/m/Y',strtotime($data[0]->dispatch_date)):''); ?>" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Person Name</label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="person_name" id="person_name" placeholder="Person Name" value="<?php if(isset($data)) echo $data[0]->person_name; ?>" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Invoice Number</label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="invoice_no" id="invoice_no" placeholder="Invoice Number" value="<?php if(isset($data)) echo $data[0]->invoice_no; ?>" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">PO Copy</label>
-                                            <div class="col-md-2 col-sm-2 col-xs-12" >
+                                            <div class="col-md-2 col-sm-2 col-xs-12" style="display: none;">
                                                 <input type="hidden" class="form-control" name="doc_document" value="<?php if(isset($data)) echo $data[0]->doc_document; ?>" />
                                                 <input type="hidden" class="form-control" name="document_name" value="<?php if(isset($data)) echo $data[0]->document_name; ?>" />
                                                 <!-- <input type="file" class="fileinput btn btn-info btn-small doc_file" name="doc_file" id="doc_file" data-error="#doc_file_error"/> -->
@@ -592,18 +577,8 @@
                                 </div>
                             </div>
                             <div class="panel-footer">
-                                <!-- <button class="btn btn-default" id="btn-confirm">Confirm</button> -->
                                 <a href="<?php echo base_url(); ?>index.php/distributor_po" class="btn btn-danger pull-right" type="reset" id="reset">Cancel</a>
-                                <!-- <button class="btn btn-success pull-right" style="<?php //if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</button> -->
-                                <?php $curusr=$this->session->userdata('session_id'); ?>
-                                <input type="submit" class="btn btn-success btn-sm" id="btn_submit" name="btn_submit" value="Submit For Approval" style="<?php if(isset($access)) { if(isset($data)) { if($data[0]->freezed) { echo 'display: none;'; } else { if($access[0]->r_edit=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || $data[0]->status=='InActive')) echo ''; else echo 'display: none;'; } } else if($access[0]->r_insert=='1') echo ''; else echo 'display: none;'; ?>" />
-                                <?php if(isset($data) && $data[0]->freezed!=1) { ?>
-                                <input type="submit" class="btn btn-danger btn-sm" id="btn_delete" name="btn_delete" value="Delete" style="<?php if(isset($access) ) {
-                                if(isset($data)) {if($access[0]->r_delete=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved') && $data[0]->status!='InActive') echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
-                                <?php } ?>
-                                <input type="submit" class="btn btn-success btn-sm" id="btn_approve" name="btn_approve" value="Approve" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
-                                <input type="submit" class="btn btn-danger btn-sm" id="btn_reject" name="btn_reject" value="Reject" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive' )) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
-                                <?php }?>                                    
+                                <input type="submit" class="btn btn-success btn-sm" id="btn_submit" name="btn_submit" value="Save" />
                             </div>
                             </form>
                         </div>
@@ -615,97 +590,6 @@
             <!-- END PAGE CONTENT -->
         </div>
         <!-- END PAGE CONTAINER -->
-        
-        <div class="modal fade" id="send_mismatch_email" role="dialog">
-            <div class="modal-dialog">
-                <form id="form_send_email" role="form" class="form-horizontal" method="post" action="<?php echo base_url().'index.php/distributor_po/send_email'; ?>">
-                    <div class="modal-content" >
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            <h4 class="modal-title">Send Mismatch Email</h4>
-                        </div>
-                        <div class="modal-body">
-                            <div class="form-group" style="display: none;">
-                                <div class="col-md-12 col-sm-12 col-xs-12">
-                                    <input type="hidden" id="email_ref_id" name="email_ref_id" value="<?php if(isset($email[0]->email_ref_id)) echo $email[0]->email_ref_id; else if(isset($data)) echo $data[0]->id; ?>" />
-                                    <input type="hidden" id="email_type" name="email_type" value="<?php if(isset($email)) echo $email[0]->email_type; ?>" />
-                                    <label class="col-md-2 col-sm-2 col-xs-12 control-label">From &nbsp;&nbsp;&nbsp; </label>
-                                    <div class="col-md-8 col-sm-8 col-xs-12">
-                                        <input type="text" class="form-control" name="email_from" value="<?php if(isset($email)) echo $email[0]->email_from; else echo 'cs@eatanytime.in'; ?>" />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group" id="email_response_div" style="display:none;">
-                                <div class="col-md-12 col-sm-12 col-xs-12">
-                                    <label class="col-md-12 col-sm-12 col-xs-12 control-label" id="email_response"></label>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="col-md-12 col-sm-12 col-xs-12">
-                                    <label class="col-md-2 col-sm-2 col-xs-12 control-label">To &nbsp;&nbsp;&nbsp; </label>
-                                    <div class="col-md-8 col-sm-8 col-xs-12">
-                                        <input type="text" class="form-control" name="email_to" value="<?php if(isset($email)) echo $email[0]->email_to; ?>" />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="col-md-12 col-sm-12 col-xs-12">
-                                    <label class="col-md-2 col-sm-2 col-xs-12 control-label">CC &nbsp;&nbsp;&nbsp; </label>
-                                    <div class="col-md-8 col-sm-8 col-xs-12">
-                                        <input type="text" class="form-control" name="email_cc" value="<?php if(isset($email)) echo $email[0]->email_cc; ?>" />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="col-md-12 col-sm-12 col-xs-12">
-                                    <label class="col-md-2 col-sm-2 col-xs-12 control-label">BCc &nbsp;&nbsp;&nbsp; </label>
-                                    <div class="col-md-8 col-sm-8 col-xs-12">
-                                        <input type="text" class="form-control" name="email_bcc" value="<?php if(isset($email)) echo $email[0]->email_bcc; ?>" />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="col-md-12 col-sm-12 col-xs-12">
-                                    <label class="col-md-2 col-sm-2 col-xs-12 control-label">Subject &nbsp;&nbsp;&nbsp; </label>
-                                    <div class="col-md-10 col-sm-10 col-xs-12">
-                                        <input type="text" class="form-control" name="email_subject" value="<?php if(isset($email)) echo $email[0]->email_subject; ?>" />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="col-md-12 col-sm-12 col-xs-12">
-                                    <label class="col-md-2 col-sm-2 col-xs-12 control-label">Body </label>
-                                    <div class="col-md-10 col-sm-10 col-xs-12">
-                                        <textarea name="email_body" id="email_body" class="form-control" rows="15"><?php if(isset($email)) echo $email[0]->email_body; ?></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
-                            <button type="button" id="btn_send" class="btn btn-default pull-right">Send</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="mi-modal">
-            <div class="modal-dialog modal-sm">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="myModalLabel">PO amount is different, Do you want to continue? </h4>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" id="modal-btn-si">Yes</button>
-                        <button type="button" class="btn btn-primary" id="modal-btn-no">No</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="alert" role="alert" id="result"></div>
-
 
         <?php $this->load->view('templates/footer');?>
         <script type="text/javascript">
@@ -714,9 +598,10 @@
         <script type="text/javascript" src="<?php echo base_url(); ?>js/load_autocomplete.js"></script>
         <script type="text/javascript" src="<?php echo base_url(); ?>js/validations.js"></script>
         <script type="text/javascript">
-            var newRow1 = '';
+            var newRow1;
             $(document).ready(function(){ 
                 $('#email_date_time').datetimepicker({
+                    
                     format: 'DD-MM-YYYY hh:mm:ss A',
                     defaultDate:new Date()
                 });
@@ -739,25 +624,49 @@
                                     '<td style="display: none;">' + 
                                         '&nbsp;' + 
                                     '</td>' + 
+                                    '<td style="display: none;">' + 
+                                        '<input type="text" class="form-control" name="po_total_amount" id="po_total_amount" placeholder="Total Amount" value="<?php if (isset($data)) { echo $data[0]->amount; } ?>" readonly />' + 
+                                    '</td>' + 
+                                    '<td style="display: none;">' + 
+                                        '<input type="text" class="form-control" name="po_cgst_amount" id="po_cgst_amount" placeholder="CGST Amount" value="<?php if (isset($data)) { echo $data[0]->cgst_amount; } ?>" readonly />' + 
+                                    '</td>' + 
+                                    '<td style="display: none;">' + 
+                                        '<input type="text" class="form-control" name="po_sgst_amount" id="po_sgst_amount" placeholder="SGST Amount" value="<?php if (isset($data)) { echo $data[0]->sgst_amount; } ?>" readonly />' + 
+                                    '</td>' + 
+                                    '<td style="display: none;">' + 
+                                        '<input type="text" class="form-control" name="po_igst_amount" id="po_igst_amount" placeholder="IGST Amount" value="<?php if (isset($data)) { echo $data[0]->igst_amount; } ?>" readonly />' + 
+                                    '</td>' + 
+                                    '<td style="display: none;">' + 
+                                        '<input type="text" class="form-control" name="po_tax_amount" id="po_tax_amount" placeholder="Tax Amount" value="<?php if (isset($data)) { echo $data[0]->tax_amount; } ?>" readonly />' + 
+                                    '</td>' + 
                                     '<td>' + 
+                                        '<input type="text" class="form-control" name="po_final_amount" id="po_final_amount" placeholder="Final Amount" value="<?php if(isset($data)) { echo $data[0]->final_amount; } ?>" readonly />' + 
+                                    '</td>' + 
+                                    '<td>' + 
+                                        '&nbsp;' + 
+                                    '</td>' + 
+                                    '<td>' + 
+                                        'Total' + 
+                                    '</td>' + 
+                                    '<td style="display: none;">' + 
                                         '<input type="text" class="form-control" name="total_amount" id="total_amount" placeholder="Total Amount" value="<?php if (isset($data)) { echo $data[0]->amount; } ?>" readonly />' + 
                                     '</td>' + 
-                                    '<td>' + 
+                                    '<td style="display: none;">' + 
                                         '<input type="text" class="form-control" name="cgst_amount" id="cgst_amount" placeholder="CGST Amount" value="<?php if (isset($data)) { echo $data[0]->cgst_amount; } ?>" readonly />' + 
                                     '</td>' + 
-                                    '<td>' + 
+                                    '<td style="display: none;">' + 
                                         '<input type="text" class="form-control" name="sgst_amount" id="sgst_amount" placeholder="SGST Amount" value="<?php if (isset($data)) { echo $data[0]->sgst_amount; } ?>" readonly />' + 
                                     '</td>' + 
-                                    '<td>' + 
+                                    '<td style="display: none;">' + 
                                         '<input type="text" class="form-control" name="igst_amount" id="igst_amount" placeholder="IGST Amount" value="<?php if (isset($data)) { echo $data[0]->igst_amount; } ?>" readonly />' + 
                                     '</td>' + 
-                                    '<td>' + 
+                                    '<td style="display: none;">' + 
                                         '<input type="text" class="form-control" name="tax_amount" id="tax_amount" placeholder="Tax Amount" value="<?php if (isset($data)) { echo $data[0]->tax_amount; } ?>" readonly />' + 
                                     '</td>' + 
                                     '<td>' + 
                                         '<input type="text" class="form-control" name="final_amount" id="final_amount" placeholder="Final Amount" value="<?php if(isset($data)) { echo $data[0]->final_amount; } ?>" readonly />' + 
                                     '</td>' + 
-                                    '<td class="table_action" style="text-align:center;">' + 
+                                    '<td class="table_action" style="text-align:center; display: none;">' + 
                                         '&nbsp;' + 
                                     '</td>' + 
                                 '</tr>');
@@ -786,6 +695,7 @@
                     $(".datepicker1").datepicker({ maxDate: 0,changeMonth: true,yearRange:'-100:+0',changeYear: true });
                 }
 
+
                 $('#email_body1').hide();
                 $('#email_body2').hide();
                 $('#email_body3').hide();
@@ -807,13 +717,14 @@
                         $('#po_num2').hide();
                     }
                 });             
-                    
+                
                 if($("#basis_of_sales option:selected").val() == 'Emails') {
                     $('#email_body1').show();
                     $('#email_body2').show();
                     $('#email_body3').show();
                     $('#po_num1').hide();
                     $('#po_num2').hide();
+                    
                 }
                 if($("#basis_of_sales option:selected").val() == 'PO Number') {
                     $('#email_body1').hide();
@@ -985,12 +896,12 @@
                     async:false,
                     success: function(data){
                         if(data.result==1){
-                            if(distributor_id==640){
-                                if($("#discount").val()==''){
-                                    $("#discount").val(25)
-                                }
+                        if(distributor_id==640){
+                            if($("#discount").val()==''){
+                                $("#discount").val(25)
                             }
-                            if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327){
+                        }
+                        if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327){
                                 $('#sell_out').val($("#discount").val());
                             } else {
                                 $('#sell_out').val(data.sell_out);
@@ -1065,6 +976,7 @@
                 } else {
                     $('.direct').hide();
                 }
+                
                 
                 if($('#distributor_id').val()!="" && $('input[name=delivery_through]:checked').val()=='WHPL'){
                     /*alert("Hii5");*/
@@ -1346,6 +1258,7 @@
                 var sgst = 0;
                 var igst = 0;
                 var grams =0;
+                var store_id = $('#store_id').val();
                 var pro_margin = 0;
                 pro_margin = parseFloat(get_number($("#promo_margin_"+index).val(),2));
                 if (isNaN(pro_margin)) pro_margin=0;
@@ -1451,9 +1364,7 @@
                 var distributor_id = $("#distributor_id").val();
                 var grams_in_bar = 0;
                 var rate = 0;
-                var cgst = 0;
-                var sgst = 0;
-                var igst = 0;
+                var store_id = $('#store_id').val();;
                 var pro_margin = 0;
                 pro_margin = parseFloat(get_number($("#promo_margin_"+index).val(),2));
                 if (isNaN(pro_margin)) pro_margin=0;
@@ -1636,8 +1547,6 @@
                 $("#invoice_amount").val(final_amt.toFixed(0));
                 $("#round_off_amount1").text(round_off_amt.toFixed(2));
                 $("#invoice_amount1").text(final_amt.toFixed(0));
-
-                check_amount();
             }
 
             $(document).ready(function(){
@@ -2017,86 +1926,6 @@
                     }
                 });
             }
-        </script>
-        <script type="text/javascript">
-            $("#btn_send_email").on("click", function(){
-                console.log('send mail');
-                $("#send_mismatch_email").modal('show');
-            });
-
-            var check_amount = function() {
-                if($("#entered_invoice_amount").val()!=""){
-                    if($("#entered_invoice_amount").val()!=$("#final_amount").val()){
-                        $("#mismatch_div").show();
-                    } else {
-                        $("#mismatch_div").hide();
-                    }
-                }
-            }
-
-            $("#btn_send").on("click", function(){
-                console.log('send email');
-
-                $.ajax({
-                    url:BASE_URL+'index.php/distributor_po/send_email',
-                    method:"post",
-                    data:$('#form_send_email').serialize(),
-                    dataType:"html",
-                    async:false,
-                    success: function(data){
-                        console.log(data);
-
-                        if(data==1){
-                            $('#email_response_div').show();
-                            $('#email_response').html('Mail Sent');
-                            $("#send_mismatch_email").modal('hide');
-                        } else {
-                            $('#email_response_div').show();
-                            $('#email_response').html('Mail Sending Failed');
-                        }
-                    },
-                    error: function (response) {
-                        var r = jQuery.parseJSON(response.responseText);
-                        alert("Message: " + r.Message);
-                        alert("StackTrace: " + r.StackTrace);
-                        alert("ExceptionType: " + r.ExceptionType);
-                    }
-                });
-            });
-
-            var modalConfirm = function(callback){
-                $("#btn-confirm").on("click", function(){
-                    $("#mi-modal").modal('show');
-                });
-
-                $("#modal-btn-si").on("click", function(){
-                    callback(true);
-                    $("#mi-modal").modal('hide');
-                });
-
-                $("#modal-btn-no").on("click", function(){
-                    callback(false);
-                    $("#mi-modal").modal('hide');
-                });
-            };
-
-            modalConfirm(function(confirm){
-                if(confirm){
-                    $("#modal_result").val("Yes");
-                    // console.log('CONFIRMADO');
-
-                    $('#form_distributor_po_details').submit();
-                } else {
-                    // $("#modal_result").val("No");
-                    // console.log('NO CONFIRMADO');
-                    
-                    var validator = $("#form_distributor_po_details").validate();
-                    var errors = {};
-                    var name = $('#entered_invoice_amount').attr('name');
-                    errors[name] = "Please Enter Correct amount";
-                    validator.showErrors(errors);
-                }
-            });
         </script>
     </body>
 </html>

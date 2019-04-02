@@ -103,7 +103,7 @@
                                                             <option value="<?php echo $vendor[$k]->id; ?>" <?php if(isset($data)) { if($vendor[$k]->id==$data[0]->vendor_id) { echo 'selected'; } } ?>><?php echo $vendor[$k]->vendor_name; ?></option>
                                                     <?php }} ?>
                                                 </select>
-												 <input type="hidden" id="vendor_state" name="vendor_state" value="<?php if(isset($data[0]->vendor_state)) echo $data[0]->vendor_state; ?>" />
+												<input type="hidden" id="vendor_state" name="vendor_state" value="<?php if(isset($data[0]->vendor_state)) echo $data[0]->vendor_state; ?>" />
                                                 <!-- <input type="hidden" name="vendor_id" id="vendor_id" value="<?php //if(isset($data)) { echo  $data[0]->vendor_id; } ?>"/>
                                                 <input type="text" class="form-control load_vendor" name="vendor" id="vendor" placeholder="Type To Select Vendor...." value="<?php //if(isset($data)) { echo  $data[0]->vendor_name; } ?>"/> -->
                                             </div>
@@ -130,14 +130,15 @@
 									<div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Depot <span class="asterisk_sign">*</span></label>
+                                            <?php // onchange="get_depot_details()" ?>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="depot_id" id="depot_id" class="form-control select2" onchange="get_depot_details()">
+                                                <select name="depot_id" id="depot_id" class="form-control select2">
                                                     <option value="">Select</option>
                                                     <?php if(isset($depot)) { for ($k=0; $k < count($depot) ; $k++) { ?>
                                                             <option value="<?php echo $depot[$k]->id; ?>" <?php if(isset($data)) { if($depot[$k]->id==$data[0]->depot_id) { echo 'selected'; } } ?>><?php echo $depot[$k]->depot_name; ?></option>
                                                     <?php }} ?>
                                                 </select>
-												 <input type="hidden" id="depot_state" name="depot_state" value="<?php if(isset($data[0]->depot_state)) echo $data[0]->depot_state; ?>" />
+												<input type="hidden" id="depot_state" name="depot_state" value="MAHARASHTRA" />
                                                 <!-- <input type="hidden" name="depot_id" id="depot_id" value="<?php //if(isset($data)) { echo  $data[0]->depot_id; } ?>"/>
                                                 <input type="text" class="form-control load_depot" name="depot" id="depot" placeholder="Type To Select Depot...." value="<?php //if(isset($data)) { echo  $data[0]->depot_name; } ?>"/> -->
                                             </div>
@@ -765,7 +766,7 @@
                             // $('#vendor_id').val(data.vendor_id);
                             // $('#depot_id').val(data.depot_id);
                             $('#depot_id').select2('val', data.depot_id);
-							get_depot_details();
+							// get_depot_details();
                         }
                     },
                     error: function (response) {

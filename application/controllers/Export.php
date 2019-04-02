@@ -1487,5 +1487,34 @@ class Export extends CI_Controller {
     public function gt_store_report() {
       $this->export_model->gt_store_report();
     }
+
+    public function test_mail() {
+        $message = '<html>
+                    <body>
+                        <h3>Wholesome Habits Private Limited</h3>
+                        <h4>Test</h4>
+                        <br/><br/>
+                        Regards,
+                        <br/><br/>
+                        CS
+                    </body>
+                    </html>';
+        $from_email = 'cs@eatanytime.co.in';
+        $from_email_sender = 'Wholesome Habits Pvt Ltd';
+        $subject = 'Test Mail';
+
+        $to_email = "prasad.bhisale@pecanreams.com";
+        $cc = 'prasad.bhisale@pecanreams.com';
+        $bcc = 'prasad.bhisale@pecanreams.com';
+
+        $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc, $cc, '');
+
+        // $mailSent=1;
+        
+        // echo $message;
+        // echo '<br/><br/>';
+        echo $mailSent;
+        echo '<br/><br/>';
+    }
 } 
 ?>

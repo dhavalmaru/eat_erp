@@ -30,7 +30,7 @@ class Distributor_po extends CI_Controller{
     }
 
     public function index(){
-        $this->checkstatus('pending_for_delivery');
+        $this->checkstatus('pending_for_approval');
     }
 
     public function get_distributors(){
@@ -145,7 +145,9 @@ class Distributor_po extends CI_Controller{
                             .'</span>'.
                             (($r[$i]->date_of_po!=null && $r[$i]->date_of_po!='')?date('d/m/Y',strtotime($r[$i]->date_of_po)):''),
 
-                            '<a href="'.base_url().'index.php/distributor_po/edit/'.$r[$i]->id.'" class=""><i class="fa fa-edit"></i></a>',
+                            (($status=='pending_for_delivery')?
+                                '<a href="'.base_url().'index.php/distributor_po/recon/'.$r[$i]->id.'" class=""><i class="fa fa-edit"></i></a>':
+                                '<a href="'.base_url().'index.php/distributor_po/edit/'.$r[$i]->id.'" class=""><i class="fa fa-edit"></i></a>'),
 
                             ((strtoupper(trim($r[$i]->distributor_name))=='DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='AMAZON DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='NYKAA DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($r[$i]->distributor_name))=='PAYTM DIRECT' || strtoupper(trim($r[$i]->distributor_name))=='UNFACTORY DIRECT')? $r[$i]->distributor_name  : $r[$i]->distributor_name),
 
@@ -310,6 +312,7 @@ class Distributor_po extends CI_Controller{
                     
                 }
             }
+
             $data['selectedstatus']=$selectedstatus;
             $data['active']=$active;
             $data['inactive']=$inactive;
@@ -323,9 +326,11 @@ class Distributor_po extends CI_Controller{
             $data['all']=count($count_data);
             $data['status']=$status;
             $data['sales_rep'] = $this->sales_rep_model->get_data('Approved');
-        $query=$this->db->query("SELECT * FROM sales_rep_master WHERE sr_type='Merchandizer'");
-        $result=$query->result();
-        $data['sales_rep1']=$result;
+
+            $query=$this->db->query("SELECT * FROM sales_rep_master WHERE sr_type='Merchandizer'");
+            $result=$query->result();
+            $data['sales_rep1']=$result;
+
             load_view('distributor_po/distributor_po_list', $data);
 
         } else {
@@ -349,6 +354,7 @@ class Distributor_po extends CI_Controller{
                 $data['box'] = $this->box_model->get_data('Approved');
                 $data['bar'] = $this->product_model->get_data('Approved');
                 $data['bank'] = $this->bank_model->get_data('Approved');
+                $data['email'] = $this->distributor_po_model->get_email_details();
 
                 load_view('distributor_po/distributor_po_details', $data);
             } else {
@@ -389,9 +395,51 @@ class Distributor_po extends CI_Controller{
                 $data['bar'] = $this->product_model->get_data('Approved');
                 $data['distributor_po_items'] = $this->distributor_po_model->get_distributor_po_items($id);
                 $data['bank'] = $this->bank_model->get_data('Approved');
+                $data['email'] = $this->distributor_po_model->get_email_details($id);
                 // $data['distributor_payment_details'] = $this->distributor_po_model->get_distributor_payment_details($id);
 
                 load_view('distributor_po/distributor_po_details', $data);
+            } else {
+                echo "Unauthorized access";
+            }
+        } else {
+            echo '<script>alert("You donot have access to this page.");</script>';
+            $this->load->view('login/main_page');
+        }
+    }
+
+    public function recon($id){
+        $result=$this->distributor_po_model->get_access();
+        if(count($result)>0) {
+            if($result[0]->r_view == 1 || $result[0]->r_edit == 1) {
+                $data['access'] = $this->distributor_po_model->get_access();
+                $id = $this->distributor_po_model->get_pending_data($id);
+                $data['data'] = $this->distributor_po_model->get_distributor_po_data('', $id);
+
+                if(count($data['data'])>0){
+                    $type_id=$data['data'][0]->type_id;
+                    $zone_id=$data['data'][0]->zone_id;
+                    $store_id=$data['data'][0]->store_id;
+                } else {
+                    $type_id='';
+                    $zone_id='';
+                    $store_id='';
+                }
+
+                $data['depot'] = $this->depot_model->get_data('Approved');
+                $data['distributor'] = $this->distributor_model->get_data_without_sample('Approved');
+                $data['type'] = $this->distributor_type_model->get_data('Approved');
+                $data['zone'] = $this->distributor_po_model->get_zone_data('Approved', $type_id);
+                $data['store'] = $this->distributor_po_model->get_store_data('Approved', $type_id, $zone_id);
+                $data['location'] = $this->distributor_po_model->get_location_data('Approved', $type_id, $zone_id, $store_id);
+                $data['sales_rep'] = $this->sales_rep_model->get_data_dist('Approved');
+                $data['box'] = $this->box_model->get_data('Approved');
+                $data['bar'] = $this->product_model->get_data('Approved');
+                $data['distributor_po_items'] = $this->distributor_po_model->get_distributor_po_recon_items($id);
+                $data['bank'] = $this->bank_model->get_data('Approved');
+                // $data['distributor_payment_details'] = $this->distributor_po_model->get_distributor_payment_details($id);
+
+                load_view('distributor_po/distributor_po_recon', $data);
             } else {
                 echo "Unauthorized access";
             }
@@ -475,13 +523,23 @@ class Distributor_po extends CI_Controller{
         echo json_encode($data);
     }
 
+    public function send_email(){
+        $result = $this->distributor_po_model->send_email();
+        echo $result;
+    }
+
     public function save(){
         $this->distributor_po_model->save_data();
-        redirect(base_url().'index.php/distributor_po/checkstatus/pending_for_delivery');
+        redirect(base_url().'index.php/distributor_po/checkstatus/pending_for_approval');
     }
 
     public function update($id){
         $this->distributor_po_model->save_data($id);
+        redirect(base_url().'index.php/distributor_po/checkstatus/pending_for_approval');
+    }
+    
+    public function update_recon($id){
+        $this->distributor_po_model->update_recon($id);
         redirect(base_url().'index.php/distributor_po/checkstatus/pending_for_delivery');
     }
     
@@ -498,13 +556,9 @@ class Distributor_po extends CI_Controller{
         $this->distributor_po_model->send_po_delivery_report();
     }
 
-    public function po_summary_report()
-    {
-       $this->distributor_po_model->po_summary_report();
-
+    public function po_summary_report() {
+        $this->distributor_po_model->po_summary_report();
     }
-
-    
 
     public function authorise(){
         $status=$this->input->post('status');
@@ -537,26 +591,22 @@ class Distributor_po extends CI_Controller{
         }
     }
 
-    public function get_comments()
-    {
+    public function get_comments(){
         $id=$this->input->post('id');
         $result = $this->distributor_po_model->get_comments($id);
-        if(count($result)>0)
-        {
+        if(count($result)>0) {
             echo json_encode($result[0]);
-        }
-        else
-        {
+        } else {
             echo 0;
         }
     }
 
-    public function add_comments()
-    {
+    public function add_comments(){
        $result = $this->distributor_po_model->save_comments();
        redirect($_SERVER['HTTP_REFERER']); 
     }
-	 public function check_po_number_availablity() {
+
+	public function check_po_number_availablity() {
 		$result = $this->distributor_po_model->check_po_number_availablity();
 		echo $result;
 	}
@@ -565,6 +615,5 @@ class Distributor_po extends CI_Controller{
 		$result = $this->distributor_po_model->check_po_number_availablity_whpl();
 		echo $result;
 	}
-
 }
 ?>
