@@ -372,7 +372,7 @@
                                        }
                                        ?>"/>
                               <input type="hidden" class="form-control" name="place_order" id="place_order" value="No"/>
-                           <div class="row" id='stock_entry'>
+							<div class="row" id='stock_entry'>
                                 <ul class="collapsible">
                                      <li>
                                        <div class="collapsible-header active" ><i class="material-icons">add</i> <strong>Bars</strong></div>
@@ -382,17 +382,8 @@
                                                 <h5>Available Quantities</h5>
                                              </div>
                                              <hr>
-                                              <div class="row" style="margin-bottom:0px!important;">
-                                               <div class="col s12">
-                                                  
-													<div class="app-title" style="margin-bottom:0px!important;">
-													<h5 style="font-size:18px;border-left:3px solid #06baa9">Bar</h5>
-													</div>
-                                                 
-                                               </div>
-                                             </div>
-                                             <br>
-                                             <div class="row" style="border-bottom: 1px solid #9e9e9e;padding-bottom:20px">
+                                              
+                                             <div class="row" >
                                                 <div class="col s12">
                                                    <div class="input-field col s6">
                                                       <label class="">Orange<span class="asterisk_sign">*</span></label>
@@ -516,16 +507,13 @@
                                                 
                                              </div>
 											 
-											  <div class="row" style="margin-bottom:0px!important;">
-                                               <div class="col s12">
-                                                  
-													<div class="app-title" style="margin-bottom:0px!important;">
-													<h5 style="font-size:18px;border-left:3px solid #06baa9">Box</h5>
-													</div>
-                                                 
-                                               </div>
-                                             </div>
-											 
+											</div>
+                                       </div>
+                                    </li> 
+									<li>
+									<div class="collapsible-header" ><i class="material-icons">add</i> <strong>Box</strong></div>
+                                       <div class="collapsible-body">
+                                          <div class="">	 
 											  <div class="row">
                                                 <div class="col s12">
                                                    <div class="input-field col s6">

@@ -527,7 +527,7 @@
                               <br>
                                  <div class="row">
                                  <ul class="collapsible">
-                                    <li>
+								 <li>
                                        <div class="collapsible-header active" ><i class="material-icons">add</i> <strong>Bars</strong></div>
                                        <div class="collapsible-body">
                                           <div class="">
@@ -535,18 +535,9 @@
                                                 <h5>Available Quantities</h5>
                                              </div>
                                              <hr>
-                                            <div class="row" style="margin-bottom:0px!important;">
-                                               <div class="col s12">
-                                                  
-													<div class="app-title" style="margin-bottom:0px!important;">
-													<h5 style="font-size:18px;border-left:3px solid #06baa9">Bar</h5>
-													</div>
-                                                 
-                                               </div>
-                                             </div>
-											  
-                                             <br>
-                                              <div class="row" style="border-bottom: 1px solid #9e9e9e;padding-bottom:20px">
+                                           
+											
+                                              <div class="row">
                                                 <div class="col s12">
                                                    <div class="input-field col s6">
                                                       <label class="">Orange<span class="asterisk_sign">*</span></label>
@@ -669,18 +660,26 @@
                                                 </div>
                                                
                                              </div>
-											 <div class="row" style="margin-bottom:0px!important;">
-                                               <div class="col s12">
-                                                  
-                                                  <div class="input-field col s6">
-                                                     <div class="app-title" style="margin-bottom:0px;">
-													<h5 style="font-size:18px;border-left:3px solid #06baa9!important;">Box</h5>
-													</div>
-                                                  </div>
-                                                 
-                                               </div>
+											 
+											 
+											 
+                                          </div>
+                                       </div>
+                                    </li>
+								 
+								 
+								 
+                                    <li>
+                                       <div class="collapsible-header active" ><i class="material-icons">add</i> <strong>Box</strong></div>
+                                       <div class="collapsible-body">
+                                          <div class="">
+                                             <div class="app-title">
+                                                <h5>Available Quantities</h5>
                                              </div>
-									 <br>
+                                             <hr>
+                                            
+											  
+                                            
 											 <div class="row">
                                                 <div class="col s12">
                                                    <div class="input-field col s6">
@@ -889,6 +888,8 @@
                                              </div>
                                           </div>
                                     </li>
+									
+
                                     <li>
                                        <div class="collapsible-header "><i class="material-icons">add</i> <strong>TrailMix </strong></div>
                                        <div class="collapsible-body">
@@ -986,6 +987,8 @@
                                     <div class="col s12">
                                        <input type="button" id="pl_ord" value="Place Order" name="srld" class="left button shadow btn_color " style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>margin-left: 22px;font-size:16px;padding:8px 12px" />
                                        <a data-toggle="modal" id="followup_anc" href="#myModal" class=" right  button shadow btn_color" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>margin-right: 22px;font-size: 16px;">Follow Up</a>
+									   
+
                                     </div>
                                  </div>
                                  <br>
@@ -993,6 +996,12 @@
                                     <div class="col s12">
                                        <a href="<?php echo base_url(); ?>index.php/Sales_rep_store_plan/clear_session" class="button left shadow btn_color1 " type="reset" id="reset" style=" float: left;margin-left: 22px;">Cancel</a>
                                        <input type="button" value="Save" id="Saver" name="srld" class="right button shadow btn_color2" style="margin-right: 10%;" />
+                                    </div>
+                                 </div>
+								 
+								 <div class="row">
+                                    <div class="col s12">
+                                       <a data-toggle="modal" id="" href="#myModal1" class=" right  button shadow btn_color">Po Quanty</a>
                                     </div>
                                  </div>
                               </div>
@@ -1018,6 +1027,468 @@
                                     </div>
                                  </div>
                               </div>
+							  
+							  
+							  <div class="modal fade" id="myModal1" role="dialog">
+                                 <div class="modal-dialog">
+                                    <!-- Modal content-->
+                                    <div class="modal-content">
+                                       <div class="modal-header">
+                                          <button type="button" style="float: right; top: -25px;right: -30px; font-size: 24px;" class="modal-close waves-effect waves-green btn-flat">&times;</button>
+                                          <h4 class="modal-title" style="font-size: 18px;">Purchase Order Quanty</h4>
+                                       </div>
+                                       <div class="modal-body">
+                                        <div class="row">
+										
+										<div class="row">
+											<div class="col s12">
+                                                   <div class="input-field col s4">
+                                                      <label class="">Po Number<span class="asterisk_sign">*</span></label>
+                                                   </div>
+                                                   <div class="input-field col s6">
+                                                      <input type="text" value="" class="browser-default qty" name="po_number" placeholder="" id=""/>  
+                                                   </div>
+                                                  
+                                            </div>
+										</div>
+										<ul class="collapsible">
+								 <li>
+                                       <div class="collapsible-header active" ><i class="material-icons">add</i> <strong>Bars</strong></div>
+                                       <div class="collapsible-body">
+                                          <div class="">
+                                             <div class="app-title">
+                                                <h5>Available Quantities</h5>
+                                             </div>
+                                             <hr>
+                                           
+											
+                                              <div class="row">
+                                                <div class="col s12">
+                                                   <div class="input-field col s6">
+                                                      <label class="">Orange<span class="asterisk_sign">*</span></label>
+                                                   </div>
+                                                   <div class="input-field col s4">
+                                                      <input type="number"   value="<?php if(isset($stock_detail['orange_bar']))
+                                                         {
+                                                            $exs =  explode('_',$stock_detail['orange_bar']);
+                                                            echo $exs[0];
+                                                         } 
+                                                         ?>" 
+                                                         class="form-control qty" name="orange_bar" placeholder="0" id="type_0" onblur="qty_change(this)"/>
+                                                   </div>
+                                                   
+                                                </div>
+                                                <div class="col s12">
+                                                   <div class="input-field col s6">
+                                                      <label class="">Butterscotch<span class="asterisk_sign">*</span></label>
+                                                   </div>
+                                                   <div class="input-field col s4">
+                                                      <input type="number" value="<?php
+                                                         if(isset($stock_detail['butterscotch_bar']))
+                                                         {
+                                                           $exs2 = explode("_",$stock_detail['butterscotch_bar']);
+                                                           echo $exs2[0];
+                                                         } 
+                                                         ?>" class="form-control qty" name="butterscotch_bar" placeholder="0" id="type_1"
+                                                        
+                                                         />  
+                                                   </div>
+                                                  
+                                                </div>
+                                                <div class="col s12">
+                                                   <div class="input-field col s6">
+                                                      <label class="">Choco<span class="asterisk_sign">*</span></label>
+                                                   </div>
+                                                   <div class="input-field col s4">
+                                                      <input type="number" value="<?php
+                                                         if(isset($stock_detail['chocopeanut_bar']))
+                                                         {
+                                                            $exs4 = explode("_",$stock_detail['chocopeanut_bar']);
+                                                           echo $exs4[0];
+                                                         } 
+                                                         ?>" class="form-control qty" name="chocopeanut_bar" placeholder="0" id="type_3"/>
+                                                   </div>
+                                                  
+                                                </div>
+                                                <div class="col s12">
+                                                   <div class="input-field col s6">
+                                                      <label class="">Chaat<span class="asterisk_sign">*</span></label>
+                                                   </div>
+                                                   <div class="input-field col s4">
+                                                      <input type="number" value="<?php
+                                                         if(isset($stock_detail['bambaiyachaat_bar']))
+                                                         {
+                                                            if($stock_detail['bambaiyachaat_bar']!=NULL)
+                                                            {
+                                                              $exs6 =  explode("_",$stock_detail['bambaiyachaat_bar']);
+                                                               echo $exs6[0];
+                                                            }
+                                                         } 
+                                                         ?>" class="form-control qty" name="bambaiyachaat_bar" placeholder="0" id="type_4"/>
+                                                   </div>
+                                                    
+                                                </div>
+                                                <div class="col s12">
+                                                   <div class="input-field col s6">
+                                                      <label class="">Mango<span class="asterisk_sign">*</span></label>
+                                                   </div>
+                                                   <div class="input-field col s4">
+                                                      <input type="number" value="<?php
+                                                         if(isset($stock_detail['mangoginger_bar']))
+                                                         {
+                                                            if($stock_detail['mangoginger_bar']!=NULL)
+                                                            {
+                                                               $exs8 = explode("_",$stock_detail['mangoginger_bar']);
+                                                                  echo $exs8[0];
+                                                            }
+                                                         } 
+                                                         ?>" class="form-control qty" name="mangoginger_bar" placeholder="0"
+                                                         id="type_5"/>
+                                                   </div>
+                                                   
+                                                </div>
+                                                <div class="col s12">
+                                                   <div class="input-field col s6">
+                                                      <label class="">Berry<span class="asterisk_sign">*</span></label>
+                                                   </div>
+                                                   <div class="input-field col s4">
+                                                      <input type="number" value="<?php if(isset($stock_detail['berry_blast_bar']))
+                                                         {
+                                                            if($stock_detail['berry_blast_bar']!=NULL)
+                                                            {
+                                                               $exs10 = explode("_",$stock_detail['berry_blast_bar']);
+                                                              echo $exs10[0];
+                                                            }
+                                                         } 
+                                                         ?>" class="form-control qty" name="berry_blast_bar" placeholder="0" id="type_6"/>
+                                                   </div>
+                                                   
+                                                </div>
+                                                <div class="col s12">
+                                                   <div class="input-field col s6">
+                                                      <label class="">Chywanprash<span class="asterisk_sign">*</span></label>
+                                                   </div>
+                                                   <div class="input-field col s4">
+                                                      <input type="number" value="<?php
+                                                         if(isset($stock_detail['chyawanprash_bar']))
+                                                         {
+                                                            if($stock_detail['chyawanprash_bar']!=NULL)
+                                                            {
+                                                               $exs12 =explode("_",$stock_detail['chyawanprash_bar']);
+                                                               echo $exs12[0];
+                                                            }
+                                                         } 
+                                                         ?>" class="form-control qty" name="chyawanprash_bar" placeholder="0"
+                                                         id="type_7"/>
+                                                   </div>
+                                                   
+                                                </div>
+                                               
+                                             </div>
+											 
+											 
+											 
+                                          </div>
+                                       </div>
+                                    </li>
+								 
+								 
+								 
+                                    <li>
+                                       <div class="collapsible-header active" ><i class="material-icons">add</i> <strong>Box</strong></div>
+                                       <div class="collapsible-body">
+                                          <div class="">
+                                             <div class="app-title">
+                                                <h5>Available Quantities</h5>
+                                             </div>
+                                             <hr>
+                                            
+											  
+                                            
+											 <div class="row">
+                                                <div class="col s12">
+                                                   <div class="input-field col s6">
+                                                      <label class="">Orange<span class="asterisk_sign">*</span></label>
+                                                   </div>
+                                                   
+                                                   <div class="input-field col s4">
+                                                      <div class="">
+                                                         <input type="number"   value="<?php if(isset($stock_detail['orange_box']))
+                                                            {
+                                                               $exs1 =  explode('_',$stock_detail['orange_box']);
+                                                               echo $exs1[0]; 
+                                                            } 
+                                                         ?>" 
+                                                         class="form-control qty" name="orange_box" placeholder="0" id="type_0" onblur="qty_change(this)"/>
+                                                      </div>
+                                                   </div>
+                                                </div>
+                                                <div class="col s12">
+                                                   <div class="input-field col s6">
+                                                      <label class="">Butterscotch<span class="asterisk_sign">*</span></label>
+                                                   </div>
+                                                   
+                                                   <div class="input-field col s4">
+                                                      <input type="number" value="<?php
+                                                         if(isset($stock_detail['butterscotch_box']))
+                                                         {
+                                                            $exs3 =explode("_",$stock_detail['butterscotch_box']);
+                                                            echo $exs3[0];
+                                                         } 
+                                                         ?>" class="form-control qty" name="butterscotch_box" placeholder="0" id="type_1"
+                                                        
+                                                         />  
+                                                   </div>
+                                                </div>
+                                                <div class="col s12">
+                                                   <div class="input-field col s6">
+                                                      <label class="">Choco<span class="asterisk_sign">*</span></label>
+                                                   </div>
+                                                   
+                                                   <div class="input-field col s4">
+                                                      <input type="number" value="<?php
+                                                         if(isset($stock_detail['chocopeanut_box']))
+                                                         {
+                                                            if($stock_detail['chocopeanut_box']!=NULL)
+                                                            {
+                                                               $exs5 =explode("_",$stock_detail['chocopeanut_box']);
+                                                               echo $exs5[0];
+                                                            }
+                                                         } 
+                                                         ?>" class="form-control qty" name="chocopeanut_box" placeholder="0" id="type_3"/>
+                                                   </div>
+                                                </div>
+                                                <div class="col s12">
+                                                   <div class="input-field col s6">
+                                                      <label class="">Chaat<span class="asterisk_sign">*</span></label>
+                                                   </div>
+                                                   
+                                                    <div class="input-field col s4">
+                                                      <input type="number" value="<?php
+                                                         if(isset($stock_detail['bambaiyachaat_box']))
+                                                         {
+                                                            if($stock_detail['bambaiyachaat_box']!=NULL)
+                                                            {
+                                                              $exs7 = explode("_",$stock_detail['bambaiyachaat_box']);
+                                                             echo $exs7[0];
+                                                            }
+                                                         } 
+                                                         ?>" class="form-control qty" name="bambaiyachaat_box" placeholder="0" id="type_4"/>
+                                                   </div>
+                                                </div>
+                                                <div class="col s12">
+                                                   <div class="input-field col s6">
+                                                      <label class="">Mango<span class="asterisk_sign">*</span></label>
+                                                   </div>
+                                                   
+                                                   <div class="input-field col s4">
+                                                      <input type="number" value="<?php
+                                                         if(isset($stock_detail['mangoginger_box']))
+                                                         {
+                                                             if($stock_detail['mangoginger_box']!=NULL)
+                                                            {
+                                                               $exs9 =explode("_",$stock_detail['mangoginger_box']);
+                                                                  echo $exs9[0];
+                                                            }
+                                                         } 
+                                                         ?>" class="form-control qty" name="mangoginger_box" placeholder="0"
+                                                         id="type_5"/>
+                                                   </div>
+                                                </div>
+                                                <div class="col s12">
+                                                   <div class="input-field col s6">
+                                                      <label class="">Berry<span class="asterisk_sign">*</span></label>
+                                                   </div>
+                                                   
+                                                   <div class="input-field col s4">
+                                                      <input type="number" value="<?php if(isset($stock_detail['berry_blast_box']))
+                                                         {
+                                                            if($stock_detail['berry_blast_box']!=NULL)
+                                                            {
+                                                               $exs11 = explode("_",$stock_detail['berry_blast_box']);
+                                                               echo $exs11[0];
+                                                            }
+                                                         } 
+                                                         ?>" class="form-control qty" name="berry_blast_box" placeholder="0" id="type_6"/>
+                                                   </div>
+                                                </div>
+                                                <div class="col s12">
+                                                   <div class="input-field col s6">
+                                                      <label class="">Chywanprash<span class="asterisk_sign">*</span></label>
+                                                   </div>
+                                                   
+                                                   <div class="input-field col s4">
+                                                      <input type="number" value="<?php
+                                                         if(isset($stock_detail['chyawanprash_box']))
+                                                         {
+                                                            if($stock_detail['chyawanprash_box']!=NULL)
+                                                            {
+                                                               $exs13 = explode("_",$stock_detail['chyawanprash_box']);
+                                                               echo $exs13[0];
+                                                            }
+                                                         } 
+                                                         ?>" class="form-control qty" name="chyawanprash_box" placeholder="0"
+                                                         id="type_7"/>
+                                                   </div>
+                                                </div>
+                                                <div class="col s12">
+                                                   <div class="input-field col s6">
+                                                      <label class="">Variety Box<span class="asterisk_sign">*</span></label>
+                                                   </div>
+                                                   <div class="input-field col s4">
+                                                   <input type="number" value="<?php
+                                                         if(isset($stock_detail['variety_box']))
+                                                         {
+                                                            if($stock_detail['variety_box']!=NULL)
+                                                            {
+                                                               $exs7 = explode('_',$stock_detail['variety_box']);
+                                                               echo $exs7[0];
+                                                            }
+                                                         } 
+                                                         ?>" class="form-control qty" name="variety_box" placeholder="0" id="type_8" />
+                                                   </div>
+                                                  
+                                                </div>
+                                             </div>
+											 
+											 
+                                          </div>
+                                       </div>
+                                    </li>
+                                    <li>
+                                       <div class="collapsible-header"><i class="material-icons">add</i> <strong> Cookies </strong></div>
+                                       <div class="collapsible-body">
+                                          <div class="app-title">
+                                             <h5>Available Quantities</h5>
+                                          </div>
+                                          <hr>
+                                          <div class="row">
+                                             <div class="col s12">
+                                                <div class="input-field col s6">
+                                                   <label class="">Chocolate <span class="asterisk_sign">*</span></label>
+                                                </div>
+                                                <div class="input-field col s4">
+                                                   <input type="number" value="<?php if(isset($stock_detail['chocolate_cookies_box']))
+                                                         {
+                                                            if($stock_detail['chocolate_cookies_box']!=NULL)
+                                                            {
+                                                               $ex6 = explode('_',$stock_detail['chocolate_cookies_box']);
+                                                               echo trim($ex6[0]);
+                                                            }
+                                                         } 
+                                                  ?>" class="form-control" name="chocolate_cookies" placeholder="0"/>
+                                                </div>
+                                             </div>
+                                             <div class="col s12">
+                                                <div class="input-field col s6">
+                                                   <label class=""> Dark Chocolate <span class="asterisk_sign">*</span></label>
+                                                </div>
+                                                <div class="input-field col s4">
+                                                   <input type="number" value="<?php if(isset($stock_detail['dark_chocolate_cookies_box']))
+                                                         {
+                                                            if($stock_detail['dark_chocolate_cookies_box']!=NULL)
+                                                            {
+                                                               $ex10 = explode('_',$stock_detail['dark_chocolate_cookies_box']);
+                                                               echo trim($ex10[0]);
+                                                            }
+                                                         } 
+                                                  ?>" class="form-control" name="dark_chocolate_cookies" placeholder="0"/>
+                                                </div>
+                                             </div>
+                                             <div class="col s12">
+                                                <div class="input-field col s6">
+                                                   <label class="">Cranberry <span class="asterisk_sign">*</span></label>
+                                                </div>
+                                                <div class="input-field col s4">
+                                                   <input type="number" value="<?php  if(isset($stock_detail['cranberry_cookies_box']))
+                                                         {
+                                                            if($stock_detail['cranberry_cookies_box']!=NULL)
+                                                            {
+                                                               $ex11 = explode('_',$stock_detail['cranberry_cookies_box']);
+                                                               echo trim($ex11[0]);
+                                                            }
+                                                         } 
+                                                  ?>" class="form-control" name="cranberry_cookies" placeholder="0"/>
+                                                </div>
+                                             </div>
+                                          </div>
+                                    </li>
+									
+
+                                    <li>
+                                       <div class="collapsible-header "><i class="material-icons">add</i> <strong>TrailMix </strong></div>
+                                       <div class="collapsible-body">
+                                       <div class="app-title">
+                                       <h5>Available Quantities</h5>
+                                       </div>
+                                       <hr>  
+                                       <div class="row">
+                                       <div class="col s12">
+                                       <div class="input-field col s6">
+                                       <label class="">Cranberry & Orange  <span class="asterisk_sign">*</span></label>
+                                       </div> 
+                                       <div class="input-field col s4">
+                                       <input type="number" value="<?php  if(isset($stock_detail['cranberry_orange_box']))
+                                             {
+                                                if($stock_detail['cranberry_orange_box']!=NULL)
+                                                {
+                                                   $ex12 = explode('_',$stock_detail['cranberry_orange_box']);
+                                                   echo trim($ex12[0]);
+                                                }
+                                             } 
+                                      ?>" class="form-control" name="cranberry_orange_zest" placeholder="0"/>
+                                       </div>
+                                       </div>
+                                       <div class="col s12">
+                                       <div class="input-field col s6">
+                                       <label class="">Fig & Raisins <span class="asterisk_sign">*</span></label>
+                                       </div> 
+                                       <div class="input-field col s4">
+                                       <input type="number" value="<?php if(isset($stock_detail['fig_raisins_box']))
+                                             {
+                                                if($stock_detail['fig_raisins_box']!=NULL)
+                                                {
+                                                   $ex13 = explode('_',$stock_detail['fig_raisins_box']);
+                                                   echo trim($ex13[0]);
+                                                }
+                                             } 
+                                      ?>" class="form-control" name="fig_raisins" placeholder="0"/>
+                                       </div>
+                                       </div>
+                                       <div class="col s12">
+                                       <div class="input-field col s6">
+                                       <label class="">Papaya & pineapple<span class="asterisk_sign">*</span></label>
+                                       </div> 
+                                       <div class="input-field col s4">
+                                       <input type="number" value="<?php if(isset($stock_detail['papaya_pineapple_box']))
+                                             {
+                                                if($stock_detail['papaya_pineapple_box']!=NULL)
+                                                {
+                                                   $ex14 = explode('_',$stock_detail['papaya_pineapple_box']);
+                                                   echo trim($ex14[0]);
+                                                }
+                                             } 
+                                      ?>" class="form-control" name="papaya_pineapple" placeholder="0"/>
+                                       </div>
+                                       </div>
+                                       </div>
+                                       </div>
+                                    </li>
+                                 </ul>
+                                 </div>
+                                          
+                                       </div>
+                                       <div class="modal-footer">
+                                          <button type="button" class="button shadow btn_color left modal-close" data-dismiss="modal">Close</button>
+                                         
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+							  
+							  
+							  
+							  
                            </div>
                         </form>
                      </div>
