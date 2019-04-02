@@ -732,7 +732,7 @@ a {
 }
 .app-title h5 {
 	font-size: 13px;
-	border-left: 3px solid #ffa726 !important;
+	border-left: 3px solid #ffa726 ;
 	padding-left: 8px;
 	font-weight: 500;
 }
