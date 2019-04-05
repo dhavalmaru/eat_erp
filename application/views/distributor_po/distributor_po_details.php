@@ -256,7 +256,7 @@
                                             <input type="text" class="form-control" name="discount" id="discount" placeholder="Discount" value="<?php if(isset($data)) { echo $data[0]->discount; } ?>" />
                                         </div>
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group" style="display: none;">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Tax <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4  col-sm-4 col-xs-12 option-line-height">
@@ -475,7 +475,9 @@
                                                 <input type="text" class="form-control" name="entered_invoice_amount" id="entered_invoice_amount" placeholder="PO Amount" value="<?php if(isset( $data[0]->entered_invoice_amount)) echo $data[0]->entered_invoice_amount; ?>" onchange="check_amount();" />
                                             </div>
                                             <div id="mismatch_div" style="display: none;">
-                                                <label class="col-md-2 col-sm-2 col-xs-12 control-label" style="color: #FF0000; display: none;">Amount Mismatch</label>
+                                                <input type="hidden" name="mismatch" id="mismatch" value="<?php if (isset($data)) { echo $data[0]->mismatch; } else echo '0'; ?>" />
+                                                <input type="hidden" name="mismatch_type" id="mismatch_type" value="<?php if (isset($data)) { echo $data[0]->mismatch_type; } ?>" />
+                                                <label class="col-md-2 col-sm-2 col-xs-12 control-label" style="color: #FF0000 !important;">Amount Mismatch</label>
                                                 <button type="button" class="btn btn-default" id="btn_send_email">Send Mismatch Email</button>
                                             </div>
                                         </div>
@@ -520,14 +522,6 @@
                                     </div>
                                     <div class="form-group" style="display: none">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Date Of Dispatch</label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control datepicker" name="dispatch_date" id="dispatch_date" placeholder="Date Of Dispatch" value="<?php if(isset($data)) echo (($data[0]->dispatch_date!=null && $data[0]->dispatch_date!='')?date('d/m/Y',strtotime($data[0]->dispatch_date)):''); ?>" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group" style="display: none">
-                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Delivery Status *</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <select class="form-control" name="delivery_status" id="delivery_status"  style="color:#000;">
@@ -538,6 +532,14 @@
                                                     <option value="Delivered" <?php if(isset($data)) {if ($data[0]->delivery_status=='Delivered') echo 'selected';}?>>Delivered</option>
                                                     <option value="Cancelled" <?php if(isset($data)) {if ($data[0]->delivery_status=='Cancelled') echo 'selected';}?>>Cancelled</option>
                                                 </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" style="display: none">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Date Of Dispatch</label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control datepicker" name="dispatch_date" id="dispatch_date" placeholder="Date Of Dispatch" value="<?php if(isset($data)) echo (($data[0]->dispatch_date!=null && $data[0]->dispatch_date!='')?date('d/m/Y',strtotime($data[0]->dispatch_date)):''); ?>" />
                                             </div>
                                         </div>
                                     </div>
@@ -627,7 +629,14 @@
                         <div class="modal-body">
                             <div class="form-group" style="display: none;">
                                 <div class="col-md-12 col-sm-12 col-xs-12">
-                                    <input type="hidden" id="email_ref_id" name="email_ref_id" value="<?php if(isset($email[0]->email_ref_id)) echo $email[0]->email_ref_id; else if(isset($data)) echo $data[0]->id; ?>" />
+                                    <?php 
+                                        $email_ref_id = '';
+                                        if(isset($email)) { if(count($email)>0) $email_ref_id = $email[0]->email_ref_id; }
+                                        if($email_ref_id==''){
+                                            if(isset($data)) { if(count($data)>0) $email_ref_id = $data[0]->id; }
+                                        }
+                                    ?>
+                                    <input type="hidden" id="email_ref_id" name="email_ref_id" value="<?php $email_ref_id; ?>" />
                                     <input type="hidden" id="email_type" name="email_type" value="<?php if(isset($email)) echo $email[0]->email_type; ?>" />
                                     <label class="col-md-2 col-sm-2 col-xs-12 control-label">From &nbsp;&nbsp;&nbsp; </label>
                                     <div class="col-md-8 col-sm-8 col-xs-12">
@@ -2020,23 +2029,26 @@
         </script>
         <script type="text/javascript">
             $("#btn_send_email").on("click", function(){
-                console.log('send mail');
                 $("#send_mismatch_email").modal('show');
             });
 
             var check_amount = function() {
                 if($("#entered_invoice_amount").val()!=""){
-                    if($("#entered_invoice_amount").val()!=$("#final_amount").val()){
+                    if(parseFloat($("#entered_invoice_amount").val())!=parseFloat($("#invoice_amount").val())){
+                        $("#mismatch").val("1");
+                        $("#mismatch_type").val("Delivery");
                         $("#mismatch_div").show();
+                        $("#btn_submit").val("Save");
                     } else {
+                        $("#mismatch").val("0");
+                        $("#mismatch_type").val("");
                         $("#mismatch_div").hide();
+                        $("#btn_submit").val("Submit For Approval");
                     }
                 }
             }
 
             $("#btn_send").on("click", function(){
-                console.log('send email');
-
                 $.ajax({
                     url:BASE_URL+'index.php/distributor_po/send_email',
                     method:"post",
@@ -2044,7 +2056,9 @@
                     dataType:"html",
                     async:false,
                     success: function(data){
-                        console.log(data);
+                        data = data.replace('<pre>', '');
+                        data = data.replace('</pre>', '');
+                        data = data.trim();
 
                         if(data==1){
                             $('#email_response_div').show();
@@ -2083,12 +2097,10 @@
             modalConfirm(function(confirm){
                 if(confirm){
                     $("#modal_result").val("Yes");
-                    // console.log('CONFIRMADO');
 
                     $('#form_distributor_po_details').submit();
                 } else {
                     // $("#modal_result").val("No");
-                    // console.log('NO CONFIRMADO');
                     
                     var validator = $("#form_distributor_po_details").validate();
                     var errors = {};

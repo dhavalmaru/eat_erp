@@ -248,7 +248,7 @@ class Sales_rep_order extends CI_Controller{
                                 if ($result[$j]['item_id']==37) {
                                     $order_detail['chocolate_cookies_box']=$result[$j]['qty'];
                                 }
-                               if ($result[$j]['item_id']==45) {
+                               if ($result[$j]['item_id']==38) {
                                     $order_detail['dark_chocolate_cookies_box']=$result[$j]['qty'];
                                 }
                                 if ($result[$j]['item_id']==39) {

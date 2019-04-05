@@ -136,7 +136,6 @@ class Sales_rep_location extends CI_Controller{
         else {
             redirect(base_url().'index.php/sales_rep_location');
         }
-        
     }
 
     public function check_date_of_visit(){
@@ -179,7 +178,6 @@ class Sales_rep_location extends CI_Controller{
         echo $location;
     }
 	
-
     public function get_location_data(){ 
         $postData = $this->input->post();
         $zone_id = $postData['zone_id'];
@@ -236,6 +234,25 @@ class Sales_rep_location extends CI_Controller{
         }
 
         echo json_encode($data);
+    }
+
+    public function get_po_nos(){ 
+        $postData = $this->input->post();
+        $zone_id = $postData['zone_id'];
+        $store_id = $postData['store_id'];
+        $location_id = $postData['location_id'];
+        $data = $this->sales_rep_location_model->get_po_nos($zone_id, $store_id, $location_id);
+        echo json_encode($data); 
+    }
+
+    public function get_po_data(){ 
+        $postData = $this->input->post();
+        $zone_id = $postData['zone_id'];
+        $store_id = $postData['store_id'];
+        $location_id = $postData['location_id'];
+        $po_id = $postData['po_id'];
+        $data = $this->sales_rep_location_model->get_po_data($zone_id, $store_id, $location_id, $po_id);
+        echo json_encode($data); 
     }
 
     public function get_closing_stock(){

@@ -30,7 +30,7 @@ class Distributor_po extends CI_Controller{
     }
 
     public function index(){
-        $this->checkstatus('pending_for_approval');
+        $this->checkstatus('pending_for_delivery');
     }
 
     public function get_distributors(){
@@ -128,9 +128,9 @@ class Distributor_po extends CI_Controller{
         $data = array();
         //. '-' . $r[$i]->client_name
         for($i=0;$i<count($r);$i++){
-            if($status=='pending_for_delivery' || $status=='gp_issued' || $status=='pending_merchendizer_delivery'){
+            if($status=='pending_for_delivery' || $status=='gt_dp' || $status=='pending_merchendizer_delivery'){
                 $data[] = array(
-                            '<input type="checkbox" id="check_'.$i.'" class="check icheckbox" name="check_val[]" value="'.$r[$i]->id.'" onChange="set_checkbox(this);" />
+                            '<input type="checkbox" id="check_'.$i.'" class="check icheckbox" name="check_val[]" value="'.$r[$i]->id.'" onChange="set_checkbox(this);" style="display: none;" />
                             <input type="hidden" id="input_check_'.$i.'" name="check[]" value="false" />
                             &nbsp;
                             
@@ -145,7 +145,7 @@ class Distributor_po extends CI_Controller{
                             .'</span>'.
                             (($r[$i]->date_of_po!=null && $r[$i]->date_of_po!='')?date('d/m/Y',strtotime($r[$i]->date_of_po)):''),
 
-                            (($status=='pending_for_delivery')?
+                            (($status=='pending_for_delivery' || $status=='gt_dp')?
                                 '<a href="'.base_url().'index.php/distributor_po/recon/'.$r[$i]->id.'" class=""><i class="fa fa-edit"></i></a>':
                                 '<a href="'.base_url().'index.php/distributor_po/edit/'.$r[$i]->id.'" class=""><i class="fa fa-edit"></i></a>'),
 
@@ -228,88 +228,66 @@ class Distributor_po extends CI_Controller{
             $delivered_not_complete=0;
             $pending_merchendiser_delivery=0;
             $delivered=0;
+            $mismatch=0;
+            $gt_dp=0;
             
             //responsive drop down list code 
-            if($status=="Approved")
-            {
+            if($status=="Approved") {
                 $selectedstatus='Approved';//$status;
-            }
-            else if($status=="pending")
-            {
+            } else if($status=="pending") {
                 $selectedstatus='Pending';//$status;
-            }
-            else if($status=="pending_for_approval")
-            {
+            } else if($status=="pending_for_approval") {
                 $selectedstatus='Approval Pending';//$status;
-            }
-            else if($status=="InActive")
-            {
+            } else if($status=="InActive") {
                 $selectedstatus='Cancelled';//$status;
-            }
-            else if($status=="pending_for_delivery")
-            {
+            } else if($status=="pending_for_delivery") {
                 $selectedstatus='Delivery Pending';//$status;
-            }
-            else if($status=="gp_issued")
-            {
-                $selectedstatus='GP Issued';//$status;
-            }
-            else if($status=="delivered_not_complete")
-            {
+            } else if($status=="gt_dp") {
+                $selectedstatus='GT DP';//$status;
+            } else if($status=="delivered_not_complete") {
                 $selectedstatus="InComplete";
-            }
-            else if($status=="pending_merchendiser_delivery")
-            {
+            } else if($status=="pending_merchendiser_delivery") {
                 $selectedstatus="Delivered pending merchandiser Approval ";
-            }
-            else if($status=="Delivered")
-            {
+            } else if($status=="Delivered") {
                 $selectedstatus="Delivered";
-            }
-            else
-            {
+            } else if($status=="mismatch") {
+                $selectedstatus="mismatch";
+            } else {
                 $selectedstatus=$status;
             }
             //responsive drop down list code 
             
             if (count($result)>0){
                 for($i=0;$i<count($count_data);$i++){
-                    if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && strtoupper(trim($count_data[$i]->delivery_through))!="WHPL")
+                    if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && strtoupper(trim($count_data[$i]->delivery_through))!="WHPL"){
                         $active=$active+1;
-                    
-                    if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && $count_data[$i]->delivery_status=='' && strtoupper(trim($count_data[$i]->delivery_through))!="WHPL")
-                    {
-                        $pending_for_delivery=$pending_for_delivery+1;
                     }
-                        
-
-                    if ((strtoupper(trim($count_data[$i]->status))=="PENDING" && 
-                        (strtoupper(trim($count_data[$i]->delivery_status))=="" || 
-                            strtoupper(trim($count_data[$i]->delivery_status))=="GP ISSUED" || 
-                            strtoupper(trim($count_data[$i]->delivery_status))=="DELIVERED NOT COMPLETE" || 
-                            strtoupper(trim($count_data[$i]->delivery_status))=="DELIVERED")) || 
-                        strtoupper(trim($count_data[$i]->status))=="DELETED")
+                    
+                    if ($count_data[$i]->mismatch=='1' && strtoupper(trim($count_data[$i]->delivery_through))!="WHPL")
+                        $mismatch=$mismatch+1;
+                    else if ((strtoupper(trim($count_data[$i]->status))=="PENDING" || 
+                            strtoupper(trim($count_data[$i]->status))=="DELETED") && $count_data[$i]->mismatch!='1')
                         $pending_for_approval=$pending_for_approval+1;
+                    else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && $count_data[$i]->type_id=='7' && $count_data[$i]->delivery_status=='' && strtoupper(trim($count_data[$i]->delivery_through))!="WHPL")
+                        $pending_for_delivery=$pending_for_delivery+1;
+                    else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && $count_data[$i]->type_id=='3' && $count_data[$i]->delivery_status=='' && strtoupper(trim($count_data[$i]->delivery_through))!="WHPL")
+                        $gt_dp=$gt_dp+1;
                     else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && 
                                 (strtoupper(trim($count_data[$i]->delivery_status))=="DELIVERED")  && strtoupper(trim($count_data[$i]->delivery_through))!="WHPL")
-                       $delivered=$delivered+1;
-                     else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && 
+                        $delivered=$delivered+1;
+                    else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && 
                                 (strtoupper(trim($count_data[$i]->delivery_status))=="PENDING") && strtoupper(trim($count_data[$i]->delivery_through))!="WHPL")
-                       $pending_merchendiser_delivery=$pending_merchendiser_delivery+1;
+                        $pending_merchendiser_delivery=$pending_merchendiser_delivery+1;
                     else if (strtoupper(trim($count_data[$i]->status))=="INACTIVE" && 
                                 strtoupper(trim($count_data[$i]->delivery_status))=="CANCELLED")
                         $inactive=$inactive+1;
-                    
                     else if (strtoupper(trim($count_data[$i]->status))=="PENDING" && 
                                 ($count_data[$i]->delivery_status==null || $count_data[$i]->delivery_status==''))
                         $pending=$pending+1;
-                                      
                     else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && strtoupper(trim($count_data[$i]->delivery_status))=="GP ISSUED" && strtoupper(trim($count_data[$i]->delivery_through))!="WHPL")
                         $gp_issued=$gp_issued+1;
-                    
                     else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && strtoupper(trim($count_data[$i]->delivery_status))=="DELIVERED NOT COMPLETE" && strtoupper(trim($count_data[$i]->delivery_through))!="WHPL")
                         $delivered_not_complete=$delivered_not_complete+1;
-                    
                 }
             }
 
@@ -319,9 +297,11 @@ class Distributor_po extends CI_Controller{
             $data['pending']=$pending;
             $data['pending_for_approval']=$pending_for_approval;
             $data['pending_for_delivery']=$pending_for_delivery;
+            $data['gt_dp']=$gt_dp;
             $data['pending_merchendiser_delivery']=$pending_merchendiser_delivery;
             $data['gp_issued']=$gp_issued;
             $data['delivered']=$delivered;
+            $data['mismatch']=$mismatch;
             $data['delivered_not_complete']=$delivered_not_complete;
             $data['all']=count($count_data);
             $data['status']=$status;
@@ -395,7 +375,12 @@ class Distributor_po extends CI_Controller{
                 $data['bar'] = $this->product_model->get_data('Approved');
                 $data['distributor_po_items'] = $this->distributor_po_model->get_distributor_po_items($id);
                 $data['bank'] = $this->bank_model->get_data('Approved');
-                $data['email'] = $this->distributor_po_model->get_email_details($id);
+                $email = $this->distributor_po_model->get_email_details($id);
+
+                if(count($email)>0){
+                    $data['email'] = $email;
+                }
+                
                 // $data['distributor_payment_details'] = $this->distributor_po_model->get_distributor_payment_details($id);
 
                 load_view('distributor_po/distributor_po_details', $data);
@@ -525,6 +510,10 @@ class Distributor_po extends CI_Controller{
 
     public function send_email(){
         $result = $this->distributor_po_model->send_email();
+
+        $result = str_replace('<pre>', '', $result);
+        $result = str_replace('<pre>', '', $result);
+        $result = trim($result);
         echo $result;
     }
 

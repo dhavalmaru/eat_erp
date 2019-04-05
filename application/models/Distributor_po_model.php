@@ -171,34 +171,33 @@ function get_distributor_po_data1($status='', $id=''){
     if($status!=""){
         if ($status=="Approved"){
             $cond=" where status='Approved' and (distributor_id!='1' and distributor_id!='189') and delivery_through!='WHPL'";
-        } else if ($status=="pending"){
-            $cond=" where ((status='Pending' and (delivery_status is null or delivery_status = '')) or status='Rejected') and 
-                            (distributor_id!='1' and distributor_id!='189')";
+        } else if ($status=="mismatch"){
+            $cond=" where mismatch='1' and (distributor_id!='1' and distributor_id!='189')";
         } else if ($status=="pending_for_approval"){
-            $cond=" where ((status='Pending' and (delivery_status='' or delivery_status='GP Issued' or 
-                                delivery_status='Delivered Not Complete' or delivery_status='Delivered')) or status='Deleted') and 
-                                (distributor_id!='1' and distributor_id!='189')";
+            $cond=" where (status='Pending' or status='Deleted') and (distributor_id!='1' and distributor_id!='189') and (mismatch!='1' or mismatch is null)";
         } else if ($status=="delivered"){
-            $cond=" where status='Approved' and delivery_status='Delivered' and (distributor_id!='1' and distributor_id!='189') and delivery_through!='WHPL'";
-        }
-        else if ($status=="pending_for_delivery"){
-            $cond=" where status='Approved' and delivery_status='' and (distributor_id!='1' and distributor_id!='189') and delivery_through!='WHPL'";
-        } 
-        else if ($status=="pending_merchendiser_delivery"){
-            $cond=" where status='Approved' and delivery_status='Pending' and (distributor_id!='1' and distributor_id!='189') and delivery_through!='WHPL'";
-        }
-        else if ($status=="gp_issued"){
-            $cond=" where status='Approved' and delivery_status='GP Issued' and (distributor_id!='1' and distributor_id!='189') and delivery_through!='WHPL'";
+            $cond=" where status='Approved' and delivery_status='Delivered' and (distributor_id!='1' and distributor_id!='189') and 
+                        delivery_through!='WHPL' and (mismatch!='1' or mismatch is null)";
+        } else if ($status=="pending_for_delivery"){
+            $cond=" where status='Approved' and delivery_status='' and (distributor_id!='1' and distributor_id!='189') and 
+                        delivery_through!='WHPL' and type_id='7' and (mismatch!='1' or mismatch is null)";
+        } else if ($status=="gt_dp"){
+            $cond=" where status='Approved' and delivery_status='' and (distributor_id!='1' and distributor_id!='189') and 
+                        delivery_through!='WHPL' and type_id='3' and (mismatch!='1' or mismatch is null)";
+        } else if ($status=="pending_merchendiser_delivery"){
+            $cond=" where status='Approved' and delivery_status='Pending' and (distributor_id!='1' and distributor_id!='189') and 
+                        delivery_through!='WHPL' and (mismatch!='1' or mismatch is null)";
+        } else if ($status=="gp_issued"){
+            $cond=" where status='Approved' and delivery_status='GP Issued' and (distributor_id!='1' and distributor_id!='189') and 
+                        delivery_through!='WHPL' and (mismatch!='1' or mismatch is null)";
         } else if ($status=="delivered_not_complete"){
             $cond=" where status='Approved' and delivery_status='Delivered Not Complete' and 
-                            (distributor_id!='1' and distributor_id!='189') and delivery_through!='WHPL'";
-        }
-        else if ($status=="InActive"){
+                            (distributor_id!='1' and distributor_id!='189') and delivery_through!='WHPL' and (mismatch!='1' or mismatch is null)";
+        } else if ($status=="InActive"){
             $cond=" where status='Inactive' and delivery_status='Cancelled' and 
                             (distributor_id!='1' and distributor_id!='189')";
-        }
-        else {
-            $cond=" where status='".$status."' and (distributor_id!='1' and distributor_id!='189' and delivery_through!='WHPL')";
+        } else {
+            $cond=" where status='".$status."' and (distributor_id!='1' and distributor_id!='189' and delivery_through!='WHPL') and (mismatch!='1' or mismatch is null)";
         }
     } else {
         // $cond=" where distributor_name!='Sample'";
@@ -270,9 +269,9 @@ function get_distributor_po_data1($status='', $id=''){
 function get_distributor_po_data($status='', $id=''){
     if($status!=""){
         if ($status=="pending_for_delivery"){
-            $cond=" where (status='Approved' or status='Rejected') and delivery_status='pending'";
-        } else if ($status=="gp_issued"){
-            $cond=" where (status='Approved' or status='Rejected') and delivery_status='GP Issued'";
+            $cond=" where (status='Approved' or status='Rejected') and type_id='7' and delivery_status='pending'";
+        } else if ($status=="gt_dp"){
+            $cond=" where (status='Approved' or status='Rejected') and type_id='3' and delivery_status='pending'";
         } else if ($status=="delivered_not_complete"){
             $cond=" where (status='Approved' or status='Rejected') and delivery_status='Delivered Not Complete'";
         } else {
@@ -389,14 +388,6 @@ function save_data($id=''){
         $delivery_date=formatdate($delivery_date);
     }
     
-
-    $delivery_date=$this->input->post('delivery_date');
-    if($delivery_date==''){
-        $delivery_date=NULL;
-    } else {
-        $delivery_date=formatdate($delivery_date);
-    }
-    
     $order_date=$this->input->post('order_date');
     if($order_date==''){
         $order_date=NULL;
@@ -450,14 +441,16 @@ function save_data($id=''){
                                 A.dispatch_date=B.dispatch_date, A.delivery_status=B.delivery_status, A.delivery_date=B.delivery_date, 
                                 A.state_code = B.state_code, A.cgst = B.cgst, A.sgst = B.sgst, A.igst = B.igst, 
                                 A.cgst_amount = B.cgst_amount, A.sgst_amount = B.sgst_amount, A.igst_amount = B.igst_amount, 
-                                A.round_off_amount = B.round_off_amount, A.invoice_amount = B.invoice_amount ,
-                                A.shipping_address=B.shipping_address,
-                                A.distributor_consignee_id=B.distributor_consignee_id,
-                                A.con_name=B.con_name,A.con_address=B.con_address,A.con_city=B.con_city,
-                                A.con_pincode=B.con_pincode,A.con_state=B.con_state,A.con_country=B.con_country,A.con_state_code=B.con_state_code,A.con_gst_number=B.con_gst_number,
-                                A.person_name=B.person_name,A.invoice_no=B.invoice_no,A.basis_of_sales=B.basis_of_sales,
+                                A.round_off_amount = B.round_off_amount, A.invoice_amount = B.invoice_amount, 
+                                A.shipping_address=B.shipping_address, A.distributor_consignee_id=B.distributor_consignee_id, 
+                                A.con_name=B.con_name, A.con_address=B.con_address, A.con_city=B.con_city, 
+                                A.con_pincode=B.con_pincode, A.con_state=B.con_state, A.con_country=B.con_country, 
+                                A.con_state_code=B.con_state_code, A.con_gst_number=B.con_gst_number, 
+                                A.basis_of_sales=B.basis_of_sales, 
                                 A.email_from=B.email_from, A.email_approved_by=B.email_approved_by, A.email_date_time=B.email_date_time,
-                                A.doc_document=B.doc_document, A.document_name=B.document_name 
+                                A.comments=B.comments, A.doc_document=B.doc_document, A.document_name=B.document_name, 
+                                A.entered_invoice_amount=B.entered_invoice_amount, 
+                                A.mismatch=B.mismatch, A.mismatch_type=B.mismatch_type 
                                 WHERE A.id = '$ref_id' and B.id = '$id'";
                     $this->db->query($sql);
 
@@ -631,7 +624,9 @@ function save_data($id=''){
             'email_approved_by' => $this->input->post('email_approved_by'),
             'doc_document' => $this->input->post('doc_document'),
             'document_name' => $this->input->post('document_name'),
-            'entered_invoice_amount' => format_number($this->input->post('entered_invoice_amount'),2)
+            'entered_invoice_amount' => format_number($this->input->post('entered_invoice_amount'),2),
+            'mismatch' => ($this->input->post('mismatch')==''?'0':$this->input->post('mismatch')),
+            'mismatch_type' => $this->input->post('mismatch_type')
         );
 
         if($id==''){
@@ -744,6 +739,13 @@ function save_data($id=''){
                 $this->db->update('distributor_po',$data);
             }
         }
+
+        if($this->input->post('mismatch')=="1"){
+            $sql = "update email_details set email_ref_id = '$id' 
+                    where email_type = 'distributor_po_mismatch' and created_by = '$curusr' and 
+                        (email_ref_id is null or email_ref_id = '')";
+            $this->db->query($sql);
+        }
     }
 
     $logarray['table_id']=$id;
@@ -779,40 +781,34 @@ function update_recon($id=''){
         $dispatch_date=formatdate($dispatch_date);
     }
 
-
     $person_name=$this->input->post('person_name');
     $invoice_no=$this->input->post('invoice_no');
     $remarks=$this->input->post('remarks');
     
-    // $delivery_remarks=$this->input->post('delivery_remarks');
+    $delivery_remarks=$this->input->post('delivery_remarks');
     // if($delivery_remarks==''){
     //     $delivery_remarks=$this->input->post('cancellation_reason');
     // }
     
-    // $cancellation_date=$this->input->post('cancellation_date');
-    // if($cancellation_date==''){
-    //     $cancellation_date=NULL;
-    // } else {
-    //     $cancellation_date=formatdate($cancellation_date);
-    // }
+    $cancellation_date=$this->input->post('cancellation_date');
+    if($cancellation_date==''){
+        $cancellation_date=NULL;
+    } else {
+        $cancellation_date=formatdate($cancellation_date);
+    }
 
-    // if($delivery_status=="Cancelled"){
-    //     $status = "InActive";
-    // }
+    if($delivery_status=="Cancelled"){
+        $status = "InActive";
+    }
 
-    // if($delivery_status=="Cancelled"){
-    //     $sql = "update distributor_po set delivery_status = '$delivery_status', cancelled_date = '$cancellation_date',
-    //             status = '$status', modified_by = '$curusr', modified_on = '$now', 
-    //             remarks = concat(remarks, '$remarks'), delivery_remarks = '$delivery_remarks' 
-    //             where id = '$id'";
-    // } else {
-    //     $sql = "update distributor_po set delivery_status = '$delivery_status', delivery_date = '$delivery_date',
-    //             dispatch_date='$dispatch_date', person_name='$person_name', invoice_no='$invoice_no', 
-    //             modified_by = '$curusr', modified_on = '$now', remarks = concat(remarks, '$remarks') 
-    //             where  id = '$id'";
-    // }
+    if($delivery_status=="Cancelled"){
+    } else {
+        $sql = "update distributor_po set 
+                modified_by = '$curusr', modified_on = '$now', remarks = concat(remarks, '$remarks') 
+                where  id = '$id'";
+    }
     
-    // $this->db->query($sql);
+    $this->db->query($sql);
 
     $data = array(
         'd_amount' => format_number($this->input->post('total_amount'),2),
@@ -826,8 +822,11 @@ function update_recon($id=''){
         'delivery_status' => $delivery_status,
         'delivery_date' => $delivery_date,
         'dispatch_date' => $dispatch_date,
+        'cancelled_date' => $cancellation_date,
+        'delivery_remarks' => $delivery_remarks,
         'person_name' => $person_name,
         'invoice_no' => $invoice_no,
+        'status' => $status,
         'remarks' => $this->input->post('remarks'),
         'modified_by' => $curusr,
         'modified_on' => $now
@@ -2441,7 +2440,6 @@ function get_distributor($status='', $id='', $class=''){
     $query=$this->db->query($sql);
     return $query->result();
 }
-
 
 public function po_summary_report(){
     //(A.status='Inactive' and distributor_po_id IS NOT NULL)  

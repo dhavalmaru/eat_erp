@@ -433,7 +433,7 @@
                                             <input type="hidden" class="form-control" name="po_invoice_amount" id="po_invoice_amount" placeholder="Invoice Amount" value="<?php if (isset($data)) { echo $data[0]->invoice_amount; } ?>" readonly />
                                         </div>
                                     </div>
-                                     <div class="form-group">
+                                     <div class="form-group" style="display: none;">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Enter PO Amount</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
@@ -487,53 +487,94 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group" style="display: none">
+                                    <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Delivery Status *</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select class="form-control" name="delivery_status" id="delivery_status"  style="color:#000;">
+                                                <select class="form-control" name="delivery_status" id="delivery_status" style="color:#000;" onchange="view_reason();">
                                                     <option value="">Select</option>
                                                     <option value="Pending" <?php if(isset($data)) {if ($data[0]->delivery_status=='Pending') echo 'selected';}?>>Delivered Pending Merchandiser Approval</option>
-                                                    <option value="GP Issued" <?php if(isset($data)) {if ($data[0]->delivery_status=='GP Issued') echo 'selected';}?>>GP Issued</option>
-                                                    <option value="Delivered Not Complete" <?php if(isset($data)) {if ($data[0]->delivery_status=='Delivered Not Complete') echo 'selected';}?>>Delivered Not Complete</option>
-                                                    <option value="Delivered" <?php if(isset($data)) {if ($data[0]->delivery_status=='Delivered') echo 'selected';}?>>Delivered</option>
                                                     <option value="Cancelled" <?php if(isset($data)) {if ($data[0]->delivery_status=='Cancelled') echo 'selected';}?>>Cancelled</option>
                                                 </select>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Delivery Date *</label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control datepicker" name="delivery_date" id="delivery_date" placeholder="Delivery Date" value="<?php if(isset($data)) echo (($data[0]->delivery_date!=null && $data[0]->delivery_date!='')?date('d/m/Y',strtotime($data[0]->delivery_date)):''); ?>" />
+
+                                    <div style="display: none;" id="Delivered">
+                                        <div class="form-group">
+                                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                                <label class="col-md-2 col-sm-2 col-xs-12 control-label">Date Of Dispatch</label>
+                                                <div class="col-md-4 col-sm-4 col-xs-12">
+                                                    <input type="text" class="form-control datepicker" name="dispatch_date" id="dispatch_date" placeholder="Date Of Dispatch" value="<?php if(isset($data)) echo (($data[0]->dispatch_date!=null && $data[0]->dispatch_date!='')?date('d/m/Y',strtotime($data[0]->dispatch_date)):''); ?>" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                                <label class="col-md-2 col-sm-2 col-xs-12 control-label">Delivery Date *</label>
+                                                <div class="col-md-4 col-sm-4 col-xs-12">
+                                                    <input type="text" class="form-control datepicker" name="delivery_date" id="delivery_date" placeholder="Delivery Date" value="<?php if(isset($data)) echo (($data[0]->delivery_date!=null && $data[0]->delivery_date!='')?date('d/m/Y',strtotime($data[0]->delivery_date)):''); ?>" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="display: none;">
+                                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                                <label class="col-md-2 col-sm-2 col-xs-12 control-label">Person Name</label>
+                                                <div class="col-md-4 col-sm-4 col-xs-12">
+                                                    <input type="text" class="form-control" name="person_name" id="person_name" placeholder="Person Name" value="<?php if(isset($data)) echo $data[0]->person_name; ?>" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                                <label class="col-md-2 col-sm-2 col-xs-12 control-label">Invoice Number</label>
+                                                <div class="col-md-4 col-sm-4 col-xs-12">
+                                                    <input type="text" class="form-control" name="invoice_no" id="invoice_no" placeholder="Invoice Number" value="<?php if(isset($data)) echo $data[0]->invoice_no; ?>" />
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group">
+
+                                    <div class="form-group" id="mismatch_remarks">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Date Of Dispatch</label>
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Mismatch Remarks <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control datepicker" name="dispatch_date" id="dispatch_date" placeholder="Date Of Dispatch" value="<?php if(isset($data)) echo (($data[0]->dispatch_date!=null && $data[0]->dispatch_date!='')?date('d/m/Y',strtotime($data[0]->dispatch_date)):''); ?>" />
+                                                <select name="delivery_remarks" id="delivery_remarks" class="form-control">
+                                                    <option value="">Select</option>
+                                                    <option>Out of Route</option>
+                                                    <option>Out of stock</option>
+                                                    <option>Distributor Missed</option>
+                                                    <option>Short TAT / Validity </option>
+                                                    <option>order for online product Bumbaiya chaat</option>
+                                                    <option>Missed by WHPL</option>
+                                                    <option>Short quantity</option>
+                                                    <option>Cancelled by WHPL</option>
+                                                    <option>Minimum Quantity</option>
+                                                    <option>We don’t deliver Bambaiy chaat in MT</option>
+                                                    <option>Variety Pack stock not available with Deepa</option>
+                                                    <option>whpl plan to deliver but stock not accepted due to Bharat Bundh</option>
+                                                    <option>Already deliver the stock before, As discussed with swapnil Cancelled</option>
+                                                    <option>Stock dispacthed but not received by store (Cancelled by store)</option>
+                                                    <option>Not delivered by Central</option>
+                                                    <option>Delayed stock delivered by FEDEX.</option>
+                                                    <option>Stock take at store</option>
+                                                    <option>No update from distributor</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Person Name</label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="person_name" id="person_name" placeholder="Person Name" value="<?php if(isset($data)) echo $data[0]->person_name; ?>" />
+
+                                    <div style="display: none;" id="cancellation_div">
+                                        <div class="form-group">
+                                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                                <label class="col-md-2 col-sm-2 col-xs-12 control-label">Cancellation Date</label>
+                                                <div class="col-md-4 col-sm-4 col-xs-12">
+                                                    <input type="text" class="form-control datepicker" name="cancellation_date" id="cancellation_date" placeholder="Delivery Date" value="" />
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Invoice Number</label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="invoice_no" id="invoice_no" placeholder="Invoice Number" value="<?php if(isset($data)) echo $data[0]->invoice_no; ?>" />
-                                            </div>
-                                        </div>
-                                    </div>
+
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">PO Copy</label>
@@ -1547,6 +1588,8 @@
                 $("#invoice_amount").val(final_amt.toFixed(0));
                 $("#round_off_amount1").text(round_off_amt.toFixed(2));
                 $("#invoice_amount1").text(final_amt.toFixed(0));
+
+                check_amount();
             }
 
             $(document).ready(function(){
@@ -1926,6 +1969,26 @@
                     }
                 });
             }
+
+            function view_reason() {
+                if($('#delivery_status').val()=='Cancelled'){
+                    $('#Delivered').hide();
+                    $('#cancellation_div').show();
+                } else {
+                    $('#cancellation_div').hide();
+                    $('#Delivered').show();
+                }
+            }
+
+            var check_amount = function() {
+                if(parseFloat($("#po_invoice_amount").val())!=parseFloat($("#invoice_amount").val())){
+                    $("#mismatch_remarks").show();
+                } else {
+                    $("#mismatch_remarks").hide();
+                    $("#mismatch_remarks").val("");
+                }
+            }
+
         </script>
     </body>
 </html>

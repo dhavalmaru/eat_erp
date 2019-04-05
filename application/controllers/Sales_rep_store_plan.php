@@ -20,7 +20,7 @@ class Sales_rep_store_plan extends CI_Controller{
         $this->load->model('store_model');
         $this->load->model('merchandiser_location_model');
         $this->load->model('sales_rep_model');
-      //    $this->load->model('Sr_beat_plan_model');
+        // $this->load->model('Sr_beat_plan_model');
         $this->load->model('distributor_sale_model');        
         $this->load->model('box_model');
         $this->load->model('product_model');
@@ -42,7 +42,7 @@ class Sales_rep_store_plan extends CI_Controller{
         // }
     // }
 
-     public function index(){
+    public function index(){
        
         $day = date('l');
         /*$m = date('F');
@@ -124,6 +124,7 @@ class Sales_rep_store_plan extends CI_Controller{
             $this->load->view('login/main_page');
         }
     }
+    
     public function add($id='',$get_frequency='',$get_channel_type='',$follow_type='', $temp=''){
         $result=$this->sales_rep_location_model->get_access();
         $day =  date('l');
@@ -237,7 +238,7 @@ class Sales_rep_store_plan extends CI_Controller{
                                         if ($result[$j]['item_id']==37) {
                                             $stock_detail['chocolate_cookies_box']=$result[$j]['qty'];
                                         }
-                                       if ($result[$j]['item_id']==45) {
+                                       if ($result[$j]['item_id']==38) {
                                             $stock_detail['dark_chocolate_cookies_box']=$result[$j]['qty'];
                                         }
                                         if ($result[$j]['item_id']==39) {
@@ -337,7 +338,7 @@ class Sales_rep_store_plan extends CI_Controller{
                     }
                     else
                     {
-                        echo "id".$id;
+                        // echo "id".$id;
                         if($id!='')
                         {
 
@@ -396,12 +397,9 @@ class Sales_rep_store_plan extends CI_Controller{
             echo '<script>alert("You donot have access to this page.");</script>';
             $this->load->view('login/main_page');
         }
-
-        
     }
 
-    public function get_zone()
-    {
+    public function get_zone() {
         $channel_type = $this->input->post('type');
         $result =  $this->sales_rep_location_model->get_zone('',$channel_type);
         if(count($result)>0)
@@ -527,7 +525,7 @@ class Sales_rep_store_plan extends CI_Controller{
                                 if ($result[$j]['item_id']==37) {
                                     $stock_detail['chocolate_cookies_box']=$result[$j]['qty'];
                                 }
-                               if ($result[$j]['item_id']==45) {
+                               if ($result[$j]['item_id']==38) {
                                     $stock_detail['dark_chocolate_cookies_box']=$result[$j]['qty'];
                                 }
                                 if ($result[$j]['item_id']==39) {
@@ -804,8 +802,7 @@ class Sales_rep_store_plan extends CI_Controller{
         echo json_encode($data);
     }
 
-    public function locations($status='')
-    {
+    public function locations($status='') {
         $result=$this->Sales_rep_route_plan_model->get_access();
         if(count($result)>0) {
             load_view_without_data('sales_rep_location/sales_rep_location_map');
@@ -813,7 +810,6 @@ class Sales_rep_store_plan extends CI_Controller{
             echo '<script>alert("You donot have access to this page.");</script>';
             $this->load->view('login/main_page');
         }
-
     }
 
     public function add_sales_rep_distributor(){
@@ -897,7 +893,8 @@ class Sales_rep_store_plan extends CI_Controller{
                 { 
                     if($visit_detail['mid']!='')
                     {
-                        echo 'mid'.$visit_id=$visit_detail['mid'];
+                        $visit_id=$visit_detail['mid'];
+                        // echo 'mid'.$visit_id
                     }
                     else if($visit_detail['sales_rep_loc_id']!='')
                     {
@@ -1012,7 +1009,7 @@ class Sales_rep_store_plan extends CI_Controller{
                                 if ($result[$j]['item_id']==37) {
                                     $order_detail['chocolate_cookies_box']=$result[$j]['qty'];
                                 }
-                               if ($result[$j]['item_id']==45) {
+                               if ($result[$j]['item_id']==38) {
                                     $order_detail['dark_chocolate_cookies_box']=$result[$j]['qty'];
                                 }
                                 if ($result[$j]['item_id']==39) {
@@ -1130,8 +1127,7 @@ class Sales_rep_store_plan extends CI_Controller{
         }
     }
 
-    public function save_order($save='')
-    {
+    public function save_order($save=''){
          if($save!='')
          {
                 $channel_type  = $this->input->post('channel_type');
@@ -1340,7 +1336,7 @@ class Sales_rep_store_plan extends CI_Controller{
 
                         if($dark_chocolate_cookies!='')
                         {
-                            $item_id =45;
+                            $item_id =38;
                             $data = array(
                                             'type'=>'Box',
                                             'item_id'=>$item_id,
@@ -1811,7 +1807,7 @@ class Sales_rep_store_plan extends CI_Controller{
                                                    'zone_id' => $visit_detail['zone_id'],
                                                    'created_on'=>$now);
                                 $this->db->insert('merchandiser_beat_plan',$after_temp_data2);
-                                echo '<br>'.$this->db->last_query();
+                                // echo '<br>'.$this->db->last_query();
                         }
                         
                         if (strpos($frequency, 'Alternate') !== false || strpos($frequency, 'Alternate2') !== false) {
@@ -2037,7 +2033,7 @@ class Sales_rep_store_plan extends CI_Controller{
                                                    'area_id' =>$visit_detail['area_id'],
                                                    'created_on'=>$now);
                                 $this->db->insert('sales_rep_beat_plan',$after_temp_data2);
-                                echo '<br>'.$this->db->last_query();
+                                // echo '<br>'.$this->db->last_query();
                         }
                         
                         if (strpos($frequency, 'Alternate') !== false || strpos($frequency, 'Alternate2') !== false) {
@@ -2228,7 +2224,7 @@ class Sales_rep_store_plan extends CI_Controller{
                              for ($j=0; $j < count($result); $j++) 
                               {  
                                 $result[$j]['sequence'];
-                                echo '<br>sequence'.$sequence;
+                                // echo '<br>sequence'.$sequence;
                                 if($result[$j]['sequence']<$sequence && $result[$j]['is_edit']!='edit')
                                 {
                                     $newsequence = $result[$j]['sequence']+1;
@@ -2416,7 +2412,7 @@ class Sales_rep_store_plan extends CI_Controller{
 
                                     $sql = "Select count(*) as sequence from merchandiser_beat_plan WHERE frequency='$frequency' and sales_rep_id=$sales_rep_id";
                                     $get_maxcount_sales_rep = $this->db->query($sql)->result_array();
-                                      echo '<br>'.$this->db->last_query();
+                                      // echo '<br>'.$this->db->last_query();
                                     if(count($get_maxcount_sales_rep)==0)
                                     {
                                         $visited_sequence_sales_re = $get_maxcount_sales_rep[0]['sequence']+1;
@@ -2459,7 +2455,7 @@ class Sales_rep_store_plan extends CI_Controller{
                                                         'status'=>'Approved');
                                                   $this->db->insert('merchandiser_detailed_beat_plan',$data22);
 
-                                                  echo '<br>'.$this->db->last_query();
+                                                  // echo '<br>'.$this->db->last_query();
                                                  
                                                 }
 
@@ -2638,7 +2634,7 @@ class Sales_rep_store_plan extends CI_Controller{
                                     'followup_date'=>$followup_date
                                 );
                                 $this->db->insert('merchandiser_stock',$data);
-                                echo '<br>last_query'.$this->db->last_query();
+                                // echo '<br>last_query'.$this->db->last_query();
                                 $visit_id = $id=$this->db->insert_id(); 
                                /*Stock is inserted*/
                            }
@@ -2659,7 +2655,7 @@ class Sales_rep_store_plan extends CI_Controller{
                                     'followup_date'=>$followup_date
                                 );
                                 $this->db->insert('merchandiser_stock',$data);
-                                echo '<br>last_query'.$this->db->last_query();
+                                // echo '<br>last_query'.$this->db->last_query();
                                 $visit_id = $id=$this->db->insert_id();
                        }
                        
@@ -2737,7 +2733,7 @@ class Sales_rep_store_plan extends CI_Controller{
                                         'created_by' => $curusr,
                             );
                             $this->db->insert('merchandiser_stock',$data);
-                            echo '<br>last_query'.$this->db->last_query();
+                            // echo '<br>last_query'.$this->db->last_query();
                             $visit_id = $id=$this->db->insert_id(); 
                        }
                        else
@@ -2773,7 +2769,7 @@ class Sales_rep_store_plan extends CI_Controller{
                                 $result = $this->db->query($sql);      
                                 
 
-                                echo '<br>'.$this->db->last_query();
+                                // echo '<br>'.$this->db->last_query();
                             }
 
                        }
@@ -2934,7 +2930,7 @@ class Sales_rep_store_plan extends CI_Controller{
                              for ($j=0; $j < count($result); $j++) 
                               {  
                                 $result[$j]['sequence'];
-                                echo '<br>sequence'.$sequence;
+                                // echo '<br>sequence'.$sequence;
                                 if($result[$j]['sequence']<$sequence && $result[$j]['is_edit']!='edit')
                                 {
                                     $newsequence = $result[$j]['sequence']+1;
@@ -3524,7 +3520,7 @@ class Sales_rep_store_plan extends CI_Controller{
 
                 if($dark_chocolate_cookies!='')
                 {
-                    $item_id =45;
+                    $item_id =38;
                     $data = array(
                                     'sales_rep_order_id' => $id,
                                     'type'=>'Box',
@@ -3785,8 +3781,7 @@ class Sales_rep_store_plan extends CI_Controller{
        /*$this->Sales_location_model->save_order('','Place Order');*/
     }
     
-    public function test_function()
-    {
+    public function test_function(){
         $day = date('l');
         $m = date('F');
         $year = date('Y');
@@ -3805,8 +3800,7 @@ class Sales_rep_store_plan extends CI_Controller{
         echo $set_days;
     }
 
-    public function get_alternate($day,$m,$year)
-    {
+    public function get_alternate($day,$m,$year){
         
         $date1 = date('d-m-Y', strtotime('second '.$day.' of '.$m.' '.$year));
         $date2 = date('d-m-Y', strtotime('fourth '.$day.' of '.$m.' '.$year));
@@ -3826,8 +3820,7 @@ class Sales_rep_store_plan extends CI_Controller{
         }
     }
 
-    public function sales_rep_not_mapped($status='')
-    {
+    public function sales_rep_not_mapped($status=''){
         $result = $this->db->query('Select DISTINCT sales_rep_id from merchandiser_beat_plan')->result();
 
         $sales_rep_id = array();
@@ -3860,8 +3853,7 @@ class Sales_rep_store_plan extends CI_Controller{
         }
     }
 
-    public function merchandizer_not_mapped($status='')
-    {
+    public function merchandizer_not_mapped($status=''){
        $result = $this->db->query('Select DISTINCT merchendizer_id from merchandiser_beat_plan')->result();
 
         $sales_rep_id = array();
@@ -3894,8 +3886,7 @@ class Sales_rep_store_plan extends CI_Controller{
         }
     }
 
-    public function store_not_mapped($status='')
-    {
+    public function store_not_mapped($status=''){
         $result = $this->db->query('Select DISTINCT store_id from merchandiser_beat_plan')->result();
 
         $sales_rep_id = array();
@@ -3928,8 +3919,7 @@ class Sales_rep_store_plan extends CI_Controller{
         }
     }
 
-    public function retailer_not_mapped($status='')
-    {
+    public function retailer_not_mapped($status=''){
        $result = $this->db->query('Select DISTINCT dist_id from merchandiser_beat_plan')->result();
 
         $sales_rep_id = array();
@@ -3962,17 +3952,13 @@ class Sales_rep_store_plan extends CI_Controller{
         }
     }   
     
-    
-
-    public function test_data()
-    {
+    public function test_data(){
        /*$one_array = array(0=>1,1=>2,2=>3,3=>4,4=>5);
        $two_array = array(0=>1,1=>2,2=>3,3=>4,4=>5);
         echo '$a == $b is ', var_dump($one_array==$two_array); */
     }
 
-    public function clear_session()
-    {
+    public function clear_session(){
         $this->session->unset_userdata('visit_detail');
         $this->session->unset_userdata('retailer_detail');
         $this->session->unset_userdata('temp_stock_details');
@@ -4086,7 +4072,7 @@ class Sales_rep_store_plan extends CI_Controller{
                                         if ($result[$j]['item_id']==37) {
                                             $stock_detail['chocolate_cookies_box']=$result[$j]['qty'];
                                         }
-                                       if ($result[$j]['item_id']==45) {
+                                       if ($result[$j]['item_id']==38) {
                                             $stock_detail['dark_chocolate_cookies_box']=$result[$j]['qty'];
                                         }
                                         if ($result[$j]['item_id']==39) {
@@ -4227,483 +4213,485 @@ class Sales_rep_store_plan extends CI_Controller{
             echo '<script>alert("You donot have access to this page.");</script>';
             $this->load->view('login/main_page');
         }
-
-        
     }
 
-public function save_stock(){
-        $channel_type  = $this->input->post('channel_type');
-        $distributor_type  = $this->input->post('distributor_type');
-        $distributor_name  = $this->input->post('distributor_name');
-        $zone_id  = $this->input->post('zone_id');
-        $area_id  = $this->input->post('area_id');
-        $location_id  = $this->input->post('location_id');
-        $longitude  = $this->input->post('longitude');
-        $latitude  = $this->input->post('latitude');
-        $remarks  = $this->input->post('remarks');
-        $reation_id  = $this->input->post('reation_id');
-        $distributor_id  = $this->input->post('distributor_id');
-        $mid  = $this->input->post('mid');
-        $beat_plan_id  = $this->input->post('beat_plan_id');
-        $distributor_status  = $this->input->post('distributor_status');
-        $sales_rep_loc_id  = $this->input->post('sales_rep_loc_id');
-        $sequence = $this->input->post('sequence');
-        $reation_id  = $this->input->post('reation_id');
-        $merchandiser_stock_id  = $this->input->post('merchandiser_stock_id');
-        $follow_type  = $this->input->post('follow_type');
-        $reation_id  = $this->input->post('reation_id');
-        $date_of_visit  = trim($this->input->post('date_of_visit'));
-        if($date_of_visit==''){
-            $date_of_visit=NULL;
-        } else {
-           $date_of_visit=formatdate($date_of_visit);
-        }
-        if($channel_type=='GT')
-        {
-            $sales_rep_id = $this->input->post('salesrep_id');
-        }
-        else
-        {
-            $sales_rep_id = $this->input->post('merchendizer_id');
-        }
-
-        $now=date('Y-m-d H:i:s');
-        $now1=date('Y-m-d');
-        $curusr=$this->session->userdata('session_id');
-        $sql = "Select CASE WHEN ((FLOOR((DayOfMonth(date('$date_of_visit'))-1)/7)+1 )=1 OR (FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=3 
-            OR (FLOOR((DayOfMonth(date('$date_of_visit'))-1)/7)+1 )=5) 
-            THEN CONCAT('Every ',DAYNAME(date('$date_of_visit'))) 
-            WHEN ((FLOOR((DayOfMonth(date('$date_of_visit'))-1)/7)+1 )=2 OR (FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=4)
-            THEN  CONCAT('Alternate ',DAYNAME(date('$date_of_visit'))) end  as frequency";
-        $result = $this->db->query($sql)->result();
-
-        $frequency = $result[0]->frequency;
-
-
-        $visit_detail = array(
-            'channel_type'  => $channel_type,
-            'distributor_types'=> $distributor_type,
-            'distributor_name' => $distributor_name,
-            'zone_id' => $zone_id,
-            'area_id' => $area_id,
-            'location_id' => $location_id,
-            'remarks' => trim($remarks),
-            'longitude'=>$longitude,
-            'latitude'=>$latitude,
-            'distributor_id'=>$distributor_id,
-            'mid'=>$mid,
-            'reation_id'=>$reation_id,
-            'beat_plan_id'=>$beat_plan_id,
-            'distributor_status'=>$distributor_status,
-            'sales_rep_loc_id'=>$sales_rep_loc_id,
-            'sequence'=>$sequence,
-            'merchandiser_stock_id'=>$merchandiser_stock_id
-        );
-
-        $batch_array = array();
-        $orange_bar = $this->input->post('orange_bar');
-        $butterscotch_bar = $this->input->post('butterscotch_bar');
-        $chocopeanut_bar = $this->input->post('chocopeanut_bar');
-        $bambaiyachaat_bar = $this->input->post('bambaiyachaat_bar');
-        $mangoginger_bar = $this->input->post('mangoginger_bar');
-        $berry_blast_bar = $this->input->post('berry_blast_bar');
-        $chyawanprash_bar = $this->input->post('chyawanprash_bar');
-        $variety_box = $this->input->post('variety_box');
-        $chocolate_cookies = $this->input->post('chocolate_cookies');
-        $dark_chocolate_cookies = $this->input->post('dark_chocolate_cookies');
-        $cranberry_cookies = $this->input->post('cranberry_cookies');
-        $cranberry_orange = $this->input->post('cranberry_orange');
-        $fig_raisins = $this->input->post('fig_raisins');
-        $papaya_pineapple = $this->input->post('papaya_pineapple');
-        $cranberry_orange_zest = $this->input->post('cranberry_orange_zest');
-        $batch_array = array();    
-        if($channel_type=='GT')
-        {
-            if($chocolate_cookies!='')
+    public function save_stock(){
+            $channel_type  = $this->input->post('channel_type');
+            $distributor_type  = $this->input->post('distributor_type');
+            $distributor_name  = $this->input->post('distributor_name');
+            $zone_id  = $this->input->post('zone_id');
+            $area_id  = $this->input->post('area_id');
+            $location_id  = $this->input->post('location_id');
+            $longitude  = $this->input->post('longitude');
+            $latitude  = $this->input->post('latitude');
+            $remarks  = $this->input->post('remarks');
+            $reation_id  = $this->input->post('reation_id');
+            $distributor_id  = $this->input->post('distributor_id');
+            $mid  = $this->input->post('mid');
+            $beat_plan_id  = $this->input->post('beat_plan_id');
+            $distributor_status  = $this->input->post('distributor_status');
+            $sales_rep_loc_id  = $this->input->post('sales_rep_loc_id');
+            $sequence = $this->input->post('sequence');
+            $reation_id  = $this->input->post('reation_id');
+            $merchandiser_stock_id  = $this->input->post('merchandiser_stock_id');
+            $follow_type  = $this->input->post('follow_type');
+            $reation_id  = $this->input->post('reation_id');
+            $date_of_visit  = trim($this->input->post('date_of_visit'));
+            if($date_of_visit==''){
+                $date_of_visit=NULL;
+            } else {
+               $date_of_visit=formatdate($date_of_visit);
+            }
+            if($channel_type=='GT')
             {
-
-                $batch_array['chocolate_cookies_box']=$chocolate_cookies;
+                $sales_rep_id = $this->input->post('salesrep_id');
+            }
+            else
+            {
+                $sales_rep_id = $this->input->post('merchendizer_id');
             }
 
-            if($dark_chocolate_cookies!='')
+            $now=date('Y-m-d H:i:s');
+            $now1=date('Y-m-d');
+            $curusr=$this->session->userdata('session_id');
+            $sql = "Select CASE WHEN ((FLOOR((DayOfMonth(date('$date_of_visit'))-1)/7)+1 )=1 OR (FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=3 
+                OR (FLOOR((DayOfMonth(date('$date_of_visit'))-1)/7)+1 )=5) 
+                THEN CONCAT('Every ',DAYNAME(date('$date_of_visit'))) 
+                WHEN ((FLOOR((DayOfMonth(date('$date_of_visit'))-1)/7)+1 )=2 OR (FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=4)
+                THEN  CONCAT('Alternate ',DAYNAME(date('$date_of_visit'))) end  as frequency";
+            $result = $this->db->query($sql)->result();
+
+            $frequency = $result[0]->frequency;
+
+
+            $visit_detail = array(
+                'channel_type'  => $channel_type,
+                'distributor_types'=> $distributor_type,
+                'distributor_name' => $distributor_name,
+                'zone_id' => $zone_id,
+                'area_id' => $area_id,
+                'location_id' => $location_id,
+                'remarks' => trim($remarks),
+                'longitude'=>$longitude,
+                'latitude'=>$latitude,
+                'distributor_id'=>$distributor_id,
+                'mid'=>$mid,
+                'reation_id'=>$reation_id,
+                'beat_plan_id'=>$beat_plan_id,
+                'distributor_status'=>$distributor_status,
+                'sales_rep_loc_id'=>$sales_rep_loc_id,
+                'sequence'=>$sequence,
+                'merchandiser_stock_id'=>$merchandiser_stock_id
+            );
+
+            $batch_array = array();
+            $orange_bar = $this->input->post('orange_bar');
+            $butterscotch_bar = $this->input->post('butterscotch_bar');
+            $chocopeanut_bar = $this->input->post('chocopeanut_bar');
+            $bambaiyachaat_bar = $this->input->post('bambaiyachaat_bar');
+            $mangoginger_bar = $this->input->post('mangoginger_bar');
+            $berry_blast_bar = $this->input->post('berry_blast_bar');
+            $chyawanprash_bar = $this->input->post('chyawanprash_bar');
+            $variety_box = $this->input->post('variety_box');
+            $chocolate_cookies = $this->input->post('chocolate_cookies');
+            $dark_chocolate_cookies = $this->input->post('dark_chocolate_cookies');
+            $cranberry_cookies = $this->input->post('cranberry_cookies');
+            $cranberry_orange = $this->input->post('cranberry_orange');
+            $fig_raisins = $this->input->post('fig_raisins');
+            $papaya_pineapple = $this->input->post('papaya_pineapple');
+            $cranberry_orange_zest = $this->input->post('cranberry_orange_zest');
+            $batch_array = array();    
+            if($channel_type=='GT')
             {
-               $batch_array['dark_chocolate_cookies_box']=$dark_chocolate_cookies;
-            }
-
-            if($cranberry_cookies!='')
-            {
-                $batch_array['cranberry_cookies_box']=$cranberry_cookies;
-            }
-
-            if($cranberry_orange_zest!='')
-            {
-                $batch_array['cranberry_orange_box'] = $cranberry_orange_zest;
-            }
-            
-            if($fig_raisins!='')
-            {
-                $batch_array['fig_raisins_box'] = $fig_raisins;
-            }
-
-            if($papaya_pineapple!='')
-            {
-                $batch_array['papaya_pineapple_box'] = $papaya_pineapple;
-            }
-
-            if($orange_bar!=null)
-            {
-                 $type = $this->input->post('type_0');
-                 if($type=='Box')
-                 {
-                    $batch_array['orange_box'] = $orange_bar;
-                 }
-                 else
-                 {
-                    $batch_array['orange_bar'] = $orange_bar;
-                 }
-            }
-
-            if($butterscotch_bar!=null)
-            {
-                $type = $this->input->post('type_1');    
-                if($type=='Box')
-                 {
-                    $batch_array['butterscotch_box'] = $butterscotch_bar;
-                 }
-                 else
-                 {
-                    $batch_array['butterscotch_bar'] = $butterscotch_bar;
-                 }
-            }
-
-            if($chocopeanut_bar!=null)
-            {
-                $type = $this->input->post('type_3');
-                if($type=='Box')
-                 {
-                    $batch_array['chocopeanut_box'] = $chocopeanut_bar;
-                 }
-                 else
-                 {
-                    $batch_array['chocopeanut_bar'] = $chocopeanut_bar;
-                 }
-            }
-
-            if($bambaiyachaat_bar!=null)
-            {
-                $type = $this->input->post('type_4');
-                 if($type=='Box')
-                 {
-                    $batch_array['bambaiyachaat_box'] = $bambaiyachaat_bar;
-                 }
-                 else
-                 {
-                    $batch_array['bambaiyachaat_bar'] = $bambaiyachaat_bar;
-                 }
-            }
-
-            if($mangoginger_bar!=null)
-            {
-                $type = $this->input->post('type_5');
-                if($type=='Box')
-                 {
-                    $batch_array['mangoginger_box'] = $mangoginger_bar;
-                 }
-                 else
-                 {
-                    $batch_array['mangoginger_bar'] = $mangoginger_bar;
-                 }
-            }
-
-            if($berry_blast_bar!=null)
-            {
-                $type = $this->input->post('type_6');
-                if($type=='Box')
-                 {
-                    $batch_array['berry_blast_box'] = $berry_blast_bar;
-                 }
-                 else
-                 {
-                    $batch_array['berry_blast_bar'] = $berry_blast_bar;
-                 }
-            }
-
-            if($chyawanprash_bar!=null)
-            {
-                $type = $this->input->post('type_7');
-                if($type=='Box')
-                 {
-                    $batch_array['chyawanprash_box'] = $chyawanprash_bar;
-                 }
-                 else
-                 {
-                    $batch_array['chyawanprash_bar'] = $chyawanprash_bar;
-                 }
-            }
-
-            if($variety_box!=null)
-            {
-                $batch_array['variety_box'] = $variety_box;
-            }  
-            
-            $sales_rep_stock_detail =  $batch_array;  
-
-
-             $data = array(
-                        'sales_rep_id' => $sales_rep_id,
-                        'date_of_visit' => $date_of_visit,
-                        'distributor_type' => $visit_detail['distributor_types'],
-                        'distributor_id' => $visit_detail['distributor_id'],
-                        'distributor_name' => $visit_detail['distributor_name'],
-                        'latitude' => $visit_detail['latitude'],
-                        'longitude' => $visit_detail['longitude'],
-                        'status' => 'Approved',
-                        'remarks' => $visit_detail['remarks'],
-                        'modified_by' => $curusr,
-                        'modified_on' => $now,
-                        'zone_id' => $visit_detail['zone_id'],
-                        'area_id' => $visit_detail['area_id'],
-                        'location_id' => $visit_detail['location_id'],
-                        'frequency'=>$frequency
-                    );
-                $data['created_by']=$curusr;
-                $data['created_on']=$now;
-
-                $this->db->insert('sales_rep_location',$data);
-                $visit_id = $sales_rep_loc_id=$this->db->insert_id();    
-
-                $sales_rep_stock_detail = $sales_rep_stock_detail;
-                $sales_rep_stock_detail['sales_rep_loc_id'] = $sales_rep_loc_id;
-
-                $this->db->insert('sales_rep_distributor_opening_stock',$sales_rep_stock_detail);
-        }
-        else
-        {
                 if($chocolate_cookies!='')
                 {
-                    $item_id =37;
-                    $data = array(
-                                    'type'=>'Box',
-                                    'item_id'=>$item_id,
-                                    'qty'=>$chocolate_cookies
-                                    );
-                    $batch_array[] = $data;
+
+                    $batch_array['chocolate_cookies_box']=$chocolate_cookies;
                 }
 
                 if($dark_chocolate_cookies!='')
                 {
-                    $item_id =45;
-                    $data = array(
-                                    'type'=>'Box',
-                                    'item_id'=>$item_id,
-                                    'qty'=>$dark_chocolate_cookies
-                                    );
-                    $batch_array[] = $data;
+                   $batch_array['dark_chocolate_cookies_box']=$dark_chocolate_cookies;
                 }
 
                 if($cranberry_cookies!='')
                 {
-                    $item_id = 39;
-                    $data = array( 'type'=>'Box',
-                                    'item_id'=>$item_id,
-                                    'qty'=>$cranberry_cookies
-                                    );
-                    $batch_array[] = $data;
+                    $batch_array['cranberry_cookies_box']=$cranberry_cookies;
                 }
 
                 if($cranberry_orange_zest!='')
                 {
-                    $item_id = 42;
-                    $data = array(  'type'=>'Box',
-                                    'item_id'=>$item_id,
-                                    'qty'=>$cranberry_orange_zest
-                                    );
-                    $batch_array[] = $data;
+                    $batch_array['cranberry_orange_box'] = $cranberry_orange_zest;
                 }
                 
                 if($fig_raisins!='')
                 {
-                    $item_id = 41;
-                    $data = array(
-                                    'type'=>'Box',
-                                    'item_id'=>$item_id,
-                                    'qty'=>$fig_raisins
-                                    );
-                    $batch_array[] = $data;
+                    $batch_array['fig_raisins_box'] = $fig_raisins;
                 }
 
                 if($papaya_pineapple!='')
                 {
-                    $item_id = 40;
-                    $data = array(
-                                    'type'=>'Box',
-                                    'item_id'=>$item_id,
-                                    'qty'=>$papaya_pineapple
-                                    );
-                    $batch_array[] = $data;
+                    $batch_array['papaya_pineapple_box'] = $papaya_pineapple;
                 }
 
                 if($orange_bar!=null)
                 {
-                    $type = $this->input->post('type_0');
-                    if($type=='Box'){
-                        $item_id = 1;
-                    }
-                    else{
-                         $item_id = 1;
-                    }
-                        
-
-                    $data = array(
-                                    'type'=>$type,
-                                    'item_id'=>$item_id,
-                                    'qty'=>$orange_bar
-                                    );
-                    $batch_array[] = $data;
+                     $type = $this->input->post('type_0');
+                     if($type=='Box')
+                     {
+                        $batch_array['orange_box'] = $orange_bar;
+                     }
+                     else
+                     {
+                        $batch_array['orange_bar'] = $orange_bar;
+                     }
                 }
 
                 if($butterscotch_bar!=null)
                 {
-                    $type = $this->input->post('type_1');
+                    $type = $this->input->post('type_1');    
                     if($type=='Box')
-                        $item_id = 3;
-                    else
-                        $item_id = 3;
-
-                    $data = array(
-                                    'type'=>$type,
-                                    'item_id'=>$item_id,
-                                    'qty'=>$butterscotch_bar
-                                    );
-                    $batch_array[] = $data;
+                     {
+                        $batch_array['butterscotch_box'] = $butterscotch_bar;
+                     }
+                     else
+                     {
+                        $batch_array['butterscotch_bar'] = $butterscotch_bar;
+                     }
                 }
 
                 if($chocopeanut_bar!=null)
                 {
                     $type = $this->input->post('type_3');
                     if($type=='Box')
-                        $item_id = 9;
-                    else
-                        $item_id = 5;
-                    
-                    $data = array(
-                                    'type'=>$type,
-                                    'item_id'=>$item_id,
-                                    'qty'=>$chocopeanut_bar
-                                    );
-                    $batch_array[] = $data;
+                     {
+                        $batch_array['chocopeanut_box'] = $chocopeanut_bar;
+                     }
+                     else
+                     {
+                        $batch_array['chocopeanut_bar'] = $chocopeanut_bar;
+                     }
                 }
 
                 if($bambaiyachaat_bar!=null)
                 {
                     $type = $this->input->post('type_4');
-                    if($type=='Box')
-                        $item_id = 8;
-                    else
-                        $item_id = 4;
-                    
-                    $data = array(
-                                    'type'=>$type,
-                                    'item_id'=>$item_id,
-                                    'qty'=>$bambaiyachaat_bar
-                                    );
-                    $batch_array[] = $data;
+                     if($type=='Box')
+                     {
+                        $batch_array['bambaiyachaat_box'] = $bambaiyachaat_bar;
+                     }
+                     else
+                     {
+                        $batch_array['bambaiyachaat_bar'] = $bambaiyachaat_bar;
+                     }
                 }
 
                 if($mangoginger_bar!=null)
                 {
                     $type = $this->input->post('type_5');
                     if($type=='Box')
-                        $item_id = 12;
-                    else
-                        $item_id = 6;
-                    
-                   $data = array(
-                                    'type'=>$type,
-                                    'item_id'=>$item_id,
-                                    'qty'=>$mangoginger_bar
-                                    );
-                    $batch_array[] = $data;
+                     {
+                        $batch_array['mangoginger_box'] = $mangoginger_bar;
+                     }
+                     else
+                     {
+                        $batch_array['mangoginger_bar'] = $mangoginger_bar;
+                     }
                 }
 
                 if($berry_blast_bar!=null)
                 {
                     $type = $this->input->post('type_6');
                     if($type=='Box')
-                        $item_id = 29;
-                    else
-                        $item_id = 9;
-                    
-                   $data = array(
-                                    'type'=>$type,
-                                    'item_id'=>$item_id,
-                                    'qty'=>$berry_blast_bar
-                                    );
-
-                    $batch_array[] = $data;
+                     {
+                        $batch_array['berry_blast_box'] = $berry_blast_bar;
+                     }
+                     else
+                     {
+                        $batch_array['berry_blast_bar'] = $berry_blast_bar;
+                     }
                 }
 
                 if($chyawanprash_bar!=null)
                 {
                     $type = $this->input->post('type_7');
                     if($type=='Box')
-                        $item_id = 31;
-                    else
-                        $item_id = 10;
-                    
-                   $data = array(
-                                    'type'=>$type,
-                                    'item_id'=>$item_id,
-                                    'qty'=>$chyawanprash_bar
-                                    );
-                    $batch_array[] = $data;
+                     {
+                        $batch_array['chyawanprash_box'] = $chyawanprash_bar;
+                     }
+                     else
+                     {
+                        $batch_array['chyawanprash_bar'] = $chyawanprash_bar;
+                     }
                 }
 
                 if($variety_box!=null)
                 {
-                    $item_id = 32;
+                    $batch_array['variety_box'] = $variety_box;
+                }  
+                
+                $sales_rep_stock_detail =  $batch_array;  
+
+
+                 $data = array(
+                            'sales_rep_id' => $sales_rep_id,
+                            'date_of_visit' => $date_of_visit,
+                            'distributor_type' => $visit_detail['distributor_types'],
+                            'distributor_id' => $visit_detail['distributor_id'],
+                            'distributor_name' => $visit_detail['distributor_name'],
+                            'latitude' => $visit_detail['latitude'],
+                            'longitude' => $visit_detail['longitude'],
+                            'status' => 'Approved',
+                            'remarks' => $visit_detail['remarks'],
+                            'modified_by' => $curusr,
+                            'modified_on' => $now,
+                            'zone_id' => $visit_detail['zone_id'],
+                            'area_id' => $visit_detail['area_id'],
+                            'location_id' => $visit_detail['location_id'],
+                            'frequency'=>$frequency
+                        );
+                    $data['created_by']=$curusr;
+                    $data['created_on']=$now;
+
+                    $this->db->insert('sales_rep_location',$data);
+                    $visit_id = $sales_rep_loc_id=$this->db->insert_id();    
+
+                    $sales_rep_stock_detail = $sales_rep_stock_detail;
+                    $sales_rep_stock_detail['sales_rep_loc_id'] = $sales_rep_loc_id;
+
+                    $this->db->insert('sales_rep_distributor_opening_stock',$sales_rep_stock_detail);
+            }
+            else
+            {
+                    if($chocolate_cookies!='')
+                    {
+                        $item_id =37;
+                        $data = array(
+                                        'type'=>'Box',
+                                        'item_id'=>$item_id,
+                                        'qty'=>$chocolate_cookies
+                                        );
+                        $batch_array[] = $data;
+                    }
+
+                    if($dark_chocolate_cookies!='')
+                    {
+                        $item_id =38;
+                        $data = array(
+                                        'type'=>'Box',
+                                        'item_id'=>$item_id,
+                                        'qty'=>$dark_chocolate_cookies
+                                        );
+                        $batch_array[] = $data;
+                    }
+
+                    if($cranberry_cookies!='')
+                    {
+                        $item_id = 39;
+                        $data = array( 'type'=>'Box',
+                                        'item_id'=>$item_id,
+                                        'qty'=>$cranberry_cookies
+                                        );
+                        $batch_array[] = $data;
+                    }
+
+                    if($cranberry_orange_zest!='')
+                    {
+                        $item_id = 42;
+                        $data = array(  'type'=>'Box',
+                                        'item_id'=>$item_id,
+                                        'qty'=>$cranberry_orange_zest
+                                        );
+                        $batch_array[] = $data;
+                    }
                     
-                    $data = array(
-                                    'type'=>$type,
-                                    'item_id'=>$item_id,
-                                    'qty'=>$variety_box
-                                    );
-                    $batch_array[] = $data;
-                }
-               $merchandiser_stock_details =  $batch_array;
-               $retailer_id = $store_id = $visit_detail['reation_id'];
-               $data = array(
-                    'm_id' => $sales_rep_id,
-                    'date_of_visit' => $date_of_visit,
-                    'dist_id' => $retailer_id,
-                    'latitude' => $visit_detail['latitude'],
-                    'longitude' => $visit_detail['longitude'],
-                    'remarks' => trim($visit_detail['remarks']),
-                    'location_id' => $visit_detail['location_id'],
-                    'zone_id' => $visit_detail['zone_id'],
-                    'created_by' => $curusr,
-                    'created_on' => $now,
-                );
-                $this->db->insert('merchandiser_stock',$data);
-                $this->db->last_query();
-                $visit_id = $merchandiser_stock_id=$this->db->insert_id();   
+                    if($fig_raisins!='')
+                    {
+                        $item_id = 41;
+                        $data = array(
+                                        'type'=>'Box',
+                                        'item_id'=>$item_id,
+                                        'qty'=>$fig_raisins
+                                        );
+                        $batch_array[] = $data;
+                    }
 
-                if(count($merchandiser_stock_details)>0)
-                {
-                    for ($j=0; $j <count($merchandiser_stock_details) ; $j++) { 
-                            $merchandiser_stock_details[$j]['merchandiser_stock_id']=$merchandiser_stock_id;
-                         }
+                    if($papaya_pineapple!='')
+                    {
+                        $item_id = 40;
+                        $data = array(
+                                        'type'=>'Box',
+                                        'item_id'=>$item_id,
+                                        'qty'=>$papaya_pineapple
+                                        );
+                        $batch_array[] = $data;
+                    }
 
-                    $this->db->where('merchandiser_stock_id',$merchandiser_stock_id)->delete('merchandiser_stock_details');
+                    if($orange_bar!=null)
+                    {
+                        $type = $this->input->post('type_0');
+                        if($type=='Box'){
+                            $item_id = 1;
+                        }
+                        else{
+                             $item_id = 1;
+                        }
+                            
 
-                    $visit_id = $merchandiser_stock_id;
-                    $this->db->insert_batch('merchandiser_stock_details',$merchandiser_stock_details);    
-                }
+                        $data = array(
+                                        'type'=>$type,
+                                        'item_id'=>$item_id,
+                                        'qty'=>$orange_bar
+                                        );
+                        $batch_array[] = $data;
+                    }
 
-        }
+                    if($butterscotch_bar!=null)
+                    {
+                        $type = $this->input->post('type_1');
+                        if($type=='Box')
+                            $item_id = 3;
+                        else
+                            $item_id = 3;
 
-       redirect(base_url().'index.php/Sales_rep_store_plan/add_stock');
-}
-     
+                        $data = array(
+                                        'type'=>$type,
+                                        'item_id'=>$item_id,
+                                        'qty'=>$butterscotch_bar
+                                        );
+                        $batch_array[] = $data;
+                    }
+
+                    if($chocopeanut_bar!=null)
+                    {
+                        $type = $this->input->post('type_3');
+                        if($type=='Box')
+                            $item_id = 9;
+                        else
+                            $item_id = 5;
+                        
+                        $data = array(
+                                        'type'=>$type,
+                                        'item_id'=>$item_id,
+                                        'qty'=>$chocopeanut_bar
+                                        );
+                        $batch_array[] = $data;
+                    }
+
+                    if($bambaiyachaat_bar!=null)
+                    {
+                        $type = $this->input->post('type_4');
+                        if($type=='Box')
+                            $item_id = 8;
+                        else
+                            $item_id = 4;
+                        
+                        $data = array(
+                                        'type'=>$type,
+                                        'item_id'=>$item_id,
+                                        'qty'=>$bambaiyachaat_bar
+                                        );
+                        $batch_array[] = $data;
+                    }
+
+                    if($mangoginger_bar!=null)
+                    {
+                        $type = $this->input->post('type_5');
+                        if($type=='Box')
+                            $item_id = 12;
+                        else
+                            $item_id = 6;
+                        
+                       $data = array(
+                                        'type'=>$type,
+                                        'item_id'=>$item_id,
+                                        'qty'=>$mangoginger_bar
+                                        );
+                        $batch_array[] = $data;
+                    }
+
+                    if($berry_blast_bar!=null)
+                    {
+                        $type = $this->input->post('type_6');
+                        if($type=='Box')
+                            $item_id = 29;
+                        else
+                            $item_id = 9;
+                        
+                       $data = array(
+                                        'type'=>$type,
+                                        'item_id'=>$item_id,
+                                        'qty'=>$berry_blast_bar
+                                        );
+
+                        $batch_array[] = $data;
+                    }
+
+                    if($chyawanprash_bar!=null)
+                    {
+                        $type = $this->input->post('type_7');
+                        if($type=='Box')
+                            $item_id = 31;
+                        else
+                            $item_id = 10;
+                        
+                       $data = array(
+                                        'type'=>$type,
+                                        'item_id'=>$item_id,
+                                        'qty'=>$chyawanprash_bar
+                                        );
+                        $batch_array[] = $data;
+                    }
+
+                    if($variety_box!=null)
+                    {
+                        $item_id = 32;
+                        
+                        $data = array(
+                                        'type'=>$type,
+                                        'item_id'=>$item_id,
+                                        'qty'=>$variety_box
+                                        );
+                        $batch_array[] = $data;
+                    }
+                   $merchandiser_stock_details =  $batch_array;
+                   $retailer_id = $store_id = $visit_detail['reation_id'];
+                   $data = array(
+                        'm_id' => $sales_rep_id,
+                        'date_of_visit' => $date_of_visit,
+                        'dist_id' => $retailer_id,
+                        'latitude' => $visit_detail['latitude'],
+                        'longitude' => $visit_detail['longitude'],
+                        'remarks' => trim($visit_detail['remarks']),
+                        'location_id' => $visit_detail['location_id'],
+                        'zone_id' => $visit_detail['zone_id'],
+                        'created_by' => $curusr,
+                        'created_on' => $now,
+                    );
+                    $this->db->insert('merchandiser_stock',$data);
+                    $this->db->last_query();
+                    $visit_id = $merchandiser_stock_id=$this->db->insert_id();   
+
+                    if(count($merchandiser_stock_details)>0)
+                    {
+                        for ($j=0; $j <count($merchandiser_stock_details) ; $j++) { 
+                                $merchandiser_stock_details[$j]['merchandiser_stock_id']=$merchandiser_stock_id;
+                             }
+
+                        $this->db->where('merchandiser_stock_id',$merchandiser_stock_id)->delete('merchandiser_stock_details');
+
+                        $visit_id = $merchandiser_stock_id;
+                        $this->db->insert_batch('merchandiser_stock_details',$merchandiser_stock_details);    
+                    }
+
+            }
+
+           redirect(base_url().'index.php/Sales_rep_store_plan/add_stock');
+    }
+    
+    public function save_po_qty(){
+        $result = $this->sales_rep_location_model->save_po_qty();
+        echo $result;
+    }
 }
 ?>

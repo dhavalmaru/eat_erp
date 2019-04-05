@@ -32,7 +32,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 // {
 //     $config['base_url'] = 'http://www.eatanytime.in/eat_erp/';
 // }
-$config['base_url'] = 'http://localhost/Git/eat_erp/';
+$config['base_url'] = 'http://localhost/eat_erp/';
 
 /*
 |--------------------------------------------------------------------------

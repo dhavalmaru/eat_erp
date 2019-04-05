@@ -1777,7 +1777,7 @@ public function save_session()
 
             if($dark_chocolate_cookies!='')
             {
-                $item_id =45;
+                $item_id =38;
                 $data = array(
                                 'type'=>'Box',
                                 'item_id'=>$item_id,
@@ -2232,7 +2232,7 @@ public function save_followup()
 
             if($dark_chocolate_cookies!='')
             {
-                $item_id =45;
+                $item_id =38;
                 $data = array(
                                 'merchandiser_stock_id' => $id,
                                 'type'=>'Box',
@@ -3554,7 +3554,7 @@ public function save_relation_session()
 
     if($dark_chocolate_cookies!='')
     {
-        $item_id =45;
+        $item_id =38;
         $data = array(
                         'type'=>'Box',
                         'item_id'=>$item_id,

@@ -111,7 +111,7 @@
             </div>
             <?php if($status=='pending_for_approval') { ?>
                 <form id="form_distributor_po_list" role="form" class="form-horizontal" method="post" action="<?php echo base_url().'index.php/distributor_po/authorise'; ?>">
-            <?php } else if($status=='pending_for_delivery') { ?>
+            <?php } else if($status=='pending_for_delivery' || $status=='gt_dp') { ?>
                 <form id="form_distributor_po_list" role="form" class="form-horizontal" method="post" action="<?php echo base_url().'index.php/distributor_po/set_delivery_status'; ?>">
             <?php } else { ?>
                 <form id="form_distributor_po_list" role="form" class="form-horizontal" method="post" action="">
@@ -129,12 +129,12 @@
                             <?php //$this->load->view('templates/download');?>
                             <a class="btn btn-danger btn-padding dropdown-toggle" href="<?php echo base_url().'index.php/distributor_po/generate_po_delivery_report'; ?>"><i class="fa fa-download"></i> &nbsp;Download</a>
                         </div>
-                        <div class="pull-right btn-margin" style="margin-left: 5px; <?php if(($access[0]->r_edit=='1' && ($status=='pending_for_delivery' || $status=='gp_issued'))) echo ''; else echo 'display: none;';?>">
+                        <div class="pull-right btn-margin" style="margin-left: 5px; display: none; <?php //if(($access[0]->r_edit=='1' && ($status=='pending_for_delivery' || $status=='gp_issued'))) echo ''; else echo 'display: none;';?>">
                             <button class="btn btn-success btn-block btn-padding" type="button" onClick="get_batch_details();">
                                 <span class="fa fa-shopping-cart"></span> Select Delivery Status
                             </button>
                         </div>
-                        <div class="pull-right btn-margin" style="<?php if($access[0]->r_insert=='0' || $status=='pending_for_delivery' || $status=='gp_issued' || $status=='delivered_not_complete') echo 'display: none;';?>">
+                        <div class="pull-right btn-margin" style="<?php //if($access[0]->r_insert=='0' || $status=='pending_for_delivery' || $status=='gp_issued' || $status=='delivered_not_complete') echo 'display: none;';?>">
                             <a class="btn btn-success btn-block btn-padding" href="<?php echo base_url(); ?>index.php/distributor_po/add">
                                 <span class="fa fa-plus"></span> Add Distributor PO Entry
                             </a>
@@ -142,10 +142,14 @@
                     </div>
                     <select onchange="dp_status(this.value);" class="mysidenav">
                         <option value="0"><?php if($selectedstatus!=""){echo $selectedstatus;}else{echo 'Select Status';} ?></option>
-                        <option value="1">Approved (<?php echo $active; ?>)</option>
-                        <option value="3">Approval Pending (<?php echo $pending_for_approval; ?>) </option>
-                        <option value="4">Delivery Pending (<?php echo $pending_for_delivery; ?>)</option>
-                        <option value="7">Cancelled (<?php echo $inactive; ?>)</option>
+                        <option value="1">Mismatch (<?php echo $mismatch; ?>)</option>
+                        <option value="2">Pending (<?php echo $pending_for_approval; ?>) </option>
+                        <option value="3">MT DP (<?php echo $pending_for_delivery; ?>)</option>
+                        <option value="4">GT DP (<?php echo $gt_dp; ?>)</option>
+                        <option value="5">Delivered Not Conf (<?php echo $pending_merchendiser_delivery; ?>)</option>
+                        <option value="6">Completed (<?php echo $delivered; ?>) </option>
+                        <option value="7">Approved (<?php echo $active; ?>)</option>
+                        <option value="8">Cancelled (<?php echo $inactive; ?>)</option>
                     </select>           
                 </div>
                 
@@ -172,25 +176,25 @@
                                         <span id="pending_for_approval"> (<?php echo $pending_for_approval; ?>) </span>
                                     </a>
                                 </li>
-                                <li class="delivery">
+                                <li class="pending_for_delivery">
                                     <a  href="<?php echo base_url(); ?>index.php/distributor_po/checkstatus/pending_for_delivery">
                                         <span class="ng-binding">MT DP</span>
                                         <span id="pending_for_delivery"> (<?php echo $pending_for_delivery; ?>) </span>
                                     </a>
                                 </li>
                                 <li class="gt_dp">
-                                    <a  href="<?php echo base_url(); ?>index.php/distributor_po/checkstatus/pending_for_delivery">
+                                    <a  href="<?php echo base_url(); ?>index.php/distributor_po/checkstatus/gt_dp">
                                         <span class="ng-binding">GT DP</span>
-                                        <span id="gt_pending_for_delivery"> (<?php echo $pending_for_delivery; ?>) </span>
+                                        <span id="gt_dp"> (<?php echo $gt_dp; ?>) </span>
                                     </a>
                                 </li>
-                                <li class="pending_merchendiser">
+                                <li class="pending_merchendiser_delivery">
                                     <a  href="<?php echo base_url(); ?>index.php/distributor_po/checkstatus/pending_merchendiser_delivery">
                                         <span class="ng-binding">Delivered Not Conf</span>
                                         <span id="pending_merchendiser_delivery"> (<?php echo $pending_merchendiser_delivery; ?>) </span>
                                     </a>
                                 </li>
-                                <li class="completed">
+                                <li class="delivered">
                                     <a  href="<?php echo base_url(); ?>index.php/distributor_po/checkstatus/delivered">
                                         <span class="ng-binding">Completed</span>
                                         <span id="delivered"> (<?php echo $delivered; ?>) </span>
@@ -253,10 +257,10 @@
             <!-- END PAGE CONTENT -->
 
             <!-- Modal -->
-            <div class="modal fade" id="myModal" role="dialog" style="<?php if($status=='pending_for_delivery') {echo 'padding-top:0px;';} ?>">
+            <div class="modal fade" id="myModal" role="dialog" style="<?php if($status=='pending_for_delivery' || $status=='gt_dp') {echo 'padding-top:0px;';} ?>">
                 <div class="modal-dialog">
                     <!-- Modal content-->
-                    <div class="modal-content" style="<?php if($access[0]->r_edit=='1' && $status=='pending_for_delivery') { echo 'width: 500px;'; } ?>">
+                    <div class="modal-content" style="<?php if($access[0]->r_edit=='1' && ($status=='pending_for_delivery' || $status=='gt_dp')) { echo 'width: 500px;'; } ?>">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal">&times;</button>
                             <h4 class="modal-title">Select Delivery Status</h4>
@@ -266,9 +270,9 @@
                             <br/>
                             <div class="">
                                 <select name="delivery_status" id="delivery_status" class="form-control" onchange="view_reason();">
-                                    <option value="">Select</option>
-                                    <option value="Pending">Delivered Pending Merchandiser Approval</option>
-                                    <option value="Cancelled">Cancelled</option>
+                                    <!-- <option value="">Select</option> -->
+                                    <!-- <option value="Pending">Delivered Pending Merchandiser Approval</option> -->
+                                    <option value="Cancelled" selected>Cancelled</option>
                                 </select>
                             </div>
                             <br/>
@@ -292,7 +296,7 @@
                                     <input type="text" class="form-control" name="invoice_no" id="invoice_no" value="" />
                                 </div>
                             </div>
-                            <div id="cancellation_div" style="display: none;">
+                            <div id="cancellation_div">
                             <label class="control-label">Cancellation Reason <span class="asterisk_sign">*</span></label>
                             <br/>
                             <div class="">
@@ -395,54 +399,39 @@
     </script>
     <script type="text/javascript" src="<?php echo base_url(); ?>js/validations.js"></script>
     <script>
-        $(document).ready(function() {               
-
+        $(document).ready(function() {
             var url = window.location.href;
 
-            if(url.includes('All')){
-                $('.all').attr('class','active');
-            }
-            else  if(url.includes('InActive')){
-                $('.inactive').attr('class','active');
-            }
-            else  if(url.includes('Approved')){
-                $('.approved').attr('class','active');
-            }
-            else  if(url.includes('pending_for_approval')){
-                // console.log('pending_for_approval');
+            if(url.includes('mismatch')){
+                $('.mismatch').attr('class','active');
+            } else if(url.includes('pending_for_approval')){
                 $('.pending_for_approval').attr('class','active');
-            }
-            else  if(url.includes('pending_for_delivery')){
-                 
-                $('.delivery').attr('class','active');
-            }
-            else if(url.includes('pending_merchendiser_delivery')){
-                $('.pending_merchendiser').attr('class','active');
-            }
-             else if(url.includes('delivered')){
-                $('.completed').attr('class','active');
-            }
-            else {
-               
-                $('.delivery').attr('class','active');
+            } else if(url.includes('pending_for_delivery')){
+                $('.pending_for_delivery').attr('class','active');
+            } else if(url.includes('gt_dp')){
+                $('.gt_dp').attr('class','active');
+            } else if(url.includes('pending_merchendiser_delivery')){
+                $('.pending_merchendiser_delivery').attr('class','active');
+            } else if(url.includes('delivered')){
+                $('.delivered').attr('class','active');
+            } else  if(url.includes('Approved')){
+                $('.approved').attr('class','active');
+            } else  if(url.includes('InActive')){
+                $('.inactive').attr('class','active');
+            } else {
+                $('.pending_for_delivery').attr('class','active');
             }
 
             $('.ahrefall').click(function(){
                 alert(window.location.href );
             });
 			
-			 $('#other_reason_div').hide();
-			 
-			 $("#other_reason").click(function()
-			 {
-                $('#other_reason_div').show();
-			 });
-			
-			
-        });
+            $('#other_reason_div').hide();
 
-        
-        
+            $("#other_reason").click(function() {
+                $('#other_reason_div').show();
+            });
+        });
 
         var blFlag = false;
         $('#myModal').on('hidden.bs.modal', function () {
@@ -467,7 +456,6 @@
                 blFlag = true;
             }
         });
-        
         
         // $('input[name="check_val[]"]').on('ifChanged', function(event){
         //     var v = $(this).is(':checked')?$(this).val():'false';
@@ -578,7 +566,7 @@
             var len = 10;
             var columnDefs = [];
 
-            if(status == 'pending_for_delivery' || status == 'gp_issued' || status == 'pending_for_approval' || status=='pending_merchendiser_delivery') {
+            if(status == 'pending_for_delivery' || status == 'gt_dp' || status == 'pending_for_approval' || status=='pending_merchendiser_delivery') {
                 len = -1;
 
                 if(status == 'gp_issued') {
@@ -596,10 +584,7 @@
                                     { "width": "10%", "targets": 8 },
                                     { className: "dt-body-center", targets: [ 3 ] }
                                 ];
-                } 
-                else if(status == 'pending_for_delivery')
-                {
-
+                } else if(status == 'pending_for_delivery' || status == 'gt_dp') {
                     columnDefs = [
                                     {
                                         "targets": [3],
@@ -609,10 +594,7 @@
                                     { "width": "10%", "targets": 8 },
                                     { className: "dt-body-center", targets: [ 3 ] }
                                 ];
-                }
-                else if(status == 'pending_for_delivery' || status == 'pending_merchendiser_delivery')
-                {
-
+                } else if(status == 'pending_for_delivery' || status == 'gt_dp' || status == 'pending_merchendiser_delivery') {
                     columnDefs = [
                                     // {
                                         // "targets": [3],
@@ -627,8 +609,7 @@
                                     { "width": "10%", "targets": 9 },
                                     { className: "dt-body-center", targets: [ 3 ] }
                                 ];
-                }
-                else {
+                } else {
                     columnDefs = [
                                     { "width": "10%", "targets": 9 },
                                     { className: "dt-body-center", targets: [ 3 ] }
@@ -760,41 +741,29 @@
                 table.DataTable(tableOptions);
             });
         });
-        function dp_status(str)
-        {
-            if(str=='1')
-            {
-                window.location.href="<?php echo base_url(); ?>index.php/distributor_po/checkstatus/Approved";
-            }   
-            else if(str=='2')
-            {
-                window.location.href="<?php echo base_url(); ?>index.php/distributor_po/checkstatus/pending";
-            }
-            else if(str=='3')
-            {
+
+        function dp_status(str) {
+            if(str=='1') {
+                window.location.href="<?php echo base_url(); ?>index.php/distributor_po/checkstatus/mismatch";
+            } else if(str=='2') {
                 window.location.href="<?php echo base_url(); ?>index.php/distributor_po/checkstatus/pending_for_approval";
-            }
-            else if(str=='4')
-            {
+            } else if(str=='3') {
                 window.location.href="<?php echo base_url(); ?>index.php/distributor_po/checkstatus/pending_for_delivery";
-            }
-            else if(str=='5')
-            {
-                window.location.href="<?php echo base_url(); ?>index.php/distributor_po/checkstatus/gp_issued";
-            }
-            else if(str=='6')
-            {
-                window.location.href="<?php echo base_url(); ?>index.php/distributor_po/checkstatus/delivered_not_complete";
-            }
-            else if(str=='7')
-            {
+            } else if(str=='4') {
+                window.location.href="<?php echo base_url(); ?>index.php/distributor_po/checkstatus/gt_dp";
+            } else if(str=='5') {
+                window.location.href="<?php echo base_url(); ?>index.php/distributor_po/checkstatus/pending_merchendiser_delivery";
+            } else if(str=='6') {
+                window.location.href="<?php echo base_url(); ?>index.php/distributor_po/checkstatus/delivered";
+            } else if(str=='7') {
+                window.location.href="<?php echo base_url(); ?>index.php/distributor_po/checkstatus/approved";
+            } else if(str=='8') {
                 window.location.href="<?php echo base_url(); ?>index.php/distributor_po/checkstatus/InActive";
-            }
-            else
-            {
+            } else {
                 alert("Please select a status.");
             }
         }
+
         function openNav() {
             document.getElementById("mySidenav").style.width = "250px";
         }

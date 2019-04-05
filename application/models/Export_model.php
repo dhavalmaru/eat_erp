@@ -15970,7 +15970,7 @@ public function gt_store_report($save='',$region=array()){
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+10].$row, $data[$i]->item_qty);
         }
 
-        if($data[$i]->item_id==45)
+        if($data[$i]->item_id==38)
         {
             $nooforder = $nooforder+$data[$i]->item_qty;
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+11].$row, $data[$i]->item_qty);

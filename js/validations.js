@@ -5807,13 +5807,6 @@ $("#form_distributor_po_details").validate({
         distributor_consignee_id:{
             required: true     
         },
-        delivery_date: {
-            required: {
-                depends: function() {
-                    return ($("#delivery_status").val() == "Delivered");
-                }
-            }
-        },
         basis_of_sales: {
             required: true
             
@@ -5839,21 +5832,44 @@ $("#form_distributor_po_details").validate({
         email_date_time:{
             required: true
         },
-        remarks: {
-            required: {
-                depends: function() {
-                    return (d_status == "Approved");
-                }
-            }
-        },
+        // remarks: {
+        //     required: {
+        //         depends: function() {
+        //             // return (d_status == "Approved");
+        //             return ($('#po_invoice_amount').val()!=$('#invoice_amount').val());
+        //         }
+        //     }
+        // },
         delivery_status:{
             required: true     
         },
+        // delivery_date: {
+            // required: {
+            //     depends: function() {
+            //         return ($("#delivery_status").val() == "Delivered");
+            //     }
+            // }
+        // },
         delivery_date:{
             required: true     
         },
-        person_receving:{
-            required: true     
+        delivery_remarks:{
+            required: {
+                depends: function() {
+                    // return ($("#delivery_status").val() == "Delivered");
+                    return ($('#po_invoice_amount').val()!=$('#invoice_amount').val());
+                }
+            }     
+        },
+        doc_file:{
+            required: {
+                depends: function() {
+                    return ($('#doc_document').val()=="");
+                }
+            }
+        },
+        entered_invoice_amount:{
+            required: true
         }
     },
 
@@ -5871,7 +5887,7 @@ $("#form_distributor_po_details").validate({
 
 $.validator.addMethod("check_po_number_availablity", function (value, element) {
     var result = 1;
-	 if($("#delivery_through_distributor").is(":checked"))
+	if($("#delivery_through_distributor").is(":checked"))
 	// if($("input[name='delivery_through'][value='Distributor']").prop("checked", true)
 
 	{
@@ -5906,24 +5922,24 @@ $.validator.addMethod("check_po_number_availablity", function (value, element) {
         }
     });
 
-// else if($("#delivery_through").val()=='WHPL')
-// {
-	// $.ajax({
-        // url: BASE_URL+'index.php/distributor_po/check_po_number_availablity_whpl',
-        // data: 'id='+$("#id").val()+'&order_no='+$("#po_number").val()+'&ref_id='+$("#ref_id").val(),
-        // type: "POST",
-        // dataType: 'html',
-        // global: false,
-        // async: false,
-        // success: function (data) {
-            // result = parseInt(data);
-        // },
-        // error: function (xhr, ajaxOptions, thrownError) {
-            // alert(xhr.status);
-            // alert(thrownError);
-        // }
-    // });
-// }
+    // else if($("#delivery_through").val()=='WHPL')
+    // {
+    	// $.ajax({
+            // url: BASE_URL+'index.php/distributor_po/check_po_number_availablity_whpl',
+            // data: 'id='+$("#id").val()+'&order_no='+$("#po_number").val()+'&ref_id='+$("#ref_id").val(),
+            // type: "POST",
+            // dataType: 'html',
+            // global: false,
+            // async: false,
+            // success: function (data) {
+                // result = parseInt(data);
+            // },
+            // error: function (xhr, ajaxOptions, thrownError) {
+                // alert(xhr.status);
+                // alert(thrownError);
+            // }
+        // });
+    // }
 
     if (result) {
         return false;
@@ -5942,7 +5958,7 @@ $("#form_distributor_po_list").validate({
         delivery_date:{
             required: true     
         },
-        person_receving:{
+        person_name:{
             required: true     
         },
         cancellation_date:{
@@ -6000,9 +6016,9 @@ $('#form_distributor_po_details').submit(function() {
     if (!$("#form_distributor_po_details").valid()) {
         return false;
     } else {
-        if (check_po_invoice_amount()==false) {
-            return false;
-        }
+        // if (check_po_invoice_amount()==false) {
+        //     return false;
+        // }
 
         removeMultiInputNamingRules('#form_distributor_po_details', 'select[alt="type[]"]');
         removeMultiInputNamingRules('#form_distributor_po_details', 'select[alt="bar[]"]');
