@@ -6,6 +6,7 @@ class Sales_rep_location_model Extends CI_Model{
 function __Construct(){
 	parent :: __construct();
     $this->load->helper('common_functions');
+    $this->load->model('email_model');
 }
 
 function get_access(){
@@ -760,6 +761,8 @@ function save_po_qty(){
         }
     }
 
+    $this->send_po_physical_confirmation_email($po_id, $mismatch);
+
     $logarray['table_id']=$po_id;
     $logarray['module_name']='Distributor_PO';
     $logarray['cnt_name']='Distributor_PO';
@@ -768,6 +771,44 @@ function save_po_qty(){
 
     return 1;
 }
+
+function send_po_physical_confirmation_email($id='', $mismatch='') {
+    $email_type = 'distributor_po_confirm_physical';
+
+    if(strtoupper(trim($mismatch))=="1"){
+        $mismatch_status = "Mismatch";
+    } else {
+        $mismatch_status = "Verified";
+    }
+    $action='Distributor Po Physical Quantity '.$mismatch_status.' mail sending failed.';
+
+    $result = $this->email_model->get_email_details('', $email_type);
+
+    if(count($result)>0){
+        $email_from = $result[0]->email_from;
+        $email_sender = $result[0]->email_sender;
+        $email_to = $result[0]->email_to;
+        $email_cc = $result[0]->email_cc;
+        $email_bcc = $result[0]->email_bcc;
+        $email_subject = $result[0]->email_subject.' '.$mismatch_status;
+        $email_body = $result[0]->email_body.' '.$mismatch_status;
+
+        $mailSent=$this->email_model->set_email_details($id, $email_type, $email_from,  $email_sender, $email_to, $email_subject, $email_body, $email_bcc, $email_cc);
+
+        if($mailSent==1){
+            $action='Distributor Po '.$delivery_status.' mail sent.';
+        }
+    }
+    
+    $logarray['table_id']=$id;
+    $logarray['module_name']='Distributor_PO';
+    $logarray['cnt_name']='Distributor_PO';
+    $logarray['action']=$action;
+    $this->user_access_log_model->insertAccessLog($logarray);
+
+    return $mailSent;
+}
+
 
 }
 ?>

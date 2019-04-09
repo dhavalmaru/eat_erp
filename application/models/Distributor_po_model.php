@@ -8,6 +8,7 @@ function __Construct(){
     $this->load->helper('common_functions');
     $this->load->model('tax_invoice_model');
     $this->load->model('distributor_out_model');
+    $this->load->model('email_model');
 }
 
 function get_access(){
@@ -314,18 +315,26 @@ function get_distributor_po_data($status='', $id=''){
     return $query->result();
 }
 
-function get_email_details($id=''){
-    $tbl_name = 'email_master';
-    $cond = " where email_type = 'distributor_po_mismatch'";
-    if($id!=''){
-        $tbl_name = 'email_details';
-        $cond = $cond . " and email_ref_id = '$id'";
-    }
+// function get_email_details($id='', $email_type=''){
+//     $tbl_name = 'email_master';
+//     $cond = " where email_type = '$email_type'";
+//     if($id!=''){
+//         $tbl_name = 'email_details';
+//         $cond = $cond . " and email_ref_id = '$id'";
+//     }
 
-    $sql = "select * from ".$tbl_name.$cond. " order by id desc";
-    $query=$this->db->query($sql);
-    return $query->result();
-}
+//     $sql="select * from ".$tbl_name.$cond. " order by id desc";
+//     $query=$this->db->query($sql);
+//     $result=$query->result();
+
+//     if(count($result)==0){
+//         $sql="select * from email_master where email_type = '$email_type' order by id desc";
+//         $query=$this->db->query($sql);
+//         $result=$query->result();
+//     }
+
+//     return $query->result();
+// }
 
 function get_distributor_po_items($id){
     $sql = "select * from distributor_po_items where distributor_po_id = '$id'";
@@ -520,6 +529,7 @@ function save_data($id=''){
                      /*$this->distributor_out_model->set_credit_note($distributor_out_id);*/
                 }
                 
+                $this->send_po_confirmation_email($id);
 
                 $action='Distributor PO Entry '.$status.'. Delivery Status: ' . $delivery_status;
             }
@@ -797,18 +807,9 @@ function update_recon($id=''){
         $cancellation_date=formatdate($cancellation_date);
     }
 
-    if($delivery_status=="Cancelled"){
+    if(strtoupper(trim($delivery_status))=="CANCELLED"){
         $status = "InActive";
     }
-
-    if($delivery_status=="Cancelled"){
-    } else {
-        $sql = "update distributor_po set 
-                modified_by = '$curusr', modified_on = '$now', remarks = concat(remarks, '$remarks') 
-                where  id = '$id'";
-    }
-    
-    $this->db->query($sql);
 
     $data = array(
         'd_amount' => format_number($this->input->post('total_amount'),2),
@@ -890,6 +891,8 @@ function update_recon($id=''){
             $this->db->insert('distributor_po_delivered_items', $data);
         }
     }
+
+    $this->send_po_delivery_confirmation_email($id, $delivery_status);
 
     $logarray['table_id']=$id;
     $logarray['module_name']='Distributor_PO';
@@ -2195,46 +2198,18 @@ function send_email() {
     $now=date('Y-m-d H:i:s');
     $curusr=$this->session->userdata('session_id');
     $login_name = $this->session->userdata('login_name');
-    $email_sender = 'Wholesome Habits Pvt Ltd';
 
     $email_ref_id = $this->input->post('email_ref_id');
     $email_type = $this->input->post('email_type');
     $email_from = $this->input->post('email_from');
+    $email_sender = $this->input->post('email_sender');
     $email_to = $this->input->post('email_to');
     $email_cc = $this->input->post('email_cc');
     $email_bcc = $this->input->post('email_bcc');
     $email_subject = $this->input->post('email_subject');
     $email_body = $this->input->post('email_body');
 
-    // $email_ref_id = '';
-    // $email_type = 'distributor_po_mismatch';
-    // $email_from = 'cs@eatanytime.in';
-    // $email_to = 'prasad.bhisale@pecanreams.com';
-    // $email_cc = 'prasad.bhisale@pecanreams.com';
-    // $email_bcc = 'prasad.bhisale@pecanreams.com';
-    // $email_subject = 'PO Amount Mismatch';
-    // $email_body = 'Hi, 
-
-    //                 PO Amount Mismatch
-
-    //                 Regards,
-
-    //                 Team EatAnyTime';
-
-    $message = '<html>
-                    <head>
-                    <style type="text/css">
-                        pre {
-                            font: small/1.5 Arial,Helvetica,sans-serif;
-                        }
-                    </style>
-                    </head>
-                    <body><pre>'.$email_body.'</pre><br/><br/>
-                    Team EAT Anytime<br/><br/>'.ucwords(trim($login_name)).'
-                    </body>
-                    </html>';
-
-    $mailSent=send_email_new($email_from,  $email_sender, $email_to, $email_subject, $message, $email_bcc, $email_cc);
+    $mailSent=$this->email_model->set_email_details($email_ref_id, $email_type, $email_from, $email_sender, $email_to, $email_subject, $email_body, $email_bcc, $email_cc);
 
     if($mailSent==1){
         $status = 1;
@@ -2243,32 +2218,130 @@ function send_email() {
         $status = 0;
         $action='Distributor Po amount mismatch mail sending failed.';
     }
-    $data = array(
-        'email_ref_id' => ($email_ref_id==''?Null:$email_ref_id),
-        'email_type' => $email_type,
-        'email_from' => $email_from,
-        'email_to' => $email_to,
-        'email_cc' => $email_cc,
-        'email_bcc' => $email_bcc,
-        'email_subject' => $email_subject,
-        'email_body' => $email_body,
-        'status' => $status,
-        'created_by' => $curusr,
-        'created_on' => $now,
-        'modified_by' => $curusr,
-        'modified_on' => $now
-    );
 
-    $this->db->insert('email_details',$data);
-    $id=$this->db->insert_id();
+    if($email_ref_id!=''){
+        $logarray['table_id']=$email_ref_id;
+        $logarray['module_name']='Distributor_PO';
+        $logarray['cnt_name']='Distributor_PO';
+        $logarray['action']=$action;
+        $this->user_access_log_model->insertAccessLog($logarray);
+    }
 
+    return $status;
+}
+
+// function set_email_details($email_ref_id, $email_type, $email_from, $email_sender, $email_to, $email_subject, $email_body, $email_bcc, $email_cc) {
+//     $now=date('Y-m-d H:i:s');
+//     $curusr=$this->session->userdata('session_id');
+//     $login_name = $this->session->userdata('login_name');
+    
+//     $message = '<html>
+//                     <head>
+//                     <style type="text/css">
+//                         pre {
+//                             font: small/1.5 Arial,Helvetica,sans-serif;
+//                         }
+//                     </style>
+//                     </head>
+//                     <body><pre>'.$email_body.'</pre><br/><br/>
+//                     Team EAT Anytime<br/><br/>'.ucwords(trim($login_name)).'
+//                     </body>
+//                     </html>';
+
+//     $mailSent=send_email_new($email_from, $email_sender, $email_to, $email_subject, $message, $email_bcc, $email_cc);
+
+//     if($mailSent==1){
+//         $status = 1;
+//     } else {
+//         $status = 0;
+//     }
+
+//     $data = array(
+//         'email_ref_id' => ($email_ref_id==''?Null:$email_ref_id),
+//         'email_type' => $email_type,
+//         'email_from' => $email_from,
+//         'email_sender' => $email_sender,
+//         'email_to' => $email_to,
+//         'email_cc' => $email_cc,
+//         'email_bcc' => $email_bcc,
+//         'email_subject' => $email_subject,
+//         'email_body' => $email_body,
+//         'status' => $status,
+//         'created_by' => $curusr,
+//         'created_on' => $now,
+//         'modified_by' => $curusr,
+//         'modified_on' => $now
+//     );
+
+//     $this->db->insert('email_details',$data);
+
+//     return $status;
+// }
+
+function send_po_confirmation_email($id='') {
+    $action='Distributor Po Confirmation mail sending failed.';
+    $email_type = 'distributor_po_confirm';
+
+    $result = $this->email_model->get_email_details('', $email_type);
+
+    if(count($result)>0){
+        $email_from = $result[0]->email_from;
+        $email_sender = $result[0]->email_sender;
+        $email_to = $result[0]->email_to;
+        $email_cc = $result[0]->email_cc;
+        $email_bcc = $result[0]->email_bcc;
+        $email_subject = $result[0]->email_subject;
+        $email_body = $result[0]->email_body;
+
+        $mailSent=$this->email_model->set_email_details($id, $email_type, $email_from,  $email_sender, $email_to, $email_subject, $email_body, $email_bcc, $email_cc);
+
+        if($mailSent==1){
+            $action='Distributor Po Confirmation mail sent.';
+        }
+    }
+    
     $logarray['table_id']=$id;
     $logarray['module_name']='Distributor_PO';
     $logarray['cnt_name']='Distributor_PO';
     $logarray['action']=$action;
     $this->user_access_log_model->insertAccessLog($logarray);
 
-    return $status;
+    return $mailSent;
+}
+
+function send_po_delivery_confirmation_email($id='', $delivery_status='') {
+    $action='Distributor Po Delivery '.$delivery_status.' mail sending failed.';
+    $email_type = 'distributor_po_confirm_delivery';
+
+    if(strtoupper(trim($delivery_status))=="PENDING"){
+        $delivery_status = "Delivered";
+    }
+
+    $result = $this->email_model->get_email_details('', $email_type);
+
+    if(count($result)>0){
+        $email_from = $result[0]->email_from;
+        $email_sender = $result[0]->email_sender;
+        $email_to = $result[0]->email_to;
+        $email_cc = $result[0]->email_cc;
+        $email_bcc = $result[0]->email_bcc;
+        $email_subject = $result[0]->email_subject.' '.$delivery_status;
+        $email_body = $result[0]->email_body.' '.$delivery_status;
+
+        $mailSent=$this->email_model->set_email_details($id, $email_type, $email_from,  $email_sender, $email_to, $email_subject, $email_body, $email_bcc, $email_cc);
+
+        if($mailSent==1){
+            $action='Distributor Po '.$delivery_status.' mail sent.';
+        }
+    }
+    
+    $logarray['table_id']=$id;
+    $logarray['module_name']='Distributor_PO';
+    $logarray['cnt_name']='Distributor_PO';
+    $logarray['action']=$action;
+    $this->user_access_log_model->insertAccessLog($logarray);
+
+    return $mailSent;
 }
 
 public function get_relationship_product_details($status='', $id='', $relationship_id=''){

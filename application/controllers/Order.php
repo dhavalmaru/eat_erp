@@ -52,20 +52,20 @@ class Order extends CI_Controller{
                         <input type="hidden" id="input_check_'.$i.'" name="check[]" value="false" />',
 
                         $i+1,
-						 '<a href="'.base_url().'index.php/order/edit/'.$r[$i]->id.'"  class=""><i style="vertical:middle;text-align:center" class="fa fa-edit"></i></a>',
+
+						'<a href="'.base_url().'index.php/order/edit/'.$r[$i]->id.'"  class=""><i style="vertical:middle;text-align:center" class="fa fa-edit"></i></a>',
 
                         '<span style="display:none;">
                         <input type="hidden" id="date_of_processing_'.$i.'" name="date_of_processing[]" value="'.$r[$i]->date_of_processing.'" />'.
                             (($r[$i]->date_of_processing!=null && $r[$i]->date_of_processing!='')?date('Ymd',strtotime($r[$i]->date_of_processing)):'')
                         .'</span>'.
-                       
-                            (($r[$i]->date_of_processing!=null && $r[$i]->date_of_processing!='')?date('d/m/Y',strtotime($r[$i]->date_of_processing)):''),
-                       
-						
-
+                        (($r[$i]->date_of_processing!=null && $r[$i]->date_of_processing!='')?date('d/m/Y',strtotime($r[$i]->date_of_processing)):''),
+                        
                         $r[$i]->id,
 
                         $r[$i]->retailer_name,
+
+                        $r[$i]->distributor_name,
 
                         $r[$i]->location,
 
@@ -124,13 +124,13 @@ class Order extends CI_Controller{
             
             if (count($result)>0){
                 for($i=0;$i<count($count_data);$i++){
-                    if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && 
+                    if ((strtoupper(trim($count_data[$i]->status))=="APPROVED" || strtoupper(trim($count_data[$i]->status))=="ACTIVE") && 
                                 ($count_data[$i]->delivery_status==null || $count_data[$i]->delivery_status==''))
                         $pending=$pending+1;
-                    else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && 
+                    else if ((strtoupper(trim($count_data[$i]->status))=="APPROVED" || strtoupper(trim($count_data[$i]->status))=="ACTIVE") && 
                                 strtoupper(trim($count_data[$i]->delivery_status))=="DELIVERED")
                         $delivered=$delivered+1;
-                    else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && 
+                    else if ((strtoupper(trim($count_data[$i]->status))=="APPROVED" || strtoupper(trim($count_data[$i]->status))=="ACTIVE") && 
                                 strtoupper(trim($count_data[$i]->delivery_status))=="CANCELLED")
                         $cancelled=$cancelled+1;
                 }

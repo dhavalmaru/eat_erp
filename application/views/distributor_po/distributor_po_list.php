@@ -129,12 +129,12 @@
                             <?php //$this->load->view('templates/download');?>
                             <a class="btn btn-danger btn-padding dropdown-toggle" href="<?php echo base_url().'index.php/distributor_po/generate_po_delivery_report'; ?>"><i class="fa fa-download"></i> &nbsp;Download</a>
                         </div>
-                        <div class="pull-right btn-margin" style="margin-left: 5px; display: none; <?php //if(($access[0]->r_edit=='1' && ($status=='pending_for_delivery' || $status=='gp_issued'))) echo ''; else echo 'display: none;';?>">
+                        <div class="pull-right btn-margin" style="margin-left: 5px; display: none; <?php //if(($access[0]->r_edit=='1' && ($status=='pending_for_delivery' || $status=='gt_dp'))) echo ''; else echo 'display: none;';?>">
                             <button class="btn btn-success btn-block btn-padding" type="button" onClick="get_batch_details();">
                                 <span class="fa fa-shopping-cart"></span> Select Delivery Status
                             </button>
                         </div>
-                        <div class="pull-right btn-margin" style="<?php //if($access[0]->r_insert=='0' || $status=='pending_for_delivery' || $status=='gp_issued' || $status=='delivered_not_complete') echo 'display: none;';?>">
+                        <div class="pull-right btn-margin" style="<?php //if($access[0]->r_insert=='0' || $status=='pending_for_delivery' || $status=='gt_dp' || $status=='delivered_not_complete') echo 'display: none;';?>">
                             <a class="btn btn-success btn-block btn-padding" href="<?php echo base_url(); ?>index.php/distributor_po/add">
                                 <span class="fa fa-plus"></span> Add Distributor PO Entry
                             </a>
@@ -228,7 +228,7 @@
                                             <table id="customers10" class="table datatable table-bordered">
                                                 <thead>
                                                     <tr>
-                                                        <th width="50" align="center" style="<?php //if($status!='pending_for_delivery' && $status!='gp_issued' && $status!='pending_for_approval') echo 'display: none;'; ?>">Select</th>
+                                                        <th width="50" align="center" style="<?php //if($status!='pending_for_delivery' && $status!='gt_dp' && $status!='pending_for_approval') echo 'display: none;'; ?>">Select</th>
                                                         <th width="50" style="text-align:center;">Sr. No.</th>
                                                         <th width="80">Date Of processing</th>
                                                         <th style="text-align:center" width="50">Edit </th>
@@ -237,8 +237,9 @@
                                                         <th width="100">Location</th>
                                                         <th width="50">Relation</th>
                                                         <th width="70">Days To Expiry</th>
-                                                        <th width="70" >Amount (In Rs)</th>
-                                                        <th width="110" >Delivery Status</th>
+                                                        <th width="70">Amount (In Rs)</th>
+                                                        <th width="110">Delivery Status</th>
+                                                        <th width="110">Mismatch Type</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -560,17 +561,22 @@
     <script>
         var table;
         $(document).ready(function() {
-            // var len=<?php //if($status=='pending_for_delivery' || $status=='gp_issued') echo '-1';else echo '10';?>;
+            // var len=<?php //if($status=='pending_for_delivery' || $status=='gt_dp') echo '-1';else echo '10';?>;
            $(".datepicker").datepicker({ maxDate: 0,changeMonth: true,yearRange:'-100:+0',changeYear: true });     
             var status = '<?php echo $status; ?>';
             var len = 10;
             var columnDefs = [];
 
-            if(status == 'pending_for_delivery' || status == 'gt_dp' || status == 'pending_for_approval' || status=='pending_merchendiser_delivery') {
+            if(status == 'mismatch' || status == 'pending_for_delivery' || status == 'gt_dp' || status == 'pending_for_approval' || status=='pending_merchendiser_delivery') {
                 len = -1;
 
-                if(status == 'gp_issued') {
+                if(status == 'mismatch') {
                     columnDefs = [
+                                    {
+                                        "targets": [0],
+                                        "visible": false,
+                                        "searchable": false
+                                    },
                                     { "width": "10%", "targets": 8 },
                                     { className: "dt-body-center", targets: [ 3 ] }
                                 ];
@@ -578,6 +584,11 @@
                     columnDefs = [    
                                     {
                                         "targets": [0],
+                                        "visible": false,
+                                        "searchable": false
+                                    },    
+                                    {
+                                        "targets": [11],
                                         "visible": false,
                                         "searchable": false
                                     },
@@ -590,27 +601,42 @@
                                         "targets": [3],
                                         "visible": true,
                                         "searchable": false
+                                    },    
+                                    {
+                                        "targets": [11],
+                                        "visible": false,
+                                        "searchable": false
                                     },
                                     { "width": "10%", "targets": 8 },
                                     { className: "dt-body-center", targets: [ 3 ] }
                                 ];
-                } else if(status == 'pending_for_delivery' || status == 'gt_dp' || status == 'pending_merchendiser_delivery') {
+                } else if(status == 'pending_merchendiser_delivery') {
                     columnDefs = [
                                     // {
                                         // "targets": [3],
                                         // "visible": false,
                                         // "searchable": false
                                     // },
-                                     {
-                                    "targets": [0],
-                                    "visible": false,
-                                    "searchable": false
+                                    {
+                                        "targets": [0],
+                                        "visible": false,
+                                        "searchable": false
+                                    },
+                                    {
+                                        "targets": [11],
+                                        "visible": false,
+                                        "searchable": false
                                     },
                                     { "width": "10%", "targets": 9 },
                                     { className: "dt-body-center", targets: [ 3 ] }
                                 ];
                 } else {
                     columnDefs = [
+                                    {
+                                        "targets": [11],
+                                        "visible": false,
+                                        "searchable": false
+                                    },
                                     { "width": "10%", "targets": 9 },
                                     { className: "dt-body-center", targets: [ 3 ] }
                                 ];
@@ -626,6 +652,11 @@
                                 },
                                 {
                                     "targets": [8],
+                                    "visible": false,
+                                    "searchable": false
+                                },    
+                                {
+                                    "targets": [11],
                                     "visible": false,
                                     "searchable": false
                                 },
@@ -730,8 +761,7 @@
                 tableOptions.bPaginate = true;
                 table.DataTable(tableOptions);
             });
-
-               $("#pdf").click(function(){
+            $("#pdf").click(function(){
                 table.DataTable().destroy();
                 tableOptions.bPaginate = false;
                 table.DataTable(tableOptions);

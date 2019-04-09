@@ -487,7 +487,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group" style="display: none">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Delivery Status *</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
@@ -569,7 +569,7 @@
                                             <div class="col-md-12 col-sm-12 col-xs-12">
                                                 <label class="col-md-2 col-sm-2 col-xs-12 control-label">Cancellation Date</label>
                                                 <div class="col-md-4 col-sm-4 col-xs-12">
-                                                    <input type="text" class="form-control datepicker" name="cancellation_date" id="cancellation_date" placeholder="Delivery Date" value="" />
+                                                    <input type="text" class="form-control datepicker" name="cancellation_date" id="cancellation_date" placeholder="Cancellation Date" value="" />
                                                 </div>
                                             </div>
                                         </div>
@@ -1986,6 +1986,14 @@
                 } else {
                     $("#mismatch_remarks").hide();
                     $("#mismatch_remarks").val("");
+                }
+
+                if(parseFloat($("#invoice_amount").val())==0){
+                    $("#delivery_status").val("Cancelled");
+                    view_reason();
+                } else {
+                    $("#delivery_status").val("Pending");
+                    view_reason();
                 }
             }
 

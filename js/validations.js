@@ -369,8 +369,6 @@ function get_raw_material_qty(model_name,form_name,depochange='') {
     return valid;
 }
 
-
-
 function get_box_qty(model_name,form_name,depochange='') {
     /*console.log('eneterd2'+model_name);*/
     var validator = $("#"+form_name).validate();
@@ -449,6 +447,8 @@ function get_box_qty(model_name,form_name,depochange='') {
 
     return valid;
 }
+
+
 
 
 // ----------------- VENDOR DETAILS FORM VALIDATION -------------------------------------
@@ -597,7 +597,6 @@ $('#form_raw_material_details').submit(function() {
         return true;
     }
 });
-
 
 
 
@@ -1092,6 +1091,7 @@ function check_purchase_order_details() {
     
     return valid;
 }
+
 
 
 
@@ -5174,6 +5174,9 @@ $.validator.addMethod("check_sales_rep_distributor_availablity", function (value
         return true;
     }
 }, 'Distributor Name already in use.');
+
+
+
 
 // ----------------- ACCOUNT GROUP FORM VALIDATION -------------------------------------
 $("#form_group_details").validate({

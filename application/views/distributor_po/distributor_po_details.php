@@ -598,13 +598,13 @@
                                 <a href="<?php echo base_url(); ?>index.php/distributor_po" class="btn btn-danger pull-right" type="reset" id="reset">Cancel</a>
                                 <!-- <button class="btn btn-success pull-right" style="<?php //if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</button> -->
                                 <?php $curusr=$this->session->userdata('session_id'); ?>
-                                <input type="submit" class="btn btn-success btn-sm" id="btn_submit" name="btn_submit" value="Submit For Approval" style="<?php if(isset($access)) { if(isset($data)) { if($data[0]->freezed) { echo 'display: none;'; } else { if($access[0]->r_edit=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || $data[0]->status=='InActive')) echo ''; else echo 'display: none;'; } } else if($access[0]->r_insert=='1') echo ''; else echo 'display: none;'; ?>" />
+                                <input type="submit" class="btn btn-success btn-sm" id="btn_submit" name="btn_submit" value="Submit For Approval" style="<?php if(isset($access)) { if(isset($data)) { if($data[0]->freezed) { echo 'display: none;'; } else if($data[0]->mismatch=='1') { echo ''; } else { if($access[0]->r_edit=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || $data[0]->status=='InActive')) echo ''; else echo 'display: none;'; } } else if($access[0]->r_insert=='1') echo ''; else echo 'display: none;'; ?>" />
                                 <?php if(isset($data) && $data[0]->freezed!=1) { ?>
                                 <input type="submit" class="btn btn-danger btn-sm" id="btn_delete" name="btn_delete" value="Delete" style="<?php if(isset($access) ) {
                                 if(isset($data)) {if($access[0]->r_delete=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved') && $data[0]->status!='InActive') echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
                                 <?php } ?>
-                                <input type="submit" class="btn btn-success btn-sm" id="btn_approve" name="btn_approve" value="Approve" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
-                                <input type="submit" class="btn btn-danger btn-sm" id="btn_reject" name="btn_reject" value="Reject" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive' )) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+                                <input type="submit" class="btn btn-success btn-sm" id="btn_approve" name="btn_approve" value="Approve" style="<?php if(isset($access)) {if(isset($data)) {if($data[0]->mismatch=='1') { echo 'display: none;'; } else if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+                                <input type="submit" class="btn btn-danger btn-sm" id="btn_reject" name="btn_reject" value="Reject" style="<?php if(isset($access)) {if(isset($data)) {if($data[0]->mismatch=='1') { echo 'display: none;'; } else if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive' )) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
                                 <?php }?>                                    
                             </div>
                             </form>
@@ -638,6 +638,7 @@
                                     ?>
                                     <input type="hidden" id="email_ref_id" name="email_ref_id" value="<?php $email_ref_id; ?>" />
                                     <input type="hidden" id="email_type" name="email_type" value="<?php if(isset($email)) echo $email[0]->email_type; ?>" />
+                                    <input type="hidden" id="email_sender" name="email_sender" value="<?php if(isset($email)) echo $email[0]->email_sender; ?>" />
                                     <label class="col-md-2 col-sm-2 col-xs-12 control-label">From &nbsp;&nbsp;&nbsp; </label>
                                     <div class="col-md-8 col-sm-8 col-xs-12">
                                         <input type="text" class="form-control" name="email_from" value="<?php if(isset($email)) echo $email[0]->email_from; else echo 'cs@eatanytime.in'; ?>" />
@@ -2039,11 +2040,16 @@
                         $("#mismatch_type").val("Delivery");
                         $("#mismatch_div").show();
                         $("#btn_submit").val("Save");
+                        // $("#btn_submit").show();
+                        // $("#btn_approve").hide();
+                        // $("#btn_reject").hide();
                     } else {
                         $("#mismatch").val("0");
                         $("#mismatch_type").val("");
                         $("#mismatch_div").hide();
                         $("#btn_submit").val("Submit For Approval");
+                        // $("#btn_approve").show();
+                        // $("#btn_reject").show();
                     }
                 }
             }

@@ -806,12 +806,10 @@
                                     style="<?php 
                                     if(isset($access)) {
                                         if(isset($data)) {
-                                            if($data[0]->freezed)
-                                            {
+                                            if($data[0]->freezed) {
                                                 echo 'display: none;';
-                                            }else
-                                            {
-                                             if($access[0]->r_edit=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || $data[0]->status=='InActive' || ($data[0]->depot_name=='' && $data[0]->status=='Pending'))) echo ''; else echo 'display: none;';
+                                            } else {
+                                                if($access[0]->r_edit=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || $data[0]->status=='InActive' || ($data[0]->depot_name=='' && $data[0]->status=='Pending'))) echo ''; else echo 'display: none;';
                                             }
                                         } else if($access[0]->r_insert=='1') echo ''; else echo 'display: none;'; ?>" />
 
@@ -1106,7 +1104,6 @@
 					$('#email_body3').show();
 					$('#po_num1').hide();
 					$('#po_num2').hide();
-					
 				}
 				if($("#basis_of_sales option:selected").val() == 'PO Number') {
 					$('#email_body1').hide();

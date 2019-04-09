@@ -20,19 +20,24 @@ function get_data($status='', $id=''){
 
     if($status!=""){
         if ($status=="delivered"){
-            $cond=" where status='Approved' and delivery_status = 'Delivered' and 
-                        ((distributor_id!='1' and distributor_id!='189') or distributor_id is null)";
+            $cond=" where (status='Approved' or status='Active') and delivery_status = 'Delivered' and 
+                        ((distributor_id!='1' and distributor_id!='189' and distributor_id!='d_1' and 
+                            distributor_id!='d_189') or distributor_id is null)";
         } else if ($status=="pending"){
-            $cond=" where (status='Approved' and (delivery_status is null or delivery_status = '')) and 
-                        ((distributor_id!='1' and distributor_id!='189') or distributor_id is null)";
+            $cond=" where ((status='Approved' or status='Active') and (delivery_status is null or delivery_status = '')) and 
+                        ((distributor_id!='1' and distributor_id!='189' and distributor_id!='d_1' and 
+                            distributor_id!='d_189') or distributor_id is null)";
         } else if ($status=="cancelled"){
-            $cond=" where status='Approved' and delivery_status='Cancelled' and 
-                        ((distributor_id!='1' and distributor_id!='189') or distributor_id is null)";
+            $cond=" where (status='Approved' or status='Active') and delivery_status='Cancelled' and 
+                        ((distributor_id!='1' and distributor_id!='189' and distributor_id!='d_1' and 
+                            distributor_id!='d_189') or distributor_id is null)";
         } else {
-            $cond=" where status='".$status."' and ((distributor_id!='1' and distributor_id!='189') or distributor_id is null)";
+            $cond=" where status='".$status."' and ((distributor_id!='1' and distributor_id!='189' and 
+                        distributor_id!='d_1' and distributor_id!='d_189') or distributor_id is null)";
         }
     } else {
-        $cond=" where ((distributor_id!='1' and distributor_id!='189') or distributor_id is null)";
+        $cond=" where ((distributor_id!='1' and distributor_id!='189' and distributor_id!='d_1' and 
+                    distributor_id!='d_189') or distributor_id is null)";
     }
 
     if($id!=""){
@@ -44,31 +49,35 @@ function get_data($status='', $id=''){
     }
     $sql = "select * from 
             (select C.id, C.date_of_processing, C.distributor_name, C.retailer_name, 
-            C.master_distributor_id as distributor_id, C.created_by as sales_rep_id, 
-            C.amount as final_amount, C.status, C.created_on, C.modified_by, C.modified_on, 
-            C.delivery_status, C.location, C.amount as invoice_amount, C.state, 
-            C.sell_out, C.contact_person, C.contact_no, C.gst_number, C.area, C.zone, C.remarks, 
-            concat(ifnull(D.first_name,''),' ',ifnull(D.last_name,'')) as sales_rep_name, 
-            concat(ifnull(D.first_name,''),' ',ifnull(D.last_name,'')) as user_name, 
-            null as invoice_no, null as voucher_no, null as gate_pass_no, null as class,null as client_name, 
-            null as depot_name, null as sample_distributor_id, null as del_person_name, null as invoice_date, 
-            null as order_no from 
-            (select A.*, B.distributor_name, B.retailer_name, B.state, B.sell_out, B.contact_person, B.contact_no, 
-                B.area, B.location, B.gst_number, B.zone, B.master_distributor_id from 
-            (select * from sales_rep_orders where status = 'Approved') A 
+                concat('d_',C.selected_distributor) as distributor_id, C.created_by as sales_rep_id, 
+                C.amount as final_amount, C.status, C.created_on, C.modified_by, C.modified_on, 
+                C.delivery_status, C.location, C.amount as invoice_amount, C.state, 
+                C.sell_out, C.contact_person, C.contact_no, C.gst_number, C.area, C.zone, C.remarks, 
+                concat(ifnull(D.first_name,''),' ',ifnull(D.last_name,'')) as sales_rep_name, 
+                concat(ifnull(D.first_name,''),' ',ifnull(D.last_name,'')) as user_name, 
+                null as invoice_no, null as voucher_no, null as gate_pass_no, null as class, 
+                null as client_name, null as depot_name, null as sample_distributor_id, 
+                null as del_person_name, null as invoice_date, null as order_no from 
+            (select A.*, B.retailer_name, B.state, B.sell_out, B.contact_person, B.contact_no, 
+                B.area, B.location, B.gst_number, B.zone from 
+            (select A.*, B.distributor_name from sales_rep_orders A left join distributor_master B 
+                on (A.selected_distributor = B.id) where A.status = 'Approved' or A.status = 'Active') A 
             left join 
             (select G.*, H.zone from 
             (select E.*, F.location from 
             (select C.*, D.area from 
-            (select concat('s_',A.id) as id, B.distributor_name, A.distributor_name as retailer_name, A.gst_number, 
-                    A.state, A.margin as sell_out, A.contact_person, A.contact_no, A.area_id, A.location_id, A.zone_id, 
-                    concat('d_',A.master_distributor_id) as master_distributor_id 
-                from sales_rep_distributors A left join distributor_master B on (A.master_distributor_id = B.id) 
+            (select concat('s_',A.id) as id, A.distributor_name as retailer_name, A.gst_number, 
+                    A.state, A.margin as sell_out, A.contact_person, A.contact_no, 
+                    A.area_id, A.location_id, A.zone_id 
+                from sales_rep_distributors A 
             union all 
-            select concat('d_',A.id) as id, A.distributor_name, null as retailer_name, A.gst_number, A.state, A.sell_out, 
-                    B.contact_person, B.mobile as contact_no, A.area_id, A.location_id, A.zone_id, 
-                    null as master_distributor_id 
-                from distributor_master A left join distributor_contacts B on (A.id = B.distributor_id)) C 
+            select concat('d_',A.id) as id, A.distributor_name as retailer_name, A.gst_number, 
+                    A.state, A.sell_out, group_concat(distinct B.contact_person) as contact_person, 
+                    group_concat(distinct B.mobile) as contact_no, 
+                    A.area_id, A.location_id, A.zone_id 
+                from distributor_master A left join distributor_contacts B on (A.id = B.distributor_id) 
+                    group by A.id, A.distributor_name, A.gst_number, A.state, A.sell_out, 
+                        A.area_id, A.location_id, A.zone_id) C 
             left join 
             (select * from area_master) D 
             on (C.Area_id = D.id)) E 

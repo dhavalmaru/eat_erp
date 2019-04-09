@@ -1,7 +1,4 @@
 <?php
-/* 
- * File Name: group_list.php
- */
 if ( ! defined('BASEPATH')) {exit('No direct script access allowed');}
 
 class Distributor_po extends CI_Controller{
@@ -26,6 +23,7 @@ class Distributor_po extends CI_Controller{
         $this->load->model('product_model');
         $this->load->model('tax_invoice_model');
         $this->load->model('bank_model');
+        $this->load->model('email_model');
         $this->load->database();
     }
 
@@ -133,9 +131,7 @@ class Distributor_po extends CI_Controller{
                             '<input type="checkbox" id="check_'.$i.'" class="check icheckbox" name="check_val[]" value="'.$r[$i]->id.'" onChange="set_checkbox(this);" style="display: none;" />
                             <input type="hidden" id="input_check_'.$i.'" name="check[]" value="false" />
                             &nbsp;
-                            
-                            <span class="fa fa-comments" onclick="get_delivery_comments(this);" style="cursor:pointer" id="'.$r[$i]->id.'"></span >
-                            ',
+                            <span class="fa fa-comments" onclick="get_delivery_comments(this);" style="cursor:pointer" id="'.$r[$i]->id.'"></span >',
 
                             $i+1,
 
@@ -154,6 +150,7 @@ class Distributor_po extends CI_Controller{
                             $r[$i]->po_number,
 
                             $r[$i]->location,
+
                             $r[$i]->store_name,
 
                             $r[$i]->days_to_expiry,
@@ -161,7 +158,9 @@ class Distributor_po extends CI_Controller{
                             $r[$i]->invoice_amount,
 
                             '<input type="hidden" id="dlvery_status_'.$i.'" name="dlvery_status[]" value="'.$r[$i]->delivery_status.'" />'.
-                            ($r[$i]->delivery_status=='Pending'?'Delivered Pending Merchandiser Approval':$r[$i]->delivery_status)
+                            ($r[$i]->delivery_status=='Pending'?'Delivered Pending Merchandiser Approval':$r[$i]->delivery_status),
+
+                            $r[$i]->mismatch_type
                         );
             } else {
                 $data[] = array(
@@ -183,13 +182,17 @@ class Distributor_po extends CI_Controller{
                             $r[$i]->po_number,
 
                             $r[$i]->location,
+
                             $r[$i]->store_name,
+
                             $r[$i]->days_to_expiry,
 
                             $r[$i]->invoice_amount,
 
                             '<input type="hidden" id="dlvery_status_'.$i.'" name="dlvery_status[]" value="'.$r[$i]->delivery_status.'" />'.
-                            ($r[$i]->delivery_status=='Pending'?'Delivered Pending Merchandiser Approval':$r[$i]->delivery_status)
+                            ($r[$i]->delivery_status=='Pending'?'Delivered Pending Merchandiser Approval':$r[$i]->delivery_status),
+
+                            $r[$i]->mismatch_type
                         );
             }
         }
@@ -334,7 +337,7 @@ class Distributor_po extends CI_Controller{
                 $data['box'] = $this->box_model->get_data('Approved');
                 $data['bar'] = $this->product_model->get_data('Approved');
                 $data['bank'] = $this->bank_model->get_data('Approved');
-                $data['email'] = $this->distributor_po_model->get_email_details();
+                $data['email'] = $this->email_model->get_email_details('', 'distributor_po_mismatch');
 
                 load_view('distributor_po/distributor_po_details', $data);
             } else {
@@ -375,7 +378,7 @@ class Distributor_po extends CI_Controller{
                 $data['bar'] = $this->product_model->get_data('Approved');
                 $data['distributor_po_items'] = $this->distributor_po_model->get_distributor_po_items($id);
                 $data['bank'] = $this->bank_model->get_data('Approved');
-                $email = $this->distributor_po_model->get_email_details($id);
+                $email = $this->email_model->get_email_details($id, 'distributor_po_mismatch');
 
                 if(count($email)>0){
                     $data['email'] = $email;

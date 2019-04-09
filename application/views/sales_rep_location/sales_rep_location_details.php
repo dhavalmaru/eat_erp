@@ -2118,7 +2118,7 @@
                             } else {
                                 // console.log('po_id len '+$('#po_id option').length);
                                 if($('#po_id option').length>0){
-                                    $("#po_id").val($("#po_id option:first").val());
+                                    $("#po_id").val($("#po_id option:first").val()).trigger('change');
                                 }
                             }
 
@@ -2130,7 +2130,10 @@
                                 // $('#myModal1').modal('open');
 
                                 // $('#myModal1').modal({backdrop: 'static', keyboard: false});
-                                $('#myModal1').modal('open');
+
+                                if(!$('#myModal1').is(':visible')){
+                                    $('#myModal1').modal('open');
+                                }
 
                                 // $('#myModall').modal({
                                 //     backdrop: 'static',
