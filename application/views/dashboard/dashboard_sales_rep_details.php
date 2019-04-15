@@ -290,7 +290,7 @@
                            </div>
                            <div class="col s4">
                               <input type="hidden" name="distributor_id_og" id="distributor_id_og" value="<?php if(isset($distributor_id)) { if($distributor_id!='') echo $distributor_id; } else if(isset($visit_detail['distributor_id'])) echo $visit_detail['distributor_id']; ?>" />
-                              <select name="distributor_id" id="distributor_id" class="browser-default select2" onchange="get_beat_plan();">
+                              <select name="distributor_id" id="distributor_id" class="browser-default select2" onchange="get_beat_plan();" style="display: none;">
                                  <option value="">Select</option>
                                  <?php if(isset($distributor)) { for ($k=0; $k < count($distributor) ; $k++) { ?>
                                  <option value="<?php echo $distributor[$k]->id; ?>" 
@@ -306,6 +306,7 @@
                                  </option>
                                  <?php }} ?>
                               </select>
+                              <label id="lbl_distributor_name"></label>
                            </div>
                         </div>
                      </div>
@@ -319,7 +320,7 @@
                            </div>
                            <div class="col s4">
                               <input type="hidden" name="beat_id_og" id="beat_id_og" value="<?php if(isset($beat_id)) { if($beat_id!='') echo $beat_id; } else if(isset($visit_detail['beat_id'])) echo $visit_detail['beat_id']; ?>" />
-                              <select name="beat_id" id="beat_id" class="browser-default select2">
+                              <select name="beat_id" id="beat_id" class="browser-default select2" style="display: none;">
                                  <option value="">Select</option>
                                  <?php if(isset($beat)) { for ($k=0; $k < count($beat) ; $k++) { ?>
                                  <option value="<?php echo $beat[$k]->id; ?>" 
@@ -335,6 +336,7 @@
                                  </option>
                                  <?php }} ?>
                               </select>
+                              <label id="lbl_beat_name"></label>
                            </div>
                         </div>
                      </div>
@@ -342,10 +344,13 @@
                   <div class="row" style="margin-top:15px">
                      <div class="col s12">
                         <div class="entry" style="text-align:center">
-                           <div class="col s5"></div>
+                           <div class="col s3"></div>
                            <div class="col s2">
-                              <!-- <button type="button" id="btn_get_route_plan">Get Route Plan</button> -->
-                              <button type="button" onclick="set_route_plan();">Get Route Plan</button>
+                              <button type="button" onclick="change_plan();">Change</button>
+                           </div>
+                           <div class="col s2"></div>
+                           <div class="col s2">
+                              <button type="button" onclick="set_route_plan();">Ok</button>
                            </div>
                         </div>
                      </div>
@@ -763,7 +768,7 @@
                </div>
                <div class="modal-footer">
                   <button type="button" style="background:#d43f3a!important"class="button shadow btn_color left modal-close" data-dismiss="modal">NO</button>
-                  <button type="button" style="background:#4cae4c!important" class="button shadow btn_color right" data-dismiss="modal" onclick="set_beat_plan()">Yes</button>
+                  <button type="button" style="background:#4cae4c!important" class="button shadow btn_color right" data-dismiss="modal" onclick="set_beat_plan();">Yes</button>
 
                   <!-- <form action="<?php //echo base_url('index.php/Sales_Attendence/checkout'); ?>" method="POST" >
                     <button type="button" style="background:#d43f3a!important"class="button shadow btn_color left modal-close" data-dismiss="modal">NO</button>
@@ -868,16 +873,19 @@
             $('.modal').modal({
                dismissible: true
             });
+
+            $('#lbl_distributor_name').html($("#distributor_id option:selected").text());
+            $('#lbl_beat_name').html($("#beat_id option:selected").text());
          });
 
          var get_beat_plan = function() {
             $.ajax({
-              url:BASE_URL+'index.php/dashboard_sales_rep/get_beat_plan',
-              method: 'post',
-              data: {distributor_id: $('#distributor_id').val(), type_id: ''},
-              dataType: 'json',
-              async: false,
-              success: function(response){
+               url:BASE_URL+'index.php/dashboard_sales_rep/get_beat_plan',
+               method: 'post',
+               data: {distributor_id: $('#distributor_id').val(), type_id: ''},
+               dataType: 'json',
+               async: false,
+               success: function(response){
                   var beat_id_val = $('#beat_id').val();
                   $('#beat_id').find('option').not(':first').remove();
 
@@ -912,4 +920,10 @@
             });
          }
 
+         var change_plan = function() {
+            $('#lbl_distributor_name').hide();
+            $('#distributor_id').show();
+            $('#lbl_beat_name').hide();
+            $('#beat_id').show();
+         }
       </script>

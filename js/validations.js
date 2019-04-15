@@ -6760,6 +6760,12 @@ $("#form_beat_master").validate({
             required: true,
             check_beat_name_availablity: true
         },
+        type_id: {
+            required: true
+        },
+        zone_id: {
+            required: true
+        },
         'location_id[]': {
             required: true
         }
@@ -6804,12 +6810,12 @@ $.validator.addMethod("check_beat_name_availablity", function (value, element) {
 }, 'Beat Name already in use.');
 
 $('#form_beat_master').submit(function() {
-    removeMultiInputNamingRules('#form_beat_master', 'input[alt="sequence[]"]');
-    addMultiInputNamingRules('#form_beat_master', 'input[name="sequence[]"]', { required: true }, "");
+    // removeMultiInputNamingRules('#form_beat_master', 'input[alt="sequence[]"]');
+    // addMultiInputNamingRules('#form_beat_master', 'input[name="sequence[]"]', { required: true }, "");
     if (!$("#form_beat_master").valid()) {
         return false;
     } else {
-        removeMultiInputNamingRules('#form_beat_master', 'input[alt="sequence[]"]');
+        // removeMultiInputNamingRules('#form_beat_master', 'input[alt="sequence[]"]');
         return true;
     }
 });
@@ -6820,6 +6826,9 @@ $('#form_beat_master').submit(function() {
 // ----------------- BEAT ALLOCATION FORM VALIDATION -------------------------------------
 $("#form_beat_allocation").validate({
     rules: {
+        type_id: {
+            required: true
+        },
         sales_rep_id: {
             required: true
         }
@@ -6838,33 +6847,77 @@ $("#form_beat_allocation").validate({
 });
 
 $('#form_beat_allocation').submit(function() {
-    removeMultiInputNamingRules('#form_beat_allocation', 'input[alt="weekday_id[]"]');
-    removeMultiInputNamingRules('#form_beat_allocation', 'input[alt="weekday[]"]');
+    // removeMultiInputNamingRules('#form_beat_allocation', 'input[alt="weekday_id[]"]');
+    // removeMultiInputNamingRules('#form_beat_allocation', 'input[alt="weekday[]"]');
     removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="frequency[]"]');
     removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="dist_id1[]"]');
     removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="beat_id1[]"]');
     removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="dist_id2[]"]');
     removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="beat_id2[]"]');
 
-    addMultiInputNamingRules('#form_beat_allocation', 'input[name="weekday_id[]"]', { required: true }, "");
-    addMultiInputNamingRules('#form_beat_allocation', 'input[name="weekday[]"]', { required: true }, "");
-    addMultiInputNamingRules('#form_beat_allocation', 'select[name="frequency[]"]', { required: true }, "");
-    addMultiInputNamingRules('#form_beat_allocation', 'select[name="dist_id1[]"]', { required: true }, "");
-    addMultiInputNamingRules('#form_beat_allocation', 'select[name="beat_id1[]"]', { required: true }, "");
+    // addMultiInputNamingRules('#form_beat_allocation', 'input[name="weekday_id[]"]', { required: true }, "");
+    // addMultiInputNamingRules('#form_beat_allocation', 'input[name="weekday[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_beat_allocation', 'select[name="frequency[]"]', 
+                                { required: function(elem) {
+                                        var id = elem.id;
+                                        var index = id.substring(id.lastIndexOf('_')+1);
+                                        if($("#dist_id1_"+index).val()!="" || $("#beat_id1_"+index).val()!="") {
+                                            return true;
+                                        } else {
+                                            return false;
+                                        }
+                                    } 
+                                }, "");
+    addMultiInputNamingRules('#form_beat_allocation', 'select[name="dist_id1[]"]', 
+                                { required: function(elem) {
+                                        var id = elem.id;
+                                        var index = id.substring(id.lastIndexOf('_')+1);
+                                        if($("#frequency_"+index).val()!="" || $("#beat_id1_"+index).val()!="") {
+                                            return true;
+                                        } else {
+                                            return false;
+                                        } 
+                                    } 
+                                }, "");
+    addMultiInputNamingRules('#form_beat_allocation', 'select[name="beat_id1[]"]', 
+                                { required: function(elem) {
+                                        var id = elem.id;
+                                        var index = id.substring(id.lastIndexOf('_')+1);
+                                        if($("#frequency_"+index).val()!="" || $("#dist_id1_"+index).val()!="") {
+                                            return true;
+                                        } else {
+                                            return false;
+                                        } 
+                                    } 
+                                }, "");
     addMultiInputNamingRules('#form_beat_allocation', 'select[name="dist_id2[]"]', { required: true }, "");
     addMultiInputNamingRules('#form_beat_allocation', 'select[name="beat_id2[]"]', { required: true }, "");
 
     if (!$("#form_beat_allocation").valid()) {
         return false;
     } else {
-        removeMultiInputNamingRules('#form_beat_allocation', 'input[alt="weekday_id[]"]');
-        removeMultiInputNamingRules('#form_beat_allocation', 'input[alt="weekday[]"]');
+
+        var validator = $("#form_beat_allocation").validate();
+        var valid = true;
+
+        if($("#frequency_0").val()=="" && $("#frequency_1").val()=="" && $("#frequency_2").val()=="" && 
+           $("#frequency_3").val()=="" && $("#frequency_4").val()=="" && $("#frequency_5").val()=="") {
+                var id = "sales_rep_id";
+                var errors = {};
+                var name = $("#"+id).attr('name');
+                errors[name] = "Please add atleast one plan";
+                validator.showErrors(errors);
+                valid = false;
+        }
+
+        // removeMultiInputNamingRules('#form_beat_allocation', 'input[alt="weekday_id[]"]');
+        // removeMultiInputNamingRules('#form_beat_allocation', 'input[alt="weekday[]"]');
         removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="frequency[]"]');
         removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="dist_id1[]"]');
         removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="beat_id1[]"]');
         removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="dist_id2[]"]');
         removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="beat_id2[]"]');
-        
-        return true;
+
+        return valid;
     }
 });

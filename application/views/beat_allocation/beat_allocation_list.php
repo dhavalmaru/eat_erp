@@ -53,11 +53,12 @@
 											<th width="65" style="text-align:center;">Edit</th>
 											<th>Type</th>
 											<th>Sales Rep Name</th>
+											<th>Weekday</th>
 											<th>Frequency</th>
-											<th>Distributor Name1</th>
+											<!-- <th>Distributor Name1</th>
 											<th>Beat Name1</th>
 											<th>Distributor Name2</th>
-											<th>Beat Name2</th>
+											<th>Beat Name2</th> -->
 											<!--<th width="110">Creation Date</th>-->
 										</tr>
 									</thead>
@@ -68,11 +69,12 @@
 											<td style="text-align:center; vertical-align: middle; "><a href="<?php echo base_url().'index.php/beat_allocation/edit/'.$data[$i]->sales_rep_id; ?>"><i class="fa fa-edit"></i></a></td>
 											<td><?php echo $data[$i]->distributor_type; ?></td>
 											<td><?php echo $data[$i]->sales_rep_name; ?></td>
+											<td><?php echo $data[$i]->weekday; ?></td>
 											<td><?php echo $data[$i]->frequency; ?></td>
-											<td><?php echo $data[$i]->distributor_name1; ?></td>
-											<td><?php echo $data[$i]->beat_name1; ?></td>
-											<td><?php echo $data[$i]->distributor_name2; ?></td>
-											<td><?php echo $data[$i]->beat_name2; ?></td>
+											<!-- <td><?php //echo $data[$i]->distributor_name1; ?></td>
+											<td><?php //echo $data[$i]->beat_name1; ?></td>
+											<td><?php //echo $data[$i]->distributor_name2; ?></td>
+											<td><?php //echo $data[$i]->beat_name2; ?></td> -->
 											<!--<td>
 												<span style="display:none;">
                                                     <?php// echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>

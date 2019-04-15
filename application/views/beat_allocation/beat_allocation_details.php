@@ -43,7 +43,7 @@
 								<div class="panel-body">
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Type</label>
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Type <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12" >
                                                 <select name="type_id" id="type_id" class="form-control select2" data-error="#err_type_id" onchange="set_beat_plan_all();">
                                                     <option value="">Select</option>
@@ -57,7 +57,7 @@
                                     </div>
 									<div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Sales Representative</label>
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Sales Representative <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12" >
                                                 <select name="sales_rep_id" id="sales_rep_id" class="form-control select2" data-error="#err_sales_rep_id">
                                                     <option value="">Select</option>

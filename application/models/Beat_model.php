@@ -169,7 +169,8 @@ function get_retailer($beat_id='', $type_id='', $zone_id='', $area_id='', $locat
     }
 
     if($type_id=='7'){
-        $sql = "select A.*, ifnull(B.sequence,'') as sequence, ifnull(C.no_of_beat,0) as no_of_beat from 
+        $sql = "select A.*, case when B.dist_id is null then '0' else '1' end as is_selected, 
+                    ifnull(B.sequence,'') as sequence, ifnull(C.no_of_beat,0) as no_of_beat from 
                 (select distinct concat('m_', A.id) as id, A.store_name as distributor_name 
                 from relationship_master A 
                 left join store_master B on (A.id = B.store_id) 
@@ -183,7 +184,8 @@ function get_retailer($beat_id='', $type_id='', $zone_id='', $area_id='', $locat
                 on (A.id = C.dist_id) 
                 order by A.distributor_name";
     } else {
-        $sql = "select A.*, ifnull(B.sequence,'') as sequence, ifnull(C.no_of_beat,0) as no_of_beat from 
+        $sql = "select A.*, case when B.dist_id is null then '0' else '1' end as is_selected, 
+                    ifnull(B.sequence,'') as sequence, ifnull(C.no_of_beat,0) as no_of_beat from 
                 (select concat('d_', id) as id, distributor_name from distributor_master 
                 where status = 'Approved'".$cond." 
                 union 
@@ -299,18 +301,21 @@ function save_data($id=''){
     $this->db->where('beat_id', $id);
     $this->db->delete('beat_details');
 
+    $is_selected=$this->input->post('is_selected[]');
     $dist_id=$this->input->post('distributor_id[]');
     $sequence=$this->input->post('sequence[]');
+    $seq = 1;
     
     for ($k=0; $k<count($dist_id); $k++) {
-        if(isset($dist_id[$k]) and $dist_id[$k]!="") {
+        if(isset($dist_id[$k])) { if($dist_id[$k]!="") { if($is_selected[$k]=="1") {
             $data = array(
                         'beat_id' => $id,
                         'dist_id' => $dist_id[$k],
-                        'sequence' => format_number($sequence[$k],2)
+                        // 'sequence' => format_number($sequence[$k],2),
+                        'sequence' => $seq++
                     );
             $this->db->insert('beat_details', $data);
-        }
+        }}}
     }
 
     $logarray['table_id']=$id;

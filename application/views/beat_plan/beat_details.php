@@ -60,7 +60,7 @@
                                     </div>
 									<div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Type</label>
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Type <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12" >
                                                 <select name="type_id" id="type_id" class="form-control select2" data-error="#err_type_id" onchange="get_zone();">
                                                     <option value="">Select</option>
@@ -74,7 +74,7 @@
                                     </div>
 									<div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Zone</label>
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Zone <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <select name="zone_id" id="zone_id" class="form-control select2" data-error="#err_zone_id" onchange="get_area(); get_store();">
                                                     <option value="">Select</option>
@@ -148,23 +148,28 @@
                                         <table class="table table-bordered" style="margin-bottom: 0px; ">
                                             <thead>
                                                 <tr>
+                                                    <th>Select</th>
                                                     <th width="500">Retailer</th>
                                                     <th>No Of Beats Assigned</th>
-                                                    <th>Sequence</th>
+                                                    <th style="display: none;">Sequence</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="beat_details">
                                                 <?php if(isset($beat_details)) { for ($i=0; $i <count($beat_details) ; $i++) { ?>
                                                     <tr>
                                                         <td>
+                                                            <input type="checkbox" class="form-control" id="is_selected_<?=$i?>" value="1" onchange="set_is_selected(this);" <?php if($beat_details[$i]->is_selected==1) echo 'checked'; ?> />
+                                                            <input type="hidden" class="form-control" name="is_selected[]" id="is_selected_val_<?=$i?>" value="<?=$beat_details[$i]->is_selected;?>" />
+                                                        </td>
+                                                        <td>
                                                             <input type="hidden" class="form-control" name="distributor_id[]" id="distributor_id_<?=$i?>" value="<?=$beat_details[$i]->id?>" />
-                                                            <input type="text" class="form-control" name="distributor_name[]" id="distributor_name_<?=$i?>" value="<?=$beat_details[$i]->distributor_name?>" tabindex="-1" readonly/>
+                                                            <input type="text" class="form-control" name="distributor_name[]" id="distributor_name_<?=$i?>" value="<?=$beat_details[$i]->distributor_name?>" tabindex="-1" readonly />
                                                         </td>
                                                         <td>
-                                                            <input type="text" class="form-control" name="no_of_beat[]" id="no_of_beat_<?=$i?>" placeholder="No Of Beats Assigned"  value="<?php if(isset($beat_details[$i]->no_of_beat)) echo $beat_details[$i]->no_of_beat; ?>" tabindex="-1" readonly />
+                                                            <input type="text" class="form-control" name="no_of_beat[]" id="no_of_beat_<?=$i?>" placeholder="No Of Beats Assigned" value="<?php if(isset($beat_details[$i]->no_of_beat)) echo $beat_details[$i]->no_of_beat; ?>" tabindex="-1" readonly />
                                                         </td>
-                                                        <td>
-                                                            <input type="text" class="form-control" name="sequence[]" id="sequence_<?=$i?>" placeholder="Sequnce"  value="<?php if(isset($beat_details[$i]->sequence)) echo $beat_details[$i]->sequence; ?>" onkeypress="return StopNonNumeric(this,event)"/>
+                                                        <td style="display: none;">
+                                                            <input type="text" class="form-control" name="sequence[]" id="sequence_<?=$i?>" placeholder="Sequnce" value="<?php if(isset($beat_details[$i]->sequence)) echo $beat_details[$i]->sequence; ?>" onkeypress="return StopNonNumeric(this,event)"/>
                                                         </td>
                                                     </tr>
                                                 <?php }} ?>
@@ -322,13 +327,17 @@
                             $.each(response,function(index,data){
                                 tr = '<tr>'+
                                         '<td>'+
+                                            '<input type="checkbox" class="form-control" id="is_selected_'+cnt+'" value="1" onchange="set_is_selected(this);" '+((data['is_selected']=="1")?"checked":"")+' />'+
+                                            '<input type="hidden" class="form-control" name="is_selected[]" id="is_selected_val_'+cnt+'" value="'+data['is_selected']+'" />'+
+                                        '</td>'+
+                                        '<td>'+
                                             '<input type="hidden" class="form-control" name="distributor_id[]" id="distributor_id_'+cnt+'" value="'+data['id']+'" />'+
                                             '<input type="text" class="form-control" name="distributor_name[]" id="distributor_name_'+cnt+'" value="'+data['distributor_name']+'" tabindex="-1" readonly />'+
                                         '</td>'+
                                         '<td>'+
                                             '<input type="text" class="form-control" name="no_of_beat[]" id="no_of_beat_'+cnt+'" placeholder="No Of Beats Assigned" value="'+data['no_of_beat']+'" tabindex="-1" readonly />'+
                                         '</td>'+
-                                        '<td>'+
+                                        '<td style="display: none;">'+
                                             '<input type="text" class="form-control" name="sequence[]" id="sequence_'+cnt+'" placeholder="Sequnce" value="'+data['sequence']+'" onkeypress="return StopNonNumeric(this,event)" />'+
                                         '</td>'+
                                     '</tr>';
@@ -338,6 +347,21 @@
                             });
                         }
                     });
+                }
+            }
+
+            var set_is_selected = function(elem) {
+                var id = elem.id;
+                var index = id.substring(id.lastIndexOf('_')+1);
+                var no_of_beat = parseInt($('#no_of_beat_'+index).val());
+                if(isNaN(no_of_beat)) no_of_beat = 0;
+
+                if(elem.checked==true){
+                    $('#is_selected_val_'+index).val('1');
+                    $('#no_of_beat_'+index).val(no_of_beat+1);
+                } else {
+                    $('#is_selected_val_'+index).val('0');
+                    $('#no_of_beat_'+index).val(no_of_beat-1);
                 }
             }
         </script>

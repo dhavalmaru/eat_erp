@@ -38,6 +38,23 @@ function get_data1($status='', $id=''){
     return $query->result();
 }
 
+function get_new_beat_details(){
+    $sales_rep_id=$this->session->userdata('sales_rep_id');
+    $type=$this->session->userdata('type');
+
+    if(strtoupper(trim($type))=="MERCHANDIZER"){
+        $table_name = "merchandiser_detailed_beat_plan";
+    } else {
+        $table_name = "sales_rep_detailed_beat_plan";
+    }
+
+    $sql = "select distinct beat_id, dist_id from ".$table_name." 
+            where status = 'Approved' and sales_rep_id = '$sales_rep_id' 
+                and date(date_of_visit) = curdate()";
+    $query = $this->db->query($sql);
+    return $query->result();
+}
+
 function get_beat_details($weekday=''){
     $sales_rep_id=$this->session->userdata('sales_rep_id');
     $sql = "select dist_id1 as every_dist, beat_id1 as every_beat, 
@@ -3884,7 +3901,7 @@ function get_beat_plan($distributor_id='', $type_id=''){
     return $query->result();
 }
 
-function set_beat_plan($beat_id='', $frequency=''){
+function set_beat_plan($distributor_id='', $beat_id='', $frequency=''){
     $now=date('Y-m-d H:i:s');
     $curusr=$this->session->userdata('session_id');
     $sales_rep_id=$this->session->userdata('sales_rep_id');
@@ -3903,11 +3920,12 @@ function set_beat_plan($beat_id='', $frequency=''){
 
         $sql = "insert into merchandiser_detailed_beat_plan (frequency, sequence, modified_on, 
                     sales_rep_id, bit_plan_id, is_edit, date_of_visit, status, store_id, 
-                    zone_id, location_id) 
+                    zone_id, location_id, beat_id, dist_id) 
                 select '".$frequency."' as frequency, AA.sequence, '".$now."' as modified_on, 
                     '".$sales_rep_id."' as sales_rep_id, '0' as bit_plan_id, null as is_edit, 
                     '".$now."' as date_of_visit, 'Approved' as status, 
-                    position('_' in AA.dist_id)+1) as dist_id, AA.zone_id, AA.location_id from 
+                    position('_' in AA.dist_id)+1) as store_id, AA.zone_id, AA.location_id, 
+                    '".$beat_id."' as beat_id, '".$distributor_id."' as dist_id from 
                 (select B.beat_name, C.dist_id, C.sequence, B.zone_id, D.location_id 
                 from beat_master B 
                 left join beat_details C on (A.id = C.beat_id) 
@@ -3935,11 +3953,12 @@ function set_beat_plan($beat_id='', $frequency=''){
 
         $sql = "insert into sales_rep_detailed_beat_plan (frequency, sequence, modified_on, 
                     sales_rep_id, bit_plan_id, is_edit, date_of_visit, status, store_id, 
-                    zone_id, area_id, location_id) 
+                    zone_id, area_id, location_id, beat_id, dist_id) 
                 select '".$frequency."' as frequency, AA.sequence, '".$now."' as modified_on, 
                     '".$sales_rep_id."' as sales_rep_id, '0' as bit_plan_id, null as is_edit, 
                     '".$now."' as date_of_visit, 'Approved' as status, AA.dist_id, AA.zone_id, 
-                    AA.area_id, AA.location_id from 
+                    AA.area_id, AA.location_id, '".$beat_id."' as beat_id, 
+                    '".$distributor_id."' as dist_id from 
                 (select B.beat_name, C.dist_id, C.sequence, D.zone_id, D.area_id, D.location_id 
                 from beat_master B
                 left join beat_details C on (B.id = C.beat_id) 

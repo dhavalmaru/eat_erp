@@ -78,7 +78,7 @@ class Beat_allocation extends CI_Controller{
 
     public function update($sales_rep_id){
         $this->beat_allocation_model->save_data($sales_rep_id);
-        // redirect(base_url().'index.php/beat_allocation');
+        redirect(base_url().'index.php/beat_allocation');
     }
 	
 	public function get_beat_plan(){ 
