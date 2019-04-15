@@ -16,6 +16,8 @@
       <link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/owl.theme.css">
       <link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/owl.transitions.css">
       <link rel="stylesheet" href="<?php echo base_url(); ?>sales_rep/css/style.css">
+      <link rel="stylesheet" href="<?php echo base_url(); ?>css/logout/popModal.css">
+      <link rel="stylesheet" href="<?php echo base_url(); ?>css/select2/css/select2.min.css">
       <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
       <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/font/material-design-icons/Material-Design-Icons.woff" rel="stylesheet">
       <style>
@@ -279,6 +281,75 @@
                         </div>
                      </div>
                   </div>
+                  <div class="row" style="margin-top:15px">
+                     <div class="col s12">
+                        <div class="entry" style="text-align:center">
+                           <div class="col s3"></div>
+                           <div class="col s2">
+                              <h6>Retailer</h6>
+                           </div>
+                           <div class="col s4">
+                              <input type="hidden" name="distributor_id_og" id="distributor_id_og" value="<?php if(isset($distributor_id)) { if($distributor_id!='') echo $distributor_id; } else if(isset($visit_detail['distributor_id'])) echo $visit_detail['distributor_id']; ?>" />
+                              <select name="distributor_id" id="distributor_id" class="browser-default select2" onchange="get_beat_plan();">
+                                 <option value="">Select</option>
+                                 <?php if(isset($distributor)) { for ($k=0; $k < count($distributor) ; $k++) { ?>
+                                 <option value="<?php echo $distributor[$k]->id; ?>" 
+                                    <?php 
+                                       if(isset($distributor_id)) {
+                                          if($distributor_id!='') {
+                                             if($distributor[$k]->id==$distributor_id) { echo 'selected'; }
+                                          }
+                                       } else if(isset($visit_detail['distributor_id'])) {
+                                          if($visit_detail['distributor_id']==$distributor[$k]->id) { echo 'selected'; }
+                                       }
+                                    ?>><?php echo $distributor[$k]->distributor_name; ?>
+                                 </option>
+                                 <?php }} ?>
+                              </select>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="row" style="margin-top:15px">
+                     <div class="col s12">
+                        <div class="entry" style="text-align:center">
+                           <div class="col s3"></div>
+                           <div class="col s2">
+                              <h6>Beat Plan</h6>
+                           </div>
+                           <div class="col s4">
+                              <input type="hidden" name="beat_id_og" id="beat_id_og" value="<?php if(isset($beat_id)) { if($beat_id!='') echo $beat_id; } else if(isset($visit_detail['beat_id'])) echo $visit_detail['beat_id']; ?>" />
+                              <select name="beat_id" id="beat_id" class="browser-default select2">
+                                 <option value="">Select</option>
+                                 <?php if(isset($beat)) { for ($k=0; $k < count($beat) ; $k++) { ?>
+                                 <option value="<?php echo $beat[$k]->id; ?>" 
+                                    <?php 
+                                       if(isset($beat_id)) {
+                                          if($beat_id!='') {
+                                             if($beat[$k]->id==$beat_id) { echo 'selected'; }
+                                          }
+                                       } else if(isset($visit_detail['beat_id'])) {
+                                          if($visit_detail['beat_id']==$beat[$k]->id) { echo 'selected'; }
+                                       }
+                                    ?>><?php echo $beat[$k]->beat_id.' - '.$beat[$k]->beat_name; ?>
+                                 </option>
+                                 <?php }} ?>
+                              </select>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="row" style="margin-top:15px">
+                     <div class="col s12">
+                        <div class="entry" style="text-align:center">
+                           <div class="col s5"></div>
+                           <div class="col s2">
+                              <!-- <button type="button" id="btn_get_route_plan">Get Route Plan</button> -->
+                              <button type="button" onclick="set_route_plan();">Get Route Plan</button>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
                   <div class="row" style="margin-top:30px">
                      <div class="col s12">
                         <div class="entry" style="text-align:center">
@@ -314,54 +385,53 @@
             <div class="wishlist app-section">
                <div class="container">
                   <ul class="tabs">
-            <?php 
-               $explode =  explode(" ",$checkstatus);
-               $checkstatus  = $explode[1];
-                $mon = date('d',strtotime('this Monday'));
-                $tue = date('d',strtotime('this Tuesday'));
-                $wed = date('d',strtotime('this Wednesday'));
-                $thu = date('d',strtotime('this Thursday'));
-                $fri = date('d',strtotime('this Friday'));
-                $sat = date('d',strtotime('this Saturday'));
-               
-            ?>
-            <li class="tab">
-               <a class="<?php if($checkstatus=='Monday') echo 'active'; ?>" href="<?php echo base_url(); ?>index.php/Sales_rep_store_plan/checkstatus/Monday/<?=$mon?>" target="_self">
-                  Mon
-                  <p class="date">(<?=$mon?>)</p>
-               </a>
-            </li>
-            <li class="tab">
-               <a class="<?php if($checkstatus=='Tuesday') echo 'active'; ?>" href="<?php echo base_url(); ?>index.php/Sales_rep_store_plan/checkstatus/Tuesday/<?=$tue?>" target="_self">
-                  Tues 
-                  <p class="date">(<?=$tue?>)</p>
-               </a>
-            </li>
-            <li class="tab">
-               <a class="<?php if($checkstatus=='Wednesday') echo 'active'; ?>" href="<?php echo base_url(); ?>index.php/Sales_rep_store_plan/checkstatus/Wednesday/<?=$wed?>" target="_self">
-                  Wed 
-                  <p class="date">(<?=$wed?>)</p>
-               </a>
-            </li>
-            <li class="tab">
-               <a class="<?php if($checkstatus=='Thursday') echo 'active'; ?>" href="<?php echo base_url(); ?>index.php/Sales_rep_store_plan/checkstatus/Thursday/<?=$thu?>" target="_self">
-                  Thur 
-                  <p class="date">(<?=$thu?>)</p>
-               </a>
-            </li>
-            <li class="tab">
-               <a class="<?php if($checkstatus=='Friday') echo 'active'; ?>" href="<?php echo base_url(); ?>index.php/Sales_rep_store_plan/checkstatus/Friday/<?=$fri?>" target="_self">
-                  Fri 
-                  <p class="date">(<?=$fri?>)</p>
-               </a>
-            </li>
-            <li class="tab">
-               <a class="<?php if($checkstatus=='Saturday') echo 'active'; ?>"  href="<?php echo base_url(); ?>index.php/Sales_rep_store_plan/checkstatus/Saturday/<?=$sat?>" target="_self">
-                  Sat
-                  <p class="date">(<?=$sat?>)</p>
-               </a>
-            </li>
-         </ul>
+                     <?php 
+                        $explode =  explode(" ",$checkstatus);
+                        $checkstatus  = $explode[1];
+                        $mon = date('d',strtotime('this Monday'));
+                        $tue = date('d',strtotime('this Tuesday'));
+                        $wed = date('d',strtotime('this Wednesday'));
+                        $thu = date('d',strtotime('this Thursday'));
+                        $fri = date('d',strtotime('this Friday'));
+                        $sat = date('d',strtotime('this Saturday'));
+                     ?>
+                     <li class="tab">
+                        <a class="<?php if($checkstatus=='Monday') echo 'active'; ?>" href="<?php echo base_url(); ?>index.php/Sales_rep_store_plan/checkstatus/Monday/<?=$mon?>" target="_self">
+                           Mon
+                           <p class="date">(<?=$mon?>)</p>
+                        </a>
+                     </li>
+                     <li class="tab">
+                        <a class="<?php if($checkstatus=='Tuesday') echo 'active'; ?>" href="<?php echo base_url(); ?>index.php/Sales_rep_store_plan/checkstatus/Tuesday/<?=$tue?>" target="_self">
+                           Tues 
+                           <p class="date">(<?=$tue?>)</p>
+                        </a>
+                     </li>
+                     <li class="tab">
+                        <a class="<?php if($checkstatus=='Wednesday') echo 'active'; ?>" href="<?php echo base_url(); ?>index.php/Sales_rep_store_plan/checkstatus/Wednesday/<?=$wed?>" target="_self">
+                           Wed 
+                           <p class="date">(<?=$wed?>)</p>
+                        </a>
+                     </li>
+                     <li class="tab">
+                        <a class="<?php if($checkstatus=='Thursday') echo 'active'; ?>" href="<?php echo base_url(); ?>index.php/Sales_rep_store_plan/checkstatus/Thursday/<?=$thu?>" target="_self">
+                           Thur 
+                           <p class="date">(<?=$thu?>)</p>
+                        </a>
+                     </li>
+                     <li class="tab">
+                        <a class="<?php if($checkstatus=='Friday') echo 'active'; ?>" href="<?php echo base_url(); ?>index.php/Sales_rep_store_plan/checkstatus/Friday/<?=$fri?>" target="_self">
+                           Fri 
+                           <p class="date">(<?=$fri?>)</p>
+                        </a>
+                     </li>
+                     <li class="tab">
+                        <a class="<?php if($checkstatus=='Saturday') echo 'active'; ?>"  href="<?php echo base_url(); ?>index.php/Sales_rep_store_plan/checkstatus/Saturday/<?=$sat?>" target="_self">
+                           Sat
+                           <p class="date">(<?=$sat?>)</p>
+                        </a>
+                     </li>
+                  </ul>
                   <?php $counter=0;?>
                    <div class="entry shadow">
                <div class="app-title">
@@ -651,7 +721,7 @@
                </div>
             </div>
 			 <!-- <div class="fixed-action-btn click-to-toggle" style="top: 450px; right: 24px;">
-               <a class="btn-floating  pink waves-effect waves-light" href="<?php echo base_url() . 'index.php/Sales_rep_order/add'; ?>">
+               <a class="btn-floating  pink waves-effect waves-light" href="<?php //echo base_url() . 'index.php/Sales_rep_order/add'; ?>">
                <i class="large material-icons">add</i>
                </a>
             </div> -->
@@ -680,27 +750,54 @@
          </div>
       </div>
 	  
-	   <div class="modal fade" id="myModal_order" role="dialog" style="top:120px!important;">
-                                 <div class="modal-dialog">
-                                    <!-- Modal content-->
-                                    <div class="modal-content">
-                                       <div class="modal-header">
-                                          <button type="button" style="float: right; top: -25px;right: -30px; font-size: 24px;" class="modal-close11 waves-effect waves-green btn-flat">&times;</button>
-                                          <h4 class="modal-title" style="font-size: 18px;font-weight:bold"> Order Details</h4>
-                                       </div>
-                                       <div class="modal-body">
-                                          <br/>
-                                          <div class="" id="resultdiv">
-                                            
-                                          </div>
-                                       </div>
-                                       <div class="modal-footer">
-                                          <button type="button" class="button shadow btn_color right modal-close11" data-dismiss="modal">Close</button>
+      <div class="modal fade" id="myModal2" role="dialog">
+         <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+               <div class="modal-header">
+                  <button type="button" style="float: right; top: -25px;right: -30px; font-size: 24px;" class="modal-close waves-effect waves-green btn-flat">&times;</button>
+                  <h4 class="modal-title" style="font-size: 18px;">Change route? </h4>
+               </div>
+               <div class="modal-body">
+                  <p>Do you want to change route?</p>
+               </div>
+               <div class="modal-footer">
+                  <button type="button" style="background:#d43f3a!important"class="button shadow btn_color left modal-close" data-dismiss="modal">NO</button>
+                  <button type="button" style="background:#4cae4c!important" class="button shadow btn_color right" data-dismiss="modal" onclick="set_beat_plan()">Yes</button>
 
-                                       </div>
-                                    </div>
-                                 </div>
-                              </div>
+                  <!-- <form action="<?php //echo base_url('index.php/Sales_Attendence/checkout'); ?>" method="POST" >
+                    <button type="button" style="background:#d43f3a!important"class="button shadow btn_color left modal-close" data-dismiss="modal">NO</button>
+                    <input type="hidden" name="checkout" value="Yes">
+                  <button type="submit" style="background:#4cae4c!important" class="button shadow btn_color right" data-dismiss="modal">Yes</button>
+                  </form> -->
+               
+               </div>
+            </div>
+         </div>
+      </div>
+
+	   <div class="modal fade" id="myModal_order" role="dialog" style="top:120px!important;">
+         <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+               <div class="modal-header">
+                  <button type="button" style="float: right; top: -25px;right: -30px; font-size: 24px;" class="modal-close11 waves-effect waves-green btn-flat">&times;</button>
+                  <h4 class="modal-title" style="font-size: 18px;font-weight:bold"> Order Details</h4>
+               </div>
+               <div class="modal-body">
+                  <br/>
+                  <div class="" id="resultdiv">
+                    
+                  </div>
+               </div>
+               <div class="modal-footer">
+                  <button type="button" class="button shadow btn_color right modal-close11" data-dismiss="modal">Close</button>
+
+               </div>
+            </div>
+         </div>
+      </div>
+
       <!-- moris js -->
       <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/js/materialize.min.js"></script>
@@ -709,10 +806,25 @@
       <script src="<?php echo base_url(); ?>sales_rep/js/slick.min.js"></script>
       <script src="<?php echo base_url(); ?>sales_rep/js/owl.carousel.min.js"></script>
       <script src="<?php echo base_url(); ?>sales_rep/js/custom.js"></script>
-      <script>
+
+      <script type='text/javascript' src='<?php echo base_url(); ?>js/plugins/validationengine/languages/jquery.validationEngine-en.js'></script>
+      <script type='text/javascript' src='<?php echo base_url(); ?>js/plugins/validationengine/jquery.validationEngine.js'></script>
+      <script type='text/javascript' src='<?php echo base_url(); ?>js/plugins/jquery-validation/jquery.validate.js'></script>
+      
+      <script type="text/javascript" src="<?php echo base_url(); ?>js/plugins.js"></script>
+      <script type="text/javascript" src="<?php echo base_url(); ?>js/actions.js"></script>
+      <script type="text/javascript" src="<?php echo base_url(); ?>js/moment.js"></script>
+
+      <script type="text/javascript" src="<?php echo base_url().'js/jquery.cookie.js';?>"></script>
+
+      <script type="text/javascript" src="<?php echo base_url(); ?>js/validations.js"></script>
+      <script src="<?php echo base_url(); ?>css/select2/js/select2.full.min.js"></script> 
+      <script type="text/javascript">
+         var BASE_URL="<?php echo base_url()?>";
+
          $('#tabs-swipe-demo').tabs({
-         swipeable: true,
-         responsiveThreshold: Infinity,
+            swipeable: true,
+            responsiveThreshold: Infinity,
          });
          
          // $('.owl-carousel').owlCarousel({
@@ -722,45 +834,82 @@
          	
          // });
       </script>
-        <script type="text/javascript">
-        $(document).ready(function(){
-			 $("#order_tabs .tab a.active").css("border-bottom", "2px solid #6FA7E4");
-			$("#order_tabs .tab").click(function(){
-				 $("#order_tabs .tab a.active").css("border-bottom", "none");
-				 $("#order_tabs .tab a").css("border-bottom", "none");
-				});
-          
-          });
-        </script>
-     	 <script>
+      <script type="text/javascript">
+         $(document).ready(function(){
+            $("#order_tabs .tab a.active").css("border-bottom", "2px solid #6FA7E4");
+            $("#order_tabs .tab").click(function(){
+               $("#order_tabs .tab a.active").css("border-bottom", "none");
+               $("#order_tabs .tab a").css("border-bottom", "none");
+            });
+         });
+
          $(document).ready(function(){
             $('.modal').modal();
             $('.modal-close11').click(function(){
-				
-				$('#myModal_order').hide();
-			});
-			
-			
-			$('.order_id_pending').click(function(){
-				
-					
+               $('#myModal_order').hide();
+            });
 
-            var order_id = $(this).attr('data-attr');
+            $('.order_id_pending').click(function(){
+               var order_id = $(this).attr('data-attr');
 
-				$.ajax({
-                            type: "POST",
-							url:'<?=base_url()?>index.php/Sales_rep_order/get_order_list_view',
-                            data: {order_id:order_id},
-                            dataType: 'html',
-							async: false,
-							success: function(response){
-							$('#resultdiv').html(response);
-							$('#myModal_order').show();
-                        
-                     }
-                            });
+               $.ajax({
+                  type: "POST",
+                  url:'<?=base_url()?>index.php/Sales_rep_order/get_order_list_view',
+                  data: {order_id:order_id},
+                  dataType: 'html',
+                  async: false,
+                  success: function(response){
+                     $('#resultdiv').html(response);
+                     $('#myModal_order').show();
+                  }
+               });
+            });
 
-       });   
+            $('.modal').modal({
+               dismissible: true
+            });
+         });
 
-				 });
+         var get_beat_plan = function() {
+            $.ajax({
+              url:BASE_URL+'index.php/dashboard_sales_rep/get_beat_plan',
+              method: 'post',
+              data: {distributor_id: $('#distributor_id').val(), type_id: ''},
+              dataType: 'json',
+              async: false,
+              success: function(response){
+                  var beat_id_val = $('#beat_id').val();
+                  $('#beat_id').find('option').not(':first').remove();
+
+                  $.each(response,function(index,data){
+                     $('#beat_id').append('<option value="'+data['id']+'" '+((data['id']==beat_id_val)?'selected':'')+'>'+data['beat_id']+' - '+data['beat_name']+'</option>');
+                  });
+              }
+            });
+         }
+
+         var set_route_plan = function() {
+            if($('#beat_id').val()!=$('#beat_id_og').val()){
+               $('#myModal2').modal('open');
+            } else {
+               window.location.href = BASE_URL+'index.php/Sales_rep_store_plan';
+            }
+         }
+
+         var set_beat_plan = function() {
+            $.ajax({
+               url:BASE_URL+'index.php/dashboard_sales_rep/set_beat_plan',
+               method: 'post',
+               data: {distributor_id: $('#distributor_id').val(), beat_id: $('#beat_id').val()},
+               dataType: 'json',
+               async: false,
+               success: function(response){
+                  console.log(response);
+                  if(response=='1'){
+                     window.location.href = BASE_URL+'index.php/Sales_rep_store_plan';
+                  }
+               }
+            });
+         }
+
       </script>

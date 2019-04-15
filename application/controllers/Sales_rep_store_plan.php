@@ -118,6 +118,9 @@ class Sales_rep_store_plan extends CI_Controller{
             $data['checkstatus'] = $frequency;
             $data['temp_date'] = $temp_date;
             $data['current_day'] = date('l');
+
+            // echo json_encode($data['data']);
+
             load_view('sales_rep/sales_rep_list_view', $data);
         } else {
             echo '<script>alert("You donot have access to this page.");</script>';

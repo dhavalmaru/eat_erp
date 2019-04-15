@@ -178,16 +178,16 @@
                                 </li>
                                 <li class="pending_for_delivery">
                                     <a  href="<?php echo base_url(); ?>index.php/distributor_po/checkstatus/pending_for_delivery">
-                                        <span class="ng-binding">MT DP</span>
+                                        <span class="ng-binding">Delivery Pending</span>
                                         <span id="pending_for_delivery"> (<?php echo $pending_for_delivery; ?>) </span>
                                     </a>
                                 </li>
-                                <li class="gt_dp">
-                                    <a  href="<?php echo base_url(); ?>index.php/distributor_po/checkstatus/gt_dp">
+                                <!-- <li class="gt_dp">
+                                    <a  href="<?php //echo base_url(); ?>index.php/distributor_po/checkstatus/gt_dp">
                                         <span class="ng-binding">GT DP</span>
-                                        <span id="gt_dp"> (<?php echo $gt_dp; ?>) </span>
+                                        <span id="gt_dp"> (<?php //echo $gt_dp; ?>) </span>
                                     </a>
-                                </li>
+                                </li> -->
                                 <li class="pending_merchendiser_delivery">
                                     <a  href="<?php echo base_url(); ?>index.php/distributor_po/checkstatus/pending_merchendiser_delivery">
                                         <span class="ng-binding">Delivered Not Conf</span>

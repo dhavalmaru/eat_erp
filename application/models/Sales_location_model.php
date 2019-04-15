@@ -38,86 +38,98 @@ function get_data1($status='', $id=''){
     return $query->result();
 }
 
+function get_beat_details($weekday=''){
+    $sales_rep_id=$this->session->userdata('sales_rep_id');
+    $sql = "select dist_id1 as every_dist, beat_id1 as every_beat, 
+                case when frequency = 'Every' then dist_id1 else dist_id2 end as alternate_dist, 
+                case when frequency = 'Every' then beat_id1 else beat_id2 end as alternate_beat 
+            from beat_allocations where status = 'Approved' and sales_rep_id = '$sales_rep_id' 
+                and weekday = '$weekday'";
+    $query = $this->db->query($sql);
+    return $query->result();
+}
+
 function get_data($status='', $id='',$frequency='',$temp_date=''){
-	   /* $cond2="";
-        if($status!=""){
-            $cond=" Where status='".$status."'";
-        } else {
-            $cond="";
-        }
+    /* $cond2="";
+    if($status!=""){
+    $cond=" Where status='".$status."'";
+    } else {
+    $cond="";
+    }
 
 
-        $sales_rep_id=$this->session->userdata('sales_rep_id');
-        
-        if($id!=""){
-            $cond2=" Where bit_plan_id=$id ";
-        }
-        else
-        {
-            $cond2='';
-        }
+    $sales_rep_id=$this->session->userdata('sales_rep_id');
 
-        $cons = " ";
-        if($frequency!=""){
-            $cond=$cond." and frequency='$frequency'";
-            $cons=" and frequency='$frequency'";
-        }*/
+    if($id!=""){
+    $cond2=" Where bit_plan_id=$id ";
+    }
+    else
+    {
+    $cond2='';
+    }
 
-    	/*if($frequency!=""){
-            $cond=$cond." and CASE WHEN ((FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=1 OR (FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=3 
-            OR (FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=5) 
-            THEN frequency = CONCAT('Every ',DAYNAME(date(now()))) 
-            WHEN ((FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=2) 
-            THEN frequency = CONCAT('Alternate ',DAYNAME(date(now()))) 
-            WHEN ((FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=4) 
-            THEN frequency = CONCAT('Alternate2 ',DAYNAME(date(now()))) end ";
-            $cons=" and CASE WHEN ((FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=1 OR (FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=3 
-            OR (FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=5) 
-            THEN frequency = CONCAT('Every ',DAYNAME(date(now()))) 
-            WHEN ((FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=2) 
-            THEN frequency = CONCAT('Alternate ',DAYNAME(date(now()))) 
-            WHEN ((FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=4) 
-            THEN frequency = CONCAT('Alternate2 ',DAYNAME(date(now()))) end  ";
-        }*/
-	   
-     /*$sql = "Select sequence from sales_rep_detailed_beat_plan Where  sales_rep_id=$sales_rep_id 
-            and CASE WHEN ((FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=1 OR (FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=3 
-            OR (FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=5) 
-            THEN frequency = CONCAT('Every ',DAYNAME(date(now()))) 
-            WHEN ((FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=2) 
-            THEN frequency = CONCAT('Alternate ',DAYNAME(date(now()))) 
-            WHEN ((FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=4) 
-            THEN frequency = CONCAT('Alternate2 ',DAYNAME(date(now()))) end and date(date_of_visit)=date(now()) ";
-      $result=$this->db->query($sql)->result_array();*/
+    $cons = " ";
+    if($frequency!=""){
+    $cond=$cond." and frequency='$frequency'";
+    $cons=" and frequency='$frequency'";
+    }*/
 
-      /*if(count($result)>0)
-      {
-            $sql = "Select sequence from sales_rep_beat_plan Where  CASE WHEN ((FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=1 OR (FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=3 
-            OR (FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=5) 
-            THEN frequency = CONCAT('Every ',DAYNAME(date(now()))) 
-            WHEN ((FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=2) 
-            THEN frequency = CONCAT('Alternate ',DAYNAME(date(now()))) 
-            WHEN ((FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=4) 
-            THEN frequency = CONCAT('Alternate2 ',DAYNAME(date(now()))) end and sales_rep_id=$sales_rep_id ";
-            $result2=$this->db->query($sql)->result_array();
-            if($result==$result2)
-            {
-                $table_name = 'select * ,id as bit_plan_id from  sales_rep_beat_plan '.$cond.'and sales_rep_id='.$sales_rep_id;
-            }
-            else
-            {
-                $table_name = 'select * from  sales_rep_detailed_beat_plan '.$cond.' and  date(date_of_visit)=date(now())'.'and sales_rep_id='.$sales_rep_id;
-            }
-      }
-      else
-      {
-             $table_name = 'select *, id as bit_plan_id  from sales_rep_beat_plan '.$cond.'and sales_rep_id='.$sales_rep_id;
-      }*/
-        //utf8mb4_unicode_ci
-        // H.remarks,H.followup_date,H.distributor_type,H.location_id,H.area_id,H.zone_id
-        //Case When H.distributor_type IS NULL Then 'Old' else 'New' end as distributor_type
-     $cond = '';  
-     $cond2 = '';
+    /*if($frequency!=""){
+    $cond=$cond." and CASE WHEN ((FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=1 OR (FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=3 
+    OR (FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=5) 
+    THEN frequency = CONCAT('Every ',DAYNAME(date(now()))) 
+    WHEN ((FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=2) 
+    THEN frequency = CONCAT('Alternate ',DAYNAME(date(now()))) 
+    WHEN ((FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=4) 
+    THEN frequency = CONCAT('Alternate2 ',DAYNAME(date(now()))) end ";
+    $cons=" and CASE WHEN ((FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=1 OR (FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=3 
+    OR (FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=5) 
+    THEN frequency = CONCAT('Every ',DAYNAME(date(now()))) 
+    WHEN ((FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=2) 
+    THEN frequency = CONCAT('Alternate ',DAYNAME(date(now()))) 
+    WHEN ((FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=4) 
+    THEN frequency = CONCAT('Alternate2 ',DAYNAME(date(now()))) end  ";
+    }*/
+
+    /*$sql = "Select sequence from sales_rep_detailed_beat_plan Where  sales_rep_id=$sales_rep_id 
+    and CASE WHEN ((FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=1 OR (FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=3 
+    OR (FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=5) 
+    THEN frequency = CONCAT('Every ',DAYNAME(date(now()))) 
+    WHEN ((FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=2) 
+    THEN frequency = CONCAT('Alternate ',DAYNAME(date(now()))) 
+    WHEN ((FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=4) 
+    THEN frequency = CONCAT('Alternate2 ',DAYNAME(date(now()))) end and date(date_of_visit)=date(now()) ";
+    $result=$this->db->query($sql)->result_array();*/
+
+    /*if(count($result)>0)
+    {
+    $sql = "Select sequence from sales_rep_beat_plan Where  CASE WHEN ((FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=1 OR (FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=3 
+    OR (FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=5) 
+    THEN frequency = CONCAT('Every ',DAYNAME(date(now()))) 
+    WHEN ((FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=2) 
+    THEN frequency = CONCAT('Alternate ',DAYNAME(date(now()))) 
+    WHEN ((FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=4) 
+    THEN frequency = CONCAT('Alternate2 ',DAYNAME(date(now()))) end and sales_rep_id=$sales_rep_id ";
+    $result2=$this->db->query($sql)->result_array();
+    if($result==$result2)
+    {
+    $table_name = 'select * ,id as bit_plan_id from  sales_rep_beat_plan '.$cond.'and sales_rep_id='.$sales_rep_id;
+    }
+    else
+    {
+    $table_name = 'select * from  sales_rep_detailed_beat_plan '.$cond.' and  date(date_of_visit)=date(now())'.'and sales_rep_id='.$sales_rep_id;
+    }
+    }
+    else
+    {
+    $table_name = 'select *, id as bit_plan_id  from sales_rep_beat_plan '.$cond.'and sales_rep_id='.$sales_rep_id;
+    }*/
+    //utf8mb4_unicode_ci
+    // H.remarks,H.followup_date,H.distributor_type,H.location_id,H.area_id,H.zone_id
+    //Case When H.distributor_type IS NULL Then 'Old' else 'New' end as distributor_type
+
+    $cond = '';  
+    $cond2 = '';
      
     if($status!="")
     {
@@ -137,15 +149,15 @@ function get_data($status='', $id='',$frequency='',$temp_date=''){
         }
 
   
-  if($temp_date!='')
-  {
-    $temp_date = date("Y-m-d",strtotime($temp_date));
-    $temp_date = '"'.$temp_date.'"';
-  }
-  else
-  {
-    $temp_date = '"'.date("Y-m-d").'"';
-  }
+      if($temp_date!='')
+      {
+        $temp_date = date("Y-m-d",strtotime($temp_date));
+        $temp_date = '"'.$temp_date.'"';
+      }
+      else
+      {
+        $temp_date = '"'.date("Y-m-d").'"';
+      }
 
      $sql = "Select sequence from sales_rep_detailed_beat_plan Where  sales_rep_id=$sales_rep_id  and  date(date_of_visit)=$temp_date";
     $result=$this->db->query($sql)->result_array();
@@ -189,7 +201,7 @@ function get_data($status='', $id='',$frequency='',$temp_date=''){
 
 
 
-   $sql = "select distinct G.*,H.date_of_visit,H.id as mid ,H.distributor_type,H.remarks,H.followup_date,H.distributor_type  from (select E.*,F.sales_rep_name from(select C.* from (select A.*,B.distributor_name ,B.distributor_name as store_name ,B.google_address,B.latitude,B.longitude,B.gst_number,B.margin,B.doc_document,B.document_name from 
+    $sql = "select distinct G.*,H.date_of_visit,H.id as mid ,H.distributor_type,H.remarks,H.followup_date,H.distributor_type  from (select E.*,F.sales_rep_name from(select C.* from (select A.*,B.distributor_name ,B.distributor_name as store_name ,B.google_address,B.latitude,B.longitude,B.gst_number,B.margin,B.doc_document,B.document_name from 
             (".$table_name.$cond.' and sales_rep_id='.$sales_rep_id.") A 
             left join 
             (Select Distinct C.* FROM(
@@ -218,8 +230,7 @@ function get_data($status='', $id='',$frequency='',$temp_date=''){
             order by G.sequence asc,G.modified_on Desc
             ";
 
-        $query=$this->db->query($sql);
-        return $query->result();
+        // echo $sql.'<br/><br/>';
 
         $query=$this->db->query($sql);
         return $query->result();
@@ -3851,12 +3862,106 @@ function getWeeks($date, $rollover)
 }
 
 function get_distributors(){
-        $sales_rep_id = $this->session->userdata('sales_rep_id');
-        $sql = "SELECT * from distributor_master Where type_id=8 and `status`='Approved'";
-        $query=$this->db->query($sql);
-        return $query->result();
+    $sql = "SELECT * from distributor_master Where type_id=8 and `status`='Approved' order by distributor_name";
+    $query=$this->db->query($sql);
+    return $query->result();
 }
 
+function get_beat_plan($distributor_id='', $type_id=''){
+    $cond = "";
+    if($distributor_id!=''){
+        $cond = " and A.distributor_id = '$distributor_id'";
+    }
+    if($type_id!=''){
+        $cond = " and B.type_id = '$type_id'";
+    }
+    $sql = "select distinct B.id, B.beat_id, B.beat_name 
+            from distributor_beat_plans A 
+            left join beat_master B on (A.beat_id = B.id) 
+            where B.status = 'Approved' ".$cond." 
+            order by B.id";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function set_beat_plan($beat_id='', $frequency=''){
+    $now=date('Y-m-d H:i:s');
+    $curusr=$this->session->userdata('session_id');
+    $sales_rep_id=$this->session->userdata('sales_rep_id');
+
+    $type_id = '';
+    $sql = "select * from beat_master where id = '$beat_id'";
+    $result = $this->db->query($sql)->result();
+    if(count($result)>0){
+        $type_id = $result[0]->type_id;
+    }
+
+    if($type_id=='7'){
+        $sql = "delete from merchandiser_detailed_beat_plan where date(date_of_visit)=curdate()";
+        $this->db->query($sql);
+        // echo $sql.'<br/><br/>';
+
+        $sql = "insert into merchandiser_detailed_beat_plan (frequency, sequence, modified_on, 
+                    sales_rep_id, bit_plan_id, is_edit, date_of_visit, status, store_id, 
+                    zone_id, location_id) 
+                select '".$frequency."' as frequency, AA.sequence, '".$now."' as modified_on, 
+                    '".$sales_rep_id."' as sales_rep_id, '0' as bit_plan_id, null as is_edit, 
+                    '".$now."' as date_of_visit, 'Approved' as status, 
+                    position('_' in AA.dist_id)+1) as dist_id, AA.zone_id, AA.location_id from 
+                (select B.beat_name, C.dist_id, C.sequence, B.zone_id, D.location_id 
+                from beat_master B 
+                left join beat_details C on (A.id = C.beat_id) 
+                left join beat_locations D on (A.id = D.beat_id) 
+                left join 
+                (select concat('d_', id) as id, distributor_name, type_id, zone_id, area_id, location_id 
+                from distributor_master where status = 'Approved' 
+                union 
+                select concat('s_', id) as id, distributor_name, type_id, zone_id, area_id, location_id 
+                from sales_rep_distributors where distributor_name is not null and 
+                    distributor_name<>'' and (status <> 'Inactive' or status is null) 
+                union 
+                select concat('m_', A.store_id) as id, B.store_name as distributor_name, 
+                    A.type_id, A.zone_id, null as area_id, A.location_id 
+                from store_master A left join relationship_master B on (A.store_id = B.id) 
+                where A.status = 'Approved') E 
+                on (C.dist_id=E.id and B.zone_id=E.zone_id and D.location_id=E.location_id) 
+                where E.id is not null and B.id = '$beat_id') AA";
+        $this->db->query($sql);
+        // echo $sql.'<br/><br/>';
+    } else {
+        $sql = "delete from sales_rep_detailed_beat_plan where date(date_of_visit)=curdate()";
+        $this->db->query($sql);
+        // echo $sql.'<br/><br/>';
+
+        $sql = "insert into sales_rep_detailed_beat_plan (frequency, sequence, modified_on, 
+                    sales_rep_id, bit_plan_id, is_edit, date_of_visit, status, store_id, 
+                    zone_id, area_id, location_id) 
+                select '".$frequency."' as frequency, AA.sequence, '".$now."' as modified_on, 
+                    '".$sales_rep_id."' as sales_rep_id, '0' as bit_plan_id, null as is_edit, 
+                    '".$now."' as date_of_visit, 'Approved' as status, AA.dist_id, AA.zone_id, 
+                    AA.area_id, AA.location_id from 
+                (select B.beat_name, C.dist_id, C.sequence, D.zone_id, D.area_id, D.location_id 
+                from beat_master B
+                left join beat_details C on (B.id = C.beat_id) 
+                left join 
+                (select concat('d_', id) as id, distributor_name, zone_id, area_id, location_id 
+                from distributor_master where status = 'Approved' 
+                union 
+                select concat('s_', id) as id, distributor_name, zone_id, area_id, location_id 
+                from sales_rep_distributors where distributor_name is not null and 
+                    distributor_name<>'' and (status <> 'Inactive' or status is null) 
+                union 
+                select concat('m_', A.store_id) as id, B.store_name as distributor_name, 
+                    A.zone_id, null as area_id, A.location_id 
+                from store_master A left join relationship_master B on (A.store_id = B.id) 
+                where A.status = 'Approved') D 
+                on (C.dist_id = D.id) where B.id = '$beat_id') AA";
+        $this->db->query($sql);
+        // echo $sql.'<br/><br/>';
+    }
+
+    return 1;
+}
 
 public function get_mtfollowup($id='',$temp_date='')
 {

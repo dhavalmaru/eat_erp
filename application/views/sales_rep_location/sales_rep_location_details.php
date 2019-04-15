@@ -1509,7 +1509,7 @@
         <script type="text/javascript" src="<?php echo base_url(); ?>js/validations.js"></script>
         <script src="<?php echo base_url(); ?>css/select2/js/select2.full.min.js"></script> 
 
-        <!-- <script src="<?php echo base_url(); ?>sales_rep/js/loading.js"></script> -->
+        <!-- <script src="<?php //echo base_url(); ?>sales_rep/js/loading.js"></script> -->
         <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyATsgOOC1sMElGnhJq4wDvR2jnqgcCCamw"></script>
         <script>
             $('document').ready(function(){

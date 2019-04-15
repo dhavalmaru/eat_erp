@@ -40,7 +40,7 @@
                                         <div class="panel-body">
                                             <div class="form-group" >
                                                 <div class="col-md-12 col-sm-12 col-xs-12">
-                                                    <label class="col-md-2 col-sm-2 col-xs-12 control-label">Zone</label>
+                                                    <label class="col-md-2 col-sm-2 col-xs-12 control-label">Zone <span class="asterisk_sign">*</span></label>
                                                     <div class="col-md-4 col-sm-4 col-xs-12">
                                                         <select name="zone_id" id="zone_id" class="form-control select2" data-error="#err_zone">
                                                             <option value="">Select</option>
@@ -68,7 +68,7 @@
                                             </div>
                                             <div class="form-group"  >
                                                 <div class="col-md-12 col-sm-12 col-xs-12">
-                                                    <label class="col-md-2 col-sm-2 col-xs-12 control-label">Location</label>
+                                                    <label class="col-md-2 col-sm-2 col-xs-12 control-label">Location <span class="asterisk_sign">*</span></label>
                                                     <div class="col-md-4 col-sm-4 col-xs-12">
                                                         <select name="location_id" id="location_id" class="form-control select2" data-error="#err_location">
                                                             <option value="">Select</option>
@@ -82,7 +82,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <div class="col-md-12 col-sm-12 col-xs-12">
-                                                    <label class="col-md-2 col-sm-2 col-xs-12 control-label">Category</label>
+                                                    <label class="col-md-2 col-sm-2 col-xs-12 control-label">Category <span class="asterisk_sign">*</span></label>
                                                     <div class="col-md-4 col-sm-4 col-xs-12">
                                                         <select name="category" id="category" class="form-control select2" data-error="#err_category">
                                                             <option value="">Select</option>
@@ -114,9 +114,9 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="form-group"  >
+                                            <div class="form-group" style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
                                                 <div class="col-md-12 col-sm-12 col-xs-12">
-                                                    <div style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
+                                                    <div>
                                                         <label class="col-md-2 col-sm-2 col-xs-12 control-label">Status <span class="asterisk_sign">*</span></label>
                                                         <div class="col-md-4 col-sm-4 col-xs-12">
                                                             <select class="form-control" name="status">

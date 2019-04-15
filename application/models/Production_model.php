@@ -250,14 +250,16 @@ class Production_model Extends CI_Model{
         
         if(count($result)==0){
             $sql = "select AA.rm_id, sum(required_qty) as required_qty, sum(available_qty) as available_qty, sum(difference_qty) as difference_qty from 
-                    (select A.id, A.manufacturer_id, A.bar_id, A.rm_id, round(A.tot_qty,3) as required_qty, round(B.tot_qty,3) as available_qty, 
+                    (select A.manufacturer_id, A.rm_id, round(A.tot_qty,3) as required_qty, round(B.tot_qty,3) as available_qty, 
                         round(ifnull(B.tot_qty,0)-ifnull(A.tot_qty,0),3) as difference_qty from 
+                    (select A.manufacturer_id, A.rm_id, sum(A.tot_qty) as tot_qty from 
                     (select A.id, A.manufacturer_id, B.bar_id, D.rm_id, ifnull(B.qty,0)*ifnull(D.qty_per_batch,0) as tot_qty 
                     from production_details A 
                     left join production_batch_details B on (A.id=B.production_id) 
                     left join ingredients_master C on (B.bar_id=C.product_id) 
                     left join ingredients_details D on (C.id=D.ing_id) 
                     where A.id='$id' and B.production_id='$id') A 
+                    group by A.manufacturer_id, A.rm_id) A 
                     left join 
                     (select H.*, I.rm_name from 
                     (select F.*, G.depot_name from 

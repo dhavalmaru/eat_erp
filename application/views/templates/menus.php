@@ -327,6 +327,12 @@
 
                 <ul class="sub_menu menu--item__has_sub_menu-5"> 
                     <li class="sub_menu--item" >
+                        <a href="<?php echo base_url().'index.php/Beat_master'; ?>" class="sub_menu--link"> Beat Master </a>
+                    </li>
+                    <li class="sub_menu--item" >
+                        <a href="<?php echo base_url().'index.php/Beat_allocation'; ?>" class="sub_menu--link"> Assign Beat </a>
+                    </li>
+                    <li class="sub_menu--item" >
                         <a href="<?php echo base_url().'index.php/Merchandiser_beat_plan'; ?>" class="sub_menu--link"> Upload Merchendizer </a>
                     </li>
                     <li class="sub_menu--item" >

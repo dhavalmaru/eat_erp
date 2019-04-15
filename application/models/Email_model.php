@@ -45,6 +45,8 @@ function set_email_details($email_ref_id, $email_type, $email_from, $email_sende
     // $email_subject = 'PO Amount Mismatch';
     // $email_body = 'Hi, PO Amount Mismatch Regards, Team EatAnyTime';
     
+    $email_cc = 'dhaval.maru@pecanreams.com';
+
     $message = '<html>
                     <head>
                     <style type="text/css">

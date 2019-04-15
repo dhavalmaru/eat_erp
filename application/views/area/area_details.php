@@ -6,16 +6,19 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        
+
         <link rel="icon" href="<?php echo base_url(); ?>favicon.ico" type="image/x-icon" />
         <!-- END META SECTION -->
-        
-                 <!-- CSS INCLUDE -->        
-         <link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>css/theme-blue.css"/>
+
+        <!-- CSS INCLUDE -->        
+        <link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>css/theme-blue.css"/>
         <link href="<?php echo base_url() . 'js/jquery-ui-1.11.2/jquery-ui.min.css'; ?>" rel="stylesheet" type="text/css" />
-		<link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>css/user-details.css"/>
+        <link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>css/user-details.css"/>
         <!-- EOF CSS INCLUDE -->     
 		
+        <style>
+            .error { margin-top: 15px !important; }
+        </style>
     </head>
     <body>								
       <!-- START PAGE CONTAINER -->
@@ -40,27 +43,29 @@
 								
 								    <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Type</label>
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Type <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12" >
-                                                <select name="type_id" id="type_id" class="form-control select2">
+                                                <select name="type_id" id="type_id" class="form-control select2" data-error="#err_type_id">
                                                     <option value="">Select</option>
                                                     <?php if(isset($type)) { for ($k=0; $k < count($type) ; $k++) { ?>
                                                             <option value="<?php echo $type[$k]->id; ?>" <?php if (isset($data)) { if($type[$k]->id==$data[0]->type_id) { echo 'selected'; } } ?>><?php echo $type[$k]->distributor_type; ?></option>
                                                     <?php }} ?>
                                                 </select>
+                                                <div id="err_type_id"></div>
                                             </div>
                                         </div>
                                     </div>
 									<div class="form-group"  >
 										<div class="col-md-12 col-sm-12 col-xs-12">
-											<label class="col-md-2 col-sm-2 col-xs-12 control-label">Zone</label>
+											<label class="col-md-2 col-sm-2 col-xs-12 control-label">Zone <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="zone_id" id="zone_id" class="form-control select2">
+                                                <select name="zone_id" id="zone_id" class="form-control select2" data-error="#err_zone_id">
                                                     <option value="">Select</option>
                                                     <?php if(isset($zone)) { for ($k=0; $k < count($zone) ; $k++) { ?>
                                                             <option value="<?php echo $zone[$k]->id; ?>" <?php if (isset($data)) { if($zone[$k]->id==$data[0]->zone_id) { echo 'selected'; } } ?>><?php echo $zone[$k]->zone; ?></option>
                                                     <?php }} ?>
                                                 </select>
+                                                <div id="err_zone_id"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -75,9 +80,9 @@
                                             </div>
                                         </div>
                                     </div>
-									<div class="form-group"  >
+									<div class="form-group" style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
 										<div class="col-md-12 col-sm-12 col-xs-12">
-                                            <div style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
+                                            <div>
                                                 <label class="col-md-2 col-sm-2 col-xs-12 control-label">Status <span class="asterisk_sign">*</span></label>
                                                 <div class="col-md-4 col-sm-4 col-xs-12">
                                                     <select class="form-control" name="status">
@@ -146,7 +151,7 @@
 
           // Add options
 		  // response = $.parseJSON(response);
-		  console.log(response);
+		  // console.log(response);
           $.each(response,function(index,data){
              $('#zone_id').append('<option value="'+data['id']+'">'+data['zone']+'</option>');
         

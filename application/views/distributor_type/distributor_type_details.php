@@ -45,9 +45,9 @@
                                             </div>
                                         </div>
                                     </div>
-									<div class="form-group"  >
+									<div class="form-group" style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
 										<div class="col-md-12 col-sm-12 col-xs-12">
-                                            <div style="<?php if(isset($data)) echo ''; else echo 'display: none;';?>">
+                                            <div>
                                                 <label class="col-md-2 col-sm-2 col-xs-12 control-label">Status <span class="asterisk_sign">*</span></label>
                                                 <div class="col-md-4 col-sm-4 col-xs-12">
                                                     <select class="form-control" name="status">

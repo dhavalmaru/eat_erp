@@ -215,12 +215,13 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Type <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12" >
-                                                <select name="type_id" id="type_id" class="form-control select2">
+                                                <select name="type_id" id="type_id" class="form-control select2" data-error="#err_type_id">
                                                     <option value="">Select</option>
                                                     <?php if(isset($type)) { for ($k=0; $k < count($type) ; $k++) { ?>
                                                             <option value="<?php echo $type[$k]->id; ?>" <?php if (isset($data)) { if($type[$k]->id==$data[0]->type_id) { echo 'selected'; } } ?>><?php echo $type[$k]->distributor_type; ?></option>
                                                     <?php }} ?>
                                                 </select>
+                                                <div id="err_type_id" style="margin-top: 15px;"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -228,12 +229,13 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Zone <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="zone_id" id="zone_id" class="form-control select2">
+                                                <select name="zone_id" id="zone_id" class="form-control select2" data-error="#err_zone_id">
                                                     <option value="">Select</option>
                                                     <?php if(isset($zone)) { for ($k=0; $k < count($zone) ; $k++) { ?>
                                                             <option value="<?php echo $zone[$k]->id; ?>" <?php if (isset($data)) { if($zone[$k]->id==$data[0]->zone_id) { echo 'selected'; } } ?>><?php echo $zone[$k]->zone; ?></option>
                                                     <?php }} ?>
                                                 </select>
+                                                <div id="err_zone_id" style="margin-top: 15px;"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -242,12 +244,13 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Area <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="area_id" id="area_id" class="form-control select2">
+                                                <select name="area_id" id="area_id" class="form-control select2" data-error="#err_area_id">
                                                     <option value="">Select</option>
                                                     <?php if(isset($area)) { for ($k=0; $k < count($area) ; $k++) { ?>
                                                             <option value="<?php echo $area[$k]->id; ?>" <?php if (isset($data)) { if($area[$k]->id==$data[0]->area_id) { echo 'selected'; } } ?>><?php echo $area[$k]->area; ?></option>
                                                     <?php }} ?>
                                                 </select>
+                                                <div id="err_area_id" style="margin-top: 15px;"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -255,12 +258,13 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Location <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="location_id"  id="location_id"class="form-control select2">
+                                                <select name="location_id"  id="location_id"class="form-control select2" data-error="#err_location_id">
                                                     <option value="">Select</option>
                                                     <?php if(isset($location)) { for ($k=0; $k < count($location) ; $k++) { ?>
                                                             <option value="<?php echo $location[$k]->id; ?>" <?php if (isset($data)) { if($location[$k]->id==$data[0]->location_id) { echo 'selected'; } } ?>><?php echo $location[$k]->location; ?></option>
                                                     <?php }} ?>
                                                 </select>
+                                                <div id="err_location_id" style="margin-top: 15px;"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -284,6 +288,27 @@
                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Tally Name<span class="asterisk_sign"></span></label>
                                            <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="tally_name" placeholder="Tally Name" value="<?php if (isset($data)) { echo $data[0]->tally_name; } ?>"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Beat Plans <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <select name="beat_id[]" id="beat_id" class="form-control select2" data-error="#err_beat_id" multiple>
+                                                    <option value="">Select</option>
+                                                    <?php 
+                                                        $beat_id=array(); 
+                                                        if(isset($distributor_beat_plans)) { 
+                                                            if($distributor_beat_plans[0]->beat_id!='' && $distributor_beat_plans[0]->beat_id!=null) 
+                                                                $beat_id=explode(',', $distributor_beat_plans[0]->beat_id); 
+                                                        } 
+                                                    ?>
+                                                    <?php if(isset($beat_plan)) { for ($k=0; $k < count($beat_plan) ; $k++) { ?>
+                                                        <option value="<?php echo $beat_plan[$k]->id; ?>" <?php if (count($beat_plan)>0) { if(in_array($beat_plan[$k]->id, $beat_id)) { echo 'selected'; } } ?>><?php echo $beat_plan[$k]->beat_id.' - '.$beat_plan[$k]->beat_name; ?></option>
+                                                    <?php }} ?>
+                                                </select>
+                                                <div id="err_location_id" style="margin-top: 15px;"></div>
                                             </div>
                                         </div>
                                     </div>

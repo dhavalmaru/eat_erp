@@ -63,7 +63,8 @@ class Dashboard_sales_rep extends CI_Controller
         // load_view('dashboard/dashboard_sales_rep_details', $data);
        
     }
-	    public function checkstatus($frequency=''){
+	
+    public function checkstatus($frequency=''){
 
         /*$day = $frequency;
         $m = date('F');
@@ -121,32 +122,73 @@ class Dashboard_sales_rep extends CI_Controller
         if(count($result)>0) {
             $data['access']=$result;
             $data['data']=$this->Sales_location_model->get_data('Approved','',$frequency,$temp_date);
-            
+
             $data['merchendizer']=$result2=$this->Sales_location_model->get_merchendiser_data('Approved','',$frequency,$temp_date);
             $data['mt_followup']=$this->Sales_location_model->get_mtfollowup('',$temp_date);
             $data['gt_followup']=$this->Sales_location_model->get_gtfollowup('',$temp_date);
             $data['checkstatus'] = $frequency;
             $data['current_day'] = date('l');
-			//$data['data1'] = $this->Sales_location_model->get_data1();
-			  $data['total_receivable']=$this->dashboard_sales_rep_model->get_total_receivable();
+            //$data['data1'] = $this->Sales_location_model->get_data1();
+            $data['total_receivable']=$this->dashboard_sales_rep_model->get_total_receivable();
             $data['target']=$this->dashboard_sales_rep_model->get_target();
             $data['payment_receivable']=$this->sales_rep_payment_receivable_model->get_data();
-			//$data['data1'] = $this->dashboard_sales_rep_model->get_data_dist();
-			$data['data2'] = $this->sales_rep_order_model->get_data();
-			$data['data1'] = $this->sales_rep_distributor_model->get_data();
+            //$data['data1'] = $this->dashboard_sales_rep_model->get_data_dist();
+            $data['data2'] = $this->sales_rep_order_model->get_data();
+            $data['data1'] = $this->sales_rep_distributor_model->get_data();
             $data['orders'] = $this->Sales_location_model->get_todaysorder();
             $data['pendingsorder'] = $this->Sales_location_model->get_pendingsorder();
-			$data['sales_rep_id']=$this->session->userdata('sales_rep_id');
-			$data['checkstatus'] = $frequency;
+            $data['sales_rep_id']=$this->session->userdata('sales_rep_id');
+            $data['checkstatus'] = $frequency;
 
-              load_view('dashboard/dashboard_sales_rep_details', $data);
+            $data['beat_details'] = $this->Sales_location_model->get_beat_details($day);
+            $data['distributor_id']='';
+            $data['beat_id']='';
+            if(count($data['beat_details'])>0){
+                if($frequency == 'Alternate '.$day){
+                    $data['distributor_id']=$data['beat_details'][0]->alternate_dist;
+                    $data['beat_id']=$data['beat_details'][0]->alternate_beat;
+                } else {
+                    $data['distributor_id']=$data['beat_details'][0]->every_dist;
+                    $data['beat_id']=$data['beat_details'][0]->every_beat;
+                }
+            }
+            $data['distributor'] = $this->Sales_location_model->get_distributors();
+            $data['beat'] = $this->Sales_location_model->get_beat_plan($data['distributor_id']);
+
+            load_view('dashboard/dashboard_sales_rep_details', $data);
 
         } else {
             echo '<script>alert("You donot have access to this page.");</script>';
             $this->load->view('login/main_page');
         }
     }
-	   public function get_lat_long(){
+
+    public function get_beat_plan(){ 
+        $distributor_id = $this->input->post('distributor_id');
+        $type_id = $this->input->post('type_id');
+        $data = $this->Sales_location_model->get_beat_plan($distributor_id, $type_id);
+        echo json_encode($data);
+    }
+
+    public function set_beat_plan(){
+        $distributor_id = $this->input->post('distributor_id');
+        $beat_id = $this->input->post('beat_id');
+
+        $day = date('l');
+        $m = date('F');
+        $year = date('Y');
+        $get_alternate  = $this->get_alternate($day,$m,$year);
+        if($get_alternate) {
+            $frequency = 'Alternate '.$day;
+        } else {
+            $frequency = 'Every '.$day;
+        }
+        
+        $data = $this->Sales_location_model->set_beat_plan($beat_id, $frequency);
+        echo json_encode($data);
+    }
+
+	public function get_lat_long(){
         $id=$this->input->post('id');
         $result=$this->Sales_location_model->get_lat_long($id);
         $data['result'] = 0;

@@ -2143,7 +2143,83 @@ function get_distributor_sale_sku_details_positive($from_date, $to_date) {
     return $result;
 }
 
-function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sample,$credit_debit='',$status_type='',$date_of_processing='',$date_of_accounting='',$flag='') {
+function get_distributor_transfer_sku_details($from_date, $to_date) {
+    $sql = "select * from 
+            (select AA.*, WEEK(date_of_transfer,1)-WEEK(STR_TO_DATE(concat(YEAR(date_of_transfer),'-',MONTH(date_of_transfer),'-',1),'%Y-%m-%d'),1)+1 as dweek, 
+                BB.item_name, BB.quantity, BB.short_name from 
+            (select A.*, A.id as transferid, B.type, B.item_id, B.qty, null as sell_rate, null as grams, 
+                null as rate, null as amount, null as item_amount, null as cgst_amt, null as sgst_amt, 
+                null as igst_amt, null as tax_amt, null as total_amt, 
+                D.distributor_name, D.sell_out, D.type_id, D.location_id, D.area_id, D.zone_id, 
+                D.city as distributor_city, D.class, D.state as dist_state, D.state_code as dist_state_code, D.gst_number as dist_gst_no, 
+                E.distributor_type, F.sales_rep_name, G.location, H.area, K.zone, 
+                (Select sales_rep_name from sales_rep_master where id=J.sales_rep_id1) as salesrepname, 
+                (Select sales_rep_name from sales_rep_master where id=J.sales_rep_id2) as salesrepname1 
+            from distributor_transfer A 
+                left join distributor_transfer_items B on(A.id=B.distributor_transfer_id) 
+                left join distributor_master D on(A.distributor_out_id=D.id) 
+                left join distributor_type_master E on(D.type_id=E.id) 
+                left join location_master G on(D.location_id=G.id) 
+                left join zone_master K on(D.zone_id=K.id) 
+                left join area_master H on(D.area_id=H.id) 
+                left join sr_mapping J on(D.area_id=J.area_id and D.type_id=J.type_id and D.zone_id=J.zone_id) 
+                left join sales_rep_master F on(J.reporting_manager_id=F.id) 
+            where A.status='Approved' and A.date_of_transfer>='$from_date' and A.date_of_transfer<='$to_date') AA 
+            left join 
+            (select id, 'Bar' as type, short_name as item_name, null as quantity, short_name from product_master 
+                where status='Approved' 
+            union all 
+            select m.id, 'Box' as type, m.box_name as item_name, sum(p.qty) as quantity, m.short_name 
+            from box_master m left join box_product p on m.id=p.box_id 
+            where m.status='Approved' group by m.id) BB 
+            on (AA.item_id=BB.id and AA.type=BB.type) 
+            where AA.class!='sample' or AA.class is null) CC 
+            order by date_of_transfer";
+
+    $query=$this->db->query($sql);
+    $result=$query->result();
+    return $result;
+}
+
+function get_distributor_transfer_sku_details_positive($from_date, $to_date) {
+    $sql = "select * from 
+            (select AA.*, WEEK(date_of_transfer,1)-WEEK(STR_TO_DATE(concat(YEAR(date_of_transfer),'-',MONTH(date_of_transfer),'-',1),'%Y-%m-%d'),1)+1 as dweek, 
+                BB.item_name, BB.quantity, BB.short_name from 
+            (select A.*, A.id as transferid, B.type, B.item_id, B.qty, null as sell_rate, null as grams, 
+                null as rate, null as amount, null as item_amount, null as cgst_amt, null as sgst_amt, 
+                null as igst_amt, null as tax_amt, null as total_amt, 
+                D.distributor_name, D.sell_out, D.type_id, D.location_id, D.area_id, D.zone_id, 
+                D.city as distributor_city, D.class, D.state as dist_state, D.state_code as dist_state_code, D.gst_number as dist_gst_no, 
+                E.distributor_type, F.sales_rep_name, G.location, H.area, K.zone, 
+                (Select sales_rep_name from sales_rep_master where id=J.sales_rep_id1) as salesrepname, 
+                (Select sales_rep_name from sales_rep_master where id=J.sales_rep_id2) as salesrepname1 
+            from distributor_transfer A 
+                left join distributor_transfer_items B on(A.id=B.distributor_transfer_id) 
+                left join distributor_master D on(A.distributor_in_id=D.id) 
+                left join distributor_type_master E on(D.type_id=E.id) 
+                left join location_master G on(D.location_id=G.id) 
+                left join zone_master K on(D.zone_id=K.id) 
+                left join area_master H on(D.area_id=H.id) 
+                left join sr_mapping J on(D.area_id=J.area_id and D.type_id=J.type_id and D.zone_id=J.zone_id) 
+                left join sales_rep_master F on(J.reporting_manager_id=F.id) 
+            where A.status='Approved' and A.date_of_transfer>='$from_date' and A.date_of_transfer<='$to_date') AA 
+            left join 
+            (select id, 'Bar' as type, short_name as item_name, null as quantity, short_name from product_master 
+                where status='Approved' 
+            union all 
+            select m.id, 'Box' as type, m.box_name as item_name, sum(p.qty) as quantity, m.short_name 
+            from box_master m left join box_product p on m.id=p.box_id 
+            where m.status='Approved' group by m.id) BB 
+            on (AA.item_id=BB.id and AA.type=BB.type) 
+            where AA.class!='sample' or AA.class is null) CC 
+            order by date_of_transfer";
+
+    $query=$this->db->query($sql);
+    $result=$query->result();
+    return $result;
+}
+
+function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sample,$credit_debit='',$status_type='',$date_of_processing='',$date_of_accounting='',$flag='',$dist_transfer='') {
     if($status_type==''){
 
         if($this->input->post('from_date')!="")
@@ -2184,7 +2260,7 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
     if($sales!="") {
         $include=$include.'Sales, ';
 
-        $data = $this->get_distributor_out_sku_details($from_date, $to_date, $status_type, $date_of_processing, $date_of_accounting);
+        $data = $this->get_distributor_out_sku_details($from_date, $to_date, 'Approved', $date_of_processing, $date_of_accounting);
 
         if(count($data)>0) {
             for($i=0; $i<count($data); $i++) {
@@ -2357,12 +2433,8 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                 }
 
             }
-
         }
-
     }
-
-
 
     if($ssallocation!="") {
         $include=$include.'SS Allocation, ';
@@ -2386,15 +2458,15 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
             $objPHPExcel->getActiveSheet()->setCellValue('A'.$row, '=TEXT(D'.$row.',"mmmm")');
             $objPHPExcel->getActiveSheet()->setCellValue('B'.$row, '=CONCATENATE("Q"&ROUNDUP(MONTH(D'.$row.')/3,0))');
             $objPHPExcel->getActiveSheet()->setCellValue('C'.$row, '=YEAR(D'.$row.')');
-			$objPHPExcel->getActiveSheet()->setCellValue('D'.$row, $mod_on1);
-            $objPHPExcel->getActiveSheet()->setCellValue('E'.$row, $dop3);
+			$objPHPExcel->getActiveSheet()->setCellValue('D'.$row, $dop3);
+            $objPHPExcel->getActiveSheet()->setCellValue('E'.$row, $mod_on1);
             $objPHPExcel->getActiveSheet()->setCellValue('F'.$row, $data[$i]->dweek);
             $objPHPExcel->getActiveSheet()->setCellValue('G'.$row, "SSALLOCATION");
             $objPHPExcel->getActiveSheet()->setCellValue('H'.$row, "SSALLOCATION");
             $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, $data[$i]->item_name);
             $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, $data[$i]->short_name);
             $objPHPExcel->getActiveSheet()->setCellValue('K'.$row, $data[$i]->type);
-            $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, '-'.$data[$i]->qty);
+            $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, floatval($data[$i]->qty)*-1);
 
             $quantity=$data[$i]->quantity;
             $barquantity=0;
@@ -2404,7 +2476,7 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                 $barquantity=$data[$i]->quantity*$data[$i]->qty;    
             }
 
-            $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, '-'.$barquantity);
+            $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, floatval($barquantity)*-1);
             $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, $data[$i]->rate);
             $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, $data[$i]->sell_rate);
 
@@ -2421,7 +2493,7 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                 $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, '0');
             } else {
-                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, '-'.$data[$i]->item_amount);
+                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, floatval($data[$i]->item_amount)*-1);
 
                 // $tax=($data[$i]->tax_per/100)*($data[$i]->item_amount);
                 // $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, $tax);
@@ -2432,7 +2504,7 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                 $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, '');
                 $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, '');
                 $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, '');
-                $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, '-'.$data[$i]->item_amount);
+                $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, floatval($data[$i]->item_amount)*-1);
                 $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, '');
                 $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $data[$i]->distributor_name);
                 $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$i]->distributor_type);
@@ -2572,8 +2644,8 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
             $objPHPExcel->getActiveSheet()->setCellValue('A'.$row, '=TEXT(D'.$row.',"mmmm")');
             $objPHPExcel->getActiveSheet()->setCellValue('B'.$row, '=CONCATENATE("Q"&ROUNDUP(MONTH(D'.$row.')/3,0))');
             $objPHPExcel->getActiveSheet()->setCellValue('C'.$row, '=YEAR(D'.$row.')');
-			$objPHPExcel->getActiveSheet()->setCellValue('D'.$row, $mod_on1);
-            $objPHPExcel->getActiveSheet()->setCellValue('E'.$row, $dop1);
+			$objPHPExcel->getActiveSheet()->setCellValue('D'.$row, $dop1);
+            $objPHPExcel->getActiveSheet()->setCellValue('E'.$row, $mod_on1);
             $objPHPExcel->getActiveSheet()->setCellValue('F'.$row, $data[$k]->dweek);
             $objPHPExcel->getActiveSheet()->setCellValue('G'.$row, "SSALLOCATION");
             $objPHPExcel->getActiveSheet()->setCellValue('H'.$row, "SSALLOCATION");
@@ -2652,7 +2724,225 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
         // }
     }
 
+    if($dist_transfer!="") {
+        $include=$include.'Distributor Transfer, ';
+        $data = $this->get_distributor_transfer_sku_details($from_date, $to_date);
+        
+        $j = 0;
+        $prv_dist_id = '';
+        $new_dist_id = '';
+        $countt=0;
 
+        for($i=0; $i<count($data); $i++) {
+            $new_dist_id = $data[$i]->distributor_out_id;
+            if($prv_dist_id != $new_dist_id){
+                $j = $i;
+                $prv_dist_id = $new_dist_id;
+            }
+
+            $dop3=date("d-m-Y", strtotime($data[$i]->date_of_transfer));
+            $mod_on1=date("d-m-Y", strtotime($data[$i]->modified_on));
+
+            $objPHPExcel->getActiveSheet()->setCellValue('A'.$row, '=TEXT(D'.$row.',"mmmm")');
+            $objPHPExcel->getActiveSheet()->setCellValue('B'.$row, '=CONCATENATE("Q"&ROUNDUP(MONTH(D'.$row.')/3,0))');
+            $objPHPExcel->getActiveSheet()->setCellValue('C'.$row, '=YEAR(D'.$row.')');
+            $objPHPExcel->getActiveSheet()->setCellValue('D'.$row, $dop3);
+            $objPHPExcel->getActiveSheet()->setCellValue('E'.$row, $mod_on1);
+            $objPHPExcel->getActiveSheet()->setCellValue('F'.$row, $data[$i]->dweek);
+            $objPHPExcel->getActiveSheet()->setCellValue('G'.$row, "SSALLOCATION");
+            $objPHPExcel->getActiveSheet()->setCellValue('H'.$row, "TRANSFER");
+            $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, $data[$i]->item_name);
+            $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, $data[$i]->short_name);
+            $objPHPExcel->getActiveSheet()->setCellValue('K'.$row, $data[$i]->type);
+            $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, floatval($data[$i]->qty)*-1);
+
+            $quantity=$data[$i]->quantity;
+            $barquantity=0;
+            if($data[$i]->quantity==null) {
+                $barquantity=1*$data[$i]->qty;
+            } else {
+                $barquantity=$data[$i]->quantity*$data[$i]->qty;    
+            }
+
+            $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, floatval($barquantity)*-1);
+            $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, $data[$i]->rate);
+            $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, $data[$i]->sell_rate);
+
+            $status = $data[$i]->status;
+            if($status=="InActive") {
+                $status='Cancelled';
+            }
+            if($status=='Cancelled') {
+                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, '0');
+            } else {
+                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, floatval($data[$i]->item_amount)*-1);
+
+                // $tax=($data[$i]->tax_per/100)*($data[$i]->item_amount);
+                // $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, $tax);
+                // $cstamt=$tax+$data[$i]->item_amount;
+
+                $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, floatval($data[$i]->item_amount)*-1);
+                $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $data[$i]->distributor_name);
+                $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$i]->distributor_type);
+                $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->dist_state_code);
+                $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->dist_state);
+                $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->dist_gst_no);
+                $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->zone);
+                $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->area);
+                $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->distributor_city);
+                $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->location);
+                $objPHPExcel->getActiveSheet()->setCellValue('AG'.$row, $data[$i]->sales_rep_name);
+                $objPHPExcel->getActiveSheet()->setCellValue('AH'.$row, $data[$i]->salesrepname);
+                $objPHPExcel->getActiveSheet()->setCellValue('AI'.$row, $data[$i]->salesrepname1);
+                $objPHPExcel->getActiveSheet()->setCellValue('AJ'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('AK'.$row, $data[$i]->transferid);
+                $objPHPExcel->getActiveSheet()->setCellValue('AL'.$row, '');
+            }
+
+            $objPHPExcel->getActiveSheet()->setCellValue('AM'.$row, $data[$i]->remarks);
+            $objPHPExcel->getActiveSheet()->setCellValue('AN'.$row, $data[$i]->transferid);
+
+            $status = $data[$i]->status;
+
+            // if($status=="InActive") {
+
+            //     $status='Cancelled';
+
+            // }
+
+            $objPHPExcel->getActiveSheet()->setCellValue('AO'.$row, $status);
+            $row=$row+1;
+
+            $bl_insert = false;
+            if($i<count($data)-1){
+                if($data[$i]->id!=$data[$i+1]->id){
+                    $bl_insert = true;
+                    $countt++;
+                }
+            } else {
+                $bl_insert = true;
+                $countt++;
+            }
+        }
+
+
+        $data = $this->get_distributor_transfer_sku_details_positive($from_date, $to_date);
+        for($i=0; $i<count($data); $i++) {
+            $new_dist_id = $data[$i]->distributor_out_id;
+            if($prv_dist_id != $new_dist_id){
+                $j = $i;
+                $prv_dist_id = $new_dist_id;
+            }
+
+            $dop3=date("d-m-Y", strtotime($data[$i]->date_of_transfer));
+            $mod_on1=date("d-m-Y", strtotime($data[$i]->modified_on));
+
+            $objPHPExcel->getActiveSheet()->setCellValue('A'.$row, '=TEXT(D'.$row.',"mmmm")');
+            $objPHPExcel->getActiveSheet()->setCellValue('B'.$row, '=CONCATENATE("Q"&ROUNDUP(MONTH(D'.$row.')/3,0))');
+            $objPHPExcel->getActiveSheet()->setCellValue('C'.$row, '=YEAR(D'.$row.')');
+            $objPHPExcel->getActiveSheet()->setCellValue('D'.$row, $dop3);
+            $objPHPExcel->getActiveSheet()->setCellValue('E'.$row, $mod_on1);
+            $objPHPExcel->getActiveSheet()->setCellValue('F'.$row, $data[$i]->dweek);
+            $objPHPExcel->getActiveSheet()->setCellValue('G'.$row, "SSALLOCATION");
+            $objPHPExcel->getActiveSheet()->setCellValue('H'.$row, "TRANSFER");
+            $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, $data[$i]->item_name);
+            $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, $data[$i]->short_name);
+            $objPHPExcel->getActiveSheet()->setCellValue('K'.$row, $data[$i]->type);
+            $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, floatval($data[$i]->qty));
+
+            $quantity=$data[$i]->quantity;
+            $barquantity=0;
+            if($data[$i]->quantity==null) {
+                $barquantity=1*$data[$i]->qty;
+            } else {
+                $barquantity=$data[$i]->quantity*$data[$i]->qty;    
+            }
+
+            $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, floatval($barquantity));
+            $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, $data[$i]->rate);
+            $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, $data[$i]->sell_rate);
+
+            $status = $data[$i]->status;
+            if($status=="InActive") {
+                $status='Cancelled';
+            }
+            if($status=='Cancelled') {
+                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, '0');
+            } else {
+                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, floatval($data[$i]->item_amount));
+
+                // $tax=($data[$i]->tax_per/100)*($data[$i]->item_amount);
+                // $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, $tax);
+                // $cstamt=$tax+$data[$i]->item_amount;
+
+                $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, floatval($data[$i]->item_amount));
+                $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $data[$i]->distributor_name);
+                $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$i]->distributor_type);
+                $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->dist_state_code);
+                $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->dist_state);
+                $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->dist_gst_no);
+                $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->zone);
+                $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->area);
+                $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->distributor_city);
+                $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->location);
+                $objPHPExcel->getActiveSheet()->setCellValue('AG'.$row, $data[$i]->sales_rep_name);
+                $objPHPExcel->getActiveSheet()->setCellValue('AH'.$row, $data[$i]->salesrepname);
+                $objPHPExcel->getActiveSheet()->setCellValue('AI'.$row, $data[$i]->salesrepname1);
+                $objPHPExcel->getActiveSheet()->setCellValue('AJ'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('AK'.$row, $data[$i]->transferid);
+                $objPHPExcel->getActiveSheet()->setCellValue('AL'.$row, '');
+            }
+
+            $objPHPExcel->getActiveSheet()->setCellValue('AM'.$row, $data[$i]->remarks);
+            $objPHPExcel->getActiveSheet()->setCellValue('AN'.$row, $data[$i]->transferid);
+
+            $status = $data[$i]->status;
+
+            // if($status=="InActive") {
+
+            //     $status='Cancelled';
+
+            // }
+
+            $objPHPExcel->getActiveSheet()->setCellValue('AO'.$row, $status);
+            $row=$row+1;
+
+            $bl_insert = false;
+            if($i<count($data)-1){
+                if($data[$i]->id!=$data[$i+1]->id){
+                    $bl_insert = true;
+                    $countt++;
+                }
+            } else {
+                $bl_insert = true;
+                $countt++;
+            }
+        }
+    }
 
     if($sample!="") {
         $include=$include.'Sample & Product Expired, ';
@@ -2761,8 +3051,6 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
         }
     }
 
-
-
     if($salesreturn!="") {
         $include=$include.'Sales Return, ';
 
@@ -2788,7 +3076,7 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
             $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, $data[$i]->item_name);
             $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, $data[$i]->short_name);
             $objPHPExcel->getActiveSheet()->setCellValue('K'.$row, $data[$i]->type);
-            $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, '-'.$data[$i]->qty);
+            $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, floatval($data[$i]->qty)*-1);
 
             $quantity=$data[$i]->quantity;
             $barquantity=0;
@@ -2798,7 +3086,7 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                 $barquantity=$data[$i]->quantity*$data[$i]->qty;
             }
 
-            $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, '-'.$barquantity);
+            $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, floatval($barquantity)*-1);
             $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, $data[$i]->rate);
             $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, $data[$i]->sell_rate);
 
@@ -2815,7 +3103,7 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                 $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, '0');
             } else {
-                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, '-'.$data[$i]->item_amount);
+                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, floatval($data[$i]->item_amount)*-1);
                 // $tax=($data[$i]->cst/100)*($data[$i]->item_amount);
                 // $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, '-'.$tax);
                 // $cstamt=$tax+$data[$i]->item_amount;
@@ -2843,16 +3131,16 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                 $round_off_amount = round($total_amt,0) - $total_amt;
                 $total_amt=$round_off_amt+$total_amt;
                 
-                $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, '-'.$cgst_amt);
-                $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, '-'.$sgst_amt);
-                $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, '-'.$igst_amt);
-                $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, '-'.$tax_amt);
+                $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, floatval($cgst_amt)*-1);
+                $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, floatval($sgst_amt)*-1);
+                $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, floatval($igst_amt)*-1);
+                $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, floatval($tax_amt)*-1);
                 if($round_off_amount<0){
                     $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, $round_off_amount);
                 } else {
-                    $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, '-'.$round_off_amount);
+                    $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, floatval($round_off_amount)*-1);
                 }
-                $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, '-'.$total_amt);
+                $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, floatval($total_amt)*-1);
                 $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, $data[$i]->depot_name);
                 $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $data[$i]->distributor_name);
                 $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$i]->distributor_type);
@@ -2924,9 +3212,9 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                 if($round_off_amount<0){
                     $objPHPExcel->getActiveSheet()->setCellValue('U'.($row-1), $round_off_amount);
                 } else {
-                    $objPHPExcel->getActiveSheet()->setCellValue('U'.($row-1), '-'.$round_off_amount);
+                    $objPHPExcel->getActiveSheet()->setCellValue('U'.($row-1), floatval($round_off_amount)*-1);
                 }
-                $objPHPExcel->getActiveSheet()->setCellValue('V'.($row-1), '-'.$total_amt);
+                $objPHPExcel->getActiveSheet()->setCellValue('V'.($row-1), floatval($total_amt)*-1);
 
 
 
@@ -2973,11 +3261,8 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
             }
 
         }
-
     }
 
-
-	
 	if($credit_debit!="") {
         $include=$include.'Credit Debit, ';
         $data = $this->get_credit_debit_sku_details($from_date, $to_date,$date_of_processing, $date_of_accounting);
@@ -2989,8 +3274,8 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
 				$objPHPExcel->getActiveSheet()->setCellValue('A'.$row, '=TEXT(D'.$row.',"mmmm")');
                 $objPHPExcel->getActiveSheet()->setCellValue('B'.$row, '=CONCATENATE("Q"&ROUNDUP(MONTH(D'.$row.')/3,0))');
                 $objPHPExcel->getActiveSheet()->setCellValue('C'.$row, '=YEAR(D'.$row.')');
-				$objPHPExcel->getActiveSheet()->setCellValue('D'.$row, $dop1);
-                $objPHPExcel->getActiveSheet()->setCellValue('E'.$row, $dop);
+				$objPHPExcel->getActiveSheet()->setCellValue('D'.$row, $dop);
+                $objPHPExcel->getActiveSheet()->setCellValue('E'.$row, $dop1);
                 $objPHPExcel->getActiveSheet()->setCellValue('F'.$row, $data[$i]->dweek);
                 $objPHPExcel->getActiveSheet()->setCellValue('G'.$row, strtoupper($data[$i]->transaction));
                 $objPHPExcel->getActiveSheet()->setCellValue('H'.$row, $data[$i]->ref_no);
@@ -3032,17 +3317,17 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                     }
 
 				    if ($data[$i]->transaction=='Credit Note') {
-                        $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, '-'.$amount_without_tax);
-                        $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, '-'.$cgst);
-                        $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, '-'.$sgst);
-                        $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, '-'.$igst);
-                        $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, '-'.$totaltax);
+                        $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, floatval($amount_without_tax)*-1);
+                        $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, floatval($cgst)*-1);
+                        $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, floatval($sgst)*-1);
+                        $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, floatval($igst)*-1);
+                        $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, floatval($totaltax)*-1);
                         if($round_off_amount<0){
                             $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, $round_off_amount);
                         } else {
-                            $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, '-'.$round_off_amount);
+                            $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, floatval($round_off_amount)*-1);
                         }
-                        $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, '-'.$amount);
+                        $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, floatval($amount)*-1);
                     } else {
                         $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, $amount_without_tax);
                         $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, $cgst);
@@ -3171,26 +3456,17 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
             }
 
         }
-
     }
-    if($date_of_processing=="")
-	 {
-		$objPHPExcel->getActiveSheet()->getColumnDimension('E')->setVisible(false);
-       
-	 }
-	 else if($date_of_accounting=="")
-	 {
-		$objPHPExcel->getActiveSheet()->getColumnDimension('D')->setVisible(false);
-       
-	 }
-     else {
+
+    if($date_of_processing=="") {
+        $objPHPExcel->getActiveSheet()->getColumnDimension('E')->setVisible(false);
+    } else if($date_of_accounting=="") {
+        $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setVisible(false);
+    } else {
         $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setVisible(true);
         $objPHPExcel->getActiveSheet()->getColumnDimension('E')->setVisible(true);
-     }
+    }
 	
-	
-	
-
     $row=$row-1;
 
     $include=substr($include, 0, strlen($include)-2);
@@ -15654,22 +15930,16 @@ public function sales_rep_exception_report(){
 public function gt_store_report($save='',$region=array()){
     $cond='';
     if(count($region)>0){
-      if(count($region)==1 && in_array('ALL',$region))
-        {
+        if(count($region)==1 && in_array('ALL',$region)) {
             $cond='';
-        }
-        else
-        {   
-            if(in_array('ALL',$region) )
-            {
+        } else {   
+            if(in_array('ALL',$region)) {
                 unset($region[0]); 
                 $region = "'" . implode ( "', '", $region ) . "'";
-                $cond=' Where L.location IN ('.$region.')';  
-            }
-            else
-            {
+                $cond=' Where AA.location IN ('.$region.')';  
+            } else {
                 $region = "'" . implode ( "', '", $region ) . "'";
-                $cond=' Where L.location IN ('.$region.')'; 
+                $cond=' Where AA.location IN ('.$region.')'; 
             }
         }  
     }
@@ -15680,180 +15950,245 @@ public function gt_store_report($save='',$region=array()){
         $cond=' Where L.location IN ('.$region.')';
     }*/
 
-   /* if($region!='' && $region!='ALL')
+    /* if($region!='' && $region!='ALL')
         $cond=' Where L.location="'.$region.'"';*/
    
-    $sql = "Select A.*,L.location,E.area from (
-                Select * from 
-                (Select id as dist_id,distributor_name,A.sales_rep_id,order_id,DATEDIFF(CURRENT_DATE(),order_date)  as  order_place_aging,order_date,sales_rep_name,item_qty,
-                sales_rep_order_id,item_id,A.location_id,A.area_id,S.last_date_of_visit,S.last_date_aging,S.remarks,S.orange,S.butterscotch,S.chocopeanut,S.mangoginger,S.berry_blast,
-                S.chyawanprash,S.dark_chocolate_cookies,S.chocolate_cookies,S.cranberry_cookies,S.cranberry_orange,S.papaya_pineapple,S.fig_raisins,1 as 'd_type'
-                 from 
-                (SELECT A.*,B.sales_rep_name from (
-                    Select B.*,C.sales_rep_id,C.order_id,O.order_date from (
-                            Select concat('d_',A.id) as id , A.distributor_name,A.area_id,A.location_id FROM
-                            (Select * from distributor_master )A
-                            LEFT JOIN sr_mapping B ON (A.area_id = B.area_id and A.zone_id = B.zone_id and  A.type_id = B.type_id) 
-                            Where A.status='approved' and A.class='normal'
-                    ) B 
-                    LEFT Join
-                    (   
-                        SELECT A.distributor_id , max(A.date_of_processing) as order_date ,A.area_id,A.location_id from 
-                        (SELECT A.distributor_id,A.date_of_processing,B.area_id,B.location_id,A.visit_id from 
-                        (SELECT distributor_id,date_of_processing,visit_id from sales_rep_orders 
-                        Where id IN (Select sales_rep_order_id From sales_rep_order_items Where qty IS NOT NULL) ) A
-                        Left join
-                        (SELECT * from sales_rep_location ) B On A.visit_id=B.id ) A
-                        Group By distributor_id,area_id,location_id 
-                    ) O On (O.distributor_id=B.id and O.location_id=B.location_id and O.area_id=B.area_id)
-                    left join
-                    (
-                        SELECT id as order_id,sales_rep_id, A.distributor_id ,A.date_of_processing,A.area_id,A.location_id from
-                        (
-                        SELECT A.id,A.distributor_id,A.date_of_processing,B.area_id,B.location_id,A.visit_id,A.sales_rep_id
-                            from 
-                            (
-                                SELECT distributor_id,date_of_processing,visit_id,id,sales_rep_id from sales_rep_orders 
-                                Where id IN (Select sales_rep_order_id From sales_rep_order_items Where qty IS NOT NULL) 
-                            ) A
-                        Left join
-                        (SELECT * from sales_rep_location ) B On A.visit_id=B.id ) A
-                        Group By distributor_id,area_id,location_id 
-                    ) 
-                    C ON ((O.distributor_id=C.distributor_id) and (O.order_date=C.date_of_processing) and (O.area_id=C.area_id) and (O.location_id=C.location_id) )
-                    Order By sales_rep_id DESC
-                ) A
-                Left Join
-                (Select * from sales_rep_master ) B On A.sales_rep_id=B.id
-                ORDER By sales_rep_id DESC ) A
-                Left join
-                (
-                     Select SUM(item_qty) as item_qty ,sales_rep_order_id ,item_id from 
-                        (
-                            SELECT case when E.type='Bar' then E.qty else (E.qty*F.qty) end  as item_qty ,
-                            E.sales_rep_order_id ,case when E.type='Bar' then E.item_id else F.product_id end  as item_id
-                            from 
-                            (select * from sales_rep_order_items)E
-                            left join box_product F On (E.type='Box' and (E.item_id=F.box_id))
-                            left join product_master G On (E.type='Bar' and (E.item_id=G.id)) 
-                        ) A GROUP By sales_rep_order_id ,item_id
-                ) B ON (A.order_id=B.sales_rep_order_id)
-                Left Join 
-                (
-                    SELECT A.date_of_visit as last_date_of_visit,DATEDIFF(CURRENT_DATE(),A.date_of_visit)  as  last_date_aging,A.distributor_id,A.sales_rep_id,A.sales_rep_loc_id,
-                    ((Case When B.orange_bar IS NOT NULL Then B.orange_bar else 0 end )+(CASE WHEN B.orange_box IS NOT NULL THEN orange_box*6 else 0 end)) as orange,
-                    ((Case When B.butterscotch_bar IS NOT NULL Then B.butterscotch_bar else 0 end )+(Case When butterscotch_box IS NOT NULL THEN butterscotch_box*6 else 0 end)) as butterscotch,
-                    ((CAse When B.chocopeanut_bar IS NOT NULL Then B.chocopeanut_bar else 0 end)+Case When B.chocopeanut_box IS NOT NULL Then chocopeanut_box*6 else 0 end ) as chocopeanut ,
-                    ((Case When B.bambaiyachaat_bar IS NOT NULL Then B.bambaiyachaat_bar else 0 end )+Case WHEN B.bambaiyachaat_box IS NOT NULL THen B.bambaiyachaat_box*6 else 0 end) as bambaiyachaat,
-                    ((Case When B.mangoginger_bar IS NOT NULL then B.mangoginger_bar else 0 end )+ Case When B.mangoginger_box IS NOT NULL THEN B.mangoginger_box*6 else 0 end ) as mangoginger,
-                    ((Case When B.berry_blast_bar IS NOT NULL then B.berry_blast_bar else 0 end )+ Case When B.berry_blast_box IS NOT NULL Then B.berry_blast_box*6 else 0 end) as berry_blast,
-                    ((CAse When B.chyawanprash_bar IS NOT NULL THen B.chyawanprash_bar else 0 end )+ Case When B.chyawanprash_box IS NOT NULL THen B.chyawanprash_box*6 else 0 end) as chyawanprash,
-                    (Case When B.chocolate_cookies_box IS NOT NULL THEN B.chocolate_cookies_box*4 else 0 end) as chocolate_cookies,
-                    (Case When B.cranberry_orange_box IS NOT NULL Then B.cranberry_orange_box*4  else 0 end ) as cranberry_orange,
-                    (Case When B.dark_chocolate_cookies_box IS NOT NULL THEN B.dark_chocolate_cookies_box*8 else 0 end ) as dark_chocolate_cookies,
-                    (Case When B.fig_raisins_box IS NOT NULL Then B.fig_raisins_box*2 else 0 end) as fig_raisins ,
-                    (Case When B.papaya_pineapple_box IS NOT NULL Then B.papaya_pineapple_box*2 Else 0 end ) as papaya_pineapple,
-                    B.variety_box,B.mint_box,(Case When B.cranberry_cookies_box IS NOT NULL Then B.cranberry_cookies_box*4 else 0 end ) as cranberry_cookies,A.remarks,A.location_id,A.area_id  from (
-                    Select A.date_of_visit,A.distributor_id,B.sales_rep_id,B.id as sales_rep_loc_id,A.location_id,A.area_id,B.remarks from
-                    (SELECT max(date_of_visit) as date_of_visit,distributor_id,location_id,area_id  from sales_rep_location 
-                    GROUP By distributor_id ) A
-                    Left Join
-                    (SELECT id,date_of_visit,distributor_id,sales_rep_id,location_id,area_id,remarks  from sales_rep_location ) B On 
-                    (date(A.date_of_visit)=date(B.date_of_visit) and (A.distributor_id=B.distributor_id and A.location_id=B.location_id and A.area_id=B.area_id)) 
-                    )A
-                    Left Join
-                    (Select * from sales_rep_distributor_opening_stock)  B on(A.sales_rep_loc_id=B.sales_rep_loc_id)
-                    Where (A.distributor_id IS NOT NULL and A.distributor_id<>'')
-                ) S On (A.id=S.distributor_id and A.location_id=S.location_id and A.area_id=S.area_id)
-                UNION
-                Select id as dist_id,distributor_name,A.sales_rep_id,order_id,DATEDIFF(CURRENT_DATE(),order_date)  as  order_place_aging,order_date,sales_rep_name,item_qty,
-                sales_rep_order_id,item_id,A.location_id,A.area_id,S.last_date_of_visit,S.last_date_aging,S.remarks,S.orange,S.butterscotch,S.chocopeanut,
-                S.mangoginger,S.berry_blast,S.chyawanprash,S.dark_chocolate_cookies,S.chocolate_cookies,S.cranberry_cookies,S.cranberry_orange,S.papaya_pineapple,S.fig_raisins,2 as 'd_type'
-                 from 
-                (SELECT A.*,B.sales_rep_name from (
-                    Select B.*,C.sales_rep_id,C.order_id,O.order_date from (
-                            Select concat('s_',A.id) as id , A.distributor_name,A.area_id,A.location_id FROM
-                            (Select * from sales_rep_distributors)A
-                    ) B 
-                    left Join
-                    (   
-                        SELECT A.distributor_id , max(A.date_of_processing) as order_date ,A.area_id,A.location_id from 
-                        (SELECT A.distributor_id,A.date_of_processing,B.area_id,B.location_id,A.visit_id from 
-                        (SELECT distributor_id,date_of_processing,visit_id from sales_rep_orders 
-                        Where id IN (Select sales_rep_order_id From sales_rep_order_items Where qty IS NOT NULL) ) A
-                        Left join
-                        (SELECT * from sales_rep_location ) B On A.visit_id=B.id ) A
-                        Group By distributor_id,area_id,location_id 
-                    ) O On (O.distributor_id=B.id and O.location_id=B.location_id and O.area_id=B.area_id)
-                    left join
-                    (
-                        SELECT id as order_id,sales_rep_id, A.distributor_id ,A.date_of_processing,A.area_id,A.location_id from
-                        (
-                        SELECT A.id,A.distributor_id,A.date_of_processing,B.area_id,B.location_id,A.visit_id,A.sales_rep_id
-                            from 
-                            (
-                                SELECT distributor_id,date_of_processing,visit_id,id,sales_rep_id from sales_rep_orders 
-                                Where id IN (Select sales_rep_order_id From sales_rep_order_items Where qty IS NOT NULL) 
-                            ) A
-                        Left join
-                        (SELECT * from sales_rep_location ) B On A.visit_id=B.id ) A
-                        Group By distributor_id,area_id,location_id 
-                    ) 
-                    C ON ((O.distributor_id=C.distributor_id) and (O.order_date=C.date_of_processing) and (O.area_id=C.area_id) and (O.location_id=C.location_id) )
-                    Order By sales_rep_id DESC
-                ) A
-                Left Join
-                (Select * from sales_rep_master ) B On A.sales_rep_id=B.id
-                ORDER By sales_rep_id DESC ) A
-                Left join
-                (      
-                        Select SUM(item_qty) as item_qty ,sales_rep_order_id ,item_id from 
-                        (
-                            SELECT case when E.type='Bar' then E.qty else (E.qty*F.qty) end  as item_qty ,
-                            E.sales_rep_order_id ,case when E.type='Bar' then E.item_id else F.product_id end  as item_id
-                            from 
-                            (select * from sales_rep_order_items)E
-                            left join box_product F On (E.type='Box' and (E.item_id=F.box_id))
-                            left join product_master G On (E.type='Bar' and (E.item_id=G.id)) 
-                        ) A GROUP By sales_rep_order_id ,item_id
-                ) B ON (A.order_id=B.sales_rep_order_id)
-                Left Join 
-                (
-                    SELECT A.date_of_visit as last_date_of_visit,DATEDIFF(CURRENT_DATE(),A.date_of_visit)  as  last_date_aging,A.distributor_id,A.sales_rep_id,A.sales_rep_loc_id,
-                    ((Case When B.orange_bar IS NOT NULL Then B.orange_bar else 0 end )+(CASE WHEN B.orange_box IS NOT NULL THEN orange_box*6 else 0 end)) as orange,
-                    ((Case When B.butterscotch_bar IS NOT NULL Then B.butterscotch_bar else 0 end )+(Case When butterscotch_box IS NOT NULL THEN butterscotch_box*6 else 0 end)) as butterscotch,
-                    ((CAse When B.chocopeanut_bar IS NOT NULL Then B.chocopeanut_bar else 0 end)+Case When B.chocopeanut_box IS NOT NULL Then chocopeanut_box*6 else 0 end ) as chocopeanut ,
-                    ((Case When B.bambaiyachaat_bar IS NOT NULL Then B.bambaiyachaat_bar else 0 end )+Case WHEN B.bambaiyachaat_box IS NOT NULL THen B.bambaiyachaat_box*6 else 0 end) as bambaiyachaat,
-                    ((Case When B.mangoginger_bar IS NOT NULL then B.mangoginger_bar else 0 end )+ Case When B.mangoginger_box IS NOT NULL THEN B.mangoginger_box*6 else 0 end ) as mangoginger,
-                    ((Case When B.berry_blast_bar IS NOT NULL then B.berry_blast_bar else 0 end )+ Case When B.berry_blast_box IS NOT NULL Then B.berry_blast_box*6 else 0 end) as berry_blast,
-                    ((CAse When B.chyawanprash_bar IS NOT NULL THen B.chyawanprash_bar else 0 end )+ Case When B.chyawanprash_box IS NOT NULL THen B.chyawanprash_box*6 else 0 end) as chyawanprash,
-                    (Case When B.chocolate_cookies_box IS NOT NULL THEN B.chocolate_cookies_box*4 else 0 end) as chocolate_cookies,
-                    (Case When B.cranberry_orange_box IS NOT NULL Then B.cranberry_orange_box*4  else 0 end ) as cranberry_orange,
-                    (Case When B.dark_chocolate_cookies_box IS NOT NULL THEN B.dark_chocolate_cookies_box*8 else 0 end ) as dark_chocolate_cookies,
-                    (Case When B.fig_raisins_box IS NOT NULL Then B.fig_raisins_box*2 else 0 end) as fig_raisins ,
-                    (Case When B.papaya_pineapple_box IS NOT NULL Then B.papaya_pineapple_box*2 Else 0 end ) as papaya_pineapple,
-                    B.variety_box,B.mint_box,(Case When B.cranberry_cookies_box IS NOT NULL Then B.cranberry_cookies_box*4 else 0 end ) as cranberry_cookies,A.remarks,A.location_id,A.area_id  from (
-                    Select A.date_of_visit,A.distributor_id,B.sales_rep_id,B.id as sales_rep_loc_id,A.location_id,A.area_id,B.remarks from
-                    (SELECT max(date_of_visit) as date_of_visit,distributor_id,location_id,area_id  from sales_rep_location 
-                    GROUP By distributor_id ) A
-                    Left Join
-                    (SELECT id,date_of_visit,distributor_id,sales_rep_id,location_id,area_id,remarks  from sales_rep_location ) B On 
-                    (date(A.date_of_visit)=date(B.date_of_visit) and (A.distributor_id=B.distributor_id and A.location_id=B.location_id and A.area_id=B.area_id)) 
-                    )A
-                    Left Join
-                    (Select * from sales_rep_distributor_opening_stock)  B on(A.sales_rep_loc_id=B.sales_rep_loc_id)
-                    Where (A.distributor_id IS NOT NULL and A.distributor_id<>'')
-                ) S On (A.id=S.distributor_id and A.location_id=S.location_id and A.area_id=S.area_id)
-                Where (S.last_date_of_visit IS NOT NULL OR A.order_date IS NOT NULL)
-            ) A ORDER By sales_rep_order_id ASC ) A
-            Left Join 
-            (Select * from location_master) L ON A.location_id=L.id
-            Left Join
-            (Select * from area_master ) E On A.area_id=E.id
-            ".$cond."
-            ORDER By d_type ASC;
-    ";
+    // $sql = "select AA.distributor_name, AA.location, AA.area, AA.d_type, AA.item_id, sum(AA.item_qty) as item_qty, 
+    //             group_concat(distinct AA.sales_rep_name) as sales_rep_name, group_concat(distinct AA.remarks) as remarks, 
+    //             min(AA.order_place_aging) as order_place_aging, min(AA.last_date_aging) as last_date_aging, 
+    //             max(AA.order_date) as order_date, max(AA.last_date_of_visit) as last_date_of_visit, 
+    //             min(AA.orange) as orange, min(AA.butterscotch) as butterscotch, min(AA.chocopeanut) as chocopeanut, 
+    //             min(AA.mangoginger) as mangoginger, min(AA.berry_blast) as berry_blast, min(AA.chyawanprash) as chyawanprash, 
+    //             min(AA.dark_chocolate_cookies) as dark_chocolate_cookies, min(AA.chocolate_cookies) as chocolate_cookies, 
+    //             min(AA.cranberry_cookies) as cranberry_cookies, min(AA.cranberry_orange) as cranberry_orange, 
+    //             min(AA.papaya_pineapple) as papaya_pineapple, min(AA.fig_raisins) as fig_raisins from 
+    //         (select A.*, L.location, E.area from 
+    //         (select * from 
+    //         (select A.id as dist_id, A.distributor_name, A.sales_rep_id, A.order_id, datediff(current_date(),A.order_date) as order_place_aging,
+    //             A.order_date, A.sales_rep_name, B.item_qty, B.sales_rep_order_id, B.item_id, A.location_id, A.area_id, S.last_date_of_visit, 
+    //             S.last_date_aging, S.remarks, S.orange, S.butterscotch, S.chocopeanut, S.mangoginger, S.berry_blast, S.chyawanprash, 
+    //             S.dark_chocolate_cookies, S.chocolate_cookies, S.cranberry_cookies, S.cranberry_orange, S.papaya_pineapple, S.fig_raisins, 
+    //             1 as d_type from 
+    //         (select A.*,B.sales_rep_name from 
+    //         (select B.*, O.order_id, C.sales_rep_id, C.order_date from 
+    //         (select concat('d_',A.id) as id, A.distributor_name, A.area_id, A.location_id from 
+    //         (select * from distributor_master) A 
+    //         left join sr_mapping B on (A.area_id = B.area_id and A.zone_id = B.zone_id and  A.type_id = B.type_id) 
+    //         where A.status='approved' and A.class='normal') B 
+    //         left join 
+    //         (select A.distributor_id, A.area_id, A.location_id, max(A.id) as order_id from 
+    //         (select A.id, A.distributor_id, A.date_of_processing, B.area_id, B.location_id, A.visit_id from 
+    //         (select id, distributor_id, date_of_processing, visit_id from sales_rep_orders 
+    //             where id in (select sales_rep_order_id from sales_rep_order_items where qty is not null)) A
+    //         left join
+    //         (select * from sales_rep_location) B on A.visit_id=B.id) A 
+    //         group by A.distributor_id, A.area_id, A.location_id) O 
+    //         on (O.distributor_id=B.id and O.location_id=B.location_id and O.area_id=B.area_id) 
+    //         left join 
+    //         (select distinct A.id as order_id, A.sales_rep_id, A.distributor_id, A.date_of_processing as order_date, A.area_id, A.location_id from 
+    //         (select A.id, A.distributor_id, A.date_of_processing, B.area_id, B.location_id, A.visit_id, A.sales_rep_id from 
+    //         (select distributor_id,date_of_processing,visit_id,id,sales_rep_id from sales_rep_orders 
+    //             where id in (select sales_rep_order_id from sales_rep_order_items where qty is not null)) A 
+    //         left join
+    //         (select * from sales_rep_location) B on A.visit_id=B.id) A) C 
+    //         on (O.distributor_id=C.distributor_id and O.order_id=C.order_id and O.area_id=C.area_id and O.location_id=C.location_id) 
+    //         order by sales_rep_id desc) A 
+    //         left join
+    //         (select * from sales_rep_master) B on A.sales_rep_id=B.id 
+    //         order by sales_rep_id desc) A 
+    //         left join 
+    //         (select A.sales_rep_order_id, A.item_id, sum(item_qty) as item_qty from 
+    //         (select case when E.type='Bar' then E.qty else (E.qty*F.qty) end as item_qty, E.sales_rep_order_id, 
+    //             case when E.type='Bar' then E.item_id else F.product_id end as item_id from 
+    //         (select * from sales_rep_order_items) E 
+    //         left join box_product F on (E.type='Box' and (E.item_id=F.box_id)) 
+    //         left join product_master G on (E.type='Bar' and (E.item_id=G.id))) A 
+    //         group by A.sales_rep_order_id, A.item_id) B on (A.order_id=B.sales_rep_order_id) 
+    //         left join 
+    //         (select A.date_of_visit as last_date_of_visit, ifnull(datediff(current_date(),A.date_of_visit),0) as last_date_aging, 
+    //             A.distributor_id, A.sales_rep_id, A.sales_rep_loc_id, 
+    //             ((case when B.orange_bar is not null then B.orange_bar else 0 end)+(case when B.orange_box is not null then orange_box*6 else 0 end)) as orange, 
+    //             ((case when B.butterscotch_bar is not null then B.butterscotch_bar else 0 end)+(case when butterscotch_box is not null then butterscotch_box*6 else 0 end)) as butterscotch, 
+    //             ((case when B.chocopeanut_bar is not null then B.chocopeanut_bar else 0 end)+case when B.chocopeanut_box is not null then chocopeanut_box*6 else 0 end ) as chocopeanut, 
+    //             ((case when B.bambaiyachaat_bar is not null then B.bambaiyachaat_bar else 0 end)+case when B.bambaiyachaat_box is not null then B.bambaiyachaat_box*6 else 0 end) as bambaiyachaat, 
+    //             ((case when B.mangoginger_bar is not null then B.mangoginger_bar else 0 end)+ case when B.mangoginger_box is not null then B.mangoginger_box*6 else 0 end ) as mangoginger, 
+    //             ((case when B.berry_blast_bar is not null then B.berry_blast_bar else 0 end)+ case when B.berry_blast_box is not null then B.berry_blast_box*6 else 0 end) as berry_blast, 
+    //             ((case when B.chyawanprash_bar is not null then B.chyawanprash_bar else 0 end)+ case when B.chyawanprash_box is not null then B.chyawanprash_box*6 else 0 end) as chyawanprash, 
+    //             (case when B.chocolate_cookies_box is not null then B.chocolate_cookies_box*4 else 0 end) as chocolate_cookies, 
+    //             (case when B.cranberry_orange_box is not null then B.cranberry_orange_box*4  else 0 end) as cranberry_orange, 
+    //             (case when B.dark_chocolate_cookies_box is not null then B.dark_chocolate_cookies_box*8 else 0 end) as dark_chocolate_cookies, 
+    //             (case when B.fig_raisins_box is not null then B.fig_raisins_box*2 else 0 end) as fig_raisins, 
+    //             (case when B.papaya_pineapple_box is not null then B.papaya_pineapple_box*2 Else 0 end) as papaya_pineapple, 
+    //             (case when B.cranberry_cookies_box is not null then B.cranberry_cookies_box*4 else 0 end) as cranberry_cookies, 
+    //             B.variety_box, B.mint_box, A.remarks, A.location_id, A.area_id from 
+    //         (select A.sales_rep_loc_id, A.distributor_id, A.location_id, A.area_id, B.date_of_visit, B.sales_rep_id, B.remarks from 
+    //         (select max(id) as sales_rep_loc_id, distributor_id, location_id, area_id from sales_rep_location group by distributor_id, location_id, area_id) A 
+    //         left join 
+    //         (select id, date_of_visit, distributor_id, sales_rep_id, location_id, area_id, remarks from sales_rep_location) B 
+    //         on (A.sales_rep_loc_id=B.id and A.distributor_id=B.distributor_id and A.location_id=B.location_id and A.area_id=B.area_id)) A 
+    //         left join 
+    //         (select * from sales_rep_distributor_opening_stock) B on (A.sales_rep_loc_id=B.sales_rep_loc_id) 
+    //             where (A.distributor_id is not null and A.distributor_id<>'')) S 
+    //         on (A.id=S.distributor_id and A.location_id=S.location_id and A.area_id=S.area_id) 
+    //         union 
+    //         select A.id as dist_id, A.distributor_name, A.sales_rep_id, A.order_id, ifnull(datediff(current_date(),A.order_date),0) as order_place_aging, 
+    //             A.order_date, A.sales_rep_name, B.item_qty, B.sales_rep_order_id, B.item_id, A.location_id, A.area_id, S.last_date_of_visit, 
+    //             S.last_date_aging, S.remarks, S.orange, S.butterscotch, S.chocopeanut, S.mangoginger, S.berry_blast, S.chyawanprash, 
+    //             S.dark_chocolate_cookies, S.chocolate_cookies, S.cranberry_cookies, S.cranberry_orange, S.papaya_pineapple, S.fig_raisins, 2 as d_type from 
+    //         (select A.*,B.sales_rep_name from 
+    //         (select B.*, C.sales_rep_id, O.order_id, C.date_of_processing as order_date from 
+    //         (select concat('s_',A.id) as id, A.distributor_name, A.area_id, A.location_id from 
+    //         (select * from sales_rep_distributors) A) B 
+    //         left join 
+    //         (select A.distributor_id, A.area_id, A.location_id, max(A.id) as order_id from 
+    //         (select A.id, A.distributor_id, A.date_of_processing, B.area_id, B.location_id, A.visit_id from 
+    //         (select id, distributor_id, date_of_processing, visit_id from sales_rep_orders 
+    //             where id in (select sales_rep_order_id from sales_rep_order_items where qty is not null)) A 
+    //         left join 
+    //         (select * from sales_rep_location) B on A.visit_id=B.id) A 
+    //         group by A.distributor_id, A.area_id, A.location_id) O 
+    //         on (O.distributor_id=B.id and O.location_id=B.location_id and O.area_id=B.area_id) 
+    //         left join 
+    //         (select distinct A.id as order_id, A.sales_rep_id, A.distributor_id, A.date_of_processing, A.area_id, A.location_id from 
+    //         (select A.id, A.distributor_id, A.date_of_processing, B.area_id, B.location_id, A.visit_id, A.sales_rep_id from 
+    //         (select distributor_id, date_of_processing, visit_id, id, sales_rep_id from sales_rep_orders 
+    //             where id in (select sales_rep_order_id from sales_rep_order_items where qty is not null)) A
+    //         left join
+    //         (select * from sales_rep_location) B on A.visit_id=B.id) A) C 
+    //         on (O.distributor_id=C.distributor_id and O.order_id=C.order_id and O.area_id=C.area_id and O.location_id=C.location_id) 
+    //         order by sales_rep_id desc) A 
+    //         left join
+    //         (select * from sales_rep_master) B on A.sales_rep_id=B.id 
+    //         order by sales_rep_id desc) A 
+    //         left join
+    //         (select sales_rep_order_id, item_id, sum(item_qty) as item_qty from 
+    //         (select E.sales_rep_order_id, case when E.type='Bar' then E.qty else (E.qty*F.qty) end  as item_qty, 
+    //             case when E.type='Bar' then E.item_id else F.product_id end  as item_id from 
+    //         (select * from sales_rep_order_items) E 
+    //         left join box_product F on (E.type='Box' and (E.item_id=F.box_id)) 
+    //         left join product_master G on (E.type='Bar' and (E.item_id=G.id))) A 
+    //         group by sales_rep_order_id ,item_id) B 
+    //         on (A.order_id=B.sales_rep_order_id)
+    //         left join 
+    //         (select A.date_of_visit as last_date_of_visit, ifnull(datediff(current_date(),A.date_of_visit),0) as last_date_aging, 
+    //             A.distributor_id, A.sales_rep_id, A.sales_rep_loc_id,
+    //             ((case when B.orange_bar is not null then B.orange_bar else 0 end )+(case when B.orange_box is not null then orange_box*6 else 0 end)) as orange, 
+    //             ((case when B.butterscotch_bar is not null then B.butterscotch_bar else 0 end )+(case when butterscotch_box is not null then butterscotch_box*6 else 0 end)) as butterscotch, 
+    //             ((case when B.chocopeanut_bar is not null then B.chocopeanut_bar else 0 end)+case when B.chocopeanut_box is not null then chocopeanut_box*6 else 0 end) as chocopeanut, 
+    //             ((case when B.bambaiyachaat_bar is not null then B.bambaiyachaat_bar else 0 end)+case when B.bambaiyachaat_box is not null then B.bambaiyachaat_box*6 else 0 end) as bambaiyachaat, 
+    //             ((case when B.mangoginger_bar is not null then B.mangoginger_bar else 0 end)+case when B.mangoginger_box is not null then B.mangoginger_box*6 else 0 end) as mangoginger, 
+    //             ((case when B.berry_blast_bar is not null then B.berry_blast_bar else 0 end)+case when B.berry_blast_box is not null then B.berry_blast_box*6 else 0 end) as berry_blast, 
+    //             ((case when B.chyawanprash_bar is not null then B.chyawanprash_bar else 0 end)+case when B.chyawanprash_box is not null then B.chyawanprash_box*6 else 0 end) as chyawanprash, 
+    //             (case when B.chocolate_cookies_box is not null then B.chocolate_cookies_box*4 else 0 end) as chocolate_cookies, 
+    //             (case when B.cranberry_orange_box is not null then B.cranberry_orange_box*4  else 0 end) as cranberry_orange, 
+    //             (case when B.dark_chocolate_cookies_box is not null then B.dark_chocolate_cookies_box*8 else 0 end) as dark_chocolate_cookies, 
+    //             (case when B.fig_raisins_box is not null then B.fig_raisins_box*2 else 0 end) as fig_raisins, 
+    //             (case when B.papaya_pineapple_box is not null then B.papaya_pineapple_box*2 Else 0 end) as papaya_pineapple, 
+    //             (case when B.cranberry_cookies_box is not null then B.cranberry_cookies_box*4 else 0 end) as cranberry_cookies, 
+    //             B.variety_box, B.mint_box, A.remarks, A.location_id, A.area_id from 
+    //         (select A.id as sales_rep_loc_id, A.distributor_id, A.location_id, A.area_id, B.date_of_visit, B.sales_rep_id, B.remarks from 
+    //         (select distributor_id, location_id, area_id, max(id) as id from sales_rep_location group by distributor_id, location_id, area_id) A 
+    //         left join 
+    //         (select id, date_of_visit, distributor_id, sales_rep_id, location_id, area_id, remarks from sales_rep_location) B 
+    //         on (A.id=B.id and (A.distributor_id=B.distributor_id and A.location_id=B.location_id and A.area_id=B.area_id))) A 
+    //         left join 
+    //         (select * from sales_rep_distributor_opening_stock) B on (A.sales_rep_loc_id=B.sales_rep_loc_id) 
+    //             where (A.distributor_id is not null and A.distributor_id<>'')) S 
+    //         on (A.id=S.distributor_id and A.location_id=S.location_id and A.area_id=S.area_id) 
+    //         where (S.last_date_of_visit is not null OR A.order_date is not null)) A order by sales_rep_order_id ASC ) A
+    //         left join 
+    //         (select * from location_master) L on A.location_id=L.id
+    //         left join
+    //         (select * from area_master) E on A.area_id=E.id 
+    //         ".$cond.") AA 
+    //         group by AA.distributor_name, AA.location, AA.area, AA.d_type, AA.item_id 
+    //         order by AA.d_type, AA.distributor_name, AA.location";
+
+    $sql = "select AA.*, ifnull(datediff(current_date(), AA.last_date_of_visit),0) as last_date_aging, 
+                ifnull(datediff(current_date(), AA.order_date),0) as order_place_aging from 
+
+            (select AA.distributor_name, AA.location, AA.area, AA.d_type, AA.item_id, sum(AA.item_qty) as item_qty, 
+                group_concat(distinct AA.sales_rep_name) as sales_rep_name, group_concat(distinct AA.remarks) as remarks, 
+                max(AA.order_date) as order_date, max(AA.date_of_visit) as last_date_of_visit, 
+                min(AA.orange) as orange, min(AA.butterscotch) as butterscotch, min(AA.chocopeanut) as chocopeanut, 
+                min(AA.mangoginger) as mangoginger, min(AA.berry_blast) as berry_blast, min(AA.chyawanprash) as chyawanprash, 
+                min(AA.dark_chocolate_cookies) as dark_chocolate_cookies, min(AA.chocolate_cookies) as chocolate_cookies, 
+                min(AA.cranberry_cookies) as cranberry_cookies, min(AA.cranberry_orange) as cranberry_orange, 
+                min(AA.papaya_pineapple) as papaya_pineapple, min(AA.fig_raisins) as fig_raisins from 
+                            
+            (select AA.id, AA.distributor_name, AA.area_id, AA.location_id, AA.d_type, BB.date_of_visit, BB.remarks, FF.sales_rep_name, GG.area, HH.location, 
+                CC.orange, CC.butterscotch, CC.chocopeanut, CC.mangoginger, CC.berry_blast, CC.chyawanprash, CC.dark_chocolate_cookies, CC.chocolate_cookies, 
+                CC.cranberry_cookies, CC.cranberry_orange, CC.papaya_pineapple, CC.fig_raisins, DD.item_id, DD.item_qty, EE.order_date from 
+
+            (select concat('d_',id) as id, distributor_name, area_id, location_id, 1 as d_type from distributor_master where status='approved' and class='normal' 
+            union 
+            select concat('s_',id) as id, distributor_name, area_id, location_id, 2 as d_type from sales_rep_distributors) AA 
+
+            left join 
+
+            (select A.distributor_id, A.visit_id, B.date_of_visit, B.sales_rep_id, B.remarks from 
+            (select distributor_id, max(id) as visit_id from sales_rep_location group by distributor_id) A 
+            left join 
+            (select * from sales_rep_location) B on (A.visit_id=B.id)) BB on (AA.id = BB.distributor_id) 
+
+            left join 
+
+            (select sales_rep_loc_id, 
+                ((case when orange_bar is not null then orange_bar else 0 end )+(case when orange_box is not null then orange_box*6 else 0 end)) as orange, 
+                ((case when butterscotch_bar is not null then butterscotch_bar else 0 end )+(case when butterscotch_box is not null then butterscotch_box*6 else 0 end)) as butterscotch, 
+                ((case when chocopeanut_bar is not null then chocopeanut_bar else 0 end)+case when chocopeanut_box is not null then chocopeanut_box*6 else 0 end) as chocopeanut, 
+                ((case when bambaiyachaat_bar is not null then bambaiyachaat_bar else 0 end)+case when bambaiyachaat_box is not null then bambaiyachaat_box*6 else 0 end) as bambaiyachaat, 
+                ((case when mangoginger_bar is not null then mangoginger_bar else 0 end)+case when mangoginger_box is not null then mangoginger_box*6 else 0 end) as mangoginger, 
+                ((case when berry_blast_bar is not null then berry_blast_bar else 0 end)+case when berry_blast_box is not null then berry_blast_box*6 else 0 end) as berry_blast, 
+                ((case when chyawanprash_bar is not null then chyawanprash_bar else 0 end)+case when chyawanprash_box is not null then chyawanprash_box*6 else 0 end) as chyawanprash, 
+                (case when chocolate_cookies_box is not null then chocolate_cookies_box*4 else 0 end) as chocolate_cookies, 
+                (case when cranberry_orange_box is not null then cranberry_orange_box*4  else 0 end) as cranberry_orange, 
+                (case when dark_chocolate_cookies_box is not null then dark_chocolate_cookies_box*8 else 0 end) as dark_chocolate_cookies, 
+                (case when fig_raisins_box is not null then fig_raisins_box*2 else 0 end) as fig_raisins, 
+                (case when papaya_pineapple_box is not null then papaya_pineapple_box*2 Else 0 end) as papaya_pineapple, 
+                (case when cranberry_cookies_box is not null then cranberry_cookies_box*4 else 0 end) as cranberry_cookies, 
+                variety_box, mint_box 
+            from sales_rep_distributor_opening_stock) CC on (BB.visit_id = CC.sales_rep_loc_id) 
+
+            left join 
+
+            (select A.id as order_id, A.visit_id, B.item_id, B.item_qty from 
+            (select id, visit_id from sales_rep_orders) A 
+            left join 
+            (select H.sales_rep_order_id, H.item_id, sum(H.item_qty) as item_qty from 
+            (select E.sales_rep_order_id, case when E.type='Bar' then E.qty else (E.qty*F.qty) end  as item_qty, 
+                case when E.type='Bar' then E.item_id else F.product_id end  as item_id from 
+            (select * from sales_rep_order_items) E 
+            left join box_product F on (E.type='Box' and (E.item_id=F.box_id)) 
+            left join product_master G on (E.type='Bar' and (E.item_id=G.id))) H 
+            group by H.sales_rep_order_id, H.item_id) B 
+            on (A.id=B.sales_rep_order_id)) DD on (BB.visit_id = DD.visit_id) 
+
+            left join 
+
+            (select A.distributor_id, A.order_id, B.date_of_processing as order_date from 
+            (select distributor_id, max(id) as order_id from sales_rep_orders group by distributor_id) A 
+            left join 
+            (select * from sales_rep_orders) B on (A.order_id=B.id)) EE on (AA.id = EE.distributor_id) 
+
+            left join 
+
+            (select * from sales_rep_master) FF on (BB.sales_rep_id=FF.id) 
+
+            left join 
+
+            (select * from area_master) GG on (AA.area_id=GG.id) 
+
+            left join 
+
+            (select * from location_master) HH on (AA.location_id=HH.id)) AA ".$cond."
+
+            group by AA.distributor_name, AA.location, AA.area, AA.d_type, AA.item_id) AA 
+            
+            order by AA.d_type, AA.distributor_name, AA.location, AA.item_id desc";
     $data = $this->db->query($sql)->result();
+
+    // echo json_encode($data);
     
     /*echo $this->db->last_query();
     die();*/
@@ -15870,142 +16205,104 @@ public function gt_store_report($save='',$region=array()){
 
     $col = 0;
     $row = 3;
-    $dist_id='';
-    $area_id='';
-    $location_id='';
+    $distributor_name='';
+    $area='';
+    $location='';
     $nooforder=0;
     $j=0;    
-    for($i=0;$i<count($data);$i++){
-        /* echo $dist_id."<br>Test".$data[$i]->dist_id;*/
-        if($dist_id!=$data[$i]->dist_id && $location_id!=$data[$i]->location_id)
-        {
-           $data[$i]->dist_id;
-           if($dist_id!='')
-                $row = $row+1;
+    for($i=0;$i<count($data);$i++) {
+        /* echo $distributor_name."<br>Test".$data[$i]->distributor_name;*/
+        if($distributor_name!=$data[$i]->distributor_name || $location!=$data[$i]->location) {
+            if($distributor_name!='') $row = $row+1;
 
-           $nooforder=0;
-           $dist_id = $data[$i]->dist_id;
-           $area_id = $data[$i]->area_id;
-           $location_id = $data[$i]->location_id;
+            $nooforder=0;
+            $distributor_name = $data[$i]->distributor_name;
+            $area = $data[$i]->area;
+            $location = $data[$i]->location;
 
-           $j = $j+1;
+            $j = $j+1;
 
-           for ($k=5; $k<=40 ; $k++) { 
-               $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+$k].$row,0);  
-           }
+            for ($k=5; $k<=40 ; $k++) { 
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+$k].$row, 0);  
+            }
 
-           $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row,$j);     
-           $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $data[$i]->distributor_name);  
-           $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, $data[$i]->location); 
-           $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $data[$i]->area); 
-           $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $data[$i]->sales_rep_name); 
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $j);     
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $data[$i]->distributor_name);  
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, $data[$i]->location); 
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $data[$i]->area); 
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $data[$i]->sales_rep_name); 
            
-           $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+42].$row, ($data[$i]->order_place_aging!=''?$data[$i]->order_place_aging:''));
-           $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+43].$row, ($data[$i]->last_date_aging!=''?$data[$i]->last_date_aging:''));
-           if($data[$i]->last_date_of_visit!=''){
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+42].$row, ($data[$i]->order_place_aging!=''?$data[$i]->order_place_aging:''));
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+43].$row, ($data[$i]->last_date_aging!=''?$data[$i]->last_date_aging:''));
+            if($data[$i]->last_date_of_visit!=''){
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+44].$row, date("d-m-Y",strtotime($data[$i]->last_date_of_visit))); 
                 $objPHPExcel->getActiveSheet()->getStyle($col_name[$col+44].$row)->getNumberFormat()->setFormatCode('dd/mm/yyyy');
-           }
-           $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+45].$row, $data[$i]->remarks);
+            }
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+45].$row, $data[$i]->remarks);
 
-           if($data[$i]->orange!=NULL)
+            if($data[$i]->orange!=NULL)
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+29].$row, $data[$i]->orange);
-           if($data[$i]->butterscotch!=NULL)
+            if($data[$i]->butterscotch!=NULL)
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+30].$row, $data[$i]->butterscotch);
-           if($data[$i]->chocopeanut!=NULL)
+            if($data[$i]->chocopeanut!=NULL)
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+31].$row, $data[$i]->chocopeanut);
-           if($data[$i]->mangoginger!=NULL)
+            if($data[$i]->mangoginger!=NULL)
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+32].$row, $data[$i]->mangoginger);
-           if($data[$i]->berry_blast!=NULL)
+            if($data[$i]->berry_blast!=NULL)
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+33].$row, $data[$i]->berry_blast);
-           if($data[$i]->chyawanprash!=NULL)
+            if($data[$i]->chyawanprash!=NULL)
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+34].$row, $data[$i]->chyawanprash);
-           if($data[$i]->dark_chocolate_cookies!=NULL)
+            if($data[$i]->dark_chocolate_cookies!=NULL)
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+35].$row, $data[$i]->dark_chocolate_cookies);
-           if($data[$i]->chocolate_cookies!=NULL)
+            if($data[$i]->chocolate_cookies!=NULL)
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+36].$row, $data[$i]->chocolate_cookies);
-           if($data[$i]->cranberry_cookies!=NULL)
+            if($data[$i]->cranberry_cookies!=NULL)
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+37].$row, $data[$i]->cranberry_cookies);
-           if($data[$i]->cranberry_orange!=NULL)
+            if($data[$i]->cranberry_orange!=NULL)
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+38].$row, $data[$i]->cranberry_orange);
-           if($data[$i]->papaya_pineapple!=NULL)
+            if($data[$i]->papaya_pineapple!=NULL)
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+39].$row, $data[$i]->papaya_pineapple);
-           if($data[$i]->fig_raisins!=NULL)
+            if($data[$i]->fig_raisins!=NULL)
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+40].$row, $data[$i]->fig_raisins);
         }
         
-        if($data[$i]->item_id==1)
-        {
+        if($data[$i]->item_id==1) {
             $nooforder = $nooforder+$data[$i]->item_qty;
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, $data[$i]->item_qty);
-        }
-
-        if($data[$i]->item_id==3)
-        {
+        } else if($data[$i]->item_id==3) {
             $nooforder = $nooforder+$data[$i]->item_qty;
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, $data[$i]->item_qty);
-        }
-
-        if($data[$i]->item_id==5)
-        {
+        } else if($data[$i]->item_id==5) {
             $nooforder = $nooforder+$data[$i]->item_qty;
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, $data[$i]->item_qty);
-        }
-
-        if($data[$i]->item_id==6)
-        {
+        } else if($data[$i]->item_id==6) {
             $nooforder = $nooforder+$data[$i]->item_qty;
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+8].$row, $data[$i]->item_qty);
-        }
-
-        if($data[$i]->item_id==9)
-        {
+        } else if($data[$i]->item_id==9) {
             $nooforder = $nooforder+$data[$i]->item_qty;
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+9].$row, $data[$i]->item_qty);
-        }
-
-        if($data[$i]->item_id==10)
-        {
+        } else if($data[$i]->item_id==10) {
             $nooforder = $nooforder+$data[$i]->item_qty;
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+10].$row, $data[$i]->item_qty);
-        }
-
-        if($data[$i]->item_id==38)
-        {
+        } else if($data[$i]->item_id==38) {
             $nooforder = $nooforder+$data[$i]->item_qty;
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+11].$row, $data[$i]->item_qty);
-        }
-
-        if($data[$i]->item_id==37)
-        {
+        } else if($data[$i]->item_id==37) {
             $nooforder = $nooforder+$data[$i]->item_qty;
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+12].$row, $data[$i]->item_qty);
-        }
-
-        if($data[$i]->item_id==39)
-        {
+        } else if($data[$i]->item_id==39) {
             $nooforder = $nooforder+$data[$i]->item_qty;
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+13].$row, $data[$i]->item_qty);
-        }
-
-        if($data[$i]->item_id==42)
-        {
+        } else if($data[$i]->item_id==42) {
             $nooforder = $nooforder+$data[$i]->item_qty;
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+14].$row, $data[$i]->item_qty);
-        }
-
-        if($data[$i]->item_id==41)
-        {
+        } else if($data[$i]->item_id==41) {
             $nooforder = $nooforder+$data[$i]->item_qty;
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+15].$row, $data[$i]->item_qty);
-        }
-
-        if($data[$i]->item_id==40)
-        {
+        } else if($data[$i]->item_id==40) {
             $nooforder = $nooforder+$data[$i]->item_qty;
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+16].$row, $data[$i]->item_qty);
         }
-
 
         /*if(!isset($nooforder))
         {
@@ -16013,12 +16310,12 @@ public function gt_store_report($save='',$region=array()){
 
             die();
         }*/
+
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+41].$row, $nooforder); 
     }
-        
-
+    
     for($col = 0; $col < 42; $col++) {
-            $objPHPExcel->getActiveSheet()->getColumnDimension($col_name[$col])->setAutoSize(true);
+        $objPHPExcel->getActiveSheet()->getColumnDimension($col_name[$col])->setAutoSize(true);
     }
 
     $objPHPExcel->getActiveSheet()->getColumnDimension($col_name[45])->setAutoSize(true);
@@ -16027,8 +16324,7 @@ public function gt_store_report($save='',$region=array()){
     /*die();*/
     $date1 = date('d-m-Y_H-i-A');
     $filename='Store_wise_sales_'.$date1.'.xls';
-    if($save=='')
-    {
+    if($save=='') {
         $path  ='/home/eatangcp/public_html/eat_erp/assets/uploads/exception_reports/';
 
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
@@ -16055,12 +16351,10 @@ public function gt_store_report($save='',$region=array()){
                     </html>';
 
         $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc, $cc, $attachment);
-        if($mailSent==1){
+        if($mailSent==1) {
             unlink($attachment);
         }
-    }
-    else
-    {
+    } else {
         header('Content-Type: application/vnd.ms-excel');
         header('Content-Disposition: attachment;filename="'.$filename.'"');
         header('Cache-Control: max-age=0'); 

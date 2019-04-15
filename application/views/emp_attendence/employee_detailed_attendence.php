@@ -101,7 +101,7 @@ input[readonly], input[readonly], select[readonly], textarea[readonly] {
                     <a href="javascript:void(0)" id="employee_name" style="float:right"><?php if(isset($emp_name)) echo $emp_name.' / '.$emp_department; ?></a> 
                       <div class="heading-h3-heading">
                       <div class="pull-right btn-margin">   
-                       <!--  <?php $this->load->view('templates/download');?>   -->  
+                       <!--  <?php //$this->load->view('templates/download');?>   -->  
                       </div>  
                 </div>        
                 </div> 

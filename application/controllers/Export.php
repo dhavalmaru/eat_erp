@@ -255,6 +255,7 @@ class Export extends CI_Controller {
             $salesreturn=$this->input->post('salesreturn');
             $sample=$this->input->post('sample');
             $credit_debit=$this->input->post('credit_debit');
+            $dist_transfer=$this->input->post('dist_transfer');
             $date_of_processing=$this->input->post('date_of_processing');
             $date_of_accounting=$this->input->post('date_of_accounting');
             $invoicelevel=$this->input->post('invoicelevel');
@@ -273,7 +274,7 @@ class Export extends CI_Controller {
             
             $flag = 0;
 
-            if(($invoicelevel!="" || $invoicelevelsalesreturn!="" || $invoicelevelsample!="") && ($sales!='' || $ssallocation!='' || $salesreturn!='' || $sample!='' || $credit_debit!='' || $status_type!=''))
+            if(($invoicelevel!="" || $invoicelevelsalesreturn!="" || $invoicelevelsample!="") && ($sales!='' || $ssallocation!='' || $salesreturn!='' || $sample!='' || $credit_debit!='' || $status_type!='' || $dist_transfer!=''))
             {
                 $flag=1;
             }
@@ -289,9 +290,11 @@ class Export extends CI_Controller {
             // echo '<br/><br/>';
             // echo $date_of_processing;
 
-            if($sales!='' || $ssallocation!='' || $salesreturn!='' || $sample!='' || $credit_debit!='' || $status_type!='')
+            // echo $dist_transfer;
+
+            if($sales!='' || $ssallocation!='' || $salesreturn!='' || $sample!='' || $credit_debit!='' || $status_type!='' || $dist_transfer!='')
             {
-                $this->export_model->generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sample,$credit_debit,$status_type,$date_of_processing,$date_of_accounting,$flag);
+                $this->export_model->generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sample,$credit_debit,$status_type,$date_of_processing,$date_of_accounting,$flag,$dist_transfer);
 
                 if($flag==1)
                     $this->zip->read_file($path.'Sale_Invoice_Sku_Report.xls');
@@ -741,8 +744,8 @@ class Export extends CI_Controller {
              $this->export_model->generate_sales_attendence_report();
         }
         else if($rep_id==30) {
-             $location = $this->input->post("location");
-             $this->export_model->gt_store_report('save',$location);
+            $location = $this->input->post("location");
+            $this->export_model->gt_store_report('save',$location);
         }
         
         $this->set_report_criteria($rep_id);

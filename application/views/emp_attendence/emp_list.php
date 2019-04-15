@@ -96,7 +96,7 @@
 					 
 					  <div class="heading-h3-heading">
     					  <div class="pull-right btn-margin">	
-    						<!-- <?php $this->load->view('templates/download');?>	 -->
+    						<!-- <?php //$this->load->view('templates/download');?>	 -->
     					  </div>
                           <?php 
                               if($this->session->userdata('user_name')=='rishit.sanghvi@otbconsulting.co.in'){?>  	
@@ -112,13 +112,13 @@
                         </div>
                           
                         <div class="pull-right btn-margin  btn-bottom " >
-                            <a href="<?=base_url().'/index.php/Eat_Attendence/download_excel'?>" class="btn btn-danger btn-padding" ><span class="fa fa-download "></span> Download</a>
+                            <a href="<?=base_url().'index.php/Eat_Attendence/download_excel'?>" class="btn btn-danger btn-padding" ><span class="fa fa-download "></span> Download</a>
                         </div>
                         <div class="pull-right btn-margin  btn-bottom "  >
-                            <a href="<?=base_url().'/index.php/Eat_Attendence/download_excel_summery/approved'?>" class="btn btn-danger btn-padding" ><span class="fa fa-download "></span> Download Summary</a>
+                            <a href="<?=base_url().'index.php/Eat_Attendence/download_excel_summery/approved'?>" class="btn btn-danger btn-padding" ><span class="fa fa-download "></span> Download Summary</a>
                         </div>
 						<div class="pull-right btn-margin  btn-bottom "  >
-                            <a href="<?=base_url().'/index.php/Eat_Attendence/download_excel/approved'?>" class="btn btn-danger btn-padding" ><span class="fa fa-download "></span> Download Approved</a>
+                            <a href="<?=base_url().'index.php/Eat_Attendence/download_excel/approved'?>" class="btn btn-danger btn-padding" ><span class="fa fa-download "></span> Download Approved</a>
 							</div>
                         <?php } ?>
                         <div class="pull-right btn-margin  btn-bottom " >

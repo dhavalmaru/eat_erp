@@ -883,17 +883,21 @@ $("#form_distributor_details").validate({
         state_code: {
             required: true
         },
-		 class: {
-            required: true
-        },
-		 type_id: {
+        type_id: {
             required: true
         },
 		 zone_id: {
             required: true
         },
-		 area_id: {
+        area_id: {
             required: true
+        },
+        location_id: {
+            required: {
+                depends: function() {
+                    return ($('#classes').val() == "normal");
+                }
+            }
         },
         'con_name[]': {
             required: true
@@ -4336,6 +4340,12 @@ function check_freezed_credit_debit_note() {
 // ----------------- Area DETAILS FORM VALIDATION -------------------------------------
 $("#form_area_details").validate({
     rules: {
+        type_id: {
+            required: true
+        },
+        zone_id: {
+            required: true
+        },
         area: {
             required: true,
             check_area_availablity: true
@@ -4393,6 +4403,12 @@ $('#form_area_details').submit(function() {
 // ----------------- LOCATION DETAILS FORM VALIDATION -------------------------------------
 $("#form_location_details").validate({
     rules: {
+        type_id: {
+            required: true
+        },
+        zone_id: {
+            required: true
+        },
         location: {
             required: true,
             check_location_availablity: true
@@ -4509,6 +4525,9 @@ $('#form_distributor_type_details').submit(function() {
 // ----------------- Zone DETAILS FORM VALIDATION -------------------------------------
 $("#form_zone_details").validate({
     rules: {
+        type_id: {
+            required: true
+        },
         zone: {
             required: true,
             check_zone_availablity: true
@@ -6724,6 +6743,128 @@ $('#form_raw_material_recon_details').submit(function() {
         removeMultiInputNamingRules('#form_raw_material_recon_details', 'select[alt="raw_material_id[]"]');
         removeMultiInputNamingRules('#form_raw_material_recon_details', 'input[alt="physical_qty[]"]');
 
+        return true;
+    }
+});
+
+
+
+
+// ----------------- BEAT MASTER FORM VALIDATION -------------------------------------
+$("#form_beat_master").validate({
+    rules: {
+        beat_id: {
+            required: true
+        },
+        beat_name: {
+            required: true,
+            check_beat_name_availablity: true
+        },
+        'location_id[]': {
+            required: true
+        }
+    },
+
+    ignore: false,
+
+    errorPlacement: function (error, element) {
+        var placement = $(element).data('error');
+        if (placement) {
+            $(placement).append(error);
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
+$.validator.addMethod("check_beat_name_availablity", function (value, element) {
+    var result = 1;
+
+    $.ajax({
+        url: BASE_URL+'index.php/beat_master/check_beat_name_availablity',
+        data: 'id='+$("#id").val()+'&beat_name='+$("#beat_name").val(),
+        type: "POST",
+        dataType: 'html',
+        global: false,
+        async: false,
+        success: function (data) {
+            result = parseInt(data);
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+        }
+    });
+
+    if (result) {
+        return false;
+    } else {
+        return true;
+    }
+}, 'Beat Name already in use.');
+
+$('#form_beat_master').submit(function() {
+    removeMultiInputNamingRules('#form_beat_master', 'input[alt="sequence[]"]');
+    addMultiInputNamingRules('#form_beat_master', 'input[name="sequence[]"]', { required: true }, "");
+    if (!$("#form_beat_master").valid()) {
+        return false;
+    } else {
+        removeMultiInputNamingRules('#form_beat_master', 'input[alt="sequence[]"]');
+        return true;
+    }
+});
+
+
+
+
+// ----------------- BEAT ALLOCATION FORM VALIDATION -------------------------------------
+$("#form_beat_allocation").validate({
+    rules: {
+        sales_rep_id: {
+            required: true
+        }
+    },
+
+    ignore: ":not(:visible)",
+
+    errorPlacement: function (error, element) {
+        var placement = $(element).data('error');
+        if (placement) {
+            $(placement).append(error);
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
+$('#form_beat_allocation').submit(function() {
+    removeMultiInputNamingRules('#form_beat_allocation', 'input[alt="weekday_id[]"]');
+    removeMultiInputNamingRules('#form_beat_allocation', 'input[alt="weekday[]"]');
+    removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="frequency[]"]');
+    removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="dist_id1[]"]');
+    removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="beat_id1[]"]');
+    removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="dist_id2[]"]');
+    removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="beat_id2[]"]');
+
+    addMultiInputNamingRules('#form_beat_allocation', 'input[name="weekday_id[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_beat_allocation', 'input[name="weekday[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_beat_allocation', 'select[name="frequency[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_beat_allocation', 'select[name="dist_id1[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_beat_allocation', 'select[name="beat_id1[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_beat_allocation', 'select[name="dist_id2[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_beat_allocation', 'select[name="beat_id2[]"]', { required: true }, "");
+
+    if (!$("#form_beat_allocation").valid()) {
+        return false;
+    } else {
+        removeMultiInputNamingRules('#form_beat_allocation', 'input[alt="weekday_id[]"]');
+        removeMultiInputNamingRules('#form_beat_allocation', 'input[alt="weekday[]"]');
+        removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="frequency[]"]');
+        removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="dist_id1[]"]');
+        removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="beat_id1[]"]');
+        removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="dist_id2[]"]');
+        removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="beat_id2[]"]');
+        
         return true;
     }
 });
