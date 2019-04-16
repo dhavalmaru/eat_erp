@@ -29,7 +29,9 @@ function get_data($status='', $sales_rep_id=''){
         }
     }
 
-	$sql = "select A.type_id, G.distributor_type, A.sales_rep_id, F.sales_rep_name, A.status, A.remarks, 
+	$sql = "select A.type_id, G.distributor_type, A.sales_rep_id, F.sales_rep_name, 
+                A.reporting_manager_id, H.sales_rep_name as reporting_manager_name, 
+                A.status, A.remarks, 
                 group_concat(A.weekday) as weekday, 
                 group_concat(A.frequency) as frequency, 
                 group_concat(B.distributor_name) as distributor_name1, 
@@ -43,8 +45,10 @@ function get_data($status='', $sales_rep_id=''){
             left join beat_master E on (A.beat_id2 = E.id) 
             left join sales_rep_master F on (A.sales_rep_id = F.id) 
             left join distributor_type_master G on (A.type_id = G.id) 
+            left join sales_rep_master H on (A.reporting_manager_id = H.id) 
             ".$cond." 
-            group by A.type_id, G.distributor_type, A.sales_rep_id, F.sales_rep_name, A.status, A.remarks 
+            group by A.type_id, G.distributor_type, A.sales_rep_id, F.sales_rep_name, 
+                A.reporting_manager_id, H.sales_rep_name, A.status, A.remarks 
             order by F.sales_rep_name";
     $query=$this->db->query($sql);
     return $query->result();
@@ -106,6 +110,7 @@ function save_data($sales_rep_id=''){
     
     $type_id = $this->input->post('type_id')==''?null:$this->input->post('type_id');
     $sales_rep_id = $this->input->post('sales_rep_id')==''?null:$this->input->post('sales_rep_id');
+    $reporting_manager_id = $this->input->post('reporting_manager_id')==''?null:$this->input->post('reporting_manager_id');
     $weekday_id = $this->input->post('weekday_id');
     $weekday = $this->input->post('weekday');
     $frequency = $this->input->post('frequency');
@@ -134,6 +139,7 @@ function save_data($sales_rep_id=''){
             $data = array(
                         'type_id' => $type_id,
                         'sales_rep_id' => $sales_rep_id,
+                        'reporting_manager_id' => $reporting_manager_id,
                         'weekday_id' => $weekday_id[$k],
                         'weekday' => $weekday[$k],
                         'frequency' => $frequency[$k],

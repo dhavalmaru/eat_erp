@@ -40,24 +40,29 @@ function get_data1($status='', $id=''){
 
 function get_new_beat_details(){
     $sales_rep_id=$this->session->userdata('sales_rep_id');
-    $type=$this->session->userdata('type');
-
-    if(strtoupper(trim($type))=="MERCHANDIZER"){
-        $table_name = "merchandiser_detailed_beat_plan";
-    } else {
-        $table_name = "sales_rep_detailed_beat_plan";
-    }
-
-    $sql = "select distinct beat_id, dist_id from ".$table_name." 
-            where status = 'Approved' and sales_rep_id = '$sales_rep_id' 
+    $sql = "select * from beat_changes where sales_rep_id = '$sales_rep_id' 
                 and date(date_of_visit) = curdate()";
     $query = $this->db->query($sql);
     return $query->result();
+
+    // $type=$this->session->userdata('type');
+
+    // if(strtoupper(trim($type))=="MERCHANDIZER"){
+    //     $table_name = "merchandiser_detailed_beat_plan";
+    // } else {
+    //     $table_name = "sales_rep_detailed_beat_plan";
+    // }
+
+    // $sql = "select distinct beat_id, dist_id from ".$table_name." 
+    //         where status = 'Approved' and sales_rep_id = '$sales_rep_id' 
+    //             and date(date_of_visit) = curdate()";
+    // $query = $this->db->query($sql);
+    // return $query->result();
 }
 
 function get_beat_details($weekday=''){
     $sales_rep_id=$this->session->userdata('sales_rep_id');
-    $sql = "select dist_id1 as every_dist, beat_id1 as every_beat, 
+    $sql = "select reporting_manager_id, dist_id1 as every_dist, beat_id1 as every_beat, 
                 case when frequency = 'Every' then dist_id1 else dist_id2 end as alternate_dist, 
                 case when frequency = 'Every' then beat_id1 else beat_id2 end as alternate_beat 
             from beat_allocations where status = 'Approved' and sales_rep_id = '$sales_rep_id' 
@@ -374,14 +379,13 @@ function get_merchandiser_stock_details($id){
     return $query->result();
 }
 
- function get_merchandiser_stock_images($id){
+function get_merchandiser_stock_images($id){
     $query=$this->db->query("SELECT * FROM merchandiser_images WHERE merchandiser_stock_id = '$id'");
     return $query->result();
- }
+}
 
 
 function save_data($id='',$status=''){
-   
     $now=date('Y-m-d H:i:s');
     $now1=date('Y-m-d');
     $curusr=$this->session->userdata('session_id');
@@ -3901,84 +3905,167 @@ function get_beat_plan($distributor_id='', $type_id=''){
     return $query->result();
 }
 
-function set_beat_plan($distributor_id='', $beat_id='', $frequency=''){
+function get_pending_beat_plan(){
+    $sales_rep_id=$this->session->userdata('sales_rep_id');
+
+    $sql = "select A.*, B.distributor_name as distributor_name1, 
+                concat(C.beat_id,' - ',C.beat_name) as beat_name1, 
+                D.distributor_name as distributor_name2, 
+                concat(E.beat_id,' - ',E.beat_name) as beat_name2,
+                F.sales_rep_name 
+            from beat_changes A 
+            left join distributor_master B on (A.dist_id1 = B.id) 
+            left join beat_master C on (A.beat_id1 = C.id) 
+            left join distributor_master D on (A.dist_id2 = D.id) 
+            left join beat_master E on (A.beat_id2 = E.id) 
+            left join sales_rep_master F on (A.sales_rep_id = F.id) 
+            where A.reporting_manager_id = '$sales_rep_id' and A.date_of_visit = curdate() and 
+                    A.status = 'Pending' 
+            order by F.sales_rep_name";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function set_beat_plan($reporting_manager_id='', $distributor_id_og='', $beat_id_og='', $distributor_id='', $beat_id=''){
     $now=date('Y-m-d H:i:s');
     $curusr=$this->session->userdata('session_id');
     $sales_rep_id=$this->session->userdata('sales_rep_id');
 
-    $type_id = '';
-    $sql = "select * from beat_master where id = '$beat_id'";
-    $result = $this->db->query($sql)->result();
+    $data = array(
+                'date_of_visit' => date('Y-m-d'),
+                'sales_rep_id' => $sales_rep_id,
+                'reporting_manager_id' => $reporting_manager_id,
+                'dist_id1' => $distributor_id_og,
+                'beat_id1' => $beat_id_og,
+                'dist_id2' => $distributor_id,
+                'beat_id2' => $beat_id,
+                'status' => 'Pending',
+                'remarks' => '',
+                'modified_by' => $curusr,
+                'modified_on' => $now
+            );
+    $sql = "select * from beat_changes where date_of_visit = curdate() and sales_rep_id = '$sales_rep_id'";
+    $query=$this->db->query($sql);
+    $result = $query->result();
+
     if(count($result)>0){
-        $type_id = $result[0]->type_id;
-    }
-
-    if($type_id=='7'){
-        $sql = "delete from merchandiser_detailed_beat_plan where date(date_of_visit)=curdate()";
-        $this->db->query($sql);
-        // echo $sql.'<br/><br/>';
-
-        $sql = "insert into merchandiser_detailed_beat_plan (frequency, sequence, modified_on, 
-                    sales_rep_id, bit_plan_id, is_edit, date_of_visit, status, store_id, 
-                    zone_id, location_id, beat_id, dist_id) 
-                select '".$frequency."' as frequency, AA.sequence, '".$now."' as modified_on, 
-                    '".$sales_rep_id."' as sales_rep_id, '0' as bit_plan_id, null as is_edit, 
-                    '".$now."' as date_of_visit, 'Approved' as status, 
-                    position('_' in AA.dist_id)+1) as store_id, AA.zone_id, AA.location_id, 
-                    '".$beat_id."' as beat_id, '".$distributor_id."' as dist_id from 
-                (select B.beat_name, C.dist_id, C.sequence, B.zone_id, D.location_id 
-                from beat_master B 
-                left join beat_details C on (A.id = C.beat_id) 
-                left join beat_locations D on (A.id = D.beat_id) 
-                left join 
-                (select concat('d_', id) as id, distributor_name, type_id, zone_id, area_id, location_id 
-                from distributor_master where status = 'Approved' 
-                union 
-                select concat('s_', id) as id, distributor_name, type_id, zone_id, area_id, location_id 
-                from sales_rep_distributors where distributor_name is not null and 
-                    distributor_name<>'' and (status <> 'Inactive' or status is null) 
-                union 
-                select concat('m_', A.store_id) as id, B.store_name as distributor_name, 
-                    A.type_id, A.zone_id, null as area_id, A.location_id 
-                from store_master A left join relationship_master B on (A.store_id = B.id) 
-                where A.status = 'Approved') E 
-                on (C.dist_id=E.id and B.zone_id=E.zone_id and D.location_id=E.location_id) 
-                where E.id is not null and B.id = '$beat_id') AA";
-        $this->db->query($sql);
-        // echo $sql.'<br/><br/>';
+        $this->db->where("date_of_visit = curdate() and sales_rep_id = '$sales_rep_id'");
+        $this->db->update('beat_changes', $data);
     } else {
-        $sql = "delete from sales_rep_detailed_beat_plan where date(date_of_visit)=curdate()";
-        $this->db->query($sql);
-        // echo $sql.'<br/><br/>';
+        $data['created_by']=$curusr;
+        $data['created_on']=$now;
 
-        $sql = "insert into sales_rep_detailed_beat_plan (frequency, sequence, modified_on, 
-                    sales_rep_id, bit_plan_id, is_edit, date_of_visit, status, store_id, 
-                    zone_id, area_id, location_id, beat_id, dist_id) 
-                select '".$frequency."' as frequency, AA.sequence, '".$now."' as modified_on, 
-                    '".$sales_rep_id."' as sales_rep_id, '0' as bit_plan_id, null as is_edit, 
-                    '".$now."' as date_of_visit, 'Approved' as status, AA.dist_id, AA.zone_id, 
-                    AA.area_id, AA.location_id, '".$beat_id."' as beat_id, 
-                    '".$distributor_id."' as dist_id from 
-                (select B.beat_name, C.dist_id, C.sequence, D.zone_id, D.area_id, D.location_id 
-                from beat_master B
-                left join beat_details C on (B.id = C.beat_id) 
-                left join 
-                (select concat('d_', id) as id, distributor_name, zone_id, area_id, location_id 
-                from distributor_master where status = 'Approved' 
-                union 
-                select concat('s_', id) as id, distributor_name, zone_id, area_id, location_id 
-                from sales_rep_distributors where distributor_name is not null and 
-                    distributor_name<>'' and (status <> 'Inactive' or status is null) 
-                union 
-                select concat('m_', A.store_id) as id, B.store_name as distributor_name, 
-                    A.zone_id, null as area_id, A.location_id 
-                from store_master A left join relationship_master B on (A.store_id = B.id) 
-                where A.status = 'Approved') D 
-                on (C.dist_id = D.id) where B.id = '$beat_id') AA";
-        $this->db->query($sql);
-        // echo $sql.'<br/><br/>';
+        $this->db->insert('beat_changes', $data);
+    }
+    
+    return 1;
+}
+
+function approve_beat_plan($frequency=''){
+    $now=date('Y-m-d H:i:s');
+    $curusr=$this->session->userdata('session_id');
+
+    $pending_id = $this->input->post('pending_id');
+
+    $status = 'Pending';
+    if($this->input->post('btn_approve')!=null){
+        $status = 'Approved';
+    } else if($this->input->post('btn_reject')!=null){
+        $status = 'Rejected';
     }
 
+    for($i=0; $i<count($pending_id); $i++){
+        $pending_beat_id = $pending_id[$i];
+
+        $sql = "update beat_changes set status = '$status', approved_by = '$curusr', approved_on = '$now' 
+                where id = '$pending_beat_id'";
+        $this->db->query($sql);
+
+        $sql = "select * from beat_changes where id = '$pending_beat_id'";
+        $result = $this->db->query($sql)->result();
+        if(count($result)>0){
+            $sales_rep_id = $result[0]->sales_rep_id;
+            $distributor_id = $result[0]->dist_id2;
+            $beat_id = $result[0]->beat_id2;
+
+            $type_id = '';
+            $sql = "select * from beat_master where id = '$beat_id'";
+            $result = $this->db->query($sql)->result();
+            if(count($result)>0){
+                $type_id = $result[0]->type_id;
+            }
+
+            if($type_id=='7'){
+                $sql = "delete from merchandiser_detailed_beat_plan where date(date_of_visit)=curdate() 
+                        and sales_rep_id='$sales_rep_id'";
+                $this->db->query($sql);
+                // echo $sql.'<br/><br/>';
+
+                $sql = "insert into merchandiser_detailed_beat_plan (frequency, sequence, modified_on, 
+                            sales_rep_id, bit_plan_id, is_edit, date_of_visit, status, store_id, 
+                            zone_id, location_id, beat_id, dist_id) 
+                        select '".$frequency."' as frequency, AA.sequence, '".$now."' as modified_on, 
+                            '".$sales_rep_id."' as sales_rep_id, '0' as bit_plan_id, null as is_edit, 
+                            '".$now."' as date_of_visit, 'Approved' as status, 
+                            position('_' in AA.dist_id)+1) as store_id, AA.zone_id, AA.location_id, 
+                            '".$beat_id."' as beat_id, '".$distributor_id."' as dist_id from 
+                        (select B.beat_name, C.dist_id, C.sequence, B.zone_id, D.location_id 
+                        from beat_master B 
+                        left join beat_details C on (A.id = C.beat_id) 
+                        left join beat_locations D on (A.id = D.beat_id) 
+                        left join 
+                        (select concat('d_', id) as id, distributor_name, type_id, zone_id, area_id, location_id 
+                        from distributor_master where status = 'Approved' 
+                        union 
+                        select concat('s_', id) as id, distributor_name, type_id, zone_id, area_id, location_id 
+                        from sales_rep_distributors where distributor_name is not null and 
+                            distributor_name<>'' and (status <> 'Inactive' or status is null) 
+                        union 
+                        select concat('m_', A.store_id) as id, B.store_name as distributor_name, 
+                            A.type_id, A.zone_id, null as area_id, A.location_id 
+                        from store_master A left join relationship_master B on (A.store_id = B.id) 
+                        where A.status = 'Approved') E 
+                        on (C.dist_id=E.id and B.zone_id=E.zone_id and D.location_id=E.location_id) 
+                        where E.id is not null and B.id = '$beat_id') AA";
+                $this->db->query($sql);
+                // echo $sql.'<br/><br/>';
+            } else {
+                $sql = "delete from sales_rep_detailed_beat_plan where date(date_of_visit)=curdate() 
+                        and sales_rep_id='$sales_rep_id'";
+                $this->db->query($sql);
+                // echo $sql.'<br/><br/>';
+
+                $sql = "insert into sales_rep_detailed_beat_plan (frequency, sequence, modified_on, 
+                            sales_rep_id, bit_plan_id, is_edit, date_of_visit, status, store_id, 
+                            zone_id, area_id, location_id, beat_id, dist_id) 
+                        select '".$frequency."' as frequency, AA.sequence, '".$now."' as modified_on, 
+                            '".$sales_rep_id."' as sales_rep_id, '0' as bit_plan_id, null as is_edit, 
+                            '".$now."' as date_of_visit, 'Approved' as status, 
+                            AA.dist_id as store_id, AA.zone_id, 
+                            AA.area_id, AA.location_id, '".$beat_id."' as beat_id, 
+                            '".$distributor_id."' as dist_id from 
+                        (select B.beat_name, C.dist_id, C.sequence, D.zone_id, D.area_id, D.location_id 
+                        from beat_master B
+                        left join beat_details C on (B.id = C.beat_id) 
+                        left join 
+                        (select concat('d_', id) as id, distributor_name, zone_id, area_id, location_id 
+                        from distributor_master where status = 'Approved' 
+                        union 
+                        select concat('s_', id) as id, distributor_name, zone_id, area_id, location_id 
+                        from sales_rep_distributors where distributor_name is not null and 
+                            distributor_name<>'' and (status <> 'Inactive' or status is null) 
+                        union 
+                        select concat('m_', A.store_id) as id, B.store_name as distributor_name, 
+                            A.zone_id, null as area_id, A.location_id 
+                        from store_master A left join relationship_master B on (A.store_id = B.id) 
+                        where A.status = 'Approved') D 
+                        on (C.dist_id = D.id) where B.id = '$beat_id') AA";
+                $this->db->query($sql);
+                // echo $sql.'<br/><br/>';
+            }
+        }
+    }
+    
     return 1;
 }
 

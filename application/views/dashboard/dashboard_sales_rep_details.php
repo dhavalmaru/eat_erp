@@ -289,6 +289,7 @@
                               <h6>Retailer</h6>
                            </div>
                            <div class="col s4">
+                              <input type="hidden" name="reporting_manager_id" id="reporting_manager_id" value="<?php if(isset($reporting_manager_id)) { if($reporting_manager_id!='') echo $reporting_manager_id; } else if(isset($visit_detail['reporting_manager_id'])) echo $visit_detail['reporting_manager_id']; ?>" />
                               <input type="hidden" name="distributor_id_og" id="distributor_id_og" value="<?php if(isset($distributor_id)) { if($distributor_id!='') echo $distributor_id; } else if(isset($visit_detail['distributor_id'])) echo $visit_detail['distributor_id']; ?>" />
                               <select name="distributor_id" id="distributor_id" class="browser-default select2" onchange="get_beat_plan();" style="display: none;">
                                  <option value="">Select</option>
@@ -316,7 +317,7 @@
                         <div class="entry" style="text-align:center">
                            <div class="col s3"></div>
                            <div class="col s2">
-                              <h6>Beat Plan</h6>
+                              <h6>Route Plan</h6>
                            </div>
                            <div class="col s4">
                               <input type="hidden" name="beat_id_og" id="beat_id_og" value="<?php if(isset($beat_id)) { if($beat_id!='') echo $beat_id; } else if(isset($visit_detail['beat_id'])) echo $visit_detail['beat_id']; ?>" />
@@ -346,11 +347,15 @@
                         <div class="entry" style="text-align:center">
                            <div class="col s3"></div>
                            <div class="col s2">
-                              <button type="button" onclick="change_plan();">Change</button>
+                              <button type="button" class="button btn_color right" onclick="change_plan();">Change</button>
                            </div>
                            <div class="col s2"></div>
                            <div class="col s2">
-                              <button type="button" onclick="set_route_plan();">Ok</button>
+                              <label id="lbl_beat_status" style="<?php if($beat_status=='Approved') echo 'display: none;'; ?>"><?php echo $beat_status; ?></label>
+                              <a class="button btn_color right" id="get_route_plan" href="<?php echo base_url() . 'index.php/Sales_rep_store_plan'; ?>" style="<?php if($beat_status!='Approved') echo 'display: none;'; ?>">
+                                 Get Route Plan
+                              </a>
+                              <button type="button" class="button btn_color right" id="set_route_plan" onclick="set_route_plan();" style="display: none;">Set Route Plan</button>
                            </div>
                         </div>
                      </div>
@@ -379,6 +384,16 @@
                            <a href="<?php echo base_url() . 'index.php/Sales_rep_order'; ?>">
                               <i class="fa fa-shopping-cart color-4"></i>
                               <h5>Todays Order</h5>
+                           </a>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="row" style="margin-top:30px" id="div_approve_route_plan">
+                     <div class="col s12">
+                        <div class="entry" style="text-align:center">
+                           <a id="approve_route_plan" onclick="get_pending_beat_plan();">
+                              <i class="fa fa-map-marker color-1"></i>
+                              <h5>Approve Route Plan</h5>
                            </a>
                         </div>
                      </div>
@@ -754,10 +769,9 @@
             </div>
          </div>
       </div>
-	  
+
       <div class="modal fade" id="myModal2" role="dialog">
          <div class="modal-dialog">
-            <!-- Modal content-->
             <div class="modal-content">
                <div class="modal-header">
                   <button type="button" style="float: right; top: -25px;right: -30px; font-size: 24px;" class="modal-close waves-effect waves-green btn-flat">&times;</button>
@@ -769,14 +783,55 @@
                <div class="modal-footer">
                   <button type="button" style="background:#d43f3a!important"class="button shadow btn_color left modal-close" data-dismiss="modal">NO</button>
                   <button type="button" style="background:#4cae4c!important" class="button shadow btn_color right" data-dismiss="modal" onclick="set_beat_plan();">Yes</button>
-
-                  <!-- <form action="<?php //echo base_url('index.php/Sales_Attendence/checkout'); ?>" method="POST" >
-                    <button type="button" style="background:#d43f3a!important"class="button shadow btn_color left modal-close" data-dismiss="modal">NO</button>
-                    <input type="hidden" name="checkout" value="Yes">
-                  <button type="submit" style="background:#4cae4c!important" class="button shadow btn_color right" data-dismiss="modal">Yes</button>
-                  </form> -->
-               
                </div>
+            </div>
+         </div>
+      </div>
+
+      <div class="modal fade" id="myModal3" role="dialog">
+         <div class="modal-dialog">
+            <div class="modal-content">
+               <form action="<?=base_url('index.php/Dashboard_sales_rep/approve_beat_plan')?>" method="POST">
+               <div class="modal-header">
+                  <button type="button" style="float: right; top: -25px;right: -30px; font-size: 24px;" class="modal-close waves-effect waves-green btn-flat">&times;</button>
+                  <h4 class="modal-title" style="font-size: 18px;">Approve Route Plan? </h4>
+                  <input type="hidden" id="pending_beat_plan_cnt" name="pending_beat_plan_cnt" value="<?php echo count($pending_beat_plan); ?>" />
+               </div>
+               <div class="modal-body">
+                  <table>
+                     <thead>
+                        <tr>
+                           <td>Select</td>
+                           <td>Sales Representative</td>
+                           <td>Old Distributor</td>
+                           <td>Old Beat Plan</td>
+                           <td>New Distributor</td>
+                           <td>New Beat Plan</td>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        <?php for($i=0; $i<count($pending_beat_plan); $i++) { ?>
+                        <tr>
+                           <td><input type="checkbox" name="pending_id[]" value="<?php echo $pending_beat_plan[$i]->id; ?>" style="opacity: 1; position: static;" /></td>
+                           <td><?php echo $pending_beat_plan[$i]->sales_rep_name; ?></td>
+                           <td><?php echo $pending_beat_plan[$i]->distributor_name1; ?></td>
+                           <td><?php echo $pending_beat_plan[$i]->beat_name1; ?></td>
+                           <td><?php echo $pending_beat_plan[$i]->distributor_name2; ?></td>
+                           <td><?php echo $pending_beat_plan[$i]->beat_name2; ?></td>
+                        </tr>
+                        <?php } ?>
+                     </tbody>
+                  </table>
+               </div>
+               <div class="modal-footer">
+                  <br/>
+                  <button type="button" style="background:#d43f3a!important;" class="button shadow btn_color left modal-close" data-dismiss="modal">Close</button>
+                  <!-- <button type="submit" style="background:#4cae4c!important" class="button shadow btn_color right">Approve</button>
+                  <button type="submit" style="background:#4cae4c!important" class="button shadow btn_color right">Reject</button> -->
+                  <input type="submit" style="background:#4cae4c!important;" class="button shadow btn_color right" id="btn_approve" name="btn_approve" value="Approve" />
+                  <input type="submit" style="background:#d43f3a!important; margin-right:10px;" class="button shadow btn_color right" id="btn_reject" name="btn_reject" value="Reject" />
+               </div>
+               </form>
             </div>
          </div>
       </div>
@@ -876,7 +931,21 @@
 
             $('#lbl_distributor_name').html($("#distributor_id option:selected").text());
             $('#lbl_beat_name').html($("#beat_id option:selected").text());
+
+            var pending_beat_plan_cnt = $('#pending_beat_plan_cnt').val();
+            if(pending_beat_plan_cnt=='') pending_beat_plan_cnt=0;
+            if(isNaN(pending_beat_plan_cnt)) pending_beat_plan_cnt=0;
+
+            if(pending_beat_plan_cnt>0){
+               get_pending_beat_plan();
+            } else {
+               $('#div_approve_route_plan').hide();
+            }
          });
+
+         var get_pending_beat_plan = function() {
+            $('#myModal3').modal('open');
+         }
 
          var get_beat_plan = function() {
             $.ajax({
@@ -897,7 +966,7 @@
          }
 
          var set_route_plan = function() {
-            if($('#beat_id').val()!=$('#beat_id_og').val()){
+            if($('#beat_id').val()!=$('#beat_id_og').val() || $('#lbl_beat_status').val()!='Approved'){
                $('#myModal2').modal('open');
             } else {
                window.location.href = BASE_URL+'index.php/Sales_rep_store_plan';
@@ -908,13 +977,13 @@
             $.ajax({
                url:BASE_URL+'index.php/dashboard_sales_rep/set_beat_plan',
                method: 'post',
-               data: {distributor_id: $('#distributor_id').val(), beat_id: $('#beat_id').val()},
+               data: {reporting_manager_id: $('#reporting_manager_id').val(), distributor_id_og: $('#distributor_id_og').val(), beat_id_og: $('#beat_id_og').val(), distributor_id: $('#distributor_id').val(), beat_id: $('#beat_id').val()},
                dataType: 'json',
                async: false,
                success: function(response){
-                  console.log(response);
+                  // console.log(response);
                   if(response=='1'){
-                     window.location.href = BASE_URL+'index.php/Sales_rep_store_plan';
+                     window.location.href = BASE_URL+'index.php/Dashboard_sales_rep';
                   }
                }
             });
@@ -925,5 +994,10 @@
             $('#distributor_id').show();
             $('#lbl_beat_name').hide();
             $('#beat_id').show();
+            $('#set_route_plan').show();
+            $('#get_route_plan').hide();
+            $('#lbl_beat_status').hide();
          }
       </script>
+   </body>
+</html>

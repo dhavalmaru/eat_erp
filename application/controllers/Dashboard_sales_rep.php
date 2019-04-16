@@ -40,7 +40,6 @@ class Dashboard_sales_rep extends CI_Controller
     }
 
     public function index(){
-
         /*if ($this->session->userdata('role_id')!=5){
              redirect(base_url().'index.php/merchandiser_location');
         }
@@ -65,7 +64,6 @@ class Dashboard_sales_rep extends CI_Controller
     }
 	
     public function checkstatus($frequency=''){
-
         /*$day = $frequency;
         $m = date('F');
         $year = date('Y');
@@ -109,12 +107,9 @@ class Dashboard_sales_rep extends CI_Controller
         $m = date('F');
         $year = date('Y');
         $get_alternate  = $this->get_alternate($day,$m,$year);
-        if($get_alternate)
-        {
+        if($get_alternate) {
             $frequency = 'Alternate '.$day;
-        }
-        else
-        {
+        } else {
             $frequency = 'Every '.$day;
         }
 
@@ -140,17 +135,24 @@ class Dashboard_sales_rep extends CI_Controller
             $data['sales_rep_id']=$this->session->userdata('sales_rep_id');
             $data['checkstatus'] = $frequency;
 
+            $data['reporting_manager_id']='';
             $data['distributor_id']='';
             $data['beat_id']='';
+            $data['beat_status']='Approved';
 
             $data['beat_details'] = $this->Sales_location_model->get_new_beat_details();
             if(count($data['beat_details'])>0){
-                $data['distributor_id']=$data['beat_details'][0]->dist_id;
-                $data['beat_id']=$data['beat_details'][0]->beat_id;
-            } 
+                $data['reporting_manager_id']=$data['beat_details'][0]->reporting_manager_id;
+                $data['distributor_id']=$data['beat_details'][0]->dist_id2;
+                $data['beat_id']=$data['beat_details'][0]->beat_id2;
+                $data['beat_status']=$data['beat_details'][0]->status;
+            }
+
             if($data['distributor_id']=="") {
                 $data['beat_details'] = $this->Sales_location_model->get_beat_details($day);
                 if(count($data['beat_details'])>0){
+                    $data['reporting_manager_id']=$data['beat_details'][0]->reporting_manager_id;
+
                     if($frequency == 'Alternate '.$day){
                         $data['distributor_id']=$data['beat_details'][0]->alternate_dist;
                         $data['beat_id']=$data['beat_details'][0]->alternate_beat;
@@ -163,6 +165,7 @@ class Dashboard_sales_rep extends CI_Controller
             
             $data['distributor'] = $this->Sales_location_model->get_distributors();
             $data['beat'] = $this->Sales_location_model->get_beat_plan($data['distributor_id']);
+            $data['pending_beat_plan'] = $this->Sales_location_model->get_pending_beat_plan();
 
             load_view('dashboard/dashboard_sales_rep_details', $data);
 
@@ -180,9 +183,17 @@ class Dashboard_sales_rep extends CI_Controller
     }
 
     public function set_beat_plan(){
+        $reporting_manager_id = $this->input->post('reporting_manager_id');
+        $distributor_id_og = $this->input->post('distributor_id_og');
+        $beat_id_og = $this->input->post('beat_id_og');
         $distributor_id = $this->input->post('distributor_id');
         $beat_id = $this->input->post('beat_id');
 
+        $data = $this->Sales_location_model->set_beat_plan($reporting_manager_id, $distributor_id_og, $beat_id_og, $distributor_id, $beat_id);
+        echo json_encode($data);
+    }
+
+    public function approve_beat_plan(){
         $day = date('l');
         $m = date('F');
         $year = date('Y');
@@ -193,8 +204,8 @@ class Dashboard_sales_rep extends CI_Controller
             $frequency = 'Every '.$day;
         }
         
-        $data = $this->Sales_location_model->set_beat_plan($distributor_id, $beat_id, $frequency);
-        echo json_encode($data);
+        $data = $this->Sales_location_model->approve_beat_plan($frequency);
+        redirect(base_url().'index.php/Dashboard_sales_rep');
     }
 
 	public function get_lat_long(){

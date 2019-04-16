@@ -69,6 +69,20 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Reporting Manager <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12" >
+                                                <select name="reporting_manager_id" id="reporting_manager_id" class="form-control select2" data-error="#err_reporting_manager_id">
+                                                    <option value="">Select</option>
+                                                    <?php if(isset($rep_manager)) { for ($k=0; $k < count($rep_manager) ; $k++) { ?>
+                                                        <option value="<?php echo $rep_manager[$k]->id; ?>" <?php if (isset($data)) { if($rep_manager[$k]->id==$data[0]->reporting_manager_id) { echo 'selected'; } } ?>><?php echo ucwords(trim(strtolower($rep_manager[$k]->sales_rep_name))); ?></option>
+                                                    <?php }} ?>
+                                                </select>
+                                                <div id="err_reporting_manager_id" style="margin-top: 15px;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <?php for($i=0; $i<count($allocations); $i++) { ?>
 									<div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
