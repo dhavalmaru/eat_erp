@@ -207,70 +207,116 @@ function get_location(){
 
 function get_zone($id='', $channel=''){
     $sales_rep_id = $this->session->userdata('sales_rep_id');
+    $distributor_id = $this->session->userdata('distributor_id');
+    $beat_id = $this->session->userdata('beat_id');
+
     /*$sql = "select distinct A.zone_id, B.zone from sr_mapping A left join zone_master B on (A.zone_id = B.id) 
             where (A.reporting_manager_id = '$sales_rep_id' or A.sales_rep_id1 = '$sales_rep_id' or A.sales_rep_id2 = '$sales_rep_id') 
                     and B.type_id = '3'";*/
+
     $cond='';
-    if($id!='')
-    {
+    $cond2='';
+    if($id!='') {
         $cond = ' And id='.$id;
+        $cond2 = ' And B.id='.$id;
     }
-	if($channel!='')
-    {
+	if($channel!='') {
 		if($channel=="GT") {
 			$cond = ' And type_id=3';
-		}
-		else {
+            $cond2 = ' And B.type_id=3';
+		} else {
 			$cond = ' And type_id=7';
+            $cond2 = ' And B.type_id=7';
 		}
     }
-    $sql = "SELECT id as zone_id, zone from zone_master Where `status`='Approved' ".$cond;
+
+    if($beat_id!=''){
+        $sql = "select distinct A.zone_id, B.zone from beat_master A 
+                left join zone_master B on(A.zone_id=B.id) 
+                where A.id='$beat_id' and B.status='Approved' and A.zone_id is not null ".$cond2;
+    } else {
+        $sql = "select id as zone_id, zone from zone_master where `status`='Approved' ".$cond;
+    }
     $query=$this->db->query($sql);
     return $query->result();
 }
 
 function get_area($zone_id='',$id=''){
+    $sales_rep_id = $this->session->userdata('sales_rep_id');
+    $distributor_id = $this->session->userdata('distributor_id');
+    $beat_id = $this->session->userdata('beat_id');
+
     $cond = '';
+    $cond2='';
     if($zone_id!=''){
         $cond = $cond . " and zone_id = '$zone_id'";
+        $cond2 = $cond2 . " and C.zone_id = '$zone_id'";
     }
 
     if($id!='')
     {
         $cond.= ' And id='.$id;
+        $cond2.= ' And C.id='.$id;
     }
 
-    $sales_rep_id = $this->session->userdata('sales_rep_id');
     /*$sql = "select distinct A.area_id, B.area from sr_mapping A left join area_master B on (A.area_id = B.id) 
             where (A.reporting_manager_id = '$sales_rep_id' or A.sales_rep_id1 = '$sales_rep_id' or A.sales_rep_id2 = '$sales_rep_id') 
                     and B.type_id = '3'" . $cond;*/
-    $sql = "SELECT id as area_id , area from area_master Where `status`='Approved' and type_id IN (3,7) ".$cond;
+
+    if($beat_id!=''){
+        $sql = "select distinct B.area_id, C.area 
+                from beat_locations A 
+                left join location_master B on (A.location_id = B.id) 
+                left join area_master C on (B.area_id = C.id) 
+                Where A.beat_id='$beat_id' and C.status='Approved' and C.type_id IN (3,7) and 
+                    B.area_id is not null ".$cond2;
+    } else {
+        $sql = "select id as area_id, area from area_master Where status='Approved' and 
+                type_id IN (3,7) ".$cond;
+    }
     $query=$this->db->query($sql);
     return $query->result();
 }
 
 function get_locations($zone_id='', $area_id='',$id='',$channel_type=''){
+    $sales_rep_id = $this->session->userdata('sales_rep_id');
+    $distributor_id = $this->session->userdata('distributor_id');
+    $beat_id = $this->session->userdata('beat_id');
+
     $cond = '';
+    $cond2 = '';
     if($zone_id!=''){
         $cond = $cond . " and zone_id = '$zone_id'";
+        $cond2 = $cond2 . " and B.zone_id = '$zone_id'";
     }
     if($area_id!=''){
         $cond = $cond . " and area_id = '$area_id'";
+        $cond2 = $cond2 . " and B.area_id = '$area_id'";
     }
 
-    if($id!='')
-    {
+    if($id!=''){
         $cond.= ' And id='.$id;
+        $cond2.= ' And B.id='.$id;
     }
 
-    if($channel_type=="MT" || $id!='')
-    {
-        $sql = "select * from location_master where status = 'Approved'" . $cond; 
+    if($beat_id!=''){
+        if($channel_type=="MT" || $id!=''){
+            $sql = "select B.* from beat_locations A 
+                    left join location_master B on (A.location_id = B.id) 
+                    where A.beat_id='$beat_id' and B.status = 'Approved' " . $cond2; 
+        } else {
+            $sql = "select B.* from beat_locations A 
+                    left join location_master B on (A.location_id = B.id) 
+                    where A.beat_id='$beat_id' and B.status = 'Approved' and B.type_id IN (3,7) " . $cond2;
+        }
+    } else {
+        if($channel_type=="MT" || $id!=''){
+            $sql = "select * from location_master where status = 'Approved'" . $cond; 
+        } else {
+            $sql = "select * from location_master where status = 'Approved' and type_id IN (3,7)" . $cond;
+        }
     }
-    else
-    {
-        $sql = "select * from location_master where status = 'Approved' and type_id IN (3,7)" . $cond;
-    }
+    
 
     /*$sql = "select * from location_master where status = 'Approved' and type_id IN (3,7)" . $cond;*/
 
@@ -400,7 +446,12 @@ function get_retailers($status='', $id=''){
 }
 
 function get_distributors($zone_id='', $area_id='',$id=''){
+    $sales_rep_id = $this->session->userdata('sales_rep_id');
+    $distributor_id = $this->session->userdata('distributor_id');
+    $beat_id = $this->session->userdata('beat_id');
+
     $cond = '';
+    $cond2 = '';
     /*if($zone_id!=''){
         $cond = $cond . " and zone_id = '$zone_id'";
     }*/
@@ -411,11 +462,20 @@ function get_distributors($zone_id='', $area_id='',$id=''){
 
     if($id!=''){
         $cond = $cond . " and id = '$id'";
+        $cond2 = $cond2 . " and B.id = '$id'";
     }
 
     //and class = 'super stockist'
-    $sales_rep_id = $this->session->userdata('sales_rep_id');
-    $sql = "select * from distributor_master where status = 'approved' and class = 'super stockist'  and distributor_name!=''" . $cond;
+    if($beat_id!=''){
+        $sql = "select * from distributor_beat_plans A 
+                left join distributor_master B on (A.distributor_id = B.id) 
+                where A.beat_id = '$beat_id' and B.status = 'approved' and B.class = 'super stockist' and 
+                    B.distributor_name!='' " . $cond;
+    } else {
+        $sql = "select * from distributor_master where status = 'approved' and class = 'super stockist' 
+                    and distributor_name!=''" . $cond;
+    }
+    
     $query=$this->db->query($sql);
     return $query->result();
 }

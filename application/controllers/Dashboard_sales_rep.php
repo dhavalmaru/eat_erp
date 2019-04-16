@@ -162,6 +162,9 @@ class Dashboard_sales_rep extends CI_Controller
                     }
                 }
             }
+
+            $this->session->set_userdata('distributor_id', $data['distributor_id']);
+            $this->session->set_userdata('beat_id', $data['beat_id']);
             
             $data['distributor'] = $this->Sales_location_model->get_distributors();
             $data['beat'] = $this->Sales_location_model->get_beat_plan($data['distributor_id']);

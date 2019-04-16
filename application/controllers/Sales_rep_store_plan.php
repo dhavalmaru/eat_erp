@@ -65,9 +65,7 @@ class Sales_rep_store_plan extends CI_Controller{
     }
     
     public function checkstatus($frequency='',$temp_date=''){
-
-
-         switch ($frequency) {
+        switch ($frequency) {
             case 'Monday':
                 $temp_date = $mon = date('Y-m-d', strtotime('Monday this week'));
                 break;
@@ -159,7 +157,7 @@ class Sales_rep_store_plan extends CI_Controller{
                         else
                         {
                             $result=$this->Sales_location_model->get_mtfollowup($id);
-                                $data['data'] = $result;
+                            $data['data'] = $result;
                         }
                     }
 
@@ -277,7 +275,7 @@ class Sales_rep_store_plan extends CI_Controller{
                                             $stock_detail['butterscotch_box']=$result[$j]['qty'];
                                         }
 
-                                      /*  if($result[$j]['item_id']==9 && $result[$j]['type']=='Box')
+                                        /*  if($result[$j]['item_id']==9 && $result[$j]['type']=='Box')
                                         {
                                             $stock_detail['butterscotch']=$result[$j]['qty'];
                                         }
@@ -922,6 +920,12 @@ class Sales_rep_store_plan extends CI_Controller{
                 else
                 {
                     $data['selected_distributor']=0;
+                }
+
+                if($data['selected_distributor']==0 || $data['selected_distributor']==''){
+                    if($this->session->userdata('distributor_id')!=''){
+                        $data['selected_distributor']=$this->session->userdata('distributor_id');
+                    }
                 }
  
                 if($visit_detail['distributor_name']=='' && $visit_detail['reation_id']=='' )
