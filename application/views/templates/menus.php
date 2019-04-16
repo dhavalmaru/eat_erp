@@ -12,197 +12,193 @@
 <![endif]-->
 
 <style type="text/css">
-  body {
-    scrollbar-base-color: #222;
-    scrollbar-3dlight-color: #222;
-    scrollbar-highlight-color: #222;
-    scrollbar-track-color: #3e3e42;
-    scrollbar-arrow-color: #111;
-    scrollbar-shadow-color: #222;
-    scrollbar-dark-shadow-color: #222; 
-    -ms-overflow-style: -ms-autohiding-scrollbar;
-  }
-  .form-control { padding:6px!important; z-index:999999;}
-  body{ overflow:initial; }
-  .fonts {
-    font-size:35px; 
-    text-align: center;
-    width: 60px;
-    line-height: 48px;
-  }
-  .x-navigation {overflow-x: hidden;}
-  .x-navigation li > a .fa, .x-navigation li > a .glyphicon  {font-size: 20px;}
-  .left-menu {  }
-  /*.left-menu li{ padding-left:25px!important; }*/
+    body {
+        scrollbar-base-color: #222;
+        scrollbar-3dlight-color: #222;
+        scrollbar-highlight-color: #222;
+        scrollbar-track-color: #3e3e42;
+        scrollbar-arrow-color: #111;
+        scrollbar-shadow-color: #222;
+        scrollbar-dark-shadow-color: #222; 
+        -ms-overflow-style: -ms-autohiding-scrollbar;
+    }
+    .form-control { padding:6px!important; z-index:999999;}
+    body{ overflow:initial; }
+    .fonts {
+        font-size:35px; 
+        text-align: center;
+        width: 60px;
+        line-height: 48px;
+    }
+    .x-navigation {overflow-x: hidden;}
+    .x-navigation li > a .fa, .x-navigation li > a .glyphicon  {font-size: 20px;}
+    .left-menu {  }
+    /*.left-menu li{ padding-left:25px!important; }*/
 
-  .left-menu li .fa{ font-size: 16px!important; padding-right:15px; }
-  .left-menu li .glyphicon { font-size: 16px!important; padding-right:15px;  }
-  .left-menu li .glyphicon { font-size: 16px!important; }
-  .left-menu li:hover{ background: #23303b!important;}
-  .scroller .x-navigation ul li { display: inline-block!important; visibility: visible!important; }
-  .x-navigation.x-navigation-horizontal { float:none!important; left: 0;  position: fixed; overflow:hidden; }
-  .x-navigation { float: none!important }
-  .menu-wrapper { 
-    top:61px;
+    .left-menu li .fa{ font-size: 16px!important; padding-right:15px; }
+    .left-menu li .glyphicon { font-size: 16px!important; padding-right:15px;  }
+    .left-menu li .glyphicon { font-size: 16px!important; }
+    .left-menu li:hover{ background: #23303b!important;}
+    .scroller .x-navigation ul li { display: inline-block!important; visibility: visible!important; }
+    .x-navigation.x-navigation-horizontal { float:none!important; left: 0;  position: fixed; overflow:hidden; }
+    .x-navigation { float: none!important }
+    .menu-wrapper { 
+        top:61px;
     /* background-image: -webkit-linear-gradient(bottom, #008161 0%, #2F5F5B 23%, #343347 100%);
     background-image: linear-gradient(to top, #008161 0%, #2F5F5B 23%, #343347 100%);*/
     background-image: linear-gradient(to top, #05131f 0%, #13202c 23%, #33414e 100%);
-  }
-  .menu-wrapper ul { background: none!important }
-  .menu { background: none!important }
-  #ng-toggle {
-    position: fixed;
-  }
-  .menu-wrapper ul li a span {opacity: 1;}
-  .menu-wrapper .menu--faq {
-    position: absolute;  
-    left: 0;     text-shadow: 0px 1px 1px #000;
-    bottom: 0;  line-height: 50px;
-    z-index: 99999;
-    width: 240px; 
-  }
-  .menu--faq  li { font-size: 1rem; }
-  .gn-icon .icon-fontello:before {
-    font-size: 20px;
-    line-height: 50px;
-    width: 50px;
-  }
-  .fa-sign-out {   }
-
-  #edit{  display: inline-block; padding: 0 5px; cursor:pointer;    }
-  .text-info { color:#fff!important; display: inline-block; line-height: 20px; }
-  .grp_change{ display: none; }
-  .menu-wrapper .scroller {
-    position: absolute;
-    overflow-y: scroll;
-    width: 240px;
-    height:80%;
-  }
-
-  .header-fixed-style {  width: 100%;  height: 61px; left:0;   position: fixed;  /*background: #33414e!important;*/ background:#245478!important;   z-index: 999; display:block;   }
-  .logo-container { width:200px;  float:left; background:#fff; text-align:center; padding:6px 0;}
-  .useremail-container {width:300px; float:left;}
-  .useremail-container a { font-size:18px; color:#fff; padding:15px 10px; display: block;}
-  .dropdown-selector { width:35%; float:right;   display:block; tex-align:right;}
-  .dropdown-selector-left    { font-size:18px; color:#fff; padding:10px 19px;  display: block; float:right;     text-align: right;}
-  .useremail-login { font-size:12px; color:#fff; display: block;}
-  .useremail-login:hover{color:#fff; } 
-  .logout-section { float:right; display:block;  }
-  .logout-section a { color:#fff; font-size:25px;  padding:13px 15px;  display: block;  float:left; border-left:1px solid #0d3553;  }
-  .logout-section a:hover { background:#0d3553!important; color:#fff;}
-
-  ::-webkit-scrollbar {
-    width: 0.5em;
-    height: 0.5em;
-  }
-  ::-webkit-scrollbar-button:start:decrement,
-  ::-webkit-scrollbar-button:end:increment  {
-    display: none;
-  }
-  ::-webkit-scrollbar-track-piece  {
-    background-color: #ccc;
-    -webkit-border-radius:0px;
-  }
-  ::-webkit-scrollbar-thumb:vertical {
-    -webkit-border-radius:0px;
-    background: #072c48 ;
-  }
-  ::-webkit-scrollbar-thumb:horizontal {
-    -webkit-border-radius:0px;
-    background: #072c48;
-  }
-  ::-webkit-scrollbar-track, 
-  ::-moz-scrollbar-track, 
-  ::-o-scrollbar-track {
-    box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-    -moz-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-    -o-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-    border-radius:0px;
-    background-color: #F5F5F5;
-  } 
-
-  .vertical_nav .bottom-menu-fixed {
-    /*bottom: 0!important;*/
-    position: absolute;
-    /* top: initial!important; */background:#245478!important;      border-top: 1px solid #0d3553;
-    top:84.2%!important;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    list-style-type: none;
-    /* max-height: 329px; */
-    z-index: 0;
-  }
-
-  .toggle_menu {
-    display: none;
-  }
-
-  @media only screen and (max-width: 991px){
-    .toggle_menu {
-      display: block;
-      float: left;
-      padding:16px 10px; 
-      color: #fff; cursor:pointer;
     }
-  }
+    .menu-wrapper ul { background: none!important }
+    .menu { background: none!important }
+    #ng-toggle {
+        position: fixed;
+    }
+    .menu-wrapper ul li a span {opacity: 1;}
+    .menu-wrapper .menu--faq {
+        position: absolute;  
+        left: 0;     text-shadow: 0px 1px 1px #000;
+        bottom: 0;  line-height: 50px;
+        z-index: 99999;
+        width: 240px; 
+    }
+    .menu--faq  li { font-size: 1rem; }
+    .gn-icon .icon-fontello:before {
+        font-size: 20px;
+        line-height: 50px;
+        width: 50px;
+    }
+    .fa-sign-out {   }
 
-  @media screen and (max-width:320px) {.vertical_nav .bottom-menu-fixed {  top: 79.2%!important;} }
-  @media only screen and (min-width:321px) and (max-width:360px) {.vertical_nav .bottom-menu-fixed {  top: 82.2%!important;}  }
+    #edit{  display: inline-block; padding: 0 5px; cursor:pointer;    }
+    .text-info { color:#fff!important; display: inline-block; line-height: 20px; }
+    .grp_change{ display: none; }
+    .menu-wrapper .scroller {
+        position: absolute;
+        overflow-y: scroll;
+        width: 240px;
+        height:80%;
+    }
 
-  /*---------- Modal CSS ----------------*/
-  /* The Modal (background) */
-  .modal {
-      display: none; /* Hidden by default */
-      position: fixed; /* Stay in place */
-      z-index: 999; /* Sit on top */
-      padding-top: 100px; /* Location of the box */
-      left: 0;
-      top: 0;
-      width: 100%; /* Full width */
-      height: 100%; /* Full height */
-      overflow: auto; /* Enable scroll if needed */
-      background-color: rgb(0,0,0); /* Fallback color */
-      background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-  }
-  #cover 
-				{
-					background: url("<?php echo base_url();?>img/loader.gif") no-repeat scroll center center #FFF;
-					position: absolute;
-					height: 100%;
-					width: 100%;
-				}
-	
+    .header-fixed-style {  width: 100%;  height: 61px; left:0;   position: fixed;  /*background: #33414e!important;*/ background:#245478!important;   z-index: 999; display:block;   }
+    .logo-container { width:200px;  float:left; background:#fff; text-align:center; padding:6px 0;}
+    .useremail-container {width:300px; float:left;}
+    .useremail-container a { font-size:18px; color:#fff; padding:15px 10px; display: block;}
+    .dropdown-selector { width:35%; float:right;   display:block; tex-align:right;}
+    .dropdown-selector-left    { font-size:18px; color:#fff; padding:10px 19px;  display: block; float:right;     text-align: right;}
+    .useremail-login { font-size:12px; color:#fff; display: block;}
+    .useremail-login:hover{color:#fff; } 
+    .logout-section { float:right; display:block;  }
+    .logout-section a { color:#fff; font-size:25px;  padding:13px 15px;  display: block;  float:left; border-left:1px solid #0d3553;  }
+    .logout-section a:hover { background:#0d3553!important; color:#fff;}
+
+    ::-webkit-scrollbar {
+        width: 0.5em;
+        height: 0.5em;
+    }
+    ::-webkit-scrollbar-button:start:decrement,
+    ::-webkit-scrollbar-button:end:increment  {
+        display: none;
+    }
+    ::-webkit-scrollbar-track-piece  {
+        background-color: #ccc;
+        -webkit-border-radius:0px;
+    }
+    ::-webkit-scrollbar-thumb:vertical {
+        -webkit-border-radius:0px;
+        background: #072c48 ;
+    }
+    ::-webkit-scrollbar-thumb:horizontal {
+        -webkit-border-radius:0px;
+        background: #072c48;
+    }
+    ::-webkit-scrollbar-track, 
+    ::-moz-scrollbar-track, 
+    ::-o-scrollbar-track {
+        box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+        -moz-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+        -o-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+        border-radius:0px;
+        background-color: #F5F5F5;
+    } 
+
+    .vertical_nav .bottom-menu-fixed {
+        /*bottom: 0!important;*/
+        position: absolute;
+        /* top: initial!important; */background:#245478!important;      border-top: 1px solid #0d3553;
+        top:84.2%!important;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        list-style-type: none;
+        /* max-height: 329px; */
+        z-index: 0;
+    }
+
+    .toggle_menu {
+        display: none;
+    }
+
+    @media only screen and (max-width: 991px){
+        .toggle_menu {
+            display: block;
+            float: left;
+            padding:16px 10px; 
+            color: #fff; cursor:pointer;
+        }
+    }
+
+    @media screen and (max-width:320px) {.vertical_nav .bottom-menu-fixed {  top: 79.2%!important;} }
+    @media only screen and (min-width:321px) and (max-width:360px) {.vertical_nav .bottom-menu-fixed {  top: 82.2%!important;}  }
+
+    /*---------- Modal CSS ----------------*/
+    /* The Modal (background) */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 999; /* Sit on top */
+        padding-top: 100px; /* Location of the box */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+    #cover 
+    {
+        background: url("<?php echo base_url();?>img/loader.gif") no-repeat scroll center center #FFF;
+        position: absolute;
+        height: 100%;
+        width: 100%;
+    }
 </style>    
 
-<div class="header-fixed-style"  >
-  <!-- START X-NAVIGATION VERTICAL -->
-  <div class="logo-container">  
-    <a class="gn-icon-menu " href="<?php $sales_rep_id=$this->session->userdata('sales_rep_id');
-                                    $type=$this->session->userdata('type');
-                                    if(isset($sales_rep_id) && $sales_rep_id<>""){
-                                      if(isset($type) && $type=="Promoter") {
-                                        echo base_url().'index.php/Dashboard_promoter';
-                                      }
-                                      else {
-                                        echo base_url().'index.php/Dashboard_sales_rep';
-                                      }
-                                    } else {
-                                       if(!isset($Dashboard)) echo base_url().'index.php/Dashboard/Dashboardscreen';
-                                       else if ($Dashboard==0) echo base_url().'index.php/Dashboard/Dashboardscreen';
-                                       else echo base_url().'index.php/Dashboard';
-                                    }
-                                    // echo base_url().'index.php/dashboard'; 
-                                    ?>"> 
-      <img height="50" style=" "   src="<?php echo base_url().'img//eat-logo.png';?>"   />  
-    </a>
-    <button id="collapse_menu" class="collapse_menu">
-      
-    </button> 
-	
-  </div>
- <h2 class="production_dashboard" style="text-align:left; display:none;color:#fff">&nbsp &nbsp Production Dashboard</h2>
+<div class="header-fixed-style">
+    <!-- START X-NAVIGATION VERTICAL -->
+    <div class="logo-container">  
+        <a class="gn-icon-menu " href="<?php $sales_rep_id=$this->session->userdata('sales_rep_id');
+                                        $type=$this->session->userdata('type');
+                                        if(isset($sales_rep_id) && $sales_rep_id<>""){
+                                          if(isset($type) && $type=="Promoter") {
+                                            echo base_url().'index.php/Dashboard_promoter';
+                                          }
+                                          else {
+                                            echo base_url().'index.php/Dashboard_sales_rep';
+                                          }
+                                        } else {
+                                           if(!isset($Dashboard)) echo base_url().'index.php/Dashboard/Dashboardscreen';
+                                           else if ($Dashboard==0) echo base_url().'index.php/Dashboard/Dashboardscreen';
+                                           else echo base_url().'index.php/Dashboard';
+                                        }
+                                        // echo base_url().'index.php/dashboard'; 
+                                        ?>"> 
+            <img height="50" style=" "   src="<?php echo base_url().'img//eat-logo.png';?>" />  
+        </a>
+        <button id="collapse_menu" class="collapse_menu"></button>
+    </div>
+    <h2 class="production_dashboard" style="text-align:left; display:none;color:#fff">&nbsp &nbsp Production Dashboard</h2>
 	
  
   <div class="toggle_menu"  id="toggleMenu">  <i class="fa fa-arrows-alt" aria-hidden="true"></i> </div>
@@ -411,24 +407,33 @@
                     <li class="sub_menu--item" <?php if ($Distributor_In==0) echo 'style="display: none;"'; ?>>
                         <a href="<?php echo base_url().'index.php/Distributor_in'; ?>" class="sub_menu--link"> Sales Return</a>
                     </li>
+                    <li  class="sub_menu--item" <?php if ($this->session->userdata('role_id')!=1) echo 'style="display: none;"'; ?>>
+                        <a class="sub_menu--link" href="<?php echo base_url().'index.php/freezed'; ?>">End of Month Sales</a>
+                    </li>
+                </ul>
+
+                <li class="menu--item  menu--item__has_sub_menu1 main-submenu-3"> 
+                    <span class="menu--label">Allocations </span>
+                </li>
+                <ul class="sub_menu menu--item__has_sub_menu-3">
                     <li  class="sub_menu--item" <?php if ($Distributor_Sale==0) echo 'style="display: none;"'; ?>>
                         <a class="sub_menu--link" href="<?php echo base_url().'index.php/Distributor_sale'; ?>">Super Stockist Sale</a>
                     </li>
                     <li  class="sub_menu--item" <?php if ($Distributor_Sale==0) echo 'style="display: none;"'; ?>>
                         <a class="sub_menu--link" href="<?php echo base_url().'index.php/Distributor_sale_in'; ?>">Super Stockist Return</a>
                     </li>
-                    <li  class="sub_menu--item" <?php if ($this->session->userdata('role_id')!=1) echo 'style="display: none;"'; ?>>
-                        <a class="sub_menu--link" href="<?php echo base_url().'index.php/freezed'; ?>">End of Month Sales</a>
-                    </li>
                     <li  class="sub_menu--item" <?php if ($Distributor_Sale==0) echo 'style="display: none;"'; ?>>
                         <a class="sub_menu--link" href="<?php echo base_url().'index.php/sales_rep_store_plan/add_stock'; ?>">Add Stock Details</a>
                     </li>
+                    <li class="sub_menu--item" <?php if ($Distributor_Transfer==0) echo 'style="display: none;"'; ?>>
+                        <a href="<?php echo base_url().'index.php/Distributor_transfer'; ?>" class="sub_menu--link">Distributor Transfer</a>
+                    </li>
                 </ul>
 
-                <li class="menu--item  menu--item__has_sub_menu1 main-submenu-3"> 
+                <li class="menu--item  menu--item__has_sub_menu1 main-submenu-4"> 
                     <span class="menu--label">Bank </span>
                 </li>
-                <ul class="sub_menu menu--item__has_sub_menu-3">
+                <ul class="sub_menu menu--item__has_sub_menu-4">
                     <li  class="sub_menu--item"  <?php if ($Payment==0) echo 'style="display: none;"'; ?>>
                         <a class="sub_menu--link" href="<?php echo base_url().'index.php/Payment'; ?>"> Payment Details</a>
                     </li>
@@ -437,24 +442,21 @@
                     </li>
                 </ul>
 
-                <li class="menu--item  menu--item__has_sub_menu1 main-submenu-4" <?php if ($Transfer==0) echo 'style="display: none;"'; ?>> 
+                <li class="menu--item  menu--item__has_sub_menu1 main-submenu-5" <?php if ($Transfer==0) echo 'style="display: none;"'; ?>> 
                     <span class="menu--label">Transfer</span>
                 </li> 
-                <ul class="sub_menu menu--item__has_sub_menu-4 ">
+                <ul class="sub_menu menu--item__has_sub_menu-5 ">
                     <li class="sub_menu--item" <?php if ($Depot_Transfer==0) echo 'style="display: none;"'; ?>>
                         <a href="<?php echo base_url().'index.php/Depot_transfer'; ?>" class="sub_menu--link"> Depot Transfer</a>
-                    </li>
-                    <li class="sub_menu--item" <?php if ($Distributor_Transfer==0) echo 'style="display: none;"'; ?>>
-                        <a href="<?php echo base_url().'index.php/Distributor_transfer'; ?>" class="sub_menu--link">Distributor Transfer</a>
                     </li>
                     <li  class="sub_menu--item"  <?php if ($Bar_To_Box==0) echo 'style="display: none;"'; ?>>
                         <a href="<?php echo base_url().'index.php/Bar_to_box'; ?>" class="sub_menu--link">Bar To Box</a>
                     </li>
-                    <li  class="sub_menu--item"  <?php if ($Box_To_Bar==0) echo 'style="display: none;"'; ?>>
-                        <a href="<?php echo base_url().'index.php/Box_to_bar'; ?>" class="sub_menu--link"> Box To Bar</a>
-                    </li>
                     <li class="sub_menu--item" <?php if ($Depot_Transfer==0) echo 'style="display: none;"'; ?>>
                         <a href="<?php echo base_url().'index.php/Raw_material_in_out'; ?>" class="sub_menu--link"> Raw Material IN/OUT</a>
+                    </li>
+                    <li  class="sub_menu--item"  <?php if ($Box_To_Bar==0) echo 'style="display: none;"'; ?>>
+                        <a href="<?php echo base_url().'index.php/Box_to_bar'; ?>" class="sub_menu--link"> Box To Bar</a>
                     </li>
                 </ul>
             </ul>
@@ -604,7 +606,6 @@
     </ul>
 </nav>
 
-
 <script type="text/javascript" src="<?php echo base_url().'mobile-menu/vertical/jquery-3.1.0.min.js';?>"></script>                
 <script type="text/javascript" src="<?php echo base_url().'mobile-menu/vertical/vertical-responsive-menu.min.js';?>"></script>  
 
@@ -671,39 +672,29 @@
 
 
 <script>
+    $('body').append('<div id="cover"></div>');
+    var start = new Date();
+    var ajaxTime= new Date().getTime();
+    $(window).on('load', function(){
+        setTimeout(removeLoader, 1000); //wait for page load PLUS two seconds.
+        // $('body').html(new Date() - start); 
+    });
 
-		$('body').append('<div id="cover"></div>');
-		 var start = new Date();
-		 var ajaxTime= new Date().getTime();
-		$(window).on('load', function(){
-		setTimeout(removeLoader, 1000); //wait for page load PLUS two seconds.
-		 // $('body').html(new Date() - start); 
-		});
-		function removeLoader(){
-		
-		var totaltime = (new Date().getTime()-ajaxTime)/ 1000;
-		$( "#cover" ).fadeOut(500, function() {
-		// fadeOut complete. Remove the loading div
-		$( "#cover" ).remove(); //makes page more lightweight 
-		
-        var pathName = window.location.href;
-		// alert(pathName);
-		$.ajax({
-				type: "POST",
-			  url:'<?=base_url()?>index.php/Loading_screen_log/',
-				data: {loadtime:totaltime,url:pathName}
-			}).done(function () {
-   
-    // Here I want to get the how long it took to load some.php and use it further
-			});
-		});
-		
-		}
-		
+    function removeLoader(){
+        var totaltime = (new Date().getTime()-ajaxTime)/ 1000;
+        $( "#cover" ).fadeOut(500, function() {
+            // fadeOut complete. Remove the loading div
+            $( "#cover" ).remove(); //makes page more lightweight 
+
+            var pathName = window.location.href;
+            // alert(pathName);
+            $.ajax({
+                type: "POST",
+                url:'<?=base_url()?>index.php/Loading_screen_log/',
+                data: {loadtime:totaltime,url:pathName}
+            }).done(function () {
+                // Here I want to get the how long it took to load some.php and use it further
+            });
+        });
+    }
 </script>
-
-		<script>
-
-		</script>
-		
-
