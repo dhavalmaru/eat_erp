@@ -284,11 +284,11 @@
                   <div class="row" style="margin-top:15px">
                      <div class="col s12">
                         <div class="entry" style="text-align:center">
-                           <div class="col s3"></div>
-                           <div class="col s2">
-                              <h6>Retailer</h6>
+                           <div class="col s4"></div>
+                           <div class="col s2" style="text-align: left;">
+                              <label style="text-align: left; font-size: small; color: #343434;">Retailer</label>
                            </div>
-                           <div class="col s4">
+                           <div class="col s4" style="text-align: left;">
                               <input type="hidden" name="reporting_manager_id" id="reporting_manager_id" value="<?php if(isset($reporting_manager_id)) { if($reporting_manager_id!='') echo $reporting_manager_id; } else if(isset($visit_detail['reporting_manager_id'])) echo $visit_detail['reporting_manager_id']; ?>" />
                               <input type="hidden" name="distributor_id_og" id="distributor_id_og" value="<?php if(isset($distributor_id)) { if($distributor_id!='') echo $distributor_id; } else if(isset($visit_detail['distributor_id'])) echo $visit_detail['distributor_id']; ?>" />
                               <select name="distributor_id" id="distributor_id" class="browser-default select2" onchange="get_beat_plan();" style="display: none;">
@@ -307,7 +307,7 @@
                                  </option>
                                  <?php }} ?>
                               </select>
-                              <label id="lbl_distributor_name"></label>
+                              <label id="lbl_distributor_name" style="text-align: left; font-size: small; color: #343434;"></label>
                            </div>
                         </div>
                      </div>
@@ -315,11 +315,11 @@
                   <div class="row" style="margin-top:15px">
                      <div class="col s12">
                         <div class="entry" style="text-align:center">
-                           <div class="col s3"></div>
-                           <div class="col s2">
-                              <h6>Route Plan</h6>
+                           <div class="col s4"></div>
+                           <div class="col s2" style="text-align: left;">
+                              <label style="text-align: left; font-size: small; color: #343434;">Route Plan</label>
                            </div>
-                           <div class="col s4">
+                           <div class="col s4" style="text-align: left;">
                               <input type="hidden" name="beat_id_og" id="beat_id_og" value="<?php if(isset($beat_id)) { if($beat_id!='') echo $beat_id; } else if(isset($visit_detail['beat_id'])) echo $visit_detail['beat_id']; ?>" />
                               <select name="beat_id" id="beat_id" class="browser-default select2" style="display: none;">
                                  <option value="">Select</option>
@@ -337,7 +337,7 @@
                                  </option>
                                  <?php }} ?>
                               </select>
-                              <label id="lbl_beat_name"></label>
+                              <label id="lbl_beat_name" style="text-align: left; font-size: small; color: #343434;"></label>
                            </div>
                         </div>
                      </div>
@@ -345,9 +345,9 @@
                   <div class="row" style="margin-top:15px">
                      <div class="col s12">
                         <div class="entry" style="text-align:center">
-                           <div class="col s3"></div>
-                           <div class="col s2">
-                              <button type="button" class="button btn_color right" onclick="change_plan();">Change</button>
+                           <div class="col s4"></div>
+                           <div class="col s2" style="text-align: left;">
+                              <button type="button" id="btn_change_plan" class="button btn_color left" onclick="change_plan();">Change</button>
                            </div>
                            <div class="col s2"></div>
                            <div class="col s2">
@@ -997,6 +997,7 @@
             $('#set_route_plan').show();
             $('#get_route_plan').hide();
             $('#lbl_beat_status').hide();
+            $('#btn_change_plan').hide();
          }
       </script>
    </body>
