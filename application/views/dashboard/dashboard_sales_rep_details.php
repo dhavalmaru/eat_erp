@@ -22,6 +22,53 @@
       <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/font/material-design-icons/Material-Design-Icons.woff" rel="stylesheet">
       <style>
 	  
+	  
+         [type="checkbox"]:not(:checked), [type="checkbox"]:checked
+         {
+         position:relative;
+         }
+         .checkmark {
+         position: absolute;
+
+         margin-bottom: 10px;
+         height: 25px;
+         width: 25px;
+         background-color: #eee;
+         border: 2px solid #2196F3;
+         }
+
+
+
+         /* When the checkbox is checked, add a blue background */
+         input:checked ~ .checkmark {
+         background-color: #2196F3;
+         }
+
+         /* Create the checkmark/indicator (hidden when not checked) */
+         .checkmark:after {
+         content: "";
+         position: absolute;
+         display: none;
+         }
+
+         /* Show the checkmark when checked */
+         input:checked ~ .checkmark:after {
+         display: block;
+         }
+
+         /* Style the checkmark/indicator */
+         .checkmark:after {
+         left: 8px;
+         top: 3px;
+         width: 7px;
+         height: 12px;
+         border: solid white;
+         border: solid white;
+         border-width: 0 3px 3px 0;
+         -webkit-transform: rotate(45deg);
+         -ms-transform: rotate(45deg);
+         transform: rotate(45deg);
+         }
          .tabs
          {
          background-color: #1861b1!important;
@@ -84,7 +131,7 @@
          color: #ffffff!important;
          }
          .tabs .tab a {
-         	color: #ffffff!important;
+         color: #ffffff!important;
          }
 
          #location_tab a 
@@ -117,10 +164,21 @@
          font-size:8px!important;
          margin-top: 0px;
          }
-		 #swipe-2 .tabs .tab
-		 {
-			 padding:4px 0px!important;
-		 }
+         #swipe-2 .tabs .tab
+         {
+         padding:4px 0px!important;
+         }
+         [type="checkbox"]+label:before, [type="checkbox"]:not(.filled-in)+label:after
+         {
+         width: 22px!important;
+         height: 22px!important;
+         }
+         [type="checkbox"]:checked+label:before {
+         top: 0px;
+         left: 0px;
+         width: 11px;
+         height: 20px;
+         }
       </style>
    </head>
    <body class="home">
@@ -284,11 +342,11 @@
                   <div class="row" style="margin-top:15px">
                      <div class="col s12">
                         <div class="entry" style="text-align:center">
-                           <div class="col s4"></div>
-                           <div class="col s2" style="text-align: left;">
+                          
+                           <div class="col s4" style="text-align: left;">
                               <label style="text-align: left; font-size: small; color: #343434;">Retailer</label>
                            </div>
-                           <div class="col s4" style="text-align: left;">
+                           <div class="col s8" style="text-align: left;">
                               <input type="hidden" name="reporting_manager_id" id="reporting_manager_id" value="<?php if(isset($reporting_manager_id)) { if($reporting_manager_id!='') echo $reporting_manager_id; } else if(isset($visit_detail['reporting_manager_id'])) echo $visit_detail['reporting_manager_id']; ?>" />
                               <input type="hidden" name="distributor_id_og" id="distributor_id_og" value="<?php if(isset($distributor_id)) { if($distributor_id!='') echo $distributor_id; } else if(isset($visit_detail['distributor_id'])) echo $visit_detail['distributor_id']; ?>" />
                               <select name="distributor_id" id="distributor_id" class="browser-default select2" onchange="get_beat_plan();" style="display: none;">
@@ -315,11 +373,11 @@
                   <div class="row" style="margin-top:15px">
                      <div class="col s12">
                         <div class="entry" style="text-align:center">
-                           <div class="col s4"></div>
-                           <div class="col s2" style="text-align: left;">
+                          
+                           <div class="col s4" style="text-align: left;">
                               <label style="text-align: left; font-size: small; color: #343434;">Route Plan</label>
                            </div>
-                           <div class="col s4" style="text-align: left;">
+                           <div class="col s8" style="text-align: left;">
                               <input type="hidden" name="beat_id_og" id="beat_id_og" value="<?php if(isset($beat_id)) { if($beat_id!='') echo $beat_id; } else if(isset($visit_detail['beat_id'])) echo $visit_detail['beat_id']; ?>" />
                               <select name="beat_id" id="beat_id" class="browser-default select2" style="display: none;">
                                  <option value="">Select</option>
@@ -345,20 +403,19 @@
                   <div class="row" style="margin-top:15px">
                      <div class="col s12">
                         <div class="entry" style="text-align:center">
-                           <div class="col s4"></div>
-                           <div class="col s2" style="text-align: left;">
-                              <button type="button" id="btn_change_plan" class="button btn_color left" onclick="change_plan();">Change</button>
-                           </div>
-                           <div class="col s2"></div>
-                           <div class="col s2">
-                              <label id="lbl_beat_status" style="<?php if($beat_status=='Approved') echo 'display: none;'; ?>"><?php echo $beat_status; ?></label>
-                              <a class="button btn_color right" id="get_route_plan" href="<?php echo base_url() . 'index.php/Sales_rep_store_plan'; ?>" style="<?php if($beat_status!='Approved') echo 'display: none;'; ?>">
-                                 Get Route Plan
-                              </a>
-                              <button type="button" class="button btn_color right" id="set_route_plan" onclick="set_route_plan();" style="display: none;">Set Route Plan</button>
-                           </div>
+                           <button type="button" id="btn_change_plan" class="button btn_color left" onclick="change_plan();">Change</button>
+                           <label id="lbl_beat_status" class="button btn-color-2" style="<?php if($beat_status=='Approved') echo 'display: none;'; ?>"><?php echo $beat_status; ?></label>
+                           <a class="button btn_color right"  style="display:none;" id="get_route_plan" href="<?php echo base_url() . 'index.php/Sales_rep_store_plan'; ?>" style="<?php if($beat_status!='Approved') echo 'display: none;'; ?>">
+                              Get Route Plan
+                           </a>
+                           <a id="approve_route_plan" href="#" class="button btn_color right" style="margin-top: 5px; margin-left: 10px;" onclick="get_pending_beat_plan();">
+                              Approve Route Plan
+                           </a>
                         </div>
+                        <button type="button" class="button btn_color right" id="set_route_plan" onclick="set_route_plan();" style="display: none;">Set Route Plan</button>
+                           
                      </div>
+                  </div>
                   </div>
                   <div class="row" style="margin-top:30px">
                      <div class="col s12">
@@ -388,16 +445,7 @@
                         </div>
                      </div>
                   </div>
-                  <div class="row" style="margin-top:30px" id="div_approve_route_plan">
-                     <div class="col s12">
-                        <div class="entry" style="text-align:center">
-                           <a id="approve_route_plan" onclick="get_pending_beat_plan();">
-                              <i class="fa fa-map-marker color-1"></i>
-                              <h5>Approve Route Plan</h5>
-                           </a>
-                        </div>
-                     </div>
-                  </div>
+                  
                </div>
             </div>
          </div>
@@ -800,27 +848,37 @@
                <div class="modal-body">
                   <table>
                      <thead>
+					   <?php for($i=0; $i<count($pending_beat_plan); $i++) { ?>
+					    
                         <tr>
-                           <td>Select</td>
-                           <td>Sales Representative</td>
-                           <td>Old Distributor</td>
-                           <td>Old Beat Plan</td>
-                           <td>New Distributor</td>
-                           <td>New Beat Plan</td>
+                         
+                           <td colspan="2"><b>Sales Representative</b> :- <?php echo $pending_beat_plan[$i]->sales_rep_name; ?></td>
                         </tr>
-                     </thead>
-                     <tbody>
-                        <?php for($i=0; $i<count($pending_beat_plan); $i++) { ?>
-                        <tr>
-                           <td><input type="checkbox" name="pending_id[]" value="<?php echo $pending_beat_plan[$i]->id; ?>" style="opacity: 1; position: static;" /></td>
-                           <td><?php echo $pending_beat_plan[$i]->sales_rep_name; ?></td>
-                           <td><?php echo $pending_beat_plan[$i]->distributor_name1; ?></td>
-                           <td><?php echo $pending_beat_plan[$i]->beat_name1; ?></td>
-                           <td><?php echo $pending_beat_plan[$i]->distributor_name2; ?></td>
-                           <td><?php echo $pending_beat_plan[$i]->beat_name2; ?></td>
-                        </tr>
-                        <?php } ?>
-                     </tbody>
+						 <tr>
+						 <td><b>Old Distributor Beat Plan </b> </td>
+						 <td><b>New Distributor Beat Plan</b></td>
+						 </tr>
+						 <tr>
+						  <td><?php echo $pending_beat_plan[$i]->distributor_name1; ?> - <?php echo $pending_beat_plan[$i]->beat_name1; ?></td>
+						  <td><?php echo $pending_beat_plan[$i]->distributor_name2; ?> - <?php echo $pending_beat_plan[$i]->beat_name2; ?></td>
+						 </tr>
+						 <tr>
+							 <td colspan="2" style="text-align:center;">
+
+								<label class="container">
+								<input type="checkbox" name="pending_id[]" id="<?php echo $pending_beat_plan[$i]->id; ?>" value="<?php echo $pending_beat_plan[$i]->id; ?>" style="" >
+									<span class="checkmark"></span>
+								</label>
+						    </td>
+						
+						 </tr>
+						 
+						 
+						
+						  <?php } ?>
+                  
+					 
+
                   </table>
                </div>
                <div class="modal-footer">
@@ -936,10 +994,11 @@
             if(pending_beat_plan_cnt=='') pending_beat_plan_cnt=0;
             if(isNaN(pending_beat_plan_cnt)) pending_beat_plan_cnt=0;
 
+            console.log(pending_beat_plan_cnt);
             if(pending_beat_plan_cnt>0){
                get_pending_beat_plan();
             } else {
-               $('#div_approve_route_plan').hide();
+               $('#approve_route_plan').hide();
             }
          });
 
