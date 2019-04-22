@@ -245,7 +245,7 @@
                 if(count($raw_material_check_doc)>0) $remarks = $raw_material_check_doc[0]->remarks;
             } 
             if($remarks==''){
-                $remarks = 'There was no issue in raw material. All raw materials were in good condition.';
+                $remarks = '';
             }
             echo $remarks;
         ?>
@@ -261,7 +261,7 @@
                 if(count($sorting_doc)>0) $remarks = $sorting_doc[0]->remarks;
             } 
             if($remarks==''){
-                $remarks = 'No problem in sorting of raw material.';
+                $remarks = '';
             }
             echo $remarks;
         ?>
@@ -277,7 +277,7 @@
                 if(count($processing_doc)>0) $remarks = $processing_doc[0]->remarks;
             } 
             if($remarks==''){
-                $remarks = 'There was no problem during the production process.';
+                $remarks = '';
             }
             echo $remarks;
         ?>
@@ -310,7 +310,7 @@
                         if(count($quality_control_doc)>0) $remarks = $quality_control_doc[0]->remarks2;
                     } 
                     if($remarks==''){
-                        $remarks = 'There was no problem in shaping/cutting & PVC Tray filling. We reused damaged or break product to mixing.';
+                        $remarks = '';
                     }
                     echo $remarks;
                 ?>
@@ -330,7 +330,7 @@
                         if(count($packaging_doc)>0) $remarks = $packaging_doc[0]->remarks;
                     } 
                     if($remarks==''){
-                        $remarks = 'We packed 40 dummy sample and done water leak test. When we found least leakage,  i.e. 0 out of 40 dummy samples then we proceed for actual product packaging.';
+                        $remarks = '';
                     }
                     echo $remarks;
                 ?>
@@ -345,7 +345,7 @@
                         if(count($packaging_doc)>0) $remarks = $packaging_doc[0]->remarks2;
                     } 
                     if($remarks==''){
-                        $remarks = 'Wrapper packaging done for all SKU. Wrapper packed product collected in corrugated box. After Water Leak test it proceeds for double seal packaging. Punctured products, after double seal packaging, return to wrapper packaging and same process as above.';
+                        $remarks = '';
                     }
                     echo $remarks;
                 ?>
@@ -357,7 +357,7 @@
 	</ul>
 	<br>
 
-    <h2 style="text-align:left"><b>9. <u>QC Report of Sarjena </u></b> <span style="text-align: right; float: right; ">Annexture G </span></h2>
+    <h2 style="text-align:left"><b>9. <u>QC Report of MFU </u></b> <span style="text-align: right; float: right; ">Annexture G </span></h2>
     <b><u>Remarks </u>:-</b> 
     <span>
         <?php 
@@ -627,7 +627,7 @@
     </div>
     <table width="100%" border="0" cellspacing="0" class="table " style="border-collapse:collapse; ">
         <tr style="border:none;">
-            <td style="border:none;" colspan="6" align="left"><h2 style="text-align:left"><b>9. <u>QC Report of Sarjena </u></b> <span style="text-align: right; float: right; ">Annexture G </span></h2></td>
+            <td style="border:none;" colspan="6" align="left"><h2 style="text-align:left"><b>9. <u>QC Report of MFU </u></b> <span style="text-align: right; float: right; ">Annexture G </span></h2></td>
         </tr>
     </table>
     <?php 

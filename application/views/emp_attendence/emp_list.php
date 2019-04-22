@@ -99,7 +99,7 @@
     						<!-- <?php //$this->load->view('templates/download');?>	 -->
     					  </div>
                           <?php 
-                              if($this->session->userdata('user_name')=='rishit.sanghvi@otbconsulting.co.in'){?>  	
+                              if($this->session->userdata('user_name')=='rishit.sanghvi@eatanytime.in'){?>  	
                     	<div class="pull-right btn-margin  btn-bottom "  >
 							<a class="btn btn-success" data-toggle="modal" href="#myModal">
                                 <span class="fa fa-file-excel-o"></span> Add Excel

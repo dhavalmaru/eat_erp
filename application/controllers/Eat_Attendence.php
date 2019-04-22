@@ -262,7 +262,7 @@ class Eat_Attendence extends CI_controller {
               $from_email = 'cs@eatanytime.co.in';
               $from_email_sender = 'Wholesome Habits Pvt Ltd';
               $to_email = $result[0]->email_id;
-              $bcc = 'vaibhav.desai@eatanytime.in, rishit.sanghvi@otbconsulting.co.in, swapnil.darekar@otbconsulting.co.in';
+              $bcc = 'vaibhav.desai@eatanytime.in, rishit.sanghvi@eatanytime.in, swapnil.darekar@otbconsulting.co.in';
               $subject = 'Attendence For Month - '.date('F Y ',strtotime($result[0]->date));
 
 
@@ -307,7 +307,7 @@ class Eat_Attendence extends CI_controller {
 
               // || $emp->status=='approved'
 
-            /*if($this->session->userdata("user_name")!='rishit.sanghvi@otbconsulting.co.in')
+            /*if($this->session->userdata("user_name")!='rishit.sanghvi@eatanytime.in')
               {
                 if($emp->status=='approved')
                     $readonly='readonly';
@@ -332,7 +332,7 @@ class Eat_Attendence extends CI_controller {
             }
             
             $tbody .= '<tr id="adjust_log_'.($i).'" style="'.$color.'" >';
-                      if($this->session->userdata("user_name")=='rishit.sanghvi@otbconsulting.co.in')
+                      if($this->session->userdata("user_name")=='rishit.sanghvi@eatanytime.in')
                       {
                         $tbody .='<td ><input type="checkbox" name="emp_check[]"  id="emp_check_id_'.$i.'" class="attendence_check"><input type="hidden" name="checkboxval[]" id="emp_check_'.$i.'" value="0"></td>';
                       }   
@@ -458,7 +458,7 @@ class Eat_Attendence extends CI_controller {
           $from_email = 'cs@eatanytime.in';
           $from_email_sender = 'Wholesome Habits Pvt Ltd';
           $to_email = $emp->email_id;
-          $bcc = 'vaibhav.desai@eatanytime.in, rishit.sanghvi@otbconsulting.co.in, swapnil.darekar@otbconsulting.co.in';
+          $bcc = 'vaibhav.desai@eatanytime.in, rishit.sanghvi@eatanytime.in, swapnil.darekar@otbconsulting.co.in';
           $subject = 'Attendence For Month-'.date('F Y ',strtotime($emp->date));
 
 
@@ -678,7 +678,7 @@ class Eat_Attendence extends CI_controller {
       			}
 
             $emp_name = $result[0]->emp_name;
-            /*$bcc = 'vaibhav.desai@eatanytime.in, rishit.sanghvi@otbconsulting.co.in, swapnil.darekar@otbconsulting.co.in';*/
+            /*$bcc = 'vaibhav.desai@eatanytime.in, rishit.sanghvi@eatanytime.in, swapnil.darekar@otbconsulting.co.in';*/
             $subject = $emp_name.' Attendence For Month - '.date('F Y ',strtotime($result[0]->date));
 
             /*$cc='sangeeta.yadav@pecanreams.com';  */
@@ -944,7 +944,7 @@ class Eat_Attendence extends CI_controller {
            
           
           $emp_name = $result[0]->emp_name;
-          /*$bcc = 'vaibhav.desai@eatanytime.in, rishit.sanghvi@otbconsulting.co.in, swapnil.darekar@otbconsulting.co.in';*/         
+          /*$bcc = 'vaibhav.desai@eatanytime.in, rishit.sanghvi@eatanytime.in, swapnil.darekar@otbconsulting.co.in';*/         
 
           if($status!='' &&  $status=='approved')
           {
@@ -1074,7 +1074,7 @@ class Eat_Attendence extends CI_controller {
 
           /*if previous time is not same as current time change status nand time is not equal to 0 then change the emp_status as present */
 
-          if($this->session->userdata("user_name")=='rishit.sanghvi@otbconsulting.co.in' || $this->session->userdata("user_name")=='swapnil.darekar@eatanytime.in')
+          if($this->session->userdata("user_name")=='rishit.sanghvi@eatanytime.in' || $this->session->userdata("user_name")=='swapnil.darekar@eatanytime.in')
           {
             $where = array("emp_id"=>$emp_id[$i],'date'=>$a_date);
             $this->db->where($where)->update("employee_attendence",$insert_array);
@@ -1142,7 +1142,7 @@ class Eat_Attendence extends CI_controller {
          $from_email = 'contact@eatanytime.co.in';
          $from_email_sender = 'Wholesome Habits Pvt Ltd';
          $to_email = "prasad.bhisale@pecanreams.com";
-         /* $bcc = 'vaibhav.desai@eatanytime.in, rishit.sanghvi@otbconsulting.co.in, swapnil.darekar@otbconsulting.co.in';*/
+         /* $bcc = 'vaibhav.desai@eatanytime.in, rishit.sanghvi@eatanytime.in, swapnil.darekar@otbconsulting.co.in';*/
          $subject = 'Attendence For Month';
 
          $message = '<!DOCTYPE html>

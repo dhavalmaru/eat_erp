@@ -126,7 +126,7 @@ input[readonly], input[readonly], select[readonly], textarea[readonly] {
                                             <thead>
                                             
                                               <tr>
-                                              <?php if($this->session->userdata("user_name")=='rishit.sanghvi@otbconsulting.co.in')
+                                              <?php if($this->session->userdata("user_name")=='rishit.sanghvi@eatanytime.in')
                                                { ?>
                                               <th style="text-align: center">Action</th>
                                               <?php } ?>
@@ -137,7 +137,7 @@ input[readonly], input[readonly], select[readonly], textarea[readonly] {
                                                 <th style="text-align: center">System Status</th>
                                               <tr>
                                               <tr>
-                                              <?php if($this->session->userdata("user_name")=='rishit.sanghvi@otbconsulting.co.in')
+                                              <?php if($this->session->userdata("user_name")=='rishit.sanghvi@eatanytime.in')
                                                { ?>
                                               <th >Checkbox</th>
                                               <?php } ?>
@@ -168,7 +168,7 @@ input[readonly], input[readonly], select[readonly], textarea[readonly] {
                               <a href="<?php echo base_url(); ?>index.php/Eat_Attendence" class="btn btn-danger" type="reset" id="reset">Cancel</a>
                              
                               <?php 
-                              if($this->session->userdata('user_name')=='rishit.sanghvi@otbconsulting.co.in'){?>  
+                              if($this->session->userdata('user_name')=='rishit.sanghvi@eatanytime.in'){?>  
                               <input type="submit" class="btn btn-success btn-sm" id="btn_approve" name="btn_approve" value="Approve"  />
 
                               <input type="submit" class="btn btn-danger btn-sm" id="btn_reject" name="btn_reject" value="Reject"  />

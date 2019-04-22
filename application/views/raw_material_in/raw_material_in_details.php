@@ -1,23 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>        
-        <!-- META SECTION -->
         <title>EAT ERP</title>            
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         
         <link rel="icon" href="<?php echo base_url(); ?>favicon.ico" type="image/x-icon" />
-        <!-- END META SECTION -->
-        
-            <!-- CSS INCLUDE -->        
-         <link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>css/theme-blue.css"/>
+        <link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>css/theme-blue.css"/>
         <link href="<?php echo base_url() . 'js/jquery-ui-1.11.2/jquery-ui.min.css'; ?>" rel="stylesheet" type="text/css" />
 		<link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>css/user-details.css"/>
-        <!-- EOF CSS INCLUDE -->     
-		
+        
 		<style>
-			 
 			th{text-align:center;}
 			.center{text-align:center;}
             input[type=radio], input[type=checkbox] { margin: 8px 0px 0px;      vertical-align: text-bottom;}
@@ -65,20 +59,20 @@
     <body>								
         <div class="page-container page-navigation-top">            
             <!-- PAGE CONTENT -->
-			   <?php $this->load->view('templates/menus');?>
-              <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
-                   <div class="heading-h2"><a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp; <a href="<?php echo base_url().'index.php/raw_material_in'; ?>" > Raw Material In List </a>  &nbsp; &#10095; &nbsp; Raw Material In Details</div>
+            <?php $this->load->view('templates/menus');?>
+            <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
+                <div class="heading-h2"><a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp; <a href="<?php echo base_url().'index.php/raw_material_in'; ?>" > Raw Material In List </a>  &nbsp; &#10095; &nbsp; Raw Material In Details</div>
 				   
                 <!-- PAGE CONTENT WRAPPER -->
-                    <div class="page-content-wrap">
+                <div class="page-content-wrap">
                     <div class="row main-wrapper">
 					    <div class="main-container">           
-                         <div class="box-shadow">
+                        <div class="box-shadow">
 							
                             <form id="form_raw_material_in_details" role="form" class="form-horizontal" method="post" enctype="multipart/form-data" action="<?php if (isset($data)) echo base_url(). 'index.php/raw_material_in/update/' . $data[0]->id; else echo base_url().'index.php/raw_material_in/save'; ?>">
-                              <div class="box-shadow-inside">
-                                <div class="col-md-12 custom-padding" style="padding:0;" >
-                                 <div class="panel panel-default">
+                                <div class="box-shadow-inside">
+                                <div class="col-md-12 custom-padding" style="padding:0;">
+                                <div class="panel panel-default">
 								
 								<div class="panel-body">
 									<div class="form-group"  >
@@ -113,7 +107,6 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Purchase Order <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-
                                                 <select name="purchase_order_id" id="purchase_order_id" class="form-control select2">
                                                     <option value="">Select</option>
                                                     <?php if(isset($purchase_order)) { for ($k=0; $k < count($purchase_order); $k++) { ?>
@@ -121,7 +114,6 @@
                                                     <?php }} ?>
                                                 </select>
                                                 <input type="hidden" name="po_id" id="po_id" value="<?php if(isset($data)) { echo  $data[0]->purchase_order_id; } ?>"/>
-
                                                 <!-- <input type="hidden" name="purchase_order_id" id="purchase_order_id" value="<?php //if(isset($data)) { echo  $data[0]->purchase_order_id; } ?>"/>
                                                 <input type="text" class="form-control load_purchase_order" name="purchase_order" id="purchase_order" placeholder="Type To Select Vendor...." value="<?php //if(isset($data)) { echo  $data[0]->purchase_order_name; } ?>"/> -->
                                             </div>
@@ -168,184 +160,175 @@
                                         </div>
                                     </div>
 									<div class="h-scroll">	
-                                       <div class="table-stripped form-group" style="padding:15px;" >
-									
-                                        <table class="table table-bordered" style="margin-bottom: 0px; ">
-                                        <thead>
-                                            <tr>
-                                                <th width="600" colspan="2">  <span class="asterisk_sign"> </span></th>
-                                                <th width="150" colspan="7">As Per PO<span class="asterisk_sign">*</span></th>
-                                                <th width="150" colspan="7">As Per RIN <span class="asterisk_sign">*</span></th>
-                                                <th width="60" class="table_action">Action</th>
-                                            </tr>
-                                            <tr>
-                                                <th width="600">Item <span class="asterisk_sign">*</span></th>
-                                                <th width="180">HSN Code </th>
-                                                <th width="150">Qty In Kg <span class="asterisk_sign">*</span></th>
-                                                <th width="180">Rate </th>
-                                                <th width="180">Amount (In Rs) </th>
-                                                <th width="100">CGST (In Rs) </th>
-                                                <th width="100">SGST (In Rs) </th>
-                                                <th width="100">IGST (In Rs) </th>
-                                                <th width="180">Total Amount (In Rs) </th>
-                                                <th width="150">Qty In Kg <span class="asterisk_sign">*</span></th>
-                                                <th width="180">Rate </th>
-                                                <th width="180">Amount (In Rs) </th>
-                                                <th width="100">CGST (In Rs) </th>
-                                                <th width="100">SGST (In Rs) </th>
-                                                <th width="100">IGST (In Rs) </th>
-                                                <th width="180">Total Amount (In Rs) </th>
-                                                <th  class="table_action" style="width:20px; text-align:center;"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="raw_material_details">
-                                        <?php $i=0; if(isset($raw_material_stock)) {
-                                                for($i=0; $i<count($raw_material_stock); $i++) { ?>
-                                            <tr id="box_<?php echo $i; ?>_row">
-                                                <td>
-                                                    <select name="raw_material[]" class="form-control raw_material select2" id="raw_material_<?php echo $i;?>" onchange="get_raw_material_details(this);" readonly>
-                                                        <!-- <option value="">Select</option> -->
-                                                        <?php if(isset($raw_material)) { for ($k=0; $k < count($raw_material) ; $k++) { 
-                                                            if($raw_material[$k]->id==$raw_material_stock[$i]->raw_material_id){
-                                                            ?>
+                                        <div class="table-stripped form-group" style="padding:15px;">
+                                            <table class="table table-bordered" style="margin-bottom: 0px;">
+                                            <thead>
+                                                <tr>
+                                                    <th width="600" colspan="2">  <span class="asterisk_sign"> </span></th>
+                                                    <th width="150" colspan="7">As Per PO<span class="asterisk_sign">*</span></th>
+                                                    <th width="150" colspan="7">As Per RIN <span class="asterisk_sign">*</span></th>
+                                                    <th width="60" class="table_action">Action</th>
+                                                </tr>
+                                                <tr>
+                                                    <th width="600">Item <span class="asterisk_sign">*</span></th>
+                                                    <th width="180">HSN Code </th>
+                                                    <th width="150">Qty In Kg <span class="asterisk_sign">*</span></th>
+                                                    <th width="180">Rate </th>
+                                                    <th width="180">Amount (In Rs) </th>
+                                                    <th width="100">CGST (In Rs) </th>
+                                                    <th width="100">SGST (In Rs) </th>
+                                                    <th width="100">IGST (In Rs) </th>
+                                                    <th width="180">Total Amount (In Rs) </th>
+                                                    <th width="150">Qty In Kg <span class="asterisk_sign">*</span></th>
+                                                    <th width="180">Rate </th>
+                                                    <th width="180">Amount (In Rs) </th>
+                                                    <th width="100">CGST (In Rs) </th>
+                                                    <th width="100">SGST (In Rs) </th>
+                                                    <th width="100">IGST (In Rs) </th>
+                                                    <th width="180">Total Amount (In Rs) </th>
+                                                    <th  class="table_action" style="width:20px; text-align:center;"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="raw_material_details">
+                                            <?php $i=0; if(isset($raw_material_stock)) {
+                                                    for($i=0; $i<count($raw_material_stock); $i++) { ?>
+                                                <tr id="box_<?php echo $i; ?>_row">
+                                                    <td>
+                                                        <select name="raw_material[]" class="form-control raw_material select2" id="raw_material_<?php echo $i;?>" onchange="get_raw_material_details(this);" readonly>
+                                                            <!-- <option value="">Select</option> -->
+                                                            <?php if(isset($raw_material)) { for ($k=0; $k < count($raw_material) ; $k++) { 
+                                                                if($raw_material[$k]->id==$raw_material_stock[$i]->raw_material_id){
+                                                                ?>
 
-                                                                <option value="<?php echo $raw_material[$k]->id; ?>" <?php if($raw_material[$k]->id==$raw_material_stock[$i]->raw_material_id) { echo 'selected'; } ?>><?php echo $raw_material[$k]->rm_name; ?></option>
-                                                        <?php }}} ?>
-                                                    </select>
-                                                </td>
-
-                                                <td>
-                                                    <input type="text" class="form-control hsn_code" name="hsn_code[]" id="hsn_code_<?php echo $i; ?>" placeholder="HSN Code" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->hsn_code; } ?>" readonly />
-                                                </td>
-
-                                                <td>
-                                                    <input type="text" class="form-control po_qty" name="po_qty[]" id="po_qty_<?php echo $i; ?>" placeholder="Qty" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->po_quantity; } ?>" readonly/>
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control po_rate" name="po_rate[]" id="po_rate_<?php echo $i; ?>" placeholder="Rate" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->po_rate; } ?>"  readonly/>
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control po_amount" name="po_amount[]" id="po_amount_<?php echo $i; ?>" placeholder="Amount" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->po_amount; } ?>" readonly />
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control po_cgst_amt" name="po_cgst_amt[]" id="po_cgst_amt_<?php echo $i; ?>" placeholder="CGST Amount" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->po_cgst_amt; } ?>" readonly />
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control po_sgst_amt" name="po_sgst_amt[]" id="po_sgst_amt_<?php echo $i; ?>" placeholder="SGST Amount" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->po_sgst_amt; } ?>" readonly />
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control po_igst_amt" name="po_igst_amt[]" id="po_igst_amt_<?php echo $i; ?>" placeholder="IGST Amount" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->po_igst_amt; } ?>" readonly />
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control po_total_amt" name="po_total_amt[]" id="po_total_amt_<?php echo $i; ?>" placeholder="Total Amount" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->po_total_amt; } ?>" readonly />
+                                                                    <option value="<?php echo $raw_material[$k]->id; ?>" <?php if($raw_material[$k]->id==$raw_material_stock[$i]->raw_material_id) { echo 'selected'; } ?>><?php echo $raw_material[$k]->rm_name; ?></option>
+                                                            <?php }}} ?>
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control hsn_code" name="hsn_code[]" id="hsn_code_<?php echo $i; ?>" placeholder="HSN Code" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->hsn_code; } ?>" readonly />
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control po_qty" name="po_qty[]" id="po_qty_<?php echo $i; ?>" placeholder="Qty" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->po_quantity; } ?>" readonly/>
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control po_rate" name="po_rate[]" id="po_rate_<?php echo $i; ?>" placeholder="Rate" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->po_rate; } ?>"  readonly/>
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control po_amount" name="po_amount[]" id="po_amount_<?php echo $i; ?>" placeholder="Amount" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->po_amount; } ?>" readonly />
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control po_cgst_amt" name="po_cgst_amt[]" id="po_cgst_amt_<?php echo $i; ?>" placeholder="CGST Amount" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->po_cgst_amt; } ?>" readonly />
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control po_sgst_amt" name="po_sgst_amt[]" id="po_sgst_amt_<?php echo $i; ?>" placeholder="SGST Amount" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->po_sgst_amt; } ?>" readonly />
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control po_igst_amt" name="po_igst_amt[]" id="po_igst_amt_<?php echo $i; ?>" placeholder="IGST Amount" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->po_igst_amt; } ?>" readonly />
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control po_total_amt" name="po_total_amt[]" id="po_total_amt_<?php echo $i; ?>" placeholder="Total Amount" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->po_total_amt; } ?>" readonly />
+                                                       
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control qty" name="qty[]" id="qty_<?php echo $i; ?>" placeholder="Qty" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->qty; } ?>" onchange="get_amount(this)" />
+                                                    </td>
                                                    
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control qty" name="qty[]" id="qty_<?php echo $i; ?>" placeholder="Qty" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->qty; } ?>" onchange="get_amount(this)" />
-                                                </td>
-                                               
-                                                <td>
-                                                    <input type="text" class="form-control rate" name="rate[]" id="rate_<?php echo $i; ?>" placeholder="Rate" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->rate; } ?>" onchange="get_amount(this)" />
-                                                    <input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_<?php echo $i; ?>" placeholder="Tax %" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->tax_per; } ?>"  onchange="get_amount(this)" />
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control amount" name="amount[]" id="amount_<?php echo $i; ?>" placeholder="Amount" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->amount; } ?>"  readonly />
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control cgst_amt" name="cgst_amt[]" id="cgst_amt_<?php echo $i; ?>" placeholder="CGST Amount" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->cgst_amt; } ?>" readonly />
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control sgst_amt" name="sgst_amt[]" id="sgst_amt_<?php echo $i; ?>" placeholder="SGST Amount" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->sgst_amt; } ?>" readonly />
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control igst_amt" name="igst_amt[]" id="igst_amt_<?php echo $i; ?>" placeholder="IGST Amount" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->igst_amt; } ?>" readonly />
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control total_amt" name="total_amt[]" id="total_amt_<?php echo $i; ?>" placeholder="Total Amount" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->total_amt; } ?>" readonly />
-                                                    <input type="hidden" class="form-control tax_amt" name="tax_amt[]" id="tax_amt_<?php echo $i; ?>" placeholder="Tax Amount" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->tax_amt; } ?>" readonly />
-                                                </td>
-                                               <td  class="table_action" style="text-align:center; vertical-align: middle;">
-                                                    <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"></span></a>
-                                                </td>
-                                            </tr>
-                                        <?php }} else { ?>
-                                            <tr id="box_<?php echo $i; ?>_row">
-                                                <td>
-                                                    <select name="raw_material[]" class="form-control raw_material select2" id="raw_material_<?php echo $i;?>" onchange="get_raw_material_details(this);">
-                                                        <option value="">Select</option>
-                                                        <?php if(isset($raw_material)) { for ($k=0; $k < count($raw_material) ; $k++) { ?>
-                                                                <option value="<?php echo $raw_material[$k]->id; ?>"><?php echo $raw_material[$k]->rm_name; ?></option>
-                                                        <?php }} ?>
-                                                    </select>
-                                                </td>
-                                             
-                                                <td>
-                                                    <input type="text" class="form-control hsn_code" name="hsn_code[]" id="hsn_code_<?php echo $i; ?>" placeholder="HSN Code" value="" readonly />
-                                                </td>
-                                                 <td>
-                                                    <input type="text" class="form-control qty" name="po_qty[]" id="po_qty_<?php echo $i; ?>" placeholder="Qty" value="" readonly/>
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control po_rate" name="po_rate[]" id="po_rate_<?php echo $i; ?>" placeholder="Rate" value=""  readonly/>
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control po_amount" name="po_amount[]" id="po_amount_<?php echo $i; ?>" placeholder="Amount" value="" readonly />
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control po_cgst_amt " name="po_cgst_amt[]" id="po_cgst_amt_<?php echo $i; ?>" placeholder="CGST Amount" value="" readonly />
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control po_sgst_amt" name="po_sgst_amt[]" id="po_sgst_amt_<?php echo $i; ?>" placeholder="SGST Amount" value="" readonly />
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control po_igst_amt" name="po_igst_amt[]" id="po_igst_amt_<?php echo $i; ?>" placeholder="IGST Amount" value="" readonly />
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control po_total_amt" name="po_total_amt[]" id="po_total_amt_<?php echo $i; ?>" placeholder="Total Amount" value="" readonly />
-                                                   
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control qty" name="qty[]" id="qty_<?php echo $i; ?>" placeholder="Qty" value="" onchange="get_amount(this)" />
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control rate" name="rate[]" id="rate_<?php echo $i; ?>" placeholder="Rate" value="" onchange="get_amount(this)" />
-                                                    <input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_<?php echo $i; ?>" placeholder="Tax %" value="" />
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control amount" name="amount[]" id="amount_<?php echo $i; ?>" placeholder="Amount" value="" readonly />
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control cgst_amt" name="cgst_amt[]" id="cgst_amt_<?php echo $i; ?>" placeholder="CGST Amount" value="" readonly />
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control sgst_amt" name="sgst_amt[]" id="sgst_amt_<?php echo $i; ?>" placeholder="SGST Amount" value="" readonly />
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control igst_amt" name="igst_amt[]" id="igst_amt_<?php echo $i; ?>" placeholder="IGST Amount" value="" readonly />
-                                                </td>
-                                                <td>
-                                                    <input type="text" class="form-control total_amt" name="total_amt[]" id="total_amt_<?php echo $i; ?>" placeholder="Total Amount" value="" readonly />
-                                                    <input type="hidden" class="form-control tax_amt" name="tax_amt[]" id="tax_amt_<?php echo $i; ?>" placeholder="Tax Amount" value="" readonly />
-                                                </td>
-
-
-                                               
-
-                                                <td style="text-align:center; vertical-align: middle;">
-                                                    <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"></span></a>
-                                                </td>
-                                            </tr>
-                                        <?php } ?>
-                                        </tbody>
-                                        <tfoot>
-                                            <tr style="<?php if(isset($raw_material_stock)) { echo 'display: none'; } else  echo 'display: block'; ?>"> 
-                                                <td colspan="18">
-                                                    <button type="button" class="btn btn-success" id="repeat-raw_material" >+</button>
-                                                </td>
-                                            </tr>
-                                        </tfoot>
-                                        </table>
-                                    </div>
+                                                    <td>
+                                                        <input type="text" class="form-control rate" name="rate[]" id="rate_<?php echo $i; ?>" placeholder="Rate" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->rate; } ?>" onchange="get_amount(this)" />
+                                                        <input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_<?php echo $i; ?>" placeholder="Tax %" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->tax_per; } ?>"  onchange="get_amount(this)" />
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control amount" name="amount[]" id="amount_<?php echo $i; ?>" placeholder="Amount" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->amount; } ?>"  readonly />
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control cgst_amt" name="cgst_amt[]" id="cgst_amt_<?php echo $i; ?>" placeholder="CGST Amount" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->cgst_amt; } ?>" readonly />
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control sgst_amt" name="sgst_amt[]" id="sgst_amt_<?php echo $i; ?>" placeholder="SGST Amount" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->sgst_amt; } ?>" readonly />
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control igst_amt" name="igst_amt[]" id="igst_amt_<?php echo $i; ?>" placeholder="IGST Amount" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->igst_amt; } ?>" readonly />
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control total_amt" name="total_amt[]" id="total_amt_<?php echo $i; ?>" placeholder="Total Amount" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->total_amt; } ?>" readonly />
+                                                        <input type="hidden" class="form-control tax_amt" name="tax_amt[]" id="tax_amt_<?php echo $i; ?>" placeholder="Tax Amount" value="<?php if (isset($raw_material_stock)) { echo $raw_material_stock[$i]->tax_amt; } ?>" readonly />
+                                                    </td>
+                                                   <td  class="table_action" style="text-align:center; vertical-align: middle;">
+                                                        <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"></span></a>
+                                                    </td>
+                                                </tr>
+                                            <?php }} else { ?>
+                                                <tr id="box_<?php echo $i; ?>_row">
+                                                    <td>
+                                                        <select name="raw_material[]" class="form-control raw_material select2" id="raw_material_<?php echo $i;?>" onchange="get_raw_material_details(this);">
+                                                            <option value="">Select</option>
+                                                            <?php if(isset($raw_material)) { for ($k=0; $k < count($raw_material) ; $k++) { ?>
+                                                                    <option value="<?php echo $raw_material[$k]->id; ?>"><?php echo $raw_material[$k]->rm_name; ?></option>
+                                                            <?php }} ?>
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control hsn_code" name="hsn_code[]" id="hsn_code_<?php echo $i; ?>" placeholder="HSN Code" value="" readonly />
+                                                    </td>
+                                                     <td>
+                                                        <input type="text" class="form-control qty" name="po_qty[]" id="po_qty_<?php echo $i; ?>" placeholder="Qty" value="" readonly/>
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control po_rate" name="po_rate[]" id="po_rate_<?php echo $i; ?>" placeholder="Rate" value=""  readonly/>
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control po_amount" name="po_amount[]" id="po_amount_<?php echo $i; ?>" placeholder="Amount" value="" readonly />
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control po_cgst_amt " name="po_cgst_amt[]" id="po_cgst_amt_<?php echo $i; ?>" placeholder="CGST Amount" value="" readonly />
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control po_sgst_amt" name="po_sgst_amt[]" id="po_sgst_amt_<?php echo $i; ?>" placeholder="SGST Amount" value="" readonly />
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control po_igst_amt" name="po_igst_amt[]" id="po_igst_amt_<?php echo $i; ?>" placeholder="IGST Amount" value="" readonly />
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control po_total_amt" name="po_total_amt[]" id="po_total_amt_<?php echo $i; ?>" placeholder="Total Amount" value="" readonly />
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control qty" name="qty[]" id="qty_<?php echo $i; ?>" placeholder="Qty" value="" onchange="get_amount(this)" />
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control rate" name="rate[]" id="rate_<?php echo $i; ?>" placeholder="Rate" value="" onchange="get_amount(this)" />
+                                                        <input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_<?php echo $i; ?>" placeholder="Tax %" value="" />
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control amount" name="amount[]" id="amount_<?php echo $i; ?>" placeholder="Amount" value="" readonly />
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control cgst_amt" name="cgst_amt[]" id="cgst_amt_<?php echo $i; ?>" placeholder="CGST Amount" value="" readonly />
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control sgst_amt" name="sgst_amt[]" id="sgst_amt_<?php echo $i; ?>" placeholder="SGST Amount" value="" readonly />
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control igst_amt" name="igst_amt[]" id="igst_amt_<?php echo $i; ?>" placeholder="IGST Amount" value="" readonly />
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" class="form-control total_amt" name="total_amt[]" id="total_amt_<?php echo $i; ?>" placeholder="Total Amount" value="" readonly />
+                                                        <input type="hidden" class="form-control tax_amt" name="tax_amt[]" id="tax_amt_<?php echo $i; ?>" placeholder="Tax Amount" value="" readonly />
+                                                    </td>
+                                                    <td style="text-align:center; vertical-align: middle;">
+                                                        <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"></span></a>
+                                                    </td>
+                                                </tr>
+                                            <?php } ?>
+                                            </tbody>
+                                            <tfoot>
+                                                <tr style="<?php if(isset($raw_material_stock)) { echo 'display: none'; } else  echo 'display: block'; ?>"> 
+                                                    <td colspan="18">
+                                                        <button type="button" class="btn btn-success" id="repeat-raw_material" >+</button>
+                                                    </td>
+                                                </tr>
+                                            </tfoot>
+                                            </table>
+                                        </div>
 									</div>
                                     <!--<div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
@@ -365,10 +348,6 @@
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="excise" id="excise" placeholder="Excise" value="<?php //if (isset($data)) { echo format_money($data[0]->excise,2); } ?>"/>
                                             </div>
-											
-											
-											
-											
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Final Amount (In Rs) <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="final_amt" id="final_amount" placeholder="Final Amount" value="<?php //if (isset($data)) { echo format_money($data[0]->final_amt,2); } ?>" readonly />
@@ -400,70 +379,58 @@
                                         </div>
                                     </div>
                                 </div>
-								 </div>
-								 <br clear="all"/>
-                                 </div>
-						   
-						      </div>
+                                </div>
+                                <br clear="all"/>
+                                </div>
+                                </div>
 
                                 <?php $curusr=$this->session->userdata('session_id'); ?>
                                 <?php 
-                                        if(isset($data[0]->status))
-                                        {
-                                         if(isset($access)) {
-                                            if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive'))
-                                                {
-                                                  if(isset($data[0]->status))
-                                                    {
-                                                         if($data[0]->status=='Deleted'){
-                                                            echo '<label class="col-xs-12 control-label" style="color:#cc2127!important">Note : If clicked on approve button this entry will be deleted permanently </label>';
-
-                                                         }    
-                                                    }     
+                                    if(isset($data[0]->status)) {
+                                        if(isset($access)) {
+                                            if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive')){
+                                                if(isset($data[0]->status)) {
+                                                    if($data[0]->status=='Deleted') {
+                                                        echo '<label class="col-xs-12 control-label" style="color:#cc2127!important">Note : If clicked on approve button this entry will be deleted permanently </label>';
+                                                    }    
                                                 }
-                                            }   
-                                        }
+                                            }
+                                        }   
+                                    }
                                 ?>
-
                                 <?php
-                                if(isset($data[0]->po_status))
-                                        {
-                                            if($data[0]->po_status=='Closed')
-                                            {
-                                                $style="display:none";
-                                            }
-                                            else
-                                            {
-                                                $style="display:block";
-                                            }
+                                    if(isset($data[0]->po_status)) {
+                                        if($data[0]->po_status=='Closed') {
+                                            $style="display:none";
+                                        } else {
+                                            $style="display:block";
                                         }
-                                        else
-                                        {
-                                                $style="display:block";
-                                        }
+                                    } else {
+                                            $style="display:block";
+                                    }
                                 ?>
-                                 <div class="panel-footer" >
+                                <div class="panel-footer" >
                                     <a href="<?php echo base_url(); ?>index.php/raw_material_in" class="btn btn-danger btn-sm pull-right" type="reset" id="reset">Cancel</a>
                                     <?php $curusr=$this->session->userdata('session_id'); ?>
                                     <div style="<?=$style?>">
                                         <input type="submit" class="btn btn-success btn-sm" id="btn_submit" name="btn_submit" value="Submit For Approval" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_edit=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || $data[0]->status=='InActive')) echo ''; else echo 'display: none;';} else if($access[0]->r_insert=='1') echo ''; else echo 'display: none;';} else echo 'display: none;'; ?>" />
-                                    <input type="submit" class="btn btn-danger btn-sm" id="btn_delete" name="btn_delete" value="Delete" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_delete=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved') && $data[0]->status!='InActive') echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
-                                    <input type="submit" class="btn btn-success btn-sm" id="btn_approve" name="btn_approve" value="Approve" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
-                                    <input type="submit" class="btn btn-danger btn-sm" id="btn_reject" name="btn_reject" value="Reject" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+                                        <input type="submit" class="btn btn-danger btn-sm" id="btn_delete" name="btn_delete" value="Delete" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_delete=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved') && $data[0]->status!='InActive') echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+                                        <input type="submit" class="btn btn-success btn-sm" id="btn_approve" name="btn_approve" value="Approve" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+                                        <input type="submit" class="btn btn-danger btn-sm" id="btn_reject" name="btn_reject" value="Reject" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
                                     </div>
+                                </div>
 							</form>
-							
-						 </div>
+
 						</div>
-					</div>
-						
-                   </div>
+                        </div>
+                    </div>
+                </div>
                 <!-- END PAGE CONTENT WRAPPER -->
-            </div>            
+            </div>
             <!-- END PAGE CONTENT -->
-        </div>
+   		</div>
         <!-- END PAGE CONTAINER -->
-       		
+
         <?php $this->load->view('templates/footer');?>
         <script type="text/javascript">
             var BASE_URL="<?php echo base_url()?>";
@@ -471,7 +438,7 @@
         <script type="text/javascript" src="<?php echo base_url(); ?>js/load_autocomplete.js"></script>
         <script type="text/javascript" src="<?php echo base_url(); ?>js/validations.js"></script>
         <script type="text/javascript">
-            var stock_flag = "<?php if(isset($raw_material_stock)) { echo 1;}else{ echo 0;} ?>"
+            var stock_flag = "<?php if(isset($raw_material_stock)) { echo 1; } else { echo 0; } ?>"
         </script>
         <script type="text/javascript">
 			var newRow1;
@@ -923,7 +890,6 @@
                 var depot_state = $("#depot_state").val();
                 var vendor_state = $("#vendor_state").val();
 				
-                
                 $('.rate').each(function(){
                     var elem = $(this);
                     var id = elem.attr('id');

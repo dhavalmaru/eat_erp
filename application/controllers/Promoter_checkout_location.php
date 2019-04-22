@@ -107,7 +107,7 @@ class Promoter_checkout_location extends CI_Controller{
         $from_email = 'cs@eatanytime.in';
         $from_email_sender = 'Eat ERP';
         // $bcc = 'dhaval.maru@otbconsulting.co.in';
-        // $bcc = 'rishit.sanghvi@otbconsulting.co.in, swapnil.darekar@otbconsulting.co.in';
+        // $bcc = 'rishit.sanghvi@eatanytime.in, swapnil.darekar@otbconsulting.co.in';
         $subject = 'Promoter Stock Report For - ' . $date;
         $links = '';
         $table = '';
@@ -181,7 +181,7 @@ class Promoter_checkout_location extends CI_Controller{
         $from_email = 'cs@eatanytime.in';
         $from_email_sender = 'Eat ERP';
         // $bcc = 'dhaval.maru@otbconsulting.co.in';
-        // $bcc = 'rishit.sanghvi@otbconsulting.co.in, swapnil.darekar@otbconsulting.co.in';
+        // $bcc = 'rishit.sanghvi@eatanytime.in, swapnil.darekar@otbconsulting.co.in';
         $subject = 'Promoter Checkin For - ' . $date;
         $links = '';
         $table = '';

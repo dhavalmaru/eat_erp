@@ -815,7 +815,7 @@ class Sales_rep_beat_plan extends CI_Controller{
 		$tbody ='';
 		$from_email = 'cs@eatanytime.co.in';
          $from_email_sender = 'Wholesome Habits Pvt Ltd';
-         $to_email = "rishit.sanghvi@otbconsulting.co.in";
+         $to_email = "rishit.sanghvi@eatanytime.in";
 		$bcc = 'vinay.pal@eatanytime.in,swapnil.darekar@otbconsulting.co.in','dhaval.maru@otbconsulting.co.in';
          $subject = 'Daily Performance Report-';
 
