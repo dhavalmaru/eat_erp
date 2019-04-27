@@ -16,7 +16,7 @@
 		<link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>css/user-details.css"/>
         <!-- EOF CSS INCLUDE -->     
 		
-		<style>			 
+		<style>
 			th{text-align:center;}
 			.center{text-align:center;}
             input[readonly], input[disabled], select[disabled], textarea[disabled] {
@@ -27,18 +27,14 @@
             @media screen and (max-width:806px) {   
                 .h-scroll { overflow-x:scroll;} .h-scroll .table-stripped{ width:805px!important;}
             }
-			.form-group
-			{
+			.form-group {
 				padding:4px 0px!important;
 			}
-				#total_outstanding1,#igst1,#cgst1,#sgst1,#total_amount1
-			{
-			
+			#total_outstanding1,#igst1,#cgst1,#sgst1,#total_amount1 {
 				font-size:14px;
 				font-weight:700;
 			}
 		</style>
-		
     </head>
     <body>								
         <!-- START PAGE CONTAINER -->
@@ -116,6 +112,8 @@
                                                 <select class="form-control" name="transaction">
                                                     <option value="Credit Note" <?php if(isset($data)) {if ($data[0]->transaction=='Credit Note') echo 'selected';}?>>Credit Note</option>
                                                     <option value="Debit Note" <?php if(isset($data)) {if ($data[0]->transaction=='Debit Note') echo 'selected';}?>>Debit Note</option>
+                                                    <option value="Expense Voucher" <?php if(isset($data)) {if ($data[0]->transaction=='Expense Voucher') echo 'selected';}?>>Expense Voucher</option>
+                                                    <option value="Expense Voucher Reversal" <?php if(isset($data)) {if ($data[0]->transaction=='Expense Voucher Reversal') echo 'selected';}?>>Expense Voucher Reversal</option>
                                                 </select>
                                             </div>
                                             

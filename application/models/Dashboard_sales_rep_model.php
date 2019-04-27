@@ -72,9 +72,7 @@ class Dashboard_sales_rep_model extends CI_Model {
         return $query->result();
     }
 
-    function get_total_receivable() {
-        $sales_rep_id=$this->session->userdata('sales_rep_id');
-
+    function get_total_receivable($sales_rep_id='') {
         $sql="select ifnull(C.total_amount,0)-ifnull(D.total_amount,0) as total_receivable from 
             (select A.temp_col, round(ifnull(A.total_amount,0)-ifnull(B.total_amount,0),0) as total_amount from 
             (select '1' as temp_col, sum(final_amount) as total_amount from distributor_out 
@@ -95,11 +93,9 @@ class Dashboard_sales_rep_model extends CI_Model {
         return $query->result();
     }
 
-    function get_target() {
-        $sales_rep_id=$this->session->userdata('sales_rep_id');
-
-        $sql="select * from sales_rep_target where status = 'Approved' and sales_rep_id = '$sales_rep_id' and 
-                month = date_format(Now(),'%b-%y')";
+    function get_target($sales_rep_id='') {
+        $sql="select * from sales_rep_target where status = 'Approved' and 
+                sales_rep_id = '$sales_rep_id' and month = date_format(Now(),'%b-%y')";
         $query=$this->db->query($sql);
         return $query->result();
     }

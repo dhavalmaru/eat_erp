@@ -194,7 +194,7 @@ class Sales_rep_location extends CI_Controller{
         $location_id = $postData['location_id'];
 		$dist_type = $postData['dist_type'];
 		$distributor_id = $postData['distributor_id'];
-		               // $data['distributor'] = $this->sales_rep_distributor_model->get_data2('Approved');
+		// $data['distributor'] = $this->sales_rep_distributor_model->get_data2('Approved');
 		if($dist_type=='New')
 			$data = $this->sales_rep_distributor_model->get_data2('','' ,$zone_id, $area_id, $location_id);
 		else

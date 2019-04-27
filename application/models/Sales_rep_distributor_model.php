@@ -119,8 +119,6 @@ function get_data($status='', $id=''){
             on (G.zone_id=H.zone_id and G.area_id=H.area_id)) I 
             where I.mapped_zone_id is not null and I.mapped_area_id is not null ".$cond." 
             order by distributor_name asc";
-	
-			
     $query=$this->db->query($sql);
     return $query->result();
 }
@@ -194,7 +192,6 @@ function get_data1($status='', $id=''){
 }
 
 function get_data2($status='',$id='', $zone_id='', $area_id='', $location_id=''){
-	
 	$cond = '';
 	if($id!=""){
         if($cond=="") {
@@ -226,21 +223,23 @@ function get_data2($status='',$id='', $zone_id='', $area_id='', $location_id='')
         $cond = $cond . " and location_id = '$location_id'";
     }
 	
-    $sales_rep_id=$this->session->userdata('sales_rep_id');
 	$sql = "Select * from (select * from (
         SELECT  Distinct concat('d_',A.id) as id, A.sales_rep_id, A.distributor_name, 
             A.address, A.city, A.pincode, A.state, 
             A.country, A.tin_number as vat_no, A.sell_out as margin, 
-            null as doc_document, null as document_name, A.area_id, A.status, A.remarks,A.zone_id, A.location_id, 
+            null as doc_document, null as document_name, A.area_id, A.status, A.remarks, 
+            A.zone_id, A.location_id, 
             A.modified_by, A.modified_on FROM distributor_master A 
             where  A.type_id=3  and A.class='normal' and A.distributor_name<>'' 
         Union All
         select Distinct concat('s_',id) as id, B.sales_rep_id, B.distributor_name, 
             B.address, B.city, B.pincode, B.state, 
             B.country, '' as vat_no, '' as margin, 
-            null as doc_document, null as document_name, B.area_id, B.status, B.remarks,B.zone_id, B.location_id,
+            null as doc_document, null as document_name, B.area_id, B.status, B.remarks, 
+            B.zone_id, B.location_id,
             B.modified_by, B.modified_on 
-                from sales_rep_distributors B where B.distributor_name<>''  ) A  where A.distributor_name<>''   ) A Where A.distributor_name<>'' ".$cond;
+                from sales_rep_distributors B where B.distributor_name<>'') A 
+            where A.distributor_name<>'') A Where A.distributor_name<>'' ".$cond;
     $query=$this->db->query($sql);
     return $query->result();
 }

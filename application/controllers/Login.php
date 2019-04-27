@@ -257,30 +257,40 @@ class Login extends CI_Controller
     }
 
     public function check_credentials_api() {
-        if(get_cookie('email')!=NULL || get_cookie('password')!=''){
-            $uname=get_cookie('email');
-            $upass=get_cookie('password');
+        $uname=urldecode($this->input->post('email'));
+        $upass=urldecode($this->input->post('password'));
 
-            $query=$this->db->query("SELECT A.id,A.emp_code,A.email_id,A.first_name,A.last_name,A.role_id,A.sales_rep_id,B.sr_type,A.status FROM user_master A left outer join sales_rep_master B on B.id=A.sales_rep_id WHERE A.email_id = '$uname' AND A.password = '$upass' AND A.status IS NOT NULL ");
-            $result=$query->result();
-        } else {
-            $uname=$this->input->post('email');
-            $upass=$this->input->post('password');
+        // $uname='raveer66@gmail.com';
+        // $upass='pass@123';
 
-            $query=$this->db->query("SELECT A.id,A.emp_code,A.email_id,A.first_name,A.last_name,A.role_id,A.sales_rep_id,B.sr_type,A.status FROM user_master A left outer join sales_rep_master B on B.id=A.sales_rep_id WHERE A.email_id = '$uname' AND A.password = '$upass' AND A.status IS NOT NULL ");
-            $result=$query->result();
-        }
+        $sql = "select A.id, A.emp_code, A.email_id, ifnull(A.first_name,'') as first_name, 
+                    ifnull(A.last_name,'') as last_name, A.role_id, 
+                    A.sales_rep_id, A.status, B.sr_type, C.check_in_time, C.check_out_time 
+                from user_master A 
+                left join sales_rep_master B on (A.sales_rep_id=B.id) 
+                left join sales_attendence C on (A.sales_rep_id=C.sales_rep_id and date(check_in_time)=curdate()) 
+                where A.email_id = '$uname' and A.password = '$upass' and 
+                    A.status is not null";
+        $query=$this->db->query($sql);
+        $result=$query->result();
         
-        if(count($result) > 0 ) {
-            if($result[0]->status!='InActive') {
+        if(count($result) > 0) {
+            if(isset($result[0]->sales_rep_id)==false || $result[0]->sales_rep_id=='') {
+                $data['result'] = '0';
+                $data['msg'] = 'You do not have access of this application.';
+            } else if($result[0]->status!='InActive') {
                 $sessiondata = array(
                                     'session_id' => $result[0]->id,
                                     'user_name' => $result[0]->email_id,
-                                    'login_name' => $result[0]->first_name . ' ' . $result[0]->last_name,
+                                    'login_name' => (isset($result[0]->first_name)?$result[0]->first_name:'') . ' ' . (isset($result[0]->last_name)?$result[0]->last_name:''),
                                     'role_id' => $result[0]->role_id,
                                     'sales_rep_id' => $result[0]->sales_rep_id,
                                     'type' => $result[0]->sr_type,
-                                    'emp_code' => $result[0]->emp_code
+                                    'emp_code' => $result[0]->emp_code,
+                                    'first_name' => (isset($result[0]->first_name)?$result[0]->first_name:''),
+                                    'last_name' => (isset($result[0]->last_name)?$result[0]->last_name:''),
+                                    'check_in_time' => $result[0]->check_in_time,
+                                    'check_out_time' => $result[0]->check_out_time
                                 );
 
                 // $this->session->set_userdata($sessiondata);
@@ -289,22 +299,21 @@ class Login extends CI_Controller
                 // set_cookie('password',$upass,$unexpired_cookie_exp_time);
                 
                 $logarray['table_id']='1';
-                $logarray['module_name']='Login';
+                $logarray['module_name']='Mobile App Login';
                 $logarray['cnt_name']='Login';
-                $logarray['action']='Logged in';
+                $logarray['action']='Mobile App Logged in';
                 $this->user_access_log_model->insertAccessLog($logarray);
 
+                $data['sessiondata'] = $sessiondata;
                 $data['result'] = '1';
                 $data['data'] = $result;
                 $data['msg'] = 'Login Successfull.';
             } else {
                 $data['result'] = '0';
-                $data['data'] = $result;
                 $data['msg'] = 'User is Inactive.';
             }
         } else {
             $data['result'] = '0';
-            $data['data'] = $result;
             $data['msg'] = 'Invalid Username or Password.';
         }
 

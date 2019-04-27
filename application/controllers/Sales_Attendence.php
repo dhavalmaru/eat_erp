@@ -2,7 +2,6 @@
 if(! defined ('BASEPATH') ){exit('No direct script access allowed');}
 
 class Sales_Attendence extends CI_controller {
-
     public function __construct(){
         parent::__construct();
         $this->load->helper('url');
@@ -15,153 +14,131 @@ class Sales_Attendence extends CI_controller {
         $this->load->model('Sales_Attendence_model');
         /*$result = $this->Sales_Attendence_model->get_todays_attendence();
 
-        if(count($result)==0)
-        {
+        if(count($result)==0){
             redirect(base_url().'index.php/Sales_Attendence');
         }*/
-
     }
 
-    public function index()
-    {
-      $data['userdata'] = $this->session->all_userdata();
-      $attendence = $this->Sales_Attendence_model->get_todays_attendence();
-      
-      
-      // $attendence = $this->Sales_Attendence_model->get_todays_attendence();
+    public function index(){
+		$data['userdata'] = $this->session->all_userdata();
+		$attendence = $this->Sales_Attendence_model->get_todays_attendence();
 
-      // echo json_encode($attendence[0]->working_status);
 
-      /*load_view('sales_rep_beat_plan/beat_plan_list', $userdata);*/
+		// $attendence = $this->Sales_Attendence_model->get_todays_attendence();
 
-      $bl_redirect = false;
-      $bl_check_out = false;
-      if(isset($attendence)){
-        if(count($attendence)>0){
-          $data['attendence'] = $attendence;
-          if(strtoupper(trim($attendence[0]->check_out))=="1"){
-            $bl_check_out = true;
-          }
-          if(strtoupper(trim($attendence[0]->working_status))=="PRESENT"){
-            $bl_redirect = true;
-          }
-        }
-      }
+		// echo json_encode($attendence[0]->working_status);
 
-      if($bl_check_out == true){
-        // echo 'dashboard/dashboard_first_screen';
-        load_view('dashboard/dashboard_first_screen', $data);
-      } else if($bl_redirect == true){
-        redirect(base_url().'index.php/Dashboard_sales_rep');
-      } else {
-        load_view('dashboard/dashboard_first_screen', $data);
-      }
-      
-      
+		/*load_view('sales_rep_beat_plan/beat_plan_list', $userdata);*/
+
+		$bl_redirect = false;
+		$bl_check_out = false;
+		if(isset($attendence)){
+			if(count($attendence)>0){
+				$data['attendence'] = $attendence;
+				if(strtoupper(trim($attendence[0]->check_out))=="1"){
+					$bl_check_out = true;
+				}
+				if(strtoupper(trim($attendence[0]->working_status))=="PRESENT"){
+					$bl_redirect = true;
+				}
+			}
+		}
+
+		if($bl_check_out == true){
+			// echo 'dashboard/dashboard_first_screen';
+			load_view('dashboard/dashboard_first_screen', $data);
+		} else if($bl_redirect == true){
+			redirect(base_url().'index.php/Dashboard_sales_rep');
+		} else {
+			load_view('dashboard/dashboard_first_screen', $data);
+		}
     }
 
-    public function save()
-    {
-      $latitude = $this->input->post('latitude');
-      $longitude = $this->input->post('longitude');
-      $absent_remark = $this->input->post('absent_remark');
-      $casual_reason = $this->input->post('casual_reason');
-      $applied_in_keka = $this->input->post('applied_on_keka');
-      $now=date('Y-m-d H:i:s');
-      $now1=date('Y-m-d');
-      $working_status = $this->input->post('working_status');
-      $sales_rep_id=$this->session->userdata('sales_rep_id');
+    public function save(){
+    	$latitude = $this->input->post('latitude');
+    	$longitude = $this->input->post('longitude');
+    	$absent_remark = $this->input->post('absent_remark');
+    	$casual_reason = $this->input->post('casual_reason');
+    	$applied_in_keka = $this->input->post('applied_on_keka');
+    	$now=date('Y-m-d H:i:s');
+    	$now1=date('Y-m-d');
+    	$working_status = $this->input->post('working_status');
+    	$sales_rep_id=$this->session->userdata('sales_rep_id');
 
+    	if($casual_reason!=''){
+    		$applied_in_keka = 'Casual';
+    		$working_status = 'Absent';
+    	}
 
-      
-      if($casual_reason!='')
-      {
-          $applied_in_keka = 'Casual';
-          $working_status = 'Absent';
-      }
+    	$where_array= array('date(check_in_time)'=>$now1, 'sales_rep_id'=>$sales_rep_id);
+    	$result = $this->db->select("sales_rep_id,id")->where($where_array)->get('sales_attendence')->result();
 
-      $where_array= array('date(check_in_time)'=>$now1,
-                          'sales_rep_id'=>$sales_rep_id);
+    	if(count($result)>0){
+    		$sales_attendence = array(
+					    			"sales_rep_id"=>$sales_rep_id,
+					    			"causual_remark"=>$casual_reason,
+					    			"working_status"=>$working_status,
+					    			"latitude"=>$latitude,
+					    			"longitude"=>$longitude,
+					    			"applied_in_keka"=>$applied_in_keka, 
+					    			"check_out"=>'0'
+				    			);
+    		$this->db->where('id', $result[0]->id);
+    		$this->db->update('sales_attendence', $sales_attendence);
+			/*echo '<script>
+			alert("Attendence Already Updated");
+			window.open("'.base_url().'index.php/Sales_Attendence", "_parent")</script>';*/
+		} else {
+			$sales_attendence = array(
+				"sales_rep_id"=>$sales_rep_id,
+				"causual_remark"=>$casual_reason,
+				"check_in_time"=>$now,
+				"working_status"=>$working_status,
+				"latitude"=>$latitude,
+				"longitude"=>$longitude,
+				"applied_in_keka"=>$applied_in_keka, 
+				"check_out"=>'0'
+				);
+			$this->db->insert('sales_attendence',$sales_attendence);
+			$id=$this->db->insert_id(); 
+		}
 
-      $result = $this->db->select("sales_rep_id,id")->where($where_array)->get('sales_attendence')->result();
+		$this->session->set_userdata('check_in_time',$now);
 
-      if(count($result)>0)
-      {
-        $sales_attendence = array(
-            "sales_rep_id"=>$sales_rep_id,
-            "causual_remark"=>$casual_reason,
-            "working_status"=>$working_status,
-            "latitude"=>$latitude,
-            "longitude"=>$longitude,
-            "applied_in_keka"=>$applied_in_keka, 
-            "check_out"=>'0'
-          );
-        $this->db->where('id', $result[0]->id);
-        $this->db->update('sales_attendence', $sales_attendence);
-         /*echo '<script>
-         alert("Attendence Already Updated");
-         window.open("'.base_url().'index.php/Sales_Attendence", "_parent")</script>';*/
-      }
-      else
-      {
-         $sales_attendence = array(
-            "sales_rep_id"=>$sales_rep_id,
-            "causual_remark"=>$casual_reason,
-            "check_in_time"=>$now,
-            "working_status"=>$working_status,
-            "latitude"=>$latitude,
-            "longitude"=>$longitude,
-            "applied_in_keka"=>$applied_in_keka, 
-            "check_out"=>'0'
-          );
-        $this->db->insert('sales_attendence',$sales_attendence);
-        $id=$this->db->insert_id(); 
-      }
+		if($casual_reason!=''){
+			redirect(base_url().'index.php/Sales_Attendence');
+		} else {
+			echo 'updated';
+		}
 
-       $this->session->set_userdata('check_in_time',$now);
-      
-      
-
-      if($casual_reason!='')
-      {
-         redirect(base_url().'index.php/Sales_Attendence');
-      }
-      else
-      {
-        echo 'updated';
-      }
-
-     /*if($working_status=='Present')
-      {
-        redirect(base_url().'index.php/Dashboard_sales_rep');
-      }
-      else
-      {
-        redirect(base_url().'index.php/Sales_Attendence');
-      }*/
+     	/*if($working_status=='Present')
+      	{
+        	redirect(base_url().'index.php/Dashboard_sales_rep');
+      	}
+      	else
+      	{
+        	redirect(base_url().'index.php/Sales_Attendence');
+      	}*/
     }
 
-    public function checkout()
-    {
-      $now=date('Y-m-d H:i:s');
-      $now1=date('Y-m-d');
-      $sales_rep_id=$this->session->userdata('sales_rep_id');
-      $where_array= array('date(check_in_time)'=>$now1,
-                          'sales_rep_id'=>$sales_rep_id);
+    public function checkout(){
+    	$now=date('Y-m-d H:i:s');
+    	$now1=date('Y-m-d');
+    	$sales_rep_id=$this->session->userdata('sales_rep_id');
+    	$where_array= array('date(check_in_time)'=>$now1, 'sales_rep_id'=>$sales_rep_id);
 
-      $result = $this->db->select("sales_rep_id,id")->where($where_array)->get('sales_attendence')->result();
+    	$result = $this->db->select("sales_rep_id, id")->where($where_array)->get('sales_attendence')->result();
 
-      $sales_attendence = array('check_out_time'=>$now, 'check_out'=>'1');
+    	$sales_attendence = array('check_out_time'=>$now, 'check_out'=>'1');
 
-      if(count($result)>0)
-      {
-         $this->db->where('id', $result[0]->id);
-         $this->db->update('sales_attendence', $sales_attendence);
-         $this->session->set_userdata('check_out_time',$now);
-         redirect(base_url().'index.php/Sales_Attendence');
-      }
-      else
-        redirect(base_url().'index.php/Dashboard_sales_rep');
+    	if(count($result)>0){
+    		$this->db->where('id', $result[0]->id);
+    		$this->db->update('sales_attendence', $sales_attendence);
+    		$this->session->set_userdata('check_out_time',$now);
+    		redirect(base_url().'index.php/Sales_Attendence');
+    	}
+    	else
+    		redirect(base_url().'index.php/Dashboard_sales_rep');
     }
 	
 	public function get_sales_attendance(){
@@ -626,8 +603,7 @@ class Sales_Attendence extends CI_controller {
         // load_view('invoice/emailer', $data);	
     }
 	
-	public function get_sales_log()
-	{
+	public function get_sales_log(){
 	 
 		$tbody ='';
 		$from_email = 'cs@eatanytime.co.in';
@@ -637,7 +613,7 @@ class Sales_Attendence extends CI_controller {
 		 $to_email = "ashwini.patil@pecanreams.com";
 	 	$bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, sangeeta.yadav@pecanreams.com";
 		// $to_email = "prasad.bhisale@pecanreams.com";
-//$bcc = "ashwini.patil@pecanreams.com";
+		//$bcc = "ashwini.patil@pecanreams.com";
 		
         $subject = 'Sales Login Log -'.date("d F Y",strtotime("now"));
         $data = $this->Sales_Attendence_model->sales_emp_log();
@@ -867,7 +843,99 @@ class Sales_Attendence extends CI_controller {
 
         // load_view('invoice/emailer', $data);	
     }
-	
+
+    public function get_todays_attendance_api(){
+    	$sales_rep_id=urldecode($this->input->post('sales_rep_id'));
+    	$now=date('Y-m-d');
+    	// $sales_rep_id = '40';
+
+    	$sql = "select sales_rep_id, working_status, id, check_in_time, check_out_time, check_out 
+                from sales_attendence where date(check_in_time)='$now' and sales_rep_id = '$sales_rep_id'";
+        $query=$this->db->query($sql);
+        $result=$query->result();
+
+        $data['data'] = $result;
+    	echo json_encode($data);
+    }
+
+    public function save_api(){
+    	$latitude = urldecode($this->input->post('latitude'));
+    	$longitude = urldecode($this->input->post('longitude'));
+    	$casual_reason = urldecode($this->input->post('casual_reason'));
+    	$applied_in_keka = urldecode($this->input->post('applied_on_keka'));
+    	$working_status = urldecode($this->input->post('working_status'));
+    	$sales_rep_id=urldecode($this->input->post('sales_rep_id'));
+    	$now=date('Y-m-d H:i:s');
+    	$now1=date('Y-m-d');
+
+    	if($casual_reason!=''){
+    		$applied_in_keka = 'Casual';
+    		$working_status = 'Absent';
+    	}
+
+    	$where_array= array('date(check_in_time)'=>$now1, 'sales_rep_id'=>$sales_rep_id);
+    	$result = $this->db->select("sales_rep_id, id, check_in_time")->where($where_array)->get('sales_attendence')->result();
+
+    	if(count($result)>0){
+    		$sales_attendence = array(
+					    			"sales_rep_id"=>$sales_rep_id,
+					    			"causual_remark"=>$casual_reason,
+					    			"working_status"=>$working_status,
+					    			"latitude"=>$latitude,
+					    			"longitude"=>$longitude,
+					    			"applied_in_keka"=>$applied_in_keka, 
+					    			"check_out"=>'0'
+				    			);
+    		$this->db->where('id', $result[0]->id);
+    		$this->db->update('sales_attendence', $sales_attendence);
+
+			$data['check_in_time'] = $result[0]->check_in_time;
+		} else {
+			$sales_attendence = array(
+									"sales_rep_id"=>$sales_rep_id,
+									"causual_remark"=>$casual_reason,
+									"check_in_time"=>$now,
+									"working_status"=>$working_status,
+									"latitude"=>$latitude,
+									"longitude"=>$longitude,
+									"applied_in_keka"=>$applied_in_keka, 
+									"check_out"=>'0'
+								);
+			$this->db->insert('sales_attendence',$sales_attendence);
+			$id=$this->db->insert_id();
+
+			$data['check_in_time'] = $now;
+		}
+
+		$data['result'] = '1';
+		$data['msg'] = 'Updated.';
+
+		echo $data['check_in_time'];
+    }
+
+    public function checkout_api(){
+    	$now=date('Y-m-d H:i:s');
+    	$now1=date('Y-m-d');
+    	$sales_rep_id=urldecode($this->input->post('sales_rep_id'));
+    	$where_array= array('date(check_in_time)'=>$now1, 'sales_rep_id'=>$sales_rep_id);
+
+    	$result = $this->db->select("sales_rep_id, id")->where($where_array)->get('sales_attendence')->result();
+
+    	$sales_attendence = array('check_out_time'=>$now, 'check_out'=>'1');
+
+    	if(count($result)>0){
+    		$this->db->where('id', $result[0]->id);
+    		$this->db->update('sales_attendence', $sales_attendence);
+    		
+    		$data['check_out_time'] = $now;
+    		$data['redirect'] = 'Sales_Attendence';
+    	}
+    	else
+    		$data['check_out_time'] = $now;
+    		$data['redirect'] = 'Dashboard_sales_rep';
+
+		echo $data['check_out_time'];
+    }
 }
 
 ?>

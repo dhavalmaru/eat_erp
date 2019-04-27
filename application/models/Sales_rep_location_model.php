@@ -10,7 +10,13 @@ function __Construct(){
 }
 
 function get_access(){
-    $role_id=$this->session->userdata('role_id');
+    $role_id='';
+    if($this->input->post('role_id')){
+        $role_id=$this->input->post('role_id');
+    } else if($this->session->userdata('role_id')){
+        $role_id=$this->session->userdata('role_id');
+    }
+    
     $query=$this->db->query("SELECT * FROM user_role_options WHERE section = 'Sales_Rep_Location' AND role_id='$role_id' AND (r_insert = 1 OR r_view = 1 OR r_edit=1 OR r_approvals = 1 OR r_export = 1)");
     return $query->result();
 }
@@ -30,7 +36,14 @@ function get_data($status='', $id=''){
         }
     }
 
-    $sales_rep_id=$this->session->userdata('sales_rep_id');
+    $sales_rep_id='';
+    if($this->input->post('sales_rep_id')){
+        $sales_rep_id=$this->input->post('sales_rep_id');
+    } else if($this->session->userdata('sales_rep_id')){
+        $sales_rep_id=$this->session->userdata('sales_rep_id');
+    }
+    // $sales_rep_id = '2';
+
     if($sales_rep_id!=""){
         if($cond=="") {
             $cond=" where sales_rep_id='".$sales_rep_id."'";
@@ -59,7 +72,15 @@ function get_mt_data($status='', $id=''){
         }
     }
 
-    $sales_rep_id=$this->session->userdata('sales_rep_id');
+    $sales_rep_id='';
+    if($this->input->post('sales_rep_id')){
+        $sales_rep_id=$this->input->post('sales_rep_id');
+    } else if($this->session->userdata('sales_rep_id')){
+        $sales_rep_id=$this->session->userdata('sales_rep_id');
+    }
+
+    // $sales_rep_id = '2';
+
     if($sales_rep_id!=""){
         if($cond=="") {
             $cond=" where m_id='".$sales_rep_id."'";
@@ -82,8 +103,20 @@ function get_data_qty($status='', $id=''){
 function save_data($id='',$status=''){
     $now=date('Y-m-d H:i:s');
     $now1=date('Y-m-d');
-    $curusr=$this->session->userdata('session_id');
-    $sales_rep_id=$this->session->userdata('sales_rep_id');
+    $curusr='';
+    $sales_rep_id='';
+
+    if($this->input->post('session_id')){
+        $curusr=$this->input->post('session_id');
+    } else if($this->session->userdata('session_id')){
+        $curusr=$this->session->userdata('session_id');
+    }
+    if($this->input->post('sales_rep_id')){
+        $sales_rep_id=$this->input->post('sales_rep_id');
+    } else if($this->session->userdata('sales_rep_id')){
+        $sales_rep_id=$this->session->userdata('sales_rep_id');
+    }
+
     $date_of_visit=$this->input->post('date_of_visit');
     if($date_of_visit==''){
         $date_of_visit=NULL;
@@ -155,8 +188,20 @@ function save_data($id='',$status=''){
 
 function save_orders(){
     $now=date('Y-m-d H:i:s');
-    $curusr=$this->session->userdata('session_id');
-    $sales_rep_id=$this->session->userdata('sales_rep_id');
+    
+    $curusr='';
+    $sales_rep_id='';
+
+    if($this->input->post('session_id')){
+        $curusr=$this->input->post('session_id');
+    } else if($this->session->userdata('session_id')){
+        $curusr=$this->session->userdata('session_id');
+    }
+    if($this->input->post('sales_rep_id')){
+        $sales_rep_id=$this->input->post('sales_rep_id');
+    } else if($this->session->userdata('sales_rep_id')){
+        $sales_rep_id=$this->session->userdata('sales_rep_id');
+    }
 
     $date_of_processing=$this->input->post('date_of_processing');
     if($date_of_processing==''){
@@ -170,7 +215,13 @@ function check_date_of_visit(){
     $id=$this->input->post('id');
     $date_of_visit = formatdate($this->input->post('date_of_visit'));
     $distributor_name = $this->input->post('distributor_name');
-    $sales_rep_id=$this->session->userdata('sales_rep_id');
+    
+    $sales_rep_id='';
+    if($this->input->post('sales_rep_id')){
+        $sales_rep_id=$this->input->post('sales_rep_id');
+    } else if($this->session->userdata('sales_rep_id')){
+        $sales_rep_id=$this->session->userdata('sales_rep_id');
+    }
 
     // $id='2';
     // $date_of_visit = '2017-02-11';
@@ -206,55 +257,102 @@ function get_location(){
 }
 
 function get_zone($id='', $channel=''){
-    $sales_rep_id = $this->session->userdata('sales_rep_id');
-    $distributor_id = $this->session->userdata('distributor_id');
-    $beat_id = $this->session->userdata('beat_id');
+    $sales_rep_id='';
+    $distributor_id='';
+    $beat_id='';
+    
+    if($this->input->post('sales_rep_id')){
+        $sales_rep_id=$this->input->post('sales_rep_id');
+    } else if($this->session->userdata('sales_rep_id')){
+        $sales_rep_id=$this->session->userdata('sales_rep_id');
+    }
+    if($this->input->post('distributor_id')){
+        $distributor_id=$this->input->post('distributor_id');
+    } else if($this->session->userdata('distributor_id')){
+        $distributor_id=$this->session->userdata('distributor_id');
+    }
+    if($this->input->post('beat_id')){
+        $beat_id=$this->input->post('beat_id');
+    } else if($this->session->userdata('beat_id')){
+        $beat_id=$this->session->userdata('beat_id');
+    }
+
+    // $sales_rep_id = '2';
+    // $distributor_id = '1298';
+    // $beat_id = '1';
 
     /*$sql = "select distinct A.zone_id, B.zone from sr_mapping A left join zone_master B on (A.zone_id = B.id) 
             where (A.reporting_manager_id = '$sales_rep_id' or A.sales_rep_id1 = '$sales_rep_id' or A.sales_rep_id2 = '$sales_rep_id') 
                     and B.type_id = '3'";*/
 
-    $cond='';
-    $cond2='';
-    if($id!='') {
-        $cond = ' And id='.$id;
-        $cond2 = ' And B.id='.$id;
+    $cond="";
+    $cond2="";
+    if($id!="") {
+        $cond = " and id='$id'";
+        $cond2 = " and B.id='$id'";
     }
-	if($channel!='') {
+	if($channel!="") {
 		if($channel=="GT") {
-			$cond = ' And type_id=3';
-            $cond2 = ' And B.type_id=3';
+			$cond = " and type_id='3'";
+            $cond2 = " and B.type_id='3'";
 		} else {
-			$cond = ' And type_id=7';
-            $cond2 = ' And B.type_id=7';
+			$cond = " and type_id='7'";
+            $cond2 = " and B.type_id='7'";
 		}
     }
 
-    if($beat_id!=''){
+    if($beat_id!='') {
         $sql = "select distinct A.zone_id, B.zone from beat_master A 
                 left join zone_master B on(A.zone_id=B.id) 
                 where A.id='$beat_id' and B.status='Approved' and A.zone_id is not null ".$cond2;
     } else {
-        $sql = "select id as zone_id, zone from zone_master where `status`='Approved' ".$cond;
+        $sql = "select id as zone_id, zone from zone_master where status='Approved' ".$cond;
     }
-    $query=$this->db->query($sql);
-    return $query->result();
+    $query = $this->db->query($sql);
+    $result = $query->result();
+
+    if(count($result)==0){
+        $sql = "select id as zone_id, zone from zone_master where status='Approved' ".$cond;
+        $query = $this->db->query($sql);
+        $result = $query->result();
+    }
+    
+    return $result;
 }
 
 function get_area($zone_id='',$id=''){
-    $sales_rep_id = $this->session->userdata('sales_rep_id');
-    $distributor_id = $this->session->userdata('distributor_id');
-    $beat_id = $this->session->userdata('beat_id');
+    $sales_rep_id='';
+    $distributor_id='';
+    $beat_id='';
+    
+    if($this->input->post('sales_rep_id')){
+        $sales_rep_id=$this->input->post('sales_rep_id');
+    } else if($this->session->userdata('sales_rep_id')){
+        $sales_rep_id=$this->session->userdata('sales_rep_id');
+    }
+    if($this->input->post('distributor_id')){
+        $distributor_id=$this->input->post('distributor_id');
+    } else if($this->session->userdata('distributor_id')){
+        $distributor_id=$this->session->userdata('distributor_id');
+    }
+    if($this->input->post('beat_id')){
+        $beat_id=$this->input->post('beat_id');
+    } else if($this->session->userdata('beat_id')){
+        $beat_id=$this->session->userdata('beat_id');
+    }
+
+    // $sales_rep_id = '2';
+    // $distributor_id = '1298';
+    // $beat_id = '1';
 
     $cond = '';
     $cond2='';
-    if($zone_id!=''){
+    if($zone_id!='') {
         $cond = $cond . " and zone_id = '$zone_id'";
         $cond2 = $cond2 . " and C.zone_id = '$zone_id'";
     }
 
-    if($id!='')
-    {
+    if($id!='') {
         $cond.= ' And id='.$id;
         $cond2.= ' And C.id='.$id;
     }
@@ -263,7 +361,7 @@ function get_area($zone_id='',$id=''){
             where (A.reporting_manager_id = '$sales_rep_id' or A.sales_rep_id1 = '$sales_rep_id' or A.sales_rep_id2 = '$sales_rep_id') 
                     and B.type_id = '3'" . $cond;*/
 
-    if($beat_id!=''){
+    if($beat_id!='') {
         $sql = "select distinct B.area_id, C.area 
                 from beat_locations A 
                 left join location_master B on (A.location_id = B.id) 
@@ -274,14 +372,61 @@ function get_area($zone_id='',$id=''){
         $sql = "select id as area_id, area from area_master Where status='Approved' and 
                 type_id IN (3,7) ".$cond;
     }
+    $query = $this->db->query($sql);
+    $result = $query->result();
+
+    if(count($result)==0){
+        $sql = "select id as area_id, area from area_master Where status='Approved' and 
+                type_id IN (3,7) ".$cond;
+        $query = $this->db->query($sql);
+        $result = $query->result();
+    }
+    
+    return $result;
+}
+
+function get_store($zone_id='', $store_id=''){
+    $cond = '';
+    if($zone_id!='') {
+        $cond = $cond . " and zone_id='".$zone_id."' ";
+    }
+    if($store_id!='') {
+        $cond = $cond . " and store_id='".$store_id."' ";
+    }
+
+    $sql = "select distinct A.store_id, B.store_name from 
+            (select * from store_master where status='Approved' ".$cond.") A 
+            left join 
+            (select * from relationship_master where status='Approved') B 
+            on (A.store_id=B.id)";
     $query=$this->db->query($sql);
     return $query->result();
 }
 
 function get_locations($zone_id='', $area_id='',$id='',$channel_type=''){
-    $sales_rep_id = $this->session->userdata('sales_rep_id');
-    $distributor_id = $this->session->userdata('distributor_id');
-    $beat_id = $this->session->userdata('beat_id');
+    $sales_rep_id='';
+    $distributor_id='';
+    $beat_id='';
+    
+    if($this->input->post('sales_rep_id')){
+        $sales_rep_id=$this->input->post('sales_rep_id');
+    } else if($this->session->userdata('sales_rep_id')){
+        $sales_rep_id=$this->session->userdata('sales_rep_id');
+    }
+    if($this->input->post('distributor_id')){
+        $distributor_id=$this->input->post('distributor_id');
+    } else if($this->session->userdata('distributor_id')){
+        $distributor_id=$this->session->userdata('distributor_id');
+    }
+    if($this->input->post('beat_id')){
+        $beat_id=$this->input->post('beat_id');
+    } else if($this->session->userdata('beat_id')){
+        $beat_id=$this->session->userdata('beat_id');
+    }
+
+    // $sales_rep_id = '2';
+    // $distributor_id = '1298';
+    // $beat_id = '1';
 
     $cond = '';
     $cond2 = '';
@@ -301,11 +446,11 @@ function get_locations($zone_id='', $area_id='',$id='',$channel_type=''){
 
     if($beat_id!=''){
         if($channel_type=="MT" || $id!=''){
-            $sql = "select B.* from beat_locations A 
+            $sql = "select distinct B.* from beat_locations A 
                     left join location_master B on (A.location_id = B.id) 
                     where A.beat_id='$beat_id' and B.status = 'Approved' " . $cond2; 
         } else {
-            $sql = "select B.* from beat_locations A 
+            $sql = "select distinct B.* from beat_locations A 
                     left join location_master B on (A.location_id = B.id) 
                     where A.beat_id='$beat_id' and B.status = 'Approved' and B.type_id IN (3,7) " . $cond2;
         }
@@ -316,28 +461,36 @@ function get_locations($zone_id='', $area_id='',$id='',$channel_type=''){
             $sql = "select * from location_master where status = 'Approved' and type_id IN (3,7)" . $cond;
         }
     }
-    
-
-    /*$sql = "select * from location_master where status = 'Approved' and type_id IN (3,7)" . $cond;*/
-
-   
     $query=$this->db->query($sql);
-    return $query->result();
+    $result = $query->result();
+
+    if(count($result)==0){
+        if($channel_type=="MT" || $id!=''){
+            $sql = "select * from location_master where status = 'Approved' " . $cond; 
+        } else {
+            $sql = "select * from location_master where status = 'Approved' and type_id IN (3,7) " . $cond;
+        }
+        $query = $this->db->query($sql);
+        $result = $query->result();
+    }
+    
+    return $result;
 }
 
-function get_location_data($store_id,$zone_id,$id){
+function get_location_data($store_id, $zone_id, $id){
     $cond = '';
     if($id=='')
     {
-      $cond = ' and type_id IN (3,7)';
+      $cond = " and type_id IN (3,7)";
     }
 
-    $sql = "Select  A.*,D.location from 
+    $sql = "Select  distinct A.*, D.location from 
             (select * from store_master Where status='Approved') A 
             left join 
             (select * from location_master Where status='Approved' ".$cond." ) D 
             on (A.location_id=D.id)
-            where A.store_id='".$store_id  ."' and  A.zone_id='". $zone_id ."' and D.location IS NOT NULL  ";
+            where A.store_id='".$store_id  ."' and  A.zone_id='". $zone_id ."' and 
+                D.location IS NOT NULL  ";
     $query=$this->db->query($sql);
     return $query->result();
 }
@@ -446,9 +599,25 @@ function get_retailers($status='', $id=''){
 }
 
 function get_distributors($zone_id='', $area_id='',$id=''){
-    $sales_rep_id = $this->session->userdata('sales_rep_id');
-    $distributor_id = $this->session->userdata('distributor_id');
-    $beat_id = $this->session->userdata('beat_id');
+    $sales_rep_id='';
+    $distributor_id='';
+    $beat_id='';
+    
+    if($this->input->post('sales_rep_id')){
+        $sales_rep_id=$this->input->post('sales_rep_id');
+    } else if($this->session->userdata('sales_rep_id')){
+        $sales_rep_id=$this->session->userdata('sales_rep_id');
+    }
+    if($this->input->post('distributor_id')){
+        $distributor_id=$this->input->post('distributor_id');
+    } else if($this->session->userdata('distributor_id')){
+        $distributor_id=$this->session->userdata('distributor_id');
+    }
+    if($this->input->post('beat_id')){
+        $beat_id=$this->input->post('beat_id');
+    } else if($this->session->userdata('beat_id')){
+        $beat_id=$this->session->userdata('beat_id');
+    }
 
     $cond = '';
     $cond2 = '';
@@ -539,7 +708,8 @@ function get_store_name($id='',$zone_id=''){
     if($zone_id!='')
         $cond .= ' And  A.zone_id='.$zone_id;
 
-    $sql = "select * from (SELECT store_name,s.id as store_id,location_id,zone_id from   store_master s JOIN relationship_master rm on s.store_id=rm.id) A ".$cond;
+    $sql = "select * from (select store_name, s.id as store_id, location_id, zone_id 
+            from store_master s JOIN relationship_master rm on s.store_id=rm.id) A ".$cond;
 
     $result = $this->db->query($sql)->result();
     return $result;
@@ -547,7 +717,12 @@ function get_store_name($id='',$zone_id=''){
 
 function save_po_qty(){
     $now=date('Y-m-d H:i:s');
-    $curusr=$this->session->userdata('session_id');
+    $curusr='';
+    if($this->input->post('session_id')){
+        $curusr=$this->input->post('session_id');
+    } else if($this->session->userdata('session_id')){
+        $curusr=$this->session->userdata('session_id');
+    }
 
     $po_id = $this->input->post('po_id');
 

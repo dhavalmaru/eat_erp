@@ -17,10 +17,8 @@ class Dashboard_sales_rep extends CI_Controller
         $this->load->model('sales_rep_distributor_model');
         $this->load->model('sales_rep_order_model');
 		$this->load->model('Sales_location_model');
-        $this->load->model('sales_rep_location_model');
         $this->load->model('sales_rep_payment_receivable_model');
 		$this->load->model('store_model');
-        $this->load->model('store_model');
         //	$this->load->model('Sr_beat_plan_model');
         $this->load->model('product_model');
         $this->load->database();
@@ -31,10 +29,8 @@ class Dashboard_sales_rep extends CI_Controller
         {
             redirect(base_url().'index.php/Sales_Attendence');
         }
-        
     }
 
-    //index function
     public function dashboard(){
         load_view_without_data('dashboard/dashboard_first_screen');
     }
@@ -60,7 +56,6 @@ class Dashboard_sales_rep extends CI_Controller
           
 
         // load_view('dashboard/dashboard_sales_rep_details', $data);
-       
     }
 	
     public function checkstatus($frequency=''){
@@ -113,25 +108,21 @@ class Dashboard_sales_rep extends CI_Controller
             $frequency = 'Every '.$day;
         }
 
+        $sales_rep_id = $this->session->userdata('sales_rep_id');
+
         $result=$this->Sales_location_model->get_access();
         if(count($result)>0) {
             $data['access']=$result;
-            $data['data']=$this->Sales_location_model->get_data('Approved','',$frequency,$temp_date);
-
-            $data['merchendizer']=$result2=$this->Sales_location_model->get_merchendiser_data('Approved','',$frequency,$temp_date);
-            $data['mt_followup']=$this->Sales_location_model->get_mtfollowup('',$temp_date);
-            $data['gt_followup']=$this->Sales_location_model->get_gtfollowup('',$temp_date);
+            $data['data']=$this->Sales_location_model->get_data('Approved', '', $frequency, $temp_date, $sales_rep_id);
+            $data['merchendizer']=$result2=$this->Sales_location_model->get_merchendiser_data('Approved', '', $frequency, $temp_date, $sales_rep_id);
+            $data['mt_followup']=$this->Sales_location_model->get_mtfollowup('', $temp_date, $sales_rep_id);
+            $data['gt_followup']=$this->Sales_location_model->get_gtfollowup('',$temp_date, $sales_rep_id);
             $data['checkstatus'] = $frequency;
             $data['current_day'] = date('l');
-            //$data['data1'] = $this->Sales_location_model->get_data1();
-            $data['total_receivable']=$this->dashboard_sales_rep_model->get_total_receivable();
-            $data['target']=$this->dashboard_sales_rep_model->get_target();
-            $data['payment_receivable']=$this->sales_rep_payment_receivable_model->get_data();
-            //$data['data1'] = $this->dashboard_sales_rep_model->get_data_dist();
-            $data['data2'] = $this->sales_rep_order_model->get_data();
-            $data['data1'] = $this->sales_rep_distributor_model->get_data();
-            $data['orders'] = $this->Sales_location_model->get_todaysorder();
-            $data['pendingsorder'] = $this->Sales_location_model->get_pendingsorder();
+            $data['total_receivable']=$this->dashboard_sales_rep_model->get_total_receivable($sales_rep_id);
+            $data['target']=$this->dashboard_sales_rep_model->get_target($sales_rep_id);
+            $data['orders'] = $this->Sales_location_model->get_todaysorder($sales_rep_id);
+            $data['pendingsorder'] = $this->Sales_location_model->get_pendingsorder($sales_rep_id);
             $data['sales_rep_id']=$this->session->userdata('sales_rep_id');
             $data['checkstatus'] = $frequency;
 
@@ -140,7 +131,7 @@ class Dashboard_sales_rep extends CI_Controller
             $data['beat_id']='';
             $data['beat_status']='Approved';
 
-            $data['beat_details'] = $this->Sales_location_model->get_new_beat_details();
+            $data['beat_details'] = $this->Sales_location_model->get_new_beat_details($sales_rep_id);
             if(count($data['beat_details'])>0){
                 $data['reporting_manager_id']=$data['beat_details'][0]->reporting_manager_id;
                 $data['distributor_id']=$data['beat_details'][0]->dist_id2;
@@ -149,7 +140,7 @@ class Dashboard_sales_rep extends CI_Controller
             }
 
             if($data['distributor_id']=="") {
-                $data['beat_details'] = $this->Sales_location_model->get_beat_details($day);
+                $data['beat_details'] = $this->Sales_location_model->get_beat_details($day, $sales_rep_id);
                 if(count($data['beat_details'])>0){
                     $data['reporting_manager_id']=$data['beat_details'][0]->reporting_manager_id;
 
@@ -168,7 +159,7 @@ class Dashboard_sales_rep extends CI_Controller
             
             $data['distributor'] = $this->Sales_location_model->get_distributors();
             $data['beat'] = $this->Sales_location_model->get_beat_plan($data['distributor_id']);
-            $data['pending_beat_plan'] = $this->Sales_location_model->get_pending_beat_plan();
+            $data['pending_beat_plan'] = $this->Sales_location_model->get_pending_beat_plan($sales_rep_id);
 
             load_view('dashboard/dashboard_sales_rep_details', $data);
 
@@ -191,8 +182,20 @@ class Dashboard_sales_rep extends CI_Controller
         $beat_id_og = $this->input->post('beat_id_og');
         $distributor_id = $this->input->post('distributor_id');
         $beat_id = $this->input->post('beat_id');
+        $sales_rep_id = $this->session->userdata('sales_rep_id');
+        $curusr=$this->session->userdata('session_id');
 
-        $data = $this->Sales_location_model->set_beat_plan($reporting_manager_id, $distributor_id_og, $beat_id_og, $distributor_id, $beat_id);
+        $day = date('l');
+        $m = date('F');
+        $year = date('Y');
+        $get_alternate  = $this->get_alternate($day,$m,$year);
+        if($get_alternate) {
+            $frequency = 'Alternate '.$day;
+        } else {
+            $frequency = 'Every '.$day;
+        }
+
+        $data = $this->Sales_location_model->set_beat_plan($reporting_manager_id, $distributor_id_og, $beat_id_og, $distributor_id, $beat_id, $sales_rep_id, $curusr, $frequency);
         echo json_encode($data);
     }
 
@@ -206,8 +209,17 @@ class Dashboard_sales_rep extends CI_Controller
         } else {
             $frequency = 'Every '.$day;
         }
+        $curusr = $this->session->userdata('session_id');
+        $pending_id = $this->input->post('pending_id');
+
+        $status = 'Pending';
+        if($this->input->post('btn_approve')!=null){
+            $status = 'Approved';
+        } else if($this->input->post('btn_reject')!=null){
+            $status = 'Rejected';
+        }
         
-        $data = $this->Sales_location_model->approve_beat_plan($frequency);
+        $data = $this->Sales_location_model->approve_beat_plan($frequency, $pending_id, $curusr, $status);
         redirect(base_url().'index.php/Dashboard_sales_rep');
     }
 
@@ -226,8 +238,7 @@ class Dashboard_sales_rep extends CI_Controller
         echo json_encode($data);
     }
 
-    public function locations($status='')
-    {
+    public function locations($status=''){
         $result=$this->Sales_rep_route_plan_model->get_access();
         if(count($result)>0) {
             load_view_without_data('sales_rep_location/sales_rep_location_map');
@@ -235,11 +246,9 @@ class Dashboard_sales_rep extends CI_Controller
             echo '<script>alert("You donot have access to this page.");</script>';
             $this->load->view('login/main_page');
         }
-
     }
 	
-    public function test_function()
-    {
+    public function test_function(){
         $day = date('l');
         $m = date('F');
         $year = date('Y');
@@ -258,8 +267,7 @@ class Dashboard_sales_rep extends CI_Controller
         echo $set_days;
     }
 
-    public function get_alternate($day,$m,$year)
-    {
+    public function get_alternate($day,$m,$year){
         
         $date1 = date('d-m-Y', strtotime('second '.$day.' of '.$m.' '.$year));
         $date2 = date('d-m-Y', strtotime('fourth '.$day.' of '.$m.' '.$year));
@@ -279,7 +287,7 @@ class Dashboard_sales_rep extends CI_Controller
         }
     }
 
-    public function get_sale_details() {
+    public function get_sale_details(){
         $from_date = html_escape($this->input->post('from_date'));
         $to_date = html_escape($this->input->post('to_date'));
 
@@ -308,7 +316,7 @@ class Dashboard_sales_rep extends CI_Controller
         echo json_encode($result);
     }
 
-    public function get_month_wise_sale() {
+    public function get_month_wise_sale(){
         $from_date = html_escape($this->input->post('from_date'));
         $to_date = html_escape($this->input->post('to_date'));
 
@@ -360,7 +368,7 @@ class Dashboard_sales_rep extends CI_Controller
         echo json_encode($result);
     }
 
-    public function get_rout_plan_details() {
+    public function get_rout_plan_details(){
         $from_date = html_escape($this->input->post('from_date'));
         $to_date = html_escape($this->input->post('to_date'));
 

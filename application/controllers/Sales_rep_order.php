@@ -33,6 +33,7 @@ class Sales_rep_order extends CI_Controller{
             $this->load->view('login/main_page');
         }
     }*/
+
 	public function index(){
         // $result=$this->distributor_model->get_access();
         // if(count($result)>0) {
@@ -83,10 +84,13 @@ class Sales_rep_order extends CI_Controller{
             $this->load->view('login/main_page');
         }*/
 
-        $data['orders'] = $this->Sales_location_model->get_todaysorder();
-        $data['pendingsorder'] = $this->Sales_location_model->get_pendingsorder();
+        $sales_rep_id = $this->session->userdata('sales_rep_id');
+
+        $data['orders'] = $this->Sales_location_model->get_todaysorder($sales_rep_id);
+        $data['pendingsorder'] = $this->Sales_location_model->get_pendingsorder($sales_rep_id);
         load_view('sales_rep_order/sales_rep_order_list', $data);
 	 }
+
     public function add(){
         $result=$this->sales_rep_order_model->get_access();
         if(count($result)>0) {
@@ -226,6 +230,7 @@ class Sales_rep_order extends CI_Controller{
         $result = $this->sales_rep_order_model->check_product_qty_availablity();
         echo $result;
     }
+
 	function get_order_list_view(){
 		$postData = $this->input->post();
 			 $order_id = $postData['order_id'];
@@ -672,7 +677,7 @@ class Sales_rep_order extends CI_Controller{
 							 
                         }
 							  echo $order_data;
-}
+    }
 
 }
 ?>

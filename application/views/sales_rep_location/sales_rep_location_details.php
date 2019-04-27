@@ -1006,11 +1006,11 @@
                                     </div>
                                  </div>
 								 
-								 <div class="row">
+  							                  <!-- <div class="row">
                                     <div class="col s12">
                                        <a data-toggle="modal" id="" href="#myModal1" class=" right  button shadow btn_color" data-keyboard="false" data-backdrop="static">Po Quanty</a>
                                     </div>
-                                 </div>
+                                  </div> -->
                               </div>
                               <!-- Modal -->
                               <div class="modal fade" id="myModal" role="dialog">
