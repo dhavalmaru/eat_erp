@@ -104,6 +104,17 @@ function save_data($id=''){
             $action='Credit_debit_note Entry '.$status.'.';
         } else {
             if($id!='' || $ref_id!=''){
+                $reference = '';
+                if($transaction=='Credit Note'){
+                    $reference = 'credit_note';
+                } else if($transaction=='Debit Note'){
+                    $reference = 'debit_note';
+                } else if($transaction=='Expense Voucher'){
+                    $reference = 'exp';
+                } else {
+                    $reference = 'exp_rev';
+                }
+
                 if($ref_no==null || $ref_no==''){
                     $sql="select * from series_master where type='Credit_debit_note'";
                     $query=$this->db->query($sql);
@@ -134,28 +145,20 @@ function save_data($id=''){
                         $financial_year="";
                     }
                     
-                    $reference = '';
-                    if($transaction=='Credit Note'){
-                        $reference = 'credit_note';
-                    } else if($transaction=='Debit Note'){
-                        $reference = 'debit_note';
-                    } else if($transaction=='Expense Voucher'){
-                        $reference = 'exp';
-                    } else {
-                        $reference = 'exp_rev';
-                    }
+                    
                     $ref_no = 'WHPL/'.$reference.'/'.$financial_year.'/'.strval($series);
-
                 } else {
-                    if($transaction=='Credit Note'){
-                        $ref_no = str_replace('debit_note', 'credit_note', $ref_no);
+                    // if($transaction=='Credit Note'){
+                    //     $ref_no = str_replace('debit_note', 'credit_note', $ref_no);
+                    // } else {
+                    //     $ref_no = str_replace('credit_note', 'debit_note', $ref_no);
+                    // }
 
-                        $str1 = substr($ref_no, 0, strpos($ref_no, '/'));
-                        $str2 = substr($ref_no, strpos($ref_no, '/'));
-                        $str3 = substr($str2, strpos($str2, '/')+1);
-                    } else {
-                        $ref_no = str_replace('credit_note', 'debit_note', $ref_no);
-                    }
+                    $str1 = substr($ref_no, 0, strpos($ref_no, '/')+1);
+                    $str2 = substr($ref_no, strpos($ref_no, '/')+1);
+                    $str2 = substr($str2, strpos($str2, '/'));
+
+                    $ref_no = $str1.$reference.$str2;
                 }
 
                 if($ref_id!=null && $ref_id!=''){

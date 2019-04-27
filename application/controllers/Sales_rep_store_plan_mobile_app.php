@@ -1082,7 +1082,6 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
             $distributor_status = $this->input->post('distributor_status');
             $sales_rep_loc_id = $this->input->post('sales_rep_loc_id');
             $sequence = $this->input->post('sequence');
-            $reation_id = $this->input->post('reation_id');
             $merchandiser_stock_id = $this->input->post('merchandiser_stock_id');
             $follow_type = $this->input->post('follow_type');
 
@@ -2969,12 +2968,18 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
             }
         }
 
-        $this->session->unset_userdata('visit_detail');
-        $this->session->unset_userdata('retailer_detail');
-        $this->session->unset_userdata('temp_stock_details');
-        $this->session->unset_userdata('merchandiser_stock_details');
-        $this->session->unset_userdata('merchandiser_stock_details');
+        // $this->session->unset_userdata('visit_detail');
+        // $this->session->unset_userdata('retailer_detail');
+        // $this->session->unset_userdata('temp_stock_details');
+        // $this->session->unset_userdata('merchandiser_stock_details');
+        // $this->session->unset_userdata('sales_rep_stock_detail');
         // redirect(base_url().'index.php/Sales_rep_store_plan');
+
+        $data['visit_detail'] = $visit_detail;
+        $data['retailer_detail'] = $retailer_detail;
+        $data['temp_stock_details'] = $temp_stock_details;
+        $data['merchandiser_stock_details'] = $merchandiser_stock_details;
+        $data['sales_rep_stock_detail'] = $sales_rep_stock_detail;
 
         echo '1';
     }

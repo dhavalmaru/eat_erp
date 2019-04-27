@@ -1015,7 +1015,7 @@ function set_credit_note($id=''){
                     $financial_year="";
                 }
                 
-                $ref_no = 'WHPL/credit_note/'.$financial_year.'/'.strval($series);
+                $ref_no = 'WHPL/exp/'.$financial_year.'/'.strval($series);
                 $modified_approved_date = null;
             }
         } else {
@@ -1055,7 +1055,7 @@ function set_credit_note($id=''){
             $data = array(
                 'date_of_transaction' => $date_of_processing,
                 'distributor_id' => $distributor_id,
-                'transaction' => 'Credit Note',
+                'transaction' => 'Expense Voucher',
                 'invoice_no' => $invoice_no,
                 'distributor_type' => 'Invoice',
                 'amount' => $amount,
@@ -1065,7 +1065,7 @@ function set_credit_note($id=''){
                 'sgst' => $sgst_amt,
                 'amount_without_tax' => $amount_without_tax,
                 'status' => 'Approved',
-                'remarks' => 'SG - Promotion Charges Credit Note against invoice no '.$invoice_no,
+                'remarks' => 'SG - Promotion Charges Expense Voucher against invoice no '.$invoice_no,
                 'created_by' => $created_by,
                 'created_on' => $created_on,
                 'modified_by' => $modified_by,

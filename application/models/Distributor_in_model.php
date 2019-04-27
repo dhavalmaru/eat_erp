@@ -829,7 +829,7 @@ function set_debit_note($id=''){
                     $financial_year="";
                 }
                 
-                $ref_no = 'WHPL/debit_note/'.$financial_year.'/'.strval($series);
+                $ref_no = 'WHPL/exp_rev/'.$financial_year.'/'.strval($series);
                 $modified_approved_date = null;
             }
         } else {
@@ -869,7 +869,7 @@ function set_debit_note($id=''){
             $data = array(
                 'date_of_transaction' => $date_of_processing,
                 'distributor_id' => $distributor_id,
-                'transaction' => 'Debit Note',
+                'transaction' => 'Expense Voucher Reversal',
                 'invoice_no' => $sales_return_no,
                 'distributor_type' => 'Invoice',
                 'amount' => $amount,
@@ -879,7 +879,7 @@ function set_debit_note($id=''){
                 'sgst' => $sgst_amt,
                 'amount_without_tax' => $amount_without_tax,
                 'status' => 'Approved',
-                'remarks' => 'SG - Promotion Charges Debit Note against invoice no '.$sales_return_no,
+                'remarks' => 'SG - Promotion Charges Expense Voucher Reversal against invoice no '.$sales_return_no,
                 'created_by' => $created_by,
                 'created_on' => $created_on,
                 'modified_by' => $modified_by,

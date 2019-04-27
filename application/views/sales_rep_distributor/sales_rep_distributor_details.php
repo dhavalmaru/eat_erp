@@ -142,7 +142,7 @@
 										</div> 
 										<div class="input-field col s9">
                                             
-                                            <input type="hidden" class="form-control" name="id" id="id" value="<?php if($id!='') echo $id;?>"/>
+                                            <input type="hidden" class="form-control" name="id" id="id" value="<?php //if($id!='') echo $id;?>"/>
                                             <input type="hidden" class="form-control" name="place_order" id="place_order" value="No"/>
                                             <select name="distributor_id" id="distributor_id" class="browser-default">
                                                 <option value="">Select</option>
@@ -186,15 +186,15 @@
                                      
                                              <select name="zone_id" id="zone_id" class="browser-default" onchange="get_area();">
                                                 <option value="">Select</option>
-                                                <?php if(isset($zone)) { for ($k=0; $k < count($zone) ; $k++) { ?>
-                                                        <option value="<?php echo $zone[$k]->zone_id; ?>" <?php 
-                                                        if($visit_detail!=''){
-                                                                    if ($visit_detail['zone_id']==$zone[$k]->zone_id){ echo 'selected' ; }
-                                                                }
-                                                        else if(isset($data)) {
-                                                            if($zone[$k]->zone_id==$data[0]->zone_id) {echo 'selected';}} else if(isset($zone_id)) {if($zone[$k]->zone_id==$zone_id) {echo 'selected';}};
-                                                         ?>><?php echo $zone[$k]->zone; ?></option>
-                                                <?php }} ?>
+                                                <?php //if(isset($zone)) { for ($k=0; $k < count($zone) ; $k++) { ?>
+                                                        <option value="<?php //echo $zone[$k]->zone_id; ?>" <?php 
+                                                        //if($visit_detail!=''){
+                                                                    //if ($visit_detail['zone_id']==$zone[$k]->zone_id){ echo 'selected' ; }
+                                                                //}
+                                                        //else if(isset($data)) {
+                                                            //if($zone[$k]->zone_id==$data[0]->zone_id) {echo 'selected';}} else if(isset($zone_id)) {if($zone[$k]->zone_id==$zone_id) {echo 'selected';}};
+                                                         ?>><?php //echo $zone[$k]->zone; ?></option>
+                                                <?php //}} ?>
                                             </select>
 										</div>
 										</div>
@@ -207,14 +207,14 @@
 											
 											<select name="area_id" id="area_id" class="browser-default" onchange="get_location();">
                                                 <option value="">Select</option>
-                                                <?php if(isset($area)) { for ($k=0; $k < count($area) ; $k++) { ?>
-                                                        <option value="<?php echo $area[$k]->area_id; ?>" <?php  
-                                                        if($visit_detail!=''){
-                                                                    if ($visit_detail['zone_id']==$zone[$k]->zone_id){ echo 'selected' ; }
-                                                                }
-                                                        else if(isset($data)) {if($area[$k]->area_id==$data[0]->area_id) {echo 'selected';}} else if(isset($area_id)) {if($area[$k]->area_id==$area_id) {echo 'selected';}};
-                                                        ?>><?php echo $area[$k]->area; ?></option>
-                                                <?php }} ?>
+                                                <?php //if(isset($area)) { for ($k=0; $k < count($area) ; $k++) { ?>
+                                                        <option value="<?php //echo $area[$k]->area_id; ?>" <?php  
+                                                        //if($visit_detail!=''){
+                                                                    //if ($visit_detail['zone_id']==$zone[$k]->zone_id){ echo 'selected' ; }
+                                                                //}
+                                                        //else if(isset($data)) {if($area[$k]->area_id==$data[0]->area_id) {echo 'selected';}} else if(isset($area_id)) {if($area[$k]->area_id==$area_id) {echo 'selected';}};
+                                                        ?>><?php //echo $area[$k]->area; ?></option>
+                                                <?php //}} ?>
                                             </select>
 											 
 											
@@ -230,14 +230,14 @@
                                      
                                             <select name="location_id" id="location_id" class="browser-default">
                                                 <option value="">Select</option>
-                                                <?php if(isset($location)) { for ($k=0; $k < count($location) ; $k++) { ?>
-                                                        <option value="<?php echo $location[$k]->id; ?>" <?php  
-                                                        if($visit_detail!=''){
-                                                            if ($visit_detail['location_id']==$location[$k]->id){ echo 'selected' ; }
-                                                         }
-                                                        else if(isset($data)) {if($location[$k]->id==$data[0]->location_id) {echo 'selected';}} else if(isset($location_id)) {if($location[$k]->id==$location_id) {echo 'selected';}};
-                                                        ?>><?php echo $location[$k]->location; ?></option>
-                                                <?php }} ?>
+                                                <?php //if(isset($location)) { for ($k=0; $k < count($location) ; $k++) { ?>
+                                                        <option value="<?php //echo $location[$k]->id; ?>" <?php  
+                                                        //if($visit_detail!=''){
+                                                            //if ($visit_detail['location_id']==$location[$k]->id){ echo 'selected' ; }
+                                                         //}
+                                                        //else if(isset($data)) {if($location[$k]->id==$data[0]->location_id) {echo 'selected';}} else if(isset($location_id)) {if($location[$k]->id==$location_id) {echo 'selected';}};
+                                                        ?>><?php //echo $location[$k]->location; ?></option>
+                                                <?php //}} ?>
                                             </select>
 											
 										</div>

@@ -3316,7 +3316,7 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                         $amount=round($amount,0);
                     }
 
-				    if ($data[$i]->transaction=='Credit Note') {
+				    if ($data[$i]->transaction=='Credit Note' || $data[$i]->transaction=='Expense Voucher') {
                         $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, floatval($amount_without_tax)*-1);
                         $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, floatval($cgst)*-1);
                         $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, floatval($sgst)*-1);
@@ -3561,8 +3561,7 @@ function get_credit_debit_sku_details($from_date, $to_date, $date_of_processing,
     }
     
 
-    $sql = "
-	select AA.*, WEEK(date_of_transaction,1)-WEEK(STR_TO_DATE(concat(YEAR(date_of_transaction),'-',MONTH(date_of_transaction),'-',1),'%Y-%m-%d'),1)+1 as dweek from 
+    $sql = "select AA.*, WEEK(date_of_transaction,1)-WEEK(STR_TO_DATE(concat(YEAR(date_of_transaction),'-',MONTH(date_of_transaction),'-',1),'%Y-%m-%d'),1)+1 as dweek from 
             (select A.id, A.date_of_transaction, A.distributor_id, A.transaction, A.amount_without_tax, A.amount, A.tax, 
                 A.igst, A.cgst, A.sgst, A.status, A.remarks, A.created_by, A.created_on, A.modified_by, A.modified_on, 
                 A.approved_by, A.approved_on, A.rejected_by, A.rejected_on, A.ref_id, A.ref_no, A.ref_date,
@@ -3570,24 +3569,15 @@ function get_credit_debit_sku_details($from_date, $to_date, $date_of_processing,
                 D.class, D.state as dist_state, D.state_code as dist_state_code, D.gst_number as dist_gst_no, 
                 D.area_id,D.zone_id,K.zone,E.distributor_type, F.sales_rep_name, G.location, H.area ,
                 (Select sales_rep_name from sales_rep_master where id=J.sales_rep_id1) as salesrepname,
-                (Select sales_rep_name from sales_rep_master where id=J.sales_rep_id2) as salesrepname1
-
+                (Select sales_rep_name from sales_rep_master where id=J.sales_rep_id2) as salesrepname1 
             from credit_debit_note A 
-
                 left join distributor_master D on(A.distributor_id=D.id) 
-
                 left join distributor_type_master E on(D.type_id=E.id) 
-
-
                 left join location_master G on(D.location_id=G.id) 
-
                 left join area_master H on(D.area_id=H.id) 
                 left join zone_master K on(D.zone_id=K.id) 
-				
 				left join sr_mapping J on(D.area_id=J.area_id and D.type_id=J.type_id and D.zone_id=J.zone_id ) 
-				
 				left join sales_rep_master F on(J.reporting_manager_id=F.id) 
-
             where (A.status='Approved' ) ".$ddateofprocess.") AA ";
 
     $query=$this->db->query($sql);
@@ -6646,9 +6636,9 @@ function generate_distributor_ledger_report($remark_visibility='') {
 
             select DATE_FORMAT(date_of_transaction,'%d/%m/%Y') as ref_date, ref_no as reference, 
 
-                    case when transaction='Debit Note' then amount end as debit_amount, 
+                    case when (transaction='Debit Note' or transaction='Expense Voucher Reversal') then amount end as debit_amount, 
 
-                    case when transaction='Credit Note' then amount end as credit_amount, date_of_transaction as rdate, remarks as remarks, transaction as type 
+                    case when (transaction='Credit Note' or transaction='Expense Voucher') then amount end as credit_amount, date_of_transaction as rdate, remarks as remarks, transaction as type 
 
                 from credit_debit_note where status = 'Approved' and distributor_id = '$distributor_id' and 
 
@@ -6716,9 +6706,9 @@ function generate_distributor_ledger_report($remark_visibility='') {
 
             select DATE_FORMAT(date_of_transaction,'%d/%m/%Y') as ref_date, ref_no as reference, 
 
-                    case when transaction='Debit Note' then amount end as debit_amount, 
+                    case when (transaction='Debit Note' or transaction='Expense Voucher Reversal') then amount end as debit_amount, 
 
-                    case when transaction='Credit Note' then amount end as credit_amount, date_of_transaction as rdate, remarks as remarks, transaction as type 
+                    case when (transaction='Credit Note' or transaction='Expense Voucher') then amount end as credit_amount, date_of_transaction as rdate, remarks as remarks, transaction as type 
 
                 from credit_debit_note where status = 'Approved' and distributor_id = '$distributor_id' and 
 
@@ -7047,9 +7037,9 @@ function view_distributor_ledger_report($remark_visibility='') {
 
             select DATE_FORMAT(date_of_transaction,'%d/%m/%Y') as ref_date, ref_no as reference, 
 
-                    case when transaction='Debit Note' then amount end as debit_amount, 
+                    case when (transaction='Debit Note' or transaction='Expense Voucher Reversal') then amount end as debit_amount, 
 
-                    case when transaction='Credit Note' then amount end as credit_amount, date_of_transaction as rdate, remarks as remarks, transaction as type 
+                    case when (transaction='Credit Note' or transaction='Expense Voucher') then amount end as credit_amount, date_of_transaction as rdate, remarks as remarks, transaction as type 
 
                 from credit_debit_note where status = 'Approved' and distributor_id = '$distributor_id' and 
 
@@ -7119,9 +7109,9 @@ function view_distributor_ledger_report($remark_visibility='') {
 
             select DATE_FORMAT(date_of_transaction,'%d/%m/%Y') as ref_date, ref_no as reference, 
 
-                    case when transaction='Debit Note' then amount end as debit_amount, 
+                    case when (transaction='Debit Note' or transaction='Expense Voucher Reversal') then amount end as debit_amount, 
 
-                    case when transaction='Credit Note' then amount end as credit_amount, date_of_transaction as rdate, remarks as remarks, transaction as type 
+                    case when (transaction='Credit Note' or transaction='Expense Voucher') then amount end as credit_amount, date_of_transaction as rdate, remarks as remarks, transaction as type 
 
                 from credit_debit_note where status = 'Approved' and distributor_id = '$distributor_id' and 
 
@@ -7403,9 +7393,9 @@ function view_distributor_ledger_report_old() {
 
             select DATE_FORMAT(date_of_transaction,'%d/%m/%Y') as ref_date, transaction as reference, 
 
-                    case when transaction='Debit Note' then amount end as debit_amount, 
+                    case when (transaction='Debit Note' or transaction='Expense Voucher Reversal') then amount end as debit_amount, 
 
-                    case when transaction='Credit Note' then amount end as credit_amount,date_of_transaction as rdate 
+                    case when (transaction='Credit Note' or transaction='Expense Voucher') then amount end as credit_amount,date_of_transaction as rdate 
 
                 from credit_debit_note where status = 'Approved' and distributor_id = '$distributor_id' and 
 
@@ -7582,7 +7572,7 @@ function generate_agingwise_report() {
 
             union all 
 
-            select distributor_id, sum(case when transaction = 'Credit Note' then amount else amount*-1 end) paid_amount 
+            select distributor_id, sum(case when (transaction = 'Credit Note' or transaction='Expense Voucher') then amount else amount*-1 end) paid_amount 
 
                 from credit_debit_note where status = 'Approved' and 
 
@@ -9827,9 +9817,9 @@ function generate_credit_debit_report() {
 
             select d.date_of_transaction as ref_date, d.transaction as reference, 
 
-                    case when d.transaction='Debit Note' then amount end as debit_amount, 
+                    case when (d.transaction='Debit Note' or d.transaction='Expense Voucher Reversal') then amount end as debit_amount, 
 
-                    case when d.transaction='Credit Note' then amount end as credit_amount , m.distributor_name
+                    case when (d.transaction='Credit Note' or d.transaction='Expense Voucher') then amount end as credit_amount , m.distributor_name
 
                 from credit_debit_note d,distributor_master m where d.distributor_id=m.id and d.status = 'Approved' and 
 
@@ -11894,9 +11884,9 @@ function generate_distributor_balance_ledger_report() {
 
             select  
 
-                    case when transaction='Debit Note' then amount end as debit_amount, 
+                    case when (transaction='Debit Note' or transaction='Expense Voucher Reversal') then amount end as debit_amount, 
 
-                    case when transaction='Credit Note' then amount end as credit_amount, m.distributor_name 
+                    case when (transaction='Credit Note' or transaction='Expense Voucher') then amount end as credit_amount, m.distributor_name 
 
                 from credit_debit_note d,distributor_master m where d.distributor_id=m.id and d.status = 'Approved' and 
 
@@ -11955,9 +11945,9 @@ function generate_distributor_balance_ledger_report() {
 
             select  
 
-                    case when transaction='Debit Note' then amount end as debit_amount, 
+                    case when (transaction='Debit Note' or transaction='Expense Voucher Reversal') then amount end as debit_amount, 
 
-                    case when transaction='Credit Note' then amount end as credit_amount, m.distributor_name 
+                    case when (transaction='Credit Note' or transaction='Expense Voucher') then amount end as credit_amount, m.distributor_name 
 
                 from credit_debit_note d,distributor_master m where d.distributor_id=m.id and d.status = 'Approved' and 
 
@@ -12216,9 +12206,9 @@ function upload_distributor_balance_ledger_report() {
 
             select  
 
-                    case when transaction='Debit Note' then amount end as debit_amount, 
+                    case when (transaction='Debit Note' or transaction='Expense Voucher Reversal') then amount end as debit_amount, 
 
-                    case when transaction='Credit Note' then amount end as credit_amount, m.distributor_name 
+                    case when (transaction='Credit Note' or transaction='Expense Voucher') then amount end as credit_amount, m.distributor_name 
 
                 from credit_debit_note d,distributor_master m where d.distributor_id=m.id and d.status = 'Approved' and 
 
@@ -12276,9 +12266,9 @@ function upload_distributor_balance_ledger_report() {
 
                             select  
 
-                                    case when transaction='Debit Note' then amount end as debit_amount, 
+                                    case when (transaction='Debit Note' or transaction='Expense Voucher Reversal') then amount end as debit_amount, 
 
-                                    case when transaction='Credit Note' then amount end as credit_amount, m.distributor_name ,m.tally_name
+                                    case when (transaction='Credit Note' or transaction='Expense Voucher') then amount end as credit_amount, m.distributor_name ,m.tally_name
 
                                 from credit_debit_note d,distributor_master m where d.distributor_id=m.id and d.status = 'Approved' 
                 and d.date_of_transaction>='$from_date' and d.date_of_transaction<='$to_date') A group by distributor_name,tally_name)A
@@ -12597,9 +12587,9 @@ function view_generate_distributor_balance_ledger_report() {
 
             select  
 
-                    case when transaction='Debit Note' then amount end as debit_amount, 
+                    case when (transaction='Debit Note' or transaction='Expense Voucher Reversal') then amount end as debit_amount, 
 
-                    case when transaction='Credit Note' then amount end as credit_amount, m.distributor_name 
+                    case when (transaction='Credit Note' or transaction='Expense Voucher') then amount end as credit_amount, m.distributor_name 
 
                 from credit_debit_note d,distributor_master m where d.distributor_id=m.id and d.status = 'Approved' and 
 
@@ -12658,9 +12648,9 @@ function view_generate_distributor_balance_ledger_report() {
 
             select  
 
-                    case when transaction='Debit Note' then amount end as debit_amount, 
+                    case when (transaction='Debit Note' or transaction='Expense Voucher Reversal') then amount end as debit_amount, 
 
-                    case when transaction='Credit Note' then amount end as credit_amount, m.distributor_name 
+                    case when (transaction='Credit Note' or transaction='Expense Voucher') then amount end as credit_amount, m.distributor_name 
 
                 from credit_debit_note d,distributor_master m where d.distributor_id=m.id and d.status = 'Approved' and 
 
@@ -12853,10 +12843,10 @@ public function get_ledger_details() {
                 WHERE  C.credit_amount IS NOT NULL 
                 UNION ALL 
                 SELECT CASE 
-                         WHEN TRANSACTION = 'Debit Note' THEN amount 
+                         WHEN (TRANSACTION = 'Debit Note' or transaction='Expense Voucher Reversal') THEN amount 
                        END AS debit_amount, 
                        CASE 
-                         WHEN TRANSACTION = 'Credit Note' THEN amount 
+                         WHEN (TRANSACTION = 'Credit Note' or transaction='Expense Voucher') THEN amount 
                        END AS credit_amount, 
                        m.distributor_name ,m.id as dist_id
                 FROM   credit_debit_note d, 
@@ -12917,9 +12907,9 @@ public function get_ledger_details() {
 
                     select  
 
-                            case when transaction='Debit Note' then amount end as debit_amount, 
+                            case when (transaction='Debit Note' or transaction='Expense Voucher Reversal') then amount end as debit_amount, 
 
-                            case when transaction='Credit Note' then amount end as credit_amount, m.distributor_name ,m.id as dist_id
+                            case when (transaction='Credit Note' or transaction='Expense Voucher') then amount end as credit_amount, m.distributor_name ,m.id as dist_id
 
                         from credit_debit_note d,distributor_master m where d.distributor_id=m.id and d.status = 'Approved' and 
 
@@ -12992,10 +12982,10 @@ public function get_adjustment_bal() {
                     WHERE  C.credit_amount IS NOT NULL 
                     UNION ALL 
                     SELECT CASE 
-                             WHEN TRANSACTION = 'Debit Note' THEN amount 
+                             WHEN (TRANSACTION = 'Debit Note' or transaction='Expense Voucher Reversal') THEN amount 
                            END AS debit_amount, 
                            CASE 
-                             WHEN TRANSACTION = 'Credit Note' THEN amount 
+                             WHEN (TRANSACTION = 'Credit Note' or transaction='Expense Voucher') THEN amount 
                            END AS credit_amount, 
                            m.distributor_name 
                     FROM   credit_debit_note d, 
@@ -13056,9 +13046,9 @@ public function get_adjustment_bal() {
 
                         select  
 
-                                case when transaction='Debit Note' then amount end as debit_amount, 
+                                case when (transaction='Debit Note' or transaction='Expense Voucher Reversal') then amount end as debit_amount, 
 
-                                case when transaction='Credit Note' then amount end as credit_amount, m.distributor_name 
+                                case when (transaction='Credit Note' or transaction='Expense Voucher') then amount end as credit_amount, m.distributor_name 
 
                             from credit_debit_note d,distributor_master m where d.distributor_id=m.id and d.status = 'Approved' and 
 
@@ -13151,12 +13141,12 @@ public function send_exception_report() {
             sum(case when date(A.date_of_transaction)<date('".$date."') and (A.status = 'Pending' or A.status = 'Deleted') then 1 else 0 end) as pending, 
             sum(
                 case 
-                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')))
+                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != ''))) 
                      then 1 
-                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')))
-                     then 0
-                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)<date('".$date."') ))
-                      then 1
+                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = ''))) 
+                     then 0 
+                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)<date('".$date."') )) 
+                      then 1 
                 else 0
                 END
             ) as prior_pending 
@@ -13177,7 +13167,41 @@ public function send_exception_report() {
                 else 0
                 END
             ) as prior_pending
-            from credit_debit_note A where A.date_of_transaction is not null and transaction = 'Debit Note'";
+            from credit_debit_note A where A.date_of_transaction is not null and transaction = 'Debit Note' 
+
+            union all 
+
+            select 'Expense Vouchers' as temp_col, sum(case when date(A.created_on)=date('".$date."') then 1 else 0 end) as entry_done, 
+            sum(case when date(A.date_of_transaction)<date('".$date."') and (A.status = 'Pending' or A.status = 'Deleted') then 1 else 0 end) as pending, 
+            sum(
+                case 
+                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != ''))) 
+                     then 1 
+                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = ''))) 
+                     then 0 
+                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)<date('".$date."') )) 
+                      then 1 
+                else 0
+                END
+            ) as prior_pending 
+            from credit_debit_note A where A.date_of_transaction is not null and transaction = 'Expense Voucher' 
+
+            union all 
+
+            select 'Expense Voucher Reversals' as temp_col, sum(case when date(A.created_on)=date('".$date."') then 1 else 0 end) as entry_done, 
+            sum(case when date(A.date_of_transaction)<date('".$date."') and (A.status = 'Pending' or A.status = 'Deleted') then 1 else 0 end) as pending, 
+            sum(
+                case 
+                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')))
+                     then 1 
+                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')))
+                     then 0
+                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)<date('".$date."') ))
+                      then 1
+                else 0
+                END
+            ) as prior_pending
+            from credit_debit_note A where A.date_of_transaction is not null and transaction = 'Expense Voucher Reversal'";
 
     $query = $this->db->query($sql);
     $result = $query->result();
@@ -13202,7 +13226,8 @@ public function send_exception_report() {
                 $link1 = base_url().'index.php/Sample_out';
                 $link2 = base_url().'index.php/Sample_out/checkstatus/pending_for_approval';
             }
-            if(strtoupper(trim($result[$i]->temp_col))=='CREDIT NOTES' || strtoupper(trim($result[$i]->temp_col))=='DEBIT NOTES') {
+            if(strtoupper(trim($result[$i]->temp_col))=='CREDIT NOTES' || strtoupper(trim($result[$i]->temp_col))=='DEBIT NOTES' || 
+                strtoupper(trim($result[$i]->temp_col))=='EXPENSE VOUCHERS' || strtoupper(trim($result[$i]->temp_col))=='EXPENSE VOUCHER REVERSALS') {
                 $link1 = base_url().'index.php/Credit_debit_note';
                 $link2 = base_url().'index.php/Credit_debit_note/checkstatus/Pending';
             }
@@ -13306,7 +13331,7 @@ public function send_exception_report() {
             Then 1=1
             else
             1=0
-            End ))
+            End )) 
 
         union all 
 
@@ -13338,7 +13363,39 @@ public function send_exception_report() {
             else
             1=0
             End )
-        ) and transaction = 'Debit Note'";
+        ) and transaction = 'Debit Note' 
+
+        union all 
+
+        select Distinct 'Expense Vouchers' as temp_col, A.id, A.date_of_transaction as ref_date, A.ref_no, A.distributor_id, A.amount, A.modified_by, A.modified_on, B.distributor_name, concat(ifnull(C.first_name,''),' ',ifnull(C.last_name,'')) as modifiedby 
+        from credit_debit_note A left join distributor_master B on (A.distributor_id=B.id) left join user_master C on (A.modified_by=C.id) 
+        where A.date_of_transaction is not null and date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (Case When 
+            date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')
+            Then 1=1
+            When date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')
+            Then 1=0
+            When date(A.created_on)<date('".$date."') 
+            Then 1=1
+            else
+            1=0
+            End )
+        ) and transaction = 'Expense Voucher' 
+
+        union all 
+
+        select Distinct 'Expense Voucher Reversals' as temp_col, A.id, A.date_of_transaction as ref_date, A.ref_no, A.distributor_id, A.amount, A.modified_by, A.modified_on, B.distributor_name, concat(ifnull(C.first_name,''),' ',ifnull(C.last_name,'')) as modifiedby 
+        from credit_debit_note A left join distributor_master B on (A.distributor_id=B.id) left join user_master C on (A.modified_by=C.id) 
+        where A.date_of_transaction is not null and date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (Case When 
+            date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')
+            Then 1=1
+            When date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')
+            Then 1=0
+            When date(A.created_on)<date('".$date."') 
+            Then 1=1
+            else
+            1=0
+            End )
+        ) and transaction = 'Expense Voucher Reversal'";
 
     $query = $this->db->query($sql);
     $result = $query->result();
@@ -13392,7 +13449,8 @@ public function send_exception_report() {
             {
                 $url = base_url('index.php/distributor_in/edit/'.$result[$i]->id);
             }
-            else if($result[$i]->temp_col=='Credit Notes' || $result[$i]->temp_col=='Debit Notes')
+            else if($result[$i]->temp_col=='Credit Notes' || $result[$i]->temp_col=='Debit Notes' || 
+                    $result[$i]->temp_col=='Expense Vouchers' || $result[$i]->temp_col=='Expense Voucher Reversals')
             {
                 $url = base_url('index.php/credit_debit_note/edit/'.$result[$i]->id);
             }
