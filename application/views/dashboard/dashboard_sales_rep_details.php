@@ -21,8 +21,6 @@
       <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
       <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.6/font/material-design-icons/Material-Design-Icons.woff" rel="stylesheet">
       <style>
-	  
-	  
          [type="checkbox"]:not(:checked), [type="checkbox"]:checked
          {
          position:relative;
@@ -342,13 +340,12 @@
                   <div class="row" style="margin-top:15px">
                      <div class="col s12">
                         <div class="entry" style="text-align:center">
-                          
                            <div class="col s4" style="text-align: left;">
                               <label style="text-align: left; font-size: small; color: #343434;">Retailer</label>
                            </div>
                            <div class="col s8" style="text-align: left;">
                               <input type="hidden" name="reporting_manager_id" id="reporting_manager_id" value="<?php if(isset($reporting_manager_id)) { if($reporting_manager_id!='') echo $reporting_manager_id; } else if(isset($visit_detail['reporting_manager_id'])) echo $visit_detail['reporting_manager_id']; ?>" />
-                              <input type="hidden" name="distributor_id_og" id="distributor_id_og" value="<?php if(isset($distributor_id)) { if($distributor_id!='') echo $distributor_id; } else if(isset($visit_detail['distributor_id'])) echo $visit_detail['distributor_id']; ?>" />
+                              <input type="hidden" name="distributor_id_og" id="distributor_id_og" value="<?php if(isset($distributor_id_og)) { if($distributor_id_og!='') echo $distributor_id_og; } else if(isset($visit_detail['distributor_id'])) echo $visit_detail['distributor_id']; ?>" />
                               <select name="distributor_id" id="distributor_id" class="browser-default select2" onchange="get_beat_plan();" style="display: none;">
                                  <option value="">Select</option>
                                  <?php if(isset($distributor)) { for ($k=0; $k < count($distributor) ; $k++) { ?>
@@ -373,12 +370,11 @@
                   <div class="row" style="margin-top:15px">
                      <div class="col s12">
                         <div class="entry" style="text-align:center">
-                          
                            <div class="col s4" style="text-align: left;">
                               <label style="text-align: left; font-size: small; color: #343434;">Route Plan</label>
                            </div>
                            <div class="col s8" style="text-align: left;">
-                              <input type="hidden" name="beat_id_og" id="beat_id_og" value="<?php if(isset($beat_id)) { if($beat_id!='') echo $beat_id; } else if(isset($visit_detail['beat_id'])) echo $visit_detail['beat_id']; ?>" />
+                              <input type="hidden" name="beat_id_og" id="beat_id_og" value="<?php if(isset($beat_id_og)) { if($beat_id_og!='') echo $beat_id_og; } else if(isset($visit_detail['beat_id'])) echo $visit_detail['beat_id']; ?>" />
                               <select name="beat_id" id="beat_id" class="browser-default select2" style="display: none;">
                                  <option value="">Select</option>
                                  <?php if(isset($beat)) { for ($k=0; $k < count($beat) ; $k++) { ?>
@@ -894,6 +890,24 @@
          </div>
       </div>
 
+      <div class="modal fade" id="myModal4" role="dialog">
+         <div class="modal-dialog">
+            <div class="modal-content">
+               <div class="modal-header">
+                  <button type="button" style="float: right; top: -25px;right: -30px; font-size: 24px;" class="modal-close waves-effect waves-green btn-flat">&times;</button>
+                  <h4 class="modal-title" style="font-size: 18px;">Contact Reporting Manager </h4>
+               </div>
+               <div class="modal-body">
+                  <p>Please contact your reporting manager to approve route plan!</p>
+               </div>
+               <div class="modal-footer">
+                  <!-- <button type="button" style="background:#d43f3a!important" class="button shadow btn_color left modal-close" data-dismiss="modal">NO</button> -->
+                  <button type="button" style="background:#4cae4c!important" class="button shadow btn_color right" data-dismiss="modal" onclick="view_dashboard();">Ok</button>
+               </div>
+            </div>
+         </div>
+      </div>
+
 	   <div class="modal fade" id="myModal_order" role="dialog" style="top:120px!important;">
          <div class="modal-dialog">
             <!-- Modal content-->
@@ -1025,10 +1039,11 @@
          }
 
          var set_route_plan = function() {
-            if($('#beat_id').val()!=$('#beat_id_og').val() || $('#lbl_beat_status').val()!='Approved'){
+            if($('#beat_id').val()!=$('#beat_id_og').val()){
                $('#myModal2').modal('open');
             } else {
-               window.location.href = BASE_URL+'index.php/Sales_rep_store_plan';
+               set_original_beat_plan();
+               // window.location.href = BASE_URL+'index.php/Sales_rep_store_plan';
             }
          }
 
@@ -1042,10 +1057,32 @@
                success: function(response){
                   // console.log(response);
                   if(response=='1'){
-                     window.location.href = BASE_URL+'index.php/Dashboard_sales_rep';
+                     $('#myModal2').modal('close');
+                     $('#myModal4').modal('open');
+                     // window.location.href = BASE_URL+'index.php/Dashboard_sales_rep';
                   }
                }
             });
+         }
+
+         var set_original_beat_plan = function() {
+            $.ajax({
+               url:BASE_URL+'index.php/dashboard_sales_rep/set_original_beat_plan',
+               method: 'post',
+               data: {reporting_manager_id: $('#reporting_manager_id').val(), distributor_id_og: $('#distributor_id_og').val(), beat_id_og: $('#beat_id_og').val(), distributor_id: $('#distributor_id').val(), beat_id: $('#beat_id').val()},
+               dataType: 'json',
+               async: false,
+               success: function(response){
+                  // console.log(response);
+                  if(response=='1'){
+                     window.location.href = BASE_URL+'index.php/Sales_rep_store_plan';
+                  }
+               }
+            });
+         }
+
+         var view_dashboard = function() {
+            window.location.href = BASE_URL+'index.php/Dashboard_sales_rep';
          }
 
          var change_plan = function() {

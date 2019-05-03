@@ -233,35 +233,35 @@ function get_distributor_po_data1($status='', $id=''){
             on (G.modified_by=H.id)) I ".$cond."
             order by I.modified_on desc";*/
 
-        $sql = "select I.* from 
-            (select G.*, concat(ifnull(H.first_name,''),' ',ifnull(H.last_name,'')) as user_name from 
-            (select Q.*, D.depot_name from 
-            (select C.*, P.location ,E.store_name from 
-            (select A.*, B.distributor_name, B.sell_out, B.state as distributor_state, B.class from 
-            (select *, datediff(po_expiry_date, curdate()) as days_to_expiry from distributor_po) A 
-            left join 
-            (select * from distributor_master) B 
-            on (A.distributor_id=B.id)) C 
-            LEFT join 
-            (
-            SELECT A.*,B.store_name,B.type_id from 
-            (SELECT store_id,zone_id,location_id from store_master Where `status`='Approved')A
-            Left JOIN
-            (SELECT * from relationship_master WHERE `status`='Approved')B
-            On (A.store_id=B.id)
-            ) E
-            On (C.type_id=E.type_id and C.store_id=E.store_id and C.location_id=E.location_id
-            and C.zone_id=E.zone_id)
-            left join 
-            (select * from location_master) P 
-            on (C.location_id=P.id)) Q 
-            left join
-            (select * from depot_master) D 
-            on (Q.depot_id=D.id)) G 
-            left join 
-            (select * from user_master) H 
-            on (G.modified_by=H.id)) I ".$cond."
-            order by I.modified_on desc";
+    $sql = "select I.* from 
+        (select G.*, concat(ifnull(H.first_name,''),' ',ifnull(H.last_name,'')) as user_name from 
+        (select Q.*, D.depot_name from 
+        (select C.*, P.location ,E.store_name from 
+        (select A.*, B.distributor_name, B.sell_out, B.state as distributor_state, B.class from 
+        (select *, datediff(po_expiry_date, curdate()) as days_to_expiry from distributor_po) A 
+        left join 
+        (select * from distributor_master) B 
+        on (A.distributor_id=B.id)) C 
+        left join 
+        (select A.*, B.store_name, B.type_id from 
+        (select store_id,zone_id,location_id from store_master Where `status`='Approved')A
+        left join 
+        (select * from relationship_master WHERE `status`='Approved')B
+        on (A.store_id=B.id)) E
+        on (C.type_id=E.type_id and C.store_id=E.store_id and C.location_id=E.location_id
+        and C.zone_id=E.zone_id)
+        left join 
+        (select * from location_master) P 
+        on (C.location_id=P.id)) Q 
+        left join
+        (select * from depot_master) D 
+        on (Q.depot_id=D.id)) G 
+        left join 
+        (select * from user_master) H 
+        on (G.modified_by=H.id)) I ".$cond."
+        order by I.modified_on desc";
+
+    // echo $sql;
 
     $query=$this->db->query($sql);
     return $query->result();
@@ -489,44 +489,7 @@ function save_data($id=''){
                 }
 
                 if(strtoupper(trim($delivery_through))=='WHPL'){
-                    $invoice_no = '';
-                    $invoice_date = NULL;
-                    $distributor_out_id = '';
-                    $sql = "select * from distributor_out where distributor_po_id = '$id'";
-                    $query=$this->db->query($sql);
-                    $result=$query->result();
-                    if(count($result)>0){
-                        $invoice_no = $result[0]->invoice_no;
-                        $invoice_date = $result[0]->invoice_date;
-                        $distributor_out_id = $result[0]->id;
-                    }
-
-                    if($distributor_out_id==null || $distributor_out_id==''){
-                        $sql = "insert into distributor_out (date_of_processing, invoice_no, depot_id, distributor_id, amount, tax, tax_per, tax_amount, final_amount, order_no, order_date, status, remarks, created_by, created_on, modified_by, modified_on, approved_by, approved_on, state, discount, delivery_status, cgst, sgst, igst, cgst_amount, sgst_amount, igst_amount, state_code, round_off_amount, invoice_amount, distributor_po_id,shipping_address ,distributor_consignee_id ,con_name ,con_address,con_city,con_pincode,con_state,con_country,con_state_code,con_gst_number,basis_of_sales,email_from,email_approved_by,email_date_time) 
-                            select date_of_po, '$invoice_no', depot_id, distributor_id, amount, tax, tax_per, tax_amount, final_amount, po_number, date_of_po, 'pending', '$remarks', created_by, '$now', modified_by, '$now', '$curusr', '$now', state, discount, 'Pending', cgst, sgst, igst, cgst_amount, sgst_amount, igst_amount, state_code, round_off_amount, invoice_amount,  '$id' ,shipping_address ,distributor_consignee_id ,con_name ,con_address,con_city,con_pincode,con_state,con_country,con_state_code,con_gst_number,basis_of_sales,email_from,email_approved_by,email_date_time
-                            from distributor_po where id='$id'";
-                        $this->db->query($sql);
-                        $distributor_out_id=$this->db->insert_id();                       
-                    } else {
-                        $sql = "update distributor_out A, distributor_po B set A.date_of_processing=B.date_of_po, A.invoice_no = '$invoice_no', A.depot_id=B.depot_id, A.distributor_id=B.distributor_id, A.amount=B.amount, A.tax=B.tax, A.tax_per=B.tax_per, A.tax_amount=B.tax_amount, A.final_amount=B.final_amount, A.order_no=B.po_number, A.order_date=B.date_of_po, A.modified_by=B.modified_by, A.modified_on=B.modified_on, A.approved_by=B.approved_by, A.approved_on=B.approved_on, A.state=B.state, A.discount=B.discount, A.cgst=B.cgst, A.sgst=B.sgst, A.igst=B.igst, A.cgst_amount=B.cgst_amount, A.sgst_amount=B.sgst_amount, A.igst_amount=B.igst_amount, A.state_code=B.state_code, A.round_off_amount=B.round_off_amount, A.invoice_amount=B.invoice_amount, 
-                            A.shipping_address=B.shipping_address,
-                            A.distributor_consignee_id=B.distributor_consignee_id,
-                            A.con_name=B.con_name,A.con_address=B.con_address,A.con_city=B.con_city,A.basis_of_sales=B.basis_of_sales,
-                            A.email_from=B.email_from,
-                            A.email_approved_by=B.email_approved_by,
-                            A.email_date_time=B.email_date_time,
-                            A.con_pincode=B.con_pincode,A.con_state=B.con_state,A.con_country=B.con_country,A.con_state_code=B.con_state_code,A.con_gst_number=B.con_gst_number
-                        where A.id='$distributor_out_id' and A.distributor_po_id=B.id and B.id='$id' and B.status='Approved'";
-                        $this->db->query($sql);
-                    }
-
-                    $sql = "delete from distributor_out_items where distributor_out_id = '$distributor_out_id'";
-                    $this->db->query($sql);
-
-                    $sql = "insert into distributor_out_items (distributor_out_id, type, item_id, qty, sell_rate, grams, rate, amount, cgst_amt, sgst_amt, igst_amt, tax_amt, total_amt,margin_per,tax_percentage,promo_margin ) select '$distributor_out_id', type, item_id, qty, sell_rate, grams, rate, amount, cgst_amt, sgst_amt, igst_amt, tax_amt, total_amt,margin_per,tax_percentage,promo_margin from distributor_po_items where distributor_po_id = '$id'";
-                    $this->db->query($sql);
-
-                     /*$this->distributor_out_model->set_credit_note($distributor_out_id);*/
+                    $this->set_sales_entry($id, $status);
                 }
                 
                 $this->send_po_confirmation_email($id);
@@ -580,18 +543,19 @@ function save_data($id=''){
             $con_gst_number = $result[0]->con_gst_number;
         }
 
+        $delivery_through = $this->input->post('delivery_through');
 
         $data = array(
             'date_of_po' => $date_of_po,
             'po_expiry_date' => $po_expiry_date,
             'po_number' => $this->input->post('po_number'),
             'depot_id' => ($this->input->post('depot_id')==''?Null:$this->input->post('depot_id')),
-            'delivery_through' => $this->input->post('delivery_through'),
+            'delivery_through' => $delivery_through,
             'distributor_id' => $this->input->post('distributor_id'),
-            'type_id' => $this->input->post('type_id'),
-            'zone_id' => $this->input->post('zone_id'),
-            'store_id' => $this->input->post('store_id'),
-            'location_id' => $this->input->post('location_id'),
+            'type_id' => ($this->input->post('type_id')==''?Null:$this->input->post('type_id')),
+            'zone_id' => ($this->input->post('zone_id')==''?Null:$this->input->post('zone_id')),
+            'store_id' => ($this->input->post('store_id')==''?Null:$this->input->post('store_id')),
+            'location_id' => ($this->input->post('location_id')==''?Null:$this->input->post('location_id')),
             'state' => $this->input->post('state'),
             'discount' => format_number($this->input->post('discount'),2),
             'amount' => format_number($this->input->post('total_amount'),2),
@@ -756,6 +720,10 @@ function save_data($id=''){
                         (email_ref_id is null or email_ref_id = '')";
             $this->db->query($sql);
         }
+
+        if(strtoupper(trim($delivery_through))=='WHPL'){
+            $this->set_sales_entry($id, $status);
+        }
     }
 
     $logarray['table_id']=$id;
@@ -763,6 +731,81 @@ function save_data($id=''){
     $logarray['cnt_name']='Distributor_PO';
     $logarray['action']=$action;
     $this->user_access_log_model->insertAccessLog($logarray);
+}
+
+function set_sales_entry($id='', $status='Pending'){
+    $now=date('Y-m-d H:i:s');
+    $curusr=$this->session->userdata('session_id');
+    $remarks = $this->input->post('remarks');
+
+    if(strtoupper(trim($status))=='APPROVED'){
+        $status='Pending';
+    }
+
+    $invoice_no = '';
+    $invoice_date = NULL;
+    $distributor_out_id = '';
+    $sql = "select * from distributor_out where distributor_po_id = '$id'";
+    $query=$this->db->query($sql);
+    $result=$query->result();
+    if(count($result)>0){
+        $invoice_no = $result[0]->invoice_no;
+        $invoice_date = $result[0]->invoice_date;
+        $distributor_out_id = $result[0]->id;
+    }
+
+    if($distributor_out_id==null || $distributor_out_id==''){
+        $sql = "insert into distributor_out (date_of_processing, invoice_no, depot_id, distributor_id, 
+                amount, tax, tax_per, tax_amount, final_amount, order_no, order_date, status, remarks, 
+                created_by, created_on, modified_by, modified_on, approved_by, approved_on, state, 
+                discount, delivery_status, cgst, sgst, igst, cgst_amount, sgst_amount, igst_amount, 
+                state_code, round_off_amount, invoice_amount, distributor_po_id,shipping_address, 
+                distributor_consignee_id, con_name, con_address, con_city, con_pincode, con_state, 
+                con_country, con_state_code, con_gst_number, basis_of_sales, email_from, 
+                email_approved_by, email_date_time) 
+                select date_of_po, '$invoice_no', depot_id, distributor_id, amount, tax, tax_per, 
+                tax_amount, final_amount, po_number, date_of_po, '$status', '$remarks', created_by, 
+                '$now', modified_by, '$now', '$curusr', '$now', state, discount, 'Pending', cgst, sgst, 
+                igst, cgst_amount, sgst_amount, igst_amount, state_code, round_off_amount, invoice_amount, 
+                '$id', shipping_address, distributor_consignee_id, con_name, con_address, con_city, 
+                con_pincode, con_state, con_country, con_state_code, con_gst_number, basis_of_sales, 
+                email_from, email_approved_by, email_date_time 
+                from distributor_po where id='$id'";
+        $this->db->query($sql);
+        $distributor_out_id=$this->db->insert_id();
+        // echo $sql;
+        // echo "<br/>";
+    } else {
+        $sql = "update distributor_out A, distributor_po B set A.date_of_processing=B.date_of_po, 
+                A.invoice_no = '$invoice_no', A.depot_id=B.depot_id, A.distributor_id=B.distributor_id, 
+                A.amount=B.amount, A.tax=B.tax, A.tax_per=B.tax_per, A.tax_amount=B.tax_amount, 
+                A.final_amount=B.final_amount, A.order_no=B.po_number, A.order_date=B.date_of_po, 
+                A.modified_by=B.modified_by, A.modified_on=B.modified_on, A.approved_by=B.approved_by, 
+                A.approved_on=B.approved_on, A.state=B.state, A.discount=B.discount, A.cgst=B.cgst, 
+                A.sgst=B.sgst, A.igst=B.igst, A.cgst_amount=B.cgst_amount, A.sgst_amount=B.sgst_amount, 
+                A.igst_amount=B.igst_amount, A.state_code=B.state_code, 
+                A.round_off_amount=B.round_off_amount, A.invoice_amount=B.invoice_amount, 
+                A.shipping_address=B.shipping_address, A.distributor_consignee_id=B.distributor_consignee_id, 
+                A.con_name=B.con_name, A.con_address=B.con_address, A.con_city=B.con_city, 
+                A.basis_of_sales=B.basis_of_sales, A.email_from=B.email_from, 
+                A.email_approved_by=B.email_approved_by, A.email_date_time=B.email_date_time, 
+                A.con_pincode=B.con_pincode, A.con_state=B.con_state, A.con_country=B.con_country, 
+                A.con_state_code=B.con_state_code, A.con_gst_number=B.con_gst_number, 
+                A.status='$status' 
+                where A.id='$distributor_out_id' and A.distributor_po_id=B.id and B.id='$id'";
+        $this->db->query($sql);
+    }
+
+    $sql = "delete from distributor_out_items where distributor_out_id = '$distributor_out_id'";
+    $this->db->query($sql);
+
+    $sql = "insert into distributor_out_items (distributor_out_id, type, item_id, qty, sell_rate, grams, 
+            rate, amount, cgst_amt, sgst_amt, igst_amt, tax_amt, total_amt, margin_per, tax_percentage, 
+            promo_margin) 
+            select '$distributor_out_id', type, item_id, qty, sell_rate, grams, rate, amount, cgst_amt, 
+            sgst_amt, igst_amt, tax_amt, total_amt, margin_per, tax_percentage, promo_margin 
+            from distributor_po_items where distributor_po_id = '$id'";
+    $this->db->query($sql);
 }
 
 function update_recon($id=''){

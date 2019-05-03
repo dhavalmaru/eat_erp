@@ -6823,6 +6823,40 @@ $('#form_beat_master').submit(function() {
 
 
 
+// ----------------- BEAT DISTRIBUTOR FORM VALIDATION -------------------------------------
+$("#form_beat_distributor").validate({
+    rules: {
+        beat_id: {
+            required: true
+        },
+        'distributor_id[]': {
+            required: true
+        }
+    },
+
+    ignore: false,
+
+    errorPlacement: function (error, element) {
+        var placement = $(element).data('error');
+        if (placement) {
+            $(placement).append(error);
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
+$('#form_beat_distributor').submit(function() {
+    if (!$("#form_beat_distributor").valid()) {
+        return false;
+    } else {
+        return true;
+    }
+});
+
+
+
+
 // ----------------- BEAT ALLOCATION FORM VALIDATION -------------------------------------
 $("#form_beat_allocation").validate({
     rules: {

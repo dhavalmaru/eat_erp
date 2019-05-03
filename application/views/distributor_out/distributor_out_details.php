@@ -778,53 +778,54 @@
 
                                 <?php $curusr=$this->session->userdata('session_id'); ?>
                                 <?php 
-                                        if(isset($data[0]->status))
-                                        {
-                                         if(isset($access)) {
-                                            if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive'))
-                                                {
-                                                  if(isset($data[0]->status))
-                                                    {
-                                                         if($data[0]->status=='Deleted'){
-                                                            echo '<label class="col-xs-12 control-label" style="color:#cc2127!important">Note : If clicked on approve button this entry will be deleted permanently </label>';
+                                    if(isset($data[0]->status)) {
+                                        if(isset($access)) {
+                                            if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive')) {
+                                                if(isset($data[0]->status)) {
+                                                    if($data[0]->status=='Deleted') {
+                                                        echo '<label class="col-xs-12 control-label" style="color:#cc2127!important">Note : If clicked on approve button this entry will be deleted permanently </label>';
+                                                    }    
+                                                }     
+                                            }
+                                        }   
+                                    }
+                                ?>
 
-                                                         }    
-                                                    }     
-                                                }
-                                            }   
+                                <?php 
+                                    $mismatch = (isset($data[0]->mismatch)?$data[0]->mismatch:'1');
+                                    $po_status = (isset($data[0]->po_status)?$data[0]->po_status:'');
+
+                                    if($mismatch=='1' || strtoupper(trim($po_status))!='APPROVED') {
+                                        $strmsg = '';
+                                        if($mismatch=='1') {
+                                            $strmsg = 'Please clear Mismatch PO Entry.';
+                                        } else if(strtoupper(trim($po_status))!='APPROVED') {
+                                            $strmsg = 'Please Approve PO Entry First.';
                                         }
+                                        echo '<label class="col-xs-12 control-label" style="color:#cc2127!important">Note : '.$strmsg.' </label>';
+                                    }
                                 ?>
 
 
                                 <div class="panel-footer">
 									<a href="<?php echo base_url(); ?>index.php/distributor_out" class="btn btn-danger pull-right" type="reset" id="reset">Cancel</a>
+
                                     <!-- <button class="btn btn-success pull-right" style="<?php //if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</button> -->
                                     <?php $curusr=$this->session->userdata('session_id'); ?>
                                     
-                                    <input type="submit" class="btn btn-success btn-sm" id="btn_submit" name="btn_submit" value="Submit For Approval"
+                                    <?php if($mismatch!='1' && strtoupper(trim($po_status))=='APPROVED') { ?>
+                                        <input type="submit" class="btn btn-success btn-sm" id="btn_submit" name="btn_submit" value="Submit For Approval" style="<?php if(isset($access)) { if(isset($data)) { if($data[0]->freezed) { echo 'display: none;'; } else { if($access[0]->r_edit=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || $data[0]->status=='InActive' || ($data[0]->depot_name=='' && $data[0]->status=='Pending'))) echo ''; else echo 'display: none;'; } } else if($access[0]->r_insert=='1') echo ''; } else echo 'display: none;'; ?>" />
+                                        <?php if(isset($data) && $data[0]->freezed!=1) { ?>
+                                            <input type="submit" class="btn btn-danger btn-sm" id="btn_delete" name="btn_delete" value="Delete" style="<?php if(isset($access)) { if(isset($data)) {if($access[0]->r_delete=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || ($data[0]->depot_name=='' && $data[0]->status=='Pending')) && $data[0]->status!='InActive') echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+                                        <?php } ?>
+                                        <input type="submit" class="btn btn-success btn-sm" id="btn_approve" name="btn_approve" value="Approve" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive' && $data[0]->depot_name!='')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+                                        <input type="submit" class="btn btn-danger btn-sm" id="btn_reject" formnovalidate="formnovalidate" name="btn_reject" value="Reject" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive' && $data[0]->depot_name!='')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+                                    <?php } else {  ?>
+                                        <br/><br/>
+                                    <?php } ?>
 
-                                    style="<?php 
-                                    if(isset($access)) {
-                                        if(isset($data)) {
-                                            if($data[0]->freezed) {
-                                                echo 'display: none;';
-                                            } else {
-                                                if($access[0]->r_edit=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || $data[0]->status=='InActive' || ($data[0]->depot_name=='' && $data[0]->status=='Pending'))) echo ''; else echo 'display: none;';
-                                            }
-                                        } else if($access[0]->r_insert=='1') echo ''; else echo 'display: none;'; ?>" />
-
-                                    <?php if(isset($data) && $data[0]->freezed!=1) { ?>
-                                    <input type="submit" class="btn btn-danger btn-sm" id="btn_delete" name="btn_delete" value="Delete" style="<?php if(isset($access) ) {
-                                        if(isset($data)) {if($access[0]->r_delete=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || ($data[0]->depot_name=='' && $data[0]->status=='Pending')) && $data[0]->status!='InActive') echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
-
-                                   <?php } ?>
-                                    <input type="submit" class="btn btn-success btn-sm" id="btn_approve" name="btn_approve" value="Approve" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive' && $data[0]->depot_name!='')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
-                                    <input type="submit" class="btn btn-danger btn-sm" id="btn_reject" formnovalidate="formnovalidate" name="btn_reject" value="Reject" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive' && $data[0]->depot_name!='')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
-
-                                    <?php }?>
-
-                                    
                                 </div>
+
 							</form>
 							
 						 </div>

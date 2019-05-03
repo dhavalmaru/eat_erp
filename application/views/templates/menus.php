@@ -326,6 +326,9 @@
                         <a href="<?php echo base_url().'index.php/Beat_master'; ?>" class="sub_menu--link"> Beat Master </a>
                     </li>
                     <li class="sub_menu--item" >
+                        <a href="<?php echo base_url().'index.php/Beat_distributor'; ?>" class="sub_menu--link"> Beat Distributor </a>
+                    </li>
+                    <li class="sub_menu--item" >
                         <a href="<?php echo base_url().'index.php/Beat_allocation'; ?>" class="sub_menu--link"> Assign Beat </a>
                     </li>
                     <li class="sub_menu--item" >

@@ -886,6 +886,50 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
         echo 1;
     }
 
+    public function get_array_api(){
+        // $visit_detail = $this->input->post('visit_detail');
+        $visit_detail = $this->input->post('merchandiser_stock_details');
+
+        $arr = json_decode($visit_detail, true);
+        // echo json_encode($arr);
+
+        // echo $arr['mid'];
+
+        echo $arr[0]['type'];
+
+
+        // $visit_detail = "Bundle[{mid:1, sid:2}]";
+
+        // $visit = json_encode($visit_detail);
+        // echo $visit;
+        // echo '<br/><br/>';
+
+        // $bundle = json_decode($visit);
+        // echo $bundle;
+        // echo '<br/><br/>';
+
+        // $arr = (array) json_decode($visit, true);
+        
+        // // $bundle = json_decode($visit);
+        // echo $arr[0];
+        // echo '<br/><br/>';
+
+        // foreach ($arr as $k=>$v){
+        //     echo $v;
+        //     echo '<br/><br/>';
+        // }
+        
+        
+
+        // echo $visit_detail;
+        // echo strpos($visit_detail, 'mid');
+        // echo $visit_detail['Bundle']['mid'];
+        // echo $visit_detail['Bundle']->mid;
+        // echo json_encode($visit_detail['Bundle']);
+        // echo '<br/><br/>';
+        // echo $visit_detail['bundle']['mid'];
+    }
+
     public function add_order_api(){
         // $visit_detail = $this->session->userdata('visit_detail');
         $visit_detail = $this->input->post('visit_detail');
@@ -1052,8 +1096,10 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
             }
         }
         
-        if($this->session->userdata('temp_stock_details')!=null) {
-            $data['stock_detail']=$this->session->userdata('temp_stock_details');
+        // $temp_stock_details = $this->session->userdata('temp_stock_details');
+        $temp_stock_details = $this->input->post('temp_stock_details');
+        if($temp_stock_details!=null) {
+            $data['stock_detail']=$temp_stock_details;
         }
 
         $data['get_retailers'] = $this->sales_rep_location_model->get_retailers();
@@ -1134,7 +1180,6 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
             $chocolate_cookies = $this->input->post('chocolate_cookies');
             $dark_chocolate_cookies = $this->input->post('dark_chocolate_cookies');
             $cranberry_cookies = $this->input->post('cranberry_cookies');
-            $cranberry_orange = $this->input->post('cranberry_orange');
             $fig_raisins = $this->input->post('fig_raisins');
             $papaya_pineapple = $this->input->post('papaya_pineapple');
             $cranberry_orange_zest = $this->input->post('cranberry_orange_zest');
@@ -1401,12 +1446,18 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                 $merchandiser_stock_details =  $batch_array; 
             }
         } else {
-            $visit_detail = $this->input->post('visit_detail');
+            $visit_detail = $this->input->post('visit_details');
             $merchandiser_stock_details = $this->input->post('merchandiser_stock_details');
             $sales_rep_stock_detail = $this->input->post('sales_rep_stock_detail');
+
+            $visit_detail = json_decode($visit_detail, true);
+            $merchandiser_stock_details = json_decode($merchandiser_stock_details, true);
+            $sales_rep_stock_detail = json_decode($sales_rep_stock_detail, true);
         }
 
         $retailer_detail = $this->input->post('retailer_detail');
+        $retailer_detail = json_decode($retailer_detail, true);
+
         $now=date('Y-m-d H:i:s');
         $now1=date('Y-m-d');
         $curusr=$this->input->post('session_id');
@@ -2699,7 +2750,6 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
             $chocolate_cookies = $this->input->post('chocolate_cookies');
             $dark_chocolate_cookies = $this->input->post('dark_chocolate_cookies');
             $cranberry_cookies = $this->input->post('cranberry_cookies');
-            $cranberry_orange = $this->input->post('cranberry_orange');
             $fig_raisins = $this->input->post('fig_raisins');
             $papaya_pineapple = $this->input->post('papaya_pineapple');
             $cranberry_orange_zest = $this->input->post('cranberry_orange_zest');
@@ -2977,7 +3027,7 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
 
         $data['visit_detail'] = $visit_detail;
         $data['retailer_detail'] = $retailer_detail;
-        $data['temp_stock_details'] = $temp_stock_details;
+        // $data['temp_stock_details'] = $temp_stock_details;
         $data['merchandiser_stock_details'] = $merchandiser_stock_details;
         $data['sales_rep_stock_detail'] = $sales_rep_stock_detail;
 

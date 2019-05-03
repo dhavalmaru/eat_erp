@@ -30,27 +30,24 @@ class Eat_Attendence extends CI_controller {
 
     public function upload_excel()
     {
-          $path=FCPATH.'assets/uploads/attendence_upload/';
-          $config = array(
-          'upload_path' => $path,
-          'allowed_types' => "xlsx",
-          'overwrite' => TRUE,
-          'max_size' => "2048000", 
-          'max_height' => "768",
-          'max_width' => "1024"
-          );
-          $new_name = time().'_'.str_replace(' ', "_", $_FILES["upload"]['name']);
-          $config['file_name'] = $new_name;
+        $path=FCPATH.'assets/uploads/attendence_upload/';
+        $config = array(
+            'upload_path' => $path,
+            'allowed_types' => "xlsx",
+            'overwrite' => TRUE,
+            'max_size' => "2048000", 
+            'max_height' => "768",
+            'max_width' => "1024"
+        );
+        $new_name = time().'_'.str_replace(' ', "_", $_FILES["upload"]['name']);
+        $config['file_name'] = $new_name;
 
-          $this->load->library('upload', $config);
-           if(!$this->upload->do_upload('upload'))
-          { 
-              $this->upload->display_errors();
-          }
-          else
-          {
-              $imageDetailArray = $this->upload->data();
-          }
+        $this->load->library('upload', $config);
+        if(!$this->upload->do_upload('upload')) { 
+            $this->upload->display_errors();
+        } else {
+            $imageDetailArray = $this->upload->data();
+        }
 
           $file = $path.$new_name;
           $this->load->library('excel');
@@ -65,7 +62,8 @@ class Eat_Attendence extends CI_controller {
 
           for($i=4;$i<=$highestrow;$i++)
           { 
-                echo "eneterd";
+                // echo "eneterd";
+                // echo "<br/><br/>";
                 $emp_no = $objPHPExcel->getActiveSheet()->getCell('A'.$i)->getValue();
                 $emp_name = $objPHPExcel->getActiveSheet()->getCell('B'.$i)->getValue();
                 $job_title = $objPHPExcel->getActiveSheet()->getCell('C'.$i)->getValue();
@@ -150,9 +148,9 @@ class Eat_Attendence extends CI_controller {
                                           'modified_on' => $now,
                                        );
                             $this->db->where($where)->update('employee_attendence',$data);
-                            echo $this->db->last_query();
-                          }else
-                          {
+                            // echo $this->db->last_query();
+                            // echo "<br/><br/>";
+                          } else {
                              $data = array(  'emp_no' =>$emp_no,
                                           'emp_name' => $emp_name,
                                           'job_title' => $job_title,
@@ -172,7 +170,8 @@ class Eat_Attendence extends CI_controller {
                                           'created_on' => $now,
                                        );
                             $this->db->insert('employee_attendence',$data);
-                            echo $this->db->last_query();
+                            // echo $this->db->last_query();
+                            // echo "<br/><br/>";
                           }
                     }
                 }

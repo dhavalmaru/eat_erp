@@ -34,7 +34,7 @@ class Beat_allocation extends CI_Controller{
                 $data['allocations'] = $this->beat_allocation_model->get_beat_allocations();
                 $data['type'] = $this->beat_allocation_model->get_type();
                 $data['sales_rep'] = $this->beat_allocation_model->get_sales_rep();
-                $data['rep_manager'] = $this->beat_allocation_model->get_sales_rep();
+                $data['rep_manager'] = $this->beat_allocation_model->get_reporting_manager();
                 $data['distributor'] = $this->beat_allocation_model->get_distributors();
                 $data['beat_plan'] = $this->beat_allocation_model->get_beat_plan();
 
@@ -57,7 +57,7 @@ class Beat_allocation extends CI_Controller{
                 $data['allocations'] = $this->beat_allocation_model->get_beat_allocations($sales_rep_id);
                 $data['type'] = $this->beat_allocation_model->get_type();
                 $data['sales_rep'] = $this->beat_allocation_model->get_sales_rep($sales_rep_id);
-                $data['rep_manager'] = $this->beat_allocation_model->get_sales_rep();
+                $data['rep_manager'] = $this->beat_allocation_model->get_reporting_manager();
                 $data['distributor'] = $this->beat_allocation_model->get_distributors();
                 $data['beat_plan'] = $this->beat_allocation_model->get_beat_plan();
 

@@ -123,10 +123,11 @@ class Dashboard_sales_rep extends CI_Controller
             $data['target']=$this->dashboard_sales_rep_model->get_target($sales_rep_id);
             $data['orders'] = $this->Sales_location_model->get_todaysorder($sales_rep_id);
             $data['pendingsorder'] = $this->Sales_location_model->get_pendingsorder($sales_rep_id);
-            $data['sales_rep_id']=$this->session->userdata('sales_rep_id');
-            $data['checkstatus'] = $frequency;
-
+            $data['sales_rep_id']=$sales_rep_id;
+            
             $data['reporting_manager_id']='';
+            $data['distributor_id_og']='';
+            $data['beat_id_og']='';
             $data['distributor_id']='';
             $data['beat_id']='';
             $data['beat_status']='Approved';
@@ -134,8 +135,18 @@ class Dashboard_sales_rep extends CI_Controller
             $data['beat_details'] = $this->Sales_location_model->get_new_beat_details($sales_rep_id);
             if(count($data['beat_details'])>0){
                 $data['reporting_manager_id']=$data['beat_details'][0]->reporting_manager_id;
+
+                $beat_status = $data['beat_details'][0]->status;
+                if(strtoupper(trim($beat_status))=="PENDING"){
+                    $data['distributor_id_og']=$data['beat_details'][0]->dist_id1;
+                    $data['beat_id_og']=$data['beat_details'][0]->beat_id1;
+                } else {
+                    $data['distributor_id_og']=$data['beat_details'][0]->dist_id2;
+                    $data['beat_id_og']=$data['beat_details'][0]->beat_id2;
+                }
                 $data['distributor_id']=$data['beat_details'][0]->dist_id2;
                 $data['beat_id']=$data['beat_details'][0]->beat_id2;
+
                 $data['beat_status']=$data['beat_details'][0]->status;
             }
 
@@ -145,9 +156,13 @@ class Dashboard_sales_rep extends CI_Controller
                     $data['reporting_manager_id']=$data['beat_details'][0]->reporting_manager_id;
 
                     if($frequency == 'Alternate '.$day){
+                        $data['distributor_id_og']=$data['beat_details'][0]->alternate_dist;
+                        $data['beat_id_og']=$data['beat_details'][0]->alternate_beat;
                         $data['distributor_id']=$data['beat_details'][0]->alternate_dist;
                         $data['beat_id']=$data['beat_details'][0]->alternate_beat;
                     } else {
+                        $data['distributor_id_og']=$data['beat_details'][0]->every_dist;
+                        $data['beat_id_og']=$data['beat_details'][0]->every_beat;
                         $data['distributor_id']=$data['beat_details'][0]->every_dist;
                         $data['beat_id']=$data['beat_details'][0]->every_beat;
                     }
@@ -196,6 +211,29 @@ class Dashboard_sales_rep extends CI_Controller
         }
 
         $data = $this->Sales_location_model->set_beat_plan($reporting_manager_id, $distributor_id_og, $beat_id_og, $distributor_id, $beat_id, $sales_rep_id, $curusr, $frequency);
+        echo json_encode($data);
+    }
+
+    public function set_original_beat_plan(){
+        $reporting_manager_id = $this->input->post('reporting_manager_id');
+        $distributor_id_og = $this->input->post('distributor_id_og');
+        $beat_id_og = $this->input->post('beat_id_og');
+        $distributor_id = $this->input->post('distributor_id');
+        $beat_id = $this->input->post('beat_id');
+        $sales_rep_id = $this->session->userdata('sales_rep_id');
+        $curusr=$this->session->userdata('session_id');
+
+        $day = date('l');
+        $m = date('F');
+        $year = date('Y');
+        $get_alternate  = $this->get_alternate($day,$m,$year);
+        if($get_alternate) {
+            $frequency = 'Alternate '.$day;
+        } else {
+            $frequency = 'Every '.$day;
+        }
+
+        $data = $this->Sales_location_model->set_original_beat_plan($reporting_manager_id, $distributor_id_og, $beat_id_og, $distributor_id, $beat_id, $sales_rep_id, $curusr, $frequency);
         echo json_encode($data);
     }
 

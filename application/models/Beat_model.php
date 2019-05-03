@@ -164,9 +164,7 @@ function get_retailer($beat_id='', $type_id='', $zone_id='', $area_id='', $locat
         $cond4 = $cond4." and location_id in ($location_id)";
         $cond2 = $cond2." and B.location_id in ($location_id)";
     }
-    if($beat_id!=""){
-        $cond3 = $cond3." where A.id = '$beat_id'";
-    }
+    $cond3 = $cond3." where A.id = '$beat_id' and B.beat_id = '$beat_id'";
 
     if($type_id=='7'){
         $sql = "select A.*, case when B.dist_id is null then '0' else '1' end as is_selected, 

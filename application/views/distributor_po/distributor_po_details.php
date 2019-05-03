@@ -896,15 +896,7 @@
                     get_sell_rate();
                 });
                 $('input[type=radio][name=shipping_address]').on('change', function() {
-                    if($(this).val()=='no'){
-                        $('#shipping_address_div').show();
-                        // if($('#distributor_consignee_id').val()!='') {
-                        //     get_consignee_details1($('#distributor_consignee_id').val());
-                        // }
-                    } else {
-                        get_distributor_details($('#distributor_id').val());
-                        $('#shipping_address_div').hide();
-                    }
+                    set_shipping_add();
                 });
                 
                 addMultiInputNamingRules('#form_distributor_po_details', 'select[name="box[]"]', { required: true }, "");
@@ -929,6 +921,15 @@
                 //     get_distributor_details($('#sample_distributor_id').val());
                 // }
             });
+
+            var set_shipping_add = function(){
+                if($('#shipping_address_yes').is(':checked')==false){
+                    $('#shipping_address_div').show();
+                } else {
+                    get_distributor_details($('#distributor_id').val());
+                    $('#shipping_address_div').hide();
+                }
+            }
 
             function set_distributor_details(){
                 get_distributor_details($('#distributor_id').val());
@@ -1954,6 +1955,8 @@
                     $('.relationship').show();
                      $('.onbasis').hide();
                 }
+
+                set_shipping_add();
             }
 
             function get_zones(){

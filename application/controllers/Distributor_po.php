@@ -197,6 +197,8 @@ class Distributor_po extends CI_Controller{
             }
         }
 
+        // echo json_encode($data);
+
         $output = array(
                         "draw" => $draw,
                         "recordsTotal" => count($r),
@@ -266,7 +268,7 @@ class Distributor_po extends CI_Controller{
                         $active=$active+1;
                     }
                     
-                    if ($count_data[$i]->mismatch=='1' && strtoupper(trim($count_data[$i]->delivery_through))!="WHPL")
+                    if ($count_data[$i]->mismatch=='1')
                         $mismatch=$mismatch+1;
                     else if ((strtoupper(trim($count_data[$i]->status))=="PENDING" || 
                             strtoupper(trim($count_data[$i]->status))=="DELETED") && $count_data[$i]->mismatch!='1')

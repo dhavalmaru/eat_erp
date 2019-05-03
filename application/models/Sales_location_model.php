@@ -1620,247 +1620,247 @@ public function save_session() {
     }
     else
     {
+        if($chocolate_cookies!='')
+        {
+            $item_id =37;
+            $data = array(
+                            'type'=>'Box',
+                            'item_id'=>$item_id,
+                            'qty'=>$chocolate_cookies
+                            );
+            $batch_array[] = $data;
+        }
 
-            if($chocolate_cookies!='')
-            {
-                $item_id =37;
-                $data = array(
-                                'type'=>'Box',
-                                'item_id'=>$item_id,
-                                'qty'=>$chocolate_cookies
-                                );
-                $batch_array[] = $data;
-            }
+        if($dark_chocolate_cookies!='')
+        {
+            $item_id =38;
+            $data = array(
+                            'type'=>'Box',
+                            'item_id'=>$item_id,
+                            'qty'=>$dark_chocolate_cookies
+                            );
+            $batch_array[] = $data;
+        }
 
-            if($dark_chocolate_cookies!='')
-            {
-                $item_id =38;
-                $data = array(
-                                'type'=>'Box',
-                                'item_id'=>$item_id,
-                                'qty'=>$dark_chocolate_cookies
-                                );
-                $batch_array[] = $data;
-            }
+        if($cranberry_cookies!='')
+        {
+            $item_id = 39;
+            $data = array( 'type'=>'Box',
+                            'item_id'=>$item_id,
+                            'qty'=>$cranberry_cookies
+                            );
+            $batch_array[] = $data;
+        }
 
-            if($cranberry_cookies!='')
-            {
-                $item_id = 39;
-                $data = array( 'type'=>'Box',
-                                'item_id'=>$item_id,
-                                'qty'=>$cranberry_cookies
-                                );
-                $batch_array[] = $data;
-            }
+        if($cranberry_orange_zest!='')
+        {
+            $item_id = 42;
+            $data = array(  'type'=>'Box',
+                            'item_id'=>$item_id,
+                            'qty'=>$cranberry_orange_zest
+                            );
+            $batch_array[] = $data;
+        }
+        
+        if($fig_raisins!='')
+        {
+            $item_id = 41;
+            $data = array(
+                            'type'=>'Box',
+                            'item_id'=>$item_id,
+                            'qty'=>$fig_raisins
+                            );
+            $batch_array[] = $data;
+        }
 
-            if($cranberry_orange_zest!='')
-            {
-                $item_id = 42;
-                $data = array(  'type'=>'Box',
-                                'item_id'=>$item_id,
-                                'qty'=>$cranberry_orange_zest
-                                );
-                $batch_array[] = $data;
-            }
+        if($papaya_pineapple!='')
+        {
+            $item_id = 40;
+            $data = array(
+                            'type'=>'Box',
+                            'item_id'=>$item_id,
+                            'qty'=>$papaya_pineapple
+                            );
+            $batch_array[] = $data;
+        }
+
+        if($orange_bar!=null)
+        {
+            $item_id = 1;
+            $data = array(
+                            'type'=>'Bar',
+                            'item_id'=>$item_id,
+                            'qty'=>$orange_bar
+                            );
+            $batch_array[] = $data;
+        }
+
+        if($orange_box!=null)
+        {
+            $item_id = 1;  
+
+            $data = array(
+                            'type'=>'Box',
+                            'item_id'=>$item_id,
+                            'qty'=>$orange_box
+                            );
+            $batch_array[] = $data;
+        }
+
+        if($butterscotch_bar!=null)
+        {
+            $item_id = 3;
+            $data = array(
+                            'type'=>'Bar',
+                            'item_id'=>$item_id,
+                            'qty'=>$butterscotch_bar
+                            );
+            $batch_array[] = $data;
+        }
+
+        if($butterscotch_box!=null)
+        {
+            $item_id = 3;
+
+            $data = array(
+                            'type'=>'Box',
+                            'item_id'=>$item_id,
+                            'qty'=>$butterscotch_box
+                            );
+            $batch_array[] = $data;
+        }
+
+        if($chocopeanut_bar!=null)
+        {
+            $item_id = 5;
+            $data = array(
+                            'type'=>'Bar',
+                            'item_id'=>$item_id,
+                            'qty'=>$chocopeanut_bar
+                            );
+            $batch_array[] = $data;
+        }
+
+        if($chocopeanut_box!=null)
+        {
+            $item_id = 9;
+            $data = array(
+                            'type'=>'Box',
+                            'item_id'=>$item_id,
+                            'qty'=>$chocopeanut_box
+                            );
+            $batch_array[] = $data;
+        }
+
+        if($bambaiyachaat_bar!=null)
+        {
+            $item_id = 4;
+            $data = array(
+                            'type'=>'Bar',
+                            'item_id'=>$item_id,
+                            'qty'=>$bambaiyachaat_bar
+                            );
+            $batch_array[] = $data;
+        }
+
+        if($bambaiyachaat_box!=null)
+        {
+            $item_id = 8;
+            $data = array(
+                            'type'=>'Box',
+                            'item_id'=>$item_id,
+                            'qty'=>$bambaiyachaat_box
+                            );
+            $batch_array[] = $data;
+        }
+
+        if($mangoginger_bar!=null)
+        {
+            $item_id = 6;
             
-            if($fig_raisins!='')
-            {
-                $item_id = 41;
-                $data = array(
-                                'type'=>'Box',
-                                'item_id'=>$item_id,
-                                'qty'=>$fig_raisins
-                                );
-                $batch_array[] = $data;
-            }
+           $data = array(
+                            'type'=>'Bar',
+                            'item_id'=>$item_id,
+                            'qty'=>$mangoginger_bar
+                            );
+            $batch_array[] = $data;
+        }
 
-            if($papaya_pineapple!='')
-            {
-                $item_id = 40;
-                $data = array(
-                                'type'=>'Box',
-                                'item_id'=>$item_id,
-                                'qty'=>$papaya_pineapple
-                                );
-                $batch_array[] = $data;
-            }
+        if($mangoginger_box!=null)
+        {
+           $item_id = 12;
+           $data = array(
+                            'type'=>'Box',
+                            'item_id'=>$item_id,
+                            'qty'=>$mangoginger_box
+                            );
+            $batch_array[] = $data;
+        }
 
-            if($orange_bar!=null)
-            {
-                $item_id = 1;
-                $data = array(
-                                'type'=>'Bar',
-                                'item_id'=>$item_id,
-                                'qty'=>$orange_bar
-                                );
-                $batch_array[] = $data;
-            }
+        if($berry_blast_bar!=null)
+        {
+           $item_id = 9;
+           $data = array(
+                            'type'=>'Bar',
+                            'item_id'=>$item_id,
+                            'qty'=>$berry_blast_bar
+                            );
 
-            if($orange_box!=null)
-            {
-                $item_id = 1;  
+            $batch_array[] = $data;
+        }
 
-                $data = array(
-                                'type'=>'Box',
-                                'item_id'=>$item_id,
-                                'qty'=>$orange_box
-                                );
-                $batch_array[] = $data;
-            }
+        if($berry_blast_box!=null)
+        {
+           $item_id = 29;
+           $data = array(
+                            'type'=>'Box',
+                            'item_id'=>$item_id,
+                            'qty'=>$berry_blast_box
+                            );
 
-            if($butterscotch_bar!=null)
-            {
-                $item_id = 3;
-                $data = array(
-                                'type'=>'Bar',
-                                'item_id'=>$item_id,
-                                'qty'=>$butterscotch_bar
-                                );
-                $batch_array[] = $data;
-            }
+            $batch_array[] = $data;
+        }
 
-            if($butterscotch_box!=null)
-            {
-                $item_id = 3;
+        if($chyawanprash_bar!=null)
+        {
+           $item_id = 10;
+           $data = array(
+                            'type'=>'Bar',
+                            'item_id'=>$item_id,
+                            'qty'=>$chyawanprash_bar
+                            );
+            $batch_array[] = $data;
+        }
 
-                $data = array(
-                                'type'=>'Box',
-                                'item_id'=>$item_id,
-                                'qty'=>$butterscotch_box
-                                );
-                $batch_array[] = $data;
-            }
+        if($chyawanprash_box!=null)
+        {
+           $item_id = 31;
+           $data = array(
+                            'type'=>'Box',
+                            'item_id'=>$item_id,
+                            'qty'=>$chyawanprash_box
+                            );
+            $batch_array[] = $data;
+        }
 
-            if($chocopeanut_bar!=null)
-            {
-                $item_id = 5;
-                $data = array(
-                                'type'=>'Bar',
-                                'item_id'=>$item_id,
-                                'qty'=>$chocopeanut_bar
-                                );
-                $batch_array[] = $data;
-            }
-
-            if($chocopeanut_box!=null)
-            {
-                $item_id = 9;
-                $data = array(
-                                'type'=>'Box',
-                                'item_id'=>$item_id,
-                                'qty'=>$chocopeanut_box
-                                );
-                $batch_array[] = $data;
-            }
-
-            if($bambaiyachaat_bar!=null)
-            {
-                $item_id = 4;
-                $data = array(
-                                'type'=>'Bar',
-                                'item_id'=>$item_id,
-                                'qty'=>$bambaiyachaat_bar
-                                );
-                $batch_array[] = $data;
-            }
-
-            if($bambaiyachaat_box!=null)
-            {
-                $item_id = 8;
-                $data = array(
-                                'type'=>'Box',
-                                'item_id'=>$item_id,
-                                'qty'=>$bambaiyachaat_box
-                                );
-                $batch_array[] = $data;
-            }
-
-            if($mangoginger_bar!=null)
-            {
-                $item_id = 6;
-                
-               $data = array(
-                                'type'=>'Bar',
-                                'item_id'=>$item_id,
-                                'qty'=>$mangoginger_bar
-                                );
-                $batch_array[] = $data;
-            }
-
-            if($mangoginger_box!=null)
-            {
-               $item_id = 12;
-               $data = array(
-                                'type'=>'Box',
-                                'item_id'=>$item_id,
-                                'qty'=>$mangoginger_box
-                                );
-                $batch_array[] = $data;
-            }
-
-            if($berry_blast_bar!=null)
-            {
-               $item_id = 9;
-               $data = array(
-                                'type'=>'Bar',
-                                'item_id'=>$item_id,
-                                'qty'=>$berry_blast_bar
-                                );
-
-                $batch_array[] = $data;
-            }
-
-            if($berry_blast_box!=null)
-            {
-               $item_id = 29;
-               $data = array(
-                                'type'=>'Box',
-                                'item_id'=>$item_id,
-                                'qty'=>$berry_blast_box
-                                );
-
-                $batch_array[] = $data;
-            }
-
-            if($chyawanprash_bar!=null)
-            {
-               $item_id = 10;
-               $data = array(
-                                'type'=>'Bar',
-                                'item_id'=>$item_id,
-                                'qty'=>$chyawanprash_bar
-                                );
-                $batch_array[] = $data;
-            }
-
-            if($chyawanprash_box!=null)
-            {
-               $item_id = 31;
-               $data = array(
-                                'type'=>'Box',
-                                'item_id'=>$item_id,
-                                'qty'=>$chyawanprash_box
-                                );
-                $batch_array[] = $data;
-            }
-
-            if($variety_box!=null)
-            {
-                $item_id = 32;
-                
-                $data = array(
-                                'type'=>'Box',
-                                'item_id'=>$item_id,
-                                'qty'=>$variety_box
-                                );
-                $batch_array[] = $data;
-            }  
+        if($variety_box!=null)
+        {
+            $item_id = 32;
             
-             $this->session->set_userdata('merchandiser_stock_details', $batch_array);
-            /*if(count($batch_array)!='')
-             {
-                $this->db->insert_batch('merchandiser_stock_details',$batch_array);
-             }*/  
+            $data = array(
+                            'type'=>'Box',
+                            'item_id'=>$item_id,
+                            'qty'=>$variety_box
+                            );
+            $batch_array[] = $data;
+        }  
+        
+        $this->session->set_userdata('merchandiser_stock_details', $batch_array);
+
+        /*if(count($batch_array)!='')
+         {
+            $this->db->insert_batch('merchandiser_stock_details',$batch_array);
+         }*/  
     }
 
     if($channel_type=='GT')
@@ -1870,12 +1870,10 @@ public function save_session() {
     else
     {
         $temp_array['merchandiser_stock_id']= $this->input->post('merchandiser_stock_id');
-
     }
 
     if($chocolate_cookies!='')
     {
-
         $temp_array['chocolate_cookies_box']=$chocolate_cookies.'_Box';
     }
 
@@ -3703,6 +3701,53 @@ function set_beat_plan($reporting_manager_id='', $distributor_id_og='', $beat_id
 
     if($reporting_manager_id=='' || $reporting_manager_id=='0' || $reporting_manager_id==null){
         $status = 'Approved';
+        $reporting_manager_id = null;
+    }
+    
+    $data = array(
+                'date_of_visit' => date('Y-m-d'),
+                'sales_rep_id' => $sales_rep_id,
+                'reporting_manager_id' => $reporting_manager_id,
+                'dist_id1' => $distributor_id_og,
+                'beat_id1' => $beat_id_og,
+                'dist_id2' => $distributor_id,
+                'beat_id2' => $beat_id,
+                'status' => $status,
+                'remarks' => '',
+                'modified_by' => $curusr,
+                'modified_on' => $now
+            );
+    $sql = "select * from beat_changes where date_of_visit = curdate() and sales_rep_id = '$sales_rep_id'";
+    $query=$this->db->query($sql);
+    $result = $query->result();
+
+    if(count($result)>0){
+        $this->db->where("date_of_visit = curdate() and sales_rep_id = '$sales_rep_id'");
+        $this->db->update('beat_changes', $data);
+
+        $id=$result[0]->id;
+    } else {
+        $data['created_by']=$curusr;
+        $data['created_on']=$now;
+
+        $this->db->insert('beat_changes', $data);
+        $id=$this->db->insert_id();
+    }
+
+    if($status == 'Approved'){
+        $this->set_approved_beat_plan($frequency, $id, $curusr);
+    }
+    
+    return 1;
+}
+
+function set_original_beat_plan($reporting_manager_id='', $distributor_id_og='', $beat_id_og='', $distributor_id='', $beat_id='', $sales_rep_id='', $curusr='', $frequency='') {
+    $now=date('Y-m-d H:i:s');
+    $status = 'Approved';
+
+    if($reporting_manager_id=='' || $reporting_manager_id=='0' || $reporting_manager_id==null){
+        $status = 'Approved';
+        $reporting_manager_id = null;
     }
     
     $data = array(

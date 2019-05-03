@@ -79,6 +79,13 @@ function get_sales_rep($sales_rep_id=''){
     return $query->result();
 }
 
+function get_reporting_manager($sales_rep_id=''){
+    $sql = "select distinct A.id, A.sales_rep_name 
+            from sales_rep_master A where A.status = 'Approved' order by A.sales_rep_name";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
 function get_distributors(){
     $sql = "select * from distributor_master 
             where status = 'Approved' and class='super stockist'
