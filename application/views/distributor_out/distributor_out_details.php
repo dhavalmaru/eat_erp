@@ -778,55 +778,54 @@
 
                                 <?php $curusr=$this->session->userdata('session_id'); ?>
                                 <?php 
-                                        if(isset($data[0]->status))
-                                        {
-                                         if(isset($access)) {
-                                            if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive'))
-                                                {
-                                                  if(isset($data[0]->status))
-                                                    {
-                                                         if($data[0]->status=='Deleted'){
-                                                            echo '<label class="col-xs-12 control-label" style="color:#cc2127!important">Note : If clicked on approve button this entry will be deleted permanently </label>';
+                                    if(isset($data[0]->status)) {
+                                        if(isset($access)) {
+                                            if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive')) {
+                                                if(isset($data[0]->status)) {
+                                                    if($data[0]->status=='Deleted') {
+                                                        echo '<label class="col-xs-12 control-label" style="color:#cc2127!important">Note : If clicked on approve button this entry will be deleted permanently </label>';
+                                                    }    
+                                                }     
+                                            }
+                                        }   
+                                    }
+                                ?>
 
-                                                         }    
-                                                    }     
-                                                }
-                                            }   
+                                <?php 
+                                    $mismatch = (isset($data[0]->mismatch)?$data[0]->mismatch:'1');
+                                    $po_status = (isset($data[0]->po_status)?$data[0]->po_status:'');
+
+                                    if($mismatch=='1' || strtoupper(trim($po_status))!='APPROVED') {
+                                        $strmsg = '';
+                                        if($mismatch=='1') {
+                                            $strmsg = 'Please clear Mismatch PO Entry.';
+                                        } else if(strtoupper(trim($po_status))!='APPROVED') {
+                                            $strmsg = 'Please Approve PO Entry First.';
                                         }
+                                        echo '<label class="col-xs-12 control-label" style="color:#cc2127!important">Note : '.$strmsg.' </label>';
+                                    }
                                 ?>
 
 
                                 <div class="panel-footer">
 									<a href="<?php echo base_url(); ?>index.php/distributor_out" class="btn btn-danger pull-right" type="reset" id="reset">Cancel</a>
+
                                     <!-- <button class="btn btn-success pull-right" style="<?php //if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</button> -->
                                     <?php $curusr=$this->session->userdata('session_id'); ?>
                                     
-                                    <input type="submit" class="btn btn-success btn-sm" id="btn_submit" name="btn_submit" value="Submit For Approval"
+                                    <?php if($mismatch!='1' && strtoupper(trim($po_status))=='APPROVED') { ?>
+                                        <input type="submit" class="btn btn-success btn-sm" id="btn_submit" name="btn_submit" value="Submit For Approval" style="<?php if(isset($access)) { if(isset($data)) { if($data[0]->freezed) { echo 'display: none;'; } else { if($access[0]->r_edit=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || $data[0]->status=='InActive' || ($data[0]->depot_name=='' && $data[0]->status=='Pending'))) echo ''; else echo 'display: none;'; } } else if($access[0]->r_insert=='1') echo ''; } else echo 'display: none;'; ?>" />
+                                        <?php if(isset($data) && $data[0]->freezed!=1) { ?>
+                                            <input type="submit" class="btn btn-danger btn-sm" id="btn_delete" name="btn_delete" value="Delete" style="<?php if(isset($access)) { if(isset($data)) {if($access[0]->r_delete=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || ($data[0]->depot_name=='' && $data[0]->status=='Pending')) && $data[0]->status!='InActive') echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+                                        <?php } ?>
+                                        <input type="submit" class="btn btn-success btn-sm" id="btn_approve" name="btn_approve" value="Approve" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive' && $data[0]->depot_name!='')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+                                        <input type="submit" class="btn btn-danger btn-sm" id="btn_reject" formnovalidate="formnovalidate" name="btn_reject" value="Reject" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive' && $data[0]->depot_name!='')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+                                    <?php } else {  ?>
+                                        <br/><br/>
+                                    <?php } ?>
 
-                                    style="<?php 
-                                    if(isset($access)) {
-                                        if(isset($data)) {
-                                            if($data[0]->freezed)
-                                            {
-                                                echo 'display: none;';
-                                            }else
-                                            {
-                                             if($access[0]->r_edit=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || $data[0]->status=='InActive' || ($data[0]->depot_name=='' && $data[0]->status=='Pending'))) echo ''; else echo 'display: none;';
-                                            }
-                                        } else if($access[0]->r_insert=='1') echo ''; else echo 'display: none;'; ?>" />
-
-                                    <?php if(isset($data) && $data[0]->freezed!=1) { ?>
-                                    <input type="submit" class="btn btn-danger btn-sm" id="btn_delete" name="btn_delete" value="Delete" style="<?php if(isset($access) ) {
-                                        if(isset($data)) {if($access[0]->r_delete=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || ($data[0]->depot_name=='' && $data[0]->status=='Pending')) && $data[0]->status!='InActive') echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
-
-                                   <?php } ?>
-                                    <input type="submit" class="btn btn-success btn-sm" id="btn_approve" name="btn_approve" value="Approve" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive' && $data[0]->depot_name!='')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
-                                    <input type="submit" class="btn btn-danger btn-sm" id="btn_reject" formnovalidate="formnovalidate" name="btn_reject" value="Reject" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive' && $data[0]->depot_name!='')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
-
-                                    <?php }?>
-
-                                    
                                 </div>
+
 							</form>
 							
 						 </div>
@@ -995,7 +994,7 @@
                             //if(data.result==1){
                                 // console.log(data.state);
 								//alert($('#distributor_id').val());
-								if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550" && $('#distributor_id').val()!="622" && $('#distributor_id').val()!="626" && $('#distributor_id').val()!="640" && $('#distributor_id').val()!="1299" && $('#distributor_id').val()!="1319") {
+								if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550" && $('#distributor_id').val()!="622" && $('#distributor_id').val()!="626" && $('#distributor_id').val()!="640" && $('#distributor_id').val()!="1299" && $('#distributor_id').val()!="1319" && $('#distributor_id').val()!="1327") {
 									// alert($('#distributor_id').val());
 									$('#state').val(data.state);
 									$('#state_code').val(data.state_code);
@@ -1106,7 +1105,6 @@
 					$('#email_body3').show();
 					$('#po_num1').hide();
 					$('#po_num2').hide();
-					
 				}
 				if($("#basis_of_sales option:selected").val() == 'PO Number') {
 					$('#email_body1').hide();
@@ -1231,7 +1229,7 @@
                                 }
                             }
                             
-                            // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319){
+                            // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327){
                             //     $('#sell_out').val($("#discount").val());
                             // } else {
                             //     $('#sell_out').val(data.sell_out);
@@ -1241,7 +1239,7 @@
                                 $('#distributor_name').val(data.product_name);
                             }
 
-                            if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550" && $('#distributor_id').val()!="622" && $('#distributor_id').val()!="626" && $('#distributor_id').val()!="640" && $('#distributor_id').val()!="1299" && $('#distributor_id').val()!="1319") {
+                            if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550" && $('#distributor_id').val()!="622" && $('#distributor_id').val()!="626" && $('#distributor_id').val()!="640" && $('#distributor_id').val()!="1299" && $('#distributor_id').val()!="1319" && $('#distributor_id').val()!="1327") {
                                 $('#state').val(data.state);
                                 $('#state_code').val(data.state_code);
                             }
@@ -1312,7 +1310,7 @@
                     }
                 });
 
-                if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319){
+                if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327){
                     $('.direct').show();
                 } else {
                     $('.direct').hide();
@@ -1328,7 +1326,7 @@
                     var id = elem.attr('id');
                     var index = id.substr(id.lastIndexOf('_')+1);
                     var sell_out = 0;
-                    // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319){
+                    // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327){
                     //     sell_out = parseFloat($('#sell_out').val());
                     // } else {
                     //     sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
@@ -1398,7 +1396,7 @@
                 var index = id.substr(id.lastIndexOf('_')+1);
                 var qty = parseFloat(get_number($("#qty_"+index).val(),2));
                 var sell_out = 0;
-                // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319){
+                // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327){
                 //     sell_out = parseFloat($('#sell_out').val());
                 // } else {
                 //     sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
@@ -1425,7 +1423,7 @@
                         if(data.result==1){
                             grams = parseFloat(data.grams);
                             rate = parseFloat(data.rate);
-                            // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319){
+                            // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327){
                             //     sell_out = parseFloat($('#sell_out').val());
                             // } else {
                             //     sell_out = parseFloat(data.inv_margin);
@@ -1498,7 +1496,7 @@
                 var index = id.substr(id.lastIndexOf('_')+1);
                 var qty = parseFloat(get_number($("#qty_"+index).val(),2));
                 var sell_out = 0;
-                // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319){
+                // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327){
                 //     sell_out = parseFloat($('#sell_out').val());
                 // } else {
                 //     sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
@@ -1521,7 +1519,7 @@
                         if(data.result==1){
                             grams = parseFloat(data.grams);
                             rate = parseFloat(data.rate);
-                            // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319){
+                            // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327){
                             //     sell_out = parseFloat($('#sell_out').val());
                             // } else {
                             //     sell_out = parseFloat(data.inv_margin);

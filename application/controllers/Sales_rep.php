@@ -181,7 +181,7 @@ class Sales_rep extends CI_Controller{
         // // $date = '2017-04-15';
         // $from_email = 'cs@eatanytime.in';
         // $from_email_sender = 'Eat ERP';
-        // // $to_email = 'rishit.sanghvi@otbconsulting.co.in';
+        // // $to_email = 'rishit.sanghvi@eatanytime.in';
         // // $to_email = 'prasad.bhisale@otbconsulting.co.in';
         // $to_email = 'dhaval.maru@otbconsulting.co.in';
         // $subject = 'Route Plan For - ' . $date;
@@ -212,7 +212,7 @@ class Sales_rep extends CI_Controller{
         $from_email = 'cs@eatanytime.in';
         $from_email_sender = 'Eat ERP';
         // $bcc = 'prasad.bhisale@otbconsulting.co.in';
-        // $bcc = 'rishit.sanghvi@otbconsulting.co.in, swapnil.darekar@otbconsulting.co.in';
+        // $bcc = 'rishit.sanghvi@eatanytime.in, swapnil.darekar@otbconsulting.co.in';
         $subject = 'Route Plan For - ' . $date;
         $links = '';
         $table = '';

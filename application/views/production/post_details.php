@@ -205,52 +205,62 @@
                                 <div class="row">
                                     <div class="col-md-12"> 
                                         <input type="hidden" id="production_id" name="production_id" value="<?php if(isset($production_id)) echo $production_id; ?>" />
-
+                                        <?php 
+                                            $cls_active = 'report_approved';
+                                            if(isset($data)) { 
+                                                if($data[0]->batch_master==0 || $data[0]->batch_master==null) $cls_active = 'batch_master';
+                                                else if($data[0]->production_details==0 || $data[0]->production_details==null) $cls_active = 'production_details';
+                                                else if($data[0]->bar_conversion==0 || $data[0]->bar_conversion==null) $cls_active = 'bar_conversion';
+                                                else if($data[0]->depot_transfer==0 || $data[0]->depot_transfer==null) $cls_active = 'depot_transfer';
+                                                else if($data[0]->documents_upload==0 || $data[0]->documents_upload==null) $cls_active = 'documents_upload';
+                                                else if($data[0]->raw_material_recon==0 || $data[0]->raw_material_recon==null) $cls_active = 'raw_material_recon';
+                                            }
+                                        ?>
                                         <ul class="nav nav-tabs process-model more-icon-preocess" role="tablist">
-                                            <?php $cls_name='active'; if(isset($data)) { if($data[0]->batch_master==1) $cls_name='visited'; } ?>
-                                            <li role="presentation" class="<?php echo $cls_name; ?>">
+                                            <?php $cls_name=''; if(isset($data)) { if($data[0]->batch_master==1) $cls_name='visited'; } ?>
+                                            <li role="presentation" class="<?php echo $cls_name; if($cls_active=='batch_master') echo ' active'; ?>">
                                                 <a href="#batch_master" aria-controls="batch_master" role="tab" data-toggle="tab">
                                                     <i class="fa fa-database" aria-hidden="true"></i>
                                                     <p>Batch <br> Master</p>
                                                 </a>
                                             </li>
                                             <?php $cls_name=''; if(isset($data)) { if($data[0]->production_details==1) $cls_name='visited'; } ?>
-                                            <li role="presentation" class="<?php echo $cls_name; ?>">
+                                            <li role="presentation" class="<?php echo $cls_name; if($cls_active=='production_details') echo ' active'; ?>">
                                                 <a href="#discover" aria-controls="discover" role="tab" data-toggle="tab">
                                                     <i class="fa fa-cutlery" aria-hidden="true"></i>
                                                     <p>Production Details</p>
                                                 </a>
                                             </li>
                                             <?php $cls_name=''; if(isset($data)) { if($data[0]->bar_conversion==1) $cls_name='visited'; } ?>
-                                            <li role="presentation" class="<?php echo $cls_name; ?>">
+                                            <li role="presentation" class="<?php echo $cls_name; if($cls_active=='bar_conversion') echo ' active'; ?>">
                                                 <a href="#strategy" aria-controls="strategy" role="tab" data-toggle="tab">
                                                     <i class="fa fa-send-o" aria-hidden="true"></i>
                                                     <p>Bar Conversion</p>
                                                 </a>
                                             </li>
                                             <?php $cls_name=''; if(isset($data)) { if($data[0]->depot_transfer==1) $cls_name='visited'; } ?>
-                                            <li role="presentation" class="<?php echo $cls_name; ?>">
+                                            <li role="presentation" class="<?php echo $cls_name; if($cls_active=='depot_transfer') echo ' active'; ?>">
                                                 <a href="#optimization" aria-controls="optimization" role="tab" data-toggle="tab">
                                                     <i class="fa fa-truck" aria-hidden="true"></i>
                                                     <p>Depot &nbsp Transfer</p>
                                                 </a>
                                             </li>
                                             <?php $cls_name=''; if(isset($data)) { if($data[0]->documents_upload==1) $cls_name='visited'; } ?>
-                                            <li role="presentation" class="<?php echo $cls_name; ?>">
+                                            <li role="presentation" class="<?php echo $cls_name; if($cls_active=='documents_upload') echo ' active'; ?>">
                                                 <a href="#content" aria-controls="content" role="tab" data-toggle="tab">
                                                     <i class="fa fa-file" aria-hidden="true"></i>
                                                     <p>Documents Upload</p>
                                                 </a>
                                             </li>
                                             <?php $cls_name=''; if(isset($data)) { if($data[0]->raw_material_recon==1) $cls_name='visited'; } ?>
-                                            <li role="presentation" class="<?php echo $cls_name; ?>">
+                                            <li role="presentation" class="<?php echo $cls_name; if($cls_active=='raw_material_recon') echo ' active'; ?>">
                                                 <a href="#rm_recon" aria-controls="rm_recon" role="tab" data-toggle="tab">
                                                     <i class="fa fa-sort-alpha-asc" aria-hidden="true"></i>
                                                     <p>Raw Material Recon</p>
                                                 </a>
                                             </li>
                                             <?php $cls_name=''; if(isset($data)) { if($data[0]->report_approved==1) $cls_name='visited'; } ?>
-                                            <li role="presentation" class="<?php echo $cls_name; ?>">
+                                            <li role="presentation" class="<?php echo $cls_name; if($cls_active=='report_approved') echo ' active'; ?>">
                                                 <a href="#reporting" aria-controls="reporting" role="tab" data-toggle="tab">
                                                     <i class="fa fa-check" aria-hidden="true"></i>
                                                     <p>Approve Report</p>
@@ -259,7 +269,7 @@
                                         </ul>
 
                                         <div class="tab-content">
-                                            <div role="tabpanel" class="tab-pane" id="batch_master">
+                                            <div role="tabpanel" class="tab-pane <?php if($cls_active=='batch_master') echo ' active'; ?>" id="batch_master">
                                                 <div class="design-process-content">
 												<div class="pull-right btn-margin"  style="<?php if($access[0]->r_insert=='0') echo 'display: none;';?>">
 													<a class="btn btn-success" href="<?php echo base_url() . 'index.php/batch_master/add/'.((isset($production_id))?$production_id:'0').'/production'; ?>">
@@ -301,7 +311,7 @@
                                                 </div>
                                             </div>
 
-                                            <div role="tabpanel" class="tab-pane " id="discover">
+                                            <div role="tabpanel" class="tab-pane <?php if($cls_active=='production_details') echo ' active'; ?>" id="discover">
                                                 <div class="design-process-content">
                                                 <div class="pull-right btn-margin"  style="<?php if($access[0]->r_insert=='0') echo 'display: none;';?>">
                                                     <a class="btn btn-success" href="<?php echo base_url() . 'index.php/batch_processing/add/'.((isset($production_id))?$production_id:'0').'/production'; ?>">
@@ -359,7 +369,7 @@
                                                 </div>
                                             </div>
 
-                                            <div role="tabpanel" class="tab-pane" id="strategy">
+                                            <div role="tabpanel" class="tab-pane <?php if($cls_active=='bar_conversion') echo ' active'; ?>" id="strategy">
                                                 <div class="design-process-content">
 											 	<div class="pull-right btn-margin" style="<?php if($access[0]->r_insert=='0') echo 'display: none;';?>">
                                                     <a class="btn btn-success" href="<?php echo base_url() . 'index.php/bar_to_box/add/'.((isset($production_id))?$production_id:'0').'/production'; ?>">
@@ -414,7 +424,7 @@
                                                 </div>
                                             </div>
 
-                                            <div role="tabpanel" class="tab-pane" id="optimization">
+                                            <div role="tabpanel" class="tab-pane <?php if($cls_active=='depot_transfer') echo ' active'; ?>" id="optimization">
                                                 <div class="design-process-content">
 												 	<div class="pull-right btn-margin" style="<?php if($access[0]->r_insert=='0') echo 'display: none;';?>">
 														<a class="btn btn-success" href="<?php echo base_url() . 'index.php/depot_transfer/add/'.((isset($production_id))?$production_id:'0').'/production'; ?>">
@@ -468,7 +478,7 @@
                                                 </div>
                                             </div>
 
-                                            <div role="tabpanel" class="tab-pane" id="content">
+                                            <div role="tabpanel" class="tab-pane <?php if($cls_active=='documents_upload') echo ' active'; ?>" id="content">
                                                 <div class="design-process-content">
                                                     <form id="form_production_doc_details" role="form" class="form-horizontal" method="post" action="<?php echo base_url(). 'index.php/production/upload_documents/'. (isset($production_id)?$production_id:0); ?>" enctype="multipart/form-data">
                                                     <div class="panel-body  panel-group accordion">
@@ -547,7 +557,7 @@
                                                                         <div class="form-group">
                                                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Remarks </label>
                                                                             <div class="col-md-10  col-sm-10 col-xs-12">
-                                                                                <textarea class="form-control" name="raw_material_check_remarks" cols="10"><?php if(isset($raw_material_check_doc[0]->remarks)) echo $raw_material_check_doc[0]->remarks;?></textarea>
+                                                                                <textarea class="form-control" name="raw_material_check_remarks" cols="10"><?php if(isset($raw_material_check_doc[0]->remarks)) echo $raw_material_check_doc[0]->remarks; else echo 'There was no issue in raw material. All raw materials were in good condition.'; ?></textarea>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -630,7 +640,7 @@
                                                                         <div class="form-group">
                                                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Remarks </label>
                                                                             <div class="col-md-10  col-sm-10 col-xs-12">
-                                                                                <textarea class="form-control" name="sorting_remarks" cols="10"><?php if(isset($sorting_doc[0]->remarks)) echo $sorting_doc[0]->remarks;?></textarea>
+                                                                                <textarea class="form-control" name="sorting_remarks" cols="10"><?php if(isset($sorting_doc[0]->remarks)) echo $sorting_doc[0]->remarks; else echo 'No problem in sorting of raw material.'; ?></textarea>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -713,7 +723,7 @@
                                                                         <div class="form-group">
                                                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Remarks </label>
                                                                             <div class="col-md-10  col-sm-10 col-xs-12">
-                                                                                <textarea class="form-control" name="processing_remarks" cols="10"><?php if(isset($processing_doc[0]->remarks)) echo $processing_doc[0]->remarks;?></textarea>
+                                                                                <textarea class="form-control" name="processing_remarks" cols="10"><?php if(isset($processing_doc[0]->remarks)) echo $processing_doc[0]->remarks; else echo 'There was no problem during the production process.'; ?></textarea>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -796,13 +806,13 @@
                                                                         <div class="form-group">
                                                                             <label class="col-md-3 col-sm-3 col-xs-12 control-label">Weight & Measure Remarks </label>
                                                                             <div class="col-md-9 col-sm-9 col-xs-12">
-                                                                                <textarea class="form-control" name="quality_control_remarks" cols="10"><?php if(isset($quality_control_doc[0]->remarks)) echo $quality_control_doc[0]->remarks;?></textarea>
+                                                                                <textarea class="form-control" name="quality_control_remarks" cols="10"><?php if(isset($quality_control_doc[0]->remarks)) echo $quality_control_doc[0]->remarks; ?></textarea>
                                                                             </div>
                                                                         </div>
                                                                         <div class="form-group">
                                                                             <label class="col-md-3 col-sm-3 col-xs-12 control-label">Shaping/Cutting & PVC Tray <br/>Filling Remarks </label>
                                                                             <div class="col-md-9 col-sm-9 col-xs-12">
-                                                                                <textarea class="form-control" name="quality_control_remarks2" cols="10"><?php if(isset($quality_control_doc[0]->remarks2)) echo $quality_control_doc[0]->remarks2;?></textarea>
+                                                                                <textarea class="form-control" name="quality_control_remarks2" cols="10"><?php if(isset($quality_control_doc[0]->remarks2)) echo $quality_control_doc[0]->remarks2; echo 'There was no problem in shaping/cutting & PVC Tray filling. We reused damaged or break product to mixing.'; ?></textarea>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -885,13 +895,13 @@
                                                                         <div class="form-group">
                                                                             <label class="col-md-3 col-sm-3 col-xs-12 control-label">Dummy Sample Test Remarks </label>
                                                                             <div class="col-md-9 col-sm-9 col-xs-12">
-                                                                                <textarea class="form-control" name="packaging_remarks" cols="10"><?php if(isset($packaging_doc[0]->remarks)) echo $packaging_doc[0]->remarks;?></textarea>
+                                                                                <textarea class="form-control" name="packaging_remarks" cols="10"><?php if(isset($packaging_doc[0]->remarks)) echo $packaging_doc[0]->remarks; else echo 'We packed 40 dummy sample and done water leak test. When we found least leakage,  i.e. 0 out of 40 dummy samples then we proceed for actual product packaging.'; ?></textarea>
                                                                             </div>
                                                                         </div>
                                                                         <div class="form-group">
                                                                             <label class="col-md-3 col-sm-3 col-xs-12 control-label">Wrapper Packaging & Double Seal <br/>Packaging Remarks </label>
                                                                             <div class="col-md-9 col-sm-9 col-xs-12">
-                                                                                <textarea class="form-control" name="packaging_remarks2" cols="10"><?php if(isset($packaging_doc[0]->remarks2)) echo $packaging_doc[0]->remarks2;?></textarea>
+                                                                                <textarea class="form-control" name="packaging_remarks2" cols="10"><?php if(isset($packaging_doc[0]->remarks2)) echo $packaging_doc[0]->remarks2; else echo 'Wrapper packaging done for all SKU. Wrapper packed product collected in corrugated box. After Water Leak test it proceeds for double seal packaging. Punctured products, after double seal packaging, return to wrapper packaging and same process as above.'; ?></textarea>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -1240,7 +1250,7 @@
                                                 </div>
                                             </div>
                                                
-                                            <div role="tabpanel" class="tab-pane" id="rm_recon">
+                                            <div role="tabpanel" class="tab-pane <?php if($cls_active=='raw_material_recon') echo ' active'; ?>" id="rm_recon">
                                                 <div class="design-process-content">
                                                 <div class="pull-right btn-margin"  style="<?php if($access[0]->r_insert=='0') echo 'display: none;';?>">
                                                     <a class="btn btn-success" href="<?php echo base_url() . 'index.php/raw_material_recon/add/'.((isset($production_id))?$production_id:'0').'/production'; ?>">
@@ -1285,7 +1295,7 @@
                                                 </div>
                                             </div>
                                                
-                                            <div role="tabpanel" class="tab-pane active" id="reporting">
+                                            <div role="tabpanel" class="tab-pane <?php if($cls_active=='report_approved') echo ' active'; ?>" id="reporting">
                                                 <div class="design-process-content">
                                                 <div class="panel panel-default">
                                                     <div class="panel-body">
@@ -1346,6 +1356,8 @@
                                                                             } else {
                                                                                 echo 'Approve Report.';
                                                                             }
+                                                                        else if($data[$i]->report_approved=='1') 
+                                                                            echo 'Approved.';
                                                                         else echo $data[$i]->p_status;
                                                                     ?>
                                                                     </td>

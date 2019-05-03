@@ -26,6 +26,10 @@
             @media screen and (max-width:800px) {
                .h-scroll { overflow-x:scroll;} .h-scroll .table-stripped{ width:806px!important;}
             }
+            .form-control[disabled] {
+                color: #245478;
+                background-color: white;
+            }
 		</style>
 		
 		<style>
@@ -177,8 +181,8 @@
                                             <th style="display: none;">Rate (In Rs) </th>
                                             <th style="display: none;">Sell Rate (In Rs) <span class="asterisk_sign">*</span></th>
                                             <th style="display: none;">Grams</th>
-                                            <th>Amount (In Rs)</th>
-                                            <th>Action</th>
+                                            <th style="display: none;">Amount (In Rs)</th>
+                                            <th class="table_action">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody id="box_details">
@@ -219,10 +223,10 @@
                                             <td style="display: none;">
                                                 <input type="text" class="form-control grams" name="grams[]" id="grams_<?php echo $i; ?>" placeholder="Grams" value="<?php if (isset($order_items)) { echo $order_items[$i]->grams; } ?>" readonly />
                                             </td>
-                                            <td>
+                                            <td style="display: none;">
                                                 <input type="text" class="form-control amount" name="amount[]" id="amount_<?php echo $i; ?>" placeholder="Amount" value="<?php if (isset($order_items)) { echo $order_items[$i]->amount; } ?>" readonly />
                                             </td>
-                                             <td style="text-align:center;     vertical-align: middle;">
+                                             <td class="table_action" style="text-align:center; vertical-align: middle;">
                                                 <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>
                                             </td>
                                         </tr>
@@ -262,10 +266,10 @@
                                             <td style="display: none;">
                                                 <input type="text" class="form-control grams" name="grams[]" id="grams_<?php echo $i; ?>" placeholder="Grams" value="" readonly />
                                             </td>
-                                            <td>
+                                            <td style="display: none;">
                                                 <input type="text" class="form-control amount" name="amount[]" id="amount_<?php echo $i; ?>" placeholder="Amount" value="" readonly />
                                             </td>
-                                              <td style="text-align:center;     vertical-align: middle;">
+                                              <td class="table_action" style="text-align:center; vertical-align: middle;">
                                                 <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>
                                             </td>
                                         </tr>
@@ -281,7 +285,7 @@
                                     </table>
                                 </div>
 								</div>
-                                <div class="form-group">
+                                <div class="form-group" style="display: none;">
                                     <div class="col-md-12 col-sm-12 col-xs-12">
                                         <label class="col-md-2 col-sm-2 col-xs-12 control-label">Total Amount (In Rs)<span class="asterisk_sign">*</span></label>
                                         <div class="col-md-4 col-sm-4 col-xs-12">
@@ -391,10 +395,10 @@
                 });
                 $(".datepicker1").datepicker({ maxDate: 0,changeMonth: true,yearRange:'-100:+0',changeYear: true });
                 
-                addMultiInputNamingRules('#form_order_details', 'select[name="box[]"]', { required: true }, "");
-                addMultiInputNamingRules('#form_order_details', 'select[name="bar[]"]', { required: true }, "");
-                addMultiInputNamingRules('#form_order_details', 'input[name="qty[]"]', { required: true }, "");
-                addMultiInputNamingRules('#form_order_details', 'input[name="sell_rate[]"]', { required: true }, "");
+                // addMultiInputNamingRules('#form_order_details', 'select[name="box[]"]', { required: true }, "");
+                // addMultiInputNamingRules('#form_order_details', 'select[name="bar[]"]', { required: true }, "");
+                // addMultiInputNamingRules('#form_order_details', 'input[name="qty[]"]', { required: true }, "");
+                // addMultiInputNamingRules('#form_order_details', 'input[name="sell_rate[]"]', { required: true }, "");
 
                 // get_distributor_details($('#distributor_id').val());
 
@@ -407,6 +411,21 @@
                 // if($('#sample_distributor_id').val()!=''){
                 //     get_distributor_details($('#sample_distributor_id').val());
                 // }
+
+                $('input[type="text"').attr("readonly", true);
+                $('input[type="checkbox"]').attr("disabled", true);
+                $('input[type="file"]').attr("disabled", true);
+                $('input[type="radio"]').attr("disabled", true);
+                $("select:visible").attr("disabled", true);
+                $("textarea").attr("disabled", true);
+                $(".datepicker").attr("disabled", true);
+
+                // $("#btn_approve").attr("disabled", false);
+                // $("#btn_reject").attr("disabled", false);
+                // $("#remarks").attr("disabled", false);
+
+                $('tfoot').hide();
+                $('.table_action').hide();
             });
 
             function show_item(elem){

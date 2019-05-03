@@ -255,6 +255,7 @@ class Export extends CI_Controller {
             $salesreturn=$this->input->post('salesreturn');
             $sample=$this->input->post('sample');
             $credit_debit=$this->input->post('credit_debit');
+            $dist_transfer=$this->input->post('dist_transfer');
             $date_of_processing=$this->input->post('date_of_processing');
             $date_of_accounting=$this->input->post('date_of_accounting');
             $invoicelevel=$this->input->post('invoicelevel');
@@ -273,7 +274,7 @@ class Export extends CI_Controller {
             
             $flag = 0;
 
-            if(($invoicelevel!="" || $invoicelevelsalesreturn!="" || $invoicelevelsample!="") && ($sales!='' || $ssallocation!='' || $salesreturn!='' || $sample!='' || $credit_debit!='' || $status_type!=''))
+            if(($invoicelevel!="" || $invoicelevelsalesreturn!="" || $invoicelevelsample!="") && ($sales!='' || $ssallocation!='' || $salesreturn!='' || $sample!='' || $credit_debit!='' || $status_type!='' || $dist_transfer!=''))
             {
                 $flag=1;
             }
@@ -289,9 +290,11 @@ class Export extends CI_Controller {
             // echo '<br/><br/>';
             // echo $date_of_processing;
 
-            if($sales!='' || $ssallocation!='' || $salesreturn!='' || $sample!='' || $credit_debit!='' || $status_type!='')
+            // echo $dist_transfer;
+
+            if($sales!='' || $ssallocation!='' || $salesreturn!='' || $sample!='' || $credit_debit!='' || $status_type!='' || $dist_transfer!='')
             {
-                $this->export_model->generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sample,$credit_debit,$status_type,$date_of_processing,$date_of_accounting,$flag);
+                $this->export_model->generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sample,$credit_debit,$status_type,$date_of_processing,$date_of_accounting,$flag,$dist_transfer);
 
                 if($flag==1)
                     $this->zip->read_file($path.'Sale_Invoice_Sku_Report.xls');
@@ -741,8 +744,8 @@ class Export extends CI_Controller {
              $this->export_model->generate_sales_attendence_report();
         }
         else if($rep_id==30) {
-             $location = $this->input->post("location");
-             $this->export_model->gt_store_report('save',$location);
+            $location = $this->input->post("location");
+            $this->export_model->gt_store_report('save',$location);
         }
         
         $this->set_report_criteria($rep_id);
@@ -997,6 +1000,7 @@ class Export extends CI_Controller {
         $task = $this->export_model->get_task_cnt();
         $pre_production = $this->export_model->get_pre_production_cnt();
         $post_production = $this->export_model->get_post_production_cnt();
+        $po_count = $this->export_model->get_po_count();
 
         $date = date("d.m.Y");
         $tbody ='';
@@ -1150,6 +1154,36 @@ class Export extends CI_Controller {
                                       </tr>';
                         }
 
+                        if(count($po_count)>0) {
+                            $tbody.='<tr>
+                                <td class="innerpadding1 " style="">
+                                <br>
+                                <h3>Purchase Order </h3>
+                                <table  class="body_table" style="border-collapse: collapse;width:100%;border:1px solid #000!important;">
+                                <thead>
+                                    <tr style=" background-color:#002060;color:#fff ;border-bottom: 1px solid #000;font-weight: bold;">
+                            
+                                      <th width="200" style="border-right: 1px solid #000;padding: 0 8px;text-align:left;width:200px">Approval Pending</th>
+                                      <th style="border-right: 1px solid #000;padding: 0 8px;text-align: left;width:70px;">Open</th>
+                                      <th style="border-right: 1px solid #000;padding: 0 8px;text-align: left;width:70px;">Payment Pending</th>
+                                      <th style="border-right: 1px solid #000;padding: 0 8px;text-align: left;width:70px;">Advance</th>
+                                    </tr>
+                                </thead>
+                                <tbody style="border:1px solid #000;
+                                                background-color: #fff;
+                                                color: #000;">
+                                    <tr>
+                                        <td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;">'.$po_count[0]->pending_cnt.'</td>
+                                        <td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;">'.$po_count[0]->open_cnt.'</td>
+                                        <td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;">'.$po_count[0]->pending_payment_cnt.'</td>
+                                        <td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;">'.$po_count[0]->advance_payment_cnt.'</td>
+                                    </tr>
+                                </tbody>
+                                </table>
+                                </td>
+                                </tr>';
+                        }
+
                         if(count($pre_production)>0) {
                             $tbody.='<tr>
                                     <td class="innerpadding1 " style="">
@@ -1169,8 +1203,8 @@ class Export extends CI_Controller {
                             {
                                 $tbody.= '<tr>
                                     <td style="border-right: 1px solid #000;border-bottom: 1px solid #000;padding: 0 8px;width:200px">'.$pre_production[$i]->p_id.'</td>
-                                    <td style="border-right: 1px solid #000;text-align: right;border-bottom: 1px solid #000;padding: 0 8px;">'.$pre_production[$i]->open.'</td>
-                                    <td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: right;padding: 0 8px;">'.$pre_production[$i]->overdue.'</td>
+                                    <td style="border-right: 1px solid #000;text-align: center;border-bottom: 1px solid #000;padding: 0 8px;">'.$pre_production[$i]->open.'</td>
+                                    <td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;">'.$pre_production[$i]->overdue.'</td>
                                     
                                     </tr>'; 
                             }
@@ -1205,8 +1239,8 @@ class Export extends CI_Controller {
                             {
                                 $tbody.= '<tr>
                                             <td style="border-right: 1px solid #000;border-bottom: 1px solid #000;padding: 0 8px;width:200px">'.$post_production[$i]->p_id.'</td>
-                                            <td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: right;padding: 0 8px;">'.$post_production[$i]->open.'</td>
-                                            <td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: right;padding: 0 8px;">'.$post_production[$i]->overdue.'</td>
+                                            <td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;">'.$post_production[$i]->open.'</td>
+                                            <td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;">'.$post_production[$i]->overdue.'</td>
                                         </tr>'; 
                             }
 
@@ -1267,21 +1301,25 @@ class Export extends CI_Controller {
                 $row=$row+2;
                 $start_row=$row;
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, 'Sr No');
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, 'User Name');
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, 'Subject Detail');
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, 'Due Date');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, 'Task Name');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, 'Assigned To');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, 'Priority');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, 'Due Date');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, 'Status');
 
                 $sr_no = 1;
                 for($i=0; $i<count($task_dtl); $i++) {
                     $row=$row+1;
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $sr_no++);
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $task_dtl[$i]->user_name);
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, $task_dtl[$i]->subject_detail);
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $task_dtl[$i]->due_date);
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $task_dtl[$i]->subject_detail);
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, $task_dtl[$i]->user_name);
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $task_dtl[$i]->priority);
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, date('d/m/Y',strtotime($task_dtl[$i]->due_date)));
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, $task_dtl[$i]->status);
                 }
 
-                $objPHPExcel->getActiveSheet()->getStyle('A'.$start_row.':D'.$start_row)->getFont()->setBold(true);
-                $objPHPExcel->getActiveSheet()->getStyle('A'.$start_row.':D'.$row)->applyFromArray(array(
+                $objPHPExcel->getActiveSheet()->getStyle('A'.$start_row.':F'.$start_row)->getFont()->setBold(true);
+                $objPHPExcel->getActiveSheet()->getStyle('A'.$start_row.':F'.$row)->applyFromArray(array(
                     'borders' => array(
                         'allborders' => array(
                             'style' => PHPExcel_Style_Border::BORDER_THIN
@@ -1299,20 +1337,24 @@ class Export extends CI_Controller {
                 $start_row=$row;
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, 'Sr No');
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, 'Production Id');
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, 'Notification');
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, 'Due Date');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, 'Manufacturer');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, 'Notification');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, 'Status');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, 'Due Date');
 
                 $sr_no = 1;
                 for($i=0; $i<count($pre_production_dtl); $i++) {
                     $row=$row+1;
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $sr_no++);
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $pre_production_dtl[$i]->p_id);
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, $pre_production_dtl[$i]->notification);
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $pre_production_dtl[$i]->notification_date);
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, $pre_production_dtl[$i]->depot_name);
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $pre_production_dtl[$i]->notification);
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $pre_production_dtl[$i]->p_status);
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, date('d/m/Y',strtotime($pre_production_dtl[$i]->notification_date)));
                 }
 
-                $objPHPExcel->getActiveSheet()->getStyle('A'.$start_row.':D'.$start_row)->getFont()->setBold(true);
-                $objPHPExcel->getActiveSheet()->getStyle('A'.$start_row.':D'.$row)->applyFromArray(array(
+                $objPHPExcel->getActiveSheet()->getStyle('A'.$start_row.':F'.$start_row)->getFont()->setBold(true);
+                $objPHPExcel->getActiveSheet()->getStyle('A'.$start_row.':F'.$row)->applyFromArray(array(
                     'borders' => array(
                         'allborders' => array(
                             'style' => PHPExcel_Style_Border::BORDER_THIN
@@ -1330,20 +1372,52 @@ class Export extends CI_Controller {
                 $start_row=$row;
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, 'Sr No');
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, 'Production Id');
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, 'Notification');
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, 'Due Date');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, 'Manufacturer');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, 'Notification');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, 'Status');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, 'Due Date');
 
                 $sr_no = 1;
                 for($i=0; $i<count($post_production_dtl); $i++) {
+                    $p_status = '';
+                    if($post_production_dtl[$i]->batch_master==null || $post_production_dtl[$i]->batch_master=='0') 
+                        $p_status = 'Confirm Batch Nos.';
+                    else if($post_production_dtl[$i]->production_details==null || $post_production_dtl[$i]->production_details=='0') 
+                        $p_status = 'Confirm Production Details.';
+                    else if($post_production_dtl[$i]->bar_conversion==null || $post_production_dtl[$i]->bar_conversion=='0') 
+                        $p_status = 'Perform Bar Conversion.';
+                    else if($post_production_dtl[$i]->depot_transfer==null || $post_production_dtl[$i]->depot_transfer=='0') 
+                        $p_status = 'Perform Depot Transfer.';
+                    else if($post_production_dtl[$i]->documents_upload==null || $post_production_dtl[$i]->documents_upload=='0') 
+                        $p_status = 'Perform Documents Upload.';
+                    else if($post_production_dtl[$i]->raw_material_recon==null || $post_production_dtl[$i]->raw_material_recon=='0') 
+                        $p_status = 'Perform Raw Material Recon.';
+                    else if($post_production_dtl[$i]->report_approved==null || $post_production_dtl[$i]->report_approved=='0') {
+                        if($post_production_dtl[$i]->report_status==null || $post_production_dtl[$i]->report_status==''){
+                            $p_status = 'Submit Production Report For Approval.';
+                        } else if(strtoupper(trim($post_production_dtl[$i]->report_status))=='PENDING'){
+                            $p_status = 'Approve Production Report.';
+                        } else if(strtoupper(trim($post_production_dtl[$i]->report_status))=='REJECTED'){
+                            $p_status = 'Production Report Rejected.';
+                        } else {
+                            $p_status = 'Approve Report.';
+                        }
+                    }
+                    else if($post_production_dtl[$i]->report_approved=='1') 
+                        $p_status = 'Approved.';
+                    else $p_status = $post_production_dtl[$i]->p_status;
+
                     $row=$row+1;
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $sr_no++);
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $post_production_dtl[$i]->p_id);
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, $post_production_dtl[$i]->notification);
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $post_production_dtl[$i]->notification_date);
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, $post_production_dtl[$i]->depot_name);
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $post_production_dtl[$i]->notification);
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $p_status);
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, date('d/m/Y',strtotime($post_production_dtl[$i]->notification_date)));
                 }
 
-                $objPHPExcel->getActiveSheet()->getStyle('A'.$start_row.':D'.$start_row)->getFont()->setBold(true);
-                $objPHPExcel->getActiveSheet()->getStyle('A'.$start_row.':D'.$row)->applyFromArray(array(
+                $objPHPExcel->getActiveSheet()->getStyle('A'.$start_row.':F'.$start_row)->getFont()->setBold(true);
+                $objPHPExcel->getActiveSheet()->getStyle('A'.$start_row.':F'.$row)->applyFromArray(array(
                     'borders' => array(
                         'allborders' => array(
                             'style' => PHPExcel_Style_Border::BORDER_THIN
@@ -1357,13 +1431,13 @@ class Export extends CI_Controller {
             }
 
             $filename = 'Production_Report_'.date('d-m-Y').'.xls';
-            $path = 'C:/wamp64/www/eat_erp/assets/uploads/production_reports/';
+            // $path = 'C:/wamp64/www/eat_erp/assets/uploads/production_reports/';
             // $path  = '/home/eatangcp/public_html/test/assets/uploads/production_reports/';
-            // $path='/home/eatangcp/public_html/eat_erp/assets/uploads/production_reports/';
+            $path='/home/eatangcp/public_html/eat_erp/assets/uploads/production_reports/';
 
-            $upload_path = 'C:/wamp64/www/eat_erp/assets/uploads/production_reports';
+            // $upload_path = 'C:/wamp64/www/eat_erp/assets/uploads/production_reports';
             // $upload_path = '/home/eatangcp/public_html/test/assets/uploads/production_reports';
-            // $upload_path = '/home/eatangcp/public_html/eat_erp/assets/uploads/production_reports';
+            $upload_path = '/home/eatangcp/public_html/eat_erp/assets/uploads/production_reports';
             if(!is_dir($upload_path)) {
                 mkdir($upload_path, 0777, TRUE);
             }
@@ -1403,7 +1477,7 @@ class Export extends CI_Controller {
         if ($mailSent==1) {
             echo "Send";
         } else {
-            echo "NOT Send".$mailSent;
+            echo "NOT Send ".$mailSent;
         }
 
         // load_view('invoice/emailer', $data); 
@@ -1413,9 +1487,37 @@ class Export extends CI_Controller {
         $this->export_model->sales_rep_exception_report();
     }
 
-    public function gt_store_report()
-    {
+    public function gt_store_report() {
       $this->export_model->gt_store_report();
+    }
+
+    public function test_mail() {
+        $message = '<html>
+                    <body>
+                        <h3>Wholesome Habits Private Limited</h3>
+                        <h4>Test</h4>
+                        <br/><br/>
+                        Regards,
+                        <br/><br/>
+                        CS
+                    </body>
+                    </html>';
+        $from_email = 'cs@eatanytime.co.in';
+        $from_email_sender = 'Wholesome Habits Pvt Ltd';
+        $subject = 'Test Mail';
+
+        $to_email = "prasad.bhisale@pecanreams.com";
+        $cc = 'prasad.bhisale@pecanreams.com';
+        $bcc = 'prasad.bhisale@pecanreams.com';
+
+        $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc, $cc, '');
+
+        // $mailSent=1;
+        
+        // echo $message;
+        // echo '<br/><br/>';
+        echo $mailSent;
+        echo '<br/><br/>';
     }
 } 
 ?>

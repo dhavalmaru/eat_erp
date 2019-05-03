@@ -6,8 +6,7 @@ if ( ! defined('BASEPATH')) {exit('No direct script access allowed');}
 
 class Login extends CI_Controller
 {
-    public function __construct()
-    {
+    public function __construct() {
         parent::__construct();
         $this->load->helper('url');
         $this->load->helper('form');
@@ -21,48 +20,33 @@ class Login extends CI_Controller
     }
 
     //index function
-    public function index(){
-		
-		    
-		if(get_cookie('email')!=NULL || get_cookie('email')!='')
-		{
+    public function index() {
+		if(get_cookie('email')!=NULL || get_cookie('email')!=''){
 			$this->check_credentials();
+		} else {
+			$this->load->view('login/main_page');
 		}
-		else
-		{
-			  $this->load->view('login/main_page');
-		}
-		//set_cookie('cookie_name','cookie_value','3600'); 
-      
-		
+		//set_cookie('cookie_name','cookie_value','3600');
     }
 
     public function check_credentials() {
+		if(get_cookie('email')!=NULL || get_cookie('password')!=''){
+            $uname=get_cookie('email');
+            $upass=get_cookie('password');
 
-       
-        
-		if(get_cookie('email')!=NULL || get_cookie('password')!='')
-		{
-			 $uname=get_cookie('email');
-             $upass=get_cookie('password');
+            $query=$this->db->query("SELECT A.id,A.emp_code,A.email_id,A.first_name,A.last_name,A.role_id,A.sales_rep_id,B.sr_type,A.status FROM user_master A left outer join sales_rep_master B on B.id=A.sales_rep_id WHERE A.email_id = '$uname' AND A.password = '$upass' AND A.status IS NOT NULL ");
+            $result=$query->result();
+		} else {
+            $uname=$this->input->post('email');
+            $upass=$this->input->post('password');
 
-			 $query=$this->db->query("SELECT A.id,A.emp_code,A.email_id,A.first_name,A.last_name,A.role_id,A.sales_rep_id,B.sr_type,A.status FROM user_master A left outer join sales_rep_master B on B.id=A.sales_rep_id WHERE A.email_id = '$uname' AND A.password = '$upass' AND A.status IS NOT NULL ");
-				$result=$query->result();
-			
-		}
-		else{
-		        $uname=$this->input->post('email');
-        $upass=$this->input->post('password');
-
-			$query=$this->db->query("SELECT A.id,A.emp_code,A.email_id,A.first_name,A.last_name,A.role_id,A.sales_rep_id,B.sr_type,A.status FROM user_master A left outer join sales_rep_master B on B.id=A.sales_rep_id WHERE A.email_id = '$uname' AND A.password = '$upass' AND A.status IS NOT NULL ");
-				$result=$query->result();
+            $query=$this->db->query("SELECT A.id,A.emp_code,A.email_id,A.first_name,A.last_name,A.role_id,A.sales_rep_id,B.sr_type,A.status FROM user_master A left outer join sales_rep_master B on B.id=A.sales_rep_id WHERE A.email_id = '$uname' AND A.password = '$upass' AND A.status IS NOT NULL ");
+            $result=$query->result();
 		}
 		
         if(count($result) > 0 ) {
-            
-            if($result[0]->status!='InActive')
-            {
-                  $sessiondata = array(
+            if($result[0]->status!='InActive') {
+                $sessiondata = array(
                                     'session_id' => $result[0]->id,
                                     'user_name' => $result[0]->email_id,
                                     'login_name' => $result[0]->first_name . ' ' . $result[0]->last_name,
@@ -113,14 +97,10 @@ class Login extends CI_Controller
                     
                     // echo $this->session->userdata('role_id');
                 }   
-            }
-            else
-            {
+            } else {
                 echo "<script>alert('User is Inactive');</script>";
                 $this->load->view('login/main_page');
             }
-
-            
         } else {
             echo "<script>alert('Invalid Username or Password.');</script>";
 			$this->load->view('login/main_page');
@@ -264,21 +244,81 @@ class Login extends CI_Controller
         echo 1;
     }
 	
-		// public function chk_coockie() {
-		
-		
-			// $unexpired_cookie_exp_time = 2147483647 - time();
-			 
-			// $cookie = array(
-				// 'name' => 'cookie_name',
-				// 'value' => 'cookie_value',
-				// 'expire'=> $unexpired_cookie_exp_time
-			// );
-			 
-			// $CI->input->set_cookie($cookie);
-			
-		 
-		// }
+    public function chk_coockie() {
+        $unexpired_cookie_exp_time = 2147483647 - time();
+
+        $cookie = array(
+            'name' => 'cookie_name',
+            'value' => 'cookie_value',
+            'expire'=> $unexpired_cookie_exp_time
+        );
+
+        $CI->input->set_cookie($cookie);
+    }
+
+    public function check_credentials_api() {
+        $uname=urldecode($this->input->post('email'));
+        $upass=urldecode($this->input->post('password'));
+
+        // $uname='raveer66@gmail.com';
+        // $upass='pass@123';
+
+        $sql = "select A.id, A.emp_code, A.email_id, ifnull(A.first_name,'') as first_name, 
+                    ifnull(A.last_name,'') as last_name, A.role_id, 
+                    A.sales_rep_id, A.status, B.sr_type, C.check_in_time, C.check_out_time 
+                from user_master A 
+                left join sales_rep_master B on (A.sales_rep_id=B.id) 
+                left join sales_attendence C on (A.sales_rep_id=C.sales_rep_id and date(check_in_time)=curdate()) 
+                where A.email_id = '$uname' and A.password = '$upass' and 
+                    A.status is not null";
+        $query=$this->db->query($sql);
+        $result=$query->result();
+        
+        if(count($result) > 0) {
+            if(isset($result[0]->sales_rep_id)==false || $result[0]->sales_rep_id=='') {
+                $data['result'] = '0';
+                $data['msg'] = 'You do not have access of this application.';
+            } else if($result[0]->status!='InActive') {
+                $sessiondata = array(
+                                    'session_id' => $result[0]->id,
+                                    'user_name' => $result[0]->email_id,
+                                    'login_name' => (isset($result[0]->first_name)?$result[0]->first_name:'') . ' ' . (isset($result[0]->last_name)?$result[0]->last_name:''),
+                                    'role_id' => $result[0]->role_id,
+                                    'sales_rep_id' => $result[0]->sales_rep_id,
+                                    'type' => $result[0]->sr_type,
+                                    'emp_code' => $result[0]->emp_code,
+                                    'first_name' => (isset($result[0]->first_name)?$result[0]->first_name:''),
+                                    'last_name' => (isset($result[0]->last_name)?$result[0]->last_name:''),
+                                    'check_in_time' => $result[0]->check_in_time,
+                                    'check_out_time' => $result[0]->check_out_time
+                                );
+
+                // $this->session->set_userdata($sessiondata);
+                // $unexpired_cookie_exp_time = 2147483647 - time();
+                // set_cookie('email',$uname,$unexpired_cookie_exp_time); 
+                // set_cookie('password',$upass,$unexpired_cookie_exp_time);
+                
+                $logarray['table_id']='1';
+                $logarray['module_name']='Mobile App Login';
+                $logarray['cnt_name']='Login';
+                $logarray['action']='Mobile App Logged in';
+                $this->user_access_log_model->insertAccessLog($logarray);
+
+                $data['sessiondata'] = $sessiondata;
+                $data['result'] = '1';
+                $data['data'] = $result;
+                $data['msg'] = 'Login Successfull.';
+            } else {
+                $data['result'] = '0';
+                $data['msg'] = 'User is Inactive.';
+            }
+        } else {
+            $data['result'] = '0';
+            $data['msg'] = 'Invalid Username or Password.';
+        }
+
+        echo json_encode($data);
+    }
 
 }
 	  

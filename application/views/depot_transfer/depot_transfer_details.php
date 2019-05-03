@@ -58,7 +58,7 @@
                                             <select name="depot_out_id" id="depot_out_id" class="form-control">
                                                 <option value="">Select</option>
                                                 <?php if(isset($depot)) { for ($k=0; $k < count($depot) ; $k++) { ?>
-                                                        <option value="<?php echo $depot[$k]->id; ?>" <?php if(isset($data)) { if($depot[$k]->id==$data[0]->depot_out_id) { echo 'selected'; } } ?>><?php echo $depot[$k]->depot_name; ?></option>
+                                                        <option value="<?php echo $depot[$k]->id; ?>" <?php if(isset($data)) { if($depot[$k]->id==$data[0]->depot_out_id) { echo 'selected'; } } else if(isset($p_data)) { if($depot[$k]->id==$p_data[0]->manufacturer_id) { echo 'selected'; } } ?>><?php echo $depot[$k]->depot_name; ?></option>
                                                 <?php }} ?>
                                             </select>
                                             <!-- <input type="hidden" name="depot_out_id" id="depot_out_id" value="<?php //if(isset($data)) { echo  $data[0]->depot_out_id; } ?>"/>

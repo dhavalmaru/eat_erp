@@ -142,16 +142,16 @@ function deleteRecord(task_id){
     }
 }
 
-function completeTask(task_id){
+function completeTask(id){
     var formdata = {
-        task_id : task_id
+        id : id
     }
     if((task_id != 0 || task_id) && confirm('Are you sure you wish to complete this Task?') ){ 
         $.ajax({
             type : "POST",
             data : formdata,
             dataType : 'json',
-            url : BASE_URL+'index.php?/Task/completeTask',
+            url : BASE_URL+'index.php/Task/completeTask',
             success : function(responsmydata){
                 console.log(responsmydata);
                 if(responsmydata.status == 0){

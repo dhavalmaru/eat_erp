@@ -418,7 +418,7 @@ function send_email($id){
                 $from_email = 'cs@eatanytime.co.in';
                 $from_email_sender = 'Wholesome Habits Pvt Ltd';
                 $to_email = $email_id;
-                /*$bcc = 'vaibhav.desai@eatanytime.in, rishit.sanghvi@otbconsulting.co.in, swapnil.darekar@otbconsulting.co.in';*/
+                /*$bcc = 'vaibhav.desai@eatanytime.in, rishit.sanghvi@eatanytime.in, swapnil.darekar@otbconsulting.co.in';*/
                 $bcc = 'vaibhav.desai@eatanytime.in, dinesh.parkhi@eatanytime.in';
                 $subject = 'Purchase Order from Wholesome Habits Pvt Ltd';
                 // $message = '<html><head></head><body>Dear, '.$vendor_name.',<br /><br />' .

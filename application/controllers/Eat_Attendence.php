@@ -30,27 +30,24 @@ class Eat_Attendence extends CI_controller {
 
     public function upload_excel()
     {
-          $path=FCPATH.'assets/uploads/attendence_upload/';
-          $config = array(
-          'upload_path' => $path,
-          'allowed_types' => "xlsx",
-          'overwrite' => TRUE,
-          'max_size' => "2048000", 
-          'max_height' => "768",
-          'max_width' => "1024"
-          );
-          $new_name = time().'_'.str_replace(' ', "_", $_FILES["upload"]['name']);
-          $config['file_name'] = $new_name;
+        $path=FCPATH.'assets/uploads/attendence_upload/';
+        $config = array(
+            'upload_path' => $path,
+            'allowed_types' => "xlsx",
+            'overwrite' => TRUE,
+            'max_size' => "2048000", 
+            'max_height' => "768",
+            'max_width' => "1024"
+        );
+        $new_name = time().'_'.str_replace(' ', "_", $_FILES["upload"]['name']);
+        $config['file_name'] = $new_name;
 
-          $this->load->library('upload', $config);
-           if(!$this->upload->do_upload('upload'))
-          { 
-              $this->upload->display_errors();
-          }
-          else
-          {
-              $imageDetailArray = $this->upload->data();
-          }
+        $this->load->library('upload', $config);
+        if(!$this->upload->do_upload('upload')) { 
+            $this->upload->display_errors();
+        } else {
+            $imageDetailArray = $this->upload->data();
+        }
 
           $file = $path.$new_name;
           $this->load->library('excel');
@@ -65,7 +62,8 @@ class Eat_Attendence extends CI_controller {
 
           for($i=4;$i<=$highestrow;$i++)
           { 
-                echo "eneterd";
+                // echo "eneterd";
+                // echo "<br/><br/>";
                 $emp_no = $objPHPExcel->getActiveSheet()->getCell('A'.$i)->getValue();
                 $emp_name = $objPHPExcel->getActiveSheet()->getCell('B'.$i)->getValue();
                 $job_title = $objPHPExcel->getActiveSheet()->getCell('C'.$i)->getValue();
@@ -150,9 +148,9 @@ class Eat_Attendence extends CI_controller {
                                           'modified_on' => $now,
                                        );
                             $this->db->where($where)->update('employee_attendence',$data);
-                            echo $this->db->last_query();
-                          }else
-                          {
+                            // echo $this->db->last_query();
+                            // echo "<br/><br/>";
+                          } else {
                              $data = array(  'emp_no' =>$emp_no,
                                           'emp_name' => $emp_name,
                                           'job_title' => $job_title,
@@ -172,7 +170,8 @@ class Eat_Attendence extends CI_controller {
                                           'created_on' => $now,
                                        );
                             $this->db->insert('employee_attendence',$data);
-                            echo $this->db->last_query();
+                            // echo $this->db->last_query();
+                            // echo "<br/><br/>";
                           }
                     }
                 }
@@ -262,7 +261,7 @@ class Eat_Attendence extends CI_controller {
               $from_email = 'cs@eatanytime.co.in';
               $from_email_sender = 'Wholesome Habits Pvt Ltd';
               $to_email = $result[0]->email_id;
-              $bcc = 'vaibhav.desai@eatanytime.in, rishit.sanghvi@otbconsulting.co.in, swapnil.darekar@otbconsulting.co.in';
+              $bcc = 'vaibhav.desai@eatanytime.in, rishit.sanghvi@eatanytime.in, swapnil.darekar@otbconsulting.co.in';
               $subject = 'Attendence For Month - '.date('F Y ',strtotime($result[0]->date));
 
 
@@ -307,7 +306,7 @@ class Eat_Attendence extends CI_controller {
 
               // || $emp->status=='approved'
 
-            /*if($this->session->userdata("user_name")!='rishit.sanghvi@otbconsulting.co.in')
+            /*if($this->session->userdata("user_name")!='rishit.sanghvi@eatanytime.in')
               {
                 if($emp->status=='approved')
                     $readonly='readonly';
@@ -332,7 +331,7 @@ class Eat_Attendence extends CI_controller {
             }
             
             $tbody .= '<tr id="adjust_log_'.($i).'" style="'.$color.'" >';
-                      if($this->session->userdata("user_name")=='rishit.sanghvi@otbconsulting.co.in')
+                      if($this->session->userdata("user_name")=='rishit.sanghvi@eatanytime.in')
                       {
                         $tbody .='<td ><input type="checkbox" name="emp_check[]"  id="emp_check_id_'.$i.'" class="attendence_check"><input type="hidden" name="checkboxval[]" id="emp_check_'.$i.'" value="0"></td>';
                       }   
@@ -458,7 +457,7 @@ class Eat_Attendence extends CI_controller {
           $from_email = 'cs@eatanytime.in';
           $from_email_sender = 'Wholesome Habits Pvt Ltd';
           $to_email = $emp->email_id;
-          $bcc = 'vaibhav.desai@eatanytime.in, rishit.sanghvi@otbconsulting.co.in, swapnil.darekar@otbconsulting.co.in';
+          $bcc = 'vaibhav.desai@eatanytime.in, rishit.sanghvi@eatanytime.in, swapnil.darekar@otbconsulting.co.in';
           $subject = 'Attendence For Month-'.date('F Y ',strtotime($emp->date));
 
 
@@ -652,7 +651,7 @@ class Eat_Attendence extends CI_controller {
                             <td>&nbsp;</td>
                             <td>Total Days</td>
                             <td>'.$total_days.'</td>
-                        ';
+                        </tr>';
             foreach ($result as $emp) {
                 $tbody .= '<tr>
                             <td>'.date('Y-m-d',strtotime($emp->date)).'</td>
@@ -661,14 +660,14 @@ class Eat_Attendence extends CI_controller {
                             <td>'.$emp->effective_time.'</td>
                             <td>'.$emp->Late_marks.'</td>
                             <td>'.$emp->adjusted_time.'</td>
-                        ';
+                          </tr>';
             }
 
             $tbody .='</table>
                   </body>
                   </html>';
 
-            $from_email = 'cs@eatanytime.co.in';
+            $from_email = 'contact@eatanytime.co.in';
             $from_email_sender = 'Wholesome Habits Pvt Ltd';
       			if($result[0]->email_id2!='' || $result[0]->email_id2!=null) {
       				$to_email = $result[0]->email_id2;
@@ -677,9 +676,8 @@ class Eat_Attendence extends CI_controller {
       				$to_email = $result[0]->email_id;
       			}
 
-
             $emp_name = $result[0]->emp_name;
-            /*$bcc = 'vaibhav.desai@eatanytime.in, rishit.sanghvi@otbconsulting.co.in, swapnil.darekar@otbconsulting.co.in';*/
+            /*$bcc = 'vaibhav.desai@eatanytime.in, rishit.sanghvi@eatanytime.in, swapnil.darekar@otbconsulting.co.in';*/
             $subject = $emp_name.' Attendence For Month - '.date('F Y ',strtotime($result[0]->date));
 
             /*$cc='sangeeta.yadav@pecanreams.com';  */
@@ -692,7 +690,6 @@ class Eat_Attendence extends CI_controller {
                     "mail_fail".$mailSent;
               }
             }
-            
           }
         }
        
@@ -946,7 +943,7 @@ class Eat_Attendence extends CI_controller {
            
           
           $emp_name = $result[0]->emp_name;
-          /*$bcc = 'vaibhav.desai@eatanytime.in, rishit.sanghvi@otbconsulting.co.in, swapnil.darekar@otbconsulting.co.in';*/         
+          /*$bcc = 'vaibhav.desai@eatanytime.in, rishit.sanghvi@eatanytime.in, swapnil.darekar@otbconsulting.co.in';*/         
 
           if($status!='' &&  $status=='approved')
           {
@@ -1076,7 +1073,7 @@ class Eat_Attendence extends CI_controller {
 
           /*if previous time is not same as current time change status nand time is not equal to 0 then change the emp_status as present */
 
-          if($this->session->userdata("user_name")=='rishit.sanghvi@otbconsulting.co.in' || $this->session->userdata("user_name")=='swapnil.darekar@eatanytime.in')
+          if($this->session->userdata("user_name")=='rishit.sanghvi@eatanytime.in' || $this->session->userdata("user_name")=='swapnil.darekar@eatanytime.in')
           {
             $where = array("emp_id"=>$emp_id[$i],'date'=>$a_date);
             $this->db->where($where)->update("employee_attendence",$insert_array);
@@ -1141,13 +1138,52 @@ class Eat_Attendence extends CI_controller {
 
     public function test_mail($value='')
     {
-         $from_email = 'cs@eatanytime.co.in';
+         $from_email = 'contact@eatanytime.co.in';
          $from_email_sender = 'Wholesome Habits Pvt Ltd';
-         $to_email = "yadavsangeeta521@gmail.com";
-         /* $bcc = 'vaibhav.desai@eatanytime.in, rishit.sanghvi@otbconsulting.co.in, swapnil.darekar@otbconsulting.co.in';*/
-         $subject = 'Attendence For Month-';
+         $to_email = "prasad.bhisale@pecanreams.com";
+         /* $bcc = 'vaibhav.desai@eatanytime.in, rishit.sanghvi@eatanytime.in, swapnil.darekar@otbconsulting.co.in';*/
+         $subject = 'Attendence For Month';
 
-         $tbody = "test";
+         $message = '<!DOCTYPE html>
+                <html>
+                <head>
+                <style>
+                #customers {
+                    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+                    border-collapse: collapse;
+                    width: 100%;
+                }
+
+                #customers td, #customers th {
+                    border: 1px solid #ddd;
+                    padding: 8px;
+                }
+
+                #customers tr:nth-child(even){background-color: #f2f2f2;}
+
+                #customers tr:hover {background-color: #ddd;}
+
+                #customers th {
+                    padding-top: 12px;
+                    padding-bottom: 12px;
+                    text-align: left;
+                    background-color: #000;
+                    color: white;
+                }
+                </style>
+                </head>
+                <body>
+
+                <table id="customers">
+                 <tr> <th>Date</th>
+                  <th>Punch In</th>
+                  <th>Punch Out</th>
+                  <th>Effective Time</th>
+                  <th>Late Marks</th>
+                  <th>Adjusted Time</th></tr>
+                  </table>
+                </body>
+                </html>';
 
           /*$this->load->library('email');
           $this->email->from($from_email, 'Eat Any Time');
@@ -1167,12 +1203,57 @@ class Eat_Attendence extends CI_controller {
             echo "mail Not sent";
           }*/
             
-          echo 'mailsent'.$mailSent=send_email($from_email,  $from_email_sender, $to_email, $subject, $tbody);
+          $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message );
           if ($mailSent==1) {
-              echo "Send";
+                 "done";
           } else {
-              echo "NOT Send".$mailSent;
+                "mail_fail".$mailSent;
           }
+          
+
+          // try {
+          //     $CI =& get_instance();
+
+          //     $from_email = 'hr@eatanytime.in';
+
+          //     //configure email settings
+          //     $config['protocol'] = 'smtp';
+          //     // $config['smtp_host'] = 'smtp.rediffmailpro.com'; //smtp host name
+          //     $config['smtp_host'] = 'ssl://smtp.gmail.com'; //smtp host name
+          //     $config['smtp_port'] = '465'; //smtp port number
+          //     $config['smtp_user'] = $from_email;
+          //     $config['smtp_pass'] = 'team@123'; //$from_email password
+          //     $config['mailtype'] = 'html';
+          //     $config['charset'] = 'iso-8859-1';
+          //     $config['wordwrap'] = TRUE;
+          //     $config['newline'] = "\r\n"; //use double quotes
+          //     $CI->email->initialize($config);
+
+          //     //send mail
+          //     $CI->email->from($from_email, $from_email_sender);
+          //     $CI->email->to($to_email);
+          //     // $CI->email->bcc($bcc);
+          //     // if($cc!='')
+          //     // $CI->email->cc($cc);
+          //     $CI->email->subject($subject);
+          //     $CI->email->message($message);
+          //     // if($attachment!='')
+          //     //     $CI->email->attach($attachment);
+          //     $CI->email->set_mailtype("html");
+          //     $result = $CI->email->send();
+          //     echo $CI->email->print_debugger();
+          //     $CI->email->clear(TRUE);
+
+          //     if ($result==1) {
+          //         echo "Mail Send";
+          //     } else {
+          //         echo "Mail NOT Send";
+          //     }
+
+          // } catch (Exception $ex) {
+              
+          // }
+
     }
 
     public function download_excel_summery($status='')

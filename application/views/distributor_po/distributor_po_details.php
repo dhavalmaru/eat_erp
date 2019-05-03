@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>        
+    <head>
         <!-- META SECTION -->
         <title>EAT ERP</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -113,13 +113,10 @@
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Option of Basis of Sales<span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <select name="basis_of_sales" id="basis_of_sales" class="form-control select2">
-                                                    
-                                                <option value="">Select</option>
-                                                
-                                                <option value="PO Number" <?php if(isset($data)){if($data[0]->basis_of_sales=='PO Number' || $data[0]->po_number!='')  echo 'selected'; } ?>>PO Number</option>
+                                                    <option value="">Select</option>
+                                                    <option value="PO Number" <?php if(isset($data)){if($data[0]->basis_of_sales=='PO Number' || $data[0]->po_number!='')  echo 'selected'; } ?>>PO Number</option>
                                                     <option value="Emails" <?php if(isset($data)){if($data[0]->basis_of_sales=='Emails') echo 'selected'; }?>>Emails</option>
                                                 </select>
-                                                
                                             </div>
                                         </div>
                                     </div>
@@ -151,10 +148,7 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Date time of email</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                            
-                                                
-                                                  <input type="text" class="form-control" name="email_date_time" id="email_date_time" placeholder="Date time of email" value="<?php if(isset($data)) { echo (($data[0]->email_date_time!=null && $data[0]->email_date_time!='')?date('d/m/y h:i:s A',strtotime($data[0]->email_date_time)):''); } ?>" />
-                                                
+                                                <input type="text" class="form-control" name="email_date_time" id="email_date_time" placeholder="Date time of email" value="<?php if(isset($data)) { echo (($data[0]->email_date_time!=null && $data[0]->email_date_time!='')?date('d/m/y h:i:s A',strtotime($data[0]->email_date_time)):''); } ?>" />
                                             </div>
                                         </div>
                                     </div>  
@@ -262,7 +256,7 @@
                                             <input type="text" class="form-control" name="discount" id="discount" placeholder="Discount" value="<?php if(isset($data)) { echo $data[0]->discount; } ?>" />
                                         </div>
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group" style="display: none;">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Tax <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4  col-sm-4 col-xs-12 option-line-height">
@@ -273,7 +267,7 @@
                                             </div>
                                   
                                             <label class="col-md-1 col-sm-1 col-xs-12 control-label">Tax (In %) <span class="asterisk_sign">*</span></label>
-                                             <div class="col-md-5 col-sm-5 col-xs-12">
+                                            <div class="col-md-5 col-sm-5 col-xs-12">
                                                 <input type="text" class="form-control" name="tax_per" id="tax_per" placeholder="Tax Percent" value="<?php if (isset($data)) { echo $data[0]->tax_per; } ?>" readonly />
                                                 <input type="hidden" class="form-control" name="cgst" id="cgst" placeholder="cgst" value="<?php if (isset($data)) { echo $data[0]->cgst; } ?>" readonly />
                                                 <input type="hidden" class="form-control" name="sgst" id="sgst" placeholder="sgst" value="<?php if (isset($data)) { echo $data[0]->sgst; } ?>" readonly />
@@ -334,13 +328,13 @@
                                                     <input type="text" class="form-control rate" name="rate[]" id="rate_<?php echo $i; ?>" placeholder="Rate" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->rate; } ?>" readonly />
                                                 </td>
                                                 <td>
-                                                    <input type="hidden" class="form-control" name="cgst[]" id="cgst_<?php echo $i; ?>" placeholder="cgst" value="0" readonly />
-                                                    <input type="hidden" class="form-control" name="sgst[]" id="sgst_<?php echo $i; ?>" placeholder="sgst" value="0" readonly />
-                                                    <input type="hidden" class="form-control" name="igst[]" id="igst_<?php echo $i; ?>" placeholder="igst" value="0" readonly />
+                                                    <input type="hidden" class="form-control" name="cgst[]" id="cgst_<?php echo $i; ?>" placeholder="cgst" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->cgst; } else echo '0'; ?>" readonly />
+                                                    <input type="hidden" class="form-control" name="sgst[]" id="sgst_<?php echo $i; ?>" placeholder="sgst" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->sgst; } else echo '0'; ?>" readonly />
+                                                    <input type="hidden" class="form-control" name="igst[]" id="igst_<?php echo $i; ?>" placeholder="igst" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->igst; } else echo '0'; ?>" readonly />
                                                     <input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_<?php echo $i; ?>" placeholder="tax_per" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->tax_percentage; } ?>"/>
                                                     <input type="hidden" class="form-control sell_margin" name="sell_margin[]" id="sell_margin_<?php echo $i; ?>" placeholder="Sell Margin" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->margin_per; } ?>"/>
-                                                   <input type="text" class="form-control sell_rate" name="sell_rate[]" id="sell_rate_<?php echo $i; ?>" placeholder="Sell Rate" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->sell_rate; } ?>"/>
-                                                   <input type="hidden" class="form-control promo_margin" name="promo_margin[]" id="promo_margin_<?php echo $i; ?>" placeholder="Promotion Margin" value="0"/>
+                                                    <input type="text" class="form-control sell_rate" name="sell_rate[]" id="sell_rate_<?php echo $i; ?>" placeholder="Sell Rate" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->sell_rate; } ?>"/>
+                                                    <input type="hidden" class="form-control promo_margin" name="promo_margin[]" id="promo_margin_<?php echo $i; ?>" placeholder="Promotion Margin" value="0"/>
                                                 </td>
                                                 <td style="display: none;">
                                                     <input type="text" class="form-control grams" name="grams[]" id="grams_<?php echo $i; ?>" placeholder="Grams" value="<?php if (isset($distributor_po_items)) { echo $distributor_po_items[$i]->grams; } ?>" readonly />
@@ -417,7 +411,6 @@
                                                     <input type="hidden" class="form-control sell_margin" name="sell_margin[]" id="sell_margin_<?php echo $i; ?>" placeholder="Sell Margin" value="0"/>
                                                     <input type="text" class="form-control sell_rate" name="sell_rate[]" id="sell_rate_<?php echo $i; ?>" placeholder="Sell Rate" value="0"/>
                                                     <input type="hidden" class="form-control promo_margin" name="promo_margin[]" id="promo_margin_<?php echo $i; ?>" placeholder="Promotion Margin" value="0"/>
-                                                
                                                 </td>
                                                 <td style="display: none;">
                                                     <input type="text" class="form-control grams" name="grams[]" id="grams_<?php echo $i; ?>" placeholder="Grams" value="" readonly />
@@ -479,7 +472,13 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Enter PO Amount</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="entered_invoice_amount" id="entered_invoice_amount" placeholder="PO Amount" value="<?php if(isset( $data[0]->invoice_amount)) echo $data[0]->invoice_amount; ?>" />
+                                                <input type="text" class="form-control" name="entered_invoice_amount" id="entered_invoice_amount" placeholder="PO Amount" value="<?php if(isset( $data[0]->entered_invoice_amount)) echo $data[0]->entered_invoice_amount; ?>" onchange="check_amount();" />
+                                            </div>
+                                            <div id="mismatch_div" style="display: none;">
+                                                <input type="hidden" name="mismatch" id="mismatch" value="<?php if (isset($data)) { echo $data[0]->mismatch; } else echo '0'; ?>" />
+                                                <input type="hidden" name="mismatch_type" id="mismatch_type" value="<?php if (isset($data)) { echo $data[0]->mismatch_type; } ?>" />
+                                                <label class="col-md-2 col-sm-2 col-xs-12 control-label" style="color: #FF0000 !important;">Amount Mismatch</label>
+                                                <button type="button" class="btn btn-default" id="btn_send_email">Send Mismatch Email</button>
                                             </div>
                                         </div>
                                     </div>
@@ -493,17 +492,15 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group depo" style="<?php if (isset($data)) { if($data[0]->delivery_through=='WHPL') echo 'display: block'; else  echo 'display: none'; } ?>">
+                                    <div class="form-group depo" id="shipping_address_div" style="<?php if (isset($data)) { if($data[0]->delivery_through=='WHPL' && $data[0]->shipping_address=='No') echo 'display: block'; else  echo 'display: none'; } else echo 'display: none;'; ?>">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <div id="shipping_address_div" style="<?php if(isset($data)) {if($data[0]->shipping_address=='No') echo ''; else echo 'display: none;';} else echo 'display: none;'; ?>">
-                                                <label class="col-md-2 col-sm-2 col-xs-12 control-label">Shipping Address <span class="asterisk_sign">*</span></label>
-                                                <div class="col-md-4 col-sm-4 col-xs-12">
-                                                    <select name="distributor_consignee_id" id="distributor_consignee_id" class="form-control">
-                                                        <option value="">Select</option>
-                                                        
-                                                    </select>
-                                                    <input type="hidden" name="distributor_consignee" id="distributor_consignee" value="<?php if(isset($data)) echo $data[0]->distributor_consignee_id; ?>" />
-                                                </div>
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Shipping Address <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <select name="distributor_consignee_id" id="distributor_consignee_id" class="form-control">
+                                                    <option value="">Select</option>
+                                                    
+                                                </select>
+                                                <input type="hidden" name="distributor_consignee" id="distributor_consignee" value="<?php if(isset($data)) echo $data[0]->distributor_consignee_id; ?>" />
                                             </div>
                                         </div>
                                     </div>
@@ -525,18 +522,10 @@
                                     </div>
                                     <div class="form-group" style="display: none">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Date Of Dispatch</label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control datepicker" name="dispatch_date" id="dispatch_date" placeholder="Date Of Dispatch" value="<?php if(isset($data)) echo (($data[0]->dispatch_date!=null && $data[0]->dispatch_date!='')?date('d/m/Y',strtotime($data[0]->dispatch_date)):''); ?>" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group" style="display: none">
-                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Delivery Status *</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <select class="form-control" name="delivery_status" id="delivery_status"  style="color:#000;">
-                                                    <option value=''></option>
+                                                    <option value="">Select</option>
                                                     <option value="Pending" <?php if(isset($data)) {if ($data[0]->delivery_status=='Pending') echo 'selected';}?>>Pending</option>
                                                     <option value="GP Issued" <?php if(isset($data)) {if ($data[0]->delivery_status=='GP Issued') echo 'selected';}?>>GP Issued</option>
                                                     <option value="Delivered Not Complete" <?php if(isset($data)) {if ($data[0]->delivery_status=='Delivered Not Complete') echo 'selected';}?>>Delivered Not Complete</option>
@@ -548,25 +537,46 @@
                                     </div>
                                     <div class="form-group" style="display: none">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Date Of Dispatch</label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control datepicker" name="dispatch_date" id="dispatch_date" placeholder="Date Of Dispatch" value="<?php if(isset($data)) echo (($data[0]->dispatch_date!=null && $data[0]->dispatch_date!='')?date('d/m/Y',strtotime($data[0]->dispatch_date)):''); ?>" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" style="display: none">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Delivery Date *</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control datepicker" name="delivery_date" id="delivery_date" placeholder="Delivery Date" value="<?php if(isset($data)) echo (($data[0]->delivery_date!=null && $data[0]->delivery_date!='')?date('d/m/Y',strtotime($data[0]->delivery_date)):''); ?>" />
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group" style="<?php if(isset($data)) {if($data[0]->status=='Pending') echo 'display: none;'; else echo '';} else echo 'display: none;';?>">
+                                    <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <div style="display: none;">
-                                                <label class="col-md-2 col-sm-2 col-xs-12 control-label">Status <span class="asterisk_sign">*</span></label>
-                                                <div class="col-md-4 col-sm-4 col-xs-12">
-                                                    <select class="form-control" name="status">
-                                                        <option value="Pending" <?php if(isset($data)) {if ($data[0]->status=='Pending') echo 'selected';} ?>>Pending</option>
-                                                        <option value="Deleted" <?php if(isset($data)) {if ($data[0]->status=='Deleted') echo 'selected';}?>>Deleted</option>
-                                                        <option value="Rejected" <?php if(isset($data)) {if ($data[0]->status=='Rejected') echo 'selected';}?>>Rejected</option>
-                                                        <option value="Approved" <?php if(isset($data)) {if ($data[0]->status=='Approved') echo 'selected';} ?>>Approved</option>
-                                                        <option value="InActive" <?php if(isset($data)) {if ($data[0]->status=='InActive') echo 'selected';} ?>>Cancelled</option>
-                                                    </select>
-                                                </div>
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">PO Copy</label>
+                                            <div class="col-md-2 col-sm-2 col-xs-12" >
+                                                <input type="hidden" class="form-control" name="doc_document" value="<?php if(isset($data)) echo $data[0]->doc_document; ?>" />
+                                                <input type="hidden" class="form-control" name="document_name" value="<?php if(isset($data)) echo $data[0]->document_name; ?>" />
+                                                <!-- <input type="file" class="fileinput btn btn-info btn-small doc_file" name="doc_file" id="doc_file" data-error="#doc_file_error"/> -->
+                                                <input type="file" class="fileinput btn btn-info btn-small doc_file" name="doc_file" id="doc_file" data-error="#doc_file_error"/>
+                                                <div id="doc_file_error"></div>
+                                            </div>          
+                                            <div class="col-md-1 col-sm-1 col-xs-12 download-width" >
+                                                <?php if(isset($data)) { if($data[0]->doc_document!= '') { ?><a target="_blank" id="doc_file_download" href="<?php if(isset($data)) echo base_url().$data[0]->doc_document; ?>"><span class="fa download fa-download" ></span></a></a><?php }} ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" style="display: none;">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Status <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <select class="form-control" name="status">
+                                                    <option value="Pending" <?php if(isset($data)) {if ($data[0]->status=='Pending') echo 'selected';} ?>>Pending</option>
+                                                    <option value="Deleted" <?php if(isset($data)) {if ($data[0]->status=='Deleted') echo 'selected';}?>>Deleted</option>
+                                                    <option value="Rejected" <?php if(isset($data)) {if ($data[0]->status=='Rejected') echo 'selected';}?>>Rejected</option>
+                                                    <option value="Approved" <?php if(isset($data)) {if ($data[0]->status=='Approved') echo 'selected';} ?>>Approved</option>
+                                                    <option value="InActive" <?php if(isset($data)) {if ($data[0]->status=='InActive') echo 'selected';} ?>>Cancelled</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -584,16 +594,17 @@
                                 </div>
                             </div>
                             <div class="panel-footer">
+                                <!-- <button class="btn btn-default" id="btn-confirm">Confirm</button> -->
                                 <a href="<?php echo base_url(); ?>index.php/distributor_po" class="btn btn-danger pull-right" type="reset" id="reset">Cancel</a>
                                 <!-- <button class="btn btn-success pull-right" style="<?php //if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</button> -->
                                 <?php $curusr=$this->session->userdata('session_id'); ?>
-                                <input type="submit" class="btn btn-success btn-sm" id="btn_submit" name="btn_submit" value="Submit For Approval" style="<?php if(isset($access)) { if(isset($data)) { if($data[0]->freezed) { echo 'display: none;'; } else { if($access[0]->r_edit=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || $data[0]->status=='InActive')) echo ''; else echo 'display: none;'; } } else if($access[0]->r_insert=='1') echo ''; else echo 'display: none;'; ?>" />
+                                <input type="submit" class="btn btn-success btn-sm" id="btn_submit" name="btn_submit" value="Submit For Approval" style="<?php if(isset($access)) { if(isset($data)) { if($data[0]->freezed) { echo 'display: none;'; } else if($data[0]->mismatch=='1') { echo ''; } else { if($access[0]->r_edit=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || $data[0]->status=='InActive')) echo ''; else echo 'display: none;'; } } else if($access[0]->r_insert=='1') echo ''; else echo 'display: none;'; ?>" />
                                 <?php if(isset($data) && $data[0]->freezed!=1) { ?>
                                 <input type="submit" class="btn btn-danger btn-sm" id="btn_delete" name="btn_delete" value="Delete" style="<?php if(isset($access) ) {
                                 if(isset($data)) {if($access[0]->r_delete=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved') && $data[0]->status!='InActive') echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
                                 <?php } ?>
-                                <input type="submit" class="btn btn-success btn-sm" id="btn_approve" name="btn_approve" value="Approve" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
-                                <input type="submit" class="btn btn-danger btn-sm" id="btn_reject" name="btn_reject" value="Reject" style="<?php if(isset($access)) {if(isset($data)) {if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive' )) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+                                <input type="submit" class="btn btn-success btn-sm" id="btn_approve" name="btn_approve" value="Approve" style="<?php if(isset($access)) {if(isset($data)) {if($data[0]->mismatch=='1') { echo 'display: none;'; } else if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+                                <input type="submit" class="btn btn-danger btn-sm" id="btn_reject" name="btn_reject" value="Reject" style="<?php if(isset($access)) {if(isset($data)) {if($data[0]->mismatch=='1') { echo 'display: none;'; } else if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive' )) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
                                 <?php }?>                                    
                             </div>
                             </form>
@@ -607,6 +618,105 @@
         </div>
         <!-- END PAGE CONTAINER -->
         
+        <div class="modal fade" id="send_mismatch_email" role="dialog">
+            <div class="modal-dialog">
+                <form id="form_send_email" role="form" class="form-horizontal" method="post" action="<?php echo base_url().'index.php/distributor_po/send_email'; ?>">
+                    <div class="modal-content" >
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Send Mismatch Email</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group" style="display: none;">
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                    <?php 
+                                        $email_ref_id = '';
+                                        if(isset($email)) { if(count($email)>0) $email_ref_id = $email[0]->email_ref_id; }
+                                        if($email_ref_id==''){
+                                            if(isset($data)) { if(count($data)>0) $email_ref_id = $data[0]->id; }
+                                        }
+                                    ?>
+                                    <input type="hidden" id="email_ref_id" name="email_ref_id" value="<?php $email_ref_id; ?>" />
+                                    <input type="hidden" id="email_type" name="email_type" value="<?php if(isset($email)) echo $email[0]->email_type; ?>" />
+                                    <input type="hidden" id="email_sender" name="email_sender" value="<?php if(isset($email)) echo $email[0]->email_sender; ?>" />
+                                    <label class="col-md-2 col-sm-2 col-xs-12 control-label">From &nbsp;&nbsp;&nbsp; </label>
+                                    <div class="col-md-8 col-sm-8 col-xs-12">
+                                        <input type="text" class="form-control" name="email_from" value="<?php if(isset($email)) echo $email[0]->email_from; else echo 'cs@eatanytime.in'; ?>" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group" id="email_response_div" style="display:none;">
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                    <label class="col-md-12 col-sm-12 col-xs-12 control-label" id="email_response"></label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                    <label class="col-md-2 col-sm-2 col-xs-12 control-label">To &nbsp;&nbsp;&nbsp; </label>
+                                    <div class="col-md-8 col-sm-8 col-xs-12">
+                                        <input type="text" class="form-control" name="email_to" value="<?php if(isset($email)) echo $email[0]->email_to; ?>" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                    <label class="col-md-2 col-sm-2 col-xs-12 control-label">CC &nbsp;&nbsp;&nbsp; </label>
+                                    <div class="col-md-8 col-sm-8 col-xs-12">
+                                        <input type="text" class="form-control" name="email_cc" value="<?php if(isset($email)) echo $email[0]->email_cc; ?>" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                    <label class="col-md-2 col-sm-2 col-xs-12 control-label">BCc &nbsp;&nbsp;&nbsp; </label>
+                                    <div class="col-md-8 col-sm-8 col-xs-12">
+                                        <input type="text" class="form-control" name="email_bcc" value="<?php if(isset($email)) echo $email[0]->email_bcc; ?>" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                    <label class="col-md-2 col-sm-2 col-xs-12 control-label">Subject &nbsp;&nbsp;&nbsp; </label>
+                                    <div class="col-md-10 col-sm-10 col-xs-12">
+                                        <input type="text" class="form-control" name="email_subject" value="<?php if(isset($email)) echo $email[0]->email_subject; ?>" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                    <label class="col-md-2 col-sm-2 col-xs-12 control-label">Body </label>
+                                    <div class="col-md-10 col-sm-10 col-xs-12">
+                                        <textarea name="email_body" id="email_body" class="form-control" rows="15"><?php if(isset($email)) echo $email[0]->email_body; ?></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                            <button type="button" id="btn_send" class="btn btn-default pull-right">Send</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true" id="mi-modal">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">PO amount is different, Do you want to continue? </h4>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" id="modal-btn-si">Yes</button>
+                        <button type="button" class="btn btn-primary" id="modal-btn-no">No</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="alert" role="alert" id="result"></div>
+
+
         <?php $this->load->view('templates/footer');?>
         <script type="text/javascript">
             var BASE_URL="<?php echo base_url()?>";
@@ -614,10 +724,9 @@
         <script type="text/javascript" src="<?php echo base_url(); ?>js/load_autocomplete.js"></script>
         <script type="text/javascript" src="<?php echo base_url(); ?>js/validations.js"></script>
         <script type="text/javascript">
-            var newRow1;
+            var newRow1 = '';
             $(document).ready(function(){ 
                 $('#email_date_time').datetimepicker({
-                    
                     format: 'DD-MM-YYYY hh:mm:ss A',
                     defaultDate:new Date()
                 });
@@ -687,7 +796,6 @@
                     $(".datepicker1").datepicker({ maxDate: 0,changeMonth: true,yearRange:'-100:+0',changeYear: true });
                 }
 
-
                 $('#email_body1').hide();
                 $('#email_body2').hide();
                 $('#email_body3').hide();
@@ -695,36 +803,35 @@
                 $('#po_num2').hide();
                     
                 $("#basis_of_sales").change(function(){
-                        if($('#basis_of_sales').val()=='PO Number' ) {
-                            $('#email_body1').hide();
-                            $('#email_body2').hide();
-                            $('#email_body3').hide();
-                            $('#po_num1').show();
-                            $('#po_num2').show();
-                        } else if($('#basis_of_sales').val()=='Emails' )  {
-                            $('#email_body1').show();
-                            $('#email_body2').show();
-                            $('#email_body3').show();
-                            $('#po_num1').hide();
-                            $('#po_num2').hide();
-                        }
-                    });             
-                    
-                    if($("#basis_of_sales option:selected").val() == 'Emails') {
-                        $('#email_body1').show();
-                        $('#email_body2').show();
-                        $('#email_body3').show();
-                        $('#po_num1').hide();
-                        $('#po_num2').hide();
-                        
-                    }
-                    if($("#basis_of_sales option:selected").val() == 'PO Number') {
+                    if($('#basis_of_sales').val()=='PO Number' ) {
                         $('#email_body1').hide();
                         $('#email_body2').hide();
                         $('#email_body3').hide();
                         $('#po_num1').show();
                         $('#po_num2').show();
+                    } else if($('#basis_of_sales').val()=='Emails' )  {
+                        $('#email_body1').show();
+                        $('#email_body2').show();
+                        $('#email_body3').show();
+                        $('#po_num1').hide();
+                        $('#po_num2').hide();
                     }
+                });             
+                    
+                if($("#basis_of_sales option:selected").val() == 'Emails') {
+                    $('#email_body1').show();
+                    $('#email_body2').show();
+                    $('#email_body3').show();
+                    $('#po_num1').hide();
+                    $('#po_num2').hide();
+                }
+                if($("#basis_of_sales option:selected").val() == 'PO Number') {
+                    $('#email_body1').hide();
+                    $('#email_body2').hide();
+                    $('#email_body3').hide();
+                    $('#po_num1').show();
+                    $('#po_num2').show();
+                }
 
                 $(".type").change(function(){
                     show_item($(this));
@@ -789,15 +896,7 @@
                     get_sell_rate();
                 });
                 $('input[type=radio][name=shipping_address]').on('change', function() {
-                    if($(this).val()=='no'){
-                        $('#shipping_address_div').show();
-                        // if($('#distributor_consignee_id').val()!='') {
-                        //     get_consignee_details1($('#distributor_consignee_id').val());
-                        // }
-                    } else {
-                        get_distributor_details($('#distributor_id').val());
-                        $('#shipping_address_div').hide();
-                    }
+                    set_shipping_add();
                 });
                 
                 addMultiInputNamingRules('#form_distributor_po_details', 'select[name="box[]"]', { required: true }, "");
@@ -822,6 +921,15 @@
                 //     get_distributor_details($('#sample_distributor_id').val());
                 // }
             });
+
+            var set_shipping_add = function(){
+                if($('#shipping_address_yes').is(':checked')==false){
+                    $('#shipping_address_div').show();
+                } else {
+                    get_distributor_details($('#distributor_id').val());
+                    $('#shipping_address_div').hide();
+                }
+            }
 
             function set_distributor_details(){
                 get_distributor_details($('#distributor_id').val());
@@ -888,12 +996,12 @@
                     async:false,
                     success: function(data){
                         if(data.result==1){
-                        if(distributor_id==640){
-                            if($("#discount").val()==''){
-                                $("#discount").val(25)
+                            if(distributor_id==640){
+                                if($("#discount").val()==''){
+                                    $("#discount").val(25)
+                                }
                             }
-                        }
-                        if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640){
+                            if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327){
                                 $('#sell_out').val($("#discount").val());
                             } else {
                                 $('#sell_out').val(data.sell_out);
@@ -903,7 +1011,7 @@
                                 $('#distributor_name').val(data.product_name);
                             }
 
-                            if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550" && $('#distributor_id').val()!="622" && $('#distributor_id').val()!="626" && $('#distributor_id').val()!="640") {
+                            if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550" && $('#distributor_id').val()!="622" && $('#distributor_id').val()!="626" && $('#distributor_id').val()!="640" && $('#distributor_id').val()!="1299" && $('#distributor_id').val()!="1319" && $('#distributor_id').val()!="1327") {
 
                                 $('#state').val(data.state);
                                 $('#state_code').val(data.state_code);
@@ -963,12 +1071,11 @@
                     }
                 });
 
-                if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640){
+                if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327){
                     $('.direct').show();
                 } else {
                     $('.direct').hide();
                 }
-                
                 
                 if($('#distributor_id').val()!="" && $('input[name=delivery_through]:checked').val()=='WHPL'){
                     /*alert("Hii5");*/
@@ -1018,13 +1125,15 @@
             function get_sell_rate(){
                 var depot_state = $("#depot_state").val();
                 var state = $("#state").val();
+                var delivery_through = $("input[name=delivery_through]:checked").val();
+                var store_id = $('#store_id').val();
 
                 $('.rate').each(function(){
                     var elem = $(this);
                     var id = elem.attr('id');
                     var index = id.substr(id.lastIndexOf('_')+1);
                     var sell_out = 0;
-                    if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640){
+                    if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327){
                         sell_out = parseFloat($('#sell_out').val());
                     } else {
                         sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
@@ -1036,30 +1145,21 @@
                     var igst = 0;
                     var tax_per = 0;
 
-                    var delivery_through = $("input[name=delivery_through]:checked").val();
-                    var store_id = $(this).val();
-
-                    if(delivery_through=="WHPL" || (delivery_through=="Distributor" && store_id!='' ))
-                    {
-                       tax_per = parseFloat(get_number($("#tax_per_"+index).val(),2));
-                       if(depot_state==state){
-                        if(delivery_through!="Distributor")
-                        {
-                            cgst = parseFloat(tax_per/2,2);
-                            sgst = parseFloat(tax_per/2,2);
-                        }
-                        } else {
-                            if(delivery_through!="Distributor")
-                            {
+                    if(delivery_through=="WHPL" || (delivery_through=="Distributor" && store_id!='' )){
+                        tax_per = parseFloat(get_number($("#tax_per_"+index).val(),2));
+                        if(delivery_through!="Distributor"){
+                            if(depot_state==state){
+                                cgst = parseFloat(tax_per/2,2);
+                                sgst = parseFloat(tax_per/2,2);
+                            } else {
                                 igst = tax_per;
                             }
-                        }        
+                        }
                     }
                     
                     $("#cgst_"+index).val(cgst);
                     $("#sgst_"+index).val(sgst);
-                    $("#igst_"+index).val(igst);   
-
+                    $("#igst_"+index).val(igst);
 
                     if (isNaN(qty)) qty=0;
                     if (isNaN(rate)) rate=0;
@@ -1234,13 +1334,17 @@
             }*/
 
             function get_bar_details(elem){
+                var depot_state = $("#depot_state").val();
+                var state = $("#state").val();
+                var delivery_through = $("input[name=delivery_through]:checked").val();
+                var store_id = $('#store_id').val();
                 var box_id = elem.val();
                 var id = elem.attr('id');
                 var index = id.substr(id.lastIndexOf('_')+1);
                 var qty = parseFloat(get_number($("#qty_"+index).val(),2));
                 var sell_out = 0;
                 var delivery_through = $("input[name=delivery_through]:checked").val();
-                if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640){
+                if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327){
                     sell_out = parseFloat($('#sell_out').val());
                 } else {
                     sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
@@ -1249,8 +1353,10 @@
                 var distributor_id = $("#distributor_id").val();
                 var grams_in_bar = 0;
                 var rate = 0;
+                var cgst = 0;
+                var sgst = 0;
+                var igst = 0;
                 var grams =0;
-                var store_id = $('#store_id').val();
                 var pro_margin = 0;
                 pro_margin = parseFloat(get_number($("#promo_margin_"+index).val(),2));
                 if (isNaN(pro_margin)) pro_margin=0;
@@ -1265,7 +1371,7 @@
                         if(data.result==1){
                             grams = parseFloat(data.grams);
                             rate = parseFloat(data.rate);
-                            if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640){
+                            if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327){
                                 sell_out = parseFloat($('#sell_out').val());
                             } else {
                                 sell_out = parseFloat(data.margin);
@@ -1289,9 +1395,21 @@
                 if (isNaN(tax_per)) tax_per=0;
                 if (isNaN(pro_margin)) pro_margin=0;
 
-                var cgst = $("#cgst_"+index).val();
-                var sgst = $("#sgst_"+index).val();
-                var igst = $("#igst_"+index).val();
+                if(delivery_through=="WHPL" || (delivery_through=="Distributor" && store_id!='' )){
+                    tax_per = parseFloat(get_number($("#tax_per_"+index).val(),2));
+                    if(delivery_through!="Distributor"){
+                        if(depot_state==state){
+                            cgst = parseFloat(tax_per/2,2);
+                            sgst = parseFloat(tax_per/2,2);
+                        } else {
+                            igst = tax_per;
+                        }
+                    }
+                }
+                
+                $("#cgst_"+index).val(cgst);
+                $("#sgst_"+index).val(sgst);
+                $("#igst_"+index).val(igst);
 
                 var sell_rate = rate-((rate*sell_out)/100);
                 sell_rate = sell_rate/(100+tax_per)*100;
@@ -1326,12 +1444,16 @@
             }
 
             function get_box_details(elem){
+                var depot_state = $("#depot_state").val();
+                var state = $("#state").val();
+                var delivery_through = $("input[name=delivery_through]:checked").val();
+                var store_id = $('#store_id').val();
                 var box_id = elem.val();
                 var id = elem.attr('id');
                 var index = id.substr(id.lastIndexOf('_')+1);
                 var qty = parseFloat(get_number($("#qty_"+index).val(),2));
                 var sell_out = 0;
-                if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640){
+                if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327){
                     sell_out = parseFloat($('#sell_out').val());
                 } else {
                     sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
@@ -1340,21 +1462,12 @@
                 var distributor_id = $("#distributor_id").val();
                 var grams_in_bar = 0;
                 var rate = 0;
-                var store_id = $('#store_id').val();;
+                var cgst = 0;
+                var sgst = 0;
+                var igst = 0;
                 var pro_margin = 0;
                 pro_margin = parseFloat(get_number($("#promo_margin_"+index).val(),2));
                 if (isNaN(pro_margin)) pro_margin=0;
-                
-                var delivery_through = $("input[name=delivery_through]:checked").val();
-                /*if(delivery_through=="Distributor" && $('#store_id').val()!='')
-                {
-                   var store_id = $('#store_id').val();
-                }
-
-                if(store_id==0)
-                {
-                  distributor_id = 0;      
-                }*/
                 
                 $.ajax({
                     url:BASE_URL+'index.php/distributor_po/get_box_details',
@@ -1366,7 +1479,7 @@
                         if(data.result==1){
                             grams = parseFloat(data.grams);
                             rate = parseFloat(data.rate);
-                            if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640){
+                            if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327){
                                 sell_out = parseFloat($('#sell_out').val());
                             } else {
                                 sell_out = parseFloat(data.margin);
@@ -1390,9 +1503,21 @@
                 if (isNaN(tax_per)) tax_per=0;
                 if (isNaN(pro_margin)) pro_margin=0;
 
-                var cgst = $("#cgst_"+index).val();
-                var sgst = $("#sgst_"+index).val();
-                var igst = $("#igst_"+index).val();
+                if(delivery_through=="WHPL" || (delivery_through=="Distributor" && store_id!='' )){
+                    tax_per = parseFloat(get_number($("#tax_per_"+index).val(),2));
+                    if(delivery_through!="Distributor"){
+                        if(depot_state==state){
+                            cgst = parseFloat(tax_per/2,2);
+                            sgst = parseFloat(tax_per/2,2);
+                        } else {
+                            igst = tax_per;
+                        }
+                    }
+                }
+                
+                $("#cgst_"+index).val(cgst);
+                $("#sgst_"+index).val(sgst);
+                $("#igst_"+index).val(igst);
 
                 var sell_rate = rate-((rate*sell_out)/100);
                 sell_rate = sell_rate/(100+tax_per)*100;
@@ -1425,7 +1550,6 @@
 
                 get_total();
             }
-
 
             function get_amount(elem){
                 var id = elem.attr('id');
@@ -1523,6 +1647,8 @@
                 $("#invoice_amount").val(final_amt.toFixed(0));
                 $("#round_off_amount1").text(round_off_amt.toFixed(2));
                 $("#invoice_amount1").text(final_amt.toFixed(0));
+
+                check_amount();
             }
 
             $(document).ready(function(){
@@ -1829,6 +1955,8 @@
                     $('.relationship').show();
                      $('.onbasis').hide();
                 }
+
+                set_shipping_add();
             }
 
             function get_zones(){
@@ -1902,6 +2030,94 @@
                     }
                 });
             }
+        </script>
+        <script type="text/javascript">
+            $("#btn_send_email").on("click", function(){
+                $("#send_mismatch_email").modal('show');
+            });
+
+            var check_amount = function() {
+                if($("#entered_invoice_amount").val()!=""){
+                    if(parseFloat($("#entered_invoice_amount").val())!=parseFloat($("#invoice_amount").val())){
+                        $("#mismatch").val("1");
+                        $("#mismatch_type").val("Delivery");
+                        $("#mismatch_div").show();
+                        $("#btn_submit").val("Save");
+                        // $("#btn_submit").show();
+                        // $("#btn_approve").hide();
+                        // $("#btn_reject").hide();
+                    } else {
+                        $("#mismatch").val("0");
+                        $("#mismatch_type").val("");
+                        $("#mismatch_div").hide();
+                        $("#btn_submit").val("Submit For Approval");
+                        // $("#btn_approve").show();
+                        // $("#btn_reject").show();
+                    }
+                }
+            }
+
+            $("#btn_send").on("click", function(){
+                $.ajax({
+                    url:BASE_URL+'index.php/distributor_po/send_email',
+                    method:"post",
+                    data:$('#form_send_email').serialize(),
+                    dataType:"html",
+                    async:false,
+                    success: function(data){
+                        data = data.replace('<pre>', '');
+                        data = data.replace('</pre>', '');
+                        data = data.trim();
+
+                        if(data==1){
+                            $('#email_response_div').show();
+                            $('#email_response').html('Mail Sent');
+                            $("#send_mismatch_email").modal('hide');
+                        } else {
+                            $('#email_response_div').show();
+                            $('#email_response').html('Mail Sending Failed');
+                        }
+                    },
+                    error: function (response) {
+                        var r = jQuery.parseJSON(response.responseText);
+                        alert("Message: " + r.Message);
+                        alert("StackTrace: " + r.StackTrace);
+                        alert("ExceptionType: " + r.ExceptionType);
+                    }
+                });
+            });
+
+            var modalConfirm = function(callback){
+                $("#btn-confirm").on("click", function(){
+                    $("#mi-modal").modal('show');
+                });
+
+                $("#modal-btn-si").on("click", function(){
+                    callback(true);
+                    $("#mi-modal").modal('hide');
+                });
+
+                $("#modal-btn-no").on("click", function(){
+                    callback(false);
+                    $("#mi-modal").modal('hide');
+                });
+            };
+
+            modalConfirm(function(confirm){
+                if(confirm){
+                    $("#modal_result").val("Yes");
+
+                    $('#form_distributor_po_details').submit();
+                } else {
+                    // $("#modal_result").val("No");
+                    
+                    var validator = $("#form_distributor_po_details").validate();
+                    var errors = {};
+                    var name = $('#entered_invoice_amount').attr('name');
+                    errors[name] = "Please Enter Correct amount";
+                    validator.showErrors(errors);
+                }
+            });
         </script>
     </body>
 </html>

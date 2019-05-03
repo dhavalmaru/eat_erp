@@ -168,6 +168,18 @@ function get_distributor_data($status='', $id='', $class=''){
     return $query->result();
 }
 
+function get_beat_plans(){
+    $sql = "select * from beat_master where status = 'Approved'";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_dist_beat_plans($id=''){
+    $sql = "select group_concat(beat_id) as beat_id from distributor_beat_plans where distributor_id = '$id'";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
 function get_distributor_contacts($id){
     $sql = "select * from distributor_contacts where distributor_id = '$id'";
     $query=$this->db->query($sql);
@@ -312,6 +324,21 @@ function save_data($id=''){
     }
 
     $this->db->where('distributor_id', $id);
+    $this->db->delete('distributor_beat_plans');
+
+    $beat_id=$this->input->post('beat_id[]');
+
+    for ($k=0; $k<count($beat_id); $k++) {
+        if(isset($beat_id[$k]) and $beat_id[$k]!="") {
+            $data = array(
+                        'distributor_id' => $id,
+                        'beat_id' => $beat_id[$k]
+                    );
+            $this->db->insert('distributor_beat_plans', $data);
+        }
+    }
+
+    $this->db->where('distributor_id', $id);
     $this->db->delete('distributor_category_margin');
 
     $category=$this->input->post('category_id[]');
@@ -400,7 +427,7 @@ function save_data($id=''){
     $this->user_access_log_model->insertAccessLog($logarray);
 }
 
-public function getDistributor_margin($distributor_id) {
+public function getDistributor_margin($distributor_id='') {
     $sql = "select A.*, B.inv_margin, B.pro_margin from category_master A left join distributor_category_margin B 
             on (A.id = B.category_id and B.distributor_id = '$distributor_id')";
     return $this->db->query($sql)->result();

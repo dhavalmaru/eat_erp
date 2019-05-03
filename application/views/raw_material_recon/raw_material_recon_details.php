@@ -68,7 +68,7 @@
                                                     <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
                                                     <input type="hidden" class="form-control" name="module" id="module" value="<?php if(isset($module)) echo $module;?>"/>
                                                     <input type="hidden" class="form-control" name="ref_id" id="ref_id" value="<?php if(isset($data)) echo $data[0]->ref_id;?>"/>
-                                                    <input type="text" class="form-control datepicker1" name="date_of_processing" id="date_of_processing" placeholder="Date Of Processing" value="<?php if(isset($data)) echo (($data[0]->date_of_processing!=null && $data[0]->date_of_processing!='')?date('d/m/Y',strtotime($data[0]->date_of_processing)):date('d/m/Y')); else echo date('d/m/Y'); ?>"/>
+                                                    <input type="text" class="form-control datepicker1" name="date_of_processing" id="date_of_processing" placeholder="Date Of Processing" onchange="get_stock();" value="<?php if(isset($data)) echo (($data[0]->date_of_processing!=null && $data[0]->date_of_processing!='')?date('d/m/Y',strtotime($data[0]->date_of_processing)):date('d/m/Y')); else if(isset($p_data)) echo (($p_data[0]->confirm_to_date!=null && $p_data[0]->confirm_to_date!='')?date('d/m/Y',strtotime($p_data[0]->confirm_to_date)):date('d/m/Y')); else echo date('d/m/Y'); ?>"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -100,7 +100,7 @@
 													<select name="depot_id" id="depot_id" class="form-control select2" onChange="get_stock();">
 														<option value="">Select</option>
                                                     <?php if(isset($depot)) { for ($k=0; $k < count($depot) ; $k++) { ?>
-                                                            <option value="<?php echo $depot[$k]->id; ?>" <?php if(isset($data)) { if($depot[$k]->id==$data[0]->depot_id) { echo 'selected'; } } ?>><?php echo $depot[$k]->depot_name; ?></option>
+                                                            <option value="<?php echo $depot[$k]->id; ?>" <?php if(isset($data)) { if($depot[$k]->id==$data[0]->depot_id) { echo 'selected'; } } else if(isset($p_data)) { if($depot[$k]->id==$p_data[0]->manufacturer_id) { echo 'selected'; } } ?>><?php echo $depot[$k]->depot_name; ?></option>
                                                     <?php }} ?>
 													</select>
                                                 <!-- <input type="hidden" name="depot_id" id="depot_id" value="<?php //if(isset($data)) { echo  $data[0]->depot_id; } ?>"/>
@@ -271,6 +271,10 @@
         <script type="text/javascript" src="<?php echo base_url(); ?>js/validations.js"></script>
         <script type="text/javascript">
             $(document).ready(function(){
+                if($('#id').val()=='') {
+                    get_stock();
+                }
+
                 $(".qty").blur(function(){
                     get_wastage();
                 });
@@ -299,7 +303,7 @@
                 $.ajax({
                     url:BASE_URL+'index.php/raw_material_recon/get_depot_stock',
                     method:"post",
-                    data:{depot_id: $('#depot_id').val()},
+                    data:{date_of_processing: $('#date_of_processing').val(), depot_id: $('#depot_id').val()},
                     dataType:"html",
                     async:false,
                     success: function(data){

@@ -250,14 +250,16 @@ class Production_model Extends CI_Model{
         
         if(count($result)==0){
             $sql = "select AA.rm_id, sum(required_qty) as required_qty, sum(available_qty) as available_qty, sum(difference_qty) as difference_qty from 
-                    (select A.id, A.manufacturer_id, A.bar_id, A.rm_id, round(A.tot_qty,3) as required_qty, round(B.tot_qty,3) as available_qty, 
+                    (select A.manufacturer_id, A.rm_id, round(A.tot_qty,3) as required_qty, round(B.tot_qty,3) as available_qty, 
                         round(ifnull(B.tot_qty,0)-ifnull(A.tot_qty,0),3) as difference_qty from 
+                    (select A.manufacturer_id, A.rm_id, sum(A.tot_qty) as tot_qty from 
                     (select A.id, A.manufacturer_id, B.bar_id, D.rm_id, ifnull(B.qty,0)*ifnull(D.qty_per_batch,0) as tot_qty 
                     from production_details A 
                     left join production_batch_details B on (A.id=B.production_id) 
                     left join ingredients_master C on (B.bar_id=C.product_id) 
                     left join ingredients_details D on (C.id=D.ing_id) 
                     where A.id='$id' and B.production_id='$id') A 
+                    group by A.manufacturer_id, A.rm_id) A 
                     left join 
                     (select H.*, I.rm_name from 
                     (select F.*, G.depot_name from 
@@ -1230,24 +1232,23 @@ class Production_model Extends CI_Model{
 
         if($this->input->post('btn_approve')!=null || $this->input->post('btn_reject')!=null){
             if($this->input->post('btn_approve')!=null){
-                if($this->input->post('status')=="Deleted"){
-                    $status = 'InActive';
+                if($this->input->post('report_status')=="Deleted"){
+                    $report_status = 'InActive';
                 } else {
-                    $status = 'Approved';
+                    $report_status = 'Approved';
                 }
             } else {
-                $status = 'Rejected';
+                $report_status = 'Rejected';
             }
 
             // $ref_id = $this->input->post('ref_id');
-            // $remarks = $this->input->post('remarks');
 
-            if($status == 'Rejected'){
-                $sql = "Update production_details Set report_status='$status', report_remarks='$report_remarks', 
+            if($report_status == 'Rejected'){
+                $sql = "Update production_details Set report_status='$report_status', report_remarks='$report_remarks', 
                         rejected_by='$curusr', rejected_on='$now' where id = '$id'";
                 $this->db->query($sql);
 
-                $action='Production Report '.$status.'.';
+                $action='Production Report '.$report_status.'.';
             } else {
                 if($id!='' || $ref_id!=''){
                     // if($ref_id!=null && $ref_id!=''){  
@@ -1257,7 +1258,7 @@ class Production_model Extends CI_Model{
                     //                 A.depot_id=B.depot_id,
                     //                 A.type=B.type,
                     //                 A.ref_no='$ref_no',
-                    //                 A.status='$status', A.remarks='$remarks', 
+                    //                 A.report_status='$report_status', A.report_remarks='$report_remarks', 
                     //                 A.modified_by=B.modified_by, A.modified_on=B.modified_on, 
                     //                 A.approved_by='$curusr',
                     //                 A.approved_on='$now' 
@@ -1278,32 +1279,32 @@ class Production_model Extends CI_Model{
                     // } else {
 
                     //     $sql = "Update raw_material_in_out A 
-                    //             Set A.status='$status', A.remarks='$remarks', A.approved_by='$curusr', A.approved_on='$now' ,A.ref_no='$ref_no'
+                    //             Set A.report_status='$report_status', A.report_remarks='$report_remarks', A.approved_by='$curusr', A.approved_on='$now' ,A.ref_no='$ref_no'
                     //             WHERE A.id = '$id'";
                     //     $this->db->query($sql);
                     // }
 
-                    $sql = "Update production_details A Set A.report_approved='1', A.report_status='$status', 
+                    $sql = "Update production_details A Set A.report_approved='1', A.report_status='$report_status', 
                             A.report_remarks='$report_remarks', A.approved_by='$curusr', A.approved_on='$now' 
                             WHERE A.id = '$id'";
                     $this->db->query($sql);
-                    $action='Production Report '.$status.'.';
+                    $action='Production Report '.$report_status.'.';
 
                     $this->notification_model->delete_notification('6', $id);
                 }
             }
         } else {
             if($this->input->post('btn_delete')!=null){
-                if($this->input->post('status')=="Approved"){
-                    $status = 'Deleted';
+                if($this->input->post('report_status')=="Approved"){
+                    $report_status = 'Deleted';
                 } else {
-                    $status = 'InActive';
+                    $report_status = 'InActive';
                 }
             } else {
-                $status = 'Pending';
+                $report_status = 'Pending';
             }
 
-            // if($this->input->post('status')=="Approved"){
+            // if($this->input->post('report_status')=="Approved"){
             //     $ref_id = $id;
             //     $id = '';
             // } else {
@@ -1315,7 +1316,7 @@ class Production_model Extends CI_Model{
             // }
 
             $data = array(
-                'report_status' => $status,
+                'report_status' => $report_status,
                 'report_remarks' => $report_remarks,
                 'modified_by' => $curusr,
                 'modified_on' => $now,

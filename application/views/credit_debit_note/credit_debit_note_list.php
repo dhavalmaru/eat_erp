@@ -30,22 +30,23 @@
        	<!-- START PAGE CONTAINER -->
         <div class="page-container page-navigation-top">            
             <!-- PAGE CONTENT -->
-			   <?php $this->load->view('templates/menus');?>
-              <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
-                
-                   <div class="heading-h3"> 
-                   <div class="heading-h3-heading mobile-head">	 <a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp;  Credit Debit Note List  </div>						 
-					  <div class="heading-h3-heading mobile-head">
-					  <div class="pull-right btn-margin">	
-								<?php $this->load->view('templates/download');?>	
-								</div>	
-                        	<div class="pull-right btn-margin" style="<?php if($access[0]->r_insert=='0') echo 'display: none;';?>">
-									<a class="btn btn-success " href="<?php echo base_url() . 'index.php/credit_debit_note/add'; ?>">
-										<span class="fa fa-plus"></span>   Add Credit Debit Note Entry 
-									</a>
-								</div>
-				     </div>	      
-                </div>	
+			<?php $this->load->view('templates/menus');?>
+            <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
+            	<div class="heading-h3"> 
+                   	<div class="heading-h3-heading mobile-head">
+                   		<a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp;  Credit Debit Note List  
+                   	</div>
+				  	<div class="heading-h3-heading mobile-head">
+					  	<div class="pull-right btn-margin">	
+							<?php $this->load->view('templates/download');?>	
+						</div>	
+                    	<div class="pull-right btn-margin" style="<?php if($access[0]->r_insert=='0') echo 'display: none;';?>">
+							<a class="btn btn-success " href="<?php echo base_url() . 'index.php/credit_debit_note/add'; ?>">
+								<span class="fa fa-plus"></span> Add Credit Debit Note Entry 
+							</a>
+						</div>
+			     	</div>
+            	</div>
 
                 <div class="nav-contacts ng-scope" ui-view="@nav">
     				<div class="u-borderBottom u-bgColorBreadcrumb ng-scope">

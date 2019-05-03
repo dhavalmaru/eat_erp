@@ -64,23 +64,23 @@ public function sales_absent_attendence($value='')
 
 public function user_login_list()
 {
-		$now=date('Y-m-d');
-		// echo $prev_date = date('Y-m-d', strtotime($now .' -15 day'));
-		/*$sql = "select concat(ifnull(A.first_name,''),' ',ifnull(A.last_name,'')) as user_name,A.email_id, B.date from
-		(select distinct(user_id),max(date) as date from user_access_log where date(date) BETWEEN '".$prev_date."' AND date(now()) and date!='NULL' and user_id!='NULL' GROUP by user_id) B
-		left JOIN
-		(SELECT * FROM `user_master`)A
-		on(A.id=B.user_id)order by date desc";*/
+	$now=date('Y-m-d');
+	// echo $prev_date = date('Y-m-d', strtotime($now .' -15 day'));
+	/*$sql = "select concat(ifnull(A.first_name,''),' ',ifnull(A.last_name,'')) as user_name,A.email_id, B.date from
+	(select distinct(user_id),max(date) as date from user_access_log where date(date) BETWEEN '".$prev_date."' AND date(now()) and date!='NULL' and user_id!='NULL' GROUP by user_id) B
+	left JOIN
+	(SELECT * FROM `user_master`)A
+	on(A.id=B.user_id)order by date desc";*/
 
 
-		$sql = "select concat(ifnull(A.first_name,''),' ',ifnull(A.last_name,'')) as user_name,A.email_id, B.date from
-		(SELECT * FROM user_master WHERE status='Approved')A
-		left JOIN
-		(select distinct(user_id),max(date) as date from user_access_log  GROUP by user_id) B
-		on(A.id=B.user_id)order by date desc";
+	$sql = "select concat(ifnull(A.first_name,''),' ',ifnull(A.last_name,'')) as user_name,A.email_id, B.date from
+	(SELECT * FROM user_master WHERE status='Approved')A
+	left JOIN
+	(select distinct(user_id),max(date) as date from user_access_log  GROUP by user_id) B
+	on(A.id=B.user_id)order by date desc";
 
-		$result = $this->db->query($sql)->result();
-		return $result;
+	$result = $this->db->query($sql)->result();
+	return $result;
 
 }
 
@@ -279,6 +279,8 @@ public function sales_emp_log($value='')
 	$result = $this->db->query($sql)->result();
 	return $result;
 }
+
+
 
 
 }

@@ -258,7 +258,9 @@ function get_distributor_out_data($status='', $id=''){
             G.shipping_address, G.distributor_consignee_id, G.con_name, G.con_address, G.con_city, G.con_pincode, G.con_state,
             G.con_country, G.con_state_code, G.con_gst_number, G.state_code, G.sample_type, G.gifting_remarks, 
             G.promoter_sales_rep_id, G.blogger_name, G.blogger_address, G.blogger_phone_no, G.blogger_email_id, 
-            G.round_off_amount, G.invoice_amount, G.ref_id, G.invoice_date,G.freezed,G.distributor_in_type,G.basis_of_sales,G.email_from,G.email_approved_by,G.email_date_time,G.gstin from 
+            G.round_off_amount, G.invoice_amount, G.ref_id, G.invoice_date, G.freezed, 
+            G.distributor_in_type, G.basis_of_sales, G.email_from, G.email_approved_by, G.email_date_time,
+            G.gstin, I.status as po_status, I.mismatch from 
             (select E.*, F.sales_rep_name from 
             (select Q.*, D.depot_name, D.state as depot_state from 
             (select C.*, P.location from 
@@ -279,6 +281,9 @@ function get_distributor_out_data($status='', $id=''){
             left join 
             (select * from user_master) H 
             on (G.modified_by=H.id) 
+            left join 
+            (select * from distributor_po) I 
+            on (G.distributor_po_id=I.id)
 
             union all 
 
@@ -298,7 +303,8 @@ function get_distributor_out_data($status='', $id=''){
             null as con_country, null as con_state_code, null as con_gst_number, null as state_code, null as sample_type, 
             null as gifting_remarks, null as promoter_sales_rep_id, null as blogger_name, null as blogger_address, 
             null as blogger_phone_no, null as blogger_email_id, null as round_off_amount, null as invoice_amount, null as ref_id, 
-            null as invoice_date,null as freezed,null as distributor_in_type,null as basis_of_sales,null as email_from,null as email_approved_by,null as email_date_time,null as gstin from 
+            null as invoice_date,null as freezed, null as distributor_in_type, null as basis_of_sales, null as email_from, 
+            null as email_approved_by, null as email_date_time, null as gstin, null as po_status, null as mismatch from 
             (select A.*, B.distributor_name, B.state, B.sell_out, B.contact_person, B.contact_no, B.area, B.location from 
             (select * from sales_rep_orders where status = 'Approved') A 
             left join 
@@ -1015,7 +1021,7 @@ function set_credit_note($id=''){
                     $financial_year="";
                 }
                 
-                $ref_no = 'WHPL/credit_note/'.$financial_year.'/'.strval($series);
+                $ref_no = 'WHPL/exp/'.$financial_year.'/'.strval($series);
                 $modified_approved_date = null;
             }
         } else {
@@ -1055,7 +1061,7 @@ function set_credit_note($id=''){
             $data = array(
                 'date_of_transaction' => $date_of_processing,
                 'distributor_id' => $distributor_id,
-                'transaction' => 'Credit Note',
+                'transaction' => 'Expense Voucher',
                 'invoice_no' => $invoice_no,
                 'distributor_type' => 'Invoice',
                 'amount' => $amount,
@@ -1065,7 +1071,7 @@ function set_credit_note($id=''){
                 'sgst' => $sgst_amt,
                 'amount_without_tax' => $amount_without_tax,
                 'status' => 'Approved',
-                'remarks' => 'SG - Promotion Charges Credit Note against invoice no '.$invoice_no,
+                'remarks' => 'SG - Promotion Charges Expense Voucher against invoice no '.$invoice_no,
                 'created_by' => $created_by,
                 'created_on' => $created_on,
                 'modified_by' => $modified_by,

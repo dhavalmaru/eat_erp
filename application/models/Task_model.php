@@ -14,7 +14,7 @@ function get_access(){
 }
 
 function get_user_list(){
-	$sql="select * from user_master where status = 'Approved' order by first_name, id";
+	$sql="select * from user_master where status = 'Approved' and role_id not in (5, 8) order by first_name, id";
 	$query=$this->db->query($sql);
 	return $query->result();
 }
@@ -73,6 +73,10 @@ function testFormData($form_data) {
 	$due_date = FormatDate($form_data['from_date']);
 	$cur_date = date('Y-m-d');
 	$week_index=0;
+
+	if($to_date==''){
+		$to_date = '2022-12-31';
+	}
 
 	while($due_date<=$to_date) {
 		// echo $due_date . ' ';
@@ -213,6 +217,10 @@ function insertDetails($form_data) {
 	$to_date = FormatDate($form_data['to_date']);
 	$due_date = date('Y-m-d');
 	$cur_date = date('Y-m-d');
+
+	if($to_date==''){
+		$to_date = '2022-12-31';
+	}
 
 	if($repeat=="Weekly") {
 		$week_day="";
@@ -524,16 +532,28 @@ function insertDetails($form_data) {
 }
 
 function getTaskList($user_id, $task_type, $view=''){
+	// if(strtoupper(trim($task_type))=='MYTASK' ||  $task_type==false){
+	// 	$cond=" and (user_id='$user_id')";
+	// } else if(strtoupper(trim($task_type))=='PENDING'){
+	// 	$cond=" and (created_by='$user_id' or user_id='$user_id') and task_status = 'pending'";
+	// } else if(strtoupper(trim($task_type))=='ASSIGNED'){
+	// 	$cond=" and (created_by='$user_id' and user_id!='$user_id')";
+	// } else if(strtoupper(trim($task_type))=='COMPLETED'){
+	// 	$cond=" and (created_by='$user_id' or user_id='$user_id') and task_status = 'completed'";
+	// } else if(strtoupper(trim($task_type))=='ALL'){
+	// 	$cond=" and (created_by='$user_id' or user_id='$user_id')";
+	// } else {
+	// 	$cond="";
+	// }
+
 	if(strtoupper(trim($task_type))=='MYTASK' ||  $task_type==false){
-		$cond=" and (user_id='$user_id')";
+		$cond=" and (A.user_id='$user_id')";
 	} else if(strtoupper(trim($task_type))=='PENDING'){
-		$cond=" and (created_by='$user_id' or user_id='$user_id') and task_status = 'pending'";
-	} else if(strtoupper(trim($task_type))=='ASSIGNED'){
-		$cond=" and (created_by='$user_id' and user_id!='$user_id')";
+		$cond=" and (A.created_by='$user_id' or A.user_id='$user_id') and A.task_status = 'pending'";
 	} else if(strtoupper(trim($task_type))=='COMPLETED'){
-		$cond=" and (created_by='$user_id' or user_id='$user_id') and task_status = 'completed'";
+		$cond=" and (A.created_by='$user_id' or A.user_id='$user_id') and A.task_status = 'completed'";
 	} else if(strtoupper(trim($task_type))=='ALL'){
-		$cond=" and (created_by='$user_id' or user_id='$user_id')";
+		$cond=" and (A.created_by='$user_id' or A.user_id='$user_id')";
 	} else {
 		$cond="";
 	}
@@ -544,12 +564,22 @@ function getTaskList($user_id, $task_type, $view=''){
 	}
 
     $roleid=$this->session->userdata('role_id');
-    
-    $sql="select C.* from 
+	
+	if(strtoupper(trim($task_type))=='ALL'){
+	    $sql="select F.* from 
+	    	(select E.task_id, max(id) as id, E.subject_detail, E.priority, E.from_date, E.to_date, 
+	    		group_concat(distinct E.user_name) as name, max(E.due_date) as due_date, max(created_by) as created_by, 
+	    		case when sum(E.task_status_cnt)>0 then 'Pending' else 'Completed' end as task_status, 
+	    		group_concat(distinct E.follower_name) as followers from 
+    		(select C.*, case when C.follower='Yes' then C.name else '' end as follower_name, 
+    			case when C.follower='Yes' then '' else C.name end as user_name,
+    			case when C.task_status='Pending' then 1 else 0 end as task_status_cnt from 
     		(select A.*, concat_ws(' ', B.first_name, B.last_name) as created_by_name from 
-			(select A.*, concat_ws(' ', B.first_name, B.last_name) as name from 
-			(select *, datediff(due_date, CURDATE()) AS no_of_days, updated_on as completed_on 
-				from user_task_detail where status='1' ".$cond.") A 
+			(select distinct A.*, concat_ws(' ', B.first_name, B.last_name) as name from 
+			(select A.task_id, A.id, A.subject_detail, A.priority, A.from_date, A.to_date, A.updated_on as completed_on, 
+				B.user_id, B.follower, B.task_status, B.created_by, B.due_date, datediff(B.due_date, CURDATE()) AS no_of_days 
+				from user_task_detail A left join user_task_detail B on (A.task_id=B.task_id and A.due_date=B.due_date) 
+				where A.status='1' ".$cond.") A 
 			left join 
 			(select * from user_master) B 
 			on (A.user_id=B.id)) A 
@@ -558,12 +588,44 @@ function getTaskList($user_id, $task_type, $view=''){
 			on (A.created_by=B.id)) C 
 			left join 
 			(select user_id, min(due_date) as due_date, min(no_of_days) as min_no_of_days from 
-			(select user_id, due_date, datediff(due_date, CURDATE()) AS no_of_days 
-				from user_task_detail where status='1' ".$cond.") A ".$cond2." 
+			(select A.user_id, A.due_date, datediff(A.due_date, CURDATE()) as no_of_days 
+				from user_task_detail A where A.status='1' ".$cond.") A ".$cond2." 
 			group by user_id) D 
 			on (C.user_id=D.user_id and C.due_date=D.due_date) 
-			where C.no_of_days <= 0 or D.due_date is not null 
-			order by due_date, name";
+			where C.no_of_days <= 0 or D.due_date is not null) E 
+			group by E.task_id, E.subject_detail, E.priority, E.from_date, E.to_date) F 
+			order by F.task_id, F.id";
+	} else {
+		$sql="select F.* from 
+			(select E.task_id, max(id) as id, E.subject_detail, E.priority, E.from_date, E.to_date, E.due_date, 
+	    		group_concat(distinct E.user_name) as name, max(created_by) as created_by, 
+	    		case when sum(E.task_status_cnt)>0 then 'Pending' else 'Completed' end as task_status, 
+	    		group_concat(distinct E.follower_name) as followers from 
+    		(select C.*, case when C.follower='Yes' then C.name else '' end as follower_name, 
+    			case when C.follower='Yes' then '' else C.name end as user_name,
+    			case when C.task_status='Pending' then 1 else 0 end as task_status_cnt from 
+    		(select A.*, concat_ws(' ', B.first_name, B.last_name) as created_by_name from 
+			(select distinct A.*, concat_ws(' ', B.first_name, B.last_name) as name from 
+			(select A.task_id, A.id, A.subject_detail, A.priority, A.from_date, A.to_date, A.updated_on as completed_on, 
+				B.user_id, B.follower, B.task_status, B.created_by, B.due_date, datediff(B.due_date, CURDATE()) AS no_of_days 
+				from user_task_detail A left join user_task_detail B on (A.task_id=B.task_id and A.due_date=B.due_date) 
+				where A.status='1' ".$cond.") A 
+			left join 
+			(select * from user_master) B 
+			on (A.user_id=B.id)) A 
+			left join 
+			(select * from user_master) B 
+			on (A.created_by=B.id)) C 
+			left join 
+			(select user_id, min(due_date) as due_date, min(no_of_days) as min_no_of_days from 
+			(select A.user_id, A.due_date, datediff(A.due_date, CURDATE()) as no_of_days 
+				from user_task_detail A where A.status='1' ".$cond.") A ".$cond2." 
+			group by user_id) D 
+			on (C.user_id=D.user_id and C.due_date=D.due_date) 
+			where C.no_of_days <= 0 or D.due_date is not null) E 
+			group by E.task_id, E.subject_detail, E.priority, E.from_date, E.to_date, E.due_date) F 
+			order by F.task_id, F.id";
+	}
     $query=$this->db->query($sql);
     return $query->result();
 }
@@ -690,17 +752,20 @@ function deleteRecord($task_id){
 	return $response;
 }
 
-function completeTask($task_id){
-	$this->db->select('id');
+function completeTask($id){
+	$this->db->select('*');
 	$this->db->from('user_task_detail');
-	$this->db->where('id = '.$task_id.' and status = "1" ');
-	$result=$this->db->get();
-	if($result->num_rows() > 0){
+	$this->db->where('id = '.$id.' and status = "1" ');
+	$result=$this->db->get()->result();
+	if(count($result) > 0){
+		$task_id = $result[0]->task_id;
+		$due_date = $result[0]->due_date;
+
 		$update_array=array(
 			"task_status" => "Completed",
 			"updated_by" => $this->session->userdata('session_id'),
 			"updated_on" => date('Y-m-d H:i:s'));
-		$this->db->where('id = '.$task_id.' ');
+		$this->db->where("task_id = '".$task_id."' and due_date = '".$due_date."'");
 		$this->db->update('user_task_detail',$update_array);
 		$response=array("status"=>true,"msg"=>"Task Completed Successfully");
 	}else{

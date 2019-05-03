@@ -213,6 +213,7 @@
                                                         <th width="156">Date Of processing</th>
     													<th width="130">Order Number</th>
     													<th width="140">Retailer Name</th>
+                                                        <th width="140">Distributor Name</th>
                                                         <th width="140">Location</th>
     													<th width="220" >Sales Representative Name</th>
     													<th width="120" >Amount (In Rs)</th>
@@ -375,7 +376,12 @@
 
                 columnDefs = [
                                 {
-                                    "targets": [10],
+                                    "targets": [9],
+                                    "visible": false,
+                                    "searchable": false
+                                },
+                                {
+                                    "targets": [11],
                                     "visible": false,
                                     "searchable": false
                                 }
@@ -384,6 +390,11 @@
                 columnDefs = [     
                                 {
                                     "targets": [0],
+                                    "visible": false,
+                                    "searchable": false
+                                },
+                                {
+                                    "targets": [9],
                                     "visible": false,
                                     "searchable": false
                                 }

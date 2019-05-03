@@ -279,7 +279,8 @@ tfoot tr th:last-child {
                                                     <input type="checkbox" name="ssallocation" id="ssallocation" value="SS Allocation" checked> SS Allocation <br>
                                                     <input type="checkbox" name="salesreturn" id="salesreturn" value="Sales Return" checked> Sales Return <br>
                                                     <input type="checkbox" name="sample" id="sample" value="Sample & Product Expired" checked> Sample & Product Expired <br>
-												 <input type="checkbox" name="credit_debit" id="credit_debit" value="Credit Debit Note" checked> Credit Debit Note <br>
+												                            <input type="checkbox" name="credit_debit" id="credit_debit" value="Credit Debit Note" checked> Credit Debit Note <br>
+                                                    <input type="checkbox" name="dist_transfer" id="dist_transfer" value="Distributor Transfer" checked> Distributor Transfer <br>
 												 
                                                 </div>
                                             </div>

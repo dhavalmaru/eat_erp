@@ -64,18 +64,19 @@ class Sales_rep_distributor extends CI_Controller{
             $this->load->view('login/main_page');
         }
     }
+    
 	public function admin_add(){
         $data['access'] = $this->sales_rep_location_model->get_access();
         //$visit_detail = $this->session->userdata('visit_detail');
 
-         $zone_id = $this->input->post('zone_id');
-         $area_id = $this->input->post('area_id');
-		 $data['zone'] = $this->sales_rep_location_model->get_zone();
-                                $data['area'] = $this->sales_rep_location_model->get_area($zone_id);
-                                $data['location'] = $this->sales_rep_location_model->get_locations($zone_id, $area_id);
-						$data['distributor'] = $this->sales_rep_distributor_model->get_distributors();
+        $zone_id = $this->input->post('zone_id');
+        $area_id = $this->input->post('area_id');
+        $data['zone'] = $this->sales_rep_location_model->get_zone();
+        $data['area'] = $this->sales_rep_location_model->get_area($zone_id);
+        $data['location'] = $this->sales_rep_location_model->get_locations($zone_id, $area_id);
+        $data['distributor'] = $this->sales_rep_distributor_model->get_distributors();
                               
-		   load_view('sales_rep_distributor/admin_sales_rep_distributor_details', $data);
+        load_view('sales_rep_distributor/admin_sales_rep_distributor_details', $data);
     }
 	
 	

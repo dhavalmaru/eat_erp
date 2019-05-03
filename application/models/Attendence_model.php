@@ -130,7 +130,7 @@ public function attendence_list($status,$year,$month)
 	else
 		$cond='';
 
-	if($this->session->userdata("user_name")!='rishit.sanghvi@otbconsulting.co.in' && $this->session->userdata("user_name")!='swapnil.darekar@eatanytime.in')
+	if($this->session->userdata("user_name")!='rishit.sanghvi@eatanytime.in' && $this->session->userdata("user_name")!='swapnil.darekar@eatanytime.in')
 	{
 		if($cond!='')
 		{
@@ -176,7 +176,7 @@ public function get_summary($status,$year,$month)
 
 	$session_email = $this->session->userdata("user_name");
 
-	if($this->session->userdata("user_name")!='rishit.sanghvi@otbconsulting.co.in' && $this->session->userdata("user_name")!='swapnil.darekar@eatanytime.in')
+	if($this->session->userdata("user_name")!='rishit.sanghvi@eatanytime.in' && $this->session->userdata("user_name")!='swapnil.darekar@eatanytime.in')
 	{
 		if($cond!='')
 		{

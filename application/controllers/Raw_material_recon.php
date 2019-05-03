@@ -128,6 +128,9 @@ class Raw_material_recon extends CI_Controller{
                 $data['p_id'] = $p_id;
                 $data['production'] = $this->production_model->get_data('Approved');
                 $data['module'] = $module;
+                if($p_id!=''){
+                    $data['p_data'] = $this->production_model->get_data('', $p_id);
+                }
 
                 load_view('raw_material_recon/raw_material_recon_details', $data);
             } else {

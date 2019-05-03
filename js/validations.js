@@ -369,8 +369,6 @@ function get_raw_material_qty(model_name,form_name,depochange='') {
     return valid;
 }
 
-
-
 function get_box_qty(model_name,form_name,depochange='') {
     /*console.log('eneterd2'+model_name);*/
     var validator = $("#"+form_name).validate();
@@ -449,6 +447,8 @@ function get_box_qty(model_name,form_name,depochange='') {
 
     return valid;
 }
+
+
 
 
 // ----------------- VENDOR DETAILS FORM VALIDATION -------------------------------------
@@ -597,7 +597,6 @@ $('#form_raw_material_details').submit(function() {
         return true;
     }
 });
-
 
 
 
@@ -884,17 +883,21 @@ $("#form_distributor_details").validate({
         state_code: {
             required: true
         },
-		 class: {
-            required: true
-        },
-		 type_id: {
+        type_id: {
             required: true
         },
 		 zone_id: {
             required: true
         },
-		 area_id: {
+        area_id: {
             required: true
+        },
+        location_id: {
+            required: {
+                depends: function() {
+                    return ($('#classes').val() == "normal");
+                }
+            }
         },
         'con_name[]': {
             required: true
@@ -1092,6 +1095,7 @@ function check_purchase_order_details() {
     
     return valid;
 }
+
 
 
 
@@ -1394,6 +1398,18 @@ $.validator.addMethod("check_batch_id_availablity", function (value, element) {
 
 
 
+var add_loader = function() {
+    console.log('add_loader');
+    $('body').append('<div id="cover"></div>');
+    setTimeout(removeLoader, 1000);
+}
+
+var remove_loader = function() {
+    $( "#cover" ).fadeOut(500, function() {
+        $( "#cover" ).remove();
+    });
+    console.log('remove_loader');
+}
 
 // ----------------- BATCH PROCESSING DETAILS FORM VALIDATION -------------------------------------
 $("#form_batch_processing_details").validate({
@@ -1456,6 +1472,8 @@ $("#form_batch_processing_details").validate({
 });
 
 $('#form_batch_processing_details').submit(function() {
+    // add_loader();
+
     removeMultiInputNamingRules('#form_batch_processing_details', 'select[alt="raw_material_id[]"]');
     removeMultiInputNamingRules('#form_batch_processing_details', 'input[alt="qty[]"]');
 
@@ -4322,6 +4340,12 @@ function check_freezed_credit_debit_note() {
 // ----------------- Area DETAILS FORM VALIDATION -------------------------------------
 $("#form_area_details").validate({
     rules: {
+        type_id: {
+            required: true
+        },
+        zone_id: {
+            required: true
+        },
         area: {
             required: true,
             check_area_availablity: true
@@ -4379,6 +4403,12 @@ $('#form_area_details').submit(function() {
 // ----------------- LOCATION DETAILS FORM VALIDATION -------------------------------------
 $("#form_location_details").validate({
     rules: {
+        type_id: {
+            required: true
+        },
+        zone_id: {
+            required: true
+        },
         location: {
             required: true,
             check_location_availablity: true
@@ -4495,6 +4525,9 @@ $('#form_distributor_type_details').submit(function() {
 // ----------------- Zone DETAILS FORM VALIDATION -------------------------------------
 $("#form_zone_details").validate({
     rules: {
+        type_id: {
+            required: true
+        },
         zone: {
             required: true,
             check_zone_availablity: true
@@ -5161,6 +5194,9 @@ $.validator.addMethod("check_sales_rep_distributor_availablity", function (value
     }
 }, 'Distributor Name already in use.');
 
+
+
+
 // ----------------- ACCOUNT GROUP FORM VALIDATION -------------------------------------
 $("#form_group_details").validate({
     rules: {
@@ -5793,44 +5829,69 @@ $("#form_distributor_po_details").validate({
         distributor_consignee_id:{
             required: true     
         },
-        delivery_date: {
+        basis_of_sales: {
+            required: true
+            
+        },
+        po_number: {
             required: {
                 depends: function() {
-                    return ($("#delivery_status").val() == "Delivered");
+                    return (clkBtn!='btn_reject');
+                }
+            },
+            check_po_number_availablity: {
+              required: {
+                depends: function() {
+                        return (clkBtn!='btn_reject');
+                    }
+                }  
+            }
+        },
+        email_from: {
+            required: true,
+            checkemail: true
+        },
+        email_date_time:{
+            required: true
+        },
+        // remarks: {
+        //     required: {
+        //         depends: function() {
+        //             // return (d_status == "Approved");
+        //             return ($('#po_invoice_amount').val()!=$('#invoice_amount').val());
+        //         }
+        //     }
+        // },
+        delivery_status:{
+            required: true     
+        },
+        // delivery_date: {
+            // required: {
+            //     depends: function() {
+            //         return ($("#delivery_status").val() == "Delivered");
+            //     }
+            // }
+        // },
+        delivery_date:{
+            required: true     
+        },
+        delivery_remarks:{
+            required: {
+                depends: function() {
+                    // return ($("#delivery_status").val() == "Delivered");
+                    return ($('#po_invoice_amount').val()!=$('#invoice_amount').val());
+                }
+            }     
+        },
+        doc_file:{
+            required: {
+                depends: function() {
+                    return ($('#doc_document').val()=="");
                 }
             }
         },
-         basis_of_sales: {
-                required: true
-                
-            },
-             po_number: {
-                required: {
-                    depends: function() {
-                        return (clkBtn!='btn_reject');
-                    }
-                },
-                check_po_number_availablity: {
-                  required: {
-                    depends: function() {
-                            return (clkBtn!='btn_reject');
-                        }
-                    }  
-                }
-            },
-            email_from: {
-                required: true,
-                checkemail: true
-            },
-            email_date_time:{
-                required: true
-            },
-        remarks: {
-            required: {
-                depends: function() {
-                    return (d_status == "Approved");
-                }
-            }
+        entered_invoice_amount:{
+            required: true
         }
     },
 
@@ -5848,7 +5909,7 @@ $("#form_distributor_po_details").validate({
 
 $.validator.addMethod("check_po_number_availablity", function (value, element) {
     var result = 1;
-	 if($("#delivery_through_distributor").is(":checked"))
+	if($("#delivery_through_distributor").is(":checked"))
 	// if($("input[name='delivery_through'][value='Distributor']").prop("checked", true)
 
 	{
@@ -5873,7 +5934,7 @@ $.validator.addMethod("check_po_number_availablity", function (value, element) {
         async: false,
         success: function (data) {
             result = parseInt(data);
-			console.log('result'+result);
+			// console.log('result'+result);
 			
 	//console.log('Distributorssssssssss'+$("#delivery_through").val());
         },
@@ -5883,24 +5944,24 @@ $.validator.addMethod("check_po_number_availablity", function (value, element) {
         }
     });
 
-// else if($("#delivery_through").val()=='WHPL')
-// {
-	// $.ajax({
-        // url: BASE_URL+'index.php/distributor_po/check_po_number_availablity_whpl',
-        // data: 'id='+$("#id").val()+'&order_no='+$("#po_number").val()+'&ref_id='+$("#ref_id").val(),
-        // type: "POST",
-        // dataType: 'html',
-        // global: false,
-        // async: false,
-        // success: function (data) {
-            // result = parseInt(data);
-        // },
-        // error: function (xhr, ajaxOptions, thrownError) {
-            // alert(xhr.status);
-            // alert(thrownError);
-        // }
-    // });
-// }
+    // else if($("#delivery_through").val()=='WHPL')
+    // {
+    	// $.ajax({
+            // url: BASE_URL+'index.php/distributor_po/check_po_number_availablity_whpl',
+            // data: 'id='+$("#id").val()+'&order_no='+$("#po_number").val()+'&ref_id='+$("#ref_id").val(),
+            // type: "POST",
+            // dataType: 'html',
+            // global: false,
+            // async: false,
+            // success: function (data) {
+                // result = parseInt(data);
+            // },
+            // error: function (xhr, ajaxOptions, thrownError) {
+                // alert(xhr.status);
+                // alert(thrownError);
+            // }
+        // });
+    // }
 
     if (result) {
         return false;
@@ -5919,7 +5980,7 @@ $("#form_distributor_po_list").validate({
         delivery_date:{
             required: true     
         },
-        person_receving:{
+        person_name:{
             required: true     
         },
         cancellation_date:{
@@ -5941,15 +6002,22 @@ $("#form_distributor_po_list").validate({
 
 function check_po_invoice_amount() {
     var validator = $("#form_distributor_po_details").validate();
-    var valid = true;
+    var valid = false;
 
-    if(parseFloat(get_number($('#entered_invoice_amount').val()))!=parseFloat(get_number($('#invoice_amount').val())))
-    {
-        var errors = {};
-        var name = $('#entered_invoice_amount').attr('name');
-        errors[name] = "Please Enter Correct amount";
-        validator.showErrors(errors);
+    // if(parseFloat(get_number($('#entered_invoice_amount').val()))!=parseFloat(get_number($('#invoice_amount').val())))
+    // {
+    //     var errors = {};
+    //     var name = $('#entered_invoice_amount').attr('name');
+    //     errors[name] = "Please Enter Correct amount";
+    //     validator.showErrors(errors);
+    //     valid = false;
+    // }
+    if($("#modal_result").val()==""){
+        $("#mi-modal").modal('show');
+    } else if($("#modal_result").val()=="No"){
         valid = false;
+    } else {
+        valid = true;
     }
 
     return valid;
@@ -5970,9 +6038,9 @@ $('#form_distributor_po_details').submit(function() {
     if (!$("#form_distributor_po_details").valid()) {
         return false;
     } else {
-         if (check_po_invoice_amount()==false) {
-            return false;
-        }
+        // if (check_po_invoice_amount()==false) {
+        //     return false;
+        // }
 
         removeMultiInputNamingRules('#form_distributor_po_details', 'select[alt="type[]"]');
         removeMultiInputNamingRules('#form_distributor_po_details', 'select[alt="bar[]"]');
@@ -5984,8 +6052,7 @@ $('#form_distributor_po_details').submit(function() {
     }
 });
 
-function StopNonNumeric(el, evt)
-{
+function StopNonNumeric(el, evt) {
     //var r=e.which?e.which:event.keyCode;
     //return (r>31)&&(r!=46)&&(48>r||r>57)?!1:void 0
     var charCode = (evt.which) ? evt.which : event.keyCode;
@@ -5995,7 +6062,7 @@ function StopNonNumeric(el, evt)
     }
     //just one dot (thanks ddlab)
     if(number.length>1 && charCode == 46){
-         return false;
+        return false;
     }
     //get the carat position
     var dotPos = el.value.indexOf(".");
@@ -6677,5 +6744,214 @@ $('#form_raw_material_recon_details').submit(function() {
         removeMultiInputNamingRules('#form_raw_material_recon_details', 'input[alt="physical_qty[]"]');
 
         return true;
+    }
+});
+
+
+
+
+// ----------------- BEAT MASTER FORM VALIDATION -------------------------------------
+$("#form_beat_master").validate({
+    rules: {
+        beat_id: {
+            required: true
+        },
+        beat_name: {
+            required: true,
+            check_beat_name_availablity: true
+        },
+        type_id: {
+            required: true
+        },
+        zone_id: {
+            required: true
+        },
+        'location_id[]': {
+            required: true
+        }
+    },
+
+    ignore: false,
+
+    errorPlacement: function (error, element) {
+        var placement = $(element).data('error');
+        if (placement) {
+            $(placement).append(error);
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
+$.validator.addMethod("check_beat_name_availablity", function (value, element) {
+    var result = 1;
+
+    $.ajax({
+        url: BASE_URL+'index.php/beat_master/check_beat_name_availablity',
+        data: 'id='+$("#id").val()+'&beat_name='+$("#beat_name").val(),
+        type: "POST",
+        dataType: 'html',
+        global: false,
+        async: false,
+        success: function (data) {
+            result = parseInt(data);
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+        }
+    });
+
+    if (result) {
+        return false;
+    } else {
+        return true;
+    }
+}, 'Beat Name already in use.');
+
+$('#form_beat_master').submit(function() {
+    // removeMultiInputNamingRules('#form_beat_master', 'input[alt="sequence[]"]');
+    // addMultiInputNamingRules('#form_beat_master', 'input[name="sequence[]"]', { required: true }, "");
+    if (!$("#form_beat_master").valid()) {
+        return false;
+    } else {
+        // removeMultiInputNamingRules('#form_beat_master', 'input[alt="sequence[]"]');
+        return true;
+    }
+});
+
+
+
+
+// ----------------- BEAT DISTRIBUTOR FORM VALIDATION -------------------------------------
+$("#form_beat_distributor").validate({
+    rules: {
+        beat_id: {
+            required: true
+        },
+        'distributor_id[]': {
+            required: true
+        }
+    },
+
+    ignore: false,
+
+    errorPlacement: function (error, element) {
+        var placement = $(element).data('error');
+        if (placement) {
+            $(placement).append(error);
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
+$('#form_beat_distributor').submit(function() {
+    if (!$("#form_beat_distributor").valid()) {
+        return false;
+    } else {
+        return true;
+    }
+});
+
+
+
+
+// ----------------- BEAT ALLOCATION FORM VALIDATION -------------------------------------
+$("#form_beat_allocation").validate({
+    rules: {
+        type_id: {
+            required: true
+        },
+        sales_rep_id: {
+            required: true
+        }
+    },
+
+    ignore: ":not(:visible)",
+
+    errorPlacement: function (error, element) {
+        var placement = $(element).data('error');
+        if (placement) {
+            $(placement).append(error);
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
+$('#form_beat_allocation').submit(function() {
+    // removeMultiInputNamingRules('#form_beat_allocation', 'input[alt="weekday_id[]"]');
+    // removeMultiInputNamingRules('#form_beat_allocation', 'input[alt="weekday[]"]');
+    removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="frequency[]"]');
+    removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="dist_id1[]"]');
+    removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="beat_id1[]"]');
+    removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="dist_id2[]"]');
+    removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="beat_id2[]"]');
+
+    // addMultiInputNamingRules('#form_beat_allocation', 'input[name="weekday_id[]"]', { required: true }, "");
+    // addMultiInputNamingRules('#form_beat_allocation', 'input[name="weekday[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_beat_allocation', 'select[name="frequency[]"]', 
+                                { required: function(elem) {
+                                        var id = elem.id;
+                                        var index = id.substring(id.lastIndexOf('_')+1);
+                                        if($("#dist_id1_"+index).val()!="" || $("#beat_id1_"+index).val()!="") {
+                                            return true;
+                                        } else {
+                                            return false;
+                                        }
+                                    } 
+                                }, "");
+    addMultiInputNamingRules('#form_beat_allocation', 'select[name="dist_id1[]"]', 
+                                { required: function(elem) {
+                                        var id = elem.id;
+                                        var index = id.substring(id.lastIndexOf('_')+1);
+                                        if($("#frequency_"+index).val()!="" || $("#beat_id1_"+index).val()!="") {
+                                            return true;
+                                        } else {
+                                            return false;
+                                        } 
+                                    } 
+                                }, "");
+    addMultiInputNamingRules('#form_beat_allocation', 'select[name="beat_id1[]"]', 
+                                { required: function(elem) {
+                                        var id = elem.id;
+                                        var index = id.substring(id.lastIndexOf('_')+1);
+                                        if($("#frequency_"+index).val()!="" || $("#dist_id1_"+index).val()!="") {
+                                            return true;
+                                        } else {
+                                            return false;
+                                        } 
+                                    } 
+                                }, "");
+    addMultiInputNamingRules('#form_beat_allocation', 'select[name="dist_id2[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_beat_allocation', 'select[name="beat_id2[]"]', { required: true }, "");
+
+    if (!$("#form_beat_allocation").valid()) {
+        return false;
+    } else {
+
+        var validator = $("#form_beat_allocation").validate();
+        var valid = true;
+
+        if($("#frequency_0").val()=="" && $("#frequency_1").val()=="" && $("#frequency_2").val()=="" && 
+           $("#frequency_3").val()=="" && $("#frequency_4").val()=="" && $("#frequency_5").val()=="") {
+                var id = "sales_rep_id";
+                var errors = {};
+                var name = $("#"+id).attr('name');
+                errors[name] = "Please add atleast one plan";
+                validator.showErrors(errors);
+                valid = false;
+        }
+
+        // removeMultiInputNamingRules('#form_beat_allocation', 'input[alt="weekday_id[]"]');
+        // removeMultiInputNamingRules('#form_beat_allocation', 'input[alt="weekday[]"]');
+        removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="frequency[]"]');
+        removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="dist_id1[]"]');
+        removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="beat_id1[]"]');
+        removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="dist_id2[]"]');
+        removeMultiInputNamingRules('#form_beat_allocation', 'select[alt="beat_id2[]"]');
+
+        return valid;
     }
 });

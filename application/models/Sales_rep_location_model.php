@@ -6,10 +6,17 @@ class Sales_rep_location_model Extends CI_Model{
 function __Construct(){
 	parent :: __construct();
     $this->load->helper('common_functions');
+    $this->load->model('email_model');
 }
 
 function get_access(){
-    $role_id=$this->session->userdata('role_id');
+    $role_id='';
+    if($this->input->post('role_id')){
+        $role_id=$this->input->post('role_id');
+    } else if($this->session->userdata('role_id')){
+        $role_id=$this->session->userdata('role_id');
+    }
+    
     $query=$this->db->query("SELECT * FROM user_role_options WHERE section = 'Sales_Rep_Location' AND role_id='$role_id' AND (r_insert = 1 OR r_view = 1 OR r_edit=1 OR r_approvals = 1 OR r_export = 1)");
     return $query->result();
 }
@@ -29,7 +36,14 @@ function get_data($status='', $id=''){
         }
     }
 
-    $sales_rep_id=$this->session->userdata('sales_rep_id');
+    $sales_rep_id='';
+    if($this->input->post('sales_rep_id')){
+        $sales_rep_id=$this->input->post('sales_rep_id');
+    } else if($this->session->userdata('sales_rep_id')){
+        $sales_rep_id=$this->session->userdata('sales_rep_id');
+    }
+    // $sales_rep_id = '2';
+
     if($sales_rep_id!=""){
         if($cond=="") {
             $cond=" where sales_rep_id='".$sales_rep_id."'";
@@ -58,7 +72,15 @@ function get_mt_data($status='', $id=''){
         }
     }
 
-    $sales_rep_id=$this->session->userdata('sales_rep_id');
+    $sales_rep_id='';
+    if($this->input->post('sales_rep_id')){
+        $sales_rep_id=$this->input->post('sales_rep_id');
+    } else if($this->session->userdata('sales_rep_id')){
+        $sales_rep_id=$this->session->userdata('sales_rep_id');
+    }
+
+    // $sales_rep_id = '2';
+
     if($sales_rep_id!=""){
         if($cond=="") {
             $cond=" where m_id='".$sales_rep_id."'";
@@ -81,8 +103,20 @@ function get_data_qty($status='', $id=''){
 function save_data($id='',$status=''){
     $now=date('Y-m-d H:i:s');
     $now1=date('Y-m-d');
-    $curusr=$this->session->userdata('session_id');
-    $sales_rep_id=$this->session->userdata('sales_rep_id');
+    $curusr='';
+    $sales_rep_id='';
+
+    if($this->input->post('session_id')){
+        $curusr=$this->input->post('session_id');
+    } else if($this->session->userdata('session_id')){
+        $curusr=$this->session->userdata('session_id');
+    }
+    if($this->input->post('sales_rep_id')){
+        $sales_rep_id=$this->input->post('sales_rep_id');
+    } else if($this->session->userdata('sales_rep_id')){
+        $sales_rep_id=$this->session->userdata('sales_rep_id');
+    }
+
     $date_of_visit=$this->input->post('date_of_visit');
     if($date_of_visit==''){
         $date_of_visit=NULL;
@@ -154,8 +188,20 @@ function save_data($id='',$status=''){
 
 function save_orders(){
     $now=date('Y-m-d H:i:s');
-    $curusr=$this->session->userdata('session_id');
-    $sales_rep_id=$this->session->userdata('sales_rep_id');
+    
+    $curusr='';
+    $sales_rep_id='';
+
+    if($this->input->post('session_id')){
+        $curusr=$this->input->post('session_id');
+    } else if($this->session->userdata('session_id')){
+        $curusr=$this->session->userdata('session_id');
+    }
+    if($this->input->post('sales_rep_id')){
+        $sales_rep_id=$this->input->post('sales_rep_id');
+    } else if($this->session->userdata('sales_rep_id')){
+        $sales_rep_id=$this->session->userdata('sales_rep_id');
+    }
 
     $date_of_processing=$this->input->post('date_of_processing');
     if($date_of_processing==''){
@@ -163,17 +209,19 @@ function save_orders(){
     } else {
         $date_of_processing=formatdate($date_of_processing);
     }
-
-    
-
 }
-
 
 function check_date_of_visit(){
     $id=$this->input->post('id');
     $date_of_visit = formatdate($this->input->post('date_of_visit'));
     $distributor_name = $this->input->post('distributor_name');
-    $sales_rep_id=$this->session->userdata('sales_rep_id');
+    
+    $sales_rep_id='';
+    if($this->input->post('sales_rep_id')){
+        $sales_rep_id=$this->input->post('sales_rep_id');
+    } else if($this->session->userdata('sales_rep_id')){
+        $sales_rep_id=$this->session->userdata('sales_rep_id');
+    }
 
     // $id='2';
     // $date_of_visit = '2017-02-11';
@@ -209,92 +257,296 @@ function get_location(){
 }
 
 function get_zone($id='', $channel=''){
-    $sales_rep_id = $this->session->userdata('sales_rep_id');
+    $sales_rep_id='';
+    $distributor_id='';
+    $beat_id='';
+    
+    if($this->input->post('sales_rep_id')){
+        $sales_rep_id=$this->input->post('sales_rep_id');
+    } else if($this->session->userdata('sales_rep_id')){
+        $sales_rep_id=$this->session->userdata('sales_rep_id');
+    }
+    if($this->input->post('distributor_id')){
+        $distributor_id=$this->input->post('distributor_id');
+    } else if($this->session->userdata('distributor_id')){
+        $distributor_id=$this->session->userdata('distributor_id');
+    }
+    if($this->input->post('beat_id')){
+        $beat_id=$this->input->post('beat_id');
+    } else if($this->session->userdata('beat_id')){
+        $beat_id=$this->session->userdata('beat_id');
+    }
+
+    // $sales_rep_id = '2';
+    // $distributor_id = '1298';
+    // $beat_id = '1';
+
     /*$sql = "select distinct A.zone_id, B.zone from sr_mapping A left join zone_master B on (A.zone_id = B.id) 
             where (A.reporting_manager_id = '$sales_rep_id' or A.sales_rep_id1 = '$sales_rep_id' or A.sales_rep_id2 = '$sales_rep_id') 
                     and B.type_id = '3'";*/
-    $cond='';
-    if($id!='')
-    {
-        $cond = ' And id='.$id;
+
+    $cond="";
+    $cond2="";
+    if($id!="") {
+        $cond = " and id='$id'";
+        $cond2 = " and B.id='$id'";
     }
-	if($channel!='')
-    {
+	if($channel!="") {
 		if($channel=="GT") {
-			$cond = ' And type_id=3';
-		}
-		else {
-			$cond = ' And type_id=7';
+			$cond = " and type_id='3'";
+            $cond2 = " and B.type_id='3'";
+		} else {
+			$cond = " and type_id='7'";
+            $cond2 = " and B.type_id='7'";
 		}
     }
-    $sql = "SELECT id as zone_id, zone from zone_master Where `status`='Approved' ".$cond;
-    $query=$this->db->query($sql);
-    return $query->result();
+
+    if($beat_id!='') {
+        $sql = "select distinct A.zone_id, B.zone from beat_master A 
+                left join zone_master B on(A.zone_id=B.id) 
+                where A.id='$beat_id' and B.status='Approved' and A.zone_id is not null ".$cond2;
+    } else {
+        $sql = "select id as zone_id, zone from zone_master where status='Approved' ".$cond;
+    }
+    $query = $this->db->query($sql);
+    $result = $query->result();
+
+    if(count($result)==0){
+        $sql = "select id as zone_id, zone from zone_master where status='Approved' ".$cond;
+        $query = $this->db->query($sql);
+        $result = $query->result();
+    }
+    
+    return $result;
 }
 
 function get_area($zone_id='',$id=''){
+    $sales_rep_id='';
+    $distributor_id='';
+    $beat_id='';
+    
+    if($this->input->post('sales_rep_id')){
+        $sales_rep_id=$this->input->post('sales_rep_id');
+    } else if($this->session->userdata('sales_rep_id')){
+        $sales_rep_id=$this->session->userdata('sales_rep_id');
+    }
+    if($this->input->post('distributor_id')){
+        $distributor_id=$this->input->post('distributor_id');
+    } else if($this->session->userdata('distributor_id')){
+        $distributor_id=$this->session->userdata('distributor_id');
+    }
+    if($this->input->post('beat_id')){
+        $beat_id=$this->input->post('beat_id');
+    } else if($this->session->userdata('beat_id')){
+        $beat_id=$this->session->userdata('beat_id');
+    }
+
+    // $sales_rep_id = '2';
+    // $distributor_id = '1298';
+    // $beat_id = '1';
+
     $cond = '';
-    if($zone_id!=''){
+    $cond2='';
+    if($zone_id!='') {
         $cond = $cond . " and zone_id = '$zone_id'";
+        $cond2 = $cond2 . " and C.zone_id = '$zone_id'";
     }
 
-    if($id!='')
-    {
+    if($id!='') {
         $cond.= ' And id='.$id;
+        $cond2.= ' And C.id='.$id;
     }
 
-    $sales_rep_id = $this->session->userdata('sales_rep_id');
     /*$sql = "select distinct A.area_id, B.area from sr_mapping A left join area_master B on (A.area_id = B.id) 
             where (A.reporting_manager_id = '$sales_rep_id' or A.sales_rep_id1 = '$sales_rep_id' or A.sales_rep_id2 = '$sales_rep_id') 
                     and B.type_id = '3'" . $cond;*/
-    $sql = "SELECT id as area_id , area from area_master Where `status`='Approved' and type_id IN (3,7) ".$cond;
+
+    if($beat_id!='') {
+        $sql = "select distinct B.area_id, C.area 
+                from beat_locations A 
+                left join location_master B on (A.location_id = B.id) 
+                left join area_master C on (B.area_id = C.id) 
+                Where A.beat_id='$beat_id' and C.status='Approved' and C.type_id IN (3,7) and 
+                    B.area_id is not null ".$cond2;
+    } else {
+        $sql = "select id as area_id, area from area_master Where status='Approved' and 
+                type_id IN (3,7) ".$cond;
+    }
+    $query = $this->db->query($sql);
+    $result = $query->result();
+
+    if(count($result)==0){
+        $sql = "select id as area_id, area from area_master Where status='Approved' and 
+                type_id IN (3,7) ".$cond;
+        $query = $this->db->query($sql);
+        $result = $query->result();
+    }
+    
+    return $result;
+}
+
+function get_store($zone_id='', $store_id=''){
+    $cond = '';
+    if($zone_id!='') {
+        $cond = $cond . " and zone_id='".$zone_id."' ";
+    }
+    if($store_id!='') {
+        $cond = $cond . " and store_id='".$store_id."' ";
+    }
+
+    $sql = "select distinct A.store_id, B.store_name from 
+            (select * from store_master where status='Approved' ".$cond.") A 
+            left join 
+            (select * from relationship_master where status='Approved') B 
+            on (A.store_id=B.id)";
     $query=$this->db->query($sql);
     return $query->result();
 }
 
 function get_locations($zone_id='', $area_id='',$id='',$channel_type=''){
+    $sales_rep_id='';
+    $distributor_id='';
+    $beat_id='';
+    
+    if($this->input->post('sales_rep_id')){
+        $sales_rep_id=$this->input->post('sales_rep_id');
+    } else if($this->session->userdata('sales_rep_id')){
+        $sales_rep_id=$this->session->userdata('sales_rep_id');
+    }
+    if($this->input->post('distributor_id')){
+        $distributor_id=$this->input->post('distributor_id');
+    } else if($this->session->userdata('distributor_id')){
+        $distributor_id=$this->session->userdata('distributor_id');
+    }
+    if($this->input->post('beat_id')){
+        $beat_id=$this->input->post('beat_id');
+    } else if($this->session->userdata('beat_id')){
+        $beat_id=$this->session->userdata('beat_id');
+    }
+
+    // $sales_rep_id = '2';
+    // $distributor_id = '1298';
+    // $beat_id = '1';
+
     $cond = '';
+    $cond2 = '';
     if($zone_id!=''){
         $cond = $cond . " and zone_id = '$zone_id'";
+        $cond2 = $cond2 . " and B.zone_id = '$zone_id'";
     }
     if($area_id!=''){
         $cond = $cond . " and area_id = '$area_id'";
+        $cond2 = $cond2 . " and B.area_id = '$area_id'";
     }
 
-    if($id!='')
-    {
+    if($id!=''){
         $cond.= ' And id='.$id;
+        $cond2.= ' And B.id='.$id;
     }
 
-    if($channel_type=="MT" || $id!='')
-    {
-        $sql = "select * from location_master where status = 'Approved'" . $cond; 
+    if($beat_id!=''){
+        if($channel_type=="MT" || $id!=''){
+            $sql = "select distinct B.* from beat_locations A 
+                    left join location_master B on (A.location_id = B.id) 
+                    where A.beat_id='$beat_id' and B.status = 'Approved' " . $cond2; 
+        } else {
+            $sql = "select distinct B.* from beat_locations A 
+                    left join location_master B on (A.location_id = B.id) 
+                    where A.beat_id='$beat_id' and B.status = 'Approved' and B.type_id IN (3,7) " . $cond2;
+        }
+    } else {
+        if($channel_type=="MT" || $id!=''){
+            $sql = "select * from location_master where status = 'Approved'" . $cond; 
+        } else {
+            $sql = "select * from location_master where status = 'Approved' and type_id IN (3,7)" . $cond;
+        }
     }
-    else
-    {
-        $sql = "select * from location_master where status = 'Approved' and type_id IN (3,7)" . $cond;
-    }
-
-    /*$sql = "select * from location_master where status = 'Approved' and type_id IN (3,7)" . $cond;*/
-
-   
     $query=$this->db->query($sql);
-    return $query->result();
+    $result = $query->result();
+
+    if(count($result)==0){
+        if($channel_type=="MT" || $id!=''){
+            $sql = "select * from location_master where status = 'Approved' " . $cond; 
+        } else {
+            $sql = "select * from location_master where status = 'Approved' and type_id IN (3,7) " . $cond;
+        }
+        $query = $this->db->query($sql);
+        $result = $query->result();
+    }
+    
+    return $result;
 }
 
-function get_location_data($store_id,$zone_id,$id){
+function get_location_data($store_id, $zone_id, $id){
     $cond = '';
     if($id=='')
     {
-      $cond = ' and type_id IN (3,7)';
+      $cond = " and type_id IN (3,7)";
     }
 
-    $sql = "Select  A.*,D.location from 
+    $sql = "Select  distinct A.*, D.location from 
             (select * from store_master Where status='Approved') A 
             left join 
             (select * from location_master Where status='Approved' ".$cond." ) D 
             on (A.location_id=D.id)
-            where A.store_id='".$store_id  ."' and  A.zone_id='". $zone_id ."' and D.location IS NOT NULL  ";
+            where A.store_id='".$store_id  ."' and  A.zone_id='". $zone_id ."' and 
+                D.location IS NOT NULL  ";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_po_nos($zone_id, $store_id, $location_id){
+    $sql = "select distinct id, po_number from distributor_po 
+            where status='Approved' and delivery_status='Pending' and delivery_through='Distributor' and 
+                (mismatch is null or mismatch!=1) and type_id='7' and zone_id='$zone_id' and 
+                store_id='$store_id' and location_id='$location_id' order by id desc";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_po_data($zone_id, $store_id, $location_id, $po_id){
+    $sql = "select E.id, E.po_number, sum(E.orange_bar_qty) as orange_bar_qty, 
+                sum(E.butterscotch_bar_qty) as butterscotch_bar_qty, sum(E.chocopeanut_bar_qty) as chocopeanut_bar_qty, 
+                sum(E.bambaiyachaat_bar_qty) as bambaiyachaat_bar_qty, 
+                sum(E.mangoginger_bar_qty) as mangoginger_bar_qty, sum(E.berry_blast_bar_qty) as berry_blast_bar_qty, 
+                sum(E.chyawanprash_bar_qty) as chyawanprash_bar_qty, sum(E.orange_box_qty) as orange_box_qty, 
+                sum(E.butterscotch_box_qty) as butterscotch_box_qty, sum(E.chocopeanut_box_qty) as chocopeanut_box_qty, 
+                sum(E.bambaiyachaat_box_qty) as bambaiyachaat_box_qty, sum(E.mangoginger_box_qty) as mangoginger_box_qty, 
+                sum(E.berry_blast_box_qty) as berry_blast_box_qty, sum(E.chyawanprash_box_qty) as chyawanprash_box_qty, 
+                sum(E.variety_box_qty) as variety_box_qty, sum(E.chocolate_cookies_qty) as chocolate_cookies_qty, 
+                sum(E.dark_chocolate_cookies_qty) as dark_chocolate_cookies_qty, sum(E.cranberry_cookies_qty) as cranberry_cookies_qty, 
+                sum(E.cranberry_orange_zest_qty) as cranberry_orange_zest_qty, sum(E.fig_raisins_qty) as fig_raisins_qty, 
+                sum(E.papaya_pineapple_qty) as papaya_pineapple_qty from 
+            (select D.id, D.po_number, 
+                case when D.type='Bar' and D.item_id='1' then D.tot_qty else 0 end as orange_bar_qty, 
+                case when D.type='Bar' and D.item_id='3' then D.tot_qty else 0 end as butterscotch_bar_qty, 
+                case when D.type='Bar' and D.item_id='5' then D.tot_qty else 0 end as chocopeanut_bar_qty, 
+                case when D.type='Bar' and D.item_id='4' then D.tot_qty else 0 end as bambaiyachaat_bar_qty, 
+                case when D.type='Bar' and D.item_id='6' then D.tot_qty else 0 end as mangoginger_bar_qty, 
+                case when D.type='Bar' and D.item_id='9' then D.tot_qty else 0 end as berry_blast_bar_qty, 
+                case when D.type='Bar' and D.item_id='10' then D.tot_qty else 0 end as chyawanprash_bar_qty, 
+                case when D.type='Box' and D.item_id='1' then D.tot_qty else 0 end as orange_box_qty, 
+                case when D.type='Box' and D.item_id='3' then D.tot_qty else 0 end as butterscotch_box_qty, 
+                case when D.type='Box' and D.item_id='9' then D.tot_qty else 0 end as chocopeanut_box_qty, 
+                case when D.type='Box' and D.item_id='8' then D.tot_qty else 0 end as bambaiyachaat_box_qty, 
+                case when D.type='Box' and D.item_id='12' then D.tot_qty else 0 end as mangoginger_box_qty, 
+                case when D.type='Box' and D.item_id='29' then D.tot_qty else 0 end as berry_blast_box_qty, 
+                case when D.type='Box' and D.item_id='31' then D.tot_qty else 0 end as chyawanprash_box_qty, 
+                case when D.type='Box' and D.item_id='32' then D.tot_qty else 0 end as variety_box_qty, 
+                case when D.type='Box' and D.item_id='37' then D.tot_qty else 0 end as chocolate_cookies_qty, 
+                case when D.type='Box' and D.item_id='38' then D.tot_qty else 0 end as dark_chocolate_cookies_qty, 
+                case when D.type='Box' and D.item_id='39' then D.tot_qty else 0 end as cranberry_cookies_qty, 
+                case when D.type='Box' and D.item_id='42' then D.tot_qty else 0 end as cranberry_orange_zest_qty, 
+                case when D.type='Box' and D.item_id='41' then D.tot_qty else 0 end as fig_raisins_qty, 
+                case when D.type='Box' and D.item_id='40' then D.tot_qty else 0 end as papaya_pineapple_qty 
+            from
+            (select C.id, C.po_number, C.type, C.item_id, sum(C.qty) as tot_qty from 
+            (select A.id, A.po_number, B.type, B.item_id, B.qty from 
+                distributor_po A left join distributor_po_delivered_items B on (A.id = B.distributor_po_id) 
+            where A.status='Approved' and A.delivery_status='Pending' and A.delivery_through='Distributor' and 
+                (A.mismatch is null or A.mismatch!=1) and A.type_id='7' and A.zone_id='$zone_id' and 
+                A.store_id='$store_id' and A.location_id='$location_id' and A.id='$po_id') C 
+            group by C.id, C.po_number, C.type, C.item_id) D) E group by E.id, E.po_number";
     $query=$this->db->query($sql);
     return $query->result();
 }
@@ -347,7 +599,28 @@ function get_retailers($status='', $id=''){
 }
 
 function get_distributors($zone_id='', $area_id='',$id=''){
+    $sales_rep_id='';
+    $distributor_id='';
+    $beat_id='';
+    
+    if($this->input->post('sales_rep_id')){
+        $sales_rep_id=$this->input->post('sales_rep_id');
+    } else if($this->session->userdata('sales_rep_id')){
+        $sales_rep_id=$this->session->userdata('sales_rep_id');
+    }
+    if($this->input->post('distributor_id')){
+        $distributor_id=$this->input->post('distributor_id');
+    } else if($this->session->userdata('distributor_id')){
+        $distributor_id=$this->session->userdata('distributor_id');
+    }
+    if($this->input->post('beat_id')){
+        $beat_id=$this->input->post('beat_id');
+    } else if($this->session->userdata('beat_id')){
+        $beat_id=$this->session->userdata('beat_id');
+    }
+
     $cond = '';
+    $cond2 = '';
     /*if($zone_id!=''){
         $cond = $cond . " and zone_id = '$zone_id'";
     }*/
@@ -358,11 +631,20 @@ function get_distributors($zone_id='', $area_id='',$id=''){
 
     if($id!=''){
         $cond = $cond . " and id = '$id'";
+        $cond2 = $cond2 . " and B.id = '$id'";
     }
 
     //and class = 'super stockist'
-    $sales_rep_id = $this->session->userdata('sales_rep_id');
-    $sql = "select * from distributor_master where status = 'approved' and class = 'super stockist'  and distributor_name!=''" . $cond;
+    if($beat_id!=''){
+        $sql = "select * from distributor_beat_plans A 
+                left join distributor_master B on (A.distributor_id = B.id) 
+                where A.beat_id = '$beat_id' and B.status = 'approved' and B.class = 'super stockist' and 
+                    B.distributor_name!='' " . $cond;
+    } else {
+        $sql = "select * from distributor_master where status = 'approved' and class = 'super stockist' 
+                    and distributor_name!=''" . $cond;
+    }
+    
     $query=$this->db->query($sql);
     return $query->result();
 }
@@ -419,20 +701,349 @@ function get_closing_stock(){
     return $data;
 }
 
-
-public function get_store_name($id='',$zone_id='')
-{
+function get_store_name($id='',$zone_id=''){
     if($id!='')
         $cond = 'Where A.store_id='.$id;
 
     if($zone_id!='')
         $cond .= ' And  A.zone_id='.$zone_id;
 
-    $sql = "select * from (SELECT store_name,s.id as store_id,location_id,zone_id from   store_master s JOIN relationship_master rm on s.store_id=rm.id) A ".$cond;
+    $sql = "select * from (select store_name, s.id as store_id, location_id, zone_id 
+            from store_master s JOIN relationship_master rm on s.store_id=rm.id) A ".$cond;
 
     $result = $this->db->query($sql)->result();
     return $result;
 }
+
+function save_po_qty(){
+    $now=date('Y-m-d H:i:s');
+    $curusr='';
+    if($this->input->post('session_id')){
+        $curusr=$this->input->post('session_id');
+    } else if($this->session->userdata('session_id')){
+        $curusr=$this->session->userdata('session_id');
+    }
+
+    $po_id = $this->input->post('po_id');
+
+    $po_orange_bar_qty = (($this->input->post('po_orange_bar_qty')=='')?0:$this->input->post('po_orange_bar_qty'));
+    $po_orange_bar = (($this->input->post('po_orange_bar')=='')?0:$this->input->post('po_orange_bar'));
+    $po_orange_bar_diff = (($this->input->post('po_orange_bar_diff')=='')?0:$this->input->post('po_orange_bar_diff'));
+    $po_butterscotch_bar_qty = (($this->input->post('po_butterscotch_bar_qty')=='')?0:$this->input->post('po_butterscotch_bar_qty'));
+    $po_butterscotch_bar = (($this->input->post('po_butterscotch_bar')=='')?0:$this->input->post('po_butterscotch_bar'));
+    $po_butterscotch_bar_diff = (($this->input->post('po_butterscotch_bar_diff')=='')?0:$this->input->post('po_butterscotch_bar_diff'));
+    $po_chocopeanut_bar_qty = (($this->input->post('po_chocopeanut_bar_qty')=='')?0:$this->input->post('po_chocopeanut_bar_qty'));
+    $po_chocopeanut_bar = (($this->input->post('po_chocopeanut_bar')=='')?0:$this->input->post('po_chocopeanut_bar'));
+    $po_chocopeanut_bar_diff = (($this->input->post('po_chocopeanut_bar_diff')=='')?0:$this->input->post('po_chocopeanut_bar_diff'));
+    $po_bambaiyachaat_bar_qty = (($this->input->post('po_bambaiyachaat_bar_qty')=='')?0:$this->input->post('po_bambaiyachaat_bar_qty'));
+    $po_bambaiyachaat_bar = (($this->input->post('po_bambaiyachaat_bar')=='')?0:$this->input->post('po_bambaiyachaat_bar'));
+    $po_bambaiyachaat_bar_diff = (($this->input->post('po_bambaiyachaat_bar_diff')=='')?0:$this->input->post('po_bambaiyachaat_bar_diff'));
+    $po_mangoginger_bar_qty = (($this->input->post('po_mangoginger_bar_qty')=='')?0:$this->input->post('po_mangoginger_bar_qty'));
+    $po_mangoginger_bar = (($this->input->post('po_mangoginger_bar')=='')?0:$this->input->post('po_mangoginger_bar'));
+    $po_mangoginger_bar_diff = (($this->input->post('po_mangoginger_bar_diff')=='')?0:$this->input->post('po_mangoginger_bar_diff'));
+    $po_berry_blast_bar_qty = (($this->input->post('po_berry_blast_bar_qty')=='')?0:$this->input->post('po_berry_blast_bar_qty'));
+    $po_berry_blast_bar = (($this->input->post('po_berry_blast_bar')=='')?0:$this->input->post('po_berry_blast_bar'));
+    $po_berry_blast_bar_diff = (($this->input->post('po_berry_blast_bar_diff')=='')?0:$this->input->post('po_berry_blast_bar_diff'));
+    $po_chyawanprash_bar_qty = (($this->input->post('po_chyawanprash_bar_qty')=='')?0:$this->input->post('po_chyawanprash_bar_qty'));
+    $po_chyawanprash_bar = (($this->input->post('po_chyawanprash_bar')=='')?0:$this->input->post('po_chyawanprash_bar'));
+    $po_chyawanprash_bar_diff = (($this->input->post('po_chyawanprash_bar_diff')=='')?0:$this->input->post('po_chyawanprash_bar_diff'));
+
+    $po_orange_box_qty = (($this->input->post('po_orange_box_qty')=='')?0:$this->input->post('po_orange_box_qty'));
+    $po_orange_box = (($this->input->post('po_orange_box')=='')?0:$this->input->post('po_orange_box'));
+    $po_orange_box_diff = (($this->input->post('po_orange_box_diff')=='')?0:$this->input->post('po_orange_box_diff'));
+    $po_butterscotch_box_qty = (($this->input->post('po_butterscotch_box_qty')=='')?0:$this->input->post('po_butterscotch_box_qty'));
+    $po_butterscotch_box = (($this->input->post('po_butterscotch_box')=='')?0:$this->input->post('po_butterscotch_box'));
+    $po_butterscotch_box_diff = (($this->input->post('po_butterscotch_box_diff')=='')?0:$this->input->post('po_butterscotch_box_diff'));
+    $po_chocopeanut_box_qty = (($this->input->post('po_chocopeanut_box_qty')=='')?0:$this->input->post('po_chocopeanut_box_qty'));
+    $po_chocopeanut_box = (($this->input->post('po_chocopeanut_box')=='')?0:$this->input->post('po_chocopeanut_box'));
+    $po_chocopeanut_box_diff = (($this->input->post('po_chocopeanut_box_diff')=='')?0:$this->input->post('po_chocopeanut_box_diff'));
+    $po_bambaiyachaat_box_qty = (($this->input->post('po_bambaiyachaat_box_qty')=='')?0:$this->input->post('po_bambaiyachaat_box_qty'));
+    $po_bambaiyachaat_box = (($this->input->post('po_bambaiyachaat_box')=='')?0:$this->input->post('po_bambaiyachaat_box'));
+    $po_bambaiyachaat_box_diff = (($this->input->post('po_bambaiyachaat_box_diff')=='')?0:$this->input->post('po_bambaiyachaat_box_diff'));
+    $po_mangoginger_box_qty = (($this->input->post('po_mangoginger_box_qty')=='')?0:$this->input->post('po_mangoginger_box_qty'));
+    $po_mangoginger_box = (($this->input->post('po_mangoginger_box')=='')?0:$this->input->post('po_mangoginger_box'));
+    $po_mangoginger_box_diff = (($this->input->post('po_mangoginger_box_diff')=='')?0:$this->input->post('po_mangoginger_box_diff'));
+    $po_berry_blast_box_qty = (($this->input->post('po_berry_blast_box_qty')=='')?0:$this->input->post('po_berry_blast_box_qty'));
+    $po_berry_blast_box = (($this->input->post('po_berry_blast_box')=='')?0:$this->input->post('po_berry_blast_box'));
+    $po_berry_blast_box_diff = (($this->input->post('po_berry_blast_box_diff')=='')?0:$this->input->post('po_berry_blast_box_diff'));
+    $po_chyawanprash_box_qty = (($this->input->post('po_chyawanprash_box_qty')=='')?0:$this->input->post('po_chyawanprash_box_qty'));
+    $po_chyawanprash_box = (($this->input->post('po_chyawanprash_box')=='')?0:$this->input->post('po_chyawanprash_box'));
+    $po_chyawanprash_box_diff = (($this->input->post('po_chyawanprash_box_diff')=='')?0:$this->input->post('po_chyawanprash_box_diff'));
+    $po_variety_box_qty = (($this->input->post('po_variety_box_qty')=='')?0:$this->input->post('po_variety_box_qty'));
+    $po_variety_box = (($this->input->post('po_variety_box')=='')?0:$this->input->post('po_variety_box'));
+    $po_variety_box_diff = (($this->input->post('po_variety_box_diff')=='')?0:$this->input->post('po_variety_box_diff'));
+
+    $po_chocolate_cookies_qty = (($this->input->post('po_chocolate_cookies_qty')=='')?0:$this->input->post('po_chocolate_cookies_qty'));
+    $po_chocolate_cookies = (($this->input->post('po_chocolate_cookies')=='')?0:$this->input->post('po_chocolate_cookies'));
+    $po_chocolate_cookies_diff = (($this->input->post('po_chocolate_cookies_diff')=='')?0:$this->input->post('po_chocolate_cookies_diff'));
+    $po_dark_chocolate_cookies_qty = (($this->input->post('po_dark_chocolate_cookies_qty')=='')?0:$this->input->post('po_dark_chocolate_cookies_qty'));
+    $po_dark_chocolate_cookies = (($this->input->post('po_dark_chocolate_cookies')=='')?0:$this->input->post('po_dark_chocolate_cookies'));
+    $po_dark_chocolate_cookies_diff = (($this->input->post('po_dark_chocolate_cookies_diff')=='')?0:$this->input->post('po_dark_chocolate_cookies_diff'));
+    $po_cranberry_cookies_qty = (($this->input->post('po_cranberry_cookies_qty')=='')?0:$this->input->post('po_cranberry_cookies_qty'));
+    $po_cranberry_cookies = (($this->input->post('po_cranberry_cookies')=='')?0:$this->input->post('po_cranberry_cookies'));
+    $po_cranberry_cookies_diff = (($this->input->post('po_cranberry_cookies_diff')=='')?0:$this->input->post('po_cranberry_cookies_diff'));
+
+    $po_cranberry_orange_zest_qty = (($this->input->post('po_cranberry_orange_zest_qty')=='')?0:$this->input->post('po_cranberry_orange_zest_qty'));
+    $po_cranberry_orange_zest = (($this->input->post('po_cranberry_orange_zest')=='')?0:$this->input->post('po_cranberry_orange_zest'));
+    $po_cranberry_orange_zest_diff = (($this->input->post('po_cranberry_orange_zest_diff')=='')?0:$this->input->post('po_cranberry_orange_zest_diff'));
+    $po_fig_raisins_qty = (($this->input->post('po_fig_raisins_qty')=='')?0:$this->input->post('po_fig_raisins_qty'));
+    $po_fig_raisins = (($this->input->post('po_fig_raisins')=='')?0:$this->input->post('po_fig_raisins'));
+    $po_fig_raisins_diff = (($this->input->post('po_fig_raisins_diff')=='')?0:$this->input->post('po_fig_raisins_diff'));
+    $po_papaya_pineapple_qty = (($this->input->post('po_papaya_pineapple_qty')=='')?0:$this->input->post('po_papaya_pineapple_qty'));
+    $po_papaya_pineapple = (($this->input->post('po_papaya_pineapple')=='')?0:$this->input->post('po_papaya_pineapple'));
+    $po_papaya_pineapple_diff = (($this->input->post('po_papaya_pineapple_diff')=='')?0:$this->input->post('po_papaya_pineapple_diff'));
+
+    $po_orange_bar_diff = $po_orange_bar - $po_orange_bar_qty;
+    $po_butterscotch_bar_diff = $po_butterscotch_bar - $po_butterscotch_bar_qty;
+    $po_chocopeanut_bar_diff = $po_chocopeanut_bar - $po_chocopeanut_bar_qty;
+    $po_bambaiyachaat_bar_diff = $po_bambaiyachaat_bar - $po_bambaiyachaat_bar_qty;
+    $po_mangoginger_bar_diff = $po_mangoginger_bar - $po_mangoginger_bar_qty;
+    $po_berry_blast_bar_diff = $po_berry_blast_bar - $po_berry_blast_bar_qty;
+    $po_chyawanprash_bar_diff = $po_chyawanprash_bar - $po_chyawanprash_bar_qty;
+
+    $po_orange_box_diff = $po_orange_box - $po_orange_box_qty;
+    $po_butterscotch_box_diff = $po_butterscotch_box - $po_butterscotch_box_qty;
+    $po_chocopeanut_box_diff = $po_chocopeanut_box - $po_chocopeanut_box_qty;
+    $po_bambaiyachaat_box_diff = $po_bambaiyachaat_box - $po_bambaiyachaat_box_qty;
+    $po_mangoginger_box_diff = $po_mangoginger_box - $po_mangoginger_box_qty;
+    $po_berry_blast_box_diff = $po_berry_blast_box - $po_berry_blast_box_qty;
+    $po_chyawanprash_box_diff = $po_chyawanprash_box - $po_chyawanprash_box_qty;
+    $po_variety_box_diff = $po_variety_box - $po_variety_box_qty;
+
+    $po_chocolate_cookies_diff = $po_chocolate_cookies - $po_chocolate_cookies_qty;
+    $po_dark_chocolate_cookies_diff = $po_dark_chocolate_cookies - $po_dark_chocolate_cookies_qty;
+    $po_cranberry_cookies_diff = $po_cranberry_cookies - $po_cranberry_cookies_qty;
+
+    $po_cranberry_orange_zest_diff = $po_cranberry_orange_zest - $po_cranberry_orange_zest_qty;
+    $po_fig_raisins_diff = $po_fig_raisins - $po_fig_raisins_qty;
+    $po_papaya_pineapple_diff = $po_papaya_pineapple - $po_papaya_pineapple_qty;
+
+    $mismatch = '0';
+    $mismatch_type = '';
+    // $delivery_status = 'Pending';
+    $delivery_status = 'Delivered';
+
+    if($po_orange_bar_diff!=0 || $po_butterscotch_bar_diff!=0 || $po_chocopeanut_bar_diff!=0 || 
+        $po_bambaiyachaat_bar_diff!=0 || $po_mangoginger_bar_diff!=0 || $po_berry_blast_bar_diff!=0 || 
+        $po_chyawanprash_bar_diff!=0 || $po_orange_box_diff!=0 || $po_butterscotch_box_diff!=0 || 
+        $po_chocopeanut_box_diff!=0 || $po_bambaiyachaat_box_diff!=0 || $po_mangoginger_box_diff!=0 || 
+        $po_berry_blast_box_diff!=0 || $po_chyawanprash_box_diff!=0 || $po_variety_box_diff!=0 || 
+        $po_chocolate_cookies_diff!=0 || $po_dark_chocolate_cookies_diff!=0 || $po_cranberry_cookies_diff!=0 || 
+        $po_cranberry_orange_zest_diff!=0 || $po_fig_raisins_diff!=0 || $po_papaya_pineapple_diff!=0) {
+            $mismatch = '1';
+            $mismatch_type = 'Physical';
+    }
+
+    $data = array(
+        'delivery_status' => $delivery_status,
+        'mismatch' => $mismatch,
+        'mismatch_type' => $mismatch_type,
+        'modified_by' => $curusr,
+        'modified_on' => $now
+    );
+
+    $this->db->where('id', $po_id);
+    $this->db->update('distributor_po',$data);
+    $action='Distributor PO Entry By Merchandiser. Delivery Status: ' . $delivery_status;
+
+    $this->db->where('distributor_po_id', $po_id);
+    $this->db->delete('distributor_po_physical_items');
+
+    $i = 0;
+    $type = array();
+    $item_id = array();
+    $qty = array();
+
+    if($po_orange_bar>0){
+        $type[$i]='Bar';
+        $item_id[$i]='1';
+        $qty[$i]=$po_orange_bar;
+        $i = $i + 1;
+    }
+    if($po_butterscotch_bar>0){
+        $type[$i]='Bar';
+        $item_id[$i]='3';
+        $qty[$i]=$po_butterscotch_bar;
+        $i = $i + 1;
+    }
+    if($po_chocopeanut_bar>0){
+        $type[$i]='Bar';
+        $item_id[$i]='5';
+        $qty[$i]=$po_chocopeanut_bar;
+        $i = $i + 1;
+    }
+    if($po_bambaiyachaat_bar>0){
+        $type[$i]='Bar';
+        $item_id[$i]='4';
+        $qty[$i]=$po_bambaiyachaat_bar;
+        $i = $i + 1;
+    }
+    if($po_mangoginger_bar>0){
+        $type[$i]='Bar';
+        $item_id[$i]='6';
+        $qty[$i]=$po_mangoginger_bar;
+        $i = $i + 1;
+    }
+    if($po_berry_blast_bar>0){
+        $type[$i]='Bar';
+        $item_id[$i]='9';
+        $qty[$i]=$po_berry_blast_bar;
+        $i = $i + 1;
+    }
+    if($po_chyawanprash_bar>0){
+        $type[$i]='Bar';
+        $item_id[$i]='10';
+        $qty[$i]=$po_chyawanprash_bar;
+        $i = $i + 1;
+    }
+
+    if($po_orange_box>0){
+        $type[$i]='Box';
+        $item_id[$i]='1';
+        $qty[$i]=$po_orange_box;
+        $i = $i + 1;
+    }
+    if($po_butterscotch_box>0){
+        $type[$i]='Box';
+        $item_id[$i]='3';
+        $qty[$i]=$po_butterscotch_box;
+        $i = $i + 1;
+    }
+    if($po_chocopeanut_box>0){
+        $type[$i]='Box';
+        $item_id[$i]='9';
+        $qty[$i]=$po_chocopeanut_box;
+        $i = $i + 1;
+    }
+    if($po_bambaiyachaat_box>0){
+        $type[$i]='Box';
+        $item_id[$i]='8';
+        $qty[$i]=$po_bambaiyachaat_box;
+        $i = $i + 1;
+    }
+    if($po_mangoginger_box>0){
+        $type[$i]='Box';
+        $item_id[$i]='12';
+        $qty[$i]=$po_mangoginger_box;
+        $i = $i + 1;
+    }
+    if($po_berry_blast_box>0){
+        $type[$i]='Box';
+        $item_id[$i]='29';
+        $qty[$i]=$po_berry_blast_box;
+        $i = $i + 1;
+    }
+    if($po_chyawanprash_box>0){
+        $type[$i]='Box';
+        $item_id[$i]='31';
+        $qty[$i]=$po_chyawanprash_box;
+        $i = $i + 1;
+    }
+    if($po_variety_box>0){
+        $type[$i]='Box';
+        $item_id[$i]='32';
+        $qty[$i]=$po_variety_box;
+        $i = $i + 1;
+    }
+
+    if($po_chocolate_cookies>0){
+        $type[$i]='Box';
+        $item_id[$i]='37';
+        $qty[$i]=$po_chocolate_cookies;
+        $i = $i + 1;
+    }
+    if($po_dark_chocolate_cookies>0){
+        $type[$i]='Box';
+        $item_id[$i]='38';
+        $qty[$i]=$po_dark_chocolate_cookies;
+        $i = $i + 1;
+    }
+    if($po_cranberry_cookies>0){
+        $type[$i]='Box';
+        $item_id[$i]='39';
+        $qty[$i]=$po_cranberry_cookies;
+        $i = $i + 1;
+    }
+
+    if($po_cranberry_orange_zest>0){
+        $type[$i]='Box';
+        $item_id[$i]='42';
+        $qty[$i]=$po_cranberry_orange_zest;
+        $i = $i + 1;
+    }
+    if($po_fig_raisins>0){
+        $type[$i]='Box';
+        $item_id[$i]='41';
+        $qty[$i]=$po_fig_raisins;
+        $i = $i + 1;
+    }
+    if($po_papaya_pineapple>0){
+        $type[$i]='Box';
+        $item_id[$i]='40';
+        $qty[$i]=$po_papaya_pineapple;
+        $i = $i + 1;
+    }
+
+    for ($k=0; $k<count($type); $k++) {
+        if(isset($type[$k]) and $type[$k]!="") {
+            $data = array(
+                        'distributor_po_id' => $po_id,
+                        'type' => $type[$k],
+                        'item_id' => $item_id[$k],
+                        'qty' => format_number($qty[$k],2)
+                    );
+            $this->db->insert('distributor_po_physical_items', $data);
+        }
+    }
+
+    $this->send_po_physical_confirmation_email($po_id, $mismatch);
+
+    $logarray['table_id']=$po_id;
+    $logarray['module_name']='Distributor_PO';
+    $logarray['cnt_name']='Distributor_PO';
+    $logarray['action']=$action;
+    $this->user_access_log_model->insertAccessLog($logarray);
+
+    return 1;
+}
+
+function send_po_physical_confirmation_email($id='', $mismatch='') {
+    $email_type = 'distributor_po_confirm_physical';
+
+    if(strtoupper(trim($mismatch))=="1"){
+        $mismatch_status = "Mismatch";
+    } else {
+        $mismatch_status = "Verified";
+    }
+    $action='Distributor Po Physical Quantity '.$mismatch_status.' mail sending failed.';
+
+    $result = $this->email_model->get_email_details('', $email_type);
+
+    if(count($result)>0){
+        $email_from = $result[0]->email_from;
+        $email_sender = $result[0]->email_sender;
+        $email_to = $result[0]->email_to;
+        $email_cc = $result[0]->email_cc;
+        $email_bcc = $result[0]->email_bcc;
+        $email_subject = $result[0]->email_subject.' '.$mismatch_status;
+        $email_body = $result[0]->email_body.' '.$mismatch_status;
+
+        $mailSent=$this->email_model->set_email_details($id, $email_type, $email_from,  $email_sender, $email_to, $email_subject, $email_body, $email_bcc, $email_cc);
+
+        if($mailSent==1){
+            $action='Distributor Po '.$delivery_status.' mail sent.';
+        }
+    }
+    
+    $logarray['table_id']=$id;
+    $logarray['module_name']='Distributor_PO';
+    $logarray['cnt_name']='Distributor_PO';
+    $logarray['action']=$action;
+    $this->user_access_log_model->insertAccessLog($logarray);
+
+    return $mailSent;
+}
+
 
 }
 ?>

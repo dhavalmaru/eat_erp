@@ -10,19 +10,20 @@
         <link rel="icon" href="<?php echo base_url(); ?>favicon.ico" type="image/x-icon" />
         <!-- END META SECTION -->
         
-          <!-- CSS INCLUDE -->        
-           <link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>css/theme-blue.css"/>
+        <!-- CSS INCLUDE -->        
+        <link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>css/theme-blue.css"/>
 		<link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>mobile-menu/vendor-1437d0659c.css"/>
 		<link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url().'css/custome_vj_css.css'; ?>"/>    
-        <!-- EOF CSS INCLUDE -->   
-<style>
-.fa-eye  { font-size:21px; color:#333;}
-.fa-file-pdf-o{ color:#e80b0b; font-size:21px;}
-.fa-paper-plane-o{ color:#520fbb; font-size:21px;}
-@media only screen and (min-width:495px) and (max-width:717px) {.btn-bottom { margin-top:5px;}}
-</style>	
+        <!-- EOF CSS INCLUDE -->
 
-<style>
+        <style>
+            .fa-eye  { font-size:21px; color:#333;}
+            .fa-file-pdf-o{ color:#e80b0b; font-size:21px;}
+            .fa-paper-plane-o{ color:#520fbb; font-size:21px;}
+            @media only screen and (min-width:495px) and (max-width:717px) {.btn-bottom { margin-top:5px;}}
+        </style>	
+
+        <style>
             .sidenav1 {
                height: 50%;
                 width: 0;
@@ -82,8 +83,8 @@
             #customers10 {width: 100% !important;}
         </style>    	
     </head>
-    <body>								
-             <!-- START PAGE CONTAINER -->
+    <body>
+        <!-- START PAGE CONTAINER -->
         <div class="page-container page-navigation-top">            
             <!-- PAGE CONTENT -->
 			   <?php $this->load->view('templates/menus');?>
@@ -154,6 +155,7 @@
                                             <th  width="45"  style="text-align:center;" > Sr. No. </th>
                                             <th  width="210"> Task Name </th>
                                             <th  width="210"> Assigned to </th>
+                                            <th  width="210"> Follower </th>
                                             <th  width="80"> Priority </th>
                                             <th  width="70"> Due Date </th>
                                             <th  width="80"> From Date </th>
