@@ -191,7 +191,7 @@
                                     <input type="hidden"  name="frequency" id="frequency" value="<?php if(isset($data[0]->frequency)) echo $data[0]->frequency;?>"/>
                                     <input type="hidden"  name="sequence" id="sequence" value="<?php if(isset($data[0]->sequence)) echo $data[0]->sequence;?>"/>
                                     <input type="hidden"  name="sales_rep_id" id="sales_rep_id" value="<?php if(isset($data[0]->sales_rep_id)) echo $data[0]->sales_rep_id;?>"/>
-                                    <input type="hidden"  name="date_of_visit" id="date_of_visit" value="  <?php if(isset($data[0]->date_of_visit)) echo (($data[0]->date_of_visit!=null && $data[0]->date_of_visit!='')?date('d/m/Y',strtotime($data[0]->date_of_visit)):date('d/m/Y')); else echo date('d/m/Y'); ?>"/>
+                                    <input type="hidden"  name="date_of_visit" id="date_of_visit" value="<?php if(isset($data[0]->date_of_visit)) echo (($data[0]->date_of_visit!=null && $data[0]->date_of_visit!='')?date('d/m/Y',strtotime($data[0]->date_of_visit)):date('d/m/Y')); else echo date('d/m/Y'); ?>"/>
                                     <input type="hidden"  name="sales_rep_loc_id" id="sales_rep_loc_id" value="<?php if(isset($data[0]->sales_rep_loc_id)) echo $data[0]->sales_rep_loc_id;?>"/>
                                     <input type="hidden"  name="distributor_status" id="distributor_status" value="<?php if(isset($data[0]->distributor_status)) echo $data[0]->distributor_status;?>"/>
                                     <input type="hidden"  name="merchandiser_stock_id" id="merchandiser_stock_id" value="<?php if(isset($data[0]->merchandiser_stock_id)) echo $data[0]->merchandiser_stock_id;?>"/>
@@ -387,7 +387,7 @@
                                                 { 
                                                   if(isset($data[0]->location_id))
                                                   {
-                                                   if($location[$k]->id==$data[0]->location_id  ) { echo 'selected'; }
+                                                   if($location[$k]->id==$data[0]->location_id) { echo 'selected'; }
                                                   }
                                                    
                                              
@@ -1563,7 +1563,7 @@
                  //console.log(distributor_id);
 
                 $.ajax({
-                        url:'<?=base_url()?>index.php/Sales_rep_location/get_distributor_details',
+                        url:'<?php // echo base_url(); ?>index.php/Sales_rep_location/get_distributor_details',
                         method: 'post',
                         data: {distributor_id: distributor_id},
                         dataType: 'json',
@@ -1730,9 +1730,9 @@
         <script>
             $('#Saver').on('click', function(){
                 if ($("#form_sales_rep_location_details").valid()) {
-                   // console.log('confirm modal');
+                    // console.log('confirm modal');
 
-                   var dist_type = $('#distributor_type').val();
+                    var dist_type = $('#distributor_type').val();
 
                     if($('#mid').val()=="" && $('#channel_type').val()=="GT" && dist_type=='New'){
                         $('#confirm_content').confirmModal({
@@ -1752,6 +1752,8 @@
                             onClose: function() {}
                         });
                         return false;
+                    } else {
+                        $("#form_sales_rep_location_details").submit();
                     }
                 }
             });

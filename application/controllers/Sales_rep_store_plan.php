@@ -332,6 +332,17 @@ class Sales_rep_store_plan extends CI_Controller{
                 if($get_channel_type!='')
                     $data['channel_type']=$get_channel_type;
 
+                // echo json_encode($data['data']);
+                // echo '<br/><br/>';
+
+                // echo json_encode($data['location']);
+                // echo '<br/><br/>';
+
+                // $visit_detail = $this->session->userdata('visit_detail');
+                // echo json_encode($visit_detail);
+                // echo '<br/><br/>';
+                
+
                 load_view('sales_rep_location/sales_rep_location_details', $data);
             } else {
                 echo "Unauthorized access";
@@ -602,40 +613,27 @@ class Sales_rep_store_plan extends CI_Controller{
 
         $user_id=$this->session->userdata('sales_rep_id');
 
-         if($this->session->userdata('posttimer')=='')
-        {
-           $this->session->set_userdata('posttimer',time());
-           $bool = 1;
-        }
-        else
-        {
-             if ((time() - $this->session->userdata('posttimer'))>5)
-             {
+        if($this->session->userdata('posttimer')=='') {
+            $this->session->set_userdata('posttimer',time());
+            $bool = 1;
+        } else {
+            if ((time() - $this->session->userdata('posttimer'))>5) {
                 $this->session->set_userdata('posttimer',time());
                 $bool = 1;
-             }
-             else
-             {
+            } else {
                 $bool = 0;
-             }
+            }
         }
 
-        if($bool==1)
-        {
+        if($bool==1) {
             if($this->input->post('srld') == "Place Order") {
-            
-
-                if($this->input->post('channel_type')=='GT')
-                {
+                if($this->input->post('channel_type')=='GT') {
                     $this->session->unset_userdata('retailer_detail');
                     $this->session->unset_userdata('visit_detail');
-                   $this->Sales_location_model->save_session();
-                }
-                else
-                {
+                    $this->Sales_location_model->save_session();
+                } else {
                    $this->Sales_location_model->save_relation_session();
                 }
-
 
                 $stock_detail = $this->session->userdata('stock_detail');
                 /*if($id == ""){
@@ -660,7 +658,7 @@ class Sales_rep_store_plan extends CI_Controller{
 
                     if($this->session->userdata('visit_detail')!=null)
                     {
-                       if($this->input->post('distributor_type')=='New')
+                        if($this->input->post('distributor_type')=='New')
                         {
                           redirect(base_url().'index.php/Sales_rep_store_plan/add_sales_rep_distributor');
                         }
@@ -672,7 +670,7 @@ class Sales_rep_store_plan extends CI_Controller{
                     }
                     else
                     {
-                      $result=$this->sales_rep_distributor_model->get_access();
+                        $result=$this->sales_rep_distributor_model->get_access();
                         if(count($result)>0) {
                             if($result[0]->r_view == 1 || $result[0]->r_edit == 1) {
                                 $id = $this->input->post('store_id');
@@ -704,8 +702,6 @@ class Sales_rep_store_plan extends CI_Controller{
                                     $data['area_id'] = $this->input->post('area_id');
                                     $data['location_id'] = $this->input->post('location_id');
 
-
-
                                     load_view('sales_rep_distributor/sales_rep_distributor_details',$data);
                                     //redirect(base_url().'index.php/sales_rep_distributor/add/'.$id);
                                     /*redirect(base_url().'index.php/Sales_rep_order/add_order/'.$id);*/
@@ -727,8 +723,6 @@ class Sales_rep_store_plan extends CI_Controller{
         {
             redirect(base_url().'index.php/Sales_rep_store_plan');
         }
-
-        
 
         //redirect(base_url().'index.php/Sales_rep_store_plan');
     }
@@ -1080,8 +1074,8 @@ class Sales_rep_store_plan extends CI_Controller{
     }
 
     public function save_order($save=''){
-         if($save!='')
-         {
+        if($save!='')
+        {
                 $channel_type  = $this->input->post('channel_type');
                 $distributor_type  = $this->input->post('distributor_type');
                 $distributor_name  = $this->input->post('distributor_name');

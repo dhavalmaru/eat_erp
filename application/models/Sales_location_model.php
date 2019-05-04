@@ -127,7 +127,7 @@ function get_data($status='', $id='', $frequency='', $temp_date='', $sales_rep_i
     }
 
     $sql = "select distinct G.*, H.date_of_visit, H.id as mid, H.distributor_type, H.remarks,
-                H.followup_date, H.distributor_type from 
+                H.followup_date, H.distributor_type, I.zone, J.area, K.location from 
             (select E.*, F.sales_rep_name from 
             (select C.* from 
             (select A.*, B.distributor_name, B.distributor_name as store_name, B.google_address, 
@@ -155,9 +155,18 @@ function get_data($status='', $id='', $frequency='', $temp_date='', $sales_rep_i
             (select * from sales_rep_location where date(date_of_visit)='$temp_date' and 
                 sales_rep_id='$sales_rep_id') H 
             on(G.store_id=H.distributor_id and G.id=H.detailed_bit_plan_id) 
+            left join 
+            (select * from zone_master) I on (G.zone_id=I.id) 
+            left join 
+            (select * from area_master) J on (G.area_id=J.id) 
+            left join 
+            (select * from location_master) K on (G.location_id=K.id) 
             ".$cond2." 
             order by G.sequence asc, G.modified_on Desc";
     $query=$this->db->query($sql);
+
+    // echo $sql;
+    // echo '<br/><br/>';
     return $query->result();
 }
 
@@ -3909,8 +3918,9 @@ public function get_mtfollowup($id='', $temp_date='', $sales_rep_id='') {
         $date = date('Y-m-d');
     }
 
-    $sql = "select Distinct A.*, D.is_edit, D.is_visited  from 
-            (select A.dist_id as store_id, R.store_name, D.zone, A.zone_id, R.store_name as relation, C.location, 
+    $sql = "select Distinct A.*, D.is_edit, D.is_visited, '' as bit_plan_id, '' as sequence  from 
+            (select A.id, A.dist_id as store_id, R.store_name, D.zone, A.zone_id, R.store_name as relation, 
+                '' as area_id, '' as area, C.location, 
                 A.location_id, A.id as merchandiser_stock_id, 'Old' as distributor_type, distributor_status, A.remarks from 
             (select * from merchandiser_stock where date(followup_date)='$date' and m_id='$sales_rep_id' ".$cond.") A 
             left join 
@@ -3935,7 +3945,7 @@ public function get_mtfollowup($id='', $temp_date='', $sales_rep_id='') {
 public function get_gtfollowup($id='', $temp_date='', $sales_rep_id='') {
     $cond= '';
 
-    if($id!='') $cond=" where id='$id'";
+    if($id!='') $cond=" where A.id='$id'";
 
     if($temp_date!='') {
         $date = $temp_date;
@@ -3943,7 +3953,8 @@ public function get_gtfollowup($id='', $temp_date='', $sales_rep_id='') {
         $date = date('Y-m-d');
     }
 
-    $sql = "select distinct A.*, B.*, D.is_edit, D.is_visited from 
+    $sql = "select distinct A.*, B.*, D.is_edit, D.is_visited, I.zone, J.area, K.location, A.distributor_name as store_name, 
+            '' as bit_plan_id, '' as sequence from 
             (select A.*, B.distributor_name from 
             (select id, id as sales_rep_loc_id, zone_id, location_id, area_id, distributor_id as store_id, 
                 followup_date, distributor_type, distributor_status, remarks 
@@ -3968,7 +3979,13 @@ public function get_gtfollowup($id='', $temp_date='', $sales_rep_id='') {
             on (A.id=B.sales_rep_loc_id) 
             left join 
             (select distributor_id, created_on, id as is_edit, is_visited from sales_rep_location) D 
-            on (D.distributor_id=A.store_id and D.is_visited=1)".$cond;
+            on (D.distributor_id=A.store_id and D.is_visited=1) 
+            left join 
+            (select * from zone_master) I on (A.zone_id=I.id) 
+            left join 
+            (select * from area_master) J on (A.area_id=J.id) 
+            left join 
+            (select * from location_master) K on (A.location_id=K.id) ".$cond;
     $result = $this->db->query($sql)->result();
     return $result;
 }
@@ -4018,7 +4035,8 @@ public function get_merchendiser_data($status='', $id='', $frequency='', $temp_d
         $table_name = "select *, id as bit_plan_id, id as bit_id from merchandiser_beat_plan ";
     }
 
-    $sql = "select distinct G.*, H.date_of_visit, H.dist_id, H.id as mid, B.location, 'Old' as distributor_type, H.remarks from 
+    $sql = "select distinct G.*, H.date_of_visit, H.dist_id, H.id as mid, 'Old' as distributor_type, H.remarks, 
+            I.zone, '' as area_id, '' as area, K.location from 
             (select E.*, F.sales_rep_name from 
             (select C.*, D.google_address, D.latitude, D.longitude from 
             (select A.*, B.store_name from 
@@ -4036,11 +4054,16 @@ public function get_merchendiser_data($status='', $id='', $frequency='', $temp_d
             (select * from merchandiser_stock Where date(date_of_visit)='$temp_date') H 
             on (G.store_id=H.dist_id and G.location_id=H.location_id and G.zone_id=H.zone_id and G.id=H.detailed_bit_plan_id) 
             left join 
-            (select * from location_master) B 
-            on (G.location_id=B.id) 
+            (select * from zone_master) I on (G.zone_id=I.id) 
+            left join 
+            (select * from location_master) K on (G.location_id=K.id) 
             ".$cond2." 
             order by G.sequence asc,G.modified_on Desc";
     $query=$this->db->query($sql);
+
+    // echo $sql;
+    // echo '<br/><br/>';
+    
     return $query->result();
 }
 

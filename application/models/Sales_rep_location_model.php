@@ -446,9 +446,7 @@ function get_locations($zone_id='', $area_id='',$id='',$channel_type=''){
 
     if($beat_id!=''){
         if($channel_type=="MT" || $id!=''){
-            $sql = "select distinct B.* from beat_locations A 
-                    left join location_master B on (A.location_id = B.id) 
-                    where A.beat_id='$beat_id' and B.status = 'Approved' " . $cond2; 
+            $sql = "select * from location_master where status = 'Approved' " . $cond; 
         } else {
             $sql = "select distinct B.* from beat_locations A 
                     left join location_master B on (A.location_id = B.id) 
@@ -456,7 +454,7 @@ function get_locations($zone_id='', $area_id='',$id='',$channel_type=''){
         }
     } else {
         if($channel_type=="MT" || $id!=''){
-            $sql = "select * from location_master where status = 'Approved'" . $cond; 
+            $sql = "select * from location_master where status = 'Approved' " . $cond; 
         } else {
             $sql = "select * from location_master where status = 'Approved' and type_id IN (3,7)" . $cond;
         }
@@ -473,6 +471,9 @@ function get_locations($zone_id='', $area_id='',$id='',$channel_type=''){
         $query = $this->db->query($sql);
         $result = $query->result();
     }
+
+    // echo $sql;
+    // echo '<br/><br/>';
     
     return $result;
 }

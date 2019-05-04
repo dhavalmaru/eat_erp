@@ -379,7 +379,7 @@
                             <a href="javascript:history.back()" class="button shadow btn_color" type="reset" id="reset">Back</a>
 
                             <input type="submit" value="Next" id="Next" name="srld" class="right button shadow btn_color">
-                            <!-- <a href="#" id="btn_save" class="right button shadow btn_color" style="<?php if($id!='') {if($access[0]->r_edit=='0') echo 'display: none;'; else if(substr($id,0,1)=="d") echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</a> -->
+                            <!-- <a href="#" id="btn_save" class="right button shadow btn_color" style="<?php //if($id!='') {if($access[0]->r_edit=='0') echo 'display: none;'; else if(substr($id,0,1)=="d") echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</a> -->
                             <!-- <button id="btn_save" class="btn pull-right" style="<?php //if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</button> -->
 							</div>
                          
@@ -408,7 +408,7 @@
                     <p>Do you want to place order?</p>
                 </div>
                 <div class="confirmModal_footer">
-                    <!-- <a href="<?php echo base_url();?>index.php/login/logout" class="btn btn-success ">Yes</a> -->
+                    <!-- <a href="<?php //echo base_url();?>index.php/login/logout" class="btn btn-success ">Yes</a> -->
                     <button type="button" class="btn " data-confirmmodal-but="ok">Yes</button>
                     <button type="button" class="btn " data-confirmmodal-but="cancel">No</button>
                 </div>
@@ -422,7 +422,7 @@
         </script>
         <script type="text/javascript" src="<?php echo base_url(); ?>js/load_autocomplete.js"></script>
         <script type="text/javascript" src="<?php echo base_url(); ?>js/validations.js"></script>
-        <!-- <script src="<?php echo base_url(); ?>sales_rep/js/loading.js"></script> -->
+        <!-- <script src="<?php //echo base_url(); ?>sales_rep/js/loading.js"></script> -->
         <script>
             $("#btn_save").click(function(){
                 /*if (!$("#form_sales_rep_distributor_details").valid()) {

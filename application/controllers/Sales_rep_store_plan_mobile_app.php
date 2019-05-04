@@ -31,8 +31,8 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
         $temp_date = urldecode($this->input->post('temp_date'));
 
         // $sales_rep_id = '2';
-        // $frequency = 'Tuesday';
-        // $temp_date = '23';
+        // $frequency = 'Friday';
+        // $temp_date = '03';
 
         switch ($frequency) {
             case 'Monday':
@@ -114,13 +114,27 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
         // $distributor_id = '1298';
         // $beat_id = '2';
         
-        // $id = '6650';
+        // $id = '6567';
         // $get_channel_type = 'GT';
         // $follow_type = '';
         // $sales_rep_id = '2';
         // $distributor_id = '1298';
         // $beat_id = '1';
-        
+
+        // $id = '2924';
+        // $get_channel_type = 'MT';
+        // $follow_type = '';
+        // $sales_rep_id = '2';
+        // $distributor_id = '1298';
+        // $beat_id = '1';
+
+        // $id = '12341';
+        // $get_channel_type = 'GT';
+        // $follow_type = 'gt_followup';
+        // $sales_rep_id = '2';
+        // $distributor_id = '1298';
+        // $beat_id = '1';
+
         $day =  date('l');
         $m = date('F');
         $year = date('Y');
@@ -131,7 +145,9 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
             $frequency = 'Every '.$day;
         }
 
-        $data['distributor'] = $this->sales_rep_distributor_model->get_data2();
+
+
+        // $data['distributor'] = $this->sales_rep_distributor_model->get_data2();
 
         // if($this->session->userdata('temp_stock_details')!=null) {
         //     if($follow_type!='') {
@@ -173,6 +189,8 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                                 from sales_rep_distributor_opening_stock Where sales_rep_loc_id='$sales_loc_id'";
                         $result = $this->db->query($sql)->result_array();
                         $data['stock_detail']=$result[0];
+
+                        $data['data1'] = $this->sales_rep_location_model->get_data_qty('', $sales_loc_id);
                     }
                 } else {
                     $result=$this->Sales_location_model->get_mtfollowup($id, '', $sales_rep_id);
@@ -182,7 +200,7 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                         $sql = "select A.id as stock_id, merchandiser_stock_id as visit_id, 
                                     Case When type='Box' Then box_name ELSE product_name end as product_name, 
                                     Case When type='Bar' Then CONCAT(qty,'_Bar') ELSE CONCAT(qty,'_Box') end as qty, 
-                                    item_id, type from 
+                                    item_id, type, qty as qty1 from 
                                 (select * from merchandiser_stock_details where merchandiser_stock_id='$sales_loc_id') A 
                                 left join 
                                 (select * from box_master) B on (A.item_id=B.id) 
@@ -191,83 +209,114 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                         $result = $this->db->query($sql)->result_array();
 
                         $stock_detail = array();
+                        $data1_obj = array();
                         if(count($result)>0) {
                             for ($j=0; $j <count($result) ; $j++) {
                                 if ($result[$j]['item_id']==37) {
                                     $stock_detail['chocolate_cookies_box']=$result[$j]['qty'];
+                                    $data1_obj['chocolate_cookies_box']=$result[$j]['qty1'];
                                 }
                                 if ($result[$j]['item_id']==38) {
                                     $stock_detail['dark_chocolate_cookies_box']=$result[$j]['qty'];
+                                    $data1_obj['dark_chocolate_cookies_box']=$result[$j]['qty1'];
                                 }
                                 if ($result[$j]['item_id']==39) {
                                     $stock_detail['cranberry_cookies_box']=$result[$j]['qty'];
+                                    $data1_obj['cranberry_cookies_box']=$result[$j]['qty1'];
                                 }
                                 if ($result[$j]['item_id']==42) {
                                     $stock_detail['cranberry_orange_box']=$result[$j]['qty'];
+                                    $data1_obj['cranberry_orange_box']=$result[$j]['qty1'];
                                 }
                                 if ($result[$j]['item_id']==41) {
                                     $stock_detail['fig_raisins_box']=$result[$j]['qty'];
+                                    $data1_obj['fig_raisins_box']=$result[$j]['qty1'];
                                 }
                                 if ($result[$j]['item_id']==40) {
                                     $stock_detail['papaya_pineapple_box']=$result[$j]['qty'];
+                                    $data1_obj['papaya_pineapple_box']=$result[$j]['qty1'];
                                 }
                                 if($result[$j]['item_id']==1 && $result[$j]['type']=='Bar') {
                                     $stock_detail['orange_bar']=$result[$j]['qty'];
+                                    $data1_obj['orange_bar']=$result[$j]['qty1'];
                                 }
                                 if($result[$j]['item_id']==1 && $result[$j]['type']=='Box') {
                                     $stock_detail['orange_box']=$result[$j]['qty'];
+                                    $data1_obj['orange_box']=$result[$j]['qty1'];
                                 }
                                 if($result[$j]['item_id']==3 && $result[$j]['type']=='Bar') {
                                     $stock_detail['butterscotch_bar']=$result[$j]['qty'];
+                                    $data1_obj['butterscotch_bar']=$result[$j]['qty1'];
                                 }
                                 if($result[$j]['item_id']==3 && $result[$j]['type']=='Box') {
                                     $stock_detail['butterscotch_box']=$result[$j]['qty'];
+                                    $data1_obj['butterscotch_box']=$result[$j]['qty1'];
                                 }
 
-                                /*  if($result[$j]['item_id']==9 && $result[$j]['type']=='Box')
-                                {
+                                /*if($result[$j]['item_id']==9 && $result[$j]['type']=='Box') {
                                     $stock_detail['butterscotch']=$result[$j]['qty'];
-                                }
-                                else if($result[$j]['item_id']==5 && $result[$j]['type']=='Bar')
-                                {
+                                } else if($result[$j]['item_id']==5 && $result[$j]['type']=='Bar') {
                                     $stock_detail['butterscotch']=$result[$j]['qty'];
                                 }*/
 
-                                if($result[$j]['item_id']==9 && $result[$j]['type']=='Box')
+                                if($result[$j]['item_id']==9 && $result[$j]['type']=='Box') {
                                     $stock_detail['chocopeanut_box']=$result[$j]['qty'];
+                                    $data1_obj['chocopeanut_box']=$result[$j]['qty1'];
+                                }
                                 
-                                if($result[$j]['item_id']==5 && $result[$j]['type']=='Bar')
+                                if($result[$j]['item_id']==5 && $result[$j]['type']=='Bar') {
                                     $stock_detail['chocopeanut_bar']=$result[$j]['qty'];
+                                    $data1_obj['chocopeanut_bar']=$result[$j]['qty1'];
+                                }
 
-                                if($result[$j]['item_id']==8 && $result[$j]['type']=='Box')
+                                if($result[$j]['item_id']==8 && $result[$j]['type']=='Box') {
                                     $stock_detail['bambaiyachaat_box']=$result[$j]['qty'];
-                                
-                                if($result[$j]['item_id']==4 && $result[$j]['type']=='Bar')
+                                    $data1_obj['bambaiyachaat_box']=$result[$j]['qty1'];
+                                }
+
+                                if($result[$j]['item_id']==4 && $result[$j]['type']=='Bar') {
                                     $stock_detail['bambaiyachaat_bar']=$result[$j]['qty'];
+                                    $data1_obj['bambaiyachaat_bar']=$result[$j]['qty1'];
+                                }
 
-                                if($result[$j]['item_id']==12 && $result[$j]['type']=='Box')
+                                if($result[$j]['item_id']==12 && $result[$j]['type']=='Box') {
                                     $stock_detail['mangoginger_box']=$result[$j]['qty'];
-                                
-                                if($result[$j]['item_id']==6 && $result[$j]['type']=='Bar')
+                                    $data1_obj['mangoginger_box']=$result[$j]['qty1'];
+                                }
+
+                                if($result[$j]['item_id']==6 && $result[$j]['type']=='Bar') {
                                     $stock_detail['mangoginger_bar']=$result[$j]['qty'];
+                                    $data1_obj['mangoginger_bar']=$result[$j]['qty1'];
+                                }
 
-                                if($result[$j]['item_id']==29 && $result[$j]['type']=='Box')
+                                if($result[$j]['item_id']==29 && $result[$j]['type']=='Box') {
                                     $stock_detail['berry_blast_box']=$result[$j]['qty'];
-                                
-                                if($result[$j]['item_id']==9 && $result[$j]['type']=='Bar')
+                                    $data1_obj['berry_blast_box']=$result[$j]['qty1'];
+                                }
+
+                                if($result[$j]['item_id']==9 && $result[$j]['type']=='Bar') {
                                     $stock_detail['berry_blast_bar']=$result[$j]['qty'];
+                                    $data1_obj['berry_blast_bar']=$result[$j]['qty1'];
+                                }
 
-                                if($result[$j]['item_id']==31 && $result[$j]['type']=='Box')
+                                if($result[$j]['item_id']==31 && $result[$j]['type']=='Box') {
                                     $stock_detail['chyawanprash_box']=$result[$j]['qty'];
-                                
-                                if($result[$j]['item_id']==10 && $result[$j]['type']=='Bar')
-                                    $stock_detail['chyawanprash_bar']=$result[$j]['qty'];
+                                    $data1_obj['chyawanprash_box']=$result[$j]['qty1'];
+                                }
 
-                                if($result[$j]['item_id']==32 && $result[$j]['type']=='Box')
+                                if($result[$j]['item_id']==10 && $result[$j]['type']=='Bar') {
+                                    $stock_detail['chyawanprash_bar']=$result[$j]['qty'];
+                                    $data1_obj['chyawanprash_bar']=$result[$j]['qty1'];
+                                }
+
+                                if($result[$j]['item_id']==32 && $result[$j]['type']=='Box') {
                                     $stock_detail['variety_box']=$result[$j]['qty'];
+                                    $data1_obj['variety_box']=$result[$j]['qty1'];
+                                }
                             }
 
                             $data['stock_detail'] = $stock_detail;
+                            $data['data1'][0] = (object) $data1_obj;
                         }
                     }
                 }
@@ -282,22 +331,22 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
             } 
         // }
 
-        if($get_channel_type=='') {
-            $channel_type = 'GT';
-        } else {
-            $channel_type = $get_channel_type;
-        }
+        // if($get_channel_type=='') {
+        //     $channel_type = 'GT';
+        // } else {
+        //     $channel_type = $get_channel_type;
+        // }
 
-        $data['zone'] = $this->sales_rep_location_model->get_zone('', $channel_type);
-        $data['area'] = $this->sales_rep_location_model->get_area();
-        if($channel_type=='MT') {
-            $data['location'] = $this->sales_rep_location_model->get_locations('','','',$channel_type);
-        } else {
-            $data['location'] = $this->sales_rep_location_model->get_locations();
-        }
-        $data['follow_type'] = $follow_type;
+        // $data['zone'] = $this->sales_rep_location_model->get_zone('', $channel_type);
+        // $data['area'] = $this->sales_rep_location_model->get_area();
+        // if($channel_type=='MT') {
+        //     $data['location'] = $this->sales_rep_location_model->get_locations('','','',$channel_type);
+        // } else {
+        //     $data['location'] = $this->sales_rep_location_model->get_locations();
+        // }
+        // $data['follow_type'] = $follow_type;
 
-        if($get_channel_type!='') $data['channel_type']=$get_channel_type;
+        // if($get_channel_type!='') $data['channel_type']=$get_channel_type;
 
         echo json_encode($data);
     }
@@ -433,28 +482,42 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
         $sales_rep_id = '';
         $distributor_id = '';
         $beat_id = '';
+        $temp = '';
 
-        // if($this->input->post('id')) {
-        //     $id = urldecode($this->input->post('id'));
-        // }
-        // if($this->input->post('get_channel_type')) {
-        //     $get_channel_type = urldecode($this->input->post('get_channel_type'));
-        // }
-        // if($this->input->post('sales_rep_id')) {
-        //     $sales_rep_id = urldecode($this->input->post('sales_rep_id'));
-        // }
-        // if($this->input->post('distributor_id')) {
-        //     $distributor_id = urldecode($this->input->post('distributor_id'));
-        // }
-        // if($this->input->post('beat_id')) {
-        //     $beat_id = urldecode($this->input->post('beat_id'));
-        // }
+        if($this->input->post('id')) {
+            $id = urldecode($this->input->post('id'));
+        }
+        if($this->input->post('get_channel_type')) {
+            $get_channel_type = urldecode($this->input->post('get_channel_type'));
+        }
+        if($this->input->post('sales_rep_id')) {
+            $sales_rep_id = urldecode($this->input->post('sales_rep_id'));
+        }
+        if($this->input->post('distributor_id')) {
+            $distributor_id = urldecode($this->input->post('distributor_id'));
+        }
+        if($this->input->post('beat_id')) {
+            $beat_id = urldecode($this->input->post('beat_id'));
+        }
+        if($this->input->post('temp')) {
+            $temp = urldecode($this->input->post('temp'));
+        }
 
-        $id = '6650';
-        $get_channel_type = 'GT';
-        $sales_rep_id = '2';
-        $distributor_id = '1298';
-        $beat_id = '1';
+        // $data['data1'] = ['id'=>$id, 'get_channel_type'=>$get_channel_type, 'sales_rep_id'=>$sales_rep_id, 'distributor_id'=>$distributor_id, 'beat_id'=>$beat_id, 'temp'=>$temp];
+
+        // $id = '2746';
+        // $get_channel_type = 'GT';
+        // $sales_rep_id = '2';
+        // $distributor_id = '1298';
+        // $beat_id = '1';
+        // $temp = '';
+
+        // $id = '2734';
+        // $get_channel_type = 'GT';
+        // $sales_rep_id = '2';
+        // $distributor_id = '1298';
+        // $beat_id = '1';
+        // $temp = '';
 
         $day =  date('l');
         $m = date('F');
@@ -478,6 +541,9 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                 $data['created_on'] = $get_result[0]['created_on'];
                 $data['created_by'] = $get_result[0]['created_by'];
             }
+
+            // echo json_encode($result);
+            // echo '<br/><br/>';
 
             $data['data'] = $result;
             $sales_rep_loc_id = $result[0]->mid;
@@ -504,8 +570,10 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                     case When chyawanprash_box IS NOT NULL and chyawanprash_box!=0 Then CONCAT(chyawanprash_box,'_Box') end as chyawanprash_box, 
                     chocolate_cookies_box,cranberry_orange_box,dark_chocolate_cookies_box,fig_raisins_box,papaya_pineapple_box,variety_box,
                     cranberry_cookies_box,sales_rep_loc_id from  sales_rep_distributor_opening_stock 
-                    Where sales_rep_loc_id=$sales_rep_loc_id")->result_array();
+                    Where sales_rep_loc_id='$sales_rep_loc_id'")->result_array();
                 $data['stock_detail']=$result[0];
+
+                $data['data1'] = $this->sales_rep_location_model->get_data_qty('', $data['data'][0]->mid);
             // }
         } else {
             if($temp!='') {
@@ -520,9 +588,10 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
             // if($this->session->userdata('temp_stock_details')!=null) {
             //     $data['stock_detail']=$this->session->userdata('temp_stock_details');
             // } else {
-                $result = $this->db->query("Select A.id as stock_id ,merchandiser_stock_id as visit_id ,
+                $result = $this->db->query("Select A.id as stock_id ,merchandiser_stock_id as visit_id,
                                 Case When type='Box' Then box_name ELSE product_name end as product_name,
-                                Case When type='Box' Then CONCAT(qty,'_Box') ELSE CONCAT(qty,'_Bar') end as qty,item_id,type
+                                Case When type='Box' Then CONCAT(qty,'_Box') ELSE CONCAT(qty,'_Bar') end as qty,
+                                item_id,type,qty as qty1 
                                 from
                                 (SELECT * from merchandiser_stock_details where merchandiser_stock_id=$merchandiser_stock_id) A 
                                 Left join 
@@ -531,37 +600,48 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                                 (SELECT * from product_master)C on A.item_id=C.id")->result_array();
 
                 $stock_detail = array();
+                $data1_obj = array();
                 if(count($result)>0) {
                     for ($j=0; $j <count($result) ; $j++) {
                         if ($result[$j]['item_id']==37) {
                             $stock_detail['chocolate_cookies_box']=$result[$j]['qty'];
+                            $data1_obj['chocolate_cookies_box']=$result[$j]['qty1'];
                         }
                         if ($result[$j]['item_id']==38) {
                             $stock_detail['dark_chocolate_cookies_box']=$result[$j]['qty'];
+                            $data1_obj['dark_chocolate_cookies_box']=$result[$j]['qty1'];
                         }
                         if ($result[$j]['item_id']==39) {
                             $stock_detail['cranberry_cookies_box']=$result[$j]['qty'];
+                            $data1_obj['cranberry_cookies_box']=$result[$j]['qty1'];
                         }
                         if ($result[$j]['item_id']==42) {
                             $stock_detail['cranberry_orange_box']=$result[$j]['qty'];
+                            $data1_obj['cranberry_orange_box']=$result[$j]['qty1'];
                         }
                         if ($result[$j]['item_id']==41) {
                             $stock_detail['fig_raisins_box']=$result[$j]['qty'];
+                            $data1_obj['fig_raisins_box']=$result[$j]['qty1'];
                         }
                         if ($result[$j]['item_id']==40) {
                             $stock_detail['papaya_pineapple_box']=$result[$j]['qty'];
+                            $data1_obj['papaya_pineapple_box']=$result[$j]['qty1'];
                         }
                         if($result[$j]['item_id']==1 && $result[$j]['type']=='Bar') {
                             $stock_detail['orange_bar']=$result[$j]['qty'];
+                            $data1_obj['orange_bar']=$result[$j]['qty1'];
                         }
                         if($result[$j]['item_id']==1 && $result[$j]['type']=='Box') {
                             $stock_detail['orange_box']=$result[$j]['qty'];
+                            $data1_obj['orange_box']=$result[$j]['qty1'];
                         }
                         if($result[$j]['item_id']==3 && $result[$j]['type']=='Bar') {
                             $stock_detail['butterscotch_bar']=$result[$j]['qty'];
+                            $data1_obj['butterscotch_bar']=$result[$j]['qty1'];
                         }
                         if($result[$j]['item_id']==3 && $result[$j]['type']=='Box') {
                             $stock_detail['butterscotch_box']=$result[$j]['qty'];
+                            $data1_obj['butterscotch_box']=$result[$j]['qty1'];
                         }
 
                         /*if($result[$j]['item_id']==9 && $result[$j]['type']=='Box') {
@@ -570,54 +650,78 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                             $stock_detail['butterscotch']=$result[$j]['qty'];
                         }*/
 
-                        if($result[$j]['item_id']==9 && $result[$j]['type']=='Box')
+                        if($result[$j]['item_id']==9 && $result[$j]['type']=='Box') {
                             $stock_detail['chocopeanut_box']=$result[$j]['qty'];
+                            $data1_obj['chocopeanut_box']=$result[$j]['qty1'];
+                        }
                         
-                        if($result[$j]['item_id']==5 && $result[$j]['type']=='Bar')
+                        if($result[$j]['item_id']==5 && $result[$j]['type']=='Bar') {
                             $stock_detail['chocopeanut_bar']=$result[$j]['qty'];
+                            $data1_obj['chocopeanut_bar']=$result[$j]['qty1'];
+                        }
 
-                        if($result[$j]['item_id']==8 && $result[$j]['type']=='Box')
+                        if($result[$j]['item_id']==8 && $result[$j]['type']=='Box') {
                             $stock_detail['bambaiyachaat_box']=$result[$j]['qty'];
+                            $data1_obj['bambaiyachaat_box']=$result[$j]['qty1'];
+                        }
 
-                        if($result[$j]['item_id']==4 && $result[$j]['type']=='Bar')
+                        if($result[$j]['item_id']==4 && $result[$j]['type']=='Bar') {
                             $stock_detail['bambaiyachaat_bar']=$result[$j]['qty'];
+                            $data1_obj['bambaiyachaat_bar']=$result[$j]['qty1'];
+                        }
 
-                        if($result[$j]['item_id']==12 && $result[$j]['type']=='Box')
+                        if($result[$j]['item_id']==12 && $result[$j]['type']=='Box') {
                             $stock_detail['mangoginger_box']=$result[$j]['qty'];
+                            $data1_obj['mangoginger_box']=$result[$j]['qty1'];
+                        }
 
-                        if($result[$j]['item_id']==6 && $result[$j]['type']=='Bar')
+                        if($result[$j]['item_id']==6 && $result[$j]['type']=='Bar') {
                             $stock_detail['mangoginger_bar']=$result[$j]['qty'];
+                            $data1_obj['mangoginger_bar']=$result[$j]['qty1'];
+                        }
 
-                        if($result[$j]['item_id']==29 && $result[$j]['type']=='Box')
+                        if($result[$j]['item_id']==29 && $result[$j]['type']=='Box') {
                             $stock_detail['berry_blast_box']=$result[$j]['qty'];
+                            $data1_obj['berry_blast_box']=$result[$j]['qty1'];
+                        }
 
-                        if($result[$j]['item_id']==9 && $result[$j]['type']=='Bar')
+                        if($result[$j]['item_id']==9 && $result[$j]['type']=='Bar') {
                             $stock_detail['berry_blast_bar']=$result[$j]['qty'];
+                            $data1_obj['berry_blast_bar']=$result[$j]['qty1'];
+                        }
 
-                        if($result[$j]['item_id']==31 && $result[$j]['type']=='Box')
+                        if($result[$j]['item_id']==31 && $result[$j]['type']=='Box') {
                             $stock_detail['chyawanprash_box']=$result[$j]['qty'];
+                            $data1_obj['chyawanprash_box']=$result[$j]['qty1'];
+                        }
 
-                        if($result[$j]['item_id']==10 && $result[$j]['type']=='Bar')
+                        if($result[$j]['item_id']==10 && $result[$j]['type']=='Bar') {
                             $stock_detail['chyawanprash_bar']=$result[$j]['qty'];
+                            $data1_obj['chyawanprash_bar']=$result[$j]['qty1'];
+                        }
 
-                        if($result[$j]['item_id']==32 && $result[$j]['type']=='Box')
+                        if($result[$j]['item_id']==32 && $result[$j]['type']=='Box') {
                             $stock_detail['variety_box']=$result[$j]['qty'];
+                            $data1_obj['variety_box']=$result[$j]['qty1'];
+                        }
                     }
 
                     $data['stock_detail'] = $stock_detail;
                 }
+
+                $data['data1'][0] = (object) $data1_obj;
+
             // }
         }
 
-        $data['data1'] = $this->sales_rep_location_model->get_data_qty('', $data['data'][0]->mid);
-        $data['distributor'] = $this->sales_rep_distributor_model->get_data2();
-        $data['zone'] = $this->sales_rep_location_model->get_zone();
-        $data['area'] = $this->sales_rep_location_model->get_area();
-        if($get_channel_type=='MT') {
-            $data['location'] = $this->sales_rep_location_model->get_locations('','','',$get_channel_type);
-        } else {
-            $data['location'] = $this->sales_rep_location_model->get_locations();
-        }
+        // $data['distributor'] = $this->sales_rep_distributor_model->get_data2();
+        // $data['zone'] = $this->sales_rep_location_model->get_zone();
+        // $data['area'] = $this->sales_rep_location_model->get_area();
+        // if($get_channel_type=='MT') {
+        //     $data['location'] = $this->sales_rep_location_model->get_locations('','','',$get_channel_type);
+        // } else {
+        //     $data['location'] = $this->sales_rep_location_model->get_locations();
+        // }
 
         if($get_channel_type!='') $data['channel_type'] = $get_channel_type;
 
@@ -803,58 +907,64 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
     }
 
     public function add_sales_rep_distributor_api(){
-        // $visit_detail = $this->session->userdata('visit_detail');
-        $visit_detail = $this->input->post('visit_detail');
+        // // $visit_detail = $this->session->userdata('visit_detail');
+        // $visit_detail = $this->input->post('visit_detail');
 
-        $sales_rep_id='';
-        $distributor_id='';
-        $beat_id='';
+        // $sales_rep_id='';
+        // $distributor_id='';
+        // $beat_id='';
 
-        if($this->input->post('sales_rep_id')){
-            $sales_rep_id=$this->input->post('sales_rep_id');
-        } else if($this->session->userdata('sales_rep_id')){
-            $sales_rep_id=$this->session->userdata('sales_rep_id');
-        }
-        if($this->input->post('distributor_id')){
-            $distributor_id=$this->input->post('distributor_id');
-        } else if($this->session->userdata('distributor_id')){
-            $distributor_id=$this->session->userdata('distributor_id');
-        }
-        if($this->input->post('beat_id')){
-            $beat_id=$this->input->post('beat_id');
-        } else if($this->session->userdata('beat_id')){
-            $beat_id=$this->session->userdata('beat_id');
-        }
+        // if($this->input->post('sales_rep_id')){
+        //     $sales_rep_id=$this->input->post('sales_rep_id');
+        // } else if($this->session->userdata('sales_rep_id')){
+        //     $sales_rep_id=$this->session->userdata('sales_rep_id');
+        // }
+        // if($this->input->post('distributor_id')){
+        //     $distributor_id=$this->input->post('distributor_id');
+        // } else if($this->session->userdata('distributor_id')){
+        //     $distributor_id=$this->session->userdata('distributor_id');
+        // }
+        // if($this->input->post('beat_id')){
+        //     $beat_id=$this->input->post('beat_id');
+        // } else if($this->session->userdata('beat_id')){
+        //     $beat_id=$this->session->userdata('beat_id');
+        // }
 
-        $data['distributor'] = $this->sales_rep_location_model->get_distributors($visit_detail['zone_id']);
-        if($visit_detail['distributor_id']!='') {
-            $result  = $this->sales_rep_distributor_model->get_data2('', $visit_detail['distributor_id']);
-            //$distributor_name =$result[0]->distributor_name;
-            //$data['distributor_name']=$distributor_name; 
-        }
-        if($visit_detail['reation_id']!='') {
-            $result  = $this->sales_rep_location_model->get_store_name($visit_detail['reation_id']);
-            $store_name =$result[0]->store_name;
-            $data['store_name']=$store_name; 
-        }
-        if($visit_detail['zone_id']!='') {
-            $result  = $this->sales_rep_location_model->get_zone($visit_detail['zone_id']);
-            $zone=$result[0]->zone; 
-            $data['zone']=$zone;
-        }
-        if($visit_detail['area_id']!='') {
-            $result  = $this->sales_rep_location_model->get_area('',$visit_detail['area_id']);
-            $area=$result[0]->area; 
-            $data['area']=$area;
-        }
-        if($visit_detail['location_id']!='') {
-            $result  = $this->sales_rep_location_model->get_locations('','',$visit_detail['location_id']);
-            $location=$result[0]->location; 
-            $data['location']=$location;
-        }
+        // $data['distributor'] = $this->sales_rep_location_model->get_distributors($visit_detail['zone_id']);
+        // if($visit_detail['distributor_id']!='') {
+        //     $result  = $this->sales_rep_distributor_model->get_data2('', $visit_detail['distributor_id']);
+        //     //$distributor_name =$result[0]->distributor_name;
+        //     //$data['distributor_name']=$distributor_name; 
+        // }
+        // if($visit_detail['reation_id']!='') {
+        //     $result  = $this->sales_rep_location_model->get_store_name($visit_detail['reation_id']);
+        //     $store_name =$result[0]->store_name;
+        //     $data['store_name']=$store_name; 
+        // }
+        // if($visit_detail['zone_id']!='') {
+        //     $result  = $this->sales_rep_location_model->get_zone($visit_detail['zone_id']);
+        //     $zone=$result[0]->zone; 
+        //     $data['zone']=$zone;
+        // }
+        // if($visit_detail['area_id']!='') {
+        //     $result  = $this->sales_rep_location_model->get_area('',$visit_detail['area_id']);
+        //     $area=$result[0]->area; 
+        //     $data['area']=$area;
+        // }
+        // if($visit_detail['location_id']!='') {
+        //     $result  = $this->sales_rep_location_model->get_locations('','',$visit_detail['location_id']);
+        //     $location=$result[0]->location; 
+        //     $data['location']=$location;
+        // }
 
-        if($visit_detail['distributor_id']!='') {
-            $dist_id=explode('s_',$visit_detail['distributor_id']);
+        $data['margin']='';
+        $data['remarks']='';
+        $data['gst_number']='';
+
+        $distributor_id = $this->input->post('distributor_id');
+
+        if($distributor_id!='') {
+            $dist_id=explode('s_',$distributor_id);
             $get_result = $this->db->where('id',$dist_id[1])->select('*')->get('sales_rep_distributors')->result_array();
 
             if(count($get_result)>0) {
@@ -932,76 +1042,82 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
 
     public function add_order_api(){
         // $visit_detail = $this->session->userdata('visit_detail');
-        $visit_detail = $this->input->post('visit_detail');
+        // $visit_detail = $this->input->post('visit_detail');
+        // $visit_detail = json_decode($visit_detail, true);
 
         // $distributor_id = $this->session->userdata('distributor_id')
-        $distributor_id = $this->input->post('distributor_id');
+        // $distributor_id = $this->input->post('distributor_id');
 
-        $data['distributor'] = $this->sales_rep_location_model->get_distributors();
+        $mid = $this->input->post('mid');
+        $sales_rep_loc_id = $this->input->post('sales_rep_loc_id');
+        $merchandiser_stock_id = $this->input->post('merchandiser_stock_id');
 
-        if($visit_detail['mid']!='' || $visit_detail['sales_rep_loc_id']!='' || $visit_detail['merchandiser_stock_id']!='') { 
-            if($visit_detail['mid']!='') {
-                $visit_id=$visit_detail['mid'];
-            } else if($visit_detail['sales_rep_loc_id']!='') {
-                $visit_id=$visit_detail['sales_rep_loc_id'];
-            } else if($visit_detail['merchandiser_stock_id']!='') {
-                $visit_id=$visit_detail['merchandiser_stock_id'];
-            }
+        $data = array();
+        $data['data1'] = array();
+        $data['remarks'] = '';
 
-            $get_result = $this->db->where('visit_id',$visit_id)->select('selected_distributor')->get('sales_rep_orders')->result_array();
+        // $data['distributor'] = $this->sales_rep_location_model->get_distributors();
 
-            if(count($get_result)>0) {
-               $data['selected_distributor']=$get_result[0]['selected_distributor']; 
-            } else {
-                $data['selected_distributor']=0;
-            }
-        } else {
-            $data['selected_distributor']=0;
-        }
+        // if($visit_detail['mid']!='' || $visit_detail['sales_rep_loc_id']!='' || $visit_detail['merchandiser_stock_id']!='') { 
+        //     if($visit_detail['mid']!='') {
+        //         $visit_id=$visit_detail['mid'];
+        //     } else if($visit_detail['sales_rep_loc_id']!='') {
+        //         $visit_id=$visit_detail['sales_rep_loc_id'];
+        //     } else if($visit_detail['merchandiser_stock_id']!='') {
+        //         $visit_id=$visit_detail['merchandiser_stock_id'];
+        //     }
 
-        if($data['selected_distributor']==0 || $data['selected_distributor']=='') {
-            if($distributor_id!='') {
-                $data['selected_distributor']=$distributor_id;
-            }
-        }
+        //     $get_result = $this->db->where('visit_id',$visit_id)->select('selected_distributor')->get('sales_rep_orders')->result_array();
 
-        if($visit_detail['distributor_name']=='' && $visit_detail['reation_id']=='') {
-            $result  = $this->sales_rep_distributor_model->get_data2('',$visit_detail['distributor_id']);
-            $distributor_name =$result[0]->distributor_name;
-            $data['distributor_name']=$distributor_name; 
-        } else {
-            $data['distributor_name']=$visit_detail['distributor_name']; 
-        }
-        if($visit_detail['reation_id']!='') {
-            $result  = $this->distributor_sale_model->get_store($visit_detail['zone_id'],$visit_detail['reation_id']);
-            $store_name =$result[0]->store_name;
-            $data['store_name']=$store_name; 
-        }
-        if($visit_detail['zone_id']!='') {
-            $result  = $this->sales_rep_location_model->get_zone($visit_detail['zone_id']);
-            $zone=$result[0]->zone; 
-            $data['zone']=$zone;
-        }
-        if($visit_detail['area_id']!='') {
-            $result  = $this->sales_rep_location_model->get_area('',$visit_detail['area_id']);
-            $area=$result[0]->area; 
-            $data['area']=$area;
-        }
-        if($visit_detail['location_id']!='') {
-            $result  = $this->sales_rep_location_model->get_locations('','',$visit_detail['location_id']);
-            $location=$result[0]->location; 
-            $data['location']=$location;
-        }
+        //     if(count($get_result)>0) {
+        //        $data['selected_distributor']=$get_result[0]['selected_distributor']; 
+        //     } else {
+        //         $data['selected_distributor']=0;
+        //     }
+        // } else {
+        //     $data['selected_distributor']=0;
+        // }
 
-        $mid = '';
-        if(count($visit_detail)>0) {
-            if($visit_detail['mid']!='') {
-                $mid=$visit_detail['mid'];
-            } else if($visit_detail['sales_rep_loc_id']!='') {
-                 $mid=$visit_detail['sales_rep_loc_id'];
-            } else if($visit_detail['merchandiser_stock_id']!='') {
-                $mid=$visit_detail['merchandiser_stock_id'];
-            }
+        // if($data['selected_distributor']==0 || $data['selected_distributor']=='') {
+        //     if($distributor_id!='') {
+        //         $data['selected_distributor']=$distributor_id;
+        //     }
+        // }
+
+        // if($visit_detail['distributor_name']=='' && $visit_detail['reation_id']=='') {
+        //     $result  = $this->sales_rep_distributor_model->get_data2('',$visit_detail['distributor_id']);
+        //     $distributor_name =$result[0]->distributor_name;
+        //     $data['distributor_name']=$distributor_name; 
+        // } else {
+        //     $data['distributor_name']=$visit_detail['distributor_name']; 
+        // }
+        // if($visit_detail['reation_id']!='') {
+        //     $result  = $this->distributor_sale_model->get_store($visit_detail['zone_id'],$visit_detail['reation_id']);
+        //     $store_name =$result[0]->store_name;
+        //     $data['store_name']=$store_name; 
+        // }
+        // if($visit_detail['zone_id']!='') {
+        //     $result  = $this->sales_rep_location_model->get_zone($visit_detail['zone_id']);
+        //     $zone=$result[0]->zone; 
+        //     $data['zone']=$zone;
+        // }
+        // if($visit_detail['area_id']!='') {
+        //     $result  = $this->sales_rep_location_model->get_area('',$visit_detail['area_id']);
+        //     $area=$result[0]->area; 
+        //     $data['area']=$area;
+        // }
+        // if($visit_detail['location_id']!='') {
+        //     $result  = $this->sales_rep_location_model->get_locations('','',$visit_detail['location_id']);
+        //     $location=$result[0]->location; 
+        //     $data['location']=$location;
+        // }
+
+        if($mid!='') {
+            $mid=$mid;
+        } else if($sales_rep_loc_id!='') {
+             $mid=$sales_rep_loc_id;
+        } else if($merchandiser_stock_id!='') {
+            $mid=$merchandiser_stock_id;
         }
 
         if($mid!='') {
@@ -1011,9 +1127,9 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                 $order_id = $get_result[0]['id'];
                 $result = $this->db->query("Select A.id as stock_id,
                                             Case When type='Box' Then box_name ELSE product_name end as product_name,
-                                            Case When type='Box' Then CONCAT(qty,'_Box') ELSE CONCAT(qty,'_Bar') end as qty,item_id,type
+                                            Case When type='Box' Then CONCAT(qty,'_Box') ELSE CONCAT(qty,'_Bar') end as qty1,qty,item_id,type
                                             from
-                                            (SELECT * from sales_rep_order_items where sales_rep_order_id=$order_id) A
+                                            (SELECT * from sales_rep_order_items where sales_rep_order_id='$order_id') A
                                             Left join 
                                             (SELECT * from box_master)B on A.item_id=B.id
                                             Left join 
@@ -1091,18 +1207,19 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                             $order_detail['variety_box']=$result[$j]['qty'];
                     }
 
-                    $data['order_detail'] = $order_detail;
+                    // $data['order_detail'] = $order_detail;
+                    $data['data1'][0] = (object) $order_detail;
                 }
             }
         }
         
         // $temp_stock_details = $this->session->userdata('temp_stock_details');
-        $temp_stock_details = $this->input->post('temp_stock_details');
-        if($temp_stock_details!=null) {
-            $data['stock_detail']=$temp_stock_details;
-        }
+        // $temp_stock_details = $this->input->post('temp_stock_details');
+        // if($temp_stock_details!=null) {
+        //     $data['stock_detail']=$temp_stock_details;
+        // }
 
-        $data['get_retailers'] = $this->sales_rep_location_model->get_retailers();
+        // $data['get_retailers'] = $this->sales_rep_location_model->get_retailers();
 
         // load_view('sales_rep_order/sales_rep_order_details', $data);
 
@@ -1869,11 +1986,11 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                             $this->db->insert_batch('merchandiser_stock_details',$merchandiser_stock_details);    
                         }
 
-                        $sql = "Select max(sequence) as sequence from merchandiser_detailed_beat_plan WHERE date(date_of_visit)=date(now()) and sales_rep_id=$sales_rep_id and is_edit='edit' and frequency='$frequency'";
+                        $sql = "Select max(sequence) as sequence from merchandiser_detailed_beat_plan WHERE date(date_of_visit)=date(now()) and sales_rep_id='$sales_rep_id' and is_edit='edit' and frequency='$frequency'";
                         $get_maxcount = $this->db->query($sql)->result_array();
                         $visited_sequence = $get_maxcount[0]['sequence']+1;
 
-                        $sql = "select * from merchandiser_detailed_beat_plan Where sales_rep_id=$sales_rep_id and date(date_of_visit)=date(now()) and frequency='$frequency'";
+                        $sql = "select * from merchandiser_detailed_beat_plan Where sales_rep_id='$sales_rep_id' and date(date_of_visit)=date(now()) and frequency='$frequency'";
                         $detailed_result = $this->db->query($sql)->result_array();
                         if(count($detailed_result)>0) {
                             $sql = "select * from merchandiser_detailed_beat_plan Where sales_rep_id=$sales_rep_id and frequency='$frequency' and date(date_of_visit)=date(now()) ";
@@ -1901,7 +2018,7 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                             $this->db->where($where);
                             $this->db->update('merchandiser_detailed_beat_plan',$data);
                         } else {
-                            $sql = "select * from merchandiser_beat_plan Where sales_rep_id=$sales_rep_id and frequency='$frequency'";
+                            $sql = "select * from merchandiser_beat_plan Where sales_rep_id='$sales_rep_id' and frequency='$frequency'";
                             $result = $this->db->query($sql)->result_array();
                             for ($j=0; $j < count($result); $j++) { 
                                 if($result[$j]['sequence']<$sequence) {
@@ -1943,7 +2060,7 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                                 }
                             }
 
-                            $sql = "select * from merchandiser_beat_plan Where sales_rep_id=$sales_rep_id and frequency='$frequency' and sequence=$sequence";
+                            $sql = "select * from merchandiser_beat_plan Where sales_rep_id='$sales_rep_id' and frequency='$frequency' and sequence='$sequence'";
                             $result = $this->db->query($sql)->result_array();
                             $data = array('date_of_visit'=> $now,
                                             'sales_rep_id'=>$sales_rep_id,
@@ -1960,7 +2077,7 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                             $detailed_insert_id = $this->db->insert_id();
                         }
 
-                        $ispermenant  ='Yes';    
+                        $ispermenant ='Yes';    
                         if($ispermenant=='Yes' || $place_order=='Yes') {
                             $count_spdb_sql = "select count(*) as count from merchandiser_detailed_beat_plan Where sales_rep_id=$sales_rep_id and frequency='$frequency' and bit_plan_id=0 and date(date_of_visit)=date(now())";
                             $result_spdb_count = $this->db->query($count_spdb_sql)->result_array();
@@ -2273,8 +2390,6 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                     $this->db->where("id",$visit_id)->update('merchandiser_stock',$update_sales_location); 
                 }
             } else {
-                $sales_rep_stock_detail = $sales_rep_stock_detail;
-
                 if($visit_detail['follow_type']!='') {
                     if($save=='') $dist_status = 'Place Order';
                     else $dist_status = 'Not Intrested';
@@ -2284,7 +2399,7 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                     $data = array('is_visited'=>1, 'remarks'=>trim($visit_detail['remarks']));
 
                     $this->db->where('id',$visit_detail['sales_rep_loc_id'])->update('sales_rep_location',$data);
-                    $visit_id = $sales_rep_loc_id=$visit_detail['sales_rep_loc_id'];  
+                    $visit_id = $sales_rep_loc_id = $visit_detail['sales_rep_loc_id'];  
 
                     $sales_rep_stock_detail['sales_rep_loc_id'] = $sales_rep_loc_id;
 
@@ -3025,11 +3140,11 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
         // $this->session->unset_userdata('sales_rep_stock_detail');
         // redirect(base_url().'index.php/Sales_rep_store_plan');
 
-        $data['visit_detail'] = $visit_detail;
-        $data['retailer_detail'] = $retailer_detail;
-        // $data['temp_stock_details'] = $temp_stock_details;
-        $data['merchandiser_stock_details'] = $merchandiser_stock_details;
-        $data['sales_rep_stock_detail'] = $sales_rep_stock_detail;
+        // $data['visit_detail'] = $visit_detail;
+        // $data['retailer_detail'] = $retailer_detail;
+        // // $data['temp_stock_details'] = $temp_stock_details;
+        // $data['merchandiser_stock_details'] = $merchandiser_stock_details;
+        // $data['sales_rep_stock_detail'] = $sales_rep_stock_detail;
 
         echo '1';
     }
