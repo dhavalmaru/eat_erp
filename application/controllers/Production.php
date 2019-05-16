@@ -45,6 +45,23 @@ class Production extends CI_Controller {
         echo $notification_date;
     }
 
+    public function test_send_mail(){
+        $subject = 'Request for Confirmation of Production - ';
+        $message = '<html><body>
+                    Hi, <br/><br/> 
+                    Request you to confirm the production availability for the below mentioned dates.<br/><br/>
+                    Dates - <br/>
+                    Total No of Days - <br/>
+                    Remarks - <br/><br/>
+                    Please confirm the same asap so that we can start the Raw Material Procurement asap. 
+                    Also please send us the closing stock of Raw Material immediately.<br/><br/>
+                    Team EAT Anytime<br/><br/>
+                    </body></html>';
+
+        $mailSent=send_email_new('prasad.bhisale@pecanreams.com',  'Wholesome Habits Pvt Ltd', 'prasad.bhisale@pecanreams.com', $subject, $message, 'prasad.bhisale@pecanreams.com', 'prasad.bhisale@pecanreams.com');
+        echo $mailSent;
+    }
+
     public function checkstatus($status=''){
         $result=$this->production_model->get_access();
         $selectedstatus="Select Status";

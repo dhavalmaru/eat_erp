@@ -31,8 +31,8 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
         $temp_date = urldecode($this->input->post('temp_date'));
 
         // $sales_rep_id = '2';
-        // $frequency = 'Friday';
-        // $temp_date = '03';
+        // $frequency = 'Monday';
+        // $temp_date = '06';
 
         switch ($frequency) {
             case 'Monday':
@@ -114,7 +114,7 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
         // $distributor_id = '1298';
         // $beat_id = '2';
         
-        // $id = '6567';
+        // $id = '2753';
         // $get_channel_type = 'GT';
         // $follow_type = '';
         // $sales_rep_id = '2';
@@ -505,14 +505,14 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
 
         // $data['data1'] = ['id'=>$id, 'get_channel_type'=>$get_channel_type, 'sales_rep_id'=>$sales_rep_id, 'distributor_id'=>$distributor_id, 'beat_id'=>$beat_id, 'temp'=>$temp];
 
-        // $id = '2746';
+        // $id = '2774';
         // $get_channel_type = 'GT';
         // $sales_rep_id = '2';
         // $distributor_id = '1298';
         // $beat_id = '1';
         // $temp = '';
 
-        // $id = '2734';
+        // $id = '2750';
         // $get_channel_type = 'GT';
         // $sales_rep_id = '2';
         // $distributor_id = '1298';
@@ -552,24 +552,29 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
             //     $data['stock_detail']=$this->session->userdata('temp_stock_details');
             // } else {
                 $result = $this->db->query("SELECT id as stock_id ,sales_rep_loc_id,
-                    case When orange_bar IS NOT NULL and orange_bar!=0 Then CONCAT(orange_bar,'_Bar') end as orange_bar,
-                    case When orange_box IS NOT NULL and orange_box!=0 Then CONCAT(orange_box,'_Box')  end as orange_box,
-                    case When mint_bar IS NOT NULL and mint_bar!=0 Then CONCAT(mint_bar,'_Bar') end as mint_bar,
-                    case When mint_box IS NOT NULL and mint_box!=0 Then CONCAT(mint_box,'_Box') end as mint_box,
-                    case When butterscotch_bar IS NOT NULL and butterscotch_bar!=0 Then CONCAT(butterscotch_bar,'_Bar') end as butterscotch_bar,
-                    case When butterscotch_box IS NOT NULL and butterscotch_box!=0 Then CONCAT(butterscotch_box,'_Box')  end as butterscotch_box,
-                    case When chocopeanut_bar IS NOT NULL and chocopeanut_bar!=0 Then CONCAT(chocopeanut_bar,'_Bar') end as chocopeanut_bar,
-                    case When chocopeanut_box IS NOT NULL and chocopeanut_box!=0 Then CONCAT(chocopeanut_box,'_Box') end as chocopeanut_box,
-                    case When bambaiyachaat_bar IS NOT NULL and bambaiyachaat_bar!=0 Then CONCAT(bambaiyachaat_bar,'_Bar') end as bambaiyachaat_bar,
-                    case When bambaiyachaat_box IS NOT NULL and bambaiyachaat_box!=0 Then CONCAT(bambaiyachaat_box,'_Box')  end as bambaiyachaat_box,
-                    case When mangoginger_bar IS NOT NULL and mangoginger_bar!=0 Then CONCAT(mangoginger_bar,'_Bar')  end as mangoginger_bar,
-                    case When mangoginger_box IS NOT NULL and mangoginger_box!=0 Then CONCAT(mangoginger_box,'_Box') end as mangoginger_box,
-                    case When berry_blast_bar IS NOT NULL and berry_blast_bar!=0 Then CONCAT(berry_blast_bar,'_Bar') end as berry_blast_bar,
-                    case When berry_blast_box IS NOT NULL and berry_blast_box!=0 Then CONCAT(berry_blast_box,'_Box')end as berry_blast_box,
-                    case When chyawanprash_bar IS NOT NULL and chyawanprash_bar!=0 Then CONCAT(chyawanprash_bar,'_Bar') end as chyawanprash_bar,
-                    case When chyawanprash_box IS NOT NULL and chyawanprash_box!=0 Then CONCAT(chyawanprash_box,'_Box') end as chyawanprash_box, 
-                    chocolate_cookies_box,cranberry_orange_box,dark_chocolate_cookies_box,fig_raisins_box,papaya_pineapple_box,variety_box,
-                    cranberry_cookies_box,sales_rep_loc_id from  sales_rep_distributor_opening_stock 
+                    case When orange_bar IS NOT NULL and orange_bar!=0 Then CONCAT(orange_bar,'_Bar') else 0 end as orange_bar,
+                    case When orange_box IS NOT NULL and orange_box!=0 Then CONCAT(orange_box,'_Box') else 0 end as orange_box,
+                    case When mint_bar IS NOT NULL and mint_bar!=0 Then CONCAT(mint_bar,'_Bar') else 0 end as mint_bar,
+                    case When mint_box IS NOT NULL and mint_box!=0 Then CONCAT(mint_box,'_Box') else 0 end as mint_box,
+                    case When butterscotch_bar IS NOT NULL and butterscotch_bar!=0 Then CONCAT(butterscotch_bar,'_Bar') else 0 end as butterscotch_bar,
+                    case When butterscotch_box IS NOT NULL and butterscotch_box!=0 Then CONCAT(butterscotch_box,'_Box') else 0 end as butterscotch_box,
+                    case When chocopeanut_bar IS NOT NULL and chocopeanut_bar!=0 Then CONCAT(chocopeanut_bar,'_Bar') else 0 end as chocopeanut_bar,
+                    case When chocopeanut_box IS NOT NULL and chocopeanut_box!=0 Then CONCAT(chocopeanut_box,'_Box') else 0 end as chocopeanut_box,
+                    case When bambaiyachaat_bar IS NOT NULL and bambaiyachaat_bar!=0 Then CONCAT(bambaiyachaat_bar,'_Bar') else 0 end as bambaiyachaat_bar,
+                    case When bambaiyachaat_box IS NOT NULL and bambaiyachaat_box!=0 Then CONCAT(bambaiyachaat_box,'_Box') else 0 end as bambaiyachaat_box,
+                    case When mangoginger_bar IS NOT NULL and mangoginger_bar!=0 Then CONCAT(mangoginger_bar,'_Bar') else 0 end as mangoginger_bar,
+                    case When mangoginger_box IS NOT NULL and mangoginger_box!=0 Then CONCAT(mangoginger_box,'_Box') else 0 end as mangoginger_box,
+                    case When berry_blast_bar IS NOT NULL and berry_blast_bar!=0 Then CONCAT(berry_blast_bar,'_Bar') else 0 end as berry_blast_bar,
+                    case When berry_blast_box IS NOT NULL and berry_blast_box!=0 Then CONCAT(berry_blast_box,'_Box') else 0 end as berry_blast_box,
+                    case When chyawanprash_bar IS NOT NULL and chyawanprash_bar!=0 Then CONCAT(chyawanprash_bar,'_Bar') else 0 end as chyawanprash_bar, 
+                    case When chyawanprash_box IS NOT NULL and chyawanprash_box!=0 Then CONCAT(chyawanprash_box,'_Box') else 0 end as chyawanprash_box, 
+                    case When chocolate_cookies_box IS NOT NULL and chocolate_cookies_box!=0 Then chocolate_cookies_box else 0 end as chocolate_cookies_box, 
+                    case When cranberry_orange_box IS NOT NULL and cranberry_orange_box!=0 Then cranberry_orange_box else 0 end as cranberry_orange_box, 
+                    case When dark_chocolate_cookies_box IS NOT NULL and dark_chocolate_cookies_box!=0 Then dark_chocolate_cookies_box else 0 end as dark_chocolate_cookies_box, 
+                    case When fig_raisins_box IS NOT NULL and fig_raisins_box!=0 Then fig_raisins_box else 0 end as fig_raisins_box, 
+                    case When papaya_pineapple_box IS NOT NULL and papaya_pineapple_box!=0 Then papaya_pineapple_box else 0 end as papaya_pineapple_box, 
+                    case When variety_box IS NOT NULL and variety_box!=0 Then variety_box else 0 end as variety_box, 
+                    case When cranberry_cookies_box IS NOT NULL and cranberry_cookies_box!=0 Then cranberry_cookies_box else 0 end as cranberry_cookies_box, sales_rep_loc_id from  sales_rep_distributor_opening_stock 
                     Where sales_rep_loc_id='$sales_rep_loc_id'")->result_array();
                 $data['stock_detail']=$result[0];
 
@@ -590,8 +595,8 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
             // } else {
                 $result = $this->db->query("Select A.id as stock_id ,merchandiser_stock_id as visit_id,
                                 Case When type='Box' Then box_name ELSE product_name end as product_name,
-                                Case When type='Box' Then CONCAT(qty,'_Box') ELSE CONCAT(qty,'_Bar') end as qty,
-                                item_id,type,qty as qty1 
+                                Case When type='Box' Then CONCAT(ifnull(qty,0),'_Box') ELSE CONCAT(ifnull(qty,0),'_Bar') end as qty,
+                                item_id,type,ifnull(qty,0) as qty1 
                                 from
                                 (SELECT * from merchandiser_stock_details where merchandiser_stock_id=$merchandiser_stock_id) A 
                                 Left join 
@@ -744,7 +749,26 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
         }
 
         $data = $this->sales_rep_location_model->get_po_nos($zone_id, $store_id, $location_id);
-        echo json_encode($data); 
+        echo json_encode($data);
+    }
+
+    public function get_pending_po_nos_api(){
+        $zone_id='';
+        $store_id='';
+        $location_id='';
+
+        if($this->input->post('zone_id')){
+            $zone_id=urldecode($this->input->post('zone_id'));
+        }
+        if($this->input->post('store_id')){
+            $store_id=urldecode($this->input->post('store_id'));
+        }
+        if($this->input->post('location_id')){
+            $location_id=urldecode($this->input->post('location_id'));
+        }
+
+        $data = $this->sales_rep_location_model->get_pending_po_nos($zone_id, $store_id, $location_id);
+        echo json_encode($data);
     }
 
     public function get_po_data_api(){ 
@@ -767,7 +791,7 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
         }
 
         $data = $this->sales_rep_location_model->get_po_data($zone_id, $store_id, $location_id, $po_id);
-        echo json_encode($data); 
+        echo json_encode($data);
     }
 
     public function save_api($id=""){
@@ -1038,6 +1062,28 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
         // echo json_encode($visit_detail['Bundle']);
         // echo '<br/><br/>';
         // echo $visit_detail['bundle']['mid'];
+    }
+
+    public function get_order_api(){
+        $sales_rep_id='';
+
+        if($this->input->post('sales_rep_id')){
+            $sales_rep_id=urldecode($this->input->post('sales_rep_id'));
+        }
+
+        $data['data'] = $this->Sales_location_model->get_todaysorder($sales_rep_id);;
+        echo json_encode($data);
+    }
+
+    function get_order_data_api(){
+        $order_id='797';
+
+        if($this->input->post('order_id')){
+            $order_id=urldecode($this->input->post('order_id'));
+        }
+
+        $data = $this->sales_rep_location_model->get_order_data($order_id);
+        echo json_encode($data);
     }
 
     public function add_order_api(){
@@ -2776,6 +2822,31 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                                                 and date(m2.date_of_visit)=date(now())";
                                         $result = $this->db->query($sql);
                                     } else {
+                                        if($visited_sequence==1) {
+                                            $sql = "select * from sales_rep_beat_plan Where sales_rep_id=$sales_rep_id and frequency='$frequency'";
+                                            $result = $this->db->query($sql)->result_array();
+                                            for ($j=0; $j < count($result); $j++) {
+                                                $new_id = $result[$j]['id'];
+                                                $store_id1 = $result[$j]['store_id'];
+                                                $zone_id = $result[$j]['zone_id'];
+                                                $area_id = $result[$j]['area_id'];
+                                                $location_id = $result[$j]['location_id'];
+                                                $newsequence = $result[$j]['sequence']+1;
+                                                $data22 = array('date_of_visit'=> $now,
+                                                      'sales_rep_id'=>$sales_rep_id,
+                                                      'sequence'=>$newsequence,
+                                                      'frequency'=>$frequency,
+                                                      'modified_on'=>$now,
+                                                      'bit_plan_id'=>$new_id,
+                                                      'store_id'=>$store_id1,
+                                                      'location_id' => $location_id,
+                                                       'zone_id' => $zone_id,
+                                                       'area_id' => $area_id,
+                                                      'status'=>'Approved');
+                                                $this->db->insert('sales_rep_detailed_beat_plan',$data22);
+                                            }
+                                        }
+
                                         $data2 = array('sales_rep_id'=>$sales_rep_id,
                                                         'sequence'=>$visited_sequence,
                                                         'frequency'=>$frequency,

@@ -52,7 +52,15 @@ function get_data($status='', $id=''){
         }
     }
 
-    $sql = "select * , id as mid,distributor_id as store_id from sales_rep_location".$cond."  order by modified_on desc";
+    $sql = "select distinct G.*, I.zone, J.area, K.location, '' as bit_plan_id, '' as sequence from 
+            (select *, id as mid, distributor_id as store_id, distributor_name as store_name 
+            from sales_rep_location".$cond.") G 
+            left join 
+            (select * from zone_master) I on (G.zone_id=I.id) 
+            left join 
+            (select * from area_master) J on (G.area_id=J.id) 
+            left join 
+            (select * from location_master) K on (G.location_id=K.id) order by G.modified_on desc";
     $query=$this->db->query($sql);
     return $query->result();
 }
@@ -95,7 +103,19 @@ function get_mt_data($status='', $id=''){
 }
 
 function get_data_qty($status='', $id=''){
-    $sql = "select * from sales_rep_distributor_opening_stock where sales_rep_loc_id='$id'";
+    $sql = "select id, sales_rep_loc_id, ifnull(orange_bar,0) as orange_bar, ifnull(mint_bar,0) as mint_bar, 
+            ifnull(butterscotch_bar,0) as butterscotch_bar, ifnull(chocopeanut_bar,0) as chocopeanut_bar, 
+            ifnull(bambaiyachaat_bar,0) as bambaiyachaat_bar, ifnull(mangoginger_bar,0) as mangoginger_bar, 
+            ifnull(berry_blast_bar,0) as berry_blast_bar, ifnull(chyawanprash_bar,0) as chyawanprash_bar, 
+            ifnull(chocolate_cookies_box,0) as chocolate_cookies_box, ifnull(cranberry_orange_box,0) as cranberry_orange_box, 
+            ifnull(dark_chocolate_cookies_box,0) as dark_chocolate_cookies_box, ifnull(fig_raisins_box,0) as fig_raisins_box, 
+            ifnull(papaya_pineapple_box,0) as papaya_pineapple_box, ifnull(variety_box,0) as variety_box, 
+            ifnull(mint_box,0) as mint_box, ifnull(butterscotch_box,0) as butterscotch_box, 
+            ifnull(chocopeanut_box,0) as chocopeanut_box, ifnull(bambaiyachaat_box,0) as bambaiyachaat_box, 
+            ifnull(berry_blast_box,0) as berry_blast_box, ifnull(mangoginger_box,0) as mangoginger_box, 
+            ifnull(cranberry_cookies_box,0) as cranberry_cookies_box, ifnull(orange_box,0) as orange_box, 
+            ifnull(chyawanprash_box,0) as chyawanprash_box 
+            from sales_rep_distributor_opening_stock where sales_rep_loc_id='$id'";
     $query=$this->db->query($sql);
     return $query->result();
 }
@@ -497,10 +517,26 @@ function get_location_data($store_id, $zone_id, $id){
 }
 
 function get_po_nos($zone_id, $store_id, $location_id){
-    $sql = "select distinct id, po_number from distributor_po 
-            where status='Approved' and delivery_status='Pending' and delivery_through='Distributor' and 
-                (mismatch is null or mismatch!=1) and type_id='7' and zone_id='$zone_id' and 
-                store_id='$store_id' and location_id='$location_id' order by id desc";
+    $sql = "select distinct A.id, A.po_number 
+            from distributor_po A 
+            left join distributor_po_delivered_items B on (A.id=B.distributor_po_id) 
+            where A.status='Approved' and A.delivery_through='Distributor' and ((A.delivery_status='Pending' and 
+                (A.mismatch is null or A.mismatch!=1)) or (A.delivery_status='Delivered' and A.mismatch=1)) and 
+                A.type_id='7' and A.zone_id='$zone_id' and A.store_id='$store_id' and A.location_id='$location_id' and 
+                B.distributor_po_id is not null 
+            order by A.id desc";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_pending_po_nos($zone_id, $store_id, $location_id){
+    $sql = "select distinct A.id, A.po_number, A.modified_on 
+            from distributor_po A 
+            left join distributor_po_delivered_items B on (A.id=B.distributor_po_id) 
+            where A.status='Approved' and A.delivery_status='Delivered' and A.delivery_through='Distributor' and 
+                A.mismatch=1 and A.mismatch_type='Physical' and A.type_id='7' and A.zone_id='$zone_id' and 
+                A.store_id='$store_id' and A.location_id='$location_id' and B.distributor_po_id is not null 
+            order by A.id desc";
     $query=$this->db->query($sql);
     return $query->result();
 }
@@ -517,8 +553,101 @@ function get_po_data($zone_id, $store_id, $location_id, $po_id){
                 sum(E.variety_box_qty) as variety_box_qty, sum(E.chocolate_cookies_qty) as chocolate_cookies_qty, 
                 sum(E.dark_chocolate_cookies_qty) as dark_chocolate_cookies_qty, sum(E.cranberry_cookies_qty) as cranberry_cookies_qty, 
                 sum(E.cranberry_orange_zest_qty) as cranberry_orange_zest_qty, sum(E.fig_raisins_qty) as fig_raisins_qty, 
-                sum(E.papaya_pineapple_qty) as papaya_pineapple_qty from 
+                sum(E.papaya_pineapple_qty) as papaya_pineapple_qty, 
+                sum(E.orange_bar_physical_qty) as orange_bar_physical_qty, 
+                sum(E.butterscotch_bar_physical_qty) as butterscotch_bar_physical_qty, 
+                sum(E.chocopeanut_bar_physical_qty) as chocopeanut_bar_physical_qty, 
+                sum(E.bambaiyachaat_bar_physical_qty) as bambaiyachaat_bar_physical_qty, 
+                sum(E.mangoginger_bar_physical_qty) as mangoginger_bar_physical_qty, 
+                sum(E.berry_blast_bar_physical_qty) as berry_blast_bar_physical_qty, 
+                sum(E.chyawanprash_bar_physical_qty) as chyawanprash_bar_physical_qty, 
+                sum(E.orange_box_physical_qty) as orange_box_physical_qty, 
+                sum(E.butterscotch_box_physical_qty) as butterscotch_box_physical_qty, 
+                sum(E.chocopeanut_box_physical_qty) as chocopeanut_box_physical_qty, 
+                sum(E.bambaiyachaat_box_physical_qty) as bambaiyachaat_box_physical_qty, 
+                sum(E.mangoginger_box_physical_qty) as mangoginger_box_physical_qty, 
+                sum(E.berry_blast_box_physical_qty) as berry_blast_box_physical_qty, 
+                sum(E.chyawanprash_box_physical_qty) as chyawanprash_box_physical_qty, 
+                sum(E.variety_box_physical_qty) as variety_box_physical_qty, 
+                sum(E.chocolate_cookies_physical_qty) as chocolate_cookies_physical_qty, 
+                sum(E.dark_chocolate_cookies_physical_qty) as dark_chocolate_cookies_physical_qty, 
+                sum(E.cranberry_cookies_physical_qty) as cranberry_cookies_physical_qty, 
+                sum(E.cranberry_orange_zest_physical_qty) as cranberry_orange_zest_physical_qty, 
+                sum(E.fig_raisins_physical_qty) as fig_raisins_physical_qty, 
+                sum(E.papaya_pineapple_physical_qty) as papaya_pineapple_physical_qty from 
             (select D.id, D.po_number, 
+                case when D.type='Bar' and D.item_id='1' then D.tot_qty else 0 end as orange_bar_qty, 
+                case when D.type='Bar' and D.item_id='3' then D.tot_qty else 0 end as butterscotch_bar_qty, 
+                case when D.type='Bar' and D.item_id='5' then D.tot_qty else 0 end as chocopeanut_bar_qty, 
+                case when D.type='Bar' and D.item_id='4' then D.tot_qty else 0 end as bambaiyachaat_bar_qty, 
+                case when D.type='Bar' and D.item_id='6' then D.tot_qty else 0 end as mangoginger_bar_qty, 
+                case when D.type='Bar' and D.item_id='9' then D.tot_qty else 0 end as berry_blast_bar_qty, 
+                case when D.type='Bar' and D.item_id='10' then D.tot_qty else 0 end as chyawanprash_bar_qty, 
+                case when D.type='Box' and D.item_id='1' then D.tot_qty else 0 end as orange_box_qty, 
+                case when D.type='Box' and D.item_id='3' then D.tot_qty else 0 end as butterscotch_box_qty, 
+                case when D.type='Box' and D.item_id='9' then D.tot_qty else 0 end as chocopeanut_box_qty, 
+                case when D.type='Box' and D.item_id='8' then D.tot_qty else 0 end as bambaiyachaat_box_qty, 
+                case when D.type='Box' and D.item_id='12' then D.tot_qty else 0 end as mangoginger_box_qty, 
+                case when D.type='Box' and D.item_id='29' then D.tot_qty else 0 end as berry_blast_box_qty, 
+                case when D.type='Box' and D.item_id='31' then D.tot_qty else 0 end as chyawanprash_box_qty, 
+                case when D.type='Box' and D.item_id='32' then D.tot_qty else 0 end as variety_box_qty, 
+                case when D.type='Box' and D.item_id='37' then D.tot_qty else 0 end as chocolate_cookies_qty, 
+                case when D.type='Box' and D.item_id='38' then D.tot_qty else 0 end as dark_chocolate_cookies_qty, 
+                case when D.type='Box' and D.item_id='39' then D.tot_qty else 0 end as cranberry_cookies_qty, 
+                case when D.type='Box' and D.item_id='42' then D.tot_qty else 0 end as cranberry_orange_zest_qty, 
+                case when D.type='Box' and D.item_id='41' then D.tot_qty else 0 end as fig_raisins_qty, 
+                case when D.type='Box' and D.item_id='40' then D.tot_qty else 0 end as papaya_pineapple_qty, 
+                case when D.type='Bar' and D.item_id='1' then D.tot_physical_qty else 0 end as orange_bar_physical_qty, 
+                case when D.type='Bar' and D.item_id='3' then D.tot_physical_qty else 0 end as butterscotch_bar_physical_qty, 
+                case when D.type='Bar' and D.item_id='5' then D.tot_physical_qty else 0 end as chocopeanut_bar_physical_qty, 
+                case when D.type='Bar' and D.item_id='4' then D.tot_physical_qty else 0 end as bambaiyachaat_bar_physical_qty, 
+                case when D.type='Bar' and D.item_id='6' then D.tot_physical_qty else 0 end as mangoginger_bar_physical_qty, 
+                case when D.type='Bar' and D.item_id='9' then D.tot_physical_qty else 0 end as berry_blast_bar_physical_qty, 
+                case when D.type='Bar' and D.item_id='10' then D.tot_physical_qty else 0 end as chyawanprash_bar_physical_qty, 
+                case when D.type='Box' and D.item_id='1' then D.tot_physical_qty else 0 end as orange_box_physical_qty, 
+                case when D.type='Box' and D.item_id='3' then D.tot_physical_qty else 0 end as butterscotch_box_physical_qty, 
+                case when D.type='Box' and D.item_id='9' then D.tot_physical_qty else 0 end as chocopeanut_box_physical_qty, 
+                case when D.type='Box' and D.item_id='8' then D.tot_physical_qty else 0 end as bambaiyachaat_box_physical_qty, 
+                case when D.type='Box' and D.item_id='12' then D.tot_physical_qty else 0 end as mangoginger_box_physical_qty, 
+                case when D.type='Box' and D.item_id='29' then D.tot_physical_qty else 0 end as berry_blast_box_physical_qty, 
+                case when D.type='Box' and D.item_id='31' then D.tot_physical_qty else 0 end as chyawanprash_box_physical_qty, 
+                case when D.type='Box' and D.item_id='32' then D.tot_physical_qty else 0 end as variety_box_physical_qty, 
+                case when D.type='Box' and D.item_id='37' then D.tot_physical_qty else 0 end as chocolate_cookies_physical_qty, 
+                case when D.type='Box' and D.item_id='38' then D.tot_physical_qty else 0 end as dark_chocolate_cookies_physical_qty, 
+                case when D.type='Box' and D.item_id='39' then D.tot_physical_qty else 0 end as cranberry_cookies_physical_qty, 
+                case when D.type='Box' and D.item_id='42' then D.tot_physical_qty else 0 end as cranberry_orange_zest_physical_qty, 
+                case when D.type='Box' and D.item_id='41' then D.tot_physical_qty else 0 end as fig_raisins_physical_qty, 
+                case when D.type='Box' and D.item_id='40' then D.tot_physical_qty else 0 end as papaya_pineapple_physical_qty 
+            from
+            (select C.id, C.po_number, C.type, C.item_id, sum(C.qty) as tot_qty, sum(physical_qty) as tot_physical_qty from 
+            (select A.id, A.po_number, B.type, B.item_id, B.qty, C.qty as physical_qty 
+            from distributor_po A 
+            left join distributor_po_delivered_items B on (A.id=B.distributor_po_id) 
+            left join distributor_po_physical_items C on (A.id=C.distributor_po_id and B.type=C.type and B.item_id=C.item_id) 
+            where A.status='Approved' and A.delivery_through='Distributor' and ((A.delivery_status='Pending' and 
+                (A.mismatch is null or A.mismatch!=1)) or (A.delivery_status='Delivered' and A.mismatch=1)) and 
+                A.type_id='7' and A.zone_id='$zone_id' and A.store_id='$store_id' and A.location_id='$location_id' and 
+                A.id='$po_id') C 
+            group by C.id, C.po_number, C.type, C.item_id) D) E group by E.id, E.po_number";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_order_data($order_id){
+    $sql = "select E.id, sum(E.orange_bar_qty) as orange_bar_qty, 
+                sum(E.butterscotch_bar_qty) as butterscotch_bar_qty, sum(E.chocopeanut_bar_qty) as chocopeanut_bar_qty, 
+                sum(E.bambaiyachaat_bar_qty) as bambaiyachaat_bar_qty, 
+                sum(E.mangoginger_bar_qty) as mangoginger_bar_qty, sum(E.berry_blast_bar_qty) as berry_blast_bar_qty, 
+                sum(E.chyawanprash_bar_qty) as chyawanprash_bar_qty, sum(E.orange_box_qty) as orange_box_qty, 
+                sum(E.butterscotch_box_qty) as butterscotch_box_qty, sum(E.chocopeanut_box_qty) as chocopeanut_box_qty, 
+                sum(E.bambaiyachaat_box_qty) as bambaiyachaat_box_qty, sum(E.mangoginger_box_qty) as mangoginger_box_qty, 
+                sum(E.berry_blast_box_qty) as berry_blast_box_qty, sum(E.chyawanprash_box_qty) as chyawanprash_box_qty, 
+                sum(E.variety_box_qty) as variety_box_qty, sum(E.chocolate_cookies_qty) as chocolate_cookies_qty, 
+                sum(E.dark_chocolate_cookies_qty) as dark_chocolate_cookies_qty, 
+                sum(E.cranberry_cookies_qty) as cranberry_cookies_qty, 
+                sum(E.cranberry_orange_zest_qty) as cranberry_orange_zest_qty, sum(E.fig_raisins_qty) as fig_raisins_qty, 
+                sum(E.papaya_pineapple_qty) as papaya_pineapple_qty from 
+            (select D.id, 
                 case when D.type='Bar' and D.item_id='1' then D.tot_qty else 0 end as orange_bar_qty, 
                 case when D.type='Bar' and D.item_id='3' then D.tot_qty else 0 end as butterscotch_bar_qty, 
                 case when D.type='Bar' and D.item_id='5' then D.tot_qty else 0 end as chocopeanut_bar_qty, 
@@ -541,13 +670,11 @@ function get_po_data($zone_id, $store_id, $location_id, $po_id){
                 case when D.type='Box' and D.item_id='41' then D.tot_qty else 0 end as fig_raisins_qty, 
                 case when D.type='Box' and D.item_id='40' then D.tot_qty else 0 end as papaya_pineapple_qty 
             from
-            (select C.id, C.po_number, C.type, C.item_id, sum(C.qty) as tot_qty from 
-            (select A.id, A.po_number, B.type, B.item_id, B.qty from 
-                distributor_po A left join distributor_po_delivered_items B on (A.id = B.distributor_po_id) 
-            where A.status='Approved' and A.delivery_status='Pending' and A.delivery_through='Distributor' and 
-                (A.mismatch is null or A.mismatch!=1) and A.type_id='7' and A.zone_id='$zone_id' and 
-                A.store_id='$store_id' and A.location_id='$location_id' and A.id='$po_id') C 
-            group by C.id, C.po_number, C.type, C.item_id) D) E group by E.id, E.po_number";
+            (select C.id, C.item_id, C.type, sum(C.qty) as tot_qty from 
+            (select A.id, B.item_id, B.type, B.qty from sales_rep_orders A 
+            left join sales_rep_order_items B on (A.id=B.sales_rep_order_id) 
+            where A.id='$order_id') C 
+            group by C.id, C.item_id, C.type) D) E group by E.id";
     $query=$this->db->query($sql);
     return $query->result();
 }
@@ -997,7 +1124,7 @@ function save_po_qty(){
         }
     }
 
-    $this->send_po_physical_confirmation_email($po_id, $mismatch);
+    // $this->send_po_physical_confirmation_email($po_id, $mismatch);
 
     $logarray['table_id']=$po_id;
     $logarray['module_name']='Distributor_PO';
@@ -1005,7 +1132,7 @@ function save_po_qty(){
     $logarray['action']=$action;
     $this->user_access_log_model->insertAccessLog($logarray);
 
-    return 1;
+    return $mismatch;
 }
 
 function send_po_physical_confirmation_email($id='', $mismatch='') {

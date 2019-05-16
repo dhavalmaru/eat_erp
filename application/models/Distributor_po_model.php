@@ -1022,47 +1022,51 @@ function set_delivery_status() {
 }
 
 function generate_po_delivery_report() {
-    $sql = "Select Distinct * from (Select * from 
-    (select AA.id, AA.date_of_po, AA.po_expiry_date, AA.order_no as po_number, AA.status, AA.remarks, 
-        AA.estimate_delivery_date, AA.tracking_id, AA.dispatch_date, 
-        Case When (AA.delivery_status='Delivered Not Complete' and AA.status='Approved') Then 'Delivered' 
-            When ((AA.delivery_status='Pending' and AA.status='Approved') OR (AA.delivery_status='Pending' and AA.status='pending')) Then 'Inprocess'
-            When (AA.status='Inactive' OR AA.status='Rejected' and distributor_po_id IS NOT NULL) Then 'Cancelled'
-            Else AA.delivery_status end as delivery_status, AA.delivery_through, 
-        AA.delivery_date, case when AA.delivery_remarks is null or AA.delivery_remarks = '' then AA.remarks else AA.delivery_remarks end as delivery_remarks, 
-        AA.days_to_expiry, AA.distributor_id, AA.distributor_name, 
-        '' as store_name , AA.location, AA.item_type, AA.item_id,
-        Case When (AA.status='Inactive' OR AA.status='Rejected' and distributor_po_id IS NOT NULL) Then AA.modified_on Else AA.cancelled_date end as cancelled_date, 
-        sum(AA.item_qty) as tot_qty , AA.date_of_processing,AA.distributor_po_id,AA.comments from 
-        (select A.*, datediff(A.po_expiry_date, curdate()) as days_to_expiry, B.distributor_name,
-        case when (E.type='Box' and (E.item_id IN (4,26,27,13,14,32,37,38,39,43,44,45) )) then E.type else 'Bar' end as item_type, 
-        case when E.type='Bar' then E.item_id when (E.type='Box' and (E.item_id IN (4,26,27,13,14,32,37,38,39,43,44,45))) then E.item_id else F.product_id end as item_id, 
-        case when E.type='Bar' then E.qty when (E.type='Box' and (E.item_id IN (4,26,27,13,14,32,37,38,39,43,44,45))) then E.qty else (E.qty*F.qty) end as item_qty ,P.location
-        from (Select A.*,B.po_expiry_date ,B.estimate_delivery_date,A.date_of_dispatch as dispatch_date,B.delivery_through,B.delivery_remarks,B.cancelled_date,B.date_of_po
-        from distributor_out  A 
-        join distributor_po  B on A.distributor_po_id=B.id
-        Where (A.status='Approved' and (A.delivery_status='Delivered Not Complete' OR A.delivery_status='GP Issued' OR  A.delivery_status='Pending')
-        OR A.status='pending' and (A.delivery_status='Pending'))
-        OR (A.status = 'Inactive' and distributor_po_id IS NOT NULL)
-        OR (A.status = 'Rejected' and distributor_po_id IS NOT NULL)
-        and (A.distributor_id!='1' and A.distributor_id!='189'))A
-        left join distributor_master B on(A.distributor_id=B.id)
-        left join location_master P on (B.location_id=P.id)
-        left join distributor_out_items E on (A.id=E.distributor_out_id) 
-        left join box_product F on(E.type='Box' and E.item_id=F.box_id and E.item_id NOT IN (4,26,27,13,14,32,37,38,39,43,44,45)) 
-        where CASE When (A.status = 'Inactive' OR A.status = 'Rejected') Then distributor_po_id IS NOT NULL ELSE 1=1 end and (CASE When A.delivery_status='Delivered Not Complete' Then distributor_po_id IS NOT NULL ELSE 1=1 end)
-        and (CASE When A.status = 'Approved' Then distributor_po_id IS NOT NULL ELSE 1=1 end)
-        ) AA 
-        group by AA.id, AA.date_of_po, AA.po_expiry_date, AA.order_no, AA.status, AA.remarks, 
-            AA.estimate_delivery_date, AA.tracking_id, AA.dispatch_date, AA.delivery_status, AA.delivery_through, AA.delivery_date, 
-            AA.delivery_remarks, AA.days_to_expiry, AA.distributor_id, AA.distributor_name,AA.item_type, AA.item_id, AA.cancelled_date ) AA
-        Union
-        Select * from 
+    $sql = "Select Distinct * from 
+            (Select * from 
+            (select AA.id, AA.date_of_po, AA.po_expiry_date, AA.order_no as po_number, AA.status, AA.remarks, 
+                AA.estimate_delivery_date, AA.tracking_id, AA.dispatch_date, Case When 
+                (AA.delivery_status='Delivered Not Complete' and AA.status='Approved') Then 'Delivered' 
+                When ((AA.delivery_status='Pending' and AA.status='Approved') OR (AA.delivery_status='Pending' and AA.status='pending')) Then 'Inprocess'
+                When (AA.status='Inactive' OR AA.status='Rejected' and AA.distributor_po_id IS NOT NULL) Then 'Cancelled'
+                    Else AA.delivery_status end as delivery_status, AA.delivery_through, 
+                AA.delivery_date, AA.delivery_remarks, AA.days_to_expiry, AA.distributor_id, AA.distributor_name, 
+                '' as store_name, AA.location, AA.item_type, AA.item_id, Case When (AA.status='Inactive' OR AA.status='Rejected' and distributor_po_id IS NOT NULL) Then AA.modified_on Else AA.cancelled_date end as cancelled_date, 
+                sum(AA.item_qty) as tot_qty, AA.date_of_processing, AA.distributor_po_id, AA.comments,
+                AA.mismatch,AA.mismatch_type,AA.mod_on as modified_on from 
+            (select A.*, datediff(A.po_expiry_date, curdate()) as days_to_expiry, B.distributor_name,
+                case when (E.type='Box' and (E.item_id IN (4,26,27,13,14,32,37,38,39,43,44,45) )) then E.type else 'Bar' end as item_type, 
+                case when E.type='Bar' then E.item_id when (E.type='Box' and (E.item_id IN (4,26,27,13,14,32,37,38,39,43,44,45))) then E.item_id else F.product_id end as item_id, 
+                case when E.type='Bar' then E.qty when (E.type='Box' and (E.item_id IN (4,26,27,13,14,32,37,38,39,43,44,45))) then E.qty else (E.qty*F.qty) end as item_qty ,P.location from 
+            (Select A.*,B.po_expiry_date ,B.estimate_delivery_date,A.date_of_dispatch as dispatch_date,B.delivery_through,B.delivery_remarks,B.cancelled_date,B.date_of_po,B.mismatch,B.mismatch_type,
+                B.modified_on as mod_on 
+            from distributor_out A 
+            join distributor_po B on A.distributor_po_id=B.id
+            Where (A.status='Approved' and (A.delivery_status='Delivered Not Complete' OR A.delivery_status='GP Issued' OR  A.delivery_status='Pending')
+                OR A.status='pending' and (A.delivery_status='Pending'))
+                OR (A.status = 'Inactive' and distributor_po_id IS NOT NULL)
+                OR (A.status = 'Rejected' and distributor_po_id IS NOT NULL)
+                and (A.distributor_id!='1' and A.distributor_id!='189'))A
+            left join distributor_master B on(A.distributor_id=B.id)
+            left join location_master P on (B.location_id=P.id)
+            left join distributor_out_items E on (A.id=E.distributor_out_id) 
+            left join box_product F on(E.type='Box' and E.item_id=F.box_id and E.item_id NOT IN (4,26,27,13,14,32,37,38,39,43,44,45)) 
+            where CASE When A.status = 'Inactive' Then distributor_po_id IS NOT NULL ELSE 1=1 end and (CASE When A.delivery_status='Delivered Not Complete' Then distributor_po_id IS NOT NULL ELSE 1=1 end)
+            and (CASE When A.status = 'Approved' Then distributor_po_id IS NOT NULL ELSE 1=1 end)
+            ) AA 
+            group by AA.id, AA.date_of_po, AA.po_expiry_date, AA.order_no, AA.status, AA.remarks, 
+                AA.estimate_delivery_date, AA.tracking_id, AA.dispatch_date, AA.delivery_status, AA.status, 
+                AA.delivery_through, AA.delivery_date, AA.delivery_remarks, AA.days_to_expiry, 
+                AA.distributor_id, AA.distributor_name, AA.location, AA.item_type, AA.item_id, AA.cancelled_date, 
+                AA.date_of_processing, AA.distributor_po_id, AA.comments, AA.mismatch, AA.mismatch_type, AA.mod_on) AA
+            Union
+            Select * from 
             (select AA.id, AA.date_of_po, AA.po_expiry_date, AA.po_number, AA.status, AA.remarks, 
                 AA.estimate_delivery_date, AA.tracking_id, AA.dispatch_date, AA.delivery_status, AA.delivery_through, 
                 AA.delivery_date, AA.delivery_remarks, AA.days_to_expiry, AA.distributor_id, AA.distributor_name, 
                 AA.store_name, AA.location, AA.item_type, AA.item_id, AA.cancelled_date, 
-                sum(AA.item_qty) as tot_qty,'' as date_of_processing,'' as distributor_po_id,AA.comments from 
+                sum(AA.item_qty) as tot_qty,'' as date_of_processing,'' as distributor_po_id, AA.comments,
+                AA.mismatch, AA.mismatch_type, AA.modified_on from 
             (select A.*, datediff(A.po_expiry_date, curdate()) as days_to_expiry, B.distributor_name, C.store_name, D.location, 
             case when (E.type='Box' and (E.item_id IN (4,26,27,13,14,32,37,38,39,43,44,45))) then E.type else 'Bar' end as item_type, 
             case when E.type='Bar' then E.item_id when (E.type='Box' and (E.item_id IN (4,26,27,13,14,32,37,38,39,43,44,45))) then E.item_id else F.product_id end as item_id, 
@@ -1073,18 +1077,17 @@ function generate_po_delivery_report() {
             left join location_master D on(A.location_id=D.id) 
             left join distributor_po_items E on (A.id=E.distributor_po_id) 
             left join box_product F on(E.type='Box' and E.item_id=F.box_id and E.item_id NOT IN (4,26,27,13,14,32,37,38,39,43,44,45)) 
-            where A.delivery_through!='WHPL' and (A.status='Approved' or (A.status='InActive' and A.delivery_status='Cancelled'))) AA 
+            where A.delivery_through!='WHPL' and (A.status='Approved' or (A.status='InActive' and A.delivery_status='Cancelled') or A.mismatch='1')) AA 
             group by AA.id, AA.date_of_po, AA.po_expiry_date, AA.po_number, AA.status, AA.remarks, 
-                AA.estimate_delivery_date, AA.tracking_id, AA.dispatch_date, AA.delivery_status, AA.delivery_through, AA.delivery_date, 
-                AA.delivery_remarks, AA.days_to_expiry, AA.distributor_id, AA.distributor_name, AA.store_name, 
-                AA.location, AA.item_type, AA.item_id, AA.cancelled_date ,AA.comments
-            order by AA.id, AA.distributor_id ) AA
-            ) AA order by
-            AA.id, AA.distributor_id";
+                AA.estimate_delivery_date, AA.tracking_id, AA.dispatch_date, AA.delivery_status, AA.delivery_through, 
+                AA.delivery_date, AA.delivery_remarks, AA.days_to_expiry, AA.distributor_id, AA.distributor_name, AA.store_name, 
+                AA.location, AA.item_type, AA.item_id, AA.cancelled_date, AA.comments, 
+                AA.mismatch, AA.mismatch_type, AA.modified_on
+            order by AA.id, AA.distributor_id) AA) AA 
+            order by AA.id desc, AA.distributor_id";
     $query=$this->db->query($sql);
     $data=$query->result();
-
-     if(count($data)>0) {
+    if(count($data)>0) {
         $template_path=$this->config->item('template_path');
         $file = $template_path.'PO_Delivery_Master.xls';
         $this->load->library('excel');
@@ -1103,6 +1106,8 @@ function generate_po_delivery_report() {
         $articolo_row = 9;
         $preduence_row = 9;
         $kosher_row = 9;
+        $mismatch_row = 1;
+        $others_row = 1;
 
         $col_name[]=array();
         for($i=0; $i<=50; $i++) {
@@ -1115,6 +1120,7 @@ function generate_po_delivery_report() {
         $po_id='';
         $prv_distributor_id='';
         $distributor_id='';
+        $sheet_type='';
 
         for($i=0; $i<count($data); $i++){
             $po_id=$data[$i]->id;
@@ -1201,38 +1207,29 @@ function generate_po_delivery_report() {
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+12].$row, $data[$i]->tot_qty);
                 } else if($data[$i]->item_id=='9'){
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+13].$row, $data[$i]->tot_qty);
-                }
-                else if($data[$i]->item_id=='21'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+16].$row, $data[$i]->tot_qty);
-                }  
-                else if($data[$i]->item_id=='20'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+17].$row, $data[$i]->tot_qty);
-                } 
-                else if($data[$i]->item_id=='19'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+18].$row, $data[$i]->tot_qty);
-                }
-                else if($data[$i]->item_id=='37'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+19].$row, $data[$i]->tot_qty);
-                } 
-                else if($data[$i]->item_id=='38'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+20].$row, $data[$i]->tot_qty);
-                }
-                else if($data[$i]->item_id=='39'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+21].$row, $data[$i]->tot_qty);
-                }
-                else if($data[$i]->item_id=='43'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+22].$row, $data[$i]->tot_qty);
-                }
-                else if($data[$i]->item_id=='44'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+23].$row, $data[$i]->tot_qty);
-                }
-                else if($data[$i]->item_id=='45'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+24].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='21'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+16].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='20'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+17].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='19'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+18].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='37'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+19].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='38'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+20].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='39'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+21].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='43'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+22].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='44'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+23].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='45'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+24].$row, $data[$i]->tot_qty);
                 }
             }
 
 
-            if(strtoupper(trim($data[$i]->delivery_status))!='DELIVERED' && strtoupper(trim($data[$i]->delivery_status))!='PENDING' && strtoupper(trim($data[$i]->delivery_status))!='CANCELLED' || strtoupper(trim($data[$i]->delivery_status))=='GP ISSUED' || strtoupper(trim($data[$i]->delivery_status))=='INPROCESS' ){
+            if((strtoupper(trim($data[$i]->delivery_status))!='DELIVERED' && strtoupper(trim($data[$i]->delivery_status))!='PENDING' && strtoupper(trim($data[$i]->delivery_status))!='CANCELLED') || strtoupper(trim($data[$i]->delivery_status))=='GP ISSUED' || strtoupper(trim($data[$i]->delivery_status))=='INPROCESS' || strtoupper(trim($data[$i]->mismatch))=='1'){
                 $distributor_id=$data[$i]->distributor_id;
 
                 if($distributor_id!=$prv_distributor_id || $po_id!=$prv_po_id2){
@@ -1242,8 +1239,15 @@ function generate_po_delivery_report() {
                     if($distributor_id!=$prv_distributor_id){
                         $prv_distributor_id = $distributor_id;
                     }
+
+                    $sheet_type='';
                     
-                    if(strtoupper(trim($data[$i]->delivery_through))=='WHPL'){
+                    if(strtoupper(trim($data[$i]->mismatch))=='1'){
+                        $objPHPExcel->setActiveSheetIndexByName('PO Mismatch');
+                        $mismatch_row = $mismatch_row + 1;
+                        $row = $mismatch_row;
+                        $sheet_type='mismatch';
+                    } else if(strtoupper(trim($data[$i]->delivery_through))=='WHPL'){
                         $objPHPExcel->setActiveSheetIndexByName('WHPL');
                         $whpl_row = $whpl_row + 1;
                         $row = $whpl_row;
@@ -1275,32 +1279,32 @@ function generate_po_delivery_report() {
                         $objPHPExcel->setActiveSheetIndexByName('Amoha');
                         $amoha_row = $amoha_row + 1;
                         $row = $amoha_row;
-                    }
-                    else if($distributor_id=='648'){
+                    } else if($distributor_id=='648'){
                         $objPHPExcel->setActiveSheetIndexByName('Articolo');
                         $articolo_row = $articolo_row + 1;
                         $row = $articolo_row;
-                    }
-                    else if($distributor_id=='1303'){
+                    } else if($distributor_id=='1303'){
                         $objPHPExcel->setActiveSheetIndexByName('Prudencee Beverages');
                         $preduence_row = $preduence_row + 1;
                         $row = $preduence_row;
-                    }
-                    else if($distributor_id=='1302'){
+                    } else if($distributor_id=='1302'){
                         $objPHPExcel->setActiveSheetIndexByName('Kosher Beverages');
                         $kosher_row = $kosher_row + 1;
                         $row = $kosher_row;
+                    } else{
+                        $objPHPExcel->setActiveSheetIndexByName('Others');
+                        $others_row = $others_row + 1;
+                        $row = $others_row;
+                        $sheet_type='others';
                     }
 
-                    
-
-                    
                     $date_of_po = '';
                     $po_expiry_date = '';
                     $estimate_delivery_date = '';
                     $dispatch_date = '';
                     $delivery_date = '';
                     $cancelled_date = '';
+                    $mismatch_date = '';
                     if($data[$i]->date_of_po!=''){
                         $date_of_po = date("d-m-Y", strtotime($data[$i]->date_of_po));
                     }
@@ -1319,6 +1323,9 @@ function generate_po_delivery_report() {
                     if($data[$i]->cancelled_date!=''){
                         $cancelled_date = date("d-m-Y", strtotime($data[$i]->cancelled_date));
                     }
+                    if($data[$i]->modified_on!=''){
+                        $mismatch_date = date("d-m-Y", strtotime($data[$i]->modified_on));
+                    }
                     
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $date_of_po);
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $po_expiry_date);
@@ -1327,9 +1334,15 @@ function generate_po_delivery_report() {
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $data[$i]->distributor_name);
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, $data[$i]->po_number);
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, $data[$i]->location);
-                    if(strtoupper(trim($data[$i]->delivery_through))=='WHPL'){
+                    if($sheet_type=='mismatch'){
                         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+25].$row, '=SUBTOTAL(9,H'.$row.':V'.$row.')');
-                       /* $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+23].$row, $estimate_delivery_date);*/
+                        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+26].$row, $data[$i]->remarks);
+                        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+27].$row, $mismatch_date);
+                        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+28].$row, $data[$i]->mismatch_type);
+                        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+29].$row, $data[$i]->comments);
+                    } else if(strtoupper(trim($data[$i]->delivery_through))=='WHPL' || $sheet_type=='others'){
+                        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+25].$row, '=SUBTOTAL(9,H'.$row.':V'.$row.')');
+                        /* $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+23].$row, $estimate_delivery_date);*/
                         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+26].$row, $data[$i]->tracking_id);
                         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+27].$row, $dispatch_date);
                         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+28].$row, $delivery_date);
@@ -1361,33 +1374,24 @@ function generate_po_delivery_report() {
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+12].$row, $data[$i]->tot_qty);
                 } else if($data[$i]->item_id=='9'){
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+13].$row, $data[$i]->tot_qty);
-                }
-                else if($data[$i]->item_id=='21'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+16].$row, $data[$i]->tot_qty);
-                }  
-                else if($data[$i]->item_id=='20'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+17].$row, $data[$i]->tot_qty);
-                } 
-                else if($data[$i]->item_id=='19'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+18].$row, $data[$i]->tot_qty);
-                }
-                else if($data[$i]->item_id=='37'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+19].$row, $data[$i]->tot_qty);
-                } 
-                else if($data[$i]->item_id=='38'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+20].$row, $data[$i]->tot_qty);
-                }
-                else if($data[$i]->item_id=='39'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+21].$row, $data[$i]->tot_qty);
-                }
-                else if($data[$i]->item_id=='43'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+22].$row, $data[$i]->tot_qty);
-                }
-                else if($data[$i]->item_id=='44'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+23].$row, $data[$i]->tot_qty);
-                }
-                else if($data[$i]->item_id=='45'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+24].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='21'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+16].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='20'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+17].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='19'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+18].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='37'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+19].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='38'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+20].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='39'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+21].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='43'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+22].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='44'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+23].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='45'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+24].$row, $data[$i]->tot_qty);
                 }
             }
         }
@@ -1415,6 +1419,30 @@ function generate_po_delivery_report() {
         /*for($col = 'A'; $col <= 'R'; $col++) {
             $objPHPExcel->getActiveSheet()->getColumnDimension($col)->setAutoSize(true);
         }*/
+
+        $objPHPExcel->setActiveSheetIndexByName('PO Mismatch');
+        $objPHPExcel->getActiveSheet()->getStyle('A1:'.$col_name[$col+29].$mismatch_row)->applyFromArray(array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+            )
+        ));
+        // for($col = 'A'; $col <= 'G'; $col++) {
+        //     $objPHPExcel->getActiveSheet()->getColumnDimension($col)->setAutoSize(true);
+        // }
+
+        $objPHPExcel->setActiveSheetIndexByName('Others');
+        $objPHPExcel->getActiveSheet()->getStyle('A1:'.$col_name[$col+29].$others_row)->applyFromArray(array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+            )
+        ));
+        // for($col = 'A'; $col <= 'G'; $col++) {
+        //     $objPHPExcel->getActiveSheet()->getColumnDimension($col)->setAutoSize(true);
+        // }
 
         $objPHPExcel->setActiveSheetIndexByName('WHPL');
         $objPHPExcel->getActiveSheet()->getStyle('A9:'.$col_name[$col+29].$whpl_row)->applyFromArray(array(
@@ -1558,45 +1586,51 @@ function generate_po_delivery_report() {
 }
 
 function send_po_delivery_report() {
-    $sql = "Select Distinct * from (Select * from 
-    (select AA.id, AA.date_of_po, AA.po_expiry_date, AA.order_no as po_number, AA.status, AA.remarks, 
-        AA.estimate_delivery_date, AA.tracking_id, AA.dispatch_date, Case When 
-            (AA.delivery_status='Delivered Not Complete' and AA.status='Approved') Then 'Delivered' 
-            When ((AA.delivery_status='Pending' and AA.status='Approved') OR (AA.delivery_status='Pending' and AA.status='pending')) Then 'Inprocess'
-            When (AA.status='Inactive' OR AA.status='Rejected' and distributor_po_id IS NOT NULL) Then 'Cancelled'
-            Else AA.delivery_status end as delivery_status, AA.delivery_through, 
-        AA.delivery_date, AA.delivery_remarks, AA.days_to_expiry, AA.distributor_id, AA.distributor_name, 
-        '' as store_name , AA.location, AA.item_type, AA.item_id, Case When (AA.status='Inactive' OR AA.status='Rejected' and distributor_po_id IS NOT NULL) Then AA.modified_on Else AA.cancelled_date end as cancelled_date , 
-        sum(AA.item_qty) as tot_qty , AA.date_of_processing,AA.distributor_po_id,AA.comments from 
-        (select A.*, datediff(A.po_expiry_date, curdate()) as days_to_expiry, B.distributor_name,
-        case when (E.type='Box' and (E.item_id IN (4,26,27,13,14,32,37,38,39,43,44,45) )) then E.type else 'Bar' end as item_type, 
-        case when E.type='Bar' then E.item_id when (E.type='Box' and (E.item_id IN (4,26,27,13,14,32,37,38,39,43,44,45))) then E.item_id else F.product_id end as item_id, 
-        case when E.type='Bar' then E.qty when (E.type='Box' and (E.item_id IN (4,26,27,13,14,32,37,38,39,43,44,45))) then E.qty else (E.qty*F.qty) end as item_qty ,P.location
-        from (Select A.*,B.po_expiry_date ,B.estimate_delivery_date,A.date_of_dispatch as dispatch_date,B.delivery_through,B.delivery_remarks,B.cancelled_date,B.date_of_po
-        from distributor_out  A 
-        join distributor_po  B on A.distributor_po_id=B.id
-        Where (A.status='Approved' and (A.delivery_status='Delivered Not Complete' OR A.delivery_status='GP Issued' OR  A.delivery_status='Pending')
-        OR A.status='pending' and (A.delivery_status='Pending'))
-        OR (A.status = 'Inactive' and distributor_po_id IS NOT NULL)
-        OR (A.status = 'Rejected' and distributor_po_id IS NOT NULL)
-        and (A.distributor_id!='1' and A.distributor_id!='189'))A
-        left join distributor_master B on(A.distributor_id=B.id)
-        left join location_master P on (B.location_id=P.id)
-        left join distributor_out_items E on (A.id=E.distributor_out_id) 
-        left join box_product F on(E.type='Box' and E.item_id=F.box_id and E.item_id NOT IN (4,26,27,13,14,32,37,38,39,43,44,45)) 
-        where CASE When A.status = 'Inactive' Then distributor_po_id IS NOT NULL ELSE 1=1 end and (CASE When A.delivery_status='Delivered Not Complete' Then distributor_po_id IS NOT NULL ELSE 1=1 end)
-        and (CASE When A.status = 'Approved' Then distributor_po_id IS NOT NULL ELSE 1=1 end)
-        ) AA 
-        group by AA.id, AA.date_of_po, AA.po_expiry_date, AA.order_no, AA.status, AA.remarks, 
-            AA.estimate_delivery_date, AA.tracking_id, AA.dispatch_date, AA.delivery_status, AA.delivery_through, AA.delivery_date, 
-            AA.delivery_remarks, AA.days_to_expiry, AA.distributor_id, AA.distributor_name,AA.item_type, AA.item_id, AA.cancelled_date ) AA
-        Union
-        Select * from 
+    $sql = "Select Distinct * from 
+            (Select * from 
+            (select AA.id, AA.date_of_po, AA.po_expiry_date, AA.order_no as po_number, AA.status, AA.remarks, 
+                AA.estimate_delivery_date, AA.tracking_id, AA.dispatch_date, Case When 
+                (AA.delivery_status='Delivered Not Complete' and AA.status='Approved') Then 'Delivered' 
+                When ((AA.delivery_status='Pending' and AA.status='Approved') OR (AA.delivery_status='Pending' and AA.status='pending')) Then 'Inprocess'
+                When (AA.status='Inactive' OR AA.status='Rejected' and AA.distributor_po_id IS NOT NULL) Then 'Cancelled'
+                    Else AA.delivery_status end as delivery_status, AA.delivery_through, 
+                AA.delivery_date, AA.delivery_remarks, AA.days_to_expiry, AA.distributor_id, AA.distributor_name, 
+                '' as store_name, AA.location, AA.item_type, AA.item_id, Case When (AA.status='Inactive' OR AA.status='Rejected' and distributor_po_id IS NOT NULL) Then AA.modified_on Else AA.cancelled_date end as cancelled_date, 
+                sum(AA.item_qty) as tot_qty, AA.date_of_processing, AA.distributor_po_id, AA.comments,
+                AA.mismatch,AA.mismatch_type,AA.mod_on as modified_on from 
+            (select A.*, datediff(A.po_expiry_date, curdate()) as days_to_expiry, B.distributor_name,
+                case when (E.type='Box' and (E.item_id IN (4,26,27,13,14,32,37,38,39,43,44,45) )) then E.type else 'Bar' end as item_type, 
+                case when E.type='Bar' then E.item_id when (E.type='Box' and (E.item_id IN (4,26,27,13,14,32,37,38,39,43,44,45))) then E.item_id else F.product_id end as item_id, 
+                case when E.type='Bar' then E.qty when (E.type='Box' and (E.item_id IN (4,26,27,13,14,32,37,38,39,43,44,45))) then E.qty else (E.qty*F.qty) end as item_qty ,P.location from 
+            (Select A.*,B.po_expiry_date ,B.estimate_delivery_date,A.date_of_dispatch as dispatch_date,B.delivery_through,B.delivery_remarks,B.cancelled_date,B.date_of_po,B.mismatch,B.mismatch_type,
+                B.modified_on as mod_on 
+            from distributor_out A 
+            join distributor_po B on A.distributor_po_id=B.id
+            Where (A.status='Approved' and (A.delivery_status='Delivered Not Complete' OR A.delivery_status='GP Issued' OR  A.delivery_status='Pending')
+                OR A.status='pending' and (A.delivery_status='Pending'))
+                OR (A.status = 'Inactive' and distributor_po_id IS NOT NULL)
+                OR (A.status = 'Rejected' and distributor_po_id IS NOT NULL)
+                and (A.distributor_id!='1' and A.distributor_id!='189'))A
+            left join distributor_master B on(A.distributor_id=B.id)
+            left join location_master P on (B.location_id=P.id)
+            left join distributor_out_items E on (A.id=E.distributor_out_id) 
+            left join box_product F on(E.type='Box' and E.item_id=F.box_id and E.item_id NOT IN (4,26,27,13,14,32,37,38,39,43,44,45)) 
+            where CASE When A.status = 'Inactive' Then distributor_po_id IS NOT NULL ELSE 1=1 end and (CASE When A.delivery_status='Delivered Not Complete' Then distributor_po_id IS NOT NULL ELSE 1=1 end)
+            and (CASE When A.status = 'Approved' Then distributor_po_id IS NOT NULL ELSE 1=1 end)
+            ) AA 
+            group by AA.id, AA.date_of_po, AA.po_expiry_date, AA.order_no, AA.status, AA.remarks, 
+                AA.estimate_delivery_date, AA.tracking_id, AA.dispatch_date, AA.delivery_status, AA.status, 
+                AA.delivery_through, AA.delivery_date, AA.delivery_remarks, AA.days_to_expiry, 
+                AA.distributor_id, AA.distributor_name, AA.location, AA.item_type, AA.item_id, AA.cancelled_date, 
+                AA.date_of_processing, AA.distributor_po_id, AA.comments, AA.mismatch, AA.mismatch_type, AA.mod_on) AA
+            Union
+            Select * from 
             (select AA.id, AA.date_of_po, AA.po_expiry_date, AA.po_number, AA.status, AA.remarks, 
                 AA.estimate_delivery_date, AA.tracking_id, AA.dispatch_date, AA.delivery_status, AA.delivery_through, 
                 AA.delivery_date, AA.delivery_remarks, AA.days_to_expiry, AA.distributor_id, AA.distributor_name, 
                 AA.store_name, AA.location, AA.item_type, AA.item_id, AA.cancelled_date, 
-                sum(AA.item_qty) as tot_qty,'' as date_of_processing,'' as distributor_po_id,AA.comments from 
+                sum(AA.item_qty) as tot_qty,'' as date_of_processing,'' as distributor_po_id, AA.comments,
+                AA.mismatch, AA.mismatch_type, AA.modified_on from 
             (select A.*, datediff(A.po_expiry_date, curdate()) as days_to_expiry, B.distributor_name, C.store_name, D.location, 
             case when (E.type='Box' and (E.item_id IN (4,26,27,13,14,32,37,38,39,43,44,45))) then E.type else 'Bar' end as item_type, 
             case when E.type='Bar' then E.item_id when (E.type='Box' and (E.item_id IN (4,26,27,13,14,32,37,38,39,43,44,45))) then E.item_id else F.product_id end as item_id, 
@@ -1607,14 +1641,14 @@ function send_po_delivery_report() {
             left join location_master D on(A.location_id=D.id) 
             left join distributor_po_items E on (A.id=E.distributor_po_id) 
             left join box_product F on(E.type='Box' and E.item_id=F.box_id and E.item_id NOT IN (4,26,27,13,14,32,37,38,39,43,44,45)) 
-            where A.delivery_through!='WHPL' and (A.status='Approved' or (A.status='InActive' and A.delivery_status='Cancelled'))) AA 
+            where A.delivery_through!='WHPL' and (A.status='Approved' or (A.status='InActive' and A.delivery_status='Cancelled') or A.mismatch='1')) AA 
             group by AA.id, AA.date_of_po, AA.po_expiry_date, AA.po_number, AA.status, AA.remarks, 
-                AA.estimate_delivery_date, AA.tracking_id, AA.dispatch_date, AA.delivery_status, AA.delivery_through, AA.delivery_date, 
-                AA.delivery_remarks, AA.days_to_expiry, AA.distributor_id, AA.distributor_name, AA.store_name, 
-                AA.location, AA.item_type, AA.item_id, AA.cancelled_date ,AA.comments
-            order by AA.id, AA.distributor_id ) AA
-            ) AA order by
-            AA.id, AA.distributor_id";
+                AA.estimate_delivery_date, AA.tracking_id, AA.dispatch_date, AA.delivery_status, AA.delivery_through, 
+                AA.delivery_date, AA.delivery_remarks, AA.days_to_expiry, AA.distributor_id, AA.distributor_name, AA.store_name, 
+                AA.location, AA.item_type, AA.item_id, AA.cancelled_date, AA.comments, 
+                AA.mismatch, AA.mismatch_type, AA.modified_on
+            order by AA.id, AA.distributor_id) AA) AA 
+            order by AA.id desc, AA.distributor_id";
     $query=$this->db->query($sql);
     $data=$query->result();
 
@@ -1637,6 +1671,8 @@ function send_po_delivery_report() {
         $articolo_row = 9;
         $preduence_row = 9;
         $kosher_row = 9;
+        $mismatch_row = 1;
+        $others_row = 1;
 
         $col_name[]=array();
         for($i=0; $i<=50; $i++) {
@@ -1649,6 +1685,7 @@ function send_po_delivery_report() {
         $po_id='';
         $prv_distributor_id='';
         $distributor_id='';
+        $sheet_type='';
 
         for($i=0; $i<count($data); $i++){
             $po_id=$data[$i]->id;
@@ -1735,38 +1772,29 @@ function send_po_delivery_report() {
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+12].$row, $data[$i]->tot_qty);
                 } else if($data[$i]->item_id=='9'){
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+13].$row, $data[$i]->tot_qty);
-                }
-                else if($data[$i]->item_id=='21'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+16].$row, $data[$i]->tot_qty);
-                }  
-                else if($data[$i]->item_id=='20'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+17].$row, $data[$i]->tot_qty);
-                } 
-                else if($data[$i]->item_id=='19'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+18].$row, $data[$i]->tot_qty);
-                }
-                else if($data[$i]->item_id=='37'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+19].$row, $data[$i]->tot_qty);
-                } 
-                else if($data[$i]->item_id=='38'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+20].$row, $data[$i]->tot_qty);
-                }
-                else if($data[$i]->item_id=='39'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+21].$row, $data[$i]->tot_qty);
-                }
-                else if($data[$i]->item_id=='43'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+22].$row, $data[$i]->tot_qty);
-                }
-                else if($data[$i]->item_id=='44'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+23].$row, $data[$i]->tot_qty);
-                }
-                else if($data[$i]->item_id=='45'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+24].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='21'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+16].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='20'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+17].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='19'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+18].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='37'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+19].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='38'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+20].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='39'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+21].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='43'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+22].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='44'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+23].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='45'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+24].$row, $data[$i]->tot_qty);
                 }
             }
 
 
-            if(strtoupper(trim($data[$i]->delivery_status))!='DELIVERED' && strtoupper(trim($data[$i]->delivery_status))!='PENDING' && strtoupper(trim($data[$i]->delivery_status))!='CANCELLED' || strtoupper(trim($data[$i]->delivery_status))=='GP ISSUED' || strtoupper(trim($data[$i]->delivery_status))=='INPROCESS' ){
+            if(strtoupper(trim($data[$i]->delivery_status))!='DELIVERED' && strtoupper(trim($data[$i]->delivery_status))!='PENDING' && strtoupper(trim($data[$i]->delivery_status))!='CANCELLED' || strtoupper(trim($data[$i]->delivery_status))=='GP ISSUED' || strtoupper(trim($data[$i]->delivery_status))=='INPROCESS' || strtoupper(trim($data[$i]->mismatch))=='1'){
                 $distributor_id=$data[$i]->distributor_id;
 
                 if($distributor_id!=$prv_distributor_id || $po_id!=$prv_po_id2){
@@ -1776,8 +1804,15 @@ function send_po_delivery_report() {
                     if($distributor_id!=$prv_distributor_id){
                         $prv_distributor_id = $distributor_id;
                     }
+
+                    $sheet_type='';
                     
-                    if(strtoupper(trim($data[$i]->delivery_through))=='WHPL'){
+                    if(strtoupper(trim($data[$i]->mismatch))=='1'){
+                        $objPHPExcel->setActiveSheetIndexByName('PO Mismatch');
+                        $mismatch_row = $mismatch_row + 1;
+                        $row = $mismatch_row;
+                        $sheet_type = 'mismatch';
+                    } else if(strtoupper(trim($data[$i]->delivery_through))=='WHPL'){
                         $objPHPExcel->setActiveSheetIndexByName('WHPL');
                         $whpl_row = $whpl_row + 1;
                         $row = $whpl_row;
@@ -1809,21 +1844,23 @@ function send_po_delivery_report() {
                         $objPHPExcel->setActiveSheetIndexByName('Amoha');
                         $amoha_row = $amoha_row + 1;
                         $row = $amoha_row;
-                    }
-                    else if($distributor_id=='648'){
+                    } else if($distributor_id=='648'){
                         $objPHPExcel->setActiveSheetIndexByName('Articolo');
                         $articolo_row = $articolo_row + 1;
                         $row = $articolo_row;
-                    }
-                    else if($distributor_id=='1303'){
+                    } else if($distributor_id=='1303'){
                         $objPHPExcel->setActiveSheetIndexByName('Prudencee Beverages');
                         $preduence_row = $preduence_row + 1;
                         $row = $preduence_row;
-                    }
-                    else if($distributor_id=='1302'){
+                    } else if($distributor_id=='1302'){
                         $objPHPExcel->setActiveSheetIndexByName('Kosher Beverages');
                         $kosher_row = $kosher_row + 1;
                         $row = $kosher_row;
+                    } else{
+                        $objPHPExcel->setActiveSheetIndexByName('Others');
+                        $others_row = $others_row + 1;
+                        $row = $others_row;
+                        $sheet_type = 'others';
                     }
                     
                     $date_of_po = '';
@@ -1832,6 +1869,8 @@ function send_po_delivery_report() {
                     $dispatch_date = '';
                     $delivery_date = '';
                     $cancelled_date = '';
+                    $mismatch_date = '';
+
                     if($data[$i]->date_of_po!=''){
                         $date_of_po = date("d-m-Y", strtotime($data[$i]->date_of_po));
                     }
@@ -1850,6 +1889,9 @@ function send_po_delivery_report() {
                     if($data[$i]->cancelled_date!=''){
                         $cancelled_date = date("d-m-Y", strtotime($data[$i]->cancelled_date));
                     }
+                    if($data[$i]->modified_on!=''){
+                        $mismatch_date = date("d-m-Y", strtotime($data[$i]->modified_on));
+                    }
                     
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $date_of_po);
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $po_expiry_date);
@@ -1858,9 +1900,16 @@ function send_po_delivery_report() {
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $data[$i]->distributor_name);
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, $data[$i]->po_number);
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, $data[$i]->location);
-                    if(strtoupper(trim($data[$i]->delivery_through))=='WHPL'){
+                    
+                    if($sheet_type=='mismatch'){
                         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+25].$row, '=SUBTOTAL(9,H'.$row.':V'.$row.')');
-                       /* $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+23].$row, $estimate_delivery_date);*/
+                        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+26].$row, $data[$i]->remarks);
+                        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+27].$row, $mismatch_date);
+                        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+28].$row, $data[$i]->mismatch_type);
+                        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+29].$row, $data[$i]->comments);
+                    } else if(strtoupper(trim($data[$i]->delivery_through))=='WHPL' || $sheet_type=='others'){
+                        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+25].$row, '=SUBTOTAL(9,H'.$row.':V'.$row.')');
+                        /* $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+23].$row, $estimate_delivery_date);*/
                         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+26].$row, $data[$i]->tracking_id);
                         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+27].$row, $dispatch_date);
                         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+28].$row, $delivery_date);
@@ -1892,33 +1941,24 @@ function send_po_delivery_report() {
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+12].$row, $data[$i]->tot_qty);
                 } else if($data[$i]->item_id=='9'){
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+13].$row, $data[$i]->tot_qty);
-                }
-                else if($data[$i]->item_id=='21'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+16].$row, $data[$i]->tot_qty);
-                }  
-                else if($data[$i]->item_id=='20'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+17].$row, $data[$i]->tot_qty);
-                } 
-                else if($data[$i]->item_id=='19'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+18].$row, $data[$i]->tot_qty);
-                }
-                else if($data[$i]->item_id=='37'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+19].$row, $data[$i]->tot_qty);
-                } 
-                else if($data[$i]->item_id=='38'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+20].$row, $data[$i]->tot_qty);
-                }
-                else if($data[$i]->item_id=='39'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+21].$row, $data[$i]->tot_qty);
-                }
-                else if($data[$i]->item_id=='43'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+22].$row, $data[$i]->tot_qty);
-                }
-                else if($data[$i]->item_id=='44'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+23].$row, $data[$i]->tot_qty);
-                }
-                else if($data[$i]->item_id=='45'){
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+24].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='21'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+16].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='20'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+17].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='19'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+18].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='37'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+19].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='38'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+20].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='39'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+21].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='43'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+22].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='44'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+23].$row, $data[$i]->tot_qty);
+                } else if($data[$i]->item_id=='45'){
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+24].$row, $data[$i]->tot_qty);
                 }
             }
         }
@@ -1937,6 +1977,30 @@ function send_po_delivery_report() {
 
         $objPHPExcel->setActiveSheetIndexByName('PO CANCELLED');
         $objPHPExcel->getActiveSheet()->getStyle('A1:'.$col_name[$col+28].$cancelled_row)->applyFromArray(array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+            )
+        ));
+        for($col = 'A'; $col <= 'G'; $col++) {
+            $objPHPExcel->getActiveSheet()->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $objPHPExcel->setActiveSheetIndexByName('PO Mismatch');
+        $objPHPExcel->getActiveSheet()->getStyle('A1:'.$col_name[$col+29].$mismatch_row)->applyFromArray(array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+            )
+        ));
+        for($col = 'A'; $col <= 'G'; $col++) {
+            $objPHPExcel->getActiveSheet()->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $objPHPExcel->setActiveSheetIndexByName('Others');
+        $objPHPExcel->getActiveSheet()->getStyle('A1:'.$col_name[$col+29].$others_row)->applyFromArray(array(
             'borders' => array(
                 'allborders' => array(
                     'style' => PHPExcel_Style_Border::BORDER_THIN
@@ -2058,13 +2122,33 @@ function send_po_delivery_report() {
         }
         
         $filename='PO_Delivery_Report'.date('Y-F-d').'.xls';
-        $path  = '/home/eatangcp/public_html/test/assets/uploads/daily_sales_rep_reports/';
-        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5'); 
-        $objWriter->save($path.$filename); 
-        $attachment = $path.$filename;
+        // $path  = '/home/eatangcp/public_html/test/assets/uploads/daily_sales_rep_reports/';
+        // $path  = 'C:/xampp/htdocs/eat_erp/assets/uploads/daily_sales_rep_reports/';
 
-		 $to_email = 'priti.tripathi@eatanytime.in,operations@eatanytime.in,rishit.sanghvi@eatanytime.in,dhaval.maru@pecanreams.com,swapnil.darekar@eatanytime.in, ashwini.patil@pecanreams.com';
-        /*$to_email = 'sangeeta.yadav@pecanreams.com';*/
+        $path  = '/home/eatangcp/public_html/test/assets/uploads/distributor_po_reports/';
+        $upload_path = '/home/eatangcp/public_html/test/assets/uploads/distributor_po_reports';
+
+        // $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/distributor_po_reports/';
+        // $upload_path = '/home/eatangcp/public_html/eat_erp/assets/uploads/distributor_po_reports';
+
+        // $path  = 'C:/xampp/htdocs/eat_erp/assets/uploads/distributor_po_reports/';
+        // $upload_path = 'C:/xampp/htdocs/eat_erp/assets/uploads/distributor_po_reports';
+        
+        if(!is_dir($upload_path)) {
+            mkdir($upload_path, 0777, TRUE);
+        }
+
+        $reportpath = $path.$filename;
+
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5'); 
+        $objWriter->save($reportpath); 
+        $attachment = $reportpath;
+
+		// $to_email = 'priti.tripathi@eatanytime.in, operations@eatanytime.in, rishit.sanghvi@eatanytime.in, 
+          //                   dhaval.maru@pecanreams.com, swapnil.darekar@eatanytime.in, ashwini.patil@pecanreams.com, 
+          //                   prasad.bhisale@pecanreams.com';
+        $to_email = 'prasad.bhisale@pecanreams.com';
+        $bcc = 'prasad.bhisale@pecanreams.com';
         $from_email = 'cs@eatanytime.co.in';
         $from_email_sender = 'Wholesome Habits Pvt Ltd';
         $subject = 'PO Tracker Report - '.date('dS F Y');
@@ -2101,7 +2185,6 @@ function send_po_delivery_report() {
                 ".$table."
                 <br /><br />Thanks,<br />Team EAT Anytime
                 </body></html>";
-        $bcc = 'sangeeta.yadav@pecanreams.com';
 
       echo 'mailsent'.$mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $tbody, $bcc,'',$attachment);
       if ($mailSent==1) {

@@ -66,20 +66,19 @@ class Attendance extends CI_Controller{
         $error_line = '';
         $batch_array = [];
    
-       for($i=2;$i<=$highestrow;$i++)
-        {
-                //$objPHPExcel->getActiveSheet()->getCell('A'.$i)->getValue();
-                $distributor = $objPHPExcel->getActiveSheet()->getCell('A'.$i)->getValue();
-               /* $area = $objPHPExcel->getActiveSheet()->getCell('B'.$i)->getValue();
-                $zone = $objPHPExcel->getActiveSheet()->getCell('C'.$i)->getValue();
-                $location = $objPHPExcel->getActiveSheet()->getCell('D'.$i)->getValue();*/
-                $sales_rep = $objPHPExcel->getActiveSheet()->getCell('B'.$i)->getValue();
-                $frequency = $objPHPExcel->getActiveSheet()->getCell('C'.$i)->getValue();
-                $sequence = $objPHPExcel->getActiveSheet()->getCell('D'.$i)->getValue();
-                $error = '';
+        for($i=2;$i<=$highestrow;$i++) {
+            //$objPHPExcel->getActiveSheet()->getCell('A'.$i)->getValue();
+            $distributor = $objPHPExcel->getActiveSheet()->getCell('A'.$i)->getValue();
+           /* $area = $objPHPExcel->getActiveSheet()->getCell('B'.$i)->getValue();
+            $zone = $objPHPExcel->getActiveSheet()->getCell('C'.$i)->getValue();
+            $location = $objPHPExcel->getActiveSheet()->getCell('D'.$i)->getValue();*/
+            $sales_rep = $objPHPExcel->getActiveSheet()->getCell('B'.$i)->getValue();
+            $frequency = $objPHPExcel->getActiveSheet()->getCell('C'.$i)->getValue();
+            $sequence = $objPHPExcel->getActiveSheet()->getCell('D'.$i)->getValue();
+            $error = '';
 
 
-                $sales_rep = trim($sales_rep);
+            $sales_rep = trim($sales_rep);
 
 
             $sql = "select K.*,L.store_name from(select I.*,j.sales_rep_name,
@@ -467,7 +466,7 @@ class Attendance extends CI_Controller{
         }
     }
 	
-	    public function single_locations($status=''){
+    public function single_locations($status=''){
         $result=$this->distributor_model->get_access();
         if(count($result)>0) {
             
@@ -478,7 +477,6 @@ class Attendance extends CI_Controller{
             $this->load->view('login/main_page');
         }
     }
-
 
     public function get_data(){
         $id=$this->input->post('id');
@@ -519,7 +517,7 @@ class Attendance extends CI_Controller{
         }
     }
 	
-	 public function get_distributor_single_locations(){
+	public function get_distributor_single_locations(){
         $id=$this->input->post('id');
         // $id=1;
 
@@ -536,7 +534,6 @@ class Attendance extends CI_Controller{
         echo json_encode($data);
     }
 	
-
     public function add(){
         $result=$this->distributor_model->get_access();
         if(count($result)>0) {
@@ -601,19 +598,17 @@ class Attendance extends CI_Controller{
     }
 
 	public function get_zone(){ 
-   
-    $postData = $this->input->post();
+        $postData = $this->input->post();
 
-    $data = $this->area_model->get_zone($postData);
-    echo json_encode($data); 
+        $data = $this->area_model->get_zone($postData);
+        echo json_encode($data); 
 	}
 
 	public function get_area(){ 
-   
-    $postData = $this->input->post();
+        $postData = $this->input->post();
 
-    $data = $this->location_model->get_area($postData);
-    echo json_encode($data); 
+        $data = $this->location_model->get_area($postData);
+        echo json_encode($data); 
 	}
 	
     public function get_shipping_state() {

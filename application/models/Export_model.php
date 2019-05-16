@@ -14104,7 +14104,7 @@ public function generate_mt_stock_report() {
 }
 
 public function send_mt_stock_tracker() {
-    // $date = '2019-03-31';
+    // $date = '2019-05-06';
     $date = date('Y-m-d');
 
     $zone_id_array = ['9', '10', '12', '16', '18', '29', '30'];
@@ -14157,7 +14157,7 @@ public function send_mt_stock_tracker() {
             $cc = 'rishit.sanghvi@eatanytime.in,swapnil.darekar@eatanytime.in,dhaval.maru@pecanreams.com,prasad.bhisale@pecanreams.com';
             $bcc = 'sangeeta.yadav@pecanreams.com';
 
-            sleep(5);
+            sleep(15);
 
             echo $attachment = $reportpath;
             echo '<br/><br/>';

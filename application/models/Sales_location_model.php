@@ -126,8 +126,8 @@ function get_data($status='', $id='', $frequency='', $temp_date='', $sales_rep_i
         $table_name = "select *, id as bit_plan_id, id as bit_id from sales_rep_beat_plan ";
     }
 
-    $sql = "select distinct G.*, H.date_of_visit, H.id as mid, H.distributor_type, H.remarks,
-                H.followup_date, H.distributor_type, I.zone, J.area, K.location from 
+    $sql = "select distinct G.*, H.date_of_visit, H.id as mid, H.remarks, H.followup_date, 
+                ifnull(H.distributor_type,'Old') as distributor_type, I.zone, J.area, K.location from 
             (select E.*, F.sales_rep_name from 
             (select C.* from 
             (select A.*, B.distributor_name, B.distributor_name as store_name, B.google_address, 
@@ -3754,7 +3754,7 @@ function set_original_beat_plan($reporting_manager_id='', $distributor_id_og='',
     $now=date('Y-m-d H:i:s');
     $status = 'Approved';
 
-    if($reporting_manager_id=='' || $reporting_manager_id=='0' || $reporting_manager_id==null){
+    if($reporting_manager_id=='' || $reporting_manager_id=='0' || $reporting_manager_id==null || $reporting_manager_id=='null'){
         $status = 'Approved';
         $reporting_manager_id = null;
     }
@@ -4072,7 +4072,7 @@ public function get_todaysorder($sales_rep_id='') {
             (select H.*, I.distributor_name as distributor from 
             (select F.*, G.location from 
             (select D.*, E.location_id from 
-            (select C.distributor_name ,A.visit_id, A.selected_distributor, A.id as order_id from 
+            (select C.distributor_name, A.visit_id, A.selected_distributor, A.id as order_id from 
             (select * from sales_rep_orders where date(created_on)=date(now()) and sales_rep_id='$sales_rep_id' and 
                 channel_type='GT' and id in (select distinct sales_rep_order_id from sales_rep_order_items)) A 
             left join 

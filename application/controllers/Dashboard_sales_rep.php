@@ -144,6 +144,7 @@ class Dashboard_sales_rep extends CI_Controller
                     $data['distributor_id_og']=$data['beat_details'][0]->dist_id2;
                     $data['beat_id_og']=$data['beat_details'][0]->beat_id2;
                 }
+                
                 $data['distributor_id']=$data['beat_details'][0]->dist_id2;
                 $data['beat_id']=$data['beat_details'][0]->beat_id2;
 
@@ -169,8 +170,8 @@ class Dashboard_sales_rep extends CI_Controller
                 }
             }
 
-            $this->session->set_userdata('distributor_id', $data['distributor_id']);
-            $this->session->set_userdata('beat_id', $data['beat_id']);
+            $this->session->set_userdata('distributor_id', $data['distributor_id_og']);
+            $this->session->set_userdata('beat_id', $data['beat_id_og']);
             
             $data['distributor'] = $this->Sales_location_model->get_distributors();
             $data['beat'] = $this->Sales_location_model->get_beat_plan($data['distributor_id']);

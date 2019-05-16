@@ -143,145 +143,267 @@ class Dashboard_sales_rep_model extends CI_Model {
         return $query->result();
     }
 	
-	
 	function get_data_dist($status='', $id=''){
-    if($status!=""){
-        $cond=" where status='".$status."'";
-    } else {
-        $cond="";
+        if($status!=""){
+            $cond=" where status='".$status."'";
+        } else {
+            $cond="";
+        }
+
+        if($id!=""){
+            if($cond=="") {
+                $cond=" where id='".$id."'";
+            } else {
+                $cond=$cond." and id='".$id."'";
+            }
+        }
+
+        $sales_rep_id=$this->session->userdata('sales_rep_id');
+        if($sales_rep_id!=""){
+            $cond2=" where sales_rep_id='".$sales_rep_id."'";
+        } else {
+            $cond2="";
+        }
+
+        if($cond2=="") {
+            $cond2=" where status != 'Active'";
+        } else {
+            $cond2=$cond2." and status != 'Active'";
+        }
+
+        $sql = "select G.* from 
+                (select E.*, concat(ifnull(F.first_name,''),' ',ifnull(F.last_name,'')) as user_name from 
+                (
+                (select C.id, C.sales_rep_id, C.distributor_name, C.address, C.city, C.pincode, C.state, 
+                C.country, C.vat_no, C.contact_person, C.contact_no, C.margin, C.doc_document, C.document_name, 
+                D.area, C.status, C.remarks, C.modified_by, C.modified_on, state_code, gst_number from 
+                (select concat('d_',A.id) as id, A.sales_rep_id, A.distributor_name, A.address, A.city, A.pincode, A.state, 
+                A.country, A.tin_number as vat_no, B.contact_person, B.mobile as contact_no, A.sell_out as margin, 
+                null as doc_document, null as document_name, A.area_id, A.status, A.remarks, 
+                A.modified_by, A.modified_on, state_code, gst_number from 
+                (select * from distributor_master".$cond2.") A 
+                left join 
+                (select * from distributor_contacts) B 
+                on (A.id = B.distributor_id)) C 
+                left join 
+                (select * from area_master) D 
+                on (C.Area_id = D.id))) E 
+                left join 
+                (select * from user_master) F 
+                on (E.modified_by=F.id)) G ".$cond." 
+    			order by distributor_name desc limit 10";
+    	
+    			
+        $query=$this->db->query($sql);
+        return $query->result();
     }
 
-    if($id!=""){
-        if($cond=="") {
-            $cond=" where id='".$id."'";
+    function get_data_loc($status='', $id=''){
+        if($status!=""){
+            $cond=" where status='".$status."'";
         } else {
-            $cond=$cond." and id='".$id."'";
+            $cond="";
+        }
+
+        if($id!=""){
+            if($cond=="") {
+                $cond=" where id='".$id."'";
+            } else {
+                $cond=$cond." and id='".$id."'";
+            }
+        }
+
+        $sales_rep_id=$this->session->userdata('sales_rep_id');
+        if($sales_rep_id!=""){
+            if($cond=="") {
+                $cond=" where sales_rep_id='".$sales_rep_id."'";
+            } else {
+                $cond=$cond." and sales_rep_id='".$sales_rep_id."'";
+            }
+        }
+
+        $sql = "select * from sales_rep_location".$cond."  and date_of_visit=date(now())  order by modified_on desc ";
+        $query=$this->db->query($sql);
+        return $query->result();
+    }  
+
+    function get_data_order($status='', $id=''){
+        if($status!=""){
+            $cond=" where status='".$status."'";
+        } else {
+            $cond="";
+        }
+
+        if($id!=""){
+            if($cond=="") {
+                $cond=" where id='".$id."'";
+            } else {
+                $cond=$cond." and id='".$id."'";
+            }
+        }
+
+        $sales_rep_id=$this->session->userdata('sales_rep_id');
+        if($sales_rep_id!=""){
+            if($cond=="") {
+                $cond=" where sales_rep_id='".$sales_rep_id."'";
+            } else {
+                $cond=$cond." and sales_rep_id='".$sales_rep_id."'";
+            }
+        }
+
+        $sql = "select E.* from 
+                (select C.*, concat(ifnull(D.first_name,''),' ',ifnull(D.last_name,'')) as user_name from 
+                (select A.*, B.distributor_name, B.sell_out, B.contact_person, B.contact_no, B.area from 
+                (select concat('s_',id) as id, sales_rep_id, date_of_processing, distributor_id, 
+                    null as invoice_no, amount, status, remarks, modified_by, modified_on from sales_rep_orders 
+                union all 
+                select concat('d_',id) as id, sales_rep_id, date_of_processing, concat('d_',distributor_id) as distributor_id, 
+                    invoice_no, final_amount as amount, status, remarks, modified_by, modified_on from distributor_out) A
+                left join 
+                (select concat('s_',id) as id, distributor_name, margin as sell_out, contact_person, contact_no, city as area 
+                    from sales_rep_distributors
+                union all 
+                select concat('d_',E.id) as id, E.distributor_name, E.sell_out, E.contact_person, E.contact_no, E.area from 
+                (select C.*, D.area from 
+                (select A.*, B.contact_person, B.mobile as contact_no from 
+                (select id, distributor_name, sell_out, area_id from distributor_master) A 
+                left join 
+                (select * from distributor_contacts) B 
+                on (A.id = B.distributor_id)) C 
+                left join 
+                (select * from area_master) D 
+                on (C.Area_id = D.id)) E) B 
+                on (A.distributor_id = B.id)) C 
+                left join 
+                (select * from user_master) D 
+                on (C.modified_by=D.id)) E ".$cond." 
+               and E.date_of_processing=date(now()) order by E.modified_on desc ";
+        $query=$this->db->query($sql);
+        return $query->result();
+    }
+
+    function get_alternate($day,$m,$year){
+        $date1 = date('d-m-Y', strtotime('second '.$day.' of '.$m.' '.$year));
+        $date2 = date('d-m-Y', strtotime('fourth '.$day.' of '.$m.' '.$year));
+
+        $todaysdate = date('d-m-Y');
+        if($date1==$todaysdate){
+            return true;
+        } elseif($date2==$todaysdate) {
+            return true;
+        } else {
+           return false;
         }
     }
 
-    $sales_rep_id=$this->session->userdata('sales_rep_id');
-    if($sales_rep_id!=""){
-        $cond2=" where sales_rep_id='".$sales_rep_id."'";
-    } else {
-        $cond2="";
-    }
-
-    if($cond2=="") {
-        $cond2=" where status != 'Active'";
-    } else {
-        $cond2=$cond2." and status != 'Active'";
-    }
-
-    $sql = "select G.* from 
-            (select E.*, concat(ifnull(F.first_name,''),' ',ifnull(F.last_name,'')) as user_name from 
-            (
-            (select C.id, C.sales_rep_id, C.distributor_name, C.address, C.city, C.pincode, C.state, 
-            C.country, C.vat_no, C.contact_person, C.contact_no, C.margin, C.doc_document, C.document_name, 
-            D.area, C.status, C.remarks, C.modified_by, C.modified_on, state_code, gst_number from 
-            (select concat('d_',A.id) as id, A.sales_rep_id, A.distributor_name, A.address, A.city, A.pincode, A.state, 
-            A.country, A.tin_number as vat_no, B.contact_person, B.mobile as contact_no, A.sell_out as margin, 
-            null as doc_document, null as document_name, A.area_id, A.status, A.remarks, 
-            A.modified_by, A.modified_on, state_code, gst_number from 
-            (select * from distributor_master".$cond2.") A 
-            left join 
-            (select * from distributor_contacts) B 
-            on (A.id = B.distributor_id)) C 
-            left join 
-            (select * from area_master) D 
-            on (C.Area_id = D.id))) E 
-            left join 
-            (select * from user_master) F 
-            on (E.modified_by=F.id)) G ".$cond." 
-			order by distributor_name desc limit 10";
-	
-			
-    $query=$this->db->query($sql);
-    return $query->result();
-}
-  function get_data_loc($status='', $id=''){
-    if($status!=""){
-        $cond=" where status='".$status."'";
-    } else {
-        $cond="";
-    }
-
-    if($id!=""){
-        if($cond=="") {
-            $cond=" where id='".$id."'";
+    function get_visit_details($sales_rep_id=''){
+        $day = date('l');
+        $m = date('F');
+        $year = date('Y');
+        $get_alternate  = $this->get_alternate($day,$m,$year);
+        if($get_alternate) {
+            $frequency = 'Alternate '.$day;
         } else {
-            $cond=$cond." and id='".$id."'";
+            $frequency = 'Every '.$day;
         }
-    }
 
-    $sales_rep_id=$this->session->userdata('sales_rep_id');
-    if($sales_rep_id!=""){
-        if($cond=="") {
-            $cond=" where sales_rep_id='".$sales_rep_id."'";
-        } else {
-            $cond=$cond." and sales_rep_id='".$sales_rep_id."'";
-        }
-    }
-
-    $sql = "select * from sales_rep_location".$cond."  and date_of_visit=date(now())  order by modified_on desc ";
-    $query=$this->db->query($sql);
-    return $query->result();
-}  
-
-function get_data_order($status='', $id=''){
-    if($status!=""){
-        $cond=" where status='".$status."'";
-    } else {
-        $cond="";
-    }
-
-    if($id!=""){
-        if($cond=="") {
-            $cond=" where id='".$id."'";
-        } else {
-            $cond=$cond." and id='".$id."'";
-        }
-    }
-
-    $sales_rep_id=$this->session->userdata('sales_rep_id');
-    if($sales_rep_id!=""){
-        if($cond=="") {
-            $cond=" where sales_rep_id='".$sales_rep_id."'";
-        } else {
-            $cond=$cond." and sales_rep_id='".$sales_rep_id."'";
-        }
-    }
-
-    $sql = "select E.* from 
-            (select C.*, concat(ifnull(D.first_name,''),' ',ifnull(D.last_name,'')) as user_name from 
-            (select A.*, B.distributor_name, B.sell_out, B.contact_person, B.contact_no, B.area from 
-            (select concat('s_',id) as id, sales_rep_id, date_of_processing, distributor_id, 
-                null as invoice_no, amount, status, remarks, modified_by, modified_on from sales_rep_orders 
-            union all 
-            select concat('d_',id) as id, sales_rep_id, date_of_processing, concat('d_',distributor_id) as distributor_id, 
-                invoice_no, final_amount as amount, status, remarks, modified_by, modified_on from distributor_out) A
+        $sql="select AA.sales_rep_name, sum(AA.unplanned_count) as unplanned_count, sum(AA.p_call) as p_call, sum(AA.planned_count) as actual_count, sum(AA.actual_count) as total_count from 
+            (select * from 
+            (select A.*, (ifnull(T.tem_visit_count,0)+ifnull(F.unplanned_count,0)) as unplanned_count, ifnull(E.p_call,0) as p_call, B.sales_rep_name, 
+                ifnull(C.planned_count,0) as planned_count, ifnull(case when D.actual_count is null then G.actual_count2 else D.actual_count end,0) as actual_count from 
+            (select distinct sales_rep_id,frequency from merchandiser_beat_plan where sales_rep_id='$sales_rep_id' and frequency='$frequency') A 
             left join 
-            (select concat('s_',id) as id, distributor_name, margin as sell_out, contact_person, contact_no, city as area 
-                from sales_rep_distributors
-            union all 
-            select concat('d_',E.id) as id, E.distributor_name, E.sell_out, E.contact_person, E.contact_no, E.area from 
-            (select C.*, D.area from 
-            (select A.*, B.contact_person, B.mobile as contact_no from 
-            (select id, distributor_name, sell_out, area_id from distributor_master) A 
+            (select sales_rep_name,id from sales_rep_master where id='$sales_rep_id' and status='Approved') B 
+            on (A.sales_rep_id=B.id) 
             left join 
-            (select * from distributor_contacts) B 
-            on (A.id = B.distributor_id)) C 
+            (select count(id) as unplanned_count,sales_rep_id,frequency from 
+            (select id,sales_rep_id,frequency from merchandiser_detailed_beat_plan A where sales_rep_id='$sales_rep_id' and frequency='$frequency' and 
+                store_id in (select distinct store_id from merchandiser_beat_plan where sales_rep_id='$sales_rep_id' and frequency='$frequency' and 
+                                date(created_on)=date(now())) and date(date_of_visit)=date(now())) A group by sales_rep_id,frequency) F 
+            on (A.sales_rep_id=F.sales_rep_id) 
             left join 
-            (select * from area_master) D 
-            on (C.Area_id = D.id)) E) B 
-            on (A.distributor_id = B.id)) C 
+            (select count(id) as tem_visit_count,sales_rep_id,frequency from merchandiser_detailed_beat_plan 
+                where sales_rep_id='$sales_rep_id' and frequency='$frequency'  and 
+                store_id not in (select distinct store_id from merchandiser_beat_plan where sales_rep_id='$sales_rep_id' and frequency='$frequency') and 
+                                    date(date_of_visit)=date(now()) group by sales_rep_id,frequency) T 
+            on (A.sales_rep_id=T.sales_rep_id) 
             left join 
-            (select * from user_master) D 
-            on (C.modified_by=D.id)) E ".$cond." 
-           and E.date_of_processing=date(now()) order by E.modified_on desc ";
-    $query=$this->db->query($sql);
-    return $query->result();
-}
+            (select count(id) as p_call,sales_rep_id from sales_rep_orders where sales_rep_id='$sales_rep_id' and date(date_of_processing)=date(now()) and 
+                channel_type='MT' group by sales_rep_id) E 
+            on (A.sales_rep_id=E.sales_rep_id) 
+            left join 
+            (select count(*) as planned_count,sales_rep_id from 
+            (select store_id,sales_rep_id,date_of_visit from merchandiser_detailed_beat_plan where sales_rep_id='$sales_rep_id' and frequency='$frequency' and 
+                store_id in (select distinct store_id from merchandiser_beat_plan where sales_rep_id='$sales_rep_id' and frequency='$frequency' and 
+                                date(created_on)<>date(now())) and date(date_of_visit)=date(now()) and is_edit='edit') B group by sales_rep_id) C 
+            on (A.sales_rep_id=C.sales_rep_id) 
+            left join 
+            (select count(*) as actual_count,sales_rep_id from 
+            (select store_id,sales_rep_id,date_of_visit from merchandiser_detailed_beat_plan where sales_rep_id='$sales_rep_id' and frequency='$frequency' and 
+                date(date_of_visit)=date(now())) B group by sales_rep_id) D 
+            on (A.sales_rep_id=D.sales_rep_id)
+            left join 
+            (select count(*) as actual_count2,sales_rep_id from 
+            (select store_id,sales_rep_id from merchandiser_beat_plan where sales_rep_id='$sales_rep_id' and frequency='$frequency') B group by sales_rep_id) G 
+            on (A.sales_rep_id=G.sales_rep_id)) AA 
+            union 
+            select * from 
+            (select A.*, (ifnull(T.tem_visit_count,0)+ifnull(F.unplanned_count,0)) as unplanned_count, ifnull(E.p_call,0) as p_call, B.sales_rep_name, 
+                ifnull(C.planned_count,0) as planned_count, ifnull(case when D.actual_count is null then G.actual_count2 else D.actual_count end,0) as actual_count from 
+            (select distinct sales_rep_id,frequency from sales_rep_beat_plan where sales_rep_id='$sales_rep_id' and frequency='$frequency') A 
+            left join 
+            (select sales_rep_name,id from sales_rep_master where id='$sales_rep_id' and status='Approved') B 
+            on (A.sales_rep_id=B.id) 
+            left join 
+            (select count(id) as unplanned_count,sales_rep_id,frequency from 
+            (select id,sales_rep_id,frequency from sales_rep_detailed_beat_plan A where sales_rep_id='$sales_rep_id' and frequency='$frequency' and 
+                store_id in (select distinct store_id from sales_rep_beat_plan where sales_rep_id='$sales_rep_id' and frequency='$frequency' and 
+                                date(created_on)=date(now())) and date(date_of_visit)=date(now())) A group by sales_rep_id,frequency) F 
+            on (A.sales_rep_id=F.sales_rep_id) 
+            left join 
+            (select count(id) as tem_visit_count,sales_rep_id,frequency from sales_rep_detailed_beat_plan 
+                where sales_rep_id='$sales_rep_id' and frequency='$frequency'  and 
+                store_id not in (select distinct store_id from sales_rep_beat_plan where sales_rep_id='$sales_rep_id' and frequency='$frequency') and 
+                                    date(date_of_visit)=date(now()) group by sales_rep_id,frequency) T 
+            on (A.sales_rep_id=T.sales_rep_id) 
+            left join 
+            (select count(id) as p_call,sales_rep_id from sales_rep_orders where sales_rep_id='$sales_rep_id' and date(date_of_processing)=date(now()) and 
+                channel_type='GT' group by sales_rep_id) E 
+            on (A.sales_rep_id=E.sales_rep_id) 
+            left join 
+            (select count(*) as planned_count,sales_rep_id from 
+            (select store_id,sales_rep_id,date_of_visit from sales_rep_detailed_beat_plan where sales_rep_id='$sales_rep_id' and frequency='$frequency' and 
+                store_id in (select distinct store_id from sales_rep_beat_plan where sales_rep_id='$sales_rep_id' and frequency='$frequency' and 
+                                date(created_on)<>date(now())) and date(date_of_visit)=date(now()) and is_edit='edit') B group by sales_rep_id) C 
+            on (A.sales_rep_id=C.sales_rep_id) 
+            left join 
+            (select count(*) as actual_count,sales_rep_id from 
+            (select store_id,sales_rep_id,date_of_visit from sales_rep_detailed_beat_plan where sales_rep_id='$sales_rep_id' and frequency='$frequency' and 
+                date(date_of_visit)=date(now())) B group by sales_rep_id) D 
+            on (A.sales_rep_id=D.sales_rep_id)
+            left join 
+            (select count(*) as actual_count2,sales_rep_id from 
+            (select store_id,sales_rep_id from sales_rep_beat_plan where sales_rep_id='$sales_rep_id' and frequency='$frequency') B group by sales_rep_id) G 
+            on (A.sales_rep_id=G.sales_rep_id)) AA) AA";
+        $query=$this->db->query($sql);
+        return $query->result();
+    }
 
-
+    function get_order_details($sales_rep_id=''){
+        $sql="select A.id, A.sales_rep_name, ifnull(B.bar_cnt,0) as bar_cnt, ifnull(B.box_cnt,0) as box_cnt, 
+                    ifnull(B.cookies_cnt,0) as cookies_cnt, ifnull(B.trailmix_cnt,0) as trailmix_cnt from 
+                (select id,sales_rep_name from sales_rep_master where id='$sales_rep_id' and status='Approved') A 
+                left join 
+                (select A.sales_rep_id, sum(A.bar_cnt) as bar_cnt, sum(A.box_cnt) as box_cnt, sum(A.cookies_cnt) as cookies_cnt, sum(A.trailmix_cnt) as trailmix_cnt from 
+                (select A.id, A.sales_rep_id, case when B.type='Bar' then case when B.qty>0 then 1 else 0 end else 0 end as bar_cnt, 
+                    case when B.type='Box' and B.item_id in (1, 3, 9, 8, 12, 29, 31, 32) then case when B.qty>0 then 1 else 0 end else 0 end as box_cnt, 
+                    case when B.type='Box' and B.item_id in (37, 38, 39) then case when B.qty>0 then 1 else 0 end else 0 end as cookies_cnt, 
+                    case when B.type='Box' and B.item_id in (40, 41, 42) then case when B.qty>0 then 1 else 0 end else 0 end as trailmix_cnt 
+                from sales_rep_orders A left join sales_rep_order_items B on (A.id=B.sales_rep_order_id) where date(date_of_processing)=date(now())) A 
+                where A.sales_rep_id='$sales_rep_id' group by A.sales_rep_id) B 
+                on (A.id=B.sales_rep_id)";
+        $query=$this->db->query($sql);
+        return $query->result();
+    }
 }
 ?>

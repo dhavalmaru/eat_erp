@@ -2,7 +2,6 @@
 if(! defined ('BASEPATH') ){exit('No direct script access allowed');}
 
 class Eat_Attendence extends CI_controller {
-
     public function __construct(){
         parent::__construct();
         $this->load->helper('url');
@@ -14,22 +13,19 @@ class Eat_Attendence extends CI_controller {
         $this->load->model('Attendence_model','attendence');
     }
 
-    public function index()
-    {
-      $year = date("Y");
-      $month = date("m");
-      $this->checkstatus($status='',$year,$month);
+    public function index(){
+        $year = date("Y");
+        $month = date("m");
+        $this->checkstatus($status='',$year,$month);
     }
 
-    public function upload()
-    {
-      $employee = $this->attendence->get_employee_code();
-      $data['employee'] = $employee;
-      load_view('emp_attendence/upload_emp_attendence', $data);
+    public function upload(){
+        $employee = $this->attendence->get_employee_code();
+        $data['employee'] = $employee;
+        load_view('emp_attendence/upload_emp_attendence', $data);
     }
 
-    public function upload_excel()
-    {
+    public function upload_excel(){
         $path=FCPATH.'assets/uploads/attendence_upload/';
         $config = array(
             'upload_path' => $path,
@@ -59,6 +55,8 @@ class Eat_Attendence extends CI_controller {
           $batch_array = array();
           $employee_array = array();
           $unique_employee_array = array();
+
+          $this->insert_sales_attendence();
 
           for($i=4;$i<=$highestrow;$i++)
           { 
@@ -131,25 +129,39 @@ class Eat_Attendence extends CI_controller {
 
                           if(count($result)>0)
                           {
-                             $data = array('emp_no' =>$emp_no,
-                                          'emp_name' => $emp_name,
-                                          'job_title' => $job_title,
-                                          'department' =>$department,
-                                          'location' => $location,
-                                          'date' => $date,
-                                          'first_in' => $first_in,
-                                          'last_out'=>$last_out,
-                                          'adjusted_in_time' => $first_in,
-                                          'adjusted_out_time'=>$last_out,
-                                          'emp_status'=>$emp_status,
-                                          'effective_hour'=>$effective_hour,
-                                          'gross_hour'=>$gross_hour,
-                                          'modified_by' => $curusr,
-                                          'modified_on' => $now,
-                                       );
-                            $this->db->where($where)->update('employee_attendence',$data);
-                            // echo $this->db->last_query();
-                            // echo "<br/><br/>";
+                               if($result[0]->is_sales==1)
+                               {
+                                 $data = array('emp_name' => $emp_name,
+                                                'job_title' =>$job_title,
+                                                'department' =>$department,
+                                                'location' => $location,
+                                                'date' => $date
+                                           );
+                                 $this->db->where($where)->update('employee_attendence',$data);
+                                 $this->db->last_query();
+                               }
+                               else
+                               {
+                                    $data = array('emp_no' =>$emp_no,
+                                                  'emp_name' => $emp_name,
+                                                  'job_title' => $job_title,
+                                                  'department' =>$department,
+                                                  'location' => $location,
+                                                  'date' => $date,
+                                                  'first_in' => $first_in,
+                                                  'last_out'=>$last_out,
+                                                  'adjusted_in_time' => $first_in,
+                                                  'adjusted_out_time'=>$last_out,
+                                                  'emp_status'=>$emp_status,
+                                                  'effective_hour'=>$effective_hour,
+                                                  'gross_hour'=>$gross_hour,
+                                                  'modified_by' => $curusr,
+                                                  'modified_on' => $now,
+                                               );
+                                    $this->db->where($where)->update('employee_attendence',$data);
+                                    // echo $this->db->last_query();
+                                    // echo "<br/><br/>";
+                                }
                           } else {
                              $data = array(  'emp_no' =>$emp_no,
                                           'emp_name' => $emp_name,
@@ -282,6 +294,110 @@ class Eat_Attendence extends CI_controller {
           redirect(base_url().'index.php/Eat_Attendence');
     }
 
+    public function insert_sales_attendence(){
+        $now=date('Y-m-d H:i:s');
+        $month = (intval(date("m"))-1);
+        $sql = "Select U.first_name,U.emp_code ,A.*,S.sr_type,S.zone from 
+                (SELECT * from sales_attendence Where MONTH(check_in_time)=$month Order By sales_rep_id,check_in_time ASC)A
+                Left Join user_master U On A.sales_rep_id=U.sales_rep_id
+                Left Join sales_rep_master S On A.sales_rep_id=S.id";
+        $result = $this->db->query($sql)->result();
+
+        for($i=0;$i<count($result);$i++){
+            $now=date('Y-m-d H:i:s');
+            $curusr=$this->session->userdata('session_id');
+            $emp_name = $result[$i]->first_name;
+            $emp_no = $result[$i]->emp_code;
+            $job_title = $result[$i]->sr_type;
+            $department = 'Sales';
+            $location = $result[$i]->zone;
+            $check_in_time = $result[$i]->check_in_time;
+            $date = date('Y-m-d',strtotime($check_in_time));
+            $first_in = date('H:i',strtotime($check_in_time));
+            if($check_in_time!=null) $last_out=0;
+            $emp_status = $result[$i]->working_status;
+            
+            $where = array("emp_no"=>$emp_no,'date'=>$date);
+            $result1 = $this->db->select("*")->where($where)->get("employee_attendence")->result();
+            $this->db->last_query();
+
+            if(count($result1)==0){
+                $data = array('emp_no' =>$emp_no,
+                      'emp_name' => $emp_name,
+                      'job_title' => $job_title,
+                      'department' =>$department,
+                      'location' => $location,
+                      'date' => $date,
+                      'first_in' => $first_in,
+                      'last_out'=>$last_out,
+                      'adjusted_in_time' => $first_in,
+                      'adjusted_out_time'=>$last_out,
+                      'emp_status'=>$emp_status,
+                      'modified_by' => $curusr,
+                      'modified_on' => $now,
+                      'created_by' => $curusr,
+                      'created_on' => $now,
+                      'is_sales'=>1
+                    );
+
+                $this->db->insert('employee_attendence',$data);
+                $this->db->last_query();
+            }
+        }
+    }
+
+    public function synchronise(){
+        $emp_code= $this->input->post('emp_code');
+        $month= $this->input->post('month');
+
+        $sql = "Select U.first_name,U.emp_code ,A.*,S.sr_type,S.zone from 
+        (SELECT * from sales_attendence Where MONTH(check_in_time)=$month Order By sales_rep_id,check_in_time ASC)A
+        Left Join user_master U On A.sales_rep_id=U.sales_rep_id
+        Left Join sales_rep_master S On A.sales_rep_id=S.id
+        Where U.emp_code='$emp_code' ";
+
+        $result = $this->db->query($sql)->result();
+
+        for($i=0;$i<count($result);$i++){
+            $now=date('Y-m-d H:i:s');
+            $last_out = null;
+            $curusr=$this->session->userdata('session_id');
+            $emp_name = $result[$i]->first_name;
+            $emp_no = $result[$i]->emp_code;
+            $job_title = $result[$i]->sr_type;
+            $department = 'Sales';
+            $location = $result[$i]->zone;
+            $check_in_time = $result[$i]->check_in_time;
+            $date = date('Y-m-d',strtotime($check_in_time));
+            $first_in = date('H:m',strtotime($check_in_time));
+            $check_out_time = $result[$i]->check_out_time;
+            if($check_out_time!=null)
+              $last_out = date('H:m',strtotime($check_out_time));
+            $emp_status = $result[$i]->working_status;
+            
+            /*$where = array("emp_no"=>$emp_no,'date'=>$date);
+            $result1 = $this->db->select("*")->where($where)->get("employee_attendence")->result();
+            $this->db->last_query();*/
+            $where = array("emp_no"=>$emp_no,'date'=>$date);
+            $data = array('emp_no' =>$emp_no,
+                          'date' => $date,
+                          'first_in' => $first_in,
+                          'last_out'=>$last_out,
+                          'emp_status'=>$emp_status,
+                          'adjusted_in_time' => $first_in,
+                          'adjusted_out_time'=>$last_out,
+                          'modified_by' => $curusr,
+                          'modified_on' => $now,
+                          'is_sales'=>1,
+                          'status'=>NULL
+                    );
+            $this->db->where($where)->update('employee_attendence',$data);
+            $this->db->last_query();
+        }
+
+        redirect(base_url().'index.php/Eat_Attendence/');
+    }
+    
     public function get_employee_attendence($emp_no,$year,$month)
     {
       $result = $this->attendence->get_employee_attendence($emp_no,$year,$month);
@@ -556,9 +672,20 @@ class Eat_Attendence extends CI_controller {
         $status = $this->input->post("status");
         $year =   $this->input->post("year");
         $month =  $this->input->post("month");
+
+        // $status = 'pending_for_approval';
+        // $year = '2019';
+        // $month = '04';
+
         $data=$this->attendence->get_summary($status,$year,$month);
         $records = array();
         for ($i=0; $i < count($data); $i++) { 
+            if($data[$i]->is_sales==1){
+                $emp_data = '<input type="checkbox" id="check_'.$i.'" class="check icheckbox" name="check_val[]"  data-empcode="'.$data[$i]->emp_no.'"  data-month="'.$data[$i]->month_no.'" />';
+            } else {
+                $emp_data = '';
+            }
+
               $records[] =  array(
                       $i+1,                       
                       ''.$data[$i]->emp_no.'',
@@ -568,7 +695,8 @@ class Eat_Attendence extends CI_controller {
                       ''.$data[$i]->total_days.'',
                       ''.$data[$i]->no_of_holiday.'',
                       ''.$data[$i]->weekly_off.'',
-                      ''.$data[$i]->no_of_leave.''
+                      ''.$data[$i]->no_of_leave.'',
+                      ''.$emp_data.''
                       /*
                        '<a href="'.base_url().'index.php/Eat_Attendence/send_mail/'.$data[$i]->emp_no.'/'.$data[$i]->year.'/'.$data[$i]->month_no.'">Resend Mail</a>',*/
                   );

@@ -854,7 +854,12 @@ class Sales_Attendence extends CI_controller {
         $query=$this->db->query($sql);
         $result=$query->result();
 
-        $data['data'] = $result;
+        if(count($result)>0){
+        	$data['data'] = $result;
+        } else {
+        	$data['data'] = array();
+        }
+        
     	echo json_encode($data);
     }
 

@@ -14,6 +14,7 @@
         <link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>css/theme-blue.css"/>
 		<link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url(); ?>mobile-menu/vendor-1437d0659c.css"/>
 		<link rel="stylesheet" type="text/css" id="theme" href="<?php echo base_url().'css/custome_vj_css.css'; ?>"/>    
+        <link rel="stylesheet" href="<?php echo base_url(); ?>css/logout/popModal.css">
         <!-- EOF CSS INCLUDE -->   
         <style>
             .fa-eye  { font-size:21px; color:#333;}
@@ -24,7 +25,7 @@
 
         <style>
             .sidenav1 {
-               height: 50%;
+                height: 50%;
                 width: 0;
                 position: fixed;
                 z-index: 1;
@@ -222,13 +223,14 @@
                                         <tr>
                                             <th width="65"  style="text-align:center;"  >Sr. No.</th>
                                             <th width="95">Employee Code</th>
-											   <th width="65" style="text-align:center; ">Edit</th>
+											<th width="65" style="text-align:center; ">Edit</th>
                                             <th width=" ">Employee Name</th>
                                             <th width=" ">Date</th>
                                             <th width=" ">Total Count</th>
                                             <th width=" ">Total Holiday</th>
                                             <th width=" ">Total Weekly Off</th>
                                             <th width=" ">Total Leaves</th>
+                                            <th width=" ">Sync</th>
                                             <!-- <th width="110 ">Creation Date</th>-->
                                             <!-- <th width="100" style="text-align:center;">Send Email</th> -->
                                         </tr>
@@ -278,223 +280,285 @@
                     </div>
                 </div>
             </div>
-            <!-- END PAGE CONTENT -->
+
+            <div id="confirm_content" style="display:none">
+                <form action="<?=base_url('index.php/Eat_Attendence/synchronise')?>" method="POST" id="attendence">
+                    <div class="logout-containerr">
+                        <button type="button" class="close" data-confirmmodal-but="close">×</button>
+                        <div class="confirmModal_header"> <span class="fa fa-sign-out"></span>Sync</div>
+                        <div class="confirmModal_content">
+                           <p>Are You Sure, You want this Sync?</p>
+                        </div>
+                        <div class="confirmModal_footer">
+                           <input type="hidden" name="emp_code"  id="emp_code"  value="">
+                           <input type="hidden" name="month" id="data_month" value="">
+                           <button type="button" class="btn " data-confirmmodal-but="ok">Yes</button>
+                           <button type="button" class="btn " data-confirmmodal-but="cancel">No</button>
+                        </div>
+                     </div>
+                </form>
+            </div>
         </div>
         <!-- END PAGE CONTAINER -->
 						
         <?php $this->load->view('templates/footer');?>
 		
-    <!-- END SCRIPTS -->      
-    <script type="text/javascript">
-        var BASE_URL="<?php echo base_url()?>";
-    </script>
-    <script type="text/javascript">
-        $(document).ready(function() { 
-            var url = window.location.href;
-            if(url.includes('pending_for_approval')){
-                $('.pending_for_approval').addClass('ng-binding');
-                $('.pending_for_approval').attr('class','active');
-            } else  if(url.includes('Approved')){
-                $('.approved').addClass('ng-binding');
-                $('.approved').addClass('active');
-            } else  if(url.includes('Pending')){
-                // console.log('pending');
-                $('.pending').addClass('ng-binding');
-                $('.pending').addClass('active');
-            } else  if(url.includes('Rejected')){
-                // console.log('pending');
-                $('.rejected').addClass('ng-binding');
-                $('.rejected').addClass('active');
-            } else {
-                $('.pending_for_approval').addClass('ng-binding');
-                $('.pending_for_approval').addClass('active');
-            }
-            $('.ahrefall').click(function(){
-                alert(window.location.href );
+        <!-- END SCRIPTS -->      
+        <script type="text/javascript">
+            var BASE_URL="<?php echo base_url()?>";
+        </script>
+        <script type="text/javascript">
+            $(document).ready(function() { 
+                var url = window.location.href;
+                if(url.includes('pending_for_approval')){
+                    $('.pending_for_approval').addClass('ng-binding');
+                    $('.pending_for_approval').attr('class','active');
+                } else  if(url.includes('Approved')){
+                    $('.approved').addClass('ng-binding');
+                    $('.approved').addClass('active');
+                } else  if(url.includes('Pending')){
+                    // console.log('pending');
+                    $('.pending').addClass('ng-binding');
+                    $('.pending').addClass('active');
+                } else  if(url.includes('Rejected')){
+                    // console.log('pending');
+                    $('.rejected').addClass('ng-binding');
+                    $('.rejected').addClass('active');
+                } else {
+                    $('.pending_for_approval').addClass('ng-binding');
+                    $('.pending_for_approval').addClass('active');
+                }
+                $('.ahrefall').click(function(){
+                    alert(window.location.href );
+                });
             });
-        });
-    </script>
-    <script>
-        var table;
-        var status = '<?php echo $status; ?>';
-        
-        // var d = new Date();
-        // var current_year = d.getFullYear();
-        // var current_year = "2018";
-        $(document).ready(function() {
-            $("#send_mail").click(function(){
-                $(this).text('Processing...');
+        </script>
+        <script>
+            var table;
+            var status = '<?php echo $status; ?>';
+            var user_loggedin = '<?php echo $this->session->userdata("user_name")?>';
+            
+            // var d = new Date();
+            // var current_year = d.getFullYear();
+            // var current_year = "2018";
+            $(document).ready(function() {
+                $('body').on('click', '.icheckbox', function() {
+                    var emp = $(this).attr('data-empcode');
+                    var month =  $(this).attr('data-month');
+                    /*alert(month);*/
+                    $("#emp_code").val(emp);
+                    $("#data_month").val(month);
+
+                    if($(this).is(':checked'))
+                    {
+                         $('#confirm_content').confirmModal({
+                                topOffset: 0,
+                                onOkBut: function() {
+                                    $("#attendence").submit();
+                                },
+                                onCancelBut: function() {
+                                   $("#attendence").submit();
+                                },
+                                onLoad: function() {
+                                 },
+                                onClose: function() {
+                                }
+                              });   
+                    }
+                });
+
+                $("#send_mail").click(function(){
+                    $(this).text('Processing...');
+                    var selected_month = $("#month").val();
+                    if(selected_month.indexOf("-")!=-1){
+                        var current_year = selected_month.substring(0, selected_month.indexOf("-"));
+                        selected_month = selected_month.substring(selected_month.indexOf("-")+1);
+                        // console.log(current_year);
+                        // console.log(selected_month);
+                        $.ajax({
+                            url : BASE_URL+'index.php/Eat_Attendence/send_bulk_mail/'+current_year+'/'+selected_month,
+                            type : 'GET',
+                            success:function(data){
+                                if(data=='success'){
+                                    $("#send_mail").html('<i class="fa fa-send-o"></i>   Send Mail');
+                                }
+                                /*var obj = JSON.parse(data);
+                                $('#approved').text('('+obj.approved+')');
+                                $('#pending').text('('+obj.pending+')');
+                                $('#pending_for_approval').text('('+obj.pending_for_approval+')');
+                                $('#rejected').text('('+obj.rejected+')');*/
+                            }
+                        });
+                    }
+                });
+
+                if(status=='') status='pending_for_approval';
+
+                get_attendence();
+                get_count();              
+
+                $( "#month" ).change(function() {
+                    $('#customers10').DataTable().destroy();
+                    get_attendence();
+                    get_count(); 
+                });
+
+                $('.ng-binding').click(function(){
+                    $('.ng-binding').each(function(){
+                        if ($(this).hasClass('active')){
+                            $(this).removeClass('active');
+                        }
+                    });
+
+                    $(this).addClass('ng-binding');
+                    $(this).addClass('active');
+
+                    $('#customers10').DataTable().destroy();
+
+                    status = $(this).attr('data-attr');
+                    get_attendence();
+                    get_count();     
+                });
+            });
+
+            function get_attendence(){
+                var len=10;
                 var selected_month = $("#month").val();
+                // console.log(selected_month);
+                
+                if(selected_month.indexOf("-")!=-1){
+                    var current_year = selected_month.substring(0, selected_month.indexOf("-"));
+                    selected_month = selected_month.substring(selected_month.indexOf("-")+1);
+                    // console.log(status);
+                    // console.log(current_year);
+                    // console.log(selected_month);
+
+                    table =  $('#customers10');
+                    if(user_loggedin=='rishit.sanghvi@eatanytime.in' || user_loggedin=='swapnil.darekar@eatanytime.in') {
+                        columnDefs = [
+                                        { "width": "10%", "targets": 9 },
+                                            { className: "dt-body-center", targets: [ 9 ] }
+                                        ];
+                    } else {
+                        columnDefs = [
+                                       {
+                                            "targets": [9],
+                                            "visible": false,
+                                            "searchable": false
+                                        },
+                                        { "width": "10%", "targets": 9 },
+                                        { className: "dt-body-center", targets: [ 9 ] }
+                                    ];
+                    }
+
+                    var tableOptions = {
+                        "columnDefs": columnDefs,
+                        'bPaginate': true,
+                        'iDisplayLength': len,
+                        aLengthMenu: [
+                            [10,25, 50, 100, 200, -1],
+                            [10,25, 50, 100, 200, "All"]
+                        ],
+                        "ajax": {
+                            url : BASE_URL+'index.php/Eat_Attendence/get_data_ajax',
+                            data: {status: status,year:current_year,month:selected_month},
+                            type : 'POST'
+                        },
+                        'bDeferRender': true,
+                        'bProcessing': true,
+                        'paging': false
+                    };
+                    table.DataTable(tableOptions);
+                    
+                    $("#csv").click(function(){
+                        table.DataTable().destroy();
+                        tableOptions.bPaginate = false;
+                        table.DataTable(tableOptions);
+                        table.tableExport({type:'csv',escape:'false'});
+                        table.DataTable().destroy();
+                        tableOptions.bPaginate = true;
+                        table.DataTable(tableOptions);
+                    });
+                    $("#xls").click(function(){
+                        table.DataTable().destroy();
+                        tableOptions.bPaginate = false;
+                        table.DataTable(tableOptions);
+                        table.tableExport({type:'excel',escape:'false'});
+                        table.DataTable().destroy();
+                        tableOptions.bPaginate = true;
+                        table.DataTable(tableOptions);
+                    });
+                    $("#txt").click(function(){
+                        table.DataTable().destroy();
+                        tableOptions.bPaginate = false;
+                        table.DataTable(tableOptions);
+                        table.tableExport({type:'txt',escape:'false'});
+                        table.DataTable().destroy();
+                        tableOptions.bPaginate = true;
+                        table.DataTable(tableOptions);
+                    });
+                    $("#doc").click(function(){
+                        table.DataTable().destroy();
+                        tableOptions.bPaginate = false;
+                        table.DataTable(tableOptions);
+                        table.tableExport({type:'doc',escape:'false'});
+                        table.DataTable().destroy();
+                        tableOptions.bPaginate = true;
+                        table.DataTable(tableOptions);
+                    });
+                    $("#powerpoint").click(function(){
+                        table.DataTable().destroy();
+                        tableOptions.bPaginate = false;
+                        table.DataTable(tableOptions);
+                        table.tableExport({type:'powerpoint',escape:'false'});
+                        table.DataTable().destroy();
+                        tableOptions.bPaginate = true;
+                        table.DataTable(tableOptions);
+                    });
+                    $("#png").click(function(){
+                        table.DataTable().destroy();
+                        tableOptions.bPaginate = false;
+                        table.DataTable(tableOptions);
+                        table.tableExport({type:'png',escape:'false'});
+                        table.DataTable().destroy();
+                        tableOptions.bPaginate = true;
+                        table.DataTable(tableOptions);
+                    });
+                    $("#pdf").click(function(){
+                        table.DataTable().destroy();
+                        tableOptions.bPaginate = false;
+                        table.DataTable(tableOptions);
+                        table.tableExport({type:'pdf',escape:'false'});
+                        table.DataTable().destroy();
+                        tableOptions.bPaginate = true;
+                        table.DataTable(tableOptions);
+                    });
+                }
+            }
+
+            function get_count(){
+                var selected_month = $("#month").val();
+
                 if(selected_month.indexOf("-")!=-1){
                     var current_year = selected_month.substring(0, selected_month.indexOf("-"));
                     selected_month = selected_month.substring(selected_month.indexOf("-")+1);
                     // console.log(current_year);
                     // console.log(selected_month);
+
                     $.ajax({
-                        url : BASE_URL+'index.php/Eat_Attendence/send_bulk_mail/'+current_year+'/'+selected_month,
-                        type : 'GET',
+                        url : BASE_URL+'index.php/Eat_Attendence/get_total_count',
+                        data: {status: '',year:current_year,month:selected_month},
+                        type : 'POST',
                         success:function(data){
-                            if(data=='success'){
-                                $("#send_mail").html('<i class="fa fa-send-o"></i>   Send Mail');
-                            }
-                            /*var obj = JSON.parse(data);
+                            var obj = JSON.parse(data);
                             $('#approved').text('('+obj.approved+')');
                             $('#pending').text('('+obj.pending+')');
                             $('#pending_for_approval').text('('+obj.pending_for_approval+')');
-                            $('#rejected').text('('+obj.rejected+')');*/
+                            $('#rejected').text('('+obj.rejected+')');
                         }
                     });
                 }
-            });
-
-            if(status=='') status='pending_for_approval';
-
-            get_attendence();
-            get_count();              
-
-            $( "#month" ).change(function() {
-                $('#customers10').DataTable().destroy();
-                get_attendence();
-                get_count(); 
-            });
-
-            $('.ng-binding').click(function(){
-                $('.ng-binding').each(function(){
-                    if ($(this).hasClass('active')){
-                        $(this).removeClass('active');
-                    }
-                });
-
-                $(this).addClass('ng-binding');
-                $(this).addClass('active');
-
-                $('#customers10').DataTable().destroy();
-
-                status = $(this).attr('data-attr');
-                get_attendence();
-                get_count();     
-            });
-        });
-
-        function get_attendence(){
-            var len=10;
-            var selected_month = $("#month").val();
-            // console.log(selected_month);
-            
-            if(selected_month.indexOf("-")!=-1){
-                var current_year = selected_month.substring(0, selected_month.indexOf("-"));
-                selected_month = selected_month.substring(selected_month.indexOf("-")+1);
-                // console.log(current_year);
-                // console.log(selected_month);
-
-                table =  $('#customers10');
-                var tableOptions = {
-                    'bPaginate': true,
-                    'iDisplayLength': len,
-                    aLengthMenu: [
-                        [10,25, 50, 100, 200, -1],
-                        [10,25, 50, 100, 200, "All"]
-                    ],
-                    "ajax": {
-                        url : BASE_URL+'index.php/Eat_Attendence/get_data_ajax',
-                        data: {status: status,year:current_year,month:selected_month},
-                        type : 'POST'
-                    },
-                    'bDeferRender': true,
-                    'bProcessing': true,
-                    'paging': false
-                };
-                table.DataTable(tableOptions);
-                
-                $("#csv").click(function(){
-                    table.DataTable().destroy();
-                    tableOptions.bPaginate = false;
-                    table.DataTable(tableOptions);
-                    table.tableExport({type:'csv',escape:'false'});
-                    table.DataTable().destroy();
-                    tableOptions.bPaginate = true;
-                    table.DataTable(tableOptions);
-                });
-                $("#xls").click(function(){
-                    table.DataTable().destroy();
-                    tableOptions.bPaginate = false;
-                    table.DataTable(tableOptions);
-                    table.tableExport({type:'excel',escape:'false'});
-                    table.DataTable().destroy();
-                    tableOptions.bPaginate = true;
-                    table.DataTable(tableOptions);
-                });
-                $("#txt").click(function(){
-                    table.DataTable().destroy();
-                    tableOptions.bPaginate = false;
-                    table.DataTable(tableOptions);
-                    table.tableExport({type:'txt',escape:'false'});
-                    table.DataTable().destroy();
-                    tableOptions.bPaginate = true;
-                    table.DataTable(tableOptions);
-                });
-                $("#doc").click(function(){
-                    table.DataTable().destroy();
-                    tableOptions.bPaginate = false;
-                    table.DataTable(tableOptions);
-                    table.tableExport({type:'doc',escape:'false'});
-                    table.DataTable().destroy();
-                    tableOptions.bPaginate = true;
-                    table.DataTable(tableOptions);
-                });
-                $("#powerpoint").click(function(){
-                    table.DataTable().destroy();
-                    tableOptions.bPaginate = false;
-                    table.DataTable(tableOptions);
-                    table.tableExport({type:'powerpoint',escape:'false'});
-                    table.DataTable().destroy();
-                    tableOptions.bPaginate = true;
-                    table.DataTable(tableOptions);
-                });
-                $("#png").click(function(){
-                    table.DataTable().destroy();
-                    tableOptions.bPaginate = false;
-                    table.DataTable(tableOptions);
-                    table.tableExport({type:'png',escape:'false'});
-                    table.DataTable().destroy();
-                    tableOptions.bPaginate = true;
-                    table.DataTable(tableOptions);
-                });
-                $("#pdf").click(function(){
-                    table.DataTable().destroy();
-                    tableOptions.bPaginate = false;
-                    table.DataTable(tableOptions);
-                    table.tableExport({type:'pdf',escape:'false'});
-                    table.DataTable().destroy();
-                    tableOptions.bPaginate = true;
-                    table.DataTable(tableOptions);
-                });
             }
-        }
-
-        function get_count(){
-            var selected_month = $("#month").val();
-
-            if(selected_month.indexOf("-")!=-1){
-                var current_year = selected_month.substring(0, selected_month.indexOf("-"));
-                selected_month = selected_month.substring(selected_month.indexOf("-")+1);
-                // console.log(current_year);
-                // console.log(selected_month);
-
-                $.ajax({
-                    url : BASE_URL+'index.php/Eat_Attendence/get_total_count',
-                    data: {status: '',year:current_year,month:selected_month},
-                    type : 'POST',
-                    success:function(data){
-                        var obj = JSON.parse(data);
-                        $('#approved').text('('+obj.approved+')');
-                        $('#pending').text('('+obj.pending+')');
-                        $('#pending_for_approval').text('('+obj.pending_for_approval+')');
-                        $('#rejected').text('('+obj.rejected+')');
-                    }
-                });
-            }
-        }
-    </script>
+        </script>
     </body>
 </html>
