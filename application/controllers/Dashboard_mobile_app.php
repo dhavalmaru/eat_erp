@@ -249,11 +249,13 @@ class Dashboard_mobile_app extends CI_Controller
         // $pending_id = ['5'];
         // $status = 'Approved';
 
+        $pending_id_arr = [$pending_id];
+
         if($status==null || $status==''){
             $status = 'Pending';
         }
         
-        $data = $this->Sales_location_model->approve_beat_plan($frequency, $pending_id, $curusr, $status);
+        $data = $this->Sales_location_model->approve_beat_plan($frequency, $pending_id_arr, $curusr, $status);
         echo $data;
     }
     

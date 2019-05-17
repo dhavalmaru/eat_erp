@@ -69,6 +69,63 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
             $frequency = 'Every '.$day;
         }
 
+        $data['reporting_manager_id']='';
+        $data['distributor_id_og']='';
+        $data['beat_id_og']='';
+        $data['distributor_id']='';
+        $data['beat_id']='';
+        $data['beat_status']='Approved';
+        $data['distributor_name']='';
+        $data['beat_name']='';
+
+        $data['beat_details'] = $this->Sales_location_model->get_new_beat_details($sales_rep_id);
+        if(count($data['beat_details'])>0){
+            $data['reporting_manager_id']=$data['beat_details'][0]->reporting_manager_id;
+
+            $beat_status = $data['beat_details'][0]->status;
+            if(strtoupper(trim($beat_status))=="PENDING"){
+                $data['distributor_id_og']=$data['beat_details'][0]->dist_id1;
+                $data['beat_id_og']=$data['beat_details'][0]->beat_id1;
+                $data['distributor_name']=$data['beat_details'][0]->distributor_name1;
+                $data['beat_name']=$data['beat_details'][0]->beat_name1;
+            } else {
+                $data['distributor_id_og']=$data['beat_details'][0]->dist_id2;
+                $data['beat_id_og']=$data['beat_details'][0]->beat_id2;
+                $data['distributor_name']=$data['beat_details'][0]->distributor_name2;
+                $data['beat_name']=$data['beat_details'][0]->beat_name2;
+            }
+            
+            $data['distributor_id']=$data['beat_details'][0]->dist_id2;
+            $data['beat_id']=$data['beat_details'][0]->beat_id2;
+            $data['beat_status']=$data['beat_details'][0]->status;
+        }
+
+        // echo $data['distributor_name'];
+        // echo '<br/>';
+
+        if($data['distributor_id']=="") {
+            $data['beat_details'] = $this->Sales_location_model->get_beat_details($day, $sales_rep_id);
+            if(count($data['beat_details'])>0){
+                $data['reporting_manager_id']=$data['beat_details'][0]->reporting_manager_id;
+
+                if($frequency == 'Alternate '.$day){
+                    $data['distributor_id_og']=$data['beat_details'][0]->alternate_dist;
+                    $data['beat_id_og']=$data['beat_details'][0]->alternate_beat;
+                    $data['distributor_id']=$data['beat_details'][0]->alternate_dist;
+                    $data['beat_id']=$data['beat_details'][0]->alternate_beat;
+                    $data['distributor_name']=$data['beat_details'][0]->distributor_name2;
+                    $data['beat_name']=$data['beat_details'][0]->beat_name2;
+                } else {
+                    $data['distributor_id_og']=$data['beat_details'][0]->every_dist;
+                    $data['beat_id_og']=$data['beat_details'][0]->every_beat;
+                    $data['distributor_id']=$data['beat_details'][0]->every_dist;
+                    $data['beat_id']=$data['beat_details'][0]->every_beat;
+                    $data['distributor_name']=$data['beat_details'][0]->distributor_name1;
+                    $data['beat_name']=$data['beat_details'][0]->beat_name1;
+                }
+            }
+        }
+
         $data['data']=$this->Sales_location_model->get_data('Approved', '', $frequency, $temp_date, $sales_rep_id);
         $data['merchendizer']=$this->Sales_location_model->get_merchendiser_data('Approved', '', $frequency, $temp_date, $sales_rep_id);
         $data['mt_followup']=$this->Sales_location_model->get_mtfollowup('', $temp_date, $sales_rep_id);
