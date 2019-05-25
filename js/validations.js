@@ -5823,9 +5823,6 @@ $("#form_distributor_po_details").validate({
         estimate_delivery_date: {
             required: true
         },
-        po_number:{
-            required: true     
-        },
         distributor_consignee_id:{
             required: true     
         },

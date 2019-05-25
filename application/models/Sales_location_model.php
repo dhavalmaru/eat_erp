@@ -3921,7 +3921,8 @@ public function get_mtfollowup($id='', $temp_date='', $sales_rep_id='') {
     $sql = "select Distinct A.*, D.is_edit, D.is_visited, '' as bit_plan_id, '' as sequence  from 
             (select A.id, A.dist_id as store_id, R.store_name, D.zone, A.zone_id, R.store_name as relation, 
                 '' as area_id, '' as area, C.location, 
-                A.location_id, A.id as merchandiser_stock_id, 'Old' as distributor_type, distributor_status, A.remarks from 
+                A.location_id, A.id as merchandiser_stock_id, 'Old' as distributor_type, distributor_status, A.remarks, 
+                A.latitude, A.longitude from 
             (select * from merchandiser_stock where date(followup_date)='$date' and m_id='$sales_rep_id' ".$cond.") A 
             left join 
             (Select * from relationship_master) R
@@ -3955,7 +3956,7 @@ public function get_gtfollowup($id='', $temp_date='', $sales_rep_id='') {
 
     $sql = "select distinct A.*, B.*, D.is_edit, D.is_visited, I.zone, J.area, K.location, A.distributor_name as store_name, 
             '' as bit_plan_id, '' as sequence from 
-            (select A.*, B.distributor_name from 
+            (select A.*, B.distributor_name, B.latitude, B.longitude from 
             (select id, id as sales_rep_loc_id, zone_id, location_id, area_id, distributor_id as store_id, 
                 followup_date, distributor_type, distributor_status, remarks 
             from sales_rep_location where date(followup_date)='$date' and sales_rep_id='$sales_rep_id') A

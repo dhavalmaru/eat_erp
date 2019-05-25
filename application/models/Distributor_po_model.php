@@ -181,7 +181,7 @@ function get_distributor_po_data1($status='', $id=''){
                         delivery_through!='WHPL' and (mismatch!='1' or mismatch is null)";
         } else if ($status=="pending_for_delivery"){
             $cond=" where status='Approved' and delivery_status='' and (distributor_id!='1' and distributor_id!='189') and 
-                        delivery_through!='WHPL' and type_id='7' and (mismatch!='1' or mismatch is null)";
+                        delivery_through!='WHPL' and (type_id='7' or type_id='4') and (mismatch!='1' or mismatch is null)";
         } else if ($status=="gt_dp"){
             $cond=" where status='Approved' and delivery_status='' and (distributor_id!='1' and distributor_id!='189') and 
                         delivery_through!='WHPL' and type_id='3' and (mismatch!='1' or mismatch is null)";
@@ -270,7 +270,7 @@ function get_distributor_po_data1($status='', $id=''){
 function get_distributor_po_data($status='', $id=''){
     if($status!=""){
         if ($status=="pending_for_delivery"){
-            $cond=" where (status='Approved' or status='Rejected') and type_id='7' and delivery_status='pending'";
+            $cond=" where (status='Approved' or status='Rejected') and (type_id='7' or type_id='4') and delivery_status='pending'";
         } else if ($status=="gt_dp"){
             $cond=" where (status='Approved' or status='Rejected') and type_id='3' and delivery_status='pending'";
         } else if ($status=="delivered_not_complete"){
@@ -721,9 +721,9 @@ function save_data($id=''){
             $this->db->query($sql);
         }
 
-        if(strtoupper(trim($delivery_through))=='WHPL'){
-            $this->set_sales_entry($id, $status);
-        }
+        // if(strtoupper(trim($delivery_through))=='WHPL'){
+        //     $this->set_sales_entry($id, $status);
+        // }
     }
 
     $logarray['table_id']=$id;
@@ -2125,14 +2125,17 @@ function send_po_delivery_report() {
         // $path  = '/home/eatangcp/public_html/test/assets/uploads/daily_sales_rep_reports/';
         // $path  = 'C:/xampp/htdocs/eat_erp/assets/uploads/daily_sales_rep_reports/';
 
-        $path  = '/home/eatangcp/public_html/test/assets/uploads/distributor_po_reports/';
-        $upload_path = '/home/eatangcp/public_html/test/assets/uploads/distributor_po_reports';
+        // $path  = '/home/eatangcp/public_html/test/assets/uploads/distributor_po_reports/';
+        // $upload_path = '/home/eatangcp/public_html/test/assets/uploads/distributor_po_reports';
 
-        // $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/distributor_po_reports/';
-        // $upload_path = '/home/eatangcp/public_html/eat_erp/assets/uploads/distributor_po_reports';
+        $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/distributor_po_reports/';
+        $upload_path = '/home/eatangcp/public_html/eat_erp/assets/uploads/distributor_po_reports';
 
         // $path  = 'C:/xampp/htdocs/eat_erp/assets/uploads/distributor_po_reports/';
         // $upload_path = 'C:/xampp/htdocs/eat_erp/assets/uploads/distributor_po_reports';
+        
+        // $path  = 'E:/wamp64/www/eat_erp/assets/uploads/distributor_po_reports/';
+        // $upload_path = 'E:/wamp64/www/eat_erp/assets/uploads/distributor_po_reports';
         
         if(!is_dir($upload_path)) {
             mkdir($upload_path, 0777, TRUE);
@@ -2144,10 +2147,10 @@ function send_po_delivery_report() {
         $objWriter->save($reportpath); 
         $attachment = $reportpath;
 
-		// $to_email = 'priti.tripathi@eatanytime.in, operations@eatanytime.in, rishit.sanghvi@eatanytime.in, 
-          //                   dhaval.maru@pecanreams.com, swapnil.darekar@eatanytime.in, ashwini.patil@pecanreams.com, 
-          //                   prasad.bhisale@pecanreams.com';
-        $to_email = 'prasad.bhisale@pecanreams.com';
+		$to_email = 'priti.tripathi@eatanytime.in, operations@eatanytime.in, rishit.sanghvi@eatanytime.in, 
+                          dhaval.maru@pecanreams.com, swapnil.darekar@eatanytime.in, ashwini.patil@pecanreams.com, 
+                          prasad.bhisale@pecanreams.com';
+        // $to_email = 'prasad.bhisale@pecanreams.com';
         $bcc = 'prasad.bhisale@pecanreams.com';
         $from_email = 'cs@eatanytime.co.in';
         $from_email_sender = 'Wholesome Habits Pvt Ltd';
@@ -2186,12 +2189,12 @@ function send_po_delivery_report() {
                 <br /><br />Thanks,<br />Team EAT Anytime
                 </body></html>";
 
-      echo 'mailsent'.$mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $tbody, $bcc,'',$attachment);
-      if ($mailSent==1) {
-          echo "Send";
-      } else {
-          echo "NOT Send".$mailSent;
-      }
+        echo 'mailsent'.$mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $tbody, $bcc,'',$attachment);
+        if ($mailSent==1) {
+            echo "Send";
+        } else {
+            echo "NOT Send".$mailSent;
+        }
 
     } else {
         echo '<script>alert("No data found");</script>';

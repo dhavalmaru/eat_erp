@@ -142,6 +142,7 @@ function get_retailer($beat_id='', $type_id='', $zone_id='', $area_id='', $locat
     $cond2 = "";
     $cond3 = "";
     $cond4 = "";
+
     if($type_id!=""){
         $cond = $cond." and type_id = '$type_id'";
     }

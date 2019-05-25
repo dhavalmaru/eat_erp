@@ -716,6 +716,8 @@
             });
 
             $(document).ready(function(){
+                // console.log('Hiiii');
+
                 if(!$('#btn_submit').is(':visible')){
                     // $("input[type!='hidden']").attr("disabled", true);
                     $('input[type="text"').attr("readonly", true);
@@ -732,7 +734,10 @@
 
                     $('tfoot').hide();
                     $('.table_action').hide();
+
+                    // console.log('btn submit visible');
                 } else {
+                    // console.log('btn submit not visible');
                     $(".datepicker1").datepicker({ maxDate: 0,changeMonth: true,yearRange:'-100:+0',changeYear: true });
                 }
 

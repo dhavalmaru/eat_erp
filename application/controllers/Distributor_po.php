@@ -273,7 +273,7 @@ class Distributor_po extends CI_Controller{
                     else if ((strtoupper(trim($count_data[$i]->status))=="PENDING" || 
                             strtoupper(trim($count_data[$i]->status))=="DELETED") && $count_data[$i]->mismatch!='1')
                         $pending_for_approval=$pending_for_approval+1;
-                    else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && $count_data[$i]->type_id=='7' && $count_data[$i]->delivery_status=='' && strtoupper(trim($count_data[$i]->delivery_through))!="WHPL")
+                    else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && ($count_data[$i]->type_id=='7' || $count_data[$i]->type_id=='4') && $count_data[$i]->delivery_status=='' && strtoupper(trim($count_data[$i]->delivery_through))!="WHPL")
                         $pending_for_delivery=$pending_for_delivery+1;
                     else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && $count_data[$i]->type_id=='3' && $count_data[$i]->delivery_status=='' && strtoupper(trim($count_data[$i]->delivery_through))!="WHPL")
                         $gt_dp=$gt_dp+1;

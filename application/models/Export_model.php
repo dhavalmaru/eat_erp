@@ -6394,35 +6394,35 @@ function get_product_stock_details($from_date, $to_date) {
             left join 
 
             (select C.depot_id, C.type, C.product_id, sum(C.qty) as depot_in_qty from 
-            (select A.id, A.depot_in_id as depot_id, B.type, B.item_id as product_id, B.qty from depot_transfer A left join depot_transfer_items B on (A.id=B.depot_transfer_id) where A.status = 'Approved' and A.date_of_transfer>'2018-09-21' and A.date_of_transfer>='$from_date' and date_of_transfer<='$to_date' and B.item_id is not null) C 
+            (select A.id, A.depot_in_id as depot_id, B.type, B.item_id as product_id, B.qty from depot_transfer A left join depot_transfer_items B on (A.id=B.depot_transfer_id) where A.status = 'Approved' and A.date_of_transfer>'2018-09-21' and A.date_of_transfer>='$from_date' and A.date_of_transfer<='$to_date' and B.item_id is not null) C 
             group by C.depot_id, C.type, C.product_id) FF 
             on (EE.depot_id=FF.depot_id and EE.type=FF.type and EE.product_id=FF.product_id)) GG 
 
             left join 
 
             (select C.depot_id, C.type, C.product_id, sum(C.qty) as depot_out_qty from 
-            (select A.id, A.depot_out_id as depot_id, B.type, B.item_id as product_id, B.qty from depot_transfer A left join depot_transfer_items B on (A.id=B.depot_transfer_id) where A.status = 'Approved' and A.date_of_transfer>'2018-09-21' and A.date_of_transfer>='$from_date' and date_of_transfer<='$to_date' and B.item_id is not null) C 
+            (select A.id, A.depot_out_id as depot_id, B.type, B.item_id as product_id, B.qty from depot_transfer A left join depot_transfer_items B on (A.id=B.depot_transfer_id) where A.status = 'Approved' and A.date_of_transfer>'2018-09-21' and A.date_of_transfer>='$from_date' and A.date_of_transfer<='$to_date' and B.item_id is not null) C 
             group by C.depot_id, C.type, C.product_id) HH 
             on (GG.depot_id=HH.depot_id and GG.type=HH.type and GG.product_id=HH.product_id)) II 
 
             left join 
 
             (select C.depot_id, C.type, C.product_id, sum(C.qty) as sale_qty from 
-            (select A.id, A.depot_id as depot_id, B.type, B.item_id as product_id, B.qty from distributor_out A left join distributor_out_items B on (A.id=B.distributor_out_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and A.date_of_processing>='$from_date' and date_of_processing<='$to_date' and distributor_id not in (1, 63, 64, 65, 66, 189) and B.item_id is not null) C 
+            (select A.id, A.depot_id as depot_id, B.type, B.item_id as product_id, B.qty from distributor_out A left join distributor_out_items B on (A.id=B.distributor_out_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and distributor_id not in (1, 63, 64, 65, 66, 189) and B.item_id is not null) C 
             group by C.depot_id, C.type, C.product_id) JJ 
             on (II.depot_id=JJ.depot_id and II.type=JJ.type and II.product_id=JJ.product_id)) KK 
 
             left join 
 
             (select C.depot_id, C.type, C.product_id, sum(C.qty) as sample_qty from 
-            (select A.id, A.depot_id as depot_id, B.type, B.item_id as product_id, B.qty from distributor_out A left join distributor_out_items B on (A.id=B.distributor_out_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and A.date_of_processing>='$from_date' and date_of_processing<='$to_date' and distributor_id in (1, 63, 64, 65, 66) and B.item_id is not null) C 
+            (select A.id, A.depot_id as depot_id, B.type, B.item_id as product_id, B.qty from distributor_out A left join distributor_out_items B on (A.id=B.distributor_out_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and distributor_id in (1, 63, 64, 65, 66) and B.item_id is not null) C 
             group by C.depot_id, C.type, C.product_id) LL 
             on (KK.depot_id=LL.depot_id and KK.type=LL.type and KK.product_id=LL.product_id)) MM 
 
             left join 
 
             (select C.depot_id, C.type, C.product_id, sum(C.qty) as expire_qty from 
-            (select A.id, A.depot_id as depot_id, B.type, B.item_id as product_id, B.qty from distributor_out A left join distributor_out_items B on (A.id=B.distributor_out_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and A.date_of_processing>='$from_date' and date_of_processing<='$to_date' and distributor_id = 189 and B.item_id is not null) C 
+            (select A.id, A.depot_id as depot_id, B.type, B.item_id as product_id, B.qty from distributor_out A left join distributor_out_items B on (A.id=B.distributor_out_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and distributor_id = 189 and B.item_id is not null) C 
             group by C.depot_id, C.type, C.product_id) NN 
             on (MM.depot_id=NN.depot_id and MM.type=NN.type and MM.product_id=NN.product_id)) OO 
 

@@ -25,14 +25,20 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
         $this->load->database();
     }
 
-    public function checkstatus_api() {
-        $sales_rep_id = urldecode($this->input->post('sales_rep_id'));
-        $frequency = urldecode($this->input->post('frequency'));
-        $temp_date = urldecode($this->input->post('temp_date'));
-
+    public function checkstatus_api($sales_rep_id="", $frequency="", $temp_date="") {
         // $sales_rep_id = '2';
-        // $frequency = 'Monday';
-        // $temp_date = '06';
+        // $frequency = 'Thursday';
+        // $temp_date = '23';
+
+        if($this->input->post('sales_rep_id')){
+            $sales_rep_id = urldecode($this->input->post('sales_rep_id'));
+        }
+        if($this->input->post('frequency')){
+            $frequency = urldecode($this->input->post('frequency'));
+        }
+        if($this->input->post('temp_date')){
+            $temp_date = urldecode($this->input->post('temp_date'));
+        }
 
         switch ($frequency) {
             case 'Monday':
@@ -78,28 +84,30 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
         $data['distributor_name']='';
         $data['beat_name']='';
 
-        $data['beat_details'] = $this->Sales_location_model->get_new_beat_details($sales_rep_id);
-        if(count($data['beat_details'])>0){
-            $data['reporting_manager_id']=$data['beat_details'][0]->reporting_manager_id;
+        if($day==date('l')){
+            $data['beat_details'] = $this->Sales_location_model->get_new_beat_details($sales_rep_id);
+            if(count($data['beat_details'])>0){
+                $data['reporting_manager_id']=$data['beat_details'][0]->reporting_manager_id;
 
-            $beat_status = $data['beat_details'][0]->status;
-            if(strtoupper(trim($beat_status))=="PENDING"){
-                $data['distributor_id_og']=$data['beat_details'][0]->dist_id1;
-                $data['beat_id_og']=$data['beat_details'][0]->beat_id1;
-                $data['distributor_name']=$data['beat_details'][0]->distributor_name1;
-                $data['beat_name']=$data['beat_details'][0]->beat_name1;
-            } else {
-                $data['distributor_id_og']=$data['beat_details'][0]->dist_id2;
-                $data['beat_id_og']=$data['beat_details'][0]->beat_id2;
-                $data['distributor_name']=$data['beat_details'][0]->distributor_name2;
-                $data['beat_name']=$data['beat_details'][0]->beat_name2;
+                $beat_status = $data['beat_details'][0]->status;
+                if(strtoupper(trim($beat_status))=="PENDING"){
+                    $data['distributor_id_og']=$data['beat_details'][0]->dist_id1;
+                    $data['beat_id_og']=$data['beat_details'][0]->beat_id1;
+                    $data['distributor_name']=$data['beat_details'][0]->distributor_name1;
+                    $data['beat_name']=$data['beat_details'][0]->beat_name1;
+                } else {
+                    $data['distributor_id_og']=$data['beat_details'][0]->dist_id2;
+                    $data['beat_id_og']=$data['beat_details'][0]->beat_id2;
+                    $data['distributor_name']=$data['beat_details'][0]->distributor_name2;
+                    $data['beat_name']=$data['beat_details'][0]->beat_name2;
+                }
+                
+                $data['distributor_id']=$data['beat_details'][0]->dist_id2;
+                $data['beat_id']=$data['beat_details'][0]->beat_id2;
+                $data['beat_status']=$data['beat_details'][0]->status;
             }
-            
-            $data['distributor_id']=$data['beat_details'][0]->dist_id2;
-            $data['beat_id']=$data['beat_details'][0]->beat_id2;
-            $data['beat_status']=$data['beat_details'][0]->status;
         }
-
+        
         // echo $data['distributor_name'];
         // echo '<br/>';
 
@@ -135,6 +143,126 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
         $data['current_day'] = date('l');
 
         echo json_encode($data);
+    }
+    
+    public function checkstatus_api2($sales_rep_id="", $frequency="", $temp_date="") {
+        // $sales_rep_id = '2';
+        // $frequency = 'Monday';
+        // $temp_date = '06';
+
+        if($this->input->post('sales_rep_id')){
+            $sales_rep_id = urldecode($this->input->post('sales_rep_id'));
+        }
+        if($this->input->post('frequency')){
+            $frequency = urldecode($this->input->post('frequency'));
+        }
+        if($this->input->post('temp_date')){
+            $temp_date = urldecode($this->input->post('temp_date'));
+        }
+
+        switch ($frequency) {
+            case 'Monday':
+                $temp_date = $mon = date('Y-m-d', strtotime('Monday this week'));
+                break;
+            case 'Tuesday':
+                $temp_date = $mon = date('Y-m-d', strtotime('Tuesday this week'));
+                break;
+            case 'Wednesday':
+                $temp_date = $mon = date('Y-m-d', strtotime('Wednesday this week'));
+                break;  
+            case 'Thursday':
+                $temp_date = $mon = date('Y-m-d', strtotime('Thursday this week'));
+                break;  
+            case 'Friday':
+                $temp_date = $mon = date('Y-m-d', strtotime('Friday this week'));
+                break;
+            case 'Saturday':
+                $temp_date = $mon = date('Y-m-d', strtotime('Saturday this week'));
+                break; 
+            default:
+                case $frequency:
+                $temp_date = $mon = date('Y-m-d', strtotime($frequency.' this week'));
+                break;
+        }
+
+        $day = $frequency;
+        $m = date('F');
+        $year = date('Y');
+        $get_alternate  = $this->get_alternate($day, $m, $year);
+        if($get_alternate) {
+            $frequency = 'Alternate '.$day;
+        } else {
+            $frequency = 'Every '.$day;
+        }
+
+        $data['reporting_manager_id']='';
+        $data['distributor_id_og']='';
+        $data['beat_id_og']='';
+        $data['distributor_id']='';
+        $data['beat_id']='';
+        $data['beat_status']='Approved';
+        $data['distributor_name']='';
+        $data['beat_name']='';
+
+        if($day==date('l')){
+            $data['beat_details'] = $this->Sales_location_model->get_new_beat_details($sales_rep_id);
+            if(count($data['beat_details'])>0){
+                $data['reporting_manager_id']=$data['beat_details'][0]->reporting_manager_id;
+
+                $beat_status = $data['beat_details'][0]->status;
+                if(strtoupper(trim($beat_status))=="PENDING"){
+                    $data['distributor_id_og']=$data['beat_details'][0]->dist_id1;
+                    $data['beat_id_og']=$data['beat_details'][0]->beat_id1;
+                    $data['distributor_name']=$data['beat_details'][0]->distributor_name1;
+                    $data['beat_name']=$data['beat_details'][0]->beat_name1;
+                } else {
+                    $data['distributor_id_og']=$data['beat_details'][0]->dist_id2;
+                    $data['beat_id_og']=$data['beat_details'][0]->beat_id2;
+                    $data['distributor_name']=$data['beat_details'][0]->distributor_name2;
+                    $data['beat_name']=$data['beat_details'][0]->beat_name2;
+                }
+                
+                $data['distributor_id']=$data['beat_details'][0]->dist_id2;
+                $data['beat_id']=$data['beat_details'][0]->beat_id2;
+                $data['beat_status']=$data['beat_details'][0]->status;
+            }
+        }
+        
+        // echo $data['distributor_name'];
+        // echo '<br/>';
+
+        if($data['distributor_id']=="") {
+            $data['beat_details'] = $this->Sales_location_model->get_beat_details($day, $sales_rep_id);
+            if(count($data['beat_details'])>0){
+                $data['reporting_manager_id']=$data['beat_details'][0]->reporting_manager_id;
+
+                if($frequency == 'Alternate '.$day){
+                    $data['distributor_id_og']=$data['beat_details'][0]->alternate_dist;
+                    $data['beat_id_og']=$data['beat_details'][0]->alternate_beat;
+                    $data['distributor_id']=$data['beat_details'][0]->alternate_dist;
+                    $data['beat_id']=$data['beat_details'][0]->alternate_beat;
+                    $data['distributor_name']=$data['beat_details'][0]->distributor_name2;
+                    $data['beat_name']=$data['beat_details'][0]->beat_name2;
+                } else {
+                    $data['distributor_id_og']=$data['beat_details'][0]->every_dist;
+                    $data['beat_id_og']=$data['beat_details'][0]->every_beat;
+                    $data['distributor_id']=$data['beat_details'][0]->every_dist;
+                    $data['beat_id']=$data['beat_details'][0]->every_beat;
+                    $data['distributor_name']=$data['beat_details'][0]->distributor_name1;
+                    $data['beat_name']=$data['beat_details'][0]->beat_name1;
+                }
+            }
+        }
+
+        $data['data']=$this->Sales_location_model->get_data('Approved', '', $frequency, $temp_date, $sales_rep_id);
+        $data['merchendizer']=$this->Sales_location_model->get_merchendiser_data('Approved', '', $frequency, $temp_date, $sales_rep_id);
+        $data['mt_followup']=$this->Sales_location_model->get_mtfollowup('', $temp_date, $sales_rep_id);
+        $data['gt_followup']=$this->Sales_location_model->get_gtfollowup('', $temp_date, $sales_rep_id);
+        $data['checkstatus'] = $frequency;
+        $data['temp_date'] = $temp_date;
+        $data['current_day'] = date('l');
+
+        return $data;
     }
     
     public function add_api() {
@@ -916,6 +1044,13 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
         //     }
         // }
 
+        $data['Monday'] = array();
+        $data['Tuesday'] = array();
+        $data['Wednesday'] = array();
+        $data['Thursday'] = array();
+        $data['Friday'] = array();
+        $data['Saturday'] = array();
+
         if($bool==1) {
             if($srld == "Place Order") {
                 if($channel_type=='GT') {
@@ -928,60 +1063,12 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
 
                 $stock_detail = $this->session->userdata('stock_detail');
             } else if($srld == "Follow Up") {
-                $this->save_order_api('Follow Up');
+                $data = $this->save_order_api('Follow Up');
             } else {
-                $this->save_order_api('Save');
+                $data = $this->save_order_api('Save');
             }    
 
-            if($srld == "Place Order" || $srld == "Purchase Order") {
-                if($distributor_type=="Old"){
-                    $id = $distributor_id;
-                    // redirect(base_url().'index.php/Sales_rep_store_plan/add_order');
-                } else {
-                    if($this->session->userdata('visit_detail')!=null) {
-                        if($distributor_type=='New') {
-                            // redirect(base_url().'index.php/Sales_rep_store_plan/add_sales_rep_distributor');
-                        } else {
-                           // redirect(base_url().'Sales_rep_store_plan/add_order');   
-                        }
-                    } else {
-                        // $result=$this->sales_rep_distributor_model->get_access();
-                        if(count($result)>0) {
-                            if($result[0]->r_view == 1 || $result[0]->r_edit == 1) {
-                                $id = $store_id;
-                                if($place_order=="Yes") {
-                                    if($id=="") {
-                                        $result = $this->db->query("Select concat('s_',id) as id from sales_rep_distributors Where distributor_name='$distributor_name' and sales_rep_id='$user_id'")->result_array();
-                                        $id = $result[0]['id'];
-                                    }
-
-                                    $array = array();
-                                    $data['id'] = $id;
-                                    $distributor_id = substr($id, 2);
-                                    $get_detail = $this->db->select("distributor_name, gst_number, zone_id, location_id, area_id, margin, remarks, document_name, margin, doc_document, master_distributor_id as distributor_id ")->where('id',$distributor_id)->get('sales_rep_distributors')->result();
-                                    $data['data'] = $get_detail;
-                                    $data['zone'] = $this->sales_rep_location_model->get_zone();
-                                    $data['area'] = $this->sales_rep_location_model->get_area($zone_id);
-                                    $data['location'] = $this->sales_rep_location_model->get_locations($zone_id, $area_id);
-                                    $data['distributor'] = $this->sales_rep_location_model->get_distributors($zone_id, $area_id);
-                                    $data['distributor_name'] = $distributor_name;
-                                    $data['zone_id'] = $zone_id;
-                                    $data['area_id'] = $area_id;
-                                    $data['location_id'] = $location_id;
-
-                                    echo json_encode($data);
-
-                                    // load_view('sales_rep_distributor/sales_rep_distributor_details',$data);
-                                } else {
-                                    // redirect(base_url().'index.php/sales_rep_distributor');
-                                }
-                            }
-                        }  
-                    }
-                }
-            } else {
-                // redirect(base_url().'index.php/Sales_rep_store_plan');
-            }
+            // echo json_encode($data);
         } else {
             // redirect(base_url().'index.php/Sales_rep_store_plan');
         }
@@ -1122,7 +1209,7 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
     }
 
     public function get_order_api(){
-        $sales_rep_id='';
+        $sales_rep_id='2';
 
         if($this->input->post('sales_rep_id')){
             $sales_rep_id=urldecode($this->input->post('sales_rep_id'));
@@ -1350,6 +1437,7 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
             $sequence = $this->input->post('sequence');
             $merchandiser_stock_id = $this->input->post('merchandiser_stock_id');
             $follow_type = $this->input->post('follow_type');
+            $id = $this->input->post('id');
 
             $followup_date=$this->input->post('followup_date');
             if($followup_date==''){
@@ -2580,8 +2668,14 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                                             'modified_on'=>$now,
                                             'is_edit'=>'edit');
 
-                            $where = array('bit_plan_id'=>$merchendiser_beat_plan_id,
-                                            'date(date_of_visit)'=>$now1);
+                            if($visit_detail['beat_plan_id']=='0') {
+                                $where = array('id'=>$id,
+                                                'bit_plan_id'=>$merchendiser_beat_plan_id,
+                                                'date(date_of_visit)'=>$now1);
+                            } else {
+                                $where = array('bit_plan_id'=>$merchendiser_beat_plan_id,
+                                                'date(date_of_visit)'=>$now1);
+                            }
 
                             $this->db->where($where);
                             $this->db->update('sales_rep_detailed_beat_plan',$data);
@@ -3274,25 +3368,41 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
         // $data['merchandiser_stock_details'] = $merchandiser_stock_details;
         // $data['sales_rep_stock_detail'] = $sales_rep_stock_detail;
 
-        echo '1';
-    }
-    
-    public function get_alternate($day,$m,$year){
+
+        $data['Monday'] = array();
+        $data['Tuesday'] = array();
+        $data['Wednesday'] = array();
+        $data['Thursday'] = array();
+        $data['Friday'] = array();
+        $data['Saturday'] = array();
+        $frequency = date('l');
+
+        $data[$frequency] = $this->checkstatus_api2($sales_rep_id, $frequency);
+
+        if($save=='Follow Up') {
+            if(isset($followup_date)) {
+                if($followup_date!=null && $followup_date!="") {
+                    $frequency2 = date('l', strtotime($followup_date));
+                    if($frequency!=$frequency2) {
+                        $data[$frequency2] = $this->checkstatus_api2($sales_rep_id, $frequency2);
+                    }
+                }
+            }
+        }
         
+        echo json_encode($data);
+    }
+
+    public function get_alternate($day,$m,$year){
         $date1 = date('d-m-Y', strtotime('second '.$day.' of '.$m.' '.$year));
         $date2 = date('d-m-Y', strtotime('fourth '.$day.' of '.$m.' '.$year));
 
         $todaysdate = date('d-m-Y');
-        if($date1==$todaysdate) 
-        {
+        if($date1==$todaysdate) {
             return true;
-        }
-        elseif($date2==$todaysdate)
-        {
+        } elseif($date2==$todaysdate) {
             return true;
-        }
-        else
-        {
+        } else {
            return false;
         }
     }
