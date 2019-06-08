@@ -291,27 +291,27 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <!-- <div class="form-group">
+                                    <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Beat Plans <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <select name="beat_id[]" id="beat_id" class="form-control select2" data-error="#err_beat_id" multiple>
                                                     <option value="">Select</option>
                                                     <?php 
-                                                        //$beat_id=array(); 
-                                                        //if(isset($distributor_beat_plans)) { 
-                                                            //if($distributor_beat_plans[0]->beat_id!='' && $distributor_beat_plans[0]->beat_id!=null) 
-                                                                //$beat_id=explode(',', $distributor_beat_plans[0]->beat_id); 
-                                                        //} 
+                                                        $beat_id=array(); 
+                                                        if(isset($distributor_beat_plans)) { 
+                                                            if($distributor_beat_plans[0]->beat_id!='' && $distributor_beat_plans[0]->beat_id!=null) 
+                                                                $beat_id=explode(',', $distributor_beat_plans[0]->beat_id); 
+                                                        } 
                                                     ?>
-                                                    <?php //if(isset($beat_plan)) { for ($k=0; $k < count($beat_plan) ; $k++) { ?>
-                                                        <option value="<?php //echo $beat_plan[$k]->id; ?>" <?php //if (count($beat_plan)>0) { if(in_array($beat_plan[$k]->id, $beat_id)) { echo 'selected'; } } ?>><?php //echo $beat_plan[$k]->beat_id.' - '.$beat_plan[$k]->beat_name; ?></option>
-                                                    <?php //}} ?>
+                                                    <?php if(isset($beat_plan)) { for ($k=0; $k < count($beat_plan) ; $k++) { ?>
+                                                        <option value="<?php echo $beat_plan[$k]->id; ?>" <?php if (count($beat_plan)>0) { if(in_array($beat_plan[$k]->id, $beat_id)) { echo 'selected'; } } ?>><?php echo $beat_plan[$k]->beat_id.' - '.$beat_plan[$k]->beat_name; ?></option>
+                                                    <?php }} ?>
                                                 </select>
                                                 <div id="err_location_id" style="margin-top: 15px;"></div>
                                             </div>
                                         </div>
-                                    </div> -->
+                                    </div>
 
                                     <br>
                                     <div class="h-scroll">  

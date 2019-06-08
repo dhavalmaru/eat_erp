@@ -67,16 +67,16 @@ function get_data($status='', $id=''){
 
 function get_mt_data($status='', $id=''){
     if($status!=""){
-        $cond=" where status='".$status."'";
+        $cond=" where A.status='".$status."'";
     } else {
         $cond="";
     }
 
     if($id!=""){
         if($cond=="") {
-            $cond=" where id='".$id."'";
+            $cond=" where A.id='".$id."'";
         } else {
-            $cond=$cond." and id='".$id."'";
+            $cond=$cond." and A.id='".$id."'";
         }
     }
 
@@ -91,13 +91,19 @@ function get_mt_data($status='', $id=''){
 
     if($sales_rep_id!=""){
         if($cond=="") {
-            $cond=" where m_id='".$sales_rep_id."'";
+            $cond=" where A.m_id='".$sales_rep_id."'";
         } else {
-            $cond=$cond." and m_id='".$sales_rep_id."'";
+            $cond=$cond." and A.m_id='".$sales_rep_id."'";
         }
     }
 
-    $sql = "select * , id as mid,'Old' as distributor_type,dist_id as store_id from merchandiser_stock ".$cond."  order by modified_on desc";
+    $sql = "select A.*, A.id as mid, 'Old' as distributor_type, A.dist_id as store_id, B.store_name, C.zone, D.location, E.area, '' as bit_plan_id 
+            from merchandiser_stock A 
+            left join relationship_master B on (A.dist_id=B.id) 
+            left join zone_master C on (A.zone_id=C.id) 
+            left join location_master D on (A.location_id=D.id)
+            left join area_master E on (A.area_id=E.id) ".$cond." 
+            order by A.modified_on desc";
     $query=$this->db->query($sql);
     return $query->result();
 }

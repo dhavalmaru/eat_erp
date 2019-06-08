@@ -3708,7 +3708,10 @@ function set_beat_plan($reporting_manager_id='', $distributor_id_og='', $beat_id
     $now=date('Y-m-d H:i:s');
     $status = 'Pending';
 
-    if($reporting_manager_id=='' || $reporting_manager_id=='0' || $reporting_manager_id==null){
+    if(!isset($reporting_manager_id)){
+        $status = 'Approved';
+        $reporting_manager_id = null;
+    } else if($reporting_manager_id=='' || $reporting_manager_id=='0' || $reporting_manager_id=='null'){
         $status = 'Approved';
         $reporting_manager_id = null;
     }

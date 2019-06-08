@@ -496,11 +496,11 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Round Off Amount (In Rs)<span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="round_off_amount" id="round_off_amount" placeholder="Round Off Amount" value="<?php if (isset($data)) { echo $data[0]->round_off_amount; } ?>" readonly />
+                                                <input type="text" class="form-control" name="round_off_amount" id="round_off_amount" placeholder="Round Off Amount" value="<?php //if (isset($data)) { echo $data[0]->round_off_amount; } ?>" readonly />
                                             </div>
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Invoice Amount (In Rs)<span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control" name="invoice_amount" id="invoice_amount" placeholder="Invoice Amount" value="<?php if (isset($data)) { echo $data[0]->invoice_amount; } ?>" readonly />
+                                                <input type="text" class="form-control" name="invoice_amount" id="invoice_amount" placeholder="Invoice Amount" value="<?php //if (isset($data)) { echo $data[0]->invoice_amount; } ?>" readonly />
                                             </div>
                                         </div>
                                     </div>
@@ -508,12 +508,12 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Due Date <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control datepicker" name="due_date" id="due_date" placeholder="Due Date" value="<?php if(isset($data)) { echo (($data[0]->due_date!=null && $data[0]->due_date!='')?date('d/m/Y',strtotime($data[0]->due_date)):''); } ?>"/>
+                                                <input type="text" class="form-control datepicker" name="due_date" id="due_date" placeholder="Due Date" value="<?php //if(isset($data)) { echo (($data[0]->due_date!=null && $data[0]->due_date!='')?date('d/m/Y',strtotime($data[0]->due_date)):''); } ?>"/>
                                             </div>
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Reverse Charge <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="radio" name="reverse_charge"  value="yes" id="reverse_charge_yes" data-error="#err_reverse_charge" <?php if (isset($data)) { if($data[0]->reverse_charge=='yes') echo 'checked'; } ?>/>&nbsp;&nbsp;Yes&nbsp;&nbsp;&nbsp;
-                                                <input type="radio" name="reverse_charge"  value="no" id="reverse_charge_no" data-error="#err_reverse_charge" <?php if (isset($data)) { if($data[0]->reverse_charge=='no') echo 'checked'; else if($data[0]->reverse_charge!='yes') echo 'checked';} else echo 'checked'; ?>/>&nbsp;&nbsp;No&nbsp;&nbsp;&nbsp;
+                                                <input type="radio" name="reverse_charge"  value="yes" id="reverse_charge_yes" data-error="#err_reverse_charge" <?php //if (isset($data)) { if($data[0]->reverse_charge=='yes') echo 'checked'; } ?>/>&nbsp;&nbsp;Yes&nbsp;&nbsp;&nbsp;
+                                                <input type="radio" name="reverse_charge"  value="no" id="reverse_charge_no" data-error="#err_reverse_charge" <?php //if (isset($data)) { if($data[0]->reverse_charge=='no') echo 'checked'; else if($data[0]->reverse_charge!='yes') echo 'checked';} else echo 'checked'; ?>/>&nbsp;&nbsp;No&nbsp;&nbsp;&nbsp;
                                                 <div id="err_reverse_charge"></div>
                                             </div>
                                         </div>
@@ -994,7 +994,7 @@
                             //if(data.result==1){
                                 // console.log(data.state);
 								//alert($('#distributor_id').val());
-								if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550" && $('#distributor_id').val()!="622" && $('#distributor_id').val()!="626" && $('#distributor_id').val()!="640" && $('#distributor_id').val()!="1299" && $('#distributor_id').val()!="1319" && $('#distributor_id').val()!="1327") {
+								if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550" && $('#distributor_id').val()!="622" && $('#distributor_id').val()!="626" && $('#distributor_id').val()!="640" && $('#distributor_id').val()!="1299" && $('#distributor_id').val()!="1319" && $('#distributor_id').val()!="1327" && $('#distributor_id').val()!="1352") {
 									// alert($('#distributor_id').val());
 									$('#state').val(data.state);
 									$('#state_code').val(data.state_code);
@@ -1229,7 +1229,7 @@
                                 }
                             }
                             
-                            // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327){
+                            // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352){
                             //     $('#sell_out').val($("#discount").val());
                             // } else {
                             //     $('#sell_out').val(data.sell_out);
@@ -1239,7 +1239,7 @@
                                 $('#distributor_name').val(data.product_name);
                             }
 
-                            if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550" && $('#distributor_id').val()!="622" && $('#distributor_id').val()!="626" && $('#distributor_id').val()!="640" && $('#distributor_id').val()!="1299" && $('#distributor_id').val()!="1319" && $('#distributor_id').val()!="1327") {
+                            if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550" && $('#distributor_id').val()!="622" && $('#distributor_id').val()!="626" && $('#distributor_id').val()!="640" && $('#distributor_id').val()!="1299" && $('#distributor_id').val()!="1319" && $('#distributor_id').val()!="1327" && $('#distributor_id').val()!="1352") {
                                 $('#state').val(data.state);
                                 $('#state_code').val(data.state_code);
                             }
@@ -1310,7 +1310,7 @@
                     }
                 });
 
-                if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327){
+                if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352){
                     $('.direct').show();
                 } else {
                     $('.direct').hide();
@@ -1326,7 +1326,7 @@
                     var id = elem.attr('id');
                     var index = id.substr(id.lastIndexOf('_')+1);
                     var sell_out = 0;
-                    // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327){
+                    // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352){
                     //     sell_out = parseFloat($('#sell_out').val());
                     // } else {
                     //     sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
@@ -1396,7 +1396,7 @@
                 var index = id.substr(id.lastIndexOf('_')+1);
                 var qty = parseFloat(get_number($("#qty_"+index).val(),2));
                 var sell_out = 0;
-                // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327){
+                // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352){
                 //     sell_out = parseFloat($('#sell_out').val());
                 // } else {
                 //     sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
@@ -1423,7 +1423,7 @@
                         if(data.result==1){
                             grams = parseFloat(data.grams);
                             rate = parseFloat(data.rate);
-                            // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327){
+                            // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352){
                             //     sell_out = parseFloat($('#sell_out').val());
                             // } else {
                             //     sell_out = parseFloat(data.inv_margin);
@@ -1496,7 +1496,7 @@
                 var index = id.substr(id.lastIndexOf('_')+1);
                 var qty = parseFloat(get_number($("#qty_"+index).val(),2));
                 var sell_out = 0;
-                // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327){
+                // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352){
                 //     sell_out = parseFloat($('#sell_out').val());
                 // } else {
                 //     sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
@@ -1519,7 +1519,7 @@
                         if(data.result==1){
                             grams = parseFloat(data.grams);
                             rate = parseFloat(data.rate);
-                            // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327){
+                            // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352){
                             //     sell_out = parseFloat($('#sell_out').val());
                             // } else {
                             //     sell_out = parseFloat(data.inv_margin);

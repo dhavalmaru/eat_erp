@@ -2344,6 +2344,8 @@
                     if(bl_valid==false){
                         // $("#mi-modal").modal('show');
                         confirm_save();
+                    } else {
+                        $("#modal_result").val("Yes");
                     }
                 }
                 

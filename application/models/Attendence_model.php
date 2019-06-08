@@ -52,7 +52,7 @@ public function get_employee_attendence($emp_no,$year,$month)
 
 		/*A.emp_id,A.emp_no,A.emp_name,A.date,A.`first_in`,A.`last_out`,A.emp_status*/
 
-	/*if($status=='approved')
+		/*if($status=='approved')
 		{
 			$cond= "Where status='$status'";
 		}
@@ -61,7 +61,7 @@ public function get_employee_attendence($emp_no,$year,$month)
 			$cond = '';
 		}*/
 
-	$sql = "Select * from (
+	/* $sql = "Select * from (
 			Select Distinct A.*,B.adjusted_late_marks,B.adjusted_late_marks_count,B.employee_adjusted_time,B.adjusted_effective_time from 
 			(Select A.emp_id,A.emp_no,A.emp_name,A.date,A.`first_in`,
 		A.`last_out`,A.emp_status,A.status,A.Late_marks,A.adjusted_in_time,A.adjusted_out_time,A.remark,A.department,B.email_id,B.email_id2,Case When Late_marks='L' Then (@cnt := @cnt + 1)  End as Late_marks_count,
@@ -116,8 +116,78 @@ public function get_employee_attendence($emp_no,$year,$month)
 			CROSS JOIN (SELECT @cnt1 := 0) AS dummy
 			left JOIN
 			(SELECT emp_code,email_id,email_id2 from user_master Where status='Approved') B on A.emp_no=B.emp_code ) B 
+			on A.emp_no=B.emp_no and A.date=B.date ) A ORDER By date(date) ASC"; */
+	
+	$sql = "Select * from (
+			Select Distinct A.*,B.adjusted_late_marks,B.adjusted_late_marks_count,B.employee_adjusted_time,B.adjusted_effective_time from 
+			(Select A.emp_id,A.emp_no,A.emp_name,A.date,A.`first_in`,
+		A.`last_out`,A.emp_status,A.status,A.Late_marks,A.adjusted_in_time,A.adjusted_out_time,A.remark,A.department,B.email_id,B.email_id2,Case When Late_marks='L' Then (@cnt := @cnt + 1)  End as Late_marks_count,
+		Case When Late_marks='L' AND @cnt>3 AND CAST(effective_time As Time)>=CAST('10:00:00' As Time) THEN 0.66 
+		When Late_marks='L' AND @cnt>3 AND CAST(effective_time As Time)<CAST('10:00:00' As Time) THEN 0.5
+		When Late_marks='H' THEN 0.5
+		When Late_marks='N' AND  ((CAST(effective_time As Time)<CAST('4:00:00' As Time) AND (emp_status!='WeeklyOff' AND emp_status!='Absent' AND emp_status!='Holiday')) OR (emp_status='Absent'))  THEN 0.00
+		When (A.effective_time=0 AND (emp_status!='WeeklyOff' AND emp_status!='Absent' AND emp_status!='Holiday')) THEN 0.00
+		ELSE 1
+		end as adjusted_time ,Case When ((A.`first_in`!='' OR CAST(A.`first_in` As Time)!=CAST('00:00:00' As Time )) && (A.`last_out`='' OR CAST(A.`last_out` As Time)=CAST('00:00:00' As Time ))) Then '0' 
+		When ((A.`last_out`!='' OR CAST(A.`last_out` As Time)!=CAST('00:00:00' As Time )) && (A.`first_in`='' OR CAST(A.`first_in` As Time)= CAST('00:00:00' As Time ))) Then '0'
+		 Else  A.effective_time end as effective_time from 
+		(SELECT *, 
+		Case 
+		When emp_status='WeeklyOff' THEN 'WeeklyOff' 
+		When emp_status='Absent' THEN 'Absent' 
+		When emp_status='Present' AND (((first_in!=0 AND first_in!='') And (last_out!=0 AND last_out!='')) ) Then (Case When CAST(last_out As Time)<CAST(first_in As Time ) Then (CAST(ADDTIME(TIMEDIFF(last_out,'00:00'),TIMEDIFF('24:00:00',first_in)) as Time))  Else cast(TIMEDIFF(last_out, first_in) as time)  end ) 
+			else 0  
+			end as effective_time,
+		Case When CAST(first_in As Time)>CAST('10:00:00' As Time) AND CAST(first_in As Time)<CAST('11:00:00' As Time )  AND cast(TIMEDIFF(last_out, first_in) as time)>=CAST('9:00:00' AS TIME)   Then 'L' 
+		When (CAST(first_in As Time)>CAST('11:00:00' As Time) OR  (cast(TIMEDIFF(last_out, first_in) as time) < CAST('9:00:00' AS TIME) AND cast(TIMEDIFF(last_out, first_in) as time)>CAST('4:00:00' AS TIME))) AND (emp_status!='WeeklyOff' AND emp_status!='Absent' AND emp_status!='Holiday') Then 'H' 
+		Else 'N' End as Late_marks
+		from employee_attendence Where emp_no='$emp_no' and MONTH(date)='$month_date' and YEAR(date)='$year') A
+		CROSS JOIN (SELECT @cnt := 0) AS dummy
+		left JOIN
+		(select C.* from 
+		(select 
+		   emp_code, email_id, email_id2, sales_rep_id, 
+		   @num := if(@type = emp_code, @num + 1, 1) as row_number, 
+		   @type := emp_code as dummy 
+		from (select emp_code, email_id, email_id2, sales_rep_id from user_master where emp_code is not null and emp_code <> '' order by emp_code, sales_rep_id) A 
+		cross join 
+		(select @type := '', @num := 0) B) C where C.row_number='1') B on A.emp_no=B.emp_code ) A
+		left join
+			(Select A.emp_no,A.date, A.Late_marks as adjusted_late_marks,Case When Late_marks='L' Then (@cnt1 := @cnt1 + 1)  End as adjusted_late_marks_count,
+			Case When Late_marks='L' AND @cnt1>3 AND CAST(effective_time As Time)>=CAST('10:00:00' As Time) THEN 0.66 
+			When Late_marks='L' AND @cnt1>3 AND CAST(effective_time As Time)<CAST('10:00:00' As Time) THEN 0.5
+			When Late_marks='H' THEN 0.5
+			When Late_marks='N' AND ((CAST(effective_time As Time)<CAST('4:00:00' As Time) AND (emp_status!='WeeklyOff' AND emp_status!='Absent' AND emp_status!='Holiday')) OR (emp_status='Absent'))  THEN 0.00
+			When (A.effective_time=0 AND (emp_status!='WeeklyOff' AND emp_status!='Absent' AND emp_status!='Holiday')) THEN 0.00
+			ELSE 1
+			end as employee_adjusted_time ,
+			Case When ((A.`adjusted_in_time`!='' OR CAST(A.`adjusted_in_time` As Time)!=CAST('00:00:00' As Time )) && (A.`adjusted_out_time`='' OR CAST(A.`adjusted_out_time` As Time)=CAST('00:00:00' As Time ))) Then '0' 
+				When ((A.`adjusted_out_time`!='' OR CAST(A.`adjusted_out_time` As Time)!=CAST('00:00:00' As Time )) && (A.`adjusted_in_time`='' OR CAST(A.`adjusted_in_time` As Time)= CAST('00:00:00' As Time ))) Then '0'
+				 Else  A.effective_time end as adjusted_effective_time from 
+			(SELECT *, 
+			Case 
+			When emp_status='WeeklyOff' THEN 'WeeklyOff' 
+			When emp_status='Absent' THEN 'Absent' 
+			When emp_status='Present' AND (((adjusted_in_time!=0 AND adjusted_in_time!='') And (adjusted_out_time!=0 AND adjusted_out_time!='')) ) Then (Case When (CAST(adjusted_out_time As Time)
+			>=CAST('00:00:00' As Time ) AND CAST(adjusted_out_time As Time)
+			<=CAST('08:00:00' As Time )) Then (CAST(ADDTIME(TIMEDIFF(adjusted_out_time,'00:00'),TIMEDIFF('24:00:00',adjusted_in_time)) as Time))  Else cast(TIMEDIFF(adjusted_out_time, adjusted_in_time) as time)  end ) 
+			Else 0
+			end as effective_time,
+			Case When CAST(adjusted_in_time As Time)>CAST('10:00:00' As Time) AND CAST(adjusted_in_time As Time)<CAST('11:00:00' As Time )  AND cast(TIMEDIFF(adjusted_out_time, adjusted_in_time) as time)>=CAST('9:00:00' AS TIME)   Then 'L' 
+			When (CAST(adjusted_in_time As Time)>CAST('11:00:00' As Time) OR   (cast(TIMEDIFF(adjusted_out_time, adjusted_in_time) as time) < CAST('9:00:00' AS TIME) AND cast(TIMEDIFF(adjusted_out_time, adjusted_in_time) as time)>CAST('4:00:00' AS TIME)) ) AND (emp_status!='WeeklyOff' AND emp_status!='Absent' AND emp_status!='Holiday') Then 'H' 
+			Else 'N' End as Late_marks
+			from employee_attendence  Where emp_no='$emp_no' and MONTH(date)='$month_date' and YEAR(date)='$year') A
+			CROSS JOIN (SELECT @cnt1 := 0) AS dummy
+			left JOIN
+			(select C.* from 
+			(select 
+			   emp_code, email_id, email_id2, sales_rep_id, 
+			   @num := if(@type = emp_code, @num + 1, 1) as row_number, 
+			   @type := emp_code as dummy 
+			from (select emp_code, email_id, email_id2, sales_rep_id from user_master where emp_code is not null and emp_code <> '' order by emp_code, sales_rep_id) A 
+			cross join 
+			(select @type := '', @num := 0) B) C where C.row_number='1') B on A.emp_no=B.emp_code ) B 
 			on A.emp_no=B.emp_no and A.date=B.date ) A ORDER By date(date) ASC";
-			
 	$result = $this->db->query($sql)->result();
 	return $result;
 }
@@ -150,7 +220,7 @@ public function attendence_list($status,$year,$month)
 	when F.rejected_status='rejected' then 'Rejected' else 'Approved' end as status from 
 	(select C.*, D.pending_status from 
 	(select A.*, B.status from 
-	(select distinct emp_no,emp_name, month(date) as month_no,YEAR(date) as `year` from employee_attendence Where year(date)='$year' and month(date)='$month') A 
+	(select distinct emp_no,emp_name, month(date) as month_no,YEAR(date) as `year` from employee_attendence Where year(date)='$year' and month(date)='$month' and emp_no is not null and emp_no<>'') A 
 	left join 
 	(select distinct emp_no,month(date) as month_no, 'bal' as status from employee_attendence where status is null and year(date)='$year' and month(date)='$month') B 
 	on (A.emp_no=B.emp_no and A.month_no=B.month_no)) C 
@@ -184,7 +254,7 @@ public function get_summary($status,$year,$month)
 		{
 			$emp_code = $this->session->userdata("emp_code");
 			$cond.=" AND A.emp_no IN ((SELECT emp_code From user_master WHERE email_id2='$session_email' OR email_id='$session_email'))";
-		}else
+		} else
 		{
 			$emp_code = $this->session->userdata("emp_code");
 			$cond.=" Where  A.emp_no IN ((SELECT emp_code From user_master WHERE email_id2='$session_email' OR email_id='$session_email'))";
@@ -209,7 +279,7 @@ public function get_summary($status,$year,$month)
 				when F.rejected_status='rejected' then 'Rejected' else 'Approved' end as status from 
 			(select C.*, D.pending_status from 
 			(select A.*, B.status from 
-			(select distinct emp_no,emp_name,is_sales,month(date) as month_no,YEAR(date) as `year` from employee_attendence Where year(date)='$year' and month(date)='$month') A 
+			(select distinct emp_no,emp_name,is_sales,month(date) as month_no,YEAR(date) as `year` from employee_attendence Where year(date)='$year' and month(date)='$month' and emp_no is not null and emp_no<>'') A 
 			left join 
 			(select distinct emp_no, month(date) as month_no, 'bal' as status from employee_attendence where status is null and year(date)='$year' and month(date)='$month') B 
 			on (A.emp_no=B.emp_no and A.month_no=B.month_no)) C 

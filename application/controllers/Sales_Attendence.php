@@ -147,11 +147,9 @@ class Sales_Attendence extends CI_controller {
 		$from_email = 'cs@eatanytime.co.in';
         $from_email_sender = 'Wholesome Habits Pvt Ltd';
        	
-		//// $to_email = "dhaval.maru@pecanreams.com";
-		//$bcc = "dhaval.maru@pecanreams.com";
-
-		//$to_email = "ashwini.patil@pecanreams.com";
-	   // $bcc = "sangeeta.yadav@pecanreams.com";
+		// $to_email = "prasad.bhisale@pecanreams.com";
+	 //   	$cc = "prasad.bhisale@pecanreams.com";
+	 //   	$bcc = "prasad.bhisale@pecanreams.com";
 	   	
 		$to_email = "ravi.hirode@eatanytime.co.in, mukesh.yadav@eatanytime.co.in, sulochana.waghmare@eatanytime.co.in, manorama.mishra@eatanytime.co.in, mahesh.ms@eatanytime.co.in, yash.doshi@eatanytime.in, darshan.dhany@eatanytime.co.in, sachin.pal@eatanytime.co.in, girish.rai@eatanytime.in, nitin.kumar@eatanytime.co.in, urvi.bhayani@eatanytime.co.in, mohil.telawade@eatanytime.co.in";
 		$bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, sangeeta.yadav@pecanreams.com,prasad.bhisale@pecanreams.com";

@@ -27,8 +27,8 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
 
     public function checkstatus_api($sales_rep_id="", $frequency="", $temp_date="") {
         // $sales_rep_id = '2';
-        // $frequency = 'Thursday';
-        // $temp_date = '23';
+        // $frequency = 'Friday';
+        // $temp_date = '07';
 
         if($this->input->post('sales_rep_id')){
             $sales_rep_id = urldecode($this->input->post('sales_rep_id'));
@@ -58,6 +58,9 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                 break;
             case 'Saturday':
                 $temp_date = $mon = date('Y-m-d', strtotime('Saturday this week'));
+                break;
+            case 'Sunday':
+                $temp_date = $mon = date('Y-m-d', strtotime('Sunday this week'));
                 break; 
             default:
                 case $frequency:
@@ -90,7 +93,7 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                 $data['reporting_manager_id']=$data['beat_details'][0]->reporting_manager_id;
 
                 $beat_status = $data['beat_details'][0]->status;
-                if(strtoupper(trim($beat_status))=="PENDING"){
+                if(strtoupper(trim($beat_status))=="PENDING" || strtoupper(trim($beat_status))=="REJECTED"){
                     $data['distributor_id_og']=$data['beat_details'][0]->dist_id1;
                     $data['beat_id_og']=$data['beat_details'][0]->beat_id1;
                     $data['distributor_name']=$data['beat_details'][0]->distributor_name1;
@@ -102,9 +105,19 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                     $data['beat_name']=$data['beat_details'][0]->beat_name2;
                 }
                 
-                $data['distributor_id']=$data['beat_details'][0]->dist_id2;
-                $data['beat_id']=$data['beat_details'][0]->beat_id2;
-                $data['beat_status']=$data['beat_details'][0]->status;
+                if(strtoupper(trim($beat_status))=="PENDING"){
+                    $data['distributor_id']=$data['beat_details'][0]->dist_id2;
+                    $data['beat_id']=$data['beat_details'][0]->beat_id2;
+                } else {
+                    $data['distributor_id']=$data['beat_details'][0]->dist_id1;
+                    $data['beat_id']=$data['beat_details'][0]->beat_id1;
+                }
+                
+                if(strtoupper(trim($beat_status))=="REJECTED"){
+                    $data['beat_status']="Approved";
+                } else {
+                    $data['beat_status']=$data['beat_details'][0]->status;
+                }
             }
         }
         
@@ -178,6 +191,9 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                 break;
             case 'Saturday':
                 $temp_date = $mon = date('Y-m-d', strtotime('Saturday this week'));
+                break; 
+            case 'Sunday':
+                $temp_date = $mon = date('Y-m-d', strtotime('Sunday this week'));
                 break; 
             default:
                 case $frequency:
@@ -767,7 +783,7 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
             // }
         } else {
             if($temp!='') {
-                $result=$this->sales_rep_location_model->get_mt_data('', $id, '');
+                $result=$this->sales_rep_location_model->get_mt_data('', $id);
             } else {
                 $result=$this->Sales_location_model->get_merchendiser_data('Approved', $id, $frequency, '', $sales_rep_id);
             }
@@ -783,7 +799,7 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                                 Case When type='Box' Then CONCAT(ifnull(qty,0),'_Box') ELSE CONCAT(ifnull(qty,0),'_Bar') end as qty,
                                 item_id,type,ifnull(qty,0) as qty1 
                                 from
-                                (SELECT * from merchandiser_stock_details where merchandiser_stock_id=$merchandiser_stock_id) A 
+                                (SELECT * from merchandiser_stock_details where merchandiser_stock_id='$merchandiser_stock_id') A 
                                 Left join 
                                 (SELECT * from box_master)B on A.item_id=B.id
                                 Left join 
@@ -1050,6 +1066,7 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
         $data['Thursday'] = array();
         $data['Friday'] = array();
         $data['Saturday'] = array();
+        $data['Sunday'] = array();
 
         if($bool==1) {
             if($srld == "Place Order") {
@@ -1414,6 +1431,48 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
         // load_view('sales_rep_order/sales_rep_order_details', $data);
 
         echo json_encode($data);
+    }
+
+    public function test(){
+        $mid='';
+        $visit_detail = array(
+                            'channel_type'=>'GT',
+                            'distributor_id'=>'s_4130',
+                            'zone_id'=>'7',
+                            'area_id'=>'5',
+                            'location_id'=>'924'
+                        );
+
+        $sql = "Select CASE WHEN ((FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=1 OR (FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=3 
+                OR (FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=5) 
+                THEN CONCAT('Every ',DAYNAME(date(now()))) 
+                WHEN ((FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=2 OR (FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=4)
+                THEN CONCAT('Alternate ',DAYNAME(date(now()))) end as frequency";
+        $result = $this->db->query($sql)->result();
+
+        $frequency = $result[0]->frequency;
+        $sales_rep_id = '2';
+
+        if($mid==''){
+            if($visit_detail['channel_type']=='MT'){
+                $sql="select * from sales";
+            } else {
+                $sql = "select * from sales_rep_detailed_beat_plan where frequency='$frequency' and 
+                        sales_rep_id='$sales_rep_id' and date(date_of_visit)=curdate() and 
+                        store_id='".$visit_detail['distributor_id']."' and 
+                        zone_id='".$visit_detail['zone_id']."' and 
+                        area_id='".$visit_detail['area_id']."' and 
+                        location_id='".$visit_detail['location_id']."'";
+                $result = $this->db->query($sql)->result();
+                if(count($result)>0){
+                    $mid = $result[0]->id;
+                    $merchendiser_beat_plan_id = $beat_plan_id = $result[0]->bit_plan_id;
+                    $sequence = $result[0]->sequence;
+                }
+            }
+        }
+
+        echo json_encode($result);
     }
 
     public function save_order_api($save=''){
@@ -1790,6 +1849,25 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
         $visit_id = 0;
         $sequence=$visit_detail['sequence'];
 
+        if($id==''){
+            if($visit_detail['channel_type']=='MT'){
+                $sql="select * from sales";
+            } else {
+                $sql = "select * from sales_rep_detailed_beat_plan where frequency='$frequency' and 
+                        sales_rep_id='$sales_rep_id' and date(date_of_visit)=curdate() and 
+                        store_id='".$visit_detail['distributor_id']."' and 
+                        zone_id='".$visit_detail['zone_id']."' and 
+                        area_id='".$visit_detail['area_id']."' and 
+                        location_id='".$visit_detail['location_id']."'";
+                $result = $this->db->query($sql)->result();
+                if(count($result)>0){
+                    $id = $result[0]->id;
+                    $merchendiser_beat_plan_id = $beat_plan_id = $result[0]->bit_plan_id;
+                    $sequence = $result[0]->sequence;
+                }
+            }
+        }
+
         if($mid!='') {
             $visit_id = $mid;
 
@@ -1847,7 +1925,6 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
 
                 $action='Merchandiser Location Modified.';        
                 $merchandiser_stock_id=$mid;
-                $merchandiser_stock_details = $merchandiser_stock_details;
 
                 if(count($merchandiser_stock_details)>0) {
                     for ($j=0; $j <count($merchandiser_stock_details); $j++) { 
@@ -1974,6 +2051,37 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                     $sales_rep_stock_detail['sales_rep_loc_id'] = $mid;
                     $this->db->where('sales_rep_loc_id',$mid)->delete('sales_rep_distributor_opening_stock');
                     $this->db->insert('sales_rep_distributor_opening_stock',$sales_rep_stock_detail);
+
+                    $store_id_d = explode('_',$visit_detail['store_id']);
+                    $store_id = $store_id_d[1];
+                    $latitude = $visit_detail['latitude'];
+                    $longitude = $visit_detail['longitude'];
+
+                    if(isset($latitude) && isset($longitude)){
+                        if($latitude!='0' && $latitude!='null' && $latitude!='' && $longitude!='0' && $longitude!='null' && $longitude!=''){
+                            if($store_id_d[0]=='d'){
+                                $dist_table_name = "distributor_master";
+                            } else {
+                                $dist_table_name = "sales_rep_distributors";
+                            }
+
+                            $sql = "select * from ".$dist_table_name." where id='$store_id'";
+                            $dist_res = $this->db->query($sql)->result();
+                            if(count($dist_res)>0){
+                                $lat = $dist_res[0]->latitude;
+                                $long = $dist_res[0]->longitude;
+                                if($lat=='0' || $lat=='null' || $lat=='' || $long=='0' || $long=='null' || $long==''){
+                                    $data_dist = array(
+                                                'modified_by' => $curusr,
+                                                'modified_on' => $now,
+                                                'latitude' =>    $visit_detail['latitude'],
+                                                'longitude' =>   $visit_detail['longitude']
+                                            );
+                                    $this->db->where('id', $store_id)->update($dist_table_name,$data_dist);
+                                }
+                            }
+                        }
+                    }
                 } else {
                     $store_id_d = explode('_',$visit_detail['store_id']);
                     $store_id = $store_id_d[1];
@@ -2270,11 +2378,11 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
 
                         $ispermenant ='Yes';    
                         if($ispermenant=='Yes' || $place_order=='Yes') {
-                            $count_spdb_sql = "select count(*) as count from merchandiser_detailed_beat_plan Where sales_rep_id=$sales_rep_id and frequency='$frequency' and bit_plan_id=0 and date(date_of_visit)=date(now())";
+                            $count_spdb_sql = "select count(*) as count from merchandiser_detailed_beat_plan Where sales_rep_id='$sales_rep_id' and frequency='$frequency' and bit_plan_id=0 and date(date_of_visit)=date(now())";
                             $result_spdb_count = $this->db->query($count_spdb_sql)->result_array();
                             if($result_spdb_count[0]['count']>0) {
                                 $count = $result_spdb_count[0]['count'];
-                                $sequence_spdb_sql = "select sequence,id from merchandiser_detailed_beat_plan Where sales_rep_id=$sales_rep_id and frequency='$frequency' and bit_plan_id=0  order by id asc Limit 0,1";
+                                $sequence_spdb_sql = "select sequence,id from merchandiser_detailed_beat_plan Where sales_rep_id='$sales_rep_id' and frequency='$frequency' and bit_plan_id=0  order by id asc Limit 0,1";
                                 $sequence_result = $this->db->query($sequence_spdb_sql)->result_array();
                                 $sequence_spdb = $sequence_result[0]['sequence'];  
 
@@ -2293,7 +2401,7 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                             $result = $this->db->query($sql);
                         }
                     } else {
-                        $sql = "Select max(sequence) as sequence from merchandiser_detailed_beat_plan WHERE date(date_of_visit)=date(now()) and sales_rep_id=$sales_rep_id and is_edit='edit' and frequency='$frequency'";
+                        $sql = "Select max(sequence) as sequence from merchandiser_detailed_beat_plan WHERE date(date_of_visit)=date(now()) and sales_rep_id='$sales_rep_id' and is_edit='edit' and frequency='$frequency'";
                         $get_maxcount = $this->db->query($sql)->result_array();
                         $visited_sequence = $get_maxcount[0]['sequence']+1;
 
@@ -2343,7 +2451,7 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                                                 $this->db->insert('merchandiser_detailed_beat_plan',$data22);
                                             }
                                         } else {
-                                            $sql = "select * from merchandiser_detailed_beat_plan Where sales_rep_id=$sales_rep_id and frequency='$frequency' and date(date_of_visit)=date(now()) and sequence>=$visited_sequence";
+                                            $sql = "select * from merchandiser_detailed_beat_plan Where sales_rep_id='$sales_rep_id' and frequency='$frequency' and date(date_of_visit)=date(now()) and sequence>='$visited_sequence'";
                                             $result = $this->db->query($sql)->result_array();
                                             for ($j=0; $j < count($result); $j++) {   
                                                 $newsequence = $result[$j]['sequence']+1;
@@ -2378,7 +2486,7 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                                             if($frequency_result==2) {
                                                $new_frequency = 'Alternate '.$explode_frequency[1]; 
                                             } else {
-                                                /*$new_frequency = 'Alternate2 '.$explode_frequency[1];*/ $new_frequency = 'Alternate '.$explode_frequency[1];
+                                                $new_frequency = 'Alternate '.$explode_frequency[1];
                                             }
 
                                             $rmax_sequnece = $this->db->select('max(sequence) as sequence')->where('frequency',$new_frequency)->get('merchandiser_beat_plan')->result_array();
@@ -2476,7 +2584,7 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                        
                         if($save=='Save') {
                             if($visited_sequence==1) {
-                                $sql = "select * from merchandiser_beat_plan Where sales_rep_id=$sales_rep_id and frequency='$frequency'";
+                                $sql = "select * from merchandiser_beat_plan Where sales_rep_id='$sales_rep_id' and frequency='$frequency'";
                                 $result = $this->db->query($sql)->result_array();
                                 for ($j=0; $j < count($result); $j++) {
                                     $new_id = $result[$j]['id'];
@@ -2498,7 +2606,7 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                                    
                                 }
                             } else {
-                                $sql = "select * from merchandiser_detailed_beat_plan Where sales_rep_id=$sales_rep_id and frequency='$frequency' and date(date_of_visit)=date(now()) and sequence>=$visited_sequence";
+                                $sql = "select * from merchandiser_detailed_beat_plan Where sales_rep_id='$sales_rep_id' and frequency='$frequency' and date(date_of_visit)=date(now()) and sequence>='$visited_sequence'";
                                 $result = $this->db->query($sql)->result_array();
                                 for ($j=0; $j < count($result); $j++) {   
                                     $newsequence = $result[$j]['sequence']+1;
@@ -2541,12 +2649,12 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                         } else {
                             $ispermenant  ='Yes';    
                             if($ispermenant=='Yes' || $place_order=='Yes') {
-                                $count_spdb_sql = "select count(*) as count from merchandiser_detailed_beat_plan Where sales_rep_id=$sales_rep_id and frequency='$frequency' and bit_plan_id=0 and date(date_of_visit)=date(now())";
+                                $count_spdb_sql = "select count(*) as count from merchandiser_detailed_beat_plan Where sales_rep_id='$sales_rep_id' and frequency='$frequency' and bit_plan_id=0 and date(date_of_visit)=date(now())";
                                 $result_spdb_count = $this->db->query($count_spdb_sql)->result_array();
 
                                 if($result_spdb_count[0]['count']>0) {
                                     $count = $result_spdb_count[0]['count'];
-                                    $sequence_spdb_sql = "select sequence,id from merchandiser_detailed_beat_plan Where sales_rep_id=$sales_rep_id and frequency='$frequency' and bit_plan_id=0  order by id asc Limit 0,1";
+                                    $sequence_spdb_sql = "select sequence,id from merchandiser_detailed_beat_plan Where sales_rep_id='$sales_rep_id' and frequency='$frequency' and bit_plan_id=0  order by id asc Limit 0,1";
                                     $sequence_result = $this->db->query($sequence_spdb_sql)->result_array();
                                     $sequence_spdb = $sequence_result[0]['sequence'];  
 
@@ -2598,7 +2706,7 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
 
                     $this->db->insert('sales_rep_distributor_opening_stock',$sales_rep_stock_detail);
                 } else {
-                    /*If bitplan d is old and isedit is empty*/
+                    // If bitplan d is old and isedit is empty
                     $detailed_insert_id=0; 
 
                     if($visit_detail['beat_plan_id']!='') {
@@ -2640,19 +2748,18 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
 
                         $this->db->insert('sales_rep_distributor_opening_stock',$sales_rep_stock_detail);
 
-                        /*Add beatplan*/
-                        $sql = "Select max(sequence) as sequence from sales_rep_detailed_beat_plan WHERE date(date_of_visit)=date(now()) and sales_rep_id=$sales_rep_id and is_edit='edit' and frequency='$frequency'";
+                        // Add beatplan
+                        $sql = "Select max(sequence) as sequence from sales_rep_detailed_beat_plan WHERE date(date_of_visit)=date(now()) and sales_rep_id='$sales_rep_id' and is_edit='edit' and frequency='$frequency'";
                         $get_maxcount = $this->db->query($sql)->result_array();
                         $visited_sequence = $get_maxcount[0]['sequence']+1;
 
-                        $sql = "select * from sales_rep_detailed_beat_plan Where sales_rep_id=$sales_rep_id and date(date_of_visit)=date(now()) and frequency='$frequency'";
+                        $sql = "select * from sales_rep_detailed_beat_plan Where sales_rep_id='$sales_rep_id' and date(date_of_visit)=date(now()) and frequency='$frequency'";
                         $detailed_result = $this->db->query($sql)->result_array();
 
                         if(count($detailed_result)>0) {
-                            $sql = "select * from sales_rep_detailed_beat_plan Where sales_rep_id=$sales_rep_id and frequency='$frequency' and date(date_of_visit)=date(now()) ";
+                            $sql = "select * from sales_rep_detailed_beat_plan Where sales_rep_id='$sales_rep_id' and frequency='$frequency' and date(date_of_visit)=date(now()) ";
                             $result = $this->db->query($sql)->result_array();
-                            for ($j=0; $j < count($result); $j++) {  
-                                $result[$j]['sequence'];
+                            for ($j=0; $j < count($result); $j++) {
                                 if($result[$j]['sequence']<$sequence && $result[$j]['is_edit']!='edit') {
                                     $newsequence = $result[$j]['sequence']+1;
                                     $new_id = $result[$j]['id'];
@@ -2683,7 +2790,7 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                             $get_beatplan = $this->db->where($where)->select('id')->get('sales_rep_detailed_beat_plan')->result();
                             $detailed_insert_id = $get_beatplan[0]->id;
                         } else {
-                            $sql = "select * from sales_rep_beat_plan Where sales_rep_id=$sales_rep_id and frequency='$frequency'";
+                            $sql = "select * from sales_rep_beat_plan Where sales_rep_id='$sales_rep_id' and frequency='$frequency'";
                             $result = $this->db->query($sql)->result_array();
                             for ($j=0; $j < count($result); $j++) { 
                                 if($result[$j]['sequence']<$sequence) {
@@ -2727,7 +2834,7 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                                 }
                             }
 
-                            $sql = "select * from sales_rep_beat_plan Where sales_rep_id=$sales_rep_id and frequency='$frequency' and sequence=$sequence ";
+                            $sql = "select * from sales_rep_beat_plan Where sales_rep_id='$sales_rep_id' and frequency='$frequency' and sequence='$sequence' ";
                             $result = $this->db->query($sql)->result_array();
                             $data = array('date_of_visit'=> $now,
                                           'sales_rep_id'=>$sales_rep_id,
@@ -2745,14 +2852,14 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                             $detailed_insert_id = $this->db->insert_id();
                         }
 
-                        $ispermenant  ='Yes';    
+                        $ispermenant='Yes';    
                         if($ispermenant=='Yes' || $place_order=='Yes') {
-                            $count_spdb_sql = "select count(*) as count from sales_rep_detailed_beat_plan Where sales_rep_id=$sales_rep_id and frequency='$frequency' and bit_plan_id=0 and date(date_of_visit)=date(now())";
+                            $count_spdb_sql = "select count(*) as count from sales_rep_detailed_beat_plan Where sales_rep_id='$sales_rep_id' and frequency='$frequency' and bit_plan_id=0 and date(date_of_visit)=date(now())";
                             $result_spdb_count = $this->db->query($count_spdb_sql)->result_array();
 
                             if($result_spdb_count[0]['count']>0) {
                                 $count = $result_spdb_count[0]['count'];
-                                $sequence_spdb_sql = "select sequence,id from sales_rep_detailed_beat_plan Where sales_rep_id=$sales_rep_id and frequency='$frequency' and bit_plan_id=0  order by id asc Limit 0,1";
+                                $sequence_spdb_sql = "select sequence,id from sales_rep_detailed_beat_plan Where sales_rep_id='$sales_rep_id' and frequency='$frequency' and bit_plan_id=0  order by id asc Limit 0,1";
                                 $sequence_result = $this->db->query($sequence_spdb_sql)->result_array();
                                 $sequence_spdb = $sequence_result[0]['sequence'];  
 
@@ -2771,7 +2878,7 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                             $result = $this->db->query($sql);
                         }
                     } else {
-                        $sql = "Select max(sequence) as sequence from sales_rep_detailed_beat_plan WHERE date(date_of_visit)=date(now()) and sales_rep_id=$sales_rep_id and is_edit='edit' and frequency='$frequency'";
+                        $sql = "Select max(sequence) as sequence from sales_rep_detailed_beat_plan WHERE date(date_of_visit)=date(now()) and sales_rep_id='$sales_rep_id' and is_edit='edit' and frequency='$frequency'";
                         $get_maxcount = $this->db->query($sql)->result_array();
                         $visited_sequence = $get_maxcount[0]['sequence']+1;
                         $retailer_id = 0;
@@ -2803,12 +2910,41 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                                 $retailer_id = 's_'.$store_id;  
                             } else {   
                                 $retailer_id =  $visit_detail['distributor_id'];
+
+                                $store_id_d = explode('_',$visit_detail['distributor_id']);
+                                $store_id = $store_id_d[1];
+                                $latitude = $visit_detail['latitude'];
+                                $longitude = $visit_detail['longitude'];
+                                if(isset($latitude) && isset($longitude)){
+                                    if($latitude!='0' && $latitude!='null' && $latitude!='' && $longitude!='0' && $longitude!='null' && $longitude!=''){
+                                        if($store_id_d[0]=='d'){
+                                            $dist_table_name = "distributor_master";
+                                        } else {
+                                            $dist_table_name = "sales_rep_distributors";
+                                        }
+                                        $sql = "select * from ".$dist_table_name." where id='$store_id'";
+                                        $dist_res = $this->db->query($sql)->result();
+                                        if(count($dist_res)>0){
+                                            $lat = $dist_res[0]->latitude;
+                                            $long = $dist_res[0]->longitude;
+                                            if($lat=='0' || $lat=='null' || $lat=='' || $long=='0' || $long=='null' || $long!=''){
+                                                $data_dist = array(
+                                                            'modified_by' => $curusr,
+                                                            'modified_on' => $now,
+                                                            'latitude' =>    $visit_detail['latitude'],
+                                                            'longitude' =>   $visit_detail['longitude']
+                                                        );
+                                                $this->db->where('id', $store_id)->update($dist_table_name,$data_dist);
+                                            }
+                                        }
+                                    }
+                                }
                             }
 
                             if($save!='Follow Up') {   
                                 if($retailer_id) { 
                                     if($ispermenant=='Yes' || $save=='') {
-                                        $sql = "Select count(*) as sequence from sales_rep_beat_plan WHERE frequency='$frequency' and sales_rep_id=$sales_rep_id";
+                                        $sql = "Select count(*) as sequence from sales_rep_beat_plan WHERE frequency='$frequency' and sales_rep_id='$sales_rep_id'";
 
                                         $get_maxcount_sales_rep = $this->db->query($sql)->result_array();
                                         if(count($get_maxcount_sales_rep)==0) {
@@ -2828,8 +2964,11 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                                             $this->db->insert('sales_rep_beat_plan',$data1);
                                             $lastinsertid=$this->db->insert_id();
                                         } else {
-                                            if($visited_sequence==1) {
-                                                $sql = "select * from sales_rep_beat_plan Where sales_rep_id=$sales_rep_id and frequency='$frequency'";
+                                            $sql = "select * from sales_rep_detailed_beat_plan Where sales_rep_id='$sales_rep_id' and frequency='$frequency' and date(date_of_visit)=date(now())";
+                                            $result = $this->db->query($sql)->result_array();
+
+                                            if($visited_sequence==1 && count($result)==0) {
+                                                $sql = "select * from sales_rep_beat_plan Where sales_rep_id='$sales_rep_id' and frequency='$frequency'";
                                                 $result = $this->db->query($sql)->result_array();
                                                 for ($j=0; $j < count($result); $j++) {
                                                     $new_id = $result[$j]['id'];
@@ -2852,7 +2991,7 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                                                     $this->db->insert('sales_rep_detailed_beat_plan',$data22);
                                                 }
                                             } else {
-                                                $sql = "select * from sales_rep_detailed_beat_plan Where sales_rep_id=$sales_rep_id and frequency='$frequency' and date(date_of_visit)=date(now()) and sequence>=$visited_sequence";
+                                                $sql = "select * from sales_rep_detailed_beat_plan Where sales_rep_id='$sales_rep_id' and frequency='$frequency' and date(date_of_visit)=date(now()) and sequence>='$visited_sequence'";
                                                 $result = $this->db->query($sql)->result_array();
                                                 for ($j=0; $j < count($result); $j++) {   
                                                     $newsequence = $result[$j]['sequence']+1;
@@ -2888,7 +3027,7 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                                                 if($frequency_result==2) {
                                                    $new_frequency = 'Alternate '.$explode_frequency[1]; 
                                                 } else {
-                                                    /*$new_frequency = 'Alternate2 '.$explode_frequency[1];*/ 
+                                                    // $new_frequency = 'Alternate2 '.$explode_frequency[1]; 
                                                     $new_frequency = 'Alternate '.$explode_frequency[1];
                                                 }
 
@@ -2950,12 +3089,12 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                                             $detailed_insert_id = $this->db->insert_id();
                                         }
 
-                                        $count_spdb_sql = "select count(*) as count from sales_rep_detailed_beat_plan Where sales_rep_id=$sales_rep_id and frequency='$frequency' and bit_plan_id=0 and date(date_of_visit)=date(now())";
+                                        $count_spdb_sql = "select count(*) as count from sales_rep_detailed_beat_plan Where sales_rep_id='$sales_rep_id' and frequency='$frequency' and bit_plan_id=0 and date(date_of_visit)=date(now())";
                                         $result_spdb_count = $this->db->query($count_spdb_sql)->result_array();
 
                                         if($result_spdb_count[0]['count']>0) {
                                             $count = $result_spdb_count[0]['count'];
-                                            $sequence_spdb_sql = "select sequence,id from sales_rep_detailed_beat_plan Where sales_rep_id=$sales_rep_id and frequency='$frequency' and bit_plan_id=0  order by id asc Limit 0,1";
+                                            $sequence_spdb_sql = "select sequence,id from sales_rep_detailed_beat_plan Where sales_rep_id='$sales_rep_id' and frequency='$frequency' and bit_plan_id=0  order by id asc Limit 0,1";
                                             $sequence_result = $this->db->query($sequence_spdb_sql)->result_array();
                                             $sequence_spdb = $sequence_result[0]['sequence'];  
 
@@ -2973,8 +3112,11 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                                                 and date(m2.date_of_visit)=date(now())";
                                         $result = $this->db->query($sql);
                                     } else {
-                                        if($visited_sequence==1) {
-                                            $sql = "select * from sales_rep_beat_plan Where sales_rep_id=$sales_rep_id and frequency='$frequency'";
+                                        $sql = "select * from sales_rep_detailed_beat_plan Where sales_rep_id='$sales_rep_id' and frequency='$frequency' and date(date_of_visit)=date(now())";
+                                        $result = $this->db->query($sql)->result_array();
+
+                                        if($visited_sequence==1 && count($result)==0) {
+                                            $sql = "select * from sales_rep_beat_plan Where sales_rep_id='$sales_rep_id' and frequency='$frequency'";
                                             $result = $this->db->query($sql)->result_array();
                                             for ($j=0; $j < count($result); $j++) {
                                                 $new_id = $result[$j]['id'];
@@ -3375,6 +3517,7 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
         $data['Thursday'] = array();
         $data['Friday'] = array();
         $data['Saturday'] = array();
+        $data['Sunday'] = array();
         $frequency = date('l');
 
         $data[$frequency] = $this->checkstatus_api2($sales_rep_id, $frequency);

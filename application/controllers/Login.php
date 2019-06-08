@@ -320,6 +320,38 @@ class Login extends CI_Controller
         echo json_encode($data);
     }
 
+    public function send_password_email_api() {
+        try {
+            $uname='prasad.bhisale@otbconsulting.co.in';
+            if($this->input->post('email')){
+                $uname=urldecode($this->input->post('email'));
+            }
+
+            $query=$this->db->query("SELECT * FROM user_master WHERE email_id='$uname'");
+            $result=$query->result();
+            if (count($result) > 0) {
+                $from_email_sender = 'Wholesome Habits Pvt Ltd';
+                $from_email = 'cs@eatanytime.co.in';
+                $to_email = $result[0]->email_id;
+                $subject = 'Your password for Eat ERP';
+                $message = '<html><head></head><body>Hi,<br /><br />' .
+                            'Password: ' . $result[0]->password .
+                            '<br /><br />Thanks</body></html>';
+
+                $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message);
+
+                if($mailSent==1){
+                    echo 'Valid';
+                } else {
+                    echo 'Invalid';
+                }
+            } else {
+                echo 'Invalid';
+            }
+        } catch (Exception $ex) {
+            echo 'Invalid';
+        }
+    }
 }
 	  
 ?>

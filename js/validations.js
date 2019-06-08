@@ -6952,3 +6952,40 @@ $('#form_beat_allocation').submit(function() {
         return valid;
     }
 });
+
+
+
+
+// ----------------- Sales Rep Attendance FORM VALIDATION -------------------------------------
+$("#form_sales_rep_attendance_details").validate({
+    rules: {
+        check_in_date: {
+            required: true
+        },
+        sales_rep_id: {
+            required: true
+        },
+        check_in_time: {
+            required: true
+        }
+    },
+
+    ignore: ":not(:visible)",
+
+    errorPlacement: function (error, element) {
+        var placement = $(element).data('error');
+        if (placement) {
+            $(placement).append(error);
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
+$('#form_sales_rep_attendance_details').submit(function() {
+    if (!$("#form_sales_rep_attendance_details").valid()) {
+        return false;
+    } else {
+        return true;
+    }
+});

@@ -67,6 +67,9 @@ class Dashboard_mobile_app extends CI_Controller
             case 'Saturday':
                 $temp_date = $mon = date('Y-m-d', strtotime('Saturday this week'));
                 break; 
+            case 'Sunday':
+                $temp_date = $mon = date('Y-m-d', strtotime('Sunday this week'));
+                break; 
             default:
                 case $frequency:
                 $temp_date = $mon = date('Y-m-d', strtotime($frequency.' this week'));
@@ -119,7 +122,7 @@ class Dashboard_mobile_app extends CI_Controller
             $data['reporting_manager_id']=$data['beat_details'][0]->reporting_manager_id;
 
             $beat_status = $data['beat_details'][0]->status;
-            if(strtoupper(trim($beat_status))=="PENDING"){
+            if(strtoupper(trim($beat_status))=="PENDING" || strtoupper(trim($beat_status))=="REJECTED"){
                 $data['distributor_id_og']=$data['beat_details'][0]->dist_id1;
                 $data['beat_id_og']=$data['beat_details'][0]->beat_id1;
             } else {
@@ -127,11 +130,23 @@ class Dashboard_mobile_app extends CI_Controller
                 $data['beat_id_og']=$data['beat_details'][0]->beat_id2;
             }
             
-            $data['distributor_id']=$data['beat_details'][0]->dist_id2;
-            $data['beat_id']=$data['beat_details'][0]->beat_id2;
-            $data['beat_status']=$data['beat_details'][0]->status;
-            $data['distributor_name']=$data['beat_details'][0]->distributor_name2;
-            $data['beat_name']=$data['beat_details'][0]->beat_name2;
+            if(strtoupper(trim($beat_status))=="PENDING" || strtoupper(trim($beat_status))=="APPROVED"){
+                $data['distributor_id']=$data['beat_details'][0]->dist_id2;
+                $data['beat_id']=$data['beat_details'][0]->beat_id2;
+                $data['distributor_name']=$data['beat_details'][0]->distributor_name2;
+                $data['beat_name']=$data['beat_details'][0]->beat_name2;
+            } else {
+                $data['distributor_id']=$data['beat_details'][0]->dist_id1;
+                $data['beat_id']=$data['beat_details'][0]->beat_id1;
+                $data['distributor_name']=$data['beat_details'][0]->distributor_name1;
+                $data['beat_name']=$data['beat_details'][0]->beat_name1;
+            }
+            
+            if(strtoupper(trim($beat_status))=="REJECTED"){
+                $data['beat_status']="Approved";
+            } else {
+                $data['beat_status']=$data['beat_details'][0]->status;
+            }
         }
 
         // echo $data['distributor_name'];
@@ -261,11 +276,15 @@ class Dashboard_mobile_app extends CI_Controller
     
     public function get_visit_details_api(){
         $sales_rep_id = 2;
+        $curusr='151';
         if($this->input->post('sales_rep_id')){
             $sales_rep_id = $this->input->post('sales_rep_id');
         }
+        if($this->input->post('session_id')){
+            $curusr = $this->input->post('session_id');
+        }
         
-        $data = $this->dashboard_sales_rep_model->get_visit_details($sales_rep_id);
+        $data = $this->dashboard_sales_rep_model->get_visit_details($sales_rep_id, $curusr);
         echo json_encode($data);
     }
 
@@ -277,6 +296,18 @@ class Dashboard_mobile_app extends CI_Controller
         
         $data = $this->dashboard_sales_rep_model->get_order_details($sales_rep_id);
         echo json_encode($data);
+    }
+
+    public function get_version_api(){
+        $sql = "select * from version_master";
+        $result = $this->db->query($sql)->result();
+        if(count($result)>0){
+            $version = $result[0]->version;
+        } else {
+            $version = '1.1';
+        }
+
+        echo $version;
     }
 }
 ?>

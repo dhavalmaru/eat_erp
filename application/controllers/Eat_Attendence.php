@@ -294,11 +294,22 @@ class Eat_Attendence extends CI_controller {
           redirect(base_url().'index.php/Eat_Attendence');
     }
 
+    public function test(){
+        $check_in_time = '2019-06-05 14:17:07';
+        $date = date('Y-m-d',strtotime($check_in_time));
+        $first_in = date('H:i',strtotime($check_in_time));
+
+        echo $date;
+        echo '<br/><br/>';
+        echo $first_in;
+    }
+
     public function insert_sales_attendence(){
         $now=date('Y-m-d H:i:s');
         $month = (intval(date("m"))-1);
-        $sql = "Select U.first_name,U.emp_code ,A.*,S.sr_type,S.zone from 
-                (SELECT * from sales_attendence Where MONTH(check_in_time)=$month Order By sales_rep_id,check_in_time ASC)A
+        $sql = "Select U.first_name, U.emp_code, A.*, S.sr_type, S.zone from 
+                (SELECT * from sales_attendence Where MONTH(check_in_time)='$month' 
+                  Order By sales_rep_id,check_in_time ASC) A
                 Left Join user_master U On A.sales_rep_id=U.sales_rep_id
                 Left Join sales_rep_master S On A.sales_rep_id=S.id";
         $result = $this->db->query($sql)->result();
@@ -314,7 +325,12 @@ class Eat_Attendence extends CI_controller {
             $check_in_time = $result[$i]->check_in_time;
             $date = date('Y-m-d',strtotime($check_in_time));
             $first_in = date('H:i',strtotime($check_in_time));
-            if($check_in_time!=null) $last_out=0;
+            // if($check_in_time!=null) $last_out=0;
+            $check_out_time = $result[$i]->check_out_time;
+            if($check_out_time!=null)
+              $last_out = date('H:i',strtotime($check_out_time));
+            else 
+              $last_out=0;
             $emp_status = $result[$i]->working_status;
             
             $where = array("emp_no"=>$emp_no,'date'=>$date);
@@ -369,10 +385,10 @@ class Eat_Attendence extends CI_controller {
             $location = $result[$i]->zone;
             $check_in_time = $result[$i]->check_in_time;
             $date = date('Y-m-d',strtotime($check_in_time));
-            $first_in = date('H:m',strtotime($check_in_time));
+            $first_in = date('H:i',strtotime($check_in_time));
             $check_out_time = $result[$i]->check_out_time;
             if($check_out_time!=null)
-              $last_out = date('H:m',strtotime($check_out_time));
+              $last_out = date('H:i',strtotime($check_out_time));
             $emp_status = $result[$i]->working_status;
             
             /*$where = array("emp_no"=>$emp_no,'date'=>$date);
@@ -714,7 +730,7 @@ class Eat_Attendence extends CI_controller {
     public function send_bulk_mail($year,$month)
     {
 
-       $result1 = $this->db->query("SELECT DISTINCT(emp_no) from employee_attendence Where MONTH(date)='$month' and YEAR(date)='$year'")->result();
+       $result1 = $this->db->query("SELECT DISTINCT(emp_no) from employee_attendence Where MONTH(date)='$month' and YEAR(date)='$year' and emp_no is not null and emp_no<>''")->result();
 
        $this->db->last_query();
 
@@ -843,7 +859,7 @@ class Eat_Attendence extends CI_controller {
        }
        else
        {
-          $result1 = $this->db->query("SELECT DISTINCT(emp_no) from employee_attendence Where MONTH(date)='$month' and YEAR(date)='$year'")->result();
+          $result1 = $this->db->query("SELECT DISTINCT(emp_no) from employee_attendence Where MONTH(date)='$month' and YEAR(date)='$year' and emp_no is not null and emp_no<>''")->result();
        }
        
 

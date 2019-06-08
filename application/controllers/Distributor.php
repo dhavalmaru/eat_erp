@@ -175,7 +175,7 @@ class Distributor extends CI_Controller{
                 $data['type'] = $this->distributor_type_model->get_data('Approved');
                 $data['zone'] = $this->zone_model->get_data('Approved');
                 $data['location'] = $this->location_model->get_data('Approved');
-                // $data['beat_plan'] = $this->distributor_model->get_beat_plans();
+                $data['beat_plan'] = $this->distributor_model->get_beat_plans();
                 $data['category_detail']=$this->distributor_model->getDistributor_margin();
                 load_view('distributor/distributor_details', $data);
             } else {
@@ -198,13 +198,13 @@ class Distributor extends CI_Controller{
                 $data['type'] = $this->distributor_type_model->get_data('Approved');
                 $data['zone'] = $this->zone_model->get_data('Approved');
                 $data['location'] = $this->location_model->get_data('Approved');
-                // $data['beat_plan'] = $this->distributor_model->get_beat_plans();
+                $data['beat_plan'] = $this->distributor_model->get_beat_plans();
                 if(strrpos($d_id, "d_") !== false){
                     $id = substr($d_id, 2);
                     $data['distributor_contacts'] = $this->distributor_model->get_distributor_contacts($id);
                     $data['distributor_consignee'] = $this->distributor_model->get_distributor_consignee($id);
                     // $data['margin_detail']=$this->distributor_model->getDistributor_margin($id);
-                    // $data['distributor_beat_plans'] = $this->distributor_model->get_dist_beat_plans($id);
+                    $data['distributor_beat_plans'] = $this->distributor_model->get_dist_beat_plans($id);
                 }
 
                 // $data['category_detail']=$this->category->getCategoryDetails();

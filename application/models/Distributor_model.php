@@ -332,7 +332,13 @@ function save_data($id=''){
         if(isset($beat_id[$k]) and $beat_id[$k]!="") {
             $data = array(
                         'distributor_id' => $id,
-                        'beat_id' => $beat_id[$k]
+                        'beat_id' => $beat_id[$k],
+                        'status' => $this->input->post('status'),
+                        'remarks' => $this->input->post('remarks'),
+                        'created_by' => $curusr,
+                        'created_on' => $now,
+                        'modified_by' => $curusr,
+                        'modified_on' => $now
                     );
             $this->db->insert('distributor_beat_plans', $data);
         }

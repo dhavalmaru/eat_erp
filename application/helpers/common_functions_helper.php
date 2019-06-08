@@ -440,13 +440,13 @@
                 $CI->email->attach($attachment);
             $CI->email->set_mailtype("html");
             $result = $CI->email->send();
-            echo $CI->email->print_debugger();
+            // echo $CI->email->print_debugger();
             $CI->email->clear(TRUE);
 
             return $result;
 
         } catch (Exception $ex) {
-            echo $ex->getMessage();
+            // echo $ex->getMessage();
         }
     }
 
