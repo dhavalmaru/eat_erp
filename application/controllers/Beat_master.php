@@ -145,5 +145,16 @@ class Beat_master extends CI_Controller{
         $result = $this->beat_model->check_beat_name_availablity();
         echo $result;
     }
+
+    public function upload_file(){
+        $this->beat_model->upload_file();
+        redirect(base_url().'index.php/beat_master');
+    }
+
+    public function download_csv(){
+        $this->beat_model->download_csv();
+        // redirect(base_url().'index.php/beat_master');
+    }
+
 }
 ?>

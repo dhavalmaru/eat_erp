@@ -35,8 +35,57 @@
 								<span class="fa fa-plus"></span> Add Beat
 							</a>
 						</div>
+                    	<div class="pull-right btn-margin"  style="<?php if($access[0]->r_insert=='0') echo 'display: none;';?>">
+	                   		<a class="btn btn-default-danger pull-right" style="margin-right:8px!important;" href="<?php echo base_url('index.php/Beat_master/download_csv');?>">
+	                   			<i class="fa fa-file-pdf-o "></i> Download Sample
+	                   		</a>
+						</div>
+                    	<div class="pull-right btn-margin"  style="<?php if($access[0]->r_insert=='0') echo 'display: none;';?>">
+	                   		<a class="btn btn-success" data-toggle="modal" href="#myModal">
+	                            <span class="fa fa-file-excel-o"></span> Upload Excel
+	                        </a>
+						</div>
 				    </div>
                 </div>
+
+                <div class="modal fade" id="myModal" role="dialog" style="">
+					<div class="modal-dialog">
+                    <!-- Modal content-->
+                    <div class="modal-content" style="">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">
+                               Upload Beat Details
+                            </h4>
+                        </div>
+                        <form id="form_beat_plan_upload" method="POST" action="<?php echo base_url();?>index.php/Beat_master/upload_file" class="form-horizontal excelform" enctype="multipart/form-data">
+                        <div class="modal-body">
+					 	<div class="form-group">
+							<label class="col-md-4 col-sm-4 col-xs-12 control-label">Add Excel <span class="asterisk_sign"></span></label>
+							<input type="file" class="fileinput btn btn-info btn-small  bar_image" name="upload" id="image" placeholder="image" value=""/>
+                     	</div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                            <!-- <button id="btn_save" class="btn btn-success pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</button> -->
+                            <input type="submit"  class="btn btn-success pull-right"  value="Save" />
+                        </div>
+                        </form>
+                    </div>
+	                </div>
+	            </div>
+
+	            <div class="container">
+					<?php if($this->session->flashdata('error')){?>
+					<div class="alert alert-danger alert-dismissible fade in">
+					<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+					<?php echo $this->session->flashdata('error');?></div>  
+					<?php } else if($this->session->flashdata('success')){?>
+					<div class="alert alert-success alert-dismissible fade in">
+					<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+					<?php echo $this->session->flashdata('success');?></div>  
+					<?php } ?>
+				</div>
               	
                 <!-- PAGE CONTENT WRAPPER -->
              	<div class="page-content-wrap">

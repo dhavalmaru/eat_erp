@@ -6989,3 +6989,35 @@ $('#form_sales_rep_attendance_details').submit(function() {
         return true;
     }
 });
+
+
+
+
+
+// ----------------- Beat Plan Upload FORM VALIDATION -------------------------------------
+$("#form_beat_plan_upload").validate({
+    rules: {
+        upload: {
+            required: true
+        }
+    },
+
+    ignore: false,
+
+    errorPlacement: function (error, element) {
+        var placement = $(element).data('error');
+        if (placement) {
+            $(placement).append(error);
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
+$('#form_beat_plan_upload').submit(function() {
+    if (!$("#form_beat_plan_upload").valid()) {
+        return false;
+    } else {
+        return true;
+    }
+});

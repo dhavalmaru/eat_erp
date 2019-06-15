@@ -148,7 +148,11 @@
                                         <table class="table table-bordered" style="margin-bottom: 0px; ">
                                             <thead>
                                                 <tr>
-                                                    <th>Select</th>
+                                                    <th>Sr No</th>
+                                                    <th>
+                                                        Select &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                        <input type="checkbox" class="form-control" onchange="selectAll(this);" style="display: inline; width: 33px;" />
+                                                    </th>
                                                     <th width="500">Retailer</th>
                                                     <th>No Of Beats Assigned</th>
                                                     <th style="display: none;">Sequence</th>
@@ -157,6 +161,9 @@
                                             <tbody id="beat_details">
                                                 <?php if(isset($beat_details)) { for ($i=0; $i <count($beat_details) ; $i++) { ?>
                                                     <tr>
+                                                        <td>
+                                                            <?php echo $i+1; ?>
+                                                        </td>
                                                         <td>
                                                             <input type="checkbox" class="form-control" id="is_selected_<?=$i?>" value="1" onchange="set_is_selected(this);" <?php if($beat_details[$i]->is_selected==1) echo 'checked'; ?> />
                                                             <input type="hidden" class="form-control" name="is_selected[]" id="is_selected_val_<?=$i?>" value="<?=$beat_details[$i]->is_selected;?>" />
@@ -225,6 +232,11 @@
         </script>
         <script type="text/javascript" src="<?php echo base_url(); ?>js/validations.js"></script>
         <script type='text/javascript'>
+            var selectAll = function(elem) {
+                console.log(elem.checked);
+                $('input:checkbox').not(elem).prop('checked', elem.checked);
+            }
+
             var get_zone = function() {
                 $.ajax({
                     url:BASE_URL+'index.php/beat_master/get_zone',
@@ -326,6 +338,7 @@
 
                             $.each(response,function(index,data){
                                 tr = '<tr>'+
+                                        '<td>'+(cnt+1)+'</td>'+
                                         '<td>'+
                                             '<input type="checkbox" class="form-control" id="is_selected_'+cnt+'" value="1" onchange="set_is_selected(this);" '+((data['is_selected']=="1")?"checked":"")+' />'+
                                             '<input type="hidden" class="form-control" name="is_selected[]" id="is_selected_val_'+cnt+'" value="'+data['is_selected']+'" />'+

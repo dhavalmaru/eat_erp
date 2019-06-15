@@ -983,35 +983,6 @@
                     // alert('hi');
                 });
 
-                function get_consignee_details1(distributor_consignee_id) {
-                    $.ajax({
-                        url:BASE_URL+'index.php/Distributor/get_shipping_state',
-                        method:"post",
-                        data:{id:distributor_consignee_id},
-                        dataType:"json",
-                        async:false,
-                        success: function(data){
-                            //if(data.result==1){
-                                // console.log(data.state);
-								//alert($('#distributor_id').val());
-								if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550" && $('#distributor_id').val()!="622" && $('#distributor_id').val()!="626" && $('#distributor_id').val()!="640" && $('#distributor_id').val()!="1299" && $('#distributor_id').val()!="1319" && $('#distributor_id').val()!="1327" && $('#distributor_id').val()!="1352") {
-									// alert($('#distributor_id').val());
-									$('#state').val(data.state);
-									$('#state_code').val(data.state_code);
-								}
-                                // alert(data.state);
-                                get_sell_rate();
-                            //}
-                        },
-                        error: function (response) {
-                            var r = jQuery.parseJSON(response.responseText);
-                            alert("Message: " + r.Message);
-                            alert("StackTrace: " + r.StackTrace);
-                            alert("ExceptionType: " + r.ExceptionType);
-                        }
-                    });
-                }
-
                 // $('#sample_distributor_id').click(function(event){
                 //     get_distributor_details($('#sample_distributor_id').val());
                 // });
@@ -1118,14 +1089,44 @@
 					defaultDate:new Date()
 				});
             });
+            
+            function get_consignee_details1(distributor_consignee_id) {
+                // console.log(distributor_consignee_id);
+                $.ajax({
+                    url:BASE_URL+'index.php/Distributor/get_shipping_state',
+                    method:"post",
+                    data:{id:distributor_consignee_id},
+                    dataType:"json",
+                    async:false,
+                    success: function(data){
+                        //if(data.result==1){
+                            // console.log(data.state);
+                            //alert($('#distributor_id').val());
+                            if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550" && $('#distributor_id').val()!="622" && $('#distributor_id').val()!="626" && $('#distributor_id').val()!="640" && $('#distributor_id').val()!="1299" && $('#distributor_id').val()!="1319" && $('#distributor_id').val()!="1327" && $('#distributor_id').val()!="1352") {
+                                // alert($('#distributor_id').val());
+                                $('#state').val(data.state);
+                                $('#state_code').val(data.state_code);
+                            }
+                            // alert(data.state);
+                            get_sell_rate();
+
+                            // console.log(data.state_code);
+                        //}
+                    },
+                    error: function (response) {
+                        var r = jQuery.parseJSON(response.responseText);
+                        alert("Message: " + r.Message);
+                        alert("StackTrace: " + r.StackTrace);
+                        alert("ExceptionType: " + r.ExceptionType);
+                    }
+                });
+            }
 
             function set_distributor_details(set_discount){
                 get_distributor_details($('#distributor_id').val(), set_discount);
+                
                 // console.log('5');
-                    
-                if($('#distributor_consignee_id').val()!='') {
-                    get_consignee_details1($('#distributor_consignee_id').val());
-                }
+
                 if($('#distributor_id').val()==1){
                     $('#sample_distributor_div').show();
                 } else {
@@ -1133,6 +1134,10 @@
                 }
 
                 get_distributor_consignee_details($('#distributor_id').val());
+                    
+                if($('#distributor_consignee_id').val()!='') {
+                    get_consignee_details1($('#distributor_consignee_id').val());
+                }
             }
 
             function show_item(elem){

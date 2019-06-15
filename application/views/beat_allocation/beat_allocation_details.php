@@ -91,8 +91,8 @@
                                             <div class="col-md-2 col-sm-2 col-xs-12" style="font-weight: bold;"><?php if(isset($allocations)) echo $allocations[$i]->weekday;?></div>
                                         </div>
                                         <div class="col-md-12 col-sm-12 col-xs-12" style="margin-top:5px;">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Frequency</label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <label class="col-md-1 col-sm-1 col-xs-12 control-label">Frequency</label>
+                                            <div class="col-md-3 col-sm-3 col-xs-12">
                                                 <select name="frequency[]" id="frequency_<?php echo $i; ?>" class="form-control select2" data-error="#err_frequency_<?php echo $i; ?>" onchange="set_frequency(this);">
                                                     <option value="">Select</option>
                                                     <option value="Alternate" <?php if (isset($allocations)) { if($allocations[$i]->frequency=='Alternate') { echo 'selected'; } } ?>>Alternate</option>
@@ -100,32 +100,35 @@
                                                 </select>
                                                 <div id="err_frequency_<?php echo $i; ?>" style="margin-top: 15px;"></div>
                                             </div>
-                                        </div>
-                                        <div class="col-md-12 col-sm-12 col-xs-12" id="frq1_div_<?php echo $i; ?>">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Distributor</label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="dist_id1[]" id="dist_id1_<?php echo $i; ?>" class="form-control select2" data-error="#err_dist_id1_<?php echo $i; ?>" onchange="get_beat_plan(this);">
-                                                    <option value="">Select</option>
-                                                    <?php if(isset($distributor)) { for ($k=0; $k < count($distributor) ; $k++) { ?>
-                                                        <option value="<?php echo $distributor[$k]->id; ?>" <?php if (isset($allocations)) { if($distributor[$k]->id==$allocations[$i]->dist_id1) { echo 'selected'; } } ?>><?php echo ucwords(trim(strtolower($distributor[$k]->distributor_name))); ?></option>
-                                                    <?php }} ?>
-                                                </select>
-                                                <div id="err_dist_id1_<?php echo $i; ?>" style="margin-top: 15px;"></div>
+                                            <div id="frq1_div_<?php echo $i; ?>">
+                                                <label class="col-md-1 col-sm-1 col-xs-12 control-label">Distributor</label>
+                                                <div class="col-md-3 col-sm-3 col-xs-12">
+                                                    <select name="dist_id1[]" id="dist_id1_<?php echo $i; ?>" class="form-control select2" data-error="#err_dist_id1_<?php echo $i; ?>" onchange="get_beat_plan(this);">
+                                                        <option value="">Select</option>
+                                                        <?php if(isset($distributor)) { for ($k=0; $k < count($distributor) ; $k++) { ?>
+                                                            <option value="<?php echo $distributor[$k]->id; ?>" <?php if (isset($allocations)) { if($distributor[$k]->id==$allocations[$i]->dist_id1) { echo 'selected'; } } ?>><?php echo ucwords(trim(strtolower($distributor[$k]->distributor_name))); ?></option>
+                                                        <?php }} ?>
+                                                    </select>
+                                                    <div id="err_dist_id1_<?php echo $i; ?>" style="margin-top: 15px;"></div>
+                                                </div>
+                                                <label class="col-md-1 col-sm-1 col-xs-12 control-label">Beat Plan</label>
+                                                <div class="col-md-3 col-sm-3 col-xs-12">
+                                                    <select name="beat_id1[]" id="beat_id1_<?php echo $i; ?>" class="form-control select2" data-error="#err_beat_id1_<?php echo $i; ?>">
+                                                        <option value="">Select</option>
+                                                        <?php if(isset($beat_plan)) { for ($k=0; $k < count($beat_plan) ; $k++) { ?>
+                                                            <option value="<?php echo $beat_plan[$k]->id; ?>" <?php if (isset($allocations)) { if($beat_plan[$k]->id==$allocations[$i]->beat_id1) { echo 'selected'; } } ?>><?php echo $beat_plan[$k]->beat_id.' - '.ucwords(trim(strtolower($beat_plan[$k]->beat_name))); ?></option>
+                                                        <?php }} ?>
+                                                    </select>
+                                                    <div id="err_beat_id1_<?php echo $i; ?>" style="margin-top: 15px;"></div>
+                                                </div>
                                             </div>
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Beat Plan</label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="beat_id1[]" id="beat_id1_<?php echo $i; ?>" class="form-control select2" data-error="#err_beat_id1_<?php echo $i; ?>">
-                                                    <option value="">Select</option>
-                                                    <?php if(isset($beat_plan)) { for ($k=0; $k < count($beat_plan) ; $k++) { ?>
-                                                        <option value="<?php echo $beat_plan[$k]->id; ?>" <?php if (isset($allocations)) { if($beat_plan[$k]->id==$allocations[$i]->beat_id1) { echo 'selected'; } } ?>><?php echo $beat_plan[$k]->beat_id.' - '.ucwords(trim(strtolower($beat_plan[$k]->beat_name))); ?></option>
-                                                    <?php }} ?>
-                                                </select>
-                                                <div id="err_beat_id1_<?php echo $i; ?>" style="margin-top: 15px;"></div>
-                                            </div>
                                         </div>
+                                        
                                         <div class="col-md-12 col-sm-12 col-xs-12" id="frq2_div_<?php echo $i; ?>">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Distributor</label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <label class="col-md-1 col-sm-1 col-xs-12 control-label">&nbsp;</label>
+                                            <div class="col-md-3 col-sm-3 col-xs-12"></div>
+                                            <label class="col-md-1 col-sm-1 col-xs-12 control-label">Distributor</label>
+                                            <div class="col-md-3 col-sm-3 col-xs-12">
                                                 <select name="dist_id2[]" id="dist_id2_<?php echo $i; ?>" class="form-control select2" data-error="#err_dist_id2_<?php echo $i; ?>" onchange="get_beat_plan(this);">
                                                     <option value="">Select</option>
                                                     <?php if(isset($distributor)) { for ($k=0; $k < count($distributor) ; $k++) { ?>
@@ -134,8 +137,8 @@
                                                 </select>
                                                 <div id="err_dist_id2_<?php echo $i; ?>" style="margin-top: 15px;"></div>
                                             </div>
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Beat Plan</label>
-                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <label class="col-md-1 col-sm-1 col-xs-12 control-label">Beat Plan</label>
+                                            <div class="col-md-3 col-sm-3 col-xs-12">
                                                 <select name="beat_id2[]" id="beat_id2_<?php echo $i; ?>" class="form-control select2" data-error="#err_beat_id2_<?php echo $i; ?>">
                                                     <option value="">Select</option>
                                                     <?php if(isset($beat_plan)) { for ($k=0; $k < count($beat_plan) ; $k++) { ?>
