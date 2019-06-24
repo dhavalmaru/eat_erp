@@ -148,13 +148,16 @@ class Sales_Attendence extends CI_controller {
         $from_email_sender = 'Wholesome Habits Pvt Ltd';
        	
 		// $to_email = "prasad.bhisale@pecanreams.com";
-	 //   	$cc = "prasad.bhisale@pecanreams.com";
-	 //   	$bcc = "prasad.bhisale@pecanreams.com";
+		// $cc = "prasad.bhisale@pecanreams.com";
+		// $bcc = "prasad.bhisale@pecanreams.com";
 	   	
-		$to_email = "ravi.hirode@eatanytime.co.in, mukesh.yadav@eatanytime.co.in, sulochana.waghmare@eatanytime.co.in, manorama.mishra@eatanytime.co.in, mahesh.ms@eatanytime.co.in, yash.doshi@eatanytime.in, darshan.dhany@eatanytime.co.in, sachin.pal@eatanytime.co.in, girish.rai@eatanytime.in, nitin.kumar@eatanytime.co.in, urvi.bhayani@eatanytime.co.in, mohil.telawade@eatanytime.co.in";
-		$bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, sangeeta.yadav@pecanreams.com,prasad.bhisale@pecanreams.com";
-		$cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, operations@eatanytime.in, mis@eatanytime.in, priti.tripathi@eatanytime.in";
-
+		$to_email = "mukesh.yadav@eatanytime.co.in, sulochana.waghmare@eatanytime.co.in, manorama.mishra@eatanytime.co.in, 
+					yash.doshi@eatanytime.in, sachin.pal@eatanytime.co.in, girish.rai@eatanytime.in, 
+					urvi.bhayani@eatanytime.co.in, vijay@eatanytime.in";
+		$cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, operations@eatanytime.in, 
+				mis@eatanytime.in, priti.tripathi@eatanytime.in";
+		$bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, prasad.bhisale@pecanreams.com";
+		
         $subject = 'Sales Rep Attendence -'.date("d F Y",strtotime("now"));
         $data = $this->Sales_Attendence_model->sales_attendence_list();
         $absent_data = $this->Sales_Attendence_model->sales_absent_attendence();

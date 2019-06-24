@@ -31,7 +31,7 @@
               <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
                 
                    <div class="heading-h3"> 
-                   <div class="heading-h3-heading mobile-head">	 <a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp;  Batch Processing List  </div>						 
+                   <div class="heading-h3-heading mobile-head">	 <a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp;  Raw Material Recon List  </div>						 
 					  <div class="heading-h3-heading  mobile-head">
 					  <div class="pull-right btn-margin">	
 								<?php $this->load->view('templates/download');?>	

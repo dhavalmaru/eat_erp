@@ -165,31 +165,30 @@ class Export extends CI_Controller {
             $data['report_type'] = 'MT Stock Tracker';
             $data['report_name'] = 'MT Stock Tracker';
             $data['sample_report_name'] = 'mt_stock_tracker.xls';
-        }
-        else if($rep_id==26){
-             $data['report_type'] = 'Distributor Transfer Report';
-             $data['report_name'] = 'Distributor Transfer Report';
-             $data['sample_report_name'] = 'distributor_transfer.xls';
-        }
-        else if($rep_id==27){
+        } else if($rep_id==26){
+            $data['report_type'] = 'Distributor Transfer Report';
+            $data['report_name'] = 'Distributor Transfer Report';
+            $data['sample_report_name'] = 'distributor_transfer.xls';
+        } else if($rep_id==27){
             $data['report_type'] = 'Raw Material Stock Report';
             $data['report_name'] = 'Raw Material Stock Report';
             $data['sample_report_name'] = 'Raw_Material_Stock_IN_OUT.xls';
-        }
-		else if($rep_id==28){
-             $data['report_type'] = 'Gt Stock Report';
-             $data['report_name'] = 'Gt Stock Reoprts';
-             $data['sample_report_name'] = 'distributor_transfer.xls';
-        }
-        else if($rep_id==29){
-             $data['report_type'] = 'Sales Attendence';
-             $data['report_name'] = 'Sales Attendence Report';
-             $data['sample_report_name'] = 'sales_attendence.xls';
-        }
-        else if($rep_id==30){
-             $data['report_type'] = 'gt_store';
-             $data['report_name'] = 'GT Store Health Report';
-             $data['sample_report_name'] = 'store_wise_sales.xls';
+        } else if($rep_id==28){
+            $data['report_type'] = 'Gt Stock Report';
+            $data['report_name'] = 'Gt Stock Reoprts';
+            $data['sample_report_name'] = 'distributor_transfer.xls';
+        } else if($rep_id==29){
+            $data['report_type'] = 'Sales Attendence';
+            $data['report_name'] = 'Sales Attendence Report';
+            $data['sample_report_name'] = 'sales_attendence.xls';
+        } else if($rep_id==30){
+            $data['report_type'] = 'gt_store';
+            $data['report_name'] = 'GT Store Health Report';
+            $data['sample_report_name'] = 'store_wise_sales.xls';
+        } else if($rep_id==31){
+            $data['report_type'] = 'Monthly Sales';
+            $data['report_name'] = 'Monthly Sales Overview Report';
+            $data['sample_report_name'] = 'monthly_sales_overview.xls';
         }
 
         if($rep_id==16 || $rep_id==17){
@@ -222,7 +221,6 @@ class Export extends CI_Controller {
             $this->export_model->generate_distributor_ledger_report($remark_visibility);
             //}
             //else {
-                
             //}
         } else if($rep_id==6) {
             $this->export_model->generate_agingwise_report();
@@ -306,7 +304,6 @@ class Export extends CI_Controller {
             /*$this->load->helper("file");
             delete_files('C:/xampp/htdocs/eat_erp_new_30/'.'Sale_Invoice_Report.xls');
             delete_files('C:/xampp/htdocs/eat_erp_new_30/'.'Sale_Invoice_Sku_Report.xls');*/
-
         } else if($rep_id==19) {
             $this->export_model->generate_sample_expired_report();
         } else if($rep_id==20) {
@@ -387,7 +384,6 @@ class Export extends CI_Controller {
             
 
             /*$this->export_model->generate_distributor_balance_ledger_report();*/
-            
         } else if($rep_id==21) {
             $this->export_model->upload_distributor_balance_ledger_report();
         } else if($rep_id==22) {
@@ -729,26 +725,40 @@ class Export extends CI_Controller {
             $objWriter->save('php://output');
         } else if($rep_id==25) {
             $this->export_model->generate_mt_stock_report();
-        }
-        else if($rep_id==26) {
+        } else if($rep_id==26) {
              $this->export_model->generate_distributor_transfer_report();
-        }
-        else if($rep_id==27) {
+        } else if($rep_id==27) {
             $this->export_model->get_raw_material_stock_report();
-        }
-		
-		else if($rep_id==28) {
+        } else if($rep_id==28) {
              $this->export_model->generate_gt_stock_report();
-		}
-        else if($rep_id==29) {
+		} else if($rep_id==29) {
              $this->export_model->generate_sales_attendence_report();
-        }
-        else if($rep_id==30) {
+        } else if($rep_id==30) {
             $location = $this->input->post("location");
             $this->export_model->gt_store_report('save',$location);
+        } else if($rep_id==31) {
+            $this->export_model->generate_monthly_sales_overview_report();
         }
         
         $this->set_report_criteria($rep_id);
+    }
+
+    public function test_month(){
+        // $start = new DateTime('2018-04-25');
+        // $start->modify('first day of this month');
+        // $end = new DateTime('2019-06-20');
+        // $end->modify('first day of next month');
+        // $interval = DateInterval::createFromDateString('1 month');
+        // $period = new DatePeriod($start, $interval, $end);
+
+        // foreach ($period as $dt) {
+        //     echo $dt->format("M-y") . "<br>\n";
+        //     echo $dt->format("m") . "<br>\n";
+        // }
+
+        // echo json_encode($period);
+
+        $this->export_model->generate_monthly_sales_overview_report();
     }
 
     public function upload_file() {

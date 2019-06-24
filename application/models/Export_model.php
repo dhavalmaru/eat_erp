@@ -10823,495 +10823,249 @@ public function getLedger($acc_id, $from_date, $to_date){
 }
 
 function generate_ledger_report() {
-
     $from_date = formatdate($this->input->post('from_date'));
-
     $to_date = formatdate($this->input->post('to_date'));
-
     $ledger_id = $this->input->post('ledger_id');
 
-
-
     if($from_date==''){
-
         $from_date=NULL;
-
     } else {
-
         $from_date = formatdate($this->input->post('from_date'));
-
     }
-
-
 
     if($to_date==''){
-
         $to_date=NULL;
-
     } else {
-
         $to_date = formatdate($this->input->post('to_date'));
-
     }
-
-
 
     $opening_bal = 0;
-
     $opening_bal_type = 'Cr';
-
     $balance = 0;
-
     $result = $this->export_model->getOpeningBal($ledger_id, $from_date);
-
     if(count($result)>0){
-
         $opening_bal = floatval($result[0]['opening_bal']);
-
     }
-
-
 
     $data = $this->export_model->getLedger($ledger_id, $from_date, $to_date);
 
-    
-
     if(count($data)>0) {
-
         $this->load->library('excel');
-
         $objPHPExcel = new PHPExcel();
-
         $objPHPExcel->setActiveSheetIndex(0);
-
-
-
         $col_name[]=array();
-
         for($i=0; $i<=20; $i++) {
-
             $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
-
         }
-
-
-
         $row=1;
-
         $col=0;
 
-
-
         //------------ setting headers of excel -------------
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Sr No");
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, "Ref ID (Voucher No)");
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, "Date");
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, "Ledger Code");
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, "Ledger Name");
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, "Ref 1");
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, "Ref 2");
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, "Debit");
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+8].$row, "Credit");
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+9].$row, "Balance");
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+10].$row, "DB/CR");
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+11].$row, "Knock Off Ref");
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+12].$row, "Narration");
 
-
-
         $row = $row + 1;
-
-
 
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Sr No");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, "Ref ID (Voucher No)");
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, "Start Date");
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, "Opening Balance");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, "Ledger Name");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, "Ref 1");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, "Ref 2");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, "Debit");
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+8].$row, format_money($opening_bal,2));
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+9].$row, $opening_bal_type);
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+10].$row, "DB/CR");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+11].$row, "Knock Off Ref");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+12].$row, "Narration");
 
-
-
         $row = $row + 1;
-
-
-
         $balance = $opening_bal;
-
-
-
         $debit_amt = 0;
-
         $credit_amt = 0;
-
         $cur_total = 0;
 
-
-
         for($i=0; $i<count($data); $i++){
-
             $ledger_code = '';
-
             $ledger_name = '';
-
-
-
             if($data[$i]['type']=='Debit'){
-
                 $entry_type = 'Dr';
-
                 $debit_amt = floatval($data[$i]['amount']);
-
                 $balance = round($balance - $debit_amt,2);
-
                 $credit_amt = '';
-
                 $cur_total = round($cur_total - $debit_amt,2);
-
             } else {
-
                 $entry_type = 'Cr';
-
                 $credit_amt = floatval($data[$i]['amount']);
-
                 $balance = round($balance + $credit_amt,2);
-
                 $debit_amt = '';
-
                 $cur_total = round($cur_total + $credit_amt,2);
-
             }
 
             if($balance<0){
-
                 $balance_type = 'Dr';
-
                 $balance_val = $balance * -1;
-
             } else {
-
                 $balance_type = 'Cr';
-
                 $balance_val = $balance;
-
             }
 
             if(isset($data[$i]['cp_acc_id'])){
-
                 if($data[$i]['cp_acc_id']!=$ledger_id){
-
                     $ledger_code = $data[$i]['cp_ledger_code'];
-
                     $ledger_name = $data[$i]['cp_ledger_name'];
-
                 }
-
             }
 
             if($ledger_code == ''){
-
                 $ledger_code = $data[$i]['ledger_code'];
-
                 $ledger_name = $data[$i]['ledger_name'];
-
             }
-
-
 
             $row=$row+1;
 
-
-
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, ($i+1));
-
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $data[$i]['voucher_id']);
-
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, (($data[$i]['ref_date']!=null && $data[$i]['ref_date']!="")?date("d/m/Y",strtotime($data[$i]['ref_date'])):""));
-
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $ledger_code);
-
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $ledger_name);
-
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, $data[$i]['ref_id']);
-
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, $data[$i]['invoice_no']);
-
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, format_money($debit_amt,2));
-
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+8].$row, format_money($credit_amt,2));
-
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+9].$row, format_money($balance_val,2));
-
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+10].$row, $balance_type);
-
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+11].$row, $data[$i]['payment_ref']);
-
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+12].$row, $data[$i]['narration']);
-
         }
-
-
 
         if($balance<0){
-
             $balance_type = 'Dr';
-
             $balance_val = $balance * -1;
-
         } else {
-
             $balance_type = 'Cr';
-
             $balance_val = $balance;
-
         }
-
-
 
         if($cur_total<0){
-
             $cur_total_type = 'Dr';
-
             $cur_total_val = $cur_total * -1;
-
         } else {
-
             $cur_total_type = 'Cr';
-
             $cur_total_val = $cur_total;
-
         }
 
-
-
         $row = $row + 1;
-
         $row = $row + 1;
-
-
 
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Sr No");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, "Ref ID (Voucher No)");
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, "End Date");
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, "Closing Balance");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, "Ledger Name");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, "Ref 1");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, "Ref 2");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, "Debit");
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+8].$row, format_money($balance_val,2));
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+9].$row, $balance_type);
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+10].$row, "DB/CR");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+11].$row, "Knock Off Ref");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+12].$row, "Narration");
 
-
-
         $row = $row + 1;
-
         $row = $row + 1;
-
-
 
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Sr No");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, "Ref ID (Voucher No)");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, "End Date");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, "Closing Balance");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, "Ledger Name");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, "Ref 1");
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, "Opening Balance");
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, (($opening_bal_type == "Dr")?format_money($opening_bal,2):"0.00"));
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+8].$row, (($opening_bal_type == "Cr")?format_money($opening_bal,2):"0.00"));
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+9].$row, $opening_bal_type);
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+10].$row, "DB/CR");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+11].$row, "Knock Off Ref");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+12].$row, "Narration");
-
-
 
         $row = $row + 1;
 
-
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Sr No");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, "Ref ID (Voucher No)");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, "End Date");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, "Closing Balance");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, "Ledger Name");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, "Ref 1");
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, "Current Total");
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, (($cur_total < 0)?format_money($cur_total_val,2):"0.00"));
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+8].$row, (($cur_total >= 0)?format_money($cur_total_val,2):"0.00"));
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+9].$row, $cur_total_type);
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+10].$row, "DB/CR");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+11].$row, "Knock Off Ref");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+12].$row, "Narration");
-
-
 
         $row = $row + 1;
 
-
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Sr No");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, "Ref ID (Voucher No)");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, "End Date");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, "Closing Balance");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, "Ledger Name");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, "Ref 1");
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, "Closing Balance");
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, (($balance < 0)?format_money($balance_val,2):"0.00"));
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+8].$row, (($balance >= 0)?format_money($balance_val,2):"0.00"));
-
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+9].$row, $balance_type);
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+10].$row, "DB/CR");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+11].$row, "Knock Off Ref");
-
         // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+12].$row, "Narration");
-
-
 
         $objPHPExcel->getActiveSheet()->getStyle('A1:'.$col_name[$col+12].$row)->applyFromArray(array(
-
             'borders' => array(
-
                 'allborders' => array(
-
                     'style' => PHPExcel_Style_Border::BORDER_THIN
-
                 )
-
             )
-
         ));
 
-
-
         $objPHPExcel->getActiveSheet()->getStyle('A1:L1')->getFill()->applyFromArray(array(
-
             'type' => PHPExcel_Style_Fill::FILL_SOLID,
-
             'startcolor' => array(
-
                 'rgb' => 'D9D9D9'
-
             )
-
         ));
 
         for($col = 'A'; $col <= 'L'; $col++) {
-
             $objPHPExcel->getActiveSheet()->getColumnDimension($col)->setAutoSize(true);
-
         }
 
-
-
         $filename='Ledger_Report.xls';
-
         header('Content-Type: application/vnd.ms-excel');
-
         header('Content-Disposition: attachment;filename="'.$filename.'"');
-
         header('Cache-Control: max-age=0');
-
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
-
         $objWriter->save('php://output');
 
-
-
         $logarray['table_id']=$this->session->userdata('session_id');
-
         $logarray['module_name']='Reports';
-
         $logarray['cnt_name']='Reports';
-
         $logarray['action']='Ledger report generated.';
-
         $this->user_access_log_model->insertAccessLog($logarray);
-
     } else {
-
         // echo '<script>alert("No data found");</script>';
-
     }
 }
 
@@ -16430,6 +16184,618 @@ public function gt_store_report($save='',$region=array()){
 public function get_gt_location(){
    $result = $this->db->query('Select Distinct location from location_master Where type_id=3')->result();
    return $result;
+}
+
+public function test_month(){
+    $start = new DateTime('2018-04-25');
+    $start->modify('first day of this month');
+    $end = new DateTime('2019-06-20');
+    $end->modify('first day of next month');
+    $interval = DateInterval::createFromDateString('1 month');
+    $period = new DatePeriod($start, $interval, $end);
+
+    foreach ($period as $dt) {
+        echo $dt->format("Y-m") . "<br>\n";
+    }
+}
+
+function generate_monthly_sales_overview_report() {
+    $from_date = formatdate($this->input->post('from_date'));
+    $to_date = formatdate($this->input->post('to_date'));
+
+    if($from_date==''){
+        $from_date=NULL;
+    } else {
+        $from_date = formatdate($this->input->post('from_date'));
+    }
+
+    if($to_date==''){
+        $to_date=NULL;
+    } else {
+        $to_date = formatdate($this->input->post('to_date'));
+    }
+
+    // $from_date = '2018-04-01';
+    // $to_date = '2019-03-31';
+
+    $mon_period = [];
+    $start = new DateTime($from_date);
+    $start->modify('first day of this month');
+    $end = new DateTime($to_date);
+    $end->modify('first day of next month');
+    $interval = DateInterval::createFromDateString('1 month');
+    $period = new DatePeriod($start, $interval, $end);
+    $cnt = 0;
+
+    foreach ($period as $dt) {
+        $mon = $dt->format("M-y");
+        $mon_period[$mon]['month'] = $mon;
+        $mon_period[$mon]['target_sales'] = 0;
+        $mon_period[$mon]['sold_bars'] = 0;
+        $mon_period[$mon]['sales_return_bars'] = 0;
+        $mon_period[$mon]['sales_incl_tax'] = 0;
+        $mon_period[$mon]['sales_return_incl_tax'] = 0;
+        $mon_period[$mon]['credit_debit_note'] = 0;
+        $mon_period[$mon]['sample_bars'] = 0;
+        $mon_period[$mon]['expired_bars'] = 0;
+        $mon_period[$mon]['productwise_sales'] = 0;
+        $mon_period[$mon]['productwise_sales_return'] = 0;
+        $mon_period[$mon]['channelwise_sales'] = 0;
+        $mon_period[$mon]['channelwise_sales_return'] = 0;
+        $mon_period[$mon]['zonewise_sales'] = 0;
+        $cnt++;
+    }
+
+    $sql = "select A.particular, A.year_no, A.mon_no, A.mon_name, sum(qty) as tot_qty from 
+            (select case when A.distributor_id='1' then 'Sample' when A.distributor_id='189' then 'Expired' else 'Sales' end as particular, 
+                DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, 
+                DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, 
+                case when B.type='Bar' then B.qty else B.qty*C.qty end as qty 
+            from distributor_out A 
+            left join distributor_out_items B on (A.id=B.distributor_out_id) 
+            left join box_product C on (B.type='Box' and B.item_id=C.box_id) 
+            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date') A 
+            group by A.particular, A.year_no, A.mon_no, A.mon_name 
+            order by A.year_no, A.mon_no";
+    $data = $this->db->query($sql)->result_array();
+    for($i=0; $i<count($data); $i++) {
+        if($data[$i]['particular']=='Sales') {
+            $mon_period[$data[$i]['mon_name']]['sold_bars'] = $data[$i]['tot_qty'];
+        } else if($data[$i]['particular']=='Sample') {
+            $mon_period[$data[$i]['mon_name']]['sample_bars'] = $data[$i]['tot_qty'];
+        } else if($data[$i]['particular']=='Expired') {
+            $mon_period[$data[$i]['mon_name']]['expired_bars'] = $data[$i]['tot_qty'];
+        }
+    }
+
+    $sql = "select A.year_no, A.mon_no, A.mon_name, sum(A.final_amount) as tot_amount from 
+            (select DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, 
+                DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, A.final_amount 
+            from distributor_out A 
+            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and 
+                (A.distributor_id!='1' and A.distributor_id!='189')) A 
+            group by A.year_no, A.mon_no, A.mon_name 
+            order by A.year_no, A.mon_no";
+    $data = $this->db->query($sql)->result_array();
+    for($i=0; $i<count($data); $i++) {
+        $mon_period[$data[$i]['mon_name']]['sales_incl_tax'] = $data[$i]['tot_amount'];
+    }
+
+    $sql = "select A.year_no, A.mon_no, A.mon_name, sum(qty) as tot_qty from 
+            (select DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, 
+                DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, 
+                case when B.type='Bar' then B.qty else B.qty*C.qty end as qty 
+            from distributor_in A 
+            left join distributor_in_items B on (A.id=B.distributor_in_id) 
+            left join box_product C on (B.type='Box' and B.item_id=C.box_id) 
+            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and 
+                (A.distributor_id!='1' and A.distributor_id!='189')) A 
+            group by A.year_no, A.mon_no, A.mon_name 
+            order by A.year_no, A.mon_no";
+    $data = $this->db->query($sql)->result_array();
+    for($i=0; $i<count($data); $i++) {
+        $mon_period[$data[$i]['mon_name']]['sales_return_bars'] = $data[$i]['tot_qty']*-1;
+    }
+
+    $sql = "select A.year_no, A.mon_no, A.mon_name, sum(A.final_amount) as tot_amount from 
+            (select DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, 
+                DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, A.final_amount 
+            from distributor_in A 
+            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and 
+                (A.distributor_id!='1' and A.distributor_id!='189')) A 
+            group by A.year_no, A.mon_no, A.mon_name 
+            order by A.year_no, A.mon_no";
+    $data = $this->db->query($sql)->result_array();
+    for($i=0; $i<count($data); $i++) {
+        $mon_period[$data[$i]['mon_name']]['sales_return_incl_tax'] = $data[$i]['tot_amount']*-1;
+    }
+
+    $sql = "select A.year_no, A.mon_no, A.mon_name, sum(A.amount) as tot_amount from 
+            (select DATE_FORMAT(A.date_of_transaction,'%Y') as year_no, DATE_FORMAT(A.date_of_transaction,'%y%m') as mon_no, 
+                DATE_FORMAT(A.date_of_transaction,'%b-%y') as mon_name, 
+                case when (A.transaction='Credit Note' or A.transaction='Expense Voucher') then A.amount 
+                    else (A.amount*-1) end as amount 
+            from credit_debit_note A 
+            where A.status='Approved' and A.date_of_transaction>='$from_date' and A.date_of_transaction<='$to_date' and 
+                (A.distributor_id!='1' and A.distributor_id!='189')) A 
+            group by A.year_no, A.mon_no, A.mon_name 
+            order by A.year_no, A.mon_no";
+    $data = $this->db->query($sql)->result_array();
+    for($i=0; $i<count($data); $i++) {
+        $mon_period[$data[$i]['mon_name']]['credit_debit_note'] = $data[$i]['tot_amount'];
+    }
+
+    $sql = "select distinct concat(H.item_type, '-', H.item_name) as item, H.item_type, H.item_name from 
+            (select G.year_no, G.mon_no, G.mon_name, G.item_type, G.item_name, sum(G.item_qty) as tot_qty from 
+            (select D.year_no, D.mon_no, D.mon_name, D.item_type, case when D.item_type='Bar' then E.short_name else F.short_name end as item_name, D.item_qty from 
+            (select DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, 
+                case when B.type='Box' and B.item_id in (4, 13, 14, 32) then 'Box' else 'Bar' end as item_type, 
+                case when B.type='Box' and B.item_id in (4, 13, 14, 32) then B.item_id when B.type='Bar' then B.item_id else C.product_id end as item_id, 
+                case when B.type='Bar' then B.qty else B.qty*C.qty end as item_qty 
+            from distributor_out A 
+            left join distributor_out_items B on (A.id=B.distributor_out_id) 
+            left join box_product C on (B.type='Box' and B.item_id=C.box_id) 
+            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and (A.distributor_id!='1' and A.distributor_id!='189')) D 
+            left join product_master E on (D.item_type='Bar' and D.item_id=E.id) 
+            left join box_master F on (D.item_type='Box' and D.item_id=F.id)) G 
+            group by G.year_no, G.mon_no, G.mon_name, G.item_type, G.item_name 
+            order by G.year_no, G.mon_no, G.mon_name, G.item_type, G.item_name) H 
+            order by H.item_type, H.item_name";
+    $sales_items = $this->db->query($sql)->result_array();
+
+    $sql = "select G.year_no, G.mon_no, G.mon_name, concat(G.item_type, '-', G.item_name) as item, G.item_type, G.item_name, 
+            sum(G.item_qty) as tot_qty from 
+            (select D.year_no, D.mon_no, D.mon_name, D.item_type, case when D.item_type='Bar' then E.short_name else F.short_name end as item_name, D.item_qty from 
+            (select DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, 
+                case when B.type='Box' and B.item_id in (4, 13, 14, 32) then 'Box' else 'Bar' end as item_type, 
+                case when B.type='Box' and B.item_id in (4, 13, 14, 32) then B.item_id when B.type='Bar' then B.item_id else C.product_id end as item_id, 
+                case when B.type='Bar' then B.qty else B.qty*C.qty end as item_qty 
+            from distributor_out A 
+            left join distributor_out_items B on (A.id=B.distributor_out_id) 
+            left join box_product C on (B.type='Box' and B.item_id=C.box_id) 
+            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and (A.distributor_id!='1' and A.distributor_id!='189')) D 
+            left join product_master E on (D.item_type='Bar' and D.item_id=E.id) 
+            left join box_master F on (D.item_type='Box' and D.item_id=F.id)) G 
+            group by G.year_no, G.mon_no, G.mon_name, G.item_type, G.item_name 
+            order by G.year_no, G.mon_no, G.mon_name, G.item_type, G.item_name";
+    $data = $this->db->query($sql)->result_array();
+    $arr=[];
+    for($i=0; $i<count($data); $i++) {
+        $arr[$data[$i]['item']] = array('item_name'=>$data[$i]['item_name'], 'tot_qty'=>$data[$i]['tot_qty']);
+        if($i==count($data)-1) {
+            $mon_period[$data[$i]['mon_name']]['productwise_sales']=$arr;
+        } else if($data[$i]['year_no']!=$data[$i+1]['year_no'] || $data[$i]['mon_no']!=$data[$i+1]['mon_no']) {
+            $mon_period[$data[$i]['mon_name']]['productwise_sales']=$arr;
+        }
+    }
+
+    $sql = "select distinct concat(H.item_type, '-', H.item_name) as item, H.item_type, H.item_name from 
+            (select G.year_no, G.mon_no, G.mon_name, G.item_type, G.item_name, sum(G.item_qty) as tot_qty from 
+            (select D.year_no, D.mon_no, D.mon_name, D.item_type, case when D.item_type='Bar' then E.short_name else F.short_name end as item_name, D.item_qty from 
+            (select DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, 
+                case when B.type='Box' and B.item_id in (4, 13, 14, 32) then 'Box' else 'Bar' end as item_type, 
+                case when B.type='Box' and B.item_id in (4, 13, 14, 32) then B.item_id when B.type='Bar' then B.item_id else C.product_id end as item_id, 
+                case when B.type='Bar' then B.qty else B.qty*C.qty end as item_qty 
+            from distributor_in A 
+            left join distributor_in_items B on (A.id=B.distributor_in_id) 
+            left join box_product C on (B.type='Box' and B.item_id=C.box_id) 
+            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and (A.distributor_id!='1' and A.distributor_id!='189')) D 
+            left join product_master E on (D.item_type='Bar' and D.item_id=E.id) 
+            left join box_master F on (D.item_type='Box' and D.item_id=F.id)) G 
+            group by G.year_no, G.mon_no, G.mon_name, G.item_type, G.item_name 
+            order by G.year_no, G.mon_no, G.mon_name, G.item_type, G.item_name) H 
+            order by H.item_type, H.item_name";
+    $sales_return_items = $this->db->query($sql)->result_array();
+
+    $sql = "select G.year_no, G.mon_no, G.mon_name, concat(G.item_type, '-', G.item_name) as item, G.item_type, G.item_name, 
+            sum(G.item_qty) as tot_qty from 
+            (select D.year_no, D.mon_no, D.mon_name, D.item_type, case when D.item_type='Bar' then E.short_name else F.short_name end as item_name, D.item_qty from 
+            (select DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, 
+                case when B.type='Box' and B.item_id in (4, 13, 14, 32) then 'Box' else 'Bar' end as item_type, 
+                case when B.type='Box' and B.item_id in (4, 13, 14, 32) then B.item_id when B.type='Bar' then B.item_id else C.product_id end as item_id, 
+                case when B.type='Bar' then B.qty else B.qty*C.qty end as item_qty 
+            from distributor_in A 
+            left join distributor_in_items B on (A.id=B.distributor_in_id) 
+            left join box_product C on (B.type='Box' and B.item_id=C.box_id and B.item_id not in (4, 13, 14, 32)) 
+            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and (A.distributor_id!='1' and A.distributor_id!='189')) D 
+            left join product_master E on (D.item_type='Bar' and D.item_id=E.id) 
+            left join box_master F on (D.item_type='Box' and D.item_id=F.id)) G 
+            group by G.year_no, G.mon_no, G.mon_name, G.item_type, G.item_name 
+            order by G.year_no, G.mon_no, G.mon_name, G.item_type, G.item_name";
+    $data = $this->db->query($sql)->result_array();
+    $arr=[];
+    for($i=0; $i<count($data); $i++) {
+        $arr[$data[$i]['item']] = array('item_name'=>$data[$i]['item_name'], 'tot_qty'=>$data[$i]['tot_qty']);
+        if($i==count($data)-1) {
+            $mon_period[$data[$i]['mon_name']]['productwise_sales_return']=$arr;
+        } else if($data[$i]['year_no']!=$data[$i+1]['year_no'] || $data[$i]['mon_no']!=$data[$i+1]['mon_no']) {
+            $mon_period[$data[$i]['mon_name']]['productwise_sales_return']=$arr;
+        }
+    }
+
+    $sql = "select distinct G.distributor_type as item, G.distributor_type as item_name from 
+            (select distinct D.distributor_id, E.type_id, F.distributor_type from 
+            (select distinct A.distributor_id from distributor_out A where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and (A.distributor_id!='1' and A.distributor_id!='189')) D 
+            left join distributor_master E on (D.distributor_id=E.id) 
+            left join distributor_type_master F on (E.type_id=F.id)) G 
+            order by G.distributor_type";
+    $channelwise_sales = $this->db->query($sql)->result_array();
+
+    $sql = "select G.year_no, G.mon_no, G.mon_name, G.distributor_type as item, 
+            G.distributor_type as item_name, sum(G.item_qty) as tot_qty from 
+            (select D.year_no, D.mon_no, D.mon_name, D.distributor_id, D.item_qty, E.type_id, F.distributor_type from 
+            (select DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, A.distributor_id, 
+                case when B.type='Bar' then B.qty else B.qty*C.qty end as item_qty 
+            from distributor_out A 
+            left join distributor_out_items B on (A.id=B.distributor_out_id) 
+            left join box_product C on (B.type='Box' and B.item_id=C.box_id) 
+            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and (A.distributor_id!='1' and A.distributor_id!='189')) D 
+            left join distributor_master E on (D.distributor_id=E.id) 
+            left join distributor_type_master F on (E.type_id=F.id)) G 
+            group by G.year_no, G.mon_no, G.mon_name, G.distributor_type 
+            order by G.year_no, G.mon_no, G.mon_name, G.distributor_type";
+    $data = $this->db->query($sql)->result_array();
+    $arr=[];
+    for($i=0; $i<count($data); $i++) {
+        $arr[$data[$i]['item']] = array('item_name'=>$data[$i]['item_name'], 'tot_qty'=>$data[$i]['tot_qty']);
+        if($i==count($data)-1) {
+            $mon_period[$data[$i]['mon_name']]['channelwise_sales']=$arr;
+        } else if($data[$i]['year_no']!=$data[$i+1]['year_no'] || $data[$i]['mon_no']!=$data[$i+1]['mon_no']) {
+            $mon_period[$data[$i]['mon_name']]['channelwise_sales']=$arr;
+        }
+    }
+
+    $sql = "select distinct G.distributor_type as item, G.distributor_type as item_name from 
+            (select D.distributor_id, E.type_id, F.distributor_type from 
+            (select distinct A.distributor_id from distributor_in A where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and (A.distributor_id!='1' and A.distributor_id!='189')) D 
+            left join distributor_master E on (D.distributor_id=E.id) 
+            left join distributor_type_master F on (E.type_id=F.id)) G 
+            order by G.distributor_type";
+    $channelwise_sales_return = $this->db->query($sql)->result_array();
+
+    $sql = "select G.year_no, G.mon_no, G.mon_name, G.distributor_type as item, 
+            G.distributor_type as item_name, sum(G.item_qty) as tot_qty from 
+            (select D.year_no, D.mon_no, D.mon_name, D.distributor_id, D.item_qty, E.type_id, F.distributor_type from 
+            (select DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, A.distributor_id, 
+                case when B.type='Bar' then B.qty else B.qty*C.qty end as item_qty 
+            from distributor_in A 
+            left join distributor_in_items B on (A.id=B.distributor_in_id) 
+            left join box_product C on (B.type='Box' and B.item_id=C.box_id) 
+            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and (A.distributor_id!='1' and A.distributor_id!='189')) D 
+            left join distributor_master E on (D.distributor_id=E.id) 
+            left join distributor_type_master F on (E.type_id=F.id)) G 
+            group by G.year_no, G.mon_no, G.mon_name, G.distributor_type 
+            order by G.year_no, G.mon_no, G.mon_name, G.distributor_type";
+    $data = $this->db->query($sql)->result_array();
+    $arr=[];
+    for($i=0; $i<count($data); $i++) {
+        $arr[$data[$i]['item']] = array('item_name'=>$data[$i]['item_name'], 'tot_qty'=>$data[$i]['tot_qty']);
+        if($i==count($data)-1) {
+            $mon_period[$data[$i]['mon_name']]['channelwise_sales_return']=$arr;
+        } else if($data[$i]['year_no']!=$data[$i+1]['year_no'] || $data[$i]['mon_no']!=$data[$i+1]['mon_no']) {
+            $mon_period[$data[$i]['mon_name']]['channelwise_sales_return']=$arr;
+        }
+    }
+
+    $sql = "select distinct C.zone as item, C.zone as item_name from 
+            (select distinct distributor_id from distributor_out where status='Approved' and 
+            date_of_processing>='$from_date' and date_of_processing<='$to_date' and (distributor_id!='1' and distributor_id!='189') 
+            union all 
+            select distinct distributor_id from distributor_in where status='Approved' and 
+            date_of_processing>='$from_date' and date_of_processing<='$to_date' and (distributor_id!='1' and distributor_id!='189')) A 
+            left join distributor_master B on (A.distributor_id=B.id) 
+            left join zone_master C on (B.zone_id=C.id)";
+    $zonewise_sales = $this->db->query($sql)->result_array();
+
+    $sql = "select G.year_no, G.mon_no, G.mon_name, G.zone as item, 
+            G.zone as item_name, sum(G.item_qty) as tot_qty from 
+            (select D.year_no, D.mon_no, D.mon_name, D.distributor_id, D.item_qty, E.zone_id, F.zone from 
+            (select DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, A.distributor_id, 
+                case when B.type='Bar' then B.qty else B.qty*C.qty end as item_qty 
+            from distributor_out A 
+            left join distributor_out_items B on (A.id=B.distributor_out_id) 
+            left join box_product C on (B.type='Box' and B.item_id=C.box_id) 
+            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and (A.distributor_id!='1' and A.distributor_id!='189') 
+            union all 
+            select DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, A.distributor_id, 
+                (case when B.type='Bar' then B.qty else B.qty*C.qty end)*-1 as item_qty 
+            from distributor_in A 
+            left join distributor_in_items B on (A.id=B.distributor_in_id) 
+            left join box_product C on (B.type='Box' and B.item_id=C.box_id) 
+            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and (A.distributor_id!='1' and A.distributor_id!='189')) D 
+            left join distributor_master E on (D.distributor_id=E.id) 
+            left join zone_master F on (E.zone_id=F.id)) G 
+            group by G.year_no, G.mon_no, G.mon_name, G.zone 
+            order by G.year_no, G.mon_no, G.mon_name, G.zone";
+    $data = $this->db->query($sql)->result_array();
+    $arr=[];
+    for($i=0; $i<count($data); $i++) {
+        $arr[$data[$i]['item']] = array('item_name'=>$data[$i]['item_name'], 'tot_qty'=>$data[$i]['tot_qty']);
+        if($i==count($data)-1) {
+            $mon_period[$data[$i]['mon_name']]['zonewise_sales']=$arr;
+        } else if($data[$i]['year_no']!=$data[$i+1]['year_no'] || $data[$i]['mon_no']!=$data[$i+1]['mon_no']) {
+            $mon_period[$data[$i]['mon_name']]['zonewise_sales']=$arr;
+        }
+    }
+
+    if(count($mon_period)>0) {
+        // $this->load->library('excel');
+        // $objPHPExcel = new PHPExcel();
+
+        $template_path=$this->config->item('template_path');
+        $file = $template_path.'Monthly_sales_overview.xls';
+        $this->load->library('excel');
+        $objPHPExcel = PHPExcel_IOFactory::load($file);
+
+        $objPHPExcel->setActiveSheetIndex(0);
+        $col_name[]=array();
+        for($i=0; $i<=$cnt+20; $i++) {
+            $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
+        }
+
+        $objPHPExcel->getActiveSheet()->setCellValue('B7', $from_date);
+        $objPHPExcel->getActiveSheet()->setCellValue('B8', $to_date);
+
+        $row = 37;
+        $sales_return_row = 40;
+        $channelwise_sales_row = 44;
+        $channelwise_sales_return_row = 48;
+        $zonewise_sales_row = 52;
+        $col=0;
+        for($i=0; $i<count($sales_items); $i++) {
+            if($i!=0){
+                $objPHPExcel->getActiveSheet()->insertNewRowBefore($row, 1);
+            }
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $sales_items[$i]['item_name']);
+            $row = $row + 1;
+            $sales_return_row = $sales_return_row + 1;
+            $channelwise_sales_row = $channelwise_sales_row + 1;
+            $channelwise_sales_return_row = $channelwise_sales_return_row + 1;
+            $zonewise_sales_row = $zonewise_sales_row + 1;
+        }
+
+        $row = $sales_return_row;
+        for($i=0; $i<count($sales_return_items); $i++) {
+            if($i!=0){
+                $objPHPExcel->getActiveSheet()->insertNewRowBefore($row, 1);
+            }
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $sales_return_items[$i]['item_name']);
+            $row = $row + 1;
+            $channelwise_sales_row = $channelwise_sales_row + 1;
+            $channelwise_sales_return_row = $channelwise_sales_return_row + 1;
+            $zonewise_sales_row = $zonewise_sales_row + 1;
+        }
+
+        $channelwise_sales_row = $channelwise_sales_row - 1;
+        $row = $channelwise_sales_row;
+        for($i=0; $i<count($channelwise_sales); $i++) {
+            if($i!=0){
+                $objPHPExcel->getActiveSheet()->insertNewRowBefore($row, 1);
+            }
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $channelwise_sales[$i]['item_name']);
+            $row = $row + 1;
+            $channelwise_sales_return_row = $channelwise_sales_return_row + 1;
+            $zonewise_sales_row = $zonewise_sales_row + 1;
+        }
+
+        $channelwise_sales_return_row = $channelwise_sales_return_row - 2;
+        $row = $channelwise_sales_return_row;
+        for($i=0; $i<count($channelwise_sales_return); $i++) {
+            if($i!=0){
+                $objPHPExcel->getActiveSheet()->insertNewRowBefore($row, 1);
+            }
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $channelwise_sales_return[$i]['item_name']);
+            $row = $row + 1;
+            $zonewise_sales_row = $zonewise_sales_row + 1;
+        }
+
+        $zonewise_sales_row = $zonewise_sales_row - 3;
+        $row = $zonewise_sales_row;
+        for($i=0; $i<count($zonewise_sales); $i++) {
+            if($i!=0){
+                $objPHPExcel->getActiveSheet()->insertNewRowBefore($row, 1);
+            }
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $zonewise_sales[$i]['item_name']);
+            $row = $row + 1;
+        }
+
+
+        $row=1;
+        $col=1;
+        $start_col=1;
+        $cnt2=1;
+        foreach ($period as $dt) {
+            $mon = $dt->format("M-y");
+            $mon_no = $dt->format("m");
+
+            if($col!=1){
+                $objPHPExcel->getActiveSheet()->insertNewColumnBefore($col_name[$col], 1);
+            }
+            
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'14', $mon_period[$mon]['month']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'15', '60000');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'16', $mon_period[$mon]['sold_bars']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'17', $mon_period[$mon]['sales_return_bars']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'18', '=sum('.$col_name[$col].'16:'.$col_name[$col].'17)');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'19', '='.$col_name[$col].'18/'.$col_name[$col].'15');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'21', $mon_period[$mon]['sales_incl_tax']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'22', $mon_period[$mon]['sales_return_incl_tax']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'23', $mon_period[$mon]['credit_debit_note']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'24', '=sum('.$col_name[$col].'21:'.$col_name[$col].'23)');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'26', '='.$col_name[$col].'24/'.$col_name[$col].'16');
+            if($col==1) {
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'27', '0');
+            } else {
+                if($col==$start_col) {
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'27', '=('.$col_name[$col].'24-'.$col_name[$col-2].'24)/'.$col_name[$col].'24');
+                } else {
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'27', '=('.$col_name[$col].'24-'.$col_name[$col-1].'24)/'.$col_name[$col].'24');
+                }
+            }
+            
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'29', $mon_period[$mon]['sample_bars']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'30', '='.$col_name[$col].'29*15');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'31', '='.$col_name[$col].'30/'.$col_name[$col].'24');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'32', $mon_period[$mon]['expired_bars']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'33', '='.$col_name[$col].'32*15');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'34', '='.$col_name[$col].'33/'.$col_name[$col].'24');
+
+            $row2 = 37;
+            $arr = $mon_period[$mon]['productwise_sales'];
+            for($i=0; $i<count($sales_items); $i++) {
+                if(isset($arr[$sales_items[$i]['item']])) {
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, $arr[$sales_items[$i]['item']]['tot_qty']);
+                }
+                $row2 = $row2 + 1;
+            }
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'36', '=sum('.$col_name[$col].'37:'.$col_name[$col].($row2-1).')');
+
+            $row2 = $sales_return_row;
+            $arr = $mon_period[$mon]['productwise_sales_return'];
+            for($i=0; $i<count($sales_return_items); $i++) {
+                if(isset($arr[$sales_return_items[$i]['item']])) {
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, $arr[$sales_return_items[$i]['item']]['tot_qty']*-1);
+                }
+                $row2 = $row2 + 1;
+            }
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($sales_return_row-1), '=sum('.$col_name[$col].$sales_return_row.':'.$col_name[$col].($row2-1).')');
+
+            $row2 = $channelwise_sales_row;
+            $arr = $mon_period[$mon]['channelwise_sales'];
+            for($i=0; $i<count($channelwise_sales); $i++) {
+                if(isset($arr[$channelwise_sales[$i]['item']])) {
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, $arr[$channelwise_sales[$i]['item']]['tot_qty']);
+                }
+                $row2 = $row2 + 1;
+            }
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($channelwise_sales_row-1), '=sum('.$col_name[$col].$channelwise_sales_row.':'.$col_name[$col].($row2-1).')');
+
+            $row2 = $channelwise_sales_return_row;
+            $arr = $mon_period[$mon]['channelwise_sales_return'];
+            for($i=0; $i<count($channelwise_sales_return); $i++) {
+                if(isset($arr[$channelwise_sales_return[$i]['item']])) {
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, $arr[$channelwise_sales_return[$i]['item']]['tot_qty']*-1);
+                }
+                $row2 = $row2 + 1;
+            }
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($channelwise_sales_return_row-1), '=sum('.$col_name[$col].$channelwise_sales_return_row.':'.$col_name[$col].($row2-1).')');
+
+            $row2 = $zonewise_sales_row;
+            $arr = $mon_period[$mon]['zonewise_sales'];
+            for($i=0; $i<count($zonewise_sales); $i++) {
+                if(isset($arr[$zonewise_sales[$i]['item']])) {
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, $arr[$zonewise_sales[$i]['item']]['tot_qty']);
+                }
+                $row2 = $row2 + 1;
+            }
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($zonewise_sales_row-1), '=sum('.$col_name[$col].$zonewise_sales_row.':'.$col_name[$col].($row2-1).')');
+
+            if($mon_no=='03' || $mon_no=='06' || $mon_no=='09' || $mon_no=='12' || $cnt2==$cnt) {
+                $col = $col + 1;
+                if($cnt2!=$cnt){
+                    $objPHPExcel->getActiveSheet()->insertNewColumnBefore($col_name[$col], 1);
+                }
+
+                if($mon_no=='01' || $mon_no=='02' || $mon_no=='03') $quater = "Q4";
+                else if($mon_no=='04' || $mon_no=='05' || $mon_no=='06') $quater = "Q1";
+                else if($mon_no=='07' || $mon_no=='08' || $mon_no=='09') $quater = "Q2";
+                else if($mon_no=='10' || $mon_no=='11' || $mon_no=='12') $quater = "Q3";
+
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'14', $quater);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'15', '=sum('.$col_name[$start_col].'15:'.$col_name[$col-1].'15)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'16', '=sum('.$col_name[$start_col].'16:'.$col_name[$col-1].'16)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'17', '=sum('.$col_name[$start_col].'17:'.$col_name[$col-1].'17)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'18', '=sum('.$col_name[$start_col].'18:'.$col_name[$col-1].'18)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'19', '=average('.$col_name[$start_col].'19:'.$col_name[$col-1].'19)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'21', '=sum('.$col_name[$start_col].'21:'.$col_name[$col-1].'21)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'22', '=sum('.$col_name[$start_col].'22:'.$col_name[$col-1].'22)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'23', '=sum('.$col_name[$start_col].'23:'.$col_name[$col-1].'23)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'24', '=sum('.$col_name[$start_col].'24:'.$col_name[$col-1].'24)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'26', '=average('.$col_name[$start_col].'26:'.$col_name[$col-1].'26)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'27', '=average('.$col_name[$start_col].'27:'.$col_name[$col-1].'27)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'29', '=sum('.$col_name[$start_col].'29:'.$col_name[$col-1].'29)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'30', '=sum('.$col_name[$start_col].'30:'.$col_name[$col-1].'30)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'31', '=average('.$col_name[$start_col].'31:'.$col_name[$col-1].'31)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'32', '=sum('.$col_name[$start_col].'32:'.$col_name[$col-1].'32)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'33', '=sum('.$col_name[$start_col].'33:'.$col_name[$col-1].'33)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'34', '=average('.$col_name[$start_col].'34:'.$col_name[$col-1].'34)');
+
+                $row2 = 37;
+                for($i=0; $i<count($sales_items); $i++) {
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, '=sum('.$col_name[$start_col].$row2.':'.$col_name[$col-1].$row2.')');
+                    $row2 = $row2 + 1;
+                }
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'36', '=sum('.$col_name[$col].'37:'.$col_name[$col].($row2-1).')');
+
+                $row2 = $sales_return_row;
+                for($i=0; $i<count($sales_return_items); $i++) {
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, '=sum('.$col_name[$start_col].$row2.':'.$col_name[$col-1].$row2.')');
+                    $row2 = $row2 + 1;
+                }
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($sales_return_row-1), '=sum('.$col_name[$col].$sales_return_row.':'.$col_name[$col].($row2-1).')');
+
+                $row2 = $channelwise_sales_row;
+                for($i=0; $i<count($channelwise_sales); $i++) {
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, '=sum('.$col_name[$start_col].$row2.':'.$col_name[$col-1].$row2.')');
+                    $row2 = $row2 + 1;
+                }
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($channelwise_sales_row-1), '=sum('.$col_name[$col].$channelwise_sales_row.':'.$col_name[$col].($row2-1).')');
+
+                $row2 = $channelwise_sales_return_row;
+                for($i=0; $i<count($channelwise_sales_return); $i++) {
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, '=sum('.$col_name[$start_col].$row2.':'.$col_name[$col-1].$row2.')');
+                    $row2 = $row2 + 1;
+                }
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($channelwise_sales_return_row-1), '=sum('.$col_name[$col].$channelwise_sales_return_row.':'.$col_name[$col].($row2-1).')');
+
+                $row2 = $zonewise_sales_row;
+                for($i=0; $i<count($zonewise_sales); $i++) {
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, '=sum('.$col_name[$start_col].$row2.':'.$col_name[$col-1].$row2.')');
+                    $row2 = $row2 + 1;
+                }
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($zonewise_sales_row-1), '=sum('.$col_name[$col].$zonewise_sales_row.':'.$col_name[$col].($row2-1).')');
+
+                $start_col = $col + 1;
+            }
+
+            $col = $col + 1;
+            $cnt2 = $cnt2 + 1;
+        }
+
+        // $objPHPExcel->getActiveSheet()->getStyle('A1:'.$col_name[$col+12].$row)->applyFromArray(array(
+        //     'borders' => array(
+        //         'allborders' => array(
+        //             'style' => PHPExcel_Style_Border::BORDER_THIN
+        //         )
+        //     )
+        // ));
+
+        // $objPHPExcel->getActiveSheet()->getStyle('A1:L1')->getFill()->applyFromArray(array(
+        //     'type' => PHPExcel_Style_Fill::FILL_SOLID,
+        //     'startcolor' => array(
+        //         'rgb' => 'D9D9D9'
+        //     )
+        // ));
+
+        for($col1 = 'A'; $col1 <= $col_name[$col-1]; $col1++) {
+            $objPHPExcel->getActiveSheet()->getColumnDimension($col1)->setAutoSize(true);
+        }
+
+        $filename='Monthly_sales_overview_report.xls';
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="'.$filename.'"');
+        header('Cache-Control: max-age=0');
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+        $objWriter->save('php://output');
+
+        $logarray['table_id']=$this->session->userdata('session_id');
+        $logarray['module_name']='Reports';
+        $logarray['cnt_name']='Reports';
+        $logarray['action']='Monthly Sales Overview report generated.';
+        $this->user_access_log_model->insertAccessLog($logarray);
+    } else {
+        // echo '<script>alert("No data found");</script>';
+    }
 }
 
 

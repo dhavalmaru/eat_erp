@@ -2877,6 +2877,37 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                                     and date(m2.date_of_visit)=date(now())";
                             $result = $this->db->query($sql);
                         }
+
+                        $retailer_id =  $visit_detail['distributor_id'];
+
+                        $store_id_d = explode('_',$visit_detail['distributor_id']);
+                        $store_id = $store_id_d[1];
+                        $latitude = $visit_detail['latitude'];
+                        $longitude = $visit_detail['longitude'];
+                        if(isset($latitude) && isset($longitude)){
+                            if($latitude!='0' && $latitude!='null' && $latitude!='' && $longitude!='0' && $longitude!='null' && $longitude!=''){
+                                if($store_id_d[0]=='d'){
+                                    $dist_table_name = "distributor_master";
+                                } else {
+                                    $dist_table_name = "sales_rep_distributors";
+                                }
+                                $sql = "select * from ".$dist_table_name." where id='$store_id'";
+                                $dist_res = $this->db->query($sql)->result();
+                                if(count($dist_res)>0){
+                                    $lat = $dist_res[0]->latitude;
+                                    $long = $dist_res[0]->longitude;
+                                    if($lat=='0' || $lat=='null' || $lat=='' || $long=='0' || $long=='null' || $long!=''){
+                                        $data_dist = array(
+                                                    'modified_by' => $curusr,
+                                                    'modified_on' => $now,
+                                                    'latitude' =>    $visit_detail['latitude'],
+                                                    'longitude' =>   $visit_detail['longitude']
+                                                );
+                                        $this->db->where('id', $store_id)->update($dist_table_name,$data_dist);
+                                    }
+                                }
+                            }
+                        }
                     } else {
                         $sql = "Select max(sequence) as sequence from sales_rep_detailed_beat_plan WHERE date(date_of_visit)=date(now()) and sales_rep_id='$sales_rep_id' and is_edit='edit' and frequency='$frequency'";
                         $get_maxcount = $this->db->query($sql)->result_array();
