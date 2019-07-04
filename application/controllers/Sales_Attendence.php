@@ -141,8 +141,7 @@ class Sales_Attendence extends CI_controller {
     		redirect(base_url().'index.php/Dashboard_sales_rep');
     }
 	
-	public function get_sales_attendance(){
-	
+	public function get_sales_attendance($status=''){
 		$tbody ='';
 		$from_email = 'cs@eatanytime.co.in';
         $from_email_sender = 'Wholesome Habits Pvt Ltd';
@@ -158,243 +157,254 @@ class Sales_Attendence extends CI_controller {
 				mis@eatanytime.in, priti.tripathi@eatanytime.in";
 		$bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, prasad.bhisale@pecanreams.com";
 		
-        $subject = 'Sales Rep Attendence -'.date("d F Y",strtotime("now"));
+		if($status=="modified"){
+			$subject = 'Sales - Daily Attendence - Back Office Modified -'.date("d F Y",strtotime("now"));
+		} else {
+			$subject = 'Sales - Daily Attendence - Original -'.date("d F Y",strtotime("now"));
+		}
+        
         $data = $this->Sales_Attendence_model->sales_attendence_list();
         $absent_data = $this->Sales_Attendence_model->sales_absent_attendence();
 
-        $date = date("d.m.Y");
+        $date = date("d-m-Y");
 
-         $tbody ='<!DOCTYPE html">
+     	$tbody='<!DOCTYPE html">
 					<html>
 					<head>
-					<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-					 
+						<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
+						<style type="text/css">
+							body {margin: 0; padding: 20px; min-width: 100%!important;font-family "Arial,Helvetica,sans-serif";}
+							img {height: auto;}
+							.content { max-width: 600px;}
+							.header {padding:  20px;}
+							.innerpadding {padding: 30px 30px 30px 30px;}
+							/*.innerpadding1 {padding: 0px 30px 30px 30px;}*/
 
-					  <style type="text/css">
-					  body {margin: 0; padding: 20px; min-width: 100%!important;font-family "Arial,Helvetica,sans-serif";}
-					  img {height: auto;}
-					  .content { max-width: 600px;}
-					  .header {padding:  20px;}
-					  .innerpadding {padding: 30px 30px 30px 30px;}
-					  /*.innerpadding1 {padding: 0px 30px 30px 30px;}*/
+							.innerpadding1 tbody td  .innerpadding1 tbody th {
+								border:1px solid #000!important;
+								padding: 0 8px!important;
+							}
 					  
-					  .innerpadding1 tbody td  .innerpadding1 tbody th
-					  {
-						border:1px solid #000!important;
-						padding: 0 8px!important;
+							.borderbottom {border-bottom: 1px solid #f2eeed;}
+							.subhead {font-size: 15px; color: #ffffff; font-family: sans-serif; letter-spacing: 10px;}
+							.h1, .h2, .bodycopy {color: #fff; font-family: sans-serif;}
+							.h1 {font-size: 33px; line-height: 38px; font-weight: bold;}
+							.h2 {padding: 0 0 15px 0; font-size: 24px; line-height: 28px; font-weight: bold;}
+							.bodycopy {font-size: 16px; line-height: 22px;}
+							.button {text-align: center; font-size: 18px; font-family: sans-serif; font-weight: bold; padding: 0 30px 0 30px;}
+							.button a {color: #ffffff; text-decoration: none;}
+							.footer {padding: 20px 30px 15px 30px;}
+							.footercopy {font-family: sans-serif; font-size: 14px; color: #ffffff;}
+							.footercopy a {color: #ffffff; text-decoration: underline;}
 
-					  }
-					  
-					  .borderbottom {border-bottom: 1px solid #f2eeed;}
-					  .subhead {font-size: 15px; color: #ffffff; font-family: sans-serif; letter-spacing: 10px;}
-					  .h1, .h2, .bodycopy {color: #fff; font-family: sans-serif;}
-					  .h1 {font-size: 33px; line-height: 38px; font-weight: bold;}
-					  .h2 {padding: 0 0 15px 0; font-size: 24px; line-height: 28px; font-weight: bold;}
-					  .bodycopy {font-size: 16px; line-height: 22px;}
-					  .button {text-align: center; font-size: 18px; font-family: sans-serif; font-weight: bold; padding: 0 30px 0 30px;}
-					  .button a {color: #ffffff; text-decoration: none;}
-					  .footer {padding: 20px 30px 15px 30px;}
-					  .footercopy {font-family: sans-serif; font-size: 14px; color: #ffffff;}
-					  .footercopy a {color: #ffffff; text-decoration: underline;}
+							@media only screen and (max-width: 550px), screen and (max-device-width: 550px) {
+							body[yahoo] .hide {display: none!important;}
+							body[yahoo] .buttonwrapper {background-color: transparent!important;}
+							body[yahoo] .button {padding: 0px!important;}
+							body[yahoo] .button a {background-color: #e05443; padding: 15px 15px 13px!important;}
+							body[yahoo] .unsubscribe {display: block; margin-top: 20px; padding: 10px 50px; background: #2f3942; border-radius: 5px; text-decoration: none!important; font-weight: bold;}
+							}
 
-					  @media only screen and (max-width: 550px), screen and (max-device-width: 550px) {
-					  body[yahoo] .hide {display: none!important;}
-					  body[yahoo] .buttonwrapper {background-color: transparent!important;}
-					  body[yahoo] .button {padding: 0px!important;}
-					  body[yahoo] .button a {background-color: #e05443; padding: 15px 15px 13px!important;}
-					  body[yahoo] .unsubscribe {display: block; margin-top: 20px; padding: 10px 50px; background: #2f3942; border-radius: 5px; text-decoration: none!important; font-weight: bold;}
-					  }
-
-					  /*@media only screen and (min-device-width: 601px) {
-						.content {width: 600px !important;}
-						.col425 {width: 425px!important;}
-						.col380 {width: 380px!important;}
-						}*/
-						table, th, td {
-					   
-						border-collapse: collapse;
-						padding: 0 8px!important;
-
-					}
-					th,td {
-							padding: 0 8px!important;
-							text-align: left;
-						
-					}
-					.total
-						{
-							color: #333333;
-							font-size: 28px;
-							font-family: Arial,Helvetica,sans-serif;
-						}
-						.used
-						{
-							color: #666666;
-							font-size: 20px;
-							font-family: Arial,Helvetica,sans-serif;
-						}
-						.team_head
-						{
-							font-size:36px;
-							font-weight:normal;
-							color:#fff;
-							font-family: "Arial,Helvetica,sans-serif";
-						}
-						.date
-						{
-							font-size:16px;
-							color:#fff;
-						}
-						.upper_table td
-						{
-							border:1px solid #000;
-							text-align:center;
-								 padding: 10px;
-							
-						}
-						.body_table tbody 
-						{
-							border:1px solid #000;
-							background-color:#fff;
-							color: #000;
-						}
-						.body_table tbody td
-							{
+						  	/*@media only screen and (min-device-width: 601px) {
+							.content {width: 600px !important;}
+							.col425 {width: 425px!important;}
+							.col380 {width: 380px!important;}
+							}*/
+							table, th, td {
+								border-collapse: collapse;
+								padding: 0 8px!important;
+							}
+							th,td {
+									padding: 0 8px!important;
+									text-align: left;
+							}
+							.total {
+								color: #333333;
+								font-size: 28px;
+								font-family: Arial,Helvetica,sans-serif;
+							}
+							.used {
+								color: #666666;
+								font-size: 20px;
+								font-family: Arial,Helvetica,sans-serif;
+							}
+							.team_head {
+								font-size:36px;
+								font-weight:normal;
+								color:#fff;
+								font-family: "Arial,Helvetica,sans-serif";
+							}
+							.date {
+								font-size:16px;
+								color:#fff;
+							}
+							.upper_table td {
+								border:1px solid #000;
+								text-align:center;
+								padding: 10px;
+							}
+							.body_table tbody {
+								border:1px solid #000;
+								background-color:#fff;
+								color: #000;
+							}
+							.body_table tbody td {
 								color:#000!important;
 								padding:0 8px!important;
 							}
-					  </style>
+				  		</style>
 					</head>
-
 					<body yahoo bgcolor="" style="margin-top:20px;"margin-bottom:20px;">
-					Dear All,
-					<br><br>
-					
-					Kindly find the updated attendance '.$date.'
-					
-					<br><br>
+						Dear All,
+						<br><br>
+						
+						Kindly find the updated attendance '.$date.'
+						
+						<br><br>
 
-					<table width="650px" bgcolor="" border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
-					<tr>
+						<table width="650px" bgcolor="" border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
+						<tr>
 		
     
-			<td class="innerpadding1 " style="">
-           <table  class="body_table" style="border-collapse: collapse;width:100%;border:1px solid #000!important;">
-			<thead>
-				<tr style=" background-color:yellow ;border-bottom: 1px solid #000;font-weight: bold;">
-		
-				  <th width="200" style="border-right: 1px solid #000;padding: 0 8px;text-align:left;width:200px">REGION</th>
-				  <th style="border-right: 1px solid #000;padding: 0 8px;text-align: left;">NO. EMP PRESENT</th>
-				  <th style="border-right: 1px solid #000;padding: 0 8px;text-align: left;width:120px">	
-		NO. EMP ABSENT</th>
-		<th style="border-right: 1px solid #000;padding: 0 8px;text-align: left;width:140px">	
-		NOT LOGGED IN EMP</th>
-				  <th style="border-right: 1px solid #000;padding:0 8px;text-align: left;">TOTAL</th>
-				  <th style="border-right: 1px solid #000;padding:0 8px;background:rgb(197,224,178);text-align: left;">ON TIME</th>
-				  <th style="border-right: 1px solid #000;padding:0 8px;color:red;text-align: left;">LATECOMERS</th>
-				
-			
-				  
-				  
-				</tr>
-			</thead>
-			<tbody style="border:1px solid #000;
-							background-color: #fff;
-							color: #000;">';
-							
-							if(count($data)>0) {
-								for($i=0; $i<count($data); $i++)
-								{
-									$tbody.= '<tr>
-										<td style="border-right: 1px solid #000;text-transform:uppercase;font-weight:bold;padding: 0 8px; border-bottom: 1px solid #000;text-align: left;">'.$data[$i]->zone.'</td>
-										<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: right;padding: 0 8px;">'.$data[$i]->present_count.'</td>
-										<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: right;padding: 0 8px;">'.$data[$i]->absent_count.'</td>
-									<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: right;padding: 0 8px;">'.$data[$i]->not_logged_in_count.'</td>
-										<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: right;padding: 0 8px;">'.($data[$i]->absent_count+$data[$i]->present_count+$data[$i]->not_logged_in_count).'</td>
-										<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: right;padding: 0 8px;">'.$data[$i]->on_time_count.'</td>
-										<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: right;padding: 0 8px;">'.$data[$i]->late_mark_count.'</td>
-										</tr>'; 
+							<td class="innerpadding1 " style="">
+							<table class="body_table" style="border-collapse:collapse;width:100%;">
+								<thead>
+									<tr><td colspan="7" style="background-color:#44546A; color:#FFFFFF; font-size:18px; text-align:center; border:1px solid #000!important;">WHOLESOME HABITS PRIVATE LIMITED</td></tr>
+									<tr><td colspan="7" style="background-color:#DDEBF7; text-align:center; border:1px solid #000!important; font-weight: bold;">DAILY ATTENDENCE - '.(($status=="modified")?"BACK OFFICE MODIFIED":"ORIGINAL").'</td></tr>
+									<tr><td colspan="7" style="text-align:center; font-weight: bold;">Date - '.$date.' to '.$date.'</td></tr>
+									<tr><td colspan="7" style="text-decoration: underline; font-weight: bold;">SUMMARY:</td></tr>
+									<tr style="background-color:#DDEBF7;border: 2px solid #000;font-weight: bold;">
+										<th width="200" style="border-right: 1px solid #000;padding: 0 8px;text-align:center;width:200px">REGION</th>
+										<th style="border-right: 1px solid #000;padding: 0 8px;text-align: center;">PRESENT</th>
+										<th style="border-right: 1px solid #000;padding: 0 8px;text-align: center;width:120px">ABSENT</th>
+										<th style="border-right: 1px solid #000;padding: 0 8px;text-align: center;width:140px">NOT LOGGED</th>
+										<th style="border-right: 1px solid #000;padding:0 8px;text-align: center;">TOTAL</th>
+										<th style="border-right: 1px solid #000;padding:0 8px;text-align: center;">ON TIME</th>
+										<th style="border-right: 1px solid #000;padding:0 8px;text-align: center;">LATE</th>
+									</tr>
+								</thead>
+								<tbody style="border:2px solid #000;background-color: #fff;color: #000;">';
+								if(count($data)>0) {
+									$tot_present_count=0;
+									$tot_absent_count=0;
+									$tot_not_logged_in_count=0;
+									$tot_on_time_count=0;
+									$tot_late_mark_count=0;
+									for($i=0; $i<count($data); $i++) {
+										$tbody.= '<tr>
+											<td style="border-right: 1px solid #000;text-transform:uppercase;font-weight:bold;padding: 0 8px; border-bottom: 1px solid #000;text-align: left;">'.ucwords(trim($data[$i]->zone)).'</td>
+											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;">'.$data[$i]->present_count.'</td>
+											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;">'.$data[$i]->absent_count.'</td>
+											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;">'.$data[$i]->not_logged_in_count.'</td>
+											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;">'.($data[$i]->absent_count+$data[$i]->present_count+$data[$i]->not_logged_in_count).'</td>
+											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;">'.$data[$i]->on_time_count.'</td>
+											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;">'.$data[$i]->late_mark_count.'</td>
+											</tr>';
+
+										$tot_present_count=$tot_present_count+intval($data[$i]->present_count);
+										$tot_absent_count=$tot_absent_count+intval($data[$i]->absent_count);
+										$tot_not_logged_in_count=$tot_not_logged_in_count+intval($data[$i]->not_logged_in_count);
+										$tot_on_time_count=$tot_on_time_count+intval($data[$i]->on_time_count);
+										$tot_late_mark_count=$tot_late_mark_count+intval($data[$i]->late_mark_count);
+									}
+									$tot_count=$tot_present_count+$tot_absent_count+$tot_not_logged_in_count;
+
+									$tbody.= '<tr style="border: 2px solid #000 !important;">
+											<td style="border-right: 1px solid #000; text-transform:uppercase; font-weight:bold; padding: 0 8px; border-bottom: 1px solid #000;text-align: center;">Total</td>
+											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;font-weight:bold;">'.$tot_present_count.'</td>
+											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;font-weight:bold;">'.$tot_absent_count.'</td>
+											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;font-weight:bold;">'.$tot_not_logged_in_count.'</td>
+											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;font-weight:bold;">'.$tot_count.'</td>
+											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;font-weight:bold;">'.$tot_on_time_count.'</td>
+											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;font-weight:bold;">'.$tot_late_mark_count.'</td>
+											</tr>';
+
+									if($tot_count==0) $tot_count=1;
+									if($tot_present_count==0) $tot_present_count=1;
+
+									$tbody.= '<tr style="border: 2px solid #000 !important;">
+											<td style="border-right: 1px solid #000;text-transform:uppercase;font-weight:bold;padding: 0 8px; border-bottom: 1px solid #000;text-align: center;color:red;">%</td>
+											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;font-weight:bold;color:red;">'.intval(round(($tot_present_count/$tot_count)*100,0)).'%</td>
+											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;font-weight:bold;color:red;">'.intval(round(($tot_absent_count/$tot_count)*100,0)).'%</td>
+											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;font-weight:bold;color:red;">'.intval(round(($tot_not_logged_in_count/$tot_count)*100,0)).'%</td>
+											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;font-weight:bold;color:red;"></td>
+											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;font-weight:bold;color:red;">'.intval(round(($tot_on_time_count/$tot_present_count)*100,0)).'%</td>
+											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;font-weight:bold;color:red;">'.intval(round(($tot_late_mark_count/$tot_present_count)*100,0)).'%</td>
+											</tr>';
 								}
-							}					
-			
-            $tbody.=   '</tbody>
-          </table>
-        </td>
-	  </tr>
-	  
-	  <br>
-	  <br>
-	  <tr>
-		
-    
-			<td class="innerpadding1 " style="">
-           <table  class="body_table" style="border-collapse: collapse;width:100%;border:1px solid #000!important;;">
-			<thead>
-				<tr style=" background-color:yellow ;border-bottom: 1px solid #000;font-weight: bold;">
-		
-				  <th width="300" style="border-right: 1px solid #000;padding:0 8px;text-align:left;width:300px">NAME OF ABSENT / NOT LOGGED IN EMP </th>
-				  <th style="border-right: 1px solid #000;padding:0 8px;text-align: left;">REGION</th>
-				  <th style="border-right: 1px solid #000;padding:0 8px;text-align: left;width:120px">	
-						REMARKS</th>
-				  <th style="border-right: 1px solid #000;padding:0 8px;text-align: left;">REASON</th>
-				  
-				  
+        $tbody.='</tbody>
+					</table>
+					</td>
+					</tr>
+					<br>
+					<tr>
+						<td class="innerpadding1 " style="">
+						<table  class="body_table" style="border-collapse: collapse;width:100%;">
+						<thead>
+							<tr>&nbsp;</tr>
+							<tr style="border:none !important;"><td colspan="7" style="text-decoration: underline; font-weight: bold;">EXCEPTIONS:</td></tr>
+							<tr style=" background-color:#DDEBF7; border:2px solid #000; font-weight: bold;">
+								<th width="300" style="border-right: 1px solid #000;padding:0 8px;text-align:left;width:300px">NAME OF EMPLOYEE </th>
+								<th style="border-right: 1px solid #000;padding:0 8px;text-align: left;">REGION</th>
+								<th style="border-right: 1px solid #000;padding:0 8px;text-align: left;">'.(($status=="modified")?"REVISED":"REASON").'</th>
+								<th style="border-right: 1px solid #000;padding:0 8px;text-align: left;">TIME</th>
+								<th style="border-right: 2px solid #000;padding:0 8px;text-align: left;width:120px">	
+								REMARKS</th>
+							</tr>
+						</thead>
+						<tbody style="border:2px solid #000;background-color: #fff;color: #000;">';
+						if(count($absent_data)>0) {
+							for($i=0; $i<count($absent_data); $i++) {
+								$reason = '';
+								if($absent_data[$i]->entry_by_admin=='1') {
+									if(isset($absent_data[$i]->created_by)) {
+										$reason = 'Logged - <span style="color:#FF0000;">'.$absent_data[$i]->reason.'</span>';
+									} else {
+										$reason = 'Not Logged - <span style="color:#FF0000;">'.$absent_data[$i]->reason.'</span>';
+									}
+								} else {
+									$reason = $absent_data[$i]->reason;
+								}
+
+								$tbody.= '<tr>
+									<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;padding: 0 8px;width:200px">'.ucwords(trim($absent_data[$i]->sales_rep_name)).'</td>
+									<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;padding: 0 8px;">'.ucwords(trim($absent_data[$i]->zone)).'</td>
+									<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;padding: 0 8px;">'.$reason.'</td>
+									<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;padding: 0 8px;">'.date("H:i", strtotime($absent_data[$i]->check_in_time)).'</td>
+									<td style="border-right: 2px solid #000;border-bottom: 1px solid #000;padding: 0 8px;width:150px">'.$absent_data[$i]->remark.'</td>
+									</tr>'; 
+							}
+						}
+        $tbody.='</tbody>
+				</table>
+				</td>
 				</tr>
-			</thead>
-			<tbody style="border:1px solid #000;background-color: #fff;color: #000;">';
-				if(count($absent_data)>0) {
-					for($i=0; $i<count($absent_data); $i++)
-					{
-						$tbody.= '<tr>
-							<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;padding: 0 8px;width:200px">'.$absent_data[$i]->sales_rep_name.'</td>
-							<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;padding: 0 8px;">'.$absent_data[$i]->zone.'</td>
-							<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;padding: 0 8px;">'.$absent_data[$i]->remark.'</td>
-							<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;padding: 0 8px;width:150px">'.$absent_data[$i]->reason.'</td>
-							</tr>'; 
-					}
-				}		
-			'<tr>
-			<td style="border-right: 1px solid #000;">MUKESH YADAV</td>
-			<td style="border-right: 1px solid #000;">MUMBAI</td>
-			<td style="border-right: 1px solid #000;">Absent /Not informed</td>
-			<td style="border-right: 1px solid #000;">Absent /Not informed</td>
-			</tr>
-								
-          '; 
-				
-			
-            $tbody.=   '</tbody>
-          </table>
-        </td>
-	  </tr>
-   
-   
-		    </table>
-		    <!--[if (gte mso 9)|(IE)]>
-		          </td>
-		        </tr>
-		    </table>
-		    <![endif]-->
-		    </td>
-		  </tr>
-		</table>
+				</table>
+				<!--[if (gte mso 9)|(IE)]>
+				</td>
+				</tr>
+				</table>
+				<![endif]-->
+				</td>
+				</tr>
+				</table>
 
-		<!--analytics-->
+				<!--analytics-->
 
-		</body>
-		</html>' ;
+				</body>
+				</html>';
 
-		 echo $tbody;
+	 	echo $tbody;
             
-          echo 'mailsent'.$mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $tbody, $bcc, $cc,'');
-          if ($mailSent==1) {
-              echo "Send";
-          } else {
-              echo "NOT Send".$mailSent;
-          }
+		echo 'mailsent'.$mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $tbody, $bcc, $cc,'');
+		if ($mailSent==1) {
+			echo "Send";
+		} else {
+			echo "NOT Send".$mailSent;
+		}
 
-        // load_view('invoice/emailer', $data);	
+		// load_view('invoice/emailer', $data);	
     }
 	
 	public function get_user_log(){

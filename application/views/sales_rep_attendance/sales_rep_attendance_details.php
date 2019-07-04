@@ -33,7 +33,7 @@
 							<?php $this->load->view('templates/download');?>	
 						</div>	
 						<div class="pull-right btn-margin">
-							<a class="btn btn-success btn-block btn-padding" href="<?php echo base_url().'index.php/Sales_Attendence/get_sales_attendance'; ?>" target="_blank">
+							<a class="btn btn-success btn-block btn-padding" href="<?php echo base_url().'index.php/Sales_Attendence/get_sales_attendance/modified'; ?>" target="_blank">
 								<span class="fa fa-plus"></span> Send Updated Attendance
 							</a>
 						</div>

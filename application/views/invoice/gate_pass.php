@@ -229,7 +229,7 @@
                 <table width="100%" border="0" style="border-spacing: 0;">
                     <tr>
                         <td width="60%" style="color:#808080;margin:0 auto;text-align:center;"   ><h1 style="padding:0; margin:0; font-size:20px;">Tax Invoice</h1></td>
-                        <td width="2%">
+                        <!-- <td width="2%">
                             <table style="width:115%;border-collapse: collapse;height: 30px;border-spacing: 0;">
                                 <tr><td style="border: 1px solid #666;width:100%;border-top:none;border-right:none;border-bottom:none;">&nbsp;&nbsp;&nbsp;&nbsp;<span class="fa fa-check"></span><td></tr>
                                 <tr><td style="border: 1px solid #666;width:100%;border-right:none;">&nbsp;<td></tr>
@@ -241,6 +241,23 @@
                                 <tr><td style="border:1px solid #666;width:100%;border-top:none;border-right:none;border-bottom:none;">Accounts<td></tr>
                                 <tr><td style="border:1px solid #666;width:100%;border-right:none;">Retailer<td></tr>
                                 <tr><td style="border:1px solid #666;width:100%;border-bottom:none;border-right:none;border-top:none;">Acknowledgement<td></tr>
+                            </table>
+                        </td> -->
+
+                        <td width="22%">
+                            <table style="width:101%;border-collapse: collapse;height: 30px;border-spacing: 0;">
+                                <tr>
+                                    <td style="border: 1px solid #666;width:20%;border-top:none;border-right:none;border-bottom:none;">&nbsp;&nbsp;&nbsp;&nbsp;<span class="fa fa-check"></span><td>
+                                    <td style="border:1px solid #666;width:80%;border-top:none;border-right:none;border-bottom:none;">Accounts<td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #666;width:20%;border-right:none;">&nbsp;<td>
+                                    <td style="border:1px solid #666;width:80%;border-right:none;">Retailer<td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #666;width:20%;border-bottom:none;border-right:none;border-top:none;">&nbsp;<td>
+                                    <td style="border:1px solid #666;width:80%;border-bottom:none;border-right:none;border-top:none;">Acknowledgement<td>
+                                </tr>
                             </table>
                         </td>
                     </tr>
@@ -337,6 +354,10 @@
                                     <td>GSTIN: </td>
                                     <td><?php if (isset($invoice_details[$inv_cnt]['gst_number'])) echo $invoice_details[$inv_cnt]['gst_number']; ?></td>
                                 </tr>
+                                <tr style="<?php if(!isset($invoice_details[$inv_cnt]['mobile_no'])) echo 'display: none;'; ?>">
+                                    <td>Mobile No: </td>
+                                    <td><?php if(isset($invoice_details[$inv_cnt]['mobile_no'])) echo $invoice_details[$inv_cnt]['mobile_no']; ?></td>
+                                </tr>
                                 <tr >
                                     <td>State: </td>
                                     <td><?php if (isset($invoice_details[$inv_cnt]['state'])) echo $invoice_details[$inv_cnt]['state']; ?>
@@ -363,6 +384,10 @@
                                 <tr>
                                     <td>GSTIN: </td>
                                     <td><?php if (isset($invoice_details[$inv_cnt]['con_gst_number'])) echo $invoice_details[$inv_cnt]['con_gst_number']; ?></td>
+                                </tr>
+                                <tr style="<?php if(!isset($invoice_details[$inv_cnt]['mobile_no'])) echo 'display: none;'; ?>">
+                                    <td>Mobile No: </td>
+                                    <td><?php if(isset($invoice_details[$inv_cnt]['mobile_no'])) echo $invoice_details[$inv_cnt]['mobile_no']; ?></td>
                                 </tr>
                                 <tr >
                                     <td>State: </td>
@@ -690,7 +715,7 @@
                 <table width="100%" border="0" style="border-spacing: 0;">
                     <tr>
                         <td width="60%" style="color:#808080;margin:0 auto;text-align:center;"   ><h1 style="padding:0; margin:0; font-size:20px;">Tax Invoice</h1></td>
-                        <td width="2%">
+                        <!-- <td width="2%">
                             <table style="width:115%;border-collapse: collapse;height: 30px;border-spacing: 0;">
                                 <tr><td style="border: 1px solid #666;width:100%;border-top:none;border-right:none;border-bottom:none;">&nbsp;<td></tr>
                                 <tr><td style="border: 1px solid #666;width:100%;border-right:none;">&nbsp;&nbsp;&nbsp;&nbsp;<span class="fa fa-check"></span><td></tr>
@@ -702,6 +727,23 @@
                                 <tr><td style="border:1px solid #666;width:100%;border-top:none;border-right:none;border-bottom:none;">Accounts<td></tr>
                                 <tr><td style="border:1px solid #666;width:100%;border-right:none;">Retailer<td></tr>
                                 <tr><td style="border:1px solid #666;width:100%;border-bottom:none;border-right:none;border-top:none;">Acknowledgement<td></tr>
+                            </table>
+                        </td> -->
+
+                        <td width="22%">
+                            <table style="width:101%;border-collapse: collapse;height: 30px;border-spacing: 0;">
+                                <tr>
+                                    <td style="border: 1px solid #666;width:20%;border-top:none;border-right:none;border-bottom:none;">&nbsp;<td>
+                                    <td style="border:1px solid #666;width:80%;border-top:none;border-right:none;border-bottom:none;">Accounts<td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #666;width:20%;border-right:none;">&nbsp;&nbsp;&nbsp;&nbsp;<span class="fa fa-check"></span><td>
+                                    <td style="border:1px solid #666;width:80%;border-right:none;">Retailer<td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #666;width:20%;border-bottom:none;border-right:none;border-top:none;">&nbsp;<td>
+                                    <td style="border:1px solid #666;width:80%;border-bottom:none;border-right:none;border-top:none;">Acknowledgement<td>
+                                </tr>
                             </table>
                         </td>
                     </tr>
@@ -797,6 +839,10 @@
                                     <td>GSTIN: </td>
                                     <td><?php if (isset($invoice_details[$inv_cnt]['gst_number'])) echo $invoice_details[$inv_cnt]['gst_number']; ?></td>
                                 </tr>
+                                <tr style="<?php if(!isset($invoice_details[$inv_cnt]['mobile_no'])) echo 'display: none;'; ?>">
+                                    <td>Mobile No: </td>
+                                    <td><?php if(isset($invoice_details[$inv_cnt]['mobile_no'])) echo $invoice_details[$inv_cnt]['mobile_no']; ?></td>
+                                </tr>
                                 <tr >
                                     <td>State: </td>
                                     <td><?php if (isset($invoice_details[$inv_cnt]['state'])) echo $invoice_details[$inv_cnt]['state']; ?>
@@ -823,6 +869,10 @@
                                 <tr>
                                     <td>GSTIN: </td>
                                     <td><?php if (isset($invoice_details[$inv_cnt]['con_gst_number'])) echo $invoice_details[$inv_cnt]['con_gst_number']; ?></td>
+                                </tr>
+                                <tr style="<?php if(!isset($invoice_details[$inv_cnt]['mobile_no'])) echo 'display: none;'; ?>">
+                                    <td>Mobile No: </td>
+                                    <td><?php if(isset($invoice_details[$inv_cnt]['mobile_no'])) echo $invoice_details[$inv_cnt]['mobile_no']; ?></td>
                                 </tr>
                                 <tr >
                                     <td>State: </td>
@@ -1085,7 +1135,7 @@
                 <table width="100%" border="0" style="border-spacing: 0;">
                     <tr>
                         <td width="60%" style="color:#808080;margin:0 auto;text-align:center;"   ><h1 style="padding:0; margin:0; font-size:20px;">Tax Invoice</h1></td>
-                        <td width="2%">
+                        <!-- <td width="2%">
                             <table style="width:115%;border-collapse: collapse;height: 30px;border-spacing: 0;">
                                 <tr><td style="border: 1px solid #666;width:100%;border-top:none;border-right:none;border-bottom:none;">&nbsp;<td></tr>
                                 <tr><td style="border: 1px solid #666;width:100%;border-right:none;">&nbsp;<td></tr>
@@ -1097,6 +1147,23 @@
                                 <tr><td style="border:1px solid #666;width:100%;border-top:none;border-right:none;border-bottom:none;">Accounts<td></tr>
                                 <tr><td style="border:1px solid #666;width:100%;border-right:none;">Retailer<td></tr>
                                 <tr><td style="border:1px solid #666;width:100%;border-bottom:none;border-right:none;border-top:none;">Acknowledgement<td></tr>
+                            </table>
+                        </td> -->
+                        
+                        <td width="22%">
+                            <table style="width:101%;border-collapse: collapse;height: 30px;border-spacing: 0;">
+                                <tr>
+                                    <td style="border: 1px solid #666;width:20%;border-top:none;border-right:none;border-bottom:none;">&nbsp;<td>
+                                    <td style="border:1px solid #666;width:80%;border-top:none;border-right:none;border-bottom:none;">Accounts<td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #666;width:20%;border-right:none;">&nbsp;<td>
+                                    <td style="border:1px solid #666;width:80%;border-right:none;">Retailer<td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #666;width:20%;border-bottom:none;border-right:none;border-top:none;">&nbsp;&nbsp;&nbsp;&nbsp;<span class="fa fa-check"></span><td>
+                                    <td style="border:1px solid #666;width:80%;border-bottom:none;border-right:none;border-top:none;">Acknowledgement<td>
+                                </tr>
                             </table>
                         </td>
                     </tr>
@@ -1192,6 +1259,10 @@
                                     <td>GSTIN: </td>
                                     <td><?php if (isset($invoice_details[$inv_cnt]['gst_number'])) echo $invoice_details[$inv_cnt]['gst_number']; ?></td>
                                 </tr>
+                                <tr style="<?php if(!isset($invoice_details[$inv_cnt]['mobile_no'])) echo 'display: none;'; ?>">
+                                    <td>Mobile No: </td>
+                                    <td><?php if(isset($invoice_details[$inv_cnt]['mobile_no'])) echo $invoice_details[$inv_cnt]['mobile_no']; ?></td>
+                                </tr>
                                 <tr >
                                     <td>State: </td>
                                     <td><?php if (isset($invoice_details[$inv_cnt]['state'])) echo $invoice_details[$inv_cnt]['state']; ?>
@@ -1218,6 +1289,10 @@
                                 <tr>
                                     <td>GSTIN: </td>
                                     <td><?php if (isset($invoice_details[$inv_cnt]['con_gst_number'])) echo $invoice_details[$inv_cnt]['con_gst_number']; ?></td>
+                                </tr>
+                                <tr style="<?php if(!isset($invoice_details[$inv_cnt]['mobile_no'])) echo 'display: none;'; ?>">
+                                    <td>Mobile No: </td>
+                                    <td><?php if(isset($invoice_details[$inv_cnt]['mobile_no'])) echo $invoice_details[$inv_cnt]['mobile_no']; ?></td>
                                 </tr>
                                 <tr >
                                     <td>State: </td>

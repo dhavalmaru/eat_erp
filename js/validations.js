@@ -1693,7 +1693,7 @@ $("#form_distributor_out_details").validate({
             required: true
             
         },
-         order_no: {
+        order_no: {
             required: {
                 depends: function() {
                     return (clkBtn!='btn_reject');
@@ -1720,6 +1720,9 @@ $("#form_distributor_out_details").validate({
                     return (d_status == "Approved");
                 }
             }
+        },
+        mobile_no: {
+            numbersonly: true
         }
     },
 
@@ -1810,6 +1813,7 @@ function check_product_availablity_for_distributor_out() {
     var validator = $("#form_distributor_out_details").validate();
     var valid = true;
     var btn_val = $(document.activeElement).val();
+    var result = 1;
 
     if(btn_val=='Submit For Approval' || btn_val=='Delete') {
         $.ajax({

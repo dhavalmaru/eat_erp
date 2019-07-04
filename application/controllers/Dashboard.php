@@ -18,11 +18,13 @@ class Dashboard extends CI_Controller
     //index function
     public function index(){
         $role_id=$this->session->userdata('role_id');
-
+        
         if($role_id==10){
             redirect(base_url().'index.php/Dashboard/production');
         } else {
             $result=$this->dashboard_model->get_access();
+            // echo json_encode($result);
+
             if(count($result)>0) {
                 $data['total_sale']=$this->dashboard_model->get_total_sale();
                 $data['total_dist']=$this->dashboard_model->get_total_distributor();

@@ -189,6 +189,22 @@ class Export extends CI_Controller {
             $data['report_type'] = 'Monthly Sales';
             $data['report_name'] = 'Monthly Sales Overview Report';
             $data['sample_report_name'] = 'monthly_sales_overview.xls';
+        } else if($rep_id==32){
+            $data['report_type'] = 'Zonewise Monthly Sales';
+            $data['report_name'] = 'Zonewise Monthly Sales Overview Report';
+            $data['sample_report_name'] = 'zonewise_monthly_sales_overview.xls';
+        } else if($rep_id==33){
+            $data['report_type'] = 'Beat Plan Analysis';
+            $data['report_name'] = 'Beat Plan Analysis Report';
+            $data['sample_report_name'] = 'Beat_plan_analysis_report.xls';
+        } else if($rep_id==34){
+            $data['report_type'] = 'Daily sales performance report';
+            $data['report_name'] = 'Daily sales performance report';
+            $data['sample_report_name'] = 'Daily_sales_performance_report.xls';
+        } else if($rep_id==35){
+            $data['report_type'] = 'Daily Merchandizer performance report';
+            $data['report_name'] = 'Daily Merchandizer performance report';
+            $data['sample_report_name'] = 'Daily_merchandiser_performance_report.xls';
         }
 
         if($rep_id==16 || $rep_id==17){
@@ -738,6 +754,14 @@ class Export extends CI_Controller {
             $this->export_model->gt_store_report('save',$location);
         } else if($rep_id==31) {
             $this->export_model->generate_monthly_sales_overview_report();
+        } else if($rep_id==32) {
+            $this->export_model->generate_monthly_sales_overview_zonewise_report();
+        } else if($rep_id==33) {
+            $this->export_model->generate_beat_analysis_report();
+        } else if($rep_id==34) {
+            $this->export_model->generate_daily_sales_performance_report();
+        } else if($rep_id==35) {
+            $this->export_model->generate_daily_merchandiser_performance_report();
         }
         
         $this->set_report_criteria($rep_id);
@@ -758,7 +782,8 @@ class Export extends CI_Controller {
 
         // echo json_encode($period);
 
-        $this->export_model->generate_monthly_sales_overview_report();
+        // $this->export_model->generate_monthly_sales_overview_report();
+        $this->export_model->generate_monthly_sales_overview_zonewise_report();
     }
 
     public function upload_file() {
@@ -1529,5 +1554,10 @@ class Export extends CI_Controller {
         echo $mailSent;
         echo '<br/><br/>';
     }
+    
+    public function send_daily_sales_performance_report() {
+        $this->export_model->send_daily_sales_performance_report();
+    }
+    
 } 
 ?>

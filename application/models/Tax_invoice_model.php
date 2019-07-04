@@ -753,8 +753,6 @@ function generate_gate_pass_old() {
     load_view('invoice/gate_pass_old', $final_data);
 }
 
-
-
 function generate_gate_pass_old_print() {
     $now=date('Y-m-d H:i:s');
     $curusr=$this->session->userdata('session_id');
@@ -1241,8 +1239,6 @@ function generate_gate_pass_old_print() {
     load_view('invoice/invoice-print', $final_data);
 }
 
-
-
 function view_gate_pass_old($distid) {
     $now=date('Y-m-d H:i:s');
     $curusr=$this->session->userdata('session_id');
@@ -1690,6 +1686,7 @@ function get_final_data($check, $sales_rep_id){
             $sample_distributor_id=$result[0]->sample_distributor_id;
             $client_name=$result[0]->client_name;
             $client_address = get_address($result[0]->address, "", $result[0]->city, $result[0]->pincode, $result[0]->state, $result[0]->country);
+            $client_mobile_no=$result[0]->mobile_no;
             $depot_name=$result[0]->depot_name;
             $shipping_address=$result[0]->shipping_address;
             $con_name = $result[0]->con_name;
@@ -1759,10 +1756,10 @@ function get_final_data($check, $sales_rep_id){
             $sample_distributor_id=null;
             $client_name=null;
             $client_address = null;
+            $client_mobile_no = null;
             $depot_name = null;
             $shipping_address = null;
             $con_name = null;
-            $client_address = null;
             $con_state = null;
             $con_state_code = null;
             $con_gst_number = null;
@@ -1862,7 +1859,7 @@ function get_final_data($check, $sales_rep_id){
             $cst_number=$result[0]->cst_number;
             $sales_rep_name=$sales_rep_name;
             $state_code=$result[0]->state_code;
-            $gst_number=$result[0]->gst_number;            
+            $gst_number=$result[0]->gst_number;
 
             $address = get_address($result[0]->address, "", $result[0]->city, $result[0]->pincode, $result[0]->state, $result[0]->country);
 
@@ -2018,19 +2015,17 @@ function get_final_data($check, $sales_rep_id){
                 $data['date_of_processing']=$date_of_processing;
 
                 if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT'){
-                    $data['distributor_name']=$client_name;
-                    $data['address']=$client_address;
-                    $data['state']=$client_state;
-                    $data['state_code']=$client_state_code;
+                        $data['distributor_name']=$client_name;
+                        $data['address']=$client_address;
+                        $data['state']=$client_state;
+                        $data['state_code']=$client_state_code;
+                        $data['mobile_no']=$client_mobile_no;
 
-                    if(strtoupper(trim($distributor_name))=='DIRECT')
-                    {
-                        $data['gst_number']=$gstin;
-                    }
-                    else
-                    {
-                        $data['gst_number']='';
-                    }
+                        if(strtoupper(trim($distributor_name))=='DIRECT') {
+                            $data['gst_number']=$gstin;
+                        } else {
+                            $data['gst_number']='';
+                        }
                     
                 } else {
                     $data['distributor_name']=$distributor_name;
@@ -2115,18 +2110,17 @@ function get_final_data($check, $sales_rep_id){
                 $data['date_of_processing']=$date_of_processing;
 
                 if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT'){
-                    $data['distributor_name']=$client_name;
-                    $data['address']=$client_address;
-                    $data['state']=$client_state;
-                    $data['state_code']=$client_state_code;
-                    if(strtoupper(trim($distributor_name))=='DIRECT')
-                    {
-                        $data['gst_number']=$gstin;
-                    }
-                    else
-                    {
-                        $data['gst_number']='';
-                    }
+                        $data['distributor_name']=$client_name;
+                        $data['address']=$client_address;
+                        $data['state']=$client_state;
+                        $data['state_code']=$client_state_code;
+                        $data['mobile_no']=$client_mobile_no;
+
+                        if(strtoupper(trim($distributor_name))=='DIRECT') {
+                            $data['gst_number']=$gstin;
+                        } else {
+                            $data['gst_number']='';
+                        }
                 } else {
                     $data['distributor_name']=$distributor_name;
                     $data['address']=$address;

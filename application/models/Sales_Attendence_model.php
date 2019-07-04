@@ -3,15 +3,12 @@ if (! defined('BASEPATH')){exit('No Direct Script Access is allowed');}
 
 class Sales_Attendence_model Extends CI_Model{
 
-function __Construct(){
+function __Construct() {
 	parent :: __construct();
     $this->load->helper('common_functions');
 }
 
-
-
-public function get_todays_attendence()
-{
+public function get_todays_attendence() {
 	$sales_rep_id=$this->session->userdata('sales_rep_id');
 	$now1=date('Y-m-d');
 	$where = array("date(check_in_time)"=>$now1,
@@ -22,48 +19,58 @@ public function get_todays_attendence()
 	return $result;
 }
 
-public function sales_attendence_list()
-{
-
-	$sql = "Select Sum(Case When emp_time='L' Then 1 else 0 end ) as late_mark_count ,sum(Case When emp_time='O' Then 1 else 0 end) as on_time_count,zone,
-		sum(Case When working_status='Absent' Then 1 Else 0 end) as absent_count, sum(Case When working_status='Present' Then 1 Else 0 end) as present_count,
-        sum(Case When working_status='NL' Then 1 Else 0 end) as not_logged_in_count
-        from 
-		(
-            Select A.id as sales_rep_id,check_in_time,A.zone,Case When (working_status='Absent') Then 'Absent'
-            When (B.check_in_time is null) Then 'NL' 
-            Else 'Present' end as working_status,
-            Case When CAST(check_in_time As Time)>CAST('10:00:00' As Time) AND CAST(check_in_time As Time)<CAST('11:00:00' As Time )  AND check_in_time IS NOT NULL Then 'L'
-            When  check_in_time IS NULL Then 'A' else 'O' end as  emp_time   from 
+public function sales_attendence_list() {
+	$sql = "Select Sum(Case When working_status='Present' and emp_time='L' Then 1 else 0 end ) as late_mark_count, 
+			sum(Case When working_status='Present' and emp_time='O' Then 1 else 0 end) as on_time_count,zone,
+			sum(Case When working_status='Absent' Then 1 Else 0 end) as absent_count, 
+			sum(Case When working_status='Present' Then 1 Else 0 end) as present_count,
+        	sum(Case When working_status='NL' Then 1 Else 0 end) as not_logged_in_count
+        	from 
+			(Select A.id as sales_rep_id, check_in_time, A.zone, 
+				Case When (working_status='Absent') Then 'Absent'
+            		When (B.check_in_time is null) Then 'NL' 
+            		Else 'Present' end as working_status,
+            	Case When CAST(check_in_time As Time)>CAST('10:00:00' As Time) AND 
+            			CAST(check_in_time As Time)<CAST('11:00:00' As Time) AND check_in_time IS NOT NULL Then 'L'
+            		When check_in_time IS NULL Then 'A' else 'O' end as emp_time from 
             (Select * from sales_rep_master Where status='Approved' and sr_type IN ('Sales Representative','Merchandizer','Promoter')) A
             Left Join
             (Select sales_rep_id,check_in_time,working_status from sales_attendence Where  date(check_in_time)=date(now())) B
-            On A.id=B.sales_rep_id
-        ) A Group By zone";
-
+            On A.id=B.sales_rep_id) A Group By zone";
 	$result = $this->db->query($sql)->result();
 	return $result;
-
 }
 
-public function sales_absent_attendence($value='')
-{
+public function sales_absent_attendence($value='') {
+	// $sql = "Select A.id as sales_rep_id, A.sales_rep_name, B.causual_remark as reason, B.check_in_time, A.zone, 
+	// 			Case When B.entry_by_admin='1' 
+	// 				then Case When B.working_status='Absent' Then 'Not Logged - <span style='color:#FF0000;'>Absent</span>' 
+	// 						Else 'Not Logged - <span style='color:#FF0000;'>Present</span>' End 
+	// 				else Case When B.working_status='Absent' Then 'Absent' Else 'Present' End End as remark from 
+	// 		(Select * from sales_rep_master Where status='Approved' and sr_type IN ('Sales Representative', 'Merchandizer', 'Promoter')) A 
+	// 		Left Join 
+	// 		(Select sales_rep_id, check_in_time, working_status, causual_remark, entry_by_admin, modified_on 
+	// 		from sales_attendence 
+	// 		Where date(check_in_time)=date(now())) B 
+	// 		On (A.id=B.sales_rep_id) 
+	// 		Where B.check_in_time is null OR B.working_status='Absent' 
+ 	//      Order by A.zone";
 
-	$sql = "Select A.id as sales_rep_id,sales_rep_name,causual_remark as reason,check_in_time,A.zone,Case When check_in_time is null Then 'Not Logged In' Else 'Absent' end as remark from 
-			(Select * from sales_rep_master Where status='Approved' and sr_type IN ('Sales Representative','Merchandizer','Promoter')) A
-			Left Join
-			(Select sales_rep_id,check_in_time,working_status,causual_remark from sales_attendence Where  date(check_in_time)=date(now())) B
-			On A.id=B.sales_rep_id
-			Where B.check_in_time is null OR working_status='Absent'
-            Order by zone";
-
+    $sql = "Select A.id as sales_rep_id, A.sales_rep_name, A.zone, B.working_status as reason, B.check_in_time, 
+				B.entry_by_admin, B.causual_remark as remark, B.created_by from 
+			(Select * from sales_rep_master Where status='Approved' and sr_type IN ('Sales Representative', 'Merchandizer', 'Promoter')) A 
+			Left Join 
+			(Select sales_rep_id, check_in_time, working_status, causual_remark, entry_by_admin, created_by 
+			from sales_attendence 
+			Where date(check_in_time)=date(now())) B 
+			On (A.id=B.sales_rep_id) 
+			Where B.check_in_time is null Or B.working_status='Absent' Or B.entry_by_admin='1' 
+            Order by A.zone";
 	$result = $this->db->query($sql)->result();
 	return $result;
-
 }
 
-public function user_login_list()
-{
+public function user_login_list() {
 	$now=date('Y-m-d');
 	// echo $prev_date = date('Y-m-d', strtotime($now .' -15 day'));
 	/*$sql = "select concat(ifnull(A.first_name,''),' ',ifnull(A.last_name,'')) as user_name,A.email_id, B.date from
@@ -81,7 +88,6 @@ public function user_login_list()
 
 	$result = $this->db->query($sql)->result();
 	return $result;
-
 }
 
 function weekOfMonth($date) {

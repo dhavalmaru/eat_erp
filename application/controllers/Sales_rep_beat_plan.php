@@ -55,8 +55,7 @@ class Sales_rep_beat_plan extends CI_Controller{
 		}
 	}
 
-	/*public function download_csv()
-	{
+	/*public function download_csv(){
 			$template_path=$this->config->item('template_path');
 			$file = $template_path.'sale_rep_beat_upload.xlsx';
 			$this->load->library('excel');
@@ -131,8 +130,7 @@ class Sales_rep_beat_plan extends CI_Controller{
 			$objWriter->save('php://output');
 	}*/
 
-	public function download_csv()
-	{
+	public function download_csv(){
 			$template_path=$this->config->item('template_path');
 			$file = $template_path.'sales_rep_beat_upload1.xlsx';
 			$this->load->library('excel');
@@ -254,8 +252,8 @@ class Sales_rep_beat_plan extends CI_Controller{
 			$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
 			$objWriter->save('php://output');
 	}
-	/*public function upload_file()
-	{
+
+	/*public function upload_file(){
 		$path=FCPATH.'assets/uploads/excel_upload/';
 		$config = array(
 		'upload_path' => $path,
@@ -365,8 +363,7 @@ class Sales_rep_beat_plan extends CI_Controller{
 			   redirect(base_url().'index.php/Sales_rep_beat_plan'); 
 	}*/
 
-	public function upload_file()
-	{
+	public function upload_file(){
 			$path=FCPATH.'assets/uploads/excel_upload/';
 			$config = array(
 			'upload_path' => $path,
@@ -777,11 +774,8 @@ class Sales_rep_beat_plan extends CI_Controller{
 				redirect(base_url().'index.php/Sales_rep_beat_plan');
 			} 
 	}
-				
-
- 
-	public function common_excel($objValidation)
-	{
+	
+	public function common_excel($objValidation){
 			$objValidation->setType( PHPExcel_Cell_DataValidation::TYPE_LIST );
 			$objValidation->setErrorStyle( PHPExcel_Cell_DataValidation::STYLE_INFORMATION );
 			$objValidation->setAllowBlank(false);
@@ -794,10 +788,6 @@ class Sales_rep_beat_plan extends CI_Controller{
 			$objValidation->setPrompt('Please pick a value from the drop-down list.');/*
 			$objValidation->setFormula1('"'.$distname.'"');*/
 	}
-
-   
-
-  
 
 	// public function get_location_data(){ 
 
@@ -838,6 +828,7 @@ class Sales_rep_beat_plan extends CI_Controller{
 		$this->sr_beat_plan_model->save_data($id);
 		redirect(base_url().'index.php/Sales_rep_beat_plan');
 	}
+
 	public function get_sales_rep_email(){
 		$frequency='';
 		$data = $this->sr_beat_plan_model->get_sales_rep_email($frequency);
@@ -1218,8 +1209,7 @@ class Sales_rep_beat_plan extends CI_Controller{
 		//load_view('invoice/emailer', $data);
 	}
 	
-   public function get_sales_rep_byemail_old($value='')
-	{
+   	public function get_sales_rep_byemail_old($value=''){
 		$frequency ='$frequency';
 		$sql = "Select A.*,Z.zone,E.p_call,D.actual_count,Case When F.check_in_time IS NULL THEN 'Absent' Else 'Present' end as emp_status
 			,O.od_units,'' as od_value
@@ -1630,9 +1620,8 @@ class Sales_rep_beat_plan extends CI_Controller{
 			  echo "NOT Send".$mailSent;
 		  }
 	}             
-   
-   public function get_sales_rep_byemail($value='')
-	{
+   	
+   	public function get_sales_rep_byemail($value=''){
 		$sql = "Select CASE WHEN ((FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=1 OR (FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=3 
 			OR (FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=5) 
 			THEN CONCAT('Every ',DAYNAME(date(now()))) 
@@ -2168,8 +2157,7 @@ class Sales_rep_beat_plan extends CI_Controller{
 		  }
 	}
 
-	public function get_promoter_byemail($value='')
-	{
+	public function get_promoter_byemail($value=''){
 		$sql = "Select CASE WHEN ((FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=1 OR (FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=3 
 			OR (FLOOR((DayOfMonth(date(now()))-1)/7)+1 )=5) 
 			THEN CONCAT('Every ',DAYNAME(date(now()))) 

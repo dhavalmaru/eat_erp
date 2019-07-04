@@ -16232,7 +16232,13 @@ function generate_monthly_sales_overview_report() {
         $mon_period[$mon]['month'] = $mon;
         $mon_period[$mon]['target_sales'] = 0;
         $mon_period[$mon]['sold_bars'] = 0;
+        $mon_period[$mon]['sales_enery_bars'] = 0;
+        $mon_period[$mon]['sales_cookies'] = 0;
+        $mon_period[$mon]['sales_trail_mix'] = 0;
         $mon_period[$mon]['sales_return_bars'] = 0;
+        $mon_period[$mon]['sales_return_enery_bars'] = 0;
+        $mon_period[$mon]['sales_return_cookies'] = 0;
+        $mon_period[$mon]['sales_return_trail_mix'] = 0;
         $mon_period[$mon]['sales_incl_tax'] = 0;
         $mon_period[$mon]['sales_return_incl_tax'] = 0;
         $mon_period[$mon]['credit_debit_note'] = 0;
@@ -16268,6 +16274,50 @@ function generate_monthly_sales_overview_report() {
         }
     }
 
+    $sql = "select A.particular, A.year_no, A.mon_no, A.mon_name, A.category_name, sum(qty) as tot_qty from 
+            (select D.*, F.category_name from 
+            (select case when A.distributor_id='1' then 'Sample' when A.distributor_id='189' then 'Expired' else 'Sales' end as particular, 
+                DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, 
+                DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, 
+                case when B.type='Bar' then B.item_id else C.product_id end as item_id, 
+                case when B.type='Bar' then B.qty else B.qty*C.qty end as qty 
+            from distributor_out A 
+            left join distributor_out_items B on (A.id=B.distributor_out_id) 
+            left join box_product C on (B.type='Box' and B.item_id=C.box_id) 
+            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date') D 
+            left join product_master E on (D.item_id=E.id) 
+            left join category_master F on (E.category_id=F.id))A 
+            group by A.particular, A.year_no, A.mon_no, A.mon_name, A.category_name 
+            order by A.year_no, A.mon_no, A.category_name";
+    $data = $this->db->query($sql)->result_array();
+    for($i=0; $i<count($data); $i++) {
+        if($data[$i]['particular']=='Sales') {
+            if($data[$i]['category_name']=='Energy Bar') {
+                $mon_period[$data[$i]['mon_name']]['sales_enery_bars'] = $data[$i]['tot_qty'];
+            } else if($data[$i]['category_name']=='Cookies') {
+                $mon_period[$data[$i]['mon_name']]['sales_cookies'] = $data[$i]['tot_qty'];
+            } else if($data[$i]['category_name']=='Trail Mix') {
+                $mon_period[$data[$i]['mon_name']]['sales_trail_mix'] = $data[$i]['tot_qty'];
+            }
+        } else if($data[$i]['particular']=='Sample') {
+            if($data[$i]['category_name']=='Energy Bar') {
+                $mon_period[$data[$i]['mon_name']]['sample_enery_bars'] = $data[$i]['tot_qty'];
+            } else if($data[$i]['category_name']=='Cookies') {
+                $mon_period[$data[$i]['mon_name']]['sample_cookies'] = $data[$i]['tot_qty'];
+            } else if($data[$i]['category_name']=='Trail Mix') {
+                $mon_period[$data[$i]['mon_name']]['sample_trail_mix'] = $data[$i]['tot_qty'];
+            }
+        } else if($data[$i]['particular']=='Expired') {
+            if($data[$i]['category_name']=='Energy Bar') {
+                $mon_period[$data[$i]['mon_name']]['expired_enery_bars'] = $data[$i]['tot_qty'];
+            } else if($data[$i]['category_name']=='Cookies') {
+                $mon_period[$data[$i]['mon_name']]['expired_cookies'] = $data[$i]['tot_qty'];
+            } else if($data[$i]['category_name']=='Trail Mix') {
+                $mon_period[$data[$i]['mon_name']]['expired_trail_mix'] = $data[$i]['tot_qty'];
+            }
+        }
+    }
+
     $sql = "select A.year_no, A.mon_no, A.mon_name, sum(A.final_amount) as tot_amount from 
             (select DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, 
                 DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, A.final_amount 
@@ -16295,6 +16345,32 @@ function generate_monthly_sales_overview_report() {
     $data = $this->db->query($sql)->result_array();
     for($i=0; $i<count($data); $i++) {
         $mon_period[$data[$i]['mon_name']]['sales_return_bars'] = $data[$i]['tot_qty']*-1;
+    }
+
+    $sql = "select A.year_no, A.mon_no, A.mon_name, A.category_name, sum(qty) as tot_qty from 
+            (select D.*, F.category_name from 
+            (select DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, 
+                DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, 
+                case when B.type='Bar' then B.item_id else C.product_id end as item_id, 
+                case when B.type='Bar' then B.qty else B.qty*C.qty end as qty 
+            from distributor_in A 
+            left join distributor_in_items B on (A.id=B.distributor_in_id) 
+            left join box_product C on (B.type='Box' and B.item_id=C.box_id) 
+            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and 
+                (A.distributor_id!='1' and A.distributor_id!='189')) D 
+            left join product_master E on (D.item_id=E.id) 
+            left join category_master F on (E.category_id=F.id)) A 
+            group by A.year_no, A.mon_no, A.mon_name, A.category_name 
+            order by A.year_no, A.mon_no, A.category_name";
+    $data = $this->db->query($sql)->result_array();
+    for($i=0; $i<count($data); $i++) {
+        if($data[$i]['category_name']=='Energy Bar') {
+            $mon_period[$data[$i]['mon_name']]['sales_return_enery_bars'] = $data[$i]['tot_qty']*-1;
+        } else if($data[$i]['category_name']=='Cookies') {
+            $mon_period[$data[$i]['mon_name']]['sales_return_cookies'] = $data[$i]['tot_qty']*-1;
+        } else if($data[$i]['category_name']=='Trail Mix') {
+            $mon_period[$data[$i]['mon_name']]['sales_return_trail_mix'] = $data[$i]['tot_qty']*-1;
+        }
     }
 
     $sql = "select A.year_no, A.mon_no, A.mon_name, sum(A.final_amount) as tot_amount from 
@@ -16364,8 +16440,10 @@ function generate_monthly_sales_overview_report() {
         $arr[$data[$i]['item']] = array('item_name'=>$data[$i]['item_name'], 'tot_qty'=>$data[$i]['tot_qty']);
         if($i==count($data)-1) {
             $mon_period[$data[$i]['mon_name']]['productwise_sales']=$arr;
+            $arr=[];
         } else if($data[$i]['year_no']!=$data[$i+1]['year_no'] || $data[$i]['mon_no']!=$data[$i+1]['mon_no']) {
             $mon_period[$data[$i]['mon_name']]['productwise_sales']=$arr;
+            $arr=[];
         }
     }
 
@@ -16396,7 +16474,7 @@ function generate_monthly_sales_overview_report() {
                 case when B.type='Bar' then B.qty else B.qty*C.qty end as item_qty 
             from distributor_in A 
             left join distributor_in_items B on (A.id=B.distributor_in_id) 
-            left join box_product C on (B.type='Box' and B.item_id=C.box_id and B.item_id not in (4, 13, 14, 32)) 
+            left join box_product C on (B.type='Box' and B.item_id=C.box_id) 
             where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and (A.distributor_id!='1' and A.distributor_id!='189')) D 
             left join product_master E on (D.item_type='Bar' and D.item_id=E.id) 
             left join box_master F on (D.item_type='Box' and D.item_id=F.id)) G 
@@ -16408,8 +16486,10 @@ function generate_monthly_sales_overview_report() {
         $arr[$data[$i]['item']] = array('item_name'=>$data[$i]['item_name'], 'tot_qty'=>$data[$i]['tot_qty']);
         if($i==count($data)-1) {
             $mon_period[$data[$i]['mon_name']]['productwise_sales_return']=$arr;
+            $arr=[];
         } else if($data[$i]['year_no']!=$data[$i+1]['year_no'] || $data[$i]['mon_no']!=$data[$i+1]['mon_no']) {
             $mon_period[$data[$i]['mon_name']]['productwise_sales_return']=$arr;
+            $arr=[];
         }
     }
 
@@ -16440,8 +16520,10 @@ function generate_monthly_sales_overview_report() {
         $arr[$data[$i]['item']] = array('item_name'=>$data[$i]['item_name'], 'tot_qty'=>$data[$i]['tot_qty']);
         if($i==count($data)-1) {
             $mon_period[$data[$i]['mon_name']]['channelwise_sales']=$arr;
+            $arr=[];
         } else if($data[$i]['year_no']!=$data[$i+1]['year_no'] || $data[$i]['mon_no']!=$data[$i+1]['mon_no']) {
             $mon_period[$data[$i]['mon_name']]['channelwise_sales']=$arr;
+            $arr=[];
         }
     }
 
@@ -16472,8 +16554,10 @@ function generate_monthly_sales_overview_report() {
         $arr[$data[$i]['item']] = array('item_name'=>$data[$i]['item_name'], 'tot_qty'=>$data[$i]['tot_qty']);
         if($i==count($data)-1) {
             $mon_period[$data[$i]['mon_name']]['channelwise_sales_return']=$arr;
+            $arr=[];
         } else if($data[$i]['year_no']!=$data[$i+1]['year_no'] || $data[$i]['mon_no']!=$data[$i+1]['mon_no']) {
             $mon_period[$data[$i]['mon_name']]['channelwise_sales_return']=$arr;
+            $arr=[];
         }
     }
 
@@ -16513,8 +16597,10 @@ function generate_monthly_sales_overview_report() {
         $arr[$data[$i]['item']] = array('item_name'=>$data[$i]['item_name'], 'tot_qty'=>$data[$i]['tot_qty']);
         if($i==count($data)-1) {
             $mon_period[$data[$i]['mon_name']]['zonewise_sales']=$arr;
+            $arr=[];
         } else if($data[$i]['year_no']!=$data[$i+1]['year_no'] || $data[$i]['mon_no']!=$data[$i+1]['mon_no']) {
             $mon_period[$data[$i]['mon_name']]['zonewise_sales']=$arr;
+            $arr=[];
         }
     }
 
@@ -16536,11 +16622,11 @@ function generate_monthly_sales_overview_report() {
         $objPHPExcel->getActiveSheet()->setCellValue('B7', $from_date);
         $objPHPExcel->getActiveSheet()->setCellValue('B8', $to_date);
 
-        $row = 37;
-        $sales_return_row = 40;
-        $channelwise_sales_row = 44;
-        $channelwise_sales_return_row = 48;
-        $zonewise_sales_row = 52;
+        $row = 46;
+        $sales_return_row = 49;
+        $channelwise_sales_row = 53;
+        $channelwise_sales_return_row = 57;
+        $zonewise_sales_row = 61;
         $col=0;
         for($i=0; $i<count($sales_items); $i++) {
             if($i!=0){
@@ -16615,32 +16701,41 @@ function generate_monthly_sales_overview_report() {
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'14', $mon_period[$mon]['month']);
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'15', '60000');
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'16', $mon_period[$mon]['sold_bars']);
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'17', $mon_period[$mon]['sales_return_bars']);
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'18', '=sum('.$col_name[$col].'16:'.$col_name[$col].'17)');
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'19', '='.$col_name[$col].'18/'.$col_name[$col].'15');
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'21', $mon_period[$mon]['sales_incl_tax']);
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'22', $mon_period[$mon]['sales_return_incl_tax']);
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'23', $mon_period[$mon]['credit_debit_note']);
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'24', '=sum('.$col_name[$col].'21:'.$col_name[$col].'23)');
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'26', '='.$col_name[$col].'24/'.$col_name[$col].'16');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'17', $mon_period[$mon]['sales_enery_bars']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'18', $mon_period[$mon]['sales_cookies']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'19', $mon_period[$mon]['sales_trail_mix']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'20', $mon_period[$mon]['sales_return_bars']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'21', $mon_period[$mon]['sales_return_enery_bars']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'22', $mon_period[$mon]['sales_return_cookies']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'23', $mon_period[$mon]['sales_return_trail_mix']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'24', '=sum('.$col_name[$col].'16,'.$col_name[$col].'20)');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'25', '=sum('.$col_name[$col].'17,'.$col_name[$col].'21)');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'26', '=sum('.$col_name[$col].'18,'.$col_name[$col].'22)');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'27', '=sum('.$col_name[$col].'19,'.$col_name[$col].'23)');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'28', '='.$col_name[$col].'24/'.$col_name[$col].'15');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'30', $mon_period[$mon]['sales_incl_tax']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'31', $mon_period[$mon]['sales_return_incl_tax']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'32', $mon_period[$mon]['credit_debit_note']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'33', '=sum('.$col_name[$col].'30:'.$col_name[$col].'32)');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'35', '='.$col_name[$col].'33/'.$col_name[$col].'16');
             if($col==1) {
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'27', '0');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'36', '0');
             } else {
                 if($col==$start_col) {
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'27', '=('.$col_name[$col].'24-'.$col_name[$col-2].'24)/'.$col_name[$col].'24');
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'36', '=('.$col_name[$col].'33-'.$col_name[$col-2].'33)/'.$col_name[$col].'33');
                 } else {
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'27', '=('.$col_name[$col].'24-'.$col_name[$col-1].'24)/'.$col_name[$col].'24');
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'36', '=('.$col_name[$col].'33-'.$col_name[$col-1].'33)/'.$col_name[$col].'33');
                 }
             }
             
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'29', $mon_period[$mon]['sample_bars']);
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'30', '='.$col_name[$col].'29*15');
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'31', '='.$col_name[$col].'30/'.$col_name[$col].'24');
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'32', $mon_period[$mon]['expired_bars']);
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'33', '='.$col_name[$col].'32*15');
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'34', '='.$col_name[$col].'33/'.$col_name[$col].'24');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'38', $mon_period[$mon]['sample_bars']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'39', '='.$col_name[$col].'38*15');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'40', '='.$col_name[$col].'39/'.$col_name[$col].'33');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'41', $mon_period[$mon]['expired_bars']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'42', '='.$col_name[$col].'41*15');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'43', '='.$col_name[$col].'42/'.$col_name[$col].'33');
 
-            $row2 = 37;
+            $row2 = 46;
             $arr = $mon_period[$mon]['productwise_sales'];
             for($i=0; $i<count($sales_items); $i++) {
                 if(isset($arr[$sales_items[$i]['item']])) {
@@ -16648,7 +16743,7 @@ function generate_monthly_sales_overview_report() {
                 }
                 $row2 = $row2 + 1;
             }
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'36', '=sum('.$col_name[$col].'37:'.$col_name[$col].($row2-1).')');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'45', '=sum('.$col_name[$col].'46:'.$col_name[$col].($row2-1).')');
 
             $row2 = $sales_return_row;
             $arr = $mon_period[$mon]['productwise_sales_return'];
@@ -16706,26 +16801,35 @@ function generate_monthly_sales_overview_report() {
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'16', '=sum('.$col_name[$start_col].'16:'.$col_name[$col-1].'16)');
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'17', '=sum('.$col_name[$start_col].'17:'.$col_name[$col-1].'17)');
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'18', '=sum('.$col_name[$start_col].'18:'.$col_name[$col-1].'18)');
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'19', '=average('.$col_name[$start_col].'19:'.$col_name[$col-1].'19)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'19', '=sum('.$col_name[$start_col].'19:'.$col_name[$col-1].'19)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'20', '=sum('.$col_name[$start_col].'20:'.$col_name[$col-1].'20)');
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'21', '=sum('.$col_name[$start_col].'21:'.$col_name[$col-1].'21)');
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'22', '=sum('.$col_name[$start_col].'22:'.$col_name[$col-1].'22)');
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'23', '=sum('.$col_name[$start_col].'23:'.$col_name[$col-1].'23)');
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'24', '=sum('.$col_name[$start_col].'24:'.$col_name[$col-1].'24)');
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'26', '=average('.$col_name[$start_col].'26:'.$col_name[$col-1].'26)');
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'27', '=average('.$col_name[$start_col].'27:'.$col_name[$col-1].'27)');
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'29', '=sum('.$col_name[$start_col].'29:'.$col_name[$col-1].'29)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'25', '=sum('.$col_name[$start_col].'25:'.$col_name[$col-1].'25)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'26', '=sum('.$col_name[$start_col].'26:'.$col_name[$col-1].'26)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'27', '=sum('.$col_name[$start_col].'27:'.$col_name[$col-1].'27)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'28', '=average('.$col_name[$start_col].'28:'.$col_name[$col-1].'28)');
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'30', '=sum('.$col_name[$start_col].'30:'.$col_name[$col-1].'30)');
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'31', '=average('.$col_name[$start_col].'31:'.$col_name[$col-1].'31)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'31', '=sum('.$col_name[$start_col].'31:'.$col_name[$col-1].'31)');
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'32', '=sum('.$col_name[$start_col].'32:'.$col_name[$col-1].'32)');
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'33', '=sum('.$col_name[$start_col].'33:'.$col_name[$col-1].'33)');
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'34', '=average('.$col_name[$start_col].'34:'.$col_name[$col-1].'34)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'35', '=average('.$col_name[$start_col].'35:'.$col_name[$col-1].'35)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'36', '=average('.$col_name[$start_col].'36:'.$col_name[$col-1].'36)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'38', '=sum('.$col_name[$start_col].'38:'.$col_name[$col-1].'38)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'39', '=sum('.$col_name[$start_col].'39:'.$col_name[$col-1].'39)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'40', '=average('.$col_name[$start_col].'40:'.$col_name[$col-1].'40)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'41', '=sum('.$col_name[$start_col].'41:'.$col_name[$col-1].'41)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'42', '=sum('.$col_name[$start_col].'42:'.$col_name[$col-1].'42)');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'43', '=average('.$col_name[$start_col].'43:'.$col_name[$col-1].'43)');
 
-                $row2 = 37;
+                $row2 = 46;
                 for($i=0; $i<count($sales_items); $i++) {
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, '=sum('.$col_name[$start_col].$row2.':'.$col_name[$col-1].$row2.')');
                     $row2 = $row2 + 1;
                 }
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'36', '=sum('.$col_name[$col].'37:'.$col_name[$col].($row2-1).')');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'45', '=sum('.$col_name[$col].'46:'.$col_name[$col].($row2-1).')');
 
                 $row2 = $sales_return_row;
                 for($i=0; $i<count($sales_return_items); $i++) {
@@ -16798,6 +16902,1702 @@ function generate_monthly_sales_overview_report() {
     }
 }
 
+function generate_monthly_sales_overview_zonewise_report() {
+    $from_date = formatdate($this->input->post('from_date'));
+    $to_date = formatdate($this->input->post('to_date'));
+
+    if($from_date==''){
+        $from_date=NULL;
+    } else {
+        $from_date = formatdate($this->input->post('from_date'));
+    }
+
+    if($to_date==''){
+        $to_date=NULL;
+    } else {
+        $to_date = formatdate($this->input->post('to_date'));
+    }
+
+    // $from_date = '2018-04-01';
+    // $to_date = '2019-03-31';
+
+    $zone_data = [];
+    $zone_list = [];
+    $cnt = 0;
+
+    $sql = "select distinct C.zone from 
+            (select distinct distributor_id from distributor_out where status='Approved' and 
+            date_of_processing>='$from_date' and date_of_processing<='$to_date' and 
+            (distributor_id!='1' and distributor_id!='189') 
+            union all 
+            select distinct distributor_id from distributor_in where status='Approved' and 
+            date_of_processing>='$from_date' and date_of_processing<='$to_date' and 
+            (distributor_id!='1' and distributor_id!='189') 
+            union all 
+            select distinct distributor_id from credit_debit_note where status='Approved' and 
+            date_of_transaction>='$from_date' and date_of_transaction<='$to_date' and 
+            (distributor_id!='1' and distributor_id!='189')) A 
+            left join distributor_master B on (A.distributor_id=B.id) 
+            left join zone_master C on (B.zone_id=C.id) 
+            order by C.zone";
+    $result = $this->db->query($sql)->result_array();
+    foreach ($result as $dt) {
+        $zone = $dt['zone'];
+        $zone_list[$cnt] = $zone;
+        $zone_data[$zone]['zone'] = $zone;
+        $zone_data[$zone]['channelwise_sales_bars'] = [];
+        $zone_data[$zone]['channelwise_sales'] = [];
+        $zone_data[$zone]['channelwise_sales_return_bars'] = [];
+        $zone_data[$zone]['channelwise_sales_return'] = [];
+        $zone_data[$zone]['channelwise_credit_debit'] = [];
+        $cnt++;
+    }
+
+    $sql = "select distinct C.distributor_type from 
+            (select distinct distributor_id from distributor_out where status='Approved' and 
+            date_of_processing>='$from_date' and date_of_processing<='$to_date' and 
+            (distributor_id!='1' and distributor_id!='189') 
+            union all 
+            select distinct distributor_id from distributor_in where status='Approved' and 
+            date_of_processing>='$from_date' and date_of_processing<='$to_date' and 
+            (distributor_id!='1' and distributor_id!='189') 
+            union all 
+            select distinct distributor_id from credit_debit_note where status='Approved' and 
+            date_of_transaction>='$from_date' and date_of_transaction<='$to_date' and 
+            (distributor_id!='1' and distributor_id!='189')) A 
+            left join distributor_master B on (A.distributor_id=B.id) 
+            left join distributor_type_master C on (B.type_id=C.id) 
+            order by C.distributor_type";
+    $channel_data = $this->db->query($sql)->result_array();
+
+    $sql = "select H.zone, H.distributor_type as item, H.distributor_type as item_name, sum(H.item_qty) as tot_qty from 
+            (select D.distributor_id, D.item_qty, F.distributor_type, G.zone from 
+            (select A.distributor_id, case when B.type='Bar' then B.qty else B.qty*C.qty end as item_qty 
+            from distributor_out A 
+            left join distributor_out_items B on (A.id=B.distributor_out_id) 
+            left join box_product C on (B.type='Box' and B.item_id=C.box_id) 
+            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and 
+            (A.distributor_id!='1' and A.distributor_id!='189')) D 
+            left join distributor_master E on (D.distributor_id=E.id) 
+            left join distributor_type_master F on (E.type_id=F.id) 
+            left join zone_master G on (E.zone_id=G.id)) H 
+            group by H.zone, H.distributor_type 
+            order by H.zone, H.distributor_type";
+    $data = $this->db->query($sql)->result_array();
+    $arr=[];
+    for($i=0; $i<count($data); $i++) {
+        $arr[$data[$i]['item']] = array('item_name'=>$data[$i]['item_name'], 'tot_qty'=>$data[$i]['tot_qty']);
+        if($i==count($data)-1) {
+            $zone_data[$data[$i]['zone']]['channelwise_sales_bars']=$arr;
+            $arr=[];
+        } else if($data[$i]['zone']!=$data[$i+1]['zone'] || $data[$i]['item']!=$data[$i+1]['item']) {
+            $zone_data[$data[$i]['zone']]['channelwise_sales_bars']=$arr;
+            $arr=[];
+        }
+    }
+
+    $sql = "select H.zone, H.distributor_type as item, H.distributor_type as item_name, sum(H.final_amount) as tot_amount from 
+            (select D.distributor_id, D.final_amount, F.distributor_type, G.zone from 
+            (select A.distributor_id, A.final_amount 
+            from distributor_out A 
+            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and (A.distributor_id!='1' and A.distributor_id!='189')) D 
+            left join distributor_master E on (D.distributor_id=E.id) 
+            left join distributor_type_master F on (E.type_id=F.id) 
+            left join zone_master G on (E.zone_id=G.id)) H 
+            group by H.zone, H.distributor_type 
+            order by H.zone, H.distributor_type";
+    $data = $this->db->query($sql)->result_array();
+    $arr=[];
+    for($i=0; $i<count($data); $i++) {
+        $arr[$data[$i]['item']] = array('item_name'=>$data[$i]['item_name'], 'tot_amount'=>$data[$i]['tot_amount']);
+        if($i==count($data)-1) {
+            $zone_data[$data[$i]['zone']]['channelwise_sales']=$arr;
+            $arr=[];
+        } else if($data[$i]['zone']!=$data[$i+1]['zone'] || $data[$i]['item']!=$data[$i+1]['item']) {
+            $zone_data[$data[$i]['zone']]['channelwise_sales']=$arr;
+            $arr=[];
+        }
+    }
+
+    $sql = "select H.zone, H.distributor_type as item, H.distributor_type as item_name, sum(H.item_qty)*-1 as tot_qty from 
+            (select D.distributor_id, D.item_qty, F.distributor_type, G.zone from 
+            (select A.distributor_id, case when B.type='Bar' then B.qty else B.qty*C.qty end as item_qty 
+            from distributor_in A 
+            left join distributor_in_items B on (A.id=B.distributor_in_id) 
+            left join box_product C on (B.type='Box' and B.item_id=C.box_id) 
+            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and 
+            (A.distributor_id!='1' and A.distributor_id!='189')) D 
+            left join distributor_master E on (D.distributor_id=E.id) 
+            left join distributor_type_master F on (E.type_id=F.id) 
+            left join zone_master G on (E.zone_id=G.id)) H 
+            group by H.zone, H.distributor_type 
+            order by H.zone, H.distributor_type";
+    $data = $this->db->query($sql)->result_array();
+    $arr=[];
+    for($i=0; $i<count($data); $i++) {
+        $arr[$data[$i]['item']] = array('item_name'=>$data[$i]['item_name'], 'tot_qty'=>$data[$i]['tot_qty']);
+        if($i==count($data)-1) {
+            $zone_data[$data[$i]['zone']]['channelwise_sales_return_bars']=$arr;
+            $arr=[];
+        } else if($data[$i]['zone']!=$data[$i+1]['zone'] || $data[$i]['item']!=$data[$i+1]['item']) {
+            $zone_data[$data[$i]['zone']]['channelwise_sales_return_bars']=$arr;
+            $arr=[];
+        }
+    }
+
+    $sql = "select H.zone, H.distributor_type as item, H.distributor_type as item_name, sum(H.final_amount)*-1 as tot_amount from 
+            (select D.distributor_id, D.final_amount, F.distributor_type, G.zone from 
+            (select A.distributor_id, A.final_amount 
+            from distributor_in A 
+            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and 
+            (A.distributor_id!='1' and A.distributor_id!='189')) D 
+            left join distributor_master E on (D.distributor_id=E.id) 
+            left join distributor_type_master F on (E.type_id=F.id) 
+            left join zone_master G on (E.zone_id=G.id)) H 
+            group by H.zone, H.distributor_type 
+            order by H.zone, H.distributor_type";
+    $data = $this->db->query($sql)->result_array();
+    $arr=[];
+    for($i=0; $i<count($data); $i++) {
+        $arr[$data[$i]['item']] = array('item_name'=>$data[$i]['item_name'], 'tot_amount'=>$data[$i]['tot_amount']);
+        if($i==count($data)-1) {
+            $zone_data[$data[$i]['zone']]['channelwise_sales_return']=$arr;
+            $arr=[];
+        } else if($data[$i]['zone']!=$data[$i+1]['zone'] || $data[$i]['item']!=$data[$i+1]['item']) {
+            $zone_data[$data[$i]['zone']]['channelwise_sales_return']=$arr;
+            $arr=[];
+        }
+    }
+
+    $sql = "select H.zone, H.distributor_type as item, H.distributor_type as item_name, sum(H.amount) as tot_amount from 
+            (select D.distributor_id, D.amount, F.distributor_type, G.zone from 
+            (select A.distributor_id, case when (A.transaction='Credit Note' or A.transaction='Expense Voucher') then A.amount 
+                    else (A.amount*-1) end as amount 
+            from credit_debit_note A 
+            where A.status='Approved' and A.date_of_transaction>='$from_date' and A.date_of_transaction<='$to_date' and 
+            (A.distributor_id!='1' and A.distributor_id!='189')) D 
+            left join distributor_master E on (D.distributor_id=E.id) 
+            left join distributor_type_master F on (E.type_id=F.id) 
+            left join zone_master G on (E.zone_id=G.id)) H 
+            group by H.zone, H.distributor_type 
+            order by H.zone, H.distributor_type";
+    $data = $this->db->query($sql)->result_array();
+    $arr=[];
+    for($i=0; $i<count($data); $i++) {
+        $arr[$data[$i]['item']] = array('item_name'=>$data[$i]['item_name'], 'tot_amount'=>$data[$i]['tot_amount']);
+        if($i==count($data)-1) {
+            $zone_data[$data[$i]['zone']]['channelwise_credit_debit']=$arr;
+            $arr=[];
+        } else if($data[$i]['zone']!=$data[$i+1]['zone'] || $data[$i]['item']!=$data[$i+1]['item']) {
+            $zone_data[$data[$i]['zone']]['channelwise_credit_debit']=$arr;
+            $arr=[];
+        }
+    }
+
+    // echo json_encode($channel_data);
+    // echo '<br/><br/>';
+    // echo json_encode($zone_data);
+    // echo '<br/><br/>';
+    
+    if(count($zone_list)>0) {
+        // $this->load->library('excel');
+        // $objPHPExcel = new PHPExcel();
+
+        $template_path=$this->config->item('template_path');
+        $file = $template_path.'Monthly_sales_overview_zonewise.xls';
+        $this->load->library('excel');
+        $objPHPExcel = PHPExcel_IOFactory::load($file);
+
+        $objPHPExcel->setActiveSheetIndex(0);
+        $col_name[]=array();
+        for($i=0; $i<=$cnt+20; $i++) {
+            $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
+        }
+
+        $objPHPExcel->getActiveSheet()->setCellValue('C1', $from_date.' to '.$to_date);
+
+        $row = 3;
+        $channelwise_sales_bars_row = 5;
+        $channelwise_sales_return_bars_row = 8;
+        $channelwise_total_sales_bars_row = 11;
+        $channelwise_sales_row = 14;
+        $channelwise_sales_return_row = 17;
+        $channelwise_credit_debit_row = 20;
+        $channelwise_total_sales_row = 23;
+        $col=1;
+
+        $row = $channelwise_sales_bars_row;
+        $row2 = $channelwise_sales_return_bars_row;
+        $row3 = $channelwise_total_sales_bars_row;
+        $row4 = $channelwise_sales_row;
+        $row5 = $channelwise_sales_return_row;
+        $row6 = $channelwise_credit_debit_row;
+        $row7 = $channelwise_total_sales_row;
+        for($i=0; $i<count($channel_data); $i++) {
+            if($i!=0){
+                $objPHPExcel->getActiveSheet()->insertNewRowBefore($row, 1);
+                $row2 = $row2 + 1;
+                $row3 = $row3 + 1;
+                $row4 = $row4 + 1;
+                $row5 = $row5 + 1;
+                $row6 = $row6 + 1;
+                $row7 = $row7 + 1;
+                $channelwise_sales_return_bars_row = $channelwise_sales_return_bars_row + 1;
+                $channelwise_total_sales_bars_row = $channelwise_total_sales_bars_row + 1;
+                $channelwise_sales_row = $channelwise_sales_row + 1;
+                $channelwise_sales_return_row = $channelwise_sales_return_row + 1;
+                $channelwise_credit_debit_row = $channelwise_credit_debit_row + 1;
+                $channelwise_total_sales_row = $channelwise_total_sales_row + 1;
+
+                $objPHPExcel->getActiveSheet()->insertNewRowBefore($row2, 1);
+                $row3 = $row3 + 1;
+                $row4 = $row4 + 1;
+                $row5 = $row5 + 1;
+                $row6 = $row6 + 1;
+                $row7 = $row7 + 1;
+                $channelwise_total_sales_bars_row = $channelwise_total_sales_bars_row + 1;
+                $channelwise_sales_row = $channelwise_sales_row + 1;
+                $channelwise_sales_return_row = $channelwise_sales_return_row + 1;
+                $channelwise_credit_debit_row = $channelwise_credit_debit_row + 1;
+                $channelwise_total_sales_row = $channelwise_total_sales_row + 1;
+                
+                $objPHPExcel->getActiveSheet()->insertNewRowBefore($row3, 1);
+                $row4 = $row4 + 1;
+                $row5 = $row5 + 1;
+                $row6 = $row6 + 1;
+                $row7 = $row7 + 1;
+                $channelwise_sales_row = $channelwise_sales_row + 1;
+                $channelwise_sales_return_row = $channelwise_sales_return_row + 1;
+                $channelwise_credit_debit_row = $channelwise_credit_debit_row + 1;
+                $channelwise_total_sales_row = $channelwise_total_sales_row + 1;
+                
+                $objPHPExcel->getActiveSheet()->insertNewRowBefore($row4, 1);
+                $row5 = $row5 + 1;
+                $row6 = $row6 + 1;
+                $row7 = $row7 + 1;
+                $channelwise_sales_return_row = $channelwise_sales_return_row + 1;
+                $channelwise_credit_debit_row = $channelwise_credit_debit_row + 1;
+                $channelwise_total_sales_row = $channelwise_total_sales_row + 1;
+                
+                $objPHPExcel->getActiveSheet()->insertNewRowBefore($row5, 1);
+                $row6 = $row6 + 1;
+                $row7 = $row7 + 1;
+                $channelwise_credit_debit_row = $channelwise_credit_debit_row + 1;
+                $channelwise_total_sales_row = $channelwise_total_sales_row + 1;
+                
+                $objPHPExcel->getActiveSheet()->insertNewRowBefore($row6, 1);
+                $row7 = $row7 + 1;
+                $channelwise_total_sales_row = $channelwise_total_sales_row + 1;
+
+                $objPHPExcel->getActiveSheet()->insertNewRowBefore($row7, 1);
+            }
+
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $channel_data[$i]['distributor_type']);
+            $row = $row + 1;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, $channel_data[$i]['distributor_type']);
+            $row2 = $row2 + 1;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row3, $channel_data[$i]['distributor_type']);
+            $row3 = $row3 + 1;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row4, $channel_data[$i]['distributor_type']);
+            $row4 = $row4 + 1;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row5, $channel_data[$i]['distributor_type']);
+            $row5 = $row5 + 1;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row6, $channel_data[$i]['distributor_type']);
+            $row6 = $row6 + 1;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row7, $channel_data[$i]['distributor_type']);
+            $row7 = $row7 + 1;
+        }
+
+        $row=1;
+        $col=2;
+        $start_col=2;
+        $cnt2=1;
+
+        for($j=0; $j<count($zone_list); $j++) {
+            $zone = $zone_list[$j];
+
+            if($col!=2){
+                $objPHPExcel->getActiveSheet()->insertNewColumnBefore($col_name[$col], 1);
+            }
+
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'3', $zone);
+
+            $row = $channelwise_sales_bars_row;
+            $row2 = $channelwise_sales_return_bars_row;
+            $row3 = $channelwise_total_sales_bars_row;
+            $row4 = $channelwise_sales_row;
+            $row5 = $channelwise_sales_return_row;
+            $row6 = $channelwise_credit_debit_row;
+            $row7 = $channelwise_total_sales_row;
+
+            $arr = $zone_data[$zone]['channelwise_sales_bars'];
+            $arr2 = $zone_data[$zone]['channelwise_sales_return_bars'];
+            // $arr3 = $zone_data[$zone]['channelwise_sales_bars'];
+            $arr4 = $zone_data[$zone]['channelwise_sales'];
+            $arr5 = $zone_data[$zone]['channelwise_sales_return'];
+            $arr6 = $zone_data[$zone]['channelwise_credit_debit'];
+            // $arr7 = $zone_data[$zone]['channelwise_sales_bars'];
+
+            for($i=0; $i<count($channel_data); $i++) {
+                if(isset($arr[$channel_data[$i]['distributor_type']])) {
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $arr[$channel_data[$i]['distributor_type']]['tot_qty']);
+                }
+                if(isset($arr2[$channel_data[$i]['distributor_type']])) {
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, $arr2[$channel_data[$i]['distributor_type']]['tot_qty']);
+                }
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row3, '=sum('.$col_name[$col].$row.','.$col_name[$col].$row2.')');
+
+                if(isset($arr4[$channel_data[$i]['distributor_type']])) {
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row4, $arr4[$channel_data[$i]['distributor_type']]['tot_amount']);
+                }
+                if(isset($arr5[$channel_data[$i]['distributor_type']])) {
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row5, $arr5[$channel_data[$i]['distributor_type']]['tot_amount']);
+                }
+                if(isset($arr6[$channel_data[$i]['distributor_type']])) {
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row6, $arr6[$channel_data[$i]['distributor_type']]['tot_amount']);
+                }
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row7, '=sum('.$col_name[$col].$row4.','.$col_name[$col].$row5.','.$col_name[$col].$row6.')');
+
+                $row = $row + 1;
+                $row2 = $row2 + 1;
+                $row3 = $row3 + 1;
+                $row4 = $row4 + 1;
+                $row5 = $row5 + 1;
+                $row6 = $row6 + 1;
+                $row7 = $row7 + 1;
+            }
+
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($channelwise_sales_bars_row-1), '=sum('.$col_name[$col].$channelwise_sales_bars_row.':'.$col_name[$col].($row-1).')');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($channelwise_sales_return_bars_row-1), '=sum('.$col_name[$col].$channelwise_sales_return_bars_row.':'.$col_name[$col].($row2-1).')');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($channelwise_total_sales_bars_row-1), '=sum('.$col_name[$col].$channelwise_total_sales_bars_row.':'.$col_name[$col].($row3-1).')');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($channelwise_sales_row-1), '=sum('.$col_name[$col].$channelwise_sales_row.':'.$col_name[$col].($row4-1).')');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($channelwise_sales_return_row-1), '=sum('.$col_name[$col].$channelwise_sales_return_row.':'.$col_name[$col].($row5-1).')');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($channelwise_credit_debit_row-1), '=sum('.$col_name[$col].$channelwise_credit_debit_row.':'.$col_name[$col].($row6-1).')');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($channelwise_total_sales_row-1), '=sum('.$col_name[$col].$channelwise_total_sales_row.':'.$col_name[$col].($row7-1).')');
+
+            $col = $col + 1;
+            $cnt2 = $cnt2 + 1;
+        }
+
+        $row = $channelwise_sales_bars_row;
+        $row2 = $channelwise_sales_return_bars_row;
+        $row3 = $channelwise_total_sales_bars_row;
+        $row4 = $channelwise_sales_row;
+        $row5 = $channelwise_sales_return_row;
+        $row6 = $channelwise_credit_debit_row;
+        $row7 = $channelwise_total_sales_row;
+
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($row-1), '=sum('.$col_name[2].($row-1).':'.$col_name[$col-1].($row-1).')');
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($row2-1), '=sum('.$col_name[2].($row2-1).':'.$col_name[$col-1].($row2-1).')');
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($row3-1), '=sum('.$col_name[2].($row3-1).':'.$col_name[$col-1].($row3-1).')');
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($row4-1), '=sum('.$col_name[2].($row4-1).':'.$col_name[$col-1].($row4-1).')');
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($row5-1), '=sum('.$col_name[2].($row5-1).':'.$col_name[$col-1].($row5-1).')');
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($row6-1), '=sum('.$col_name[2].($row6-1).':'.$col_name[$col-1].($row6-1).')');
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($row7-1), '=sum('.$col_name[2].($row7-1).':'.$col_name[$col-1].($row7-1).')');
+
+        for($i=0; $i<count($channel_data); $i++) {
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=sum('.$col_name[2].$row.':'.$col_name[$col-1].$row.')');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, '=sum('.$col_name[2].$row2.':'.$col_name[$col-1].$row2.')');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row3, '=sum('.$col_name[2].$row3.':'.$col_name[$col-1].$row3.')');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row4, '=sum('.$col_name[2].$row4.':'.$col_name[$col-1].$row4.')');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row5, '=sum('.$col_name[2].$row5.':'.$col_name[$col-1].$row5.')');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row6, '=sum('.$col_name[2].$row6.':'.$col_name[$col-1].$row6.')');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row7, '=sum('.$col_name[2].$row7.':'.$col_name[$col-1].$row7.')');
+
+            $row = $row + 1;
+            $row2 = $row2 + 1;
+            $row3 = $row3 + 1;
+            $row4 = $row4 + 1;
+            $row5 = $row5 + 1;
+            $row6 = $row6 + 1;
+            $row7 = $row7 + 1;
+        }
+
+        $objPHPExcel->getActiveSheet()->getStyle('B3:'.$col_name[$col].($row7-1))->applyFromArray(array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+            )
+        ));
+
+        for($col1 = 'A'; $col1 <= $col_name[$col]; $col1++) {
+            $objPHPExcel->getActiveSheet()->getColumnDimension($col1)->setAutoSize(true);
+        }
+
+        $filename='Zonewise_monthly_sales_overview_report.xls';
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="'.$filename.'"');
+        header('Cache-Control: max-age=0');
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+        $objWriter->save('php://output');
+
+        $logarray['table_id']=$this->session->userdata('session_id');
+        $logarray['module_name']='Reports';
+        $logarray['cnt_name']='Reports';
+        $logarray['action']='Monthly Sales Overview report generated.';
+        $this->user_access_log_model->insertAccessLog($logarray);
+    } else {
+        // echo '<script>alert("No data found");</script>';
+    }
+}
+
+function generate_beat_analysis_report() {
+    $from_date = formatdate($this->input->post('from_date'));
+    $to_date = formatdate($this->input->post('to_date'));
+
+    if($from_date==''){
+        $from_date=NULL;
+    } else {
+        $from_date = formatdate($this->input->post('from_date'));
+    }
+
+    if($to_date==''){
+        $to_date=NULL;
+    } else {
+        $to_date = formatdate($this->input->post('to_date'));
+    }
+
+    // $from_date = '2018-04-01';
+    // $to_date = '2019-03-31';
+
+    $zone_data = [];
+    $zone_list = [];
+    $cnt = 0;
+
+    $sql = "select AA.zone, BB.id, BB.distributor_name, BB.beat_id, BB.beat_name, BB.sales_rep_name, BB.total_stores, BB.total_stores_visited, 
+            BB.total_order_qty, BB.total_order_amt, BB.total_new_order, BB.total_repeat_order, BB.total_new_order_amt, BB.total_repeat_order_amt from 
+            
+        (select distinct zone from zone_master where status='Approved' and type_id='3') AA 
+
+        left join 
+
+        (select G.*, H.total_stores, I.total_stores_visited, J.total_order_qty, J.total_order_amt, J.total_new_order, 
+            J.total_repeat_order, J.total_new_order_amt, J.total_repeat_order_amt from 
+        (select E.id, E.distributor_name, E.zone, E.beat_id, E.beat_name, group_concat(distinct F.sales_rep_name) as sales_rep_name from 
+        (select A.id, A.distributor_name, B.zone, C.beat_id, D.beat_name 
+        from distributor_master A 
+        left join zone_master B on (A.zone_id=B.id) 
+        left join distributor_beat_plans C on (A.id=C.distributor_id and C.status='Approved') 
+        left join beat_master D on (C.beat_id=D.id) 
+        where A.status = 'Approved' and A.class = 'super stockist') E 
+        left join 
+        (select A.sales_rep_id, A.dist_id1, A.beat_id1, A.dist_id2, A.beat_id2, B.sales_rep_name 
+        from beat_allocations A 
+        left join sales_rep_master B on (A.sales_rep_id=B.id) 
+        where A.status='Approved') F 
+        on ((E.id=F.dist_id1 and E.beat_id=F.beat_id1) or (E.id=F.dist_id2 and E.beat_id=F.beat_id2)) 
+        group by E.id, E.distributor_name, E.zone, E.beat_id, E.beat_name) G 
+        left join 
+        (select beat_id, count(dist_id) as total_stores from beat_details group by Beat_id) H 
+        on (G.beat_id=H.beat_id) 
+        left join 
+        (select C.beat_id, sum(C.visit_cnt) as total_stores_visited from 
+        (select A.beat_id, A.dist_id, case when B.id is null then 0 else 1 end as visit_cnt 
+        from beat_details A 
+        left join sales_rep_location B on (A.dist_id=B.distributor_id) 
+        where B.status='Approved' and B.date_of_visit>='$from_date' and B.date_of_visit<='$to_date') C group by C.beat_id) I 
+        on (G.beat_id=I.beat_id) 
+        left join 
+        (select H.beat_id, sum(H.order_qty) as total_order_qty, sum(H.order_amt) as total_order_amt, sum(H.new_order) as total_new_order, 
+            sum(H.repeat_order) as total_repeat_order, sum(H.new_order_amt) as total_new_order_amt, sum(H.repeat_order_amt) as total_repeat_order_amt from 
+        (select C.beat_id, C.dist_id, G.order_qty, G.order_amt, case when C.min_order_id=G.max_order_id then 1 else 0 end as new_order, 
+            case when C.min_order_id=G.max_order_id then 0 else 1 end as repeat_order, 
+            case when C.min_order_id=G.max_order_id then order_amt else 0 end as new_order_amt, 
+            case when C.min_order_id=G.max_order_id then 0 else order_amt end as repeat_order_amt from 
+        (select A.beat_id, A.dist_id, min(B.id) as min_order_id from beat_details A left join sales_rep_orders B on (A.dist_id=B.distributor_id) group by A.beat_id, A.dist_id) C 
+        left join 
+        (select F.beat_id, F.dist_id, max(F.order_id) as max_order_id, sum(F.item_qty) as order_qty, sum(F.item_amt) as order_amt from 
+        (select A.beat_id, A.dist_id, B.id as order_id, C.type, C.item_id, 
+            case when C.type='Bar' then ifnull(C.qty,1) else (ifnull(C.qty,1)*ifnull(D.qty,1)) end as item_qty, 
+            case when C.type='Bar' then ifnull(C.qty,1)*ifnull(E.rate,1) else (ifnull(C.qty,1)*ifnull(D.qty,1)*ifnull(E.rate,1)) end as item_amt 
+        from beat_details A 
+        left join sales_rep_orders B on (A.dist_id=B.distributor_id) 
+        left join sales_rep_order_items C on (B.id=C.sales_rep_order_id) 
+        left join box_product D on (C.type='Box' and C.item_id=D.box_id) 
+        left join product_master E on ((C.type='Bar' and C.item_id=E.id) or (C.type='Box' and D.product_id=E.id))
+        where B.date_of_processing>='$from_date' and B.date_of_processing<='$to_date') F group by F.beat_id, F.dist_id) G 
+        on(C.beat_id=G.beat_id and C.dist_id=G.dist_id)) H group by H.beat_id) J 
+        on (G.beat_id=J.beat_id) 
+        where G.beat_id is not null 
+
+        union all 
+
+        select null as id, null as distributor_name, D.zone, null as beat_id, null as beat_name, null as sales_rep_name, 
+            count(D.id) as total_stores, null as total_stores_visited, null as total_order_qty, null as total_order_amt, 
+            null as total_new_order, null as total_repeat_order, null as total_new_order_amt, null as total_repeat_order_amt from 
+        (select distinct A.id, A.distributor_name, B.zone from 
+        (select concat('d_', id) as id, distributor_name, zone_id from distributor_master where status = 'Approved' and class = 'normal' 
+        union all 
+        select concat('s_', id) as id, distributor_name, zone_id from sales_rep_distributors where status = 'Approved' or status = 'Active') A 
+        left join zone_master B on (A.zone_id=B.id) 
+        left join 
+        (select distinct A.dist_id from beat_details A 
+        left join beat_allocations B on (A.beat_id=B.beat_id1) 
+        left join beat_allocations C on (A.beat_id=C.beat_id2) 
+        where B.id is not null or C.id is not null) C on (A.id=C.dist_id) 
+        where C.dist_id is null) D 
+        group by D.zone) BB 
+
+        on (AA.zone=BB.zone) 
+
+        order by AA.zone, BB.distributor_name desc";
+    $result = $this->db->query($sql)->result_array();
+    if(count($result)>0) {
+        // $this->load->library('excel');
+        // $objPHPExcel = new PHPExcel();
+
+        $template_path=$this->config->item('template_path');
+        $file = $template_path.'Beat_plan_analysis.xls';
+        $this->load->library('excel');
+        $objPHPExcel = PHPExcel_IOFactory::load($file);
+
+        $objPHPExcel->setActiveSheetIndex(0);
+        $col_name[]=array();
+        for($i=0; $i<=$cnt+20; $i++) {
+            $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
+        }
+
+        $objPHPExcel->getActiveSheet()->setCellValue('A3','Date - '.$from_date.' to '.$to_date);
+
+        $row = 5;
+        $col = 0;
+        $start_row = 5;
+
+        $total_stores_dist=0;
+        $total_stores_visited_dist=0;
+        $total_order_qty_dist=0;
+        $total_order_amt_dist=0;
+        $total_new_order_dist=0;
+        $total_repeat_order_dist=0;
+        $total_new_order_amt_dist=0;
+        $total_repeat_order_amt_dist=0;
+
+        $total_stores_zone=0;
+        $total_stores_visited_zone=0;
+        $total_order_qty_zone=0;
+        $total_order_amt_zone=0;
+        $total_new_order_zone=0;
+        $total_repeat_order_zone=0;
+        $total_new_order_amt_zone=0;
+        $total_repeat_order_amt_zone=0;
+
+        for($i=0; $i<count($result); $i++) {
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $result[$i]['zone']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $result[$i]['distributor_name']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, $result[$i]['beat_name']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $result[$i]['sales_rep_name']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $result[$i]['total_stores']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, $result[$i]['total_stores_visited']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, '=F'.$row.'/IF(OR(E'.$row.'="",E'.$row.'=0),1,E'.$row.')');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, $result[$i]['total_order_qty']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+8].$row, $result[$i]['total_order_amt']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+9].$row, $result[$i]['total_new_order'].' / '.$result[$i]['total_repeat_order']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+10].$row, $result[$i]['total_new_order_amt'].' / '.$result[$i]['total_repeat_order_amt']);
+
+            $total_stores_dist=$total_stores_dist+intval($result[$i]['total_stores']);
+            $total_stores_visited_dist=$total_stores_visited_dist+intval($result[$i]['total_stores_visited']);
+            $total_order_qty_dist=$total_order_qty_dist+intval($result[$i]['total_order_qty']);
+            $total_order_amt_dist=$total_order_amt_dist+intval($result[$i]['total_order_amt']);
+            $total_new_order_dist=$total_new_order_dist+intval($result[$i]['total_new_order']);
+            $total_repeat_order_dist=$total_repeat_order_dist+intval($result[$i]['total_repeat_order']);
+            $total_new_order_amt_dist=$total_new_order_amt_dist+intval($result[$i]['total_new_order_amt']);
+            $total_repeat_order_amt_dist=$total_repeat_order_amt_dist+intval($result[$i]['total_repeat_order_amt']);
+
+            $bl_dist_sub_total = false;
+            $bl_zone_sub_total = false;
+
+            if($i==count($result)-1) {
+                $bl_dist_sub_total = true;
+                $bl_zone_sub_total = true;
+            } else if($result[$i]['zone']!=$result[$i+1]['zone']) {
+                $bl_dist_sub_total = true;
+                $bl_zone_sub_total = true;
+            } else if($result[$i]['distributor_name']!=$result[$i+1]['distributor_name']) {
+                $bl_dist_sub_total = true;
+            }
+
+            if($bl_dist_sub_total==true) {
+                $row = $row + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $total_stores_dist);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, $total_stores_visited_dist);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, '=F'.$row.'/IF(OR(E'.$row.'="",E'.$row.'=0),1,E'.$row.')');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, $total_order_qty_dist);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+8].$row, $total_order_amt_dist);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+9].$row, $total_new_order_dist.' / '.$total_repeat_order_dist);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+10].$row, $total_new_order_amt_dist.' / '.$total_repeat_order_amt_dist);
+
+                $total_stores_zone=$total_stores_zone+$total_stores_dist;
+                $total_stores_visited_zone=$total_stores_visited_zone+$total_stores_visited_dist;
+                $total_order_qty_zone=$total_order_qty_zone+$total_order_qty_dist;
+                $total_order_amt_zone=$total_order_amt_zone+$total_order_amt_dist;
+                $total_new_order_zone=$total_new_order_zone+$total_new_order_dist;
+                $total_repeat_order_zone=$total_repeat_order_zone+$total_repeat_order_dist;
+                $total_new_order_amt_zone=$total_new_order_amt_zone+$total_new_order_amt_dist;
+                $total_repeat_order_amt_zone=$total_repeat_order_amt_zone+$total_repeat_order_amt_dist;
+
+                $total_stores_dist=0;
+                $total_stores_visited_dist=0;
+                $total_order_qty_dist=0;
+                $total_order_amt_dist=0;
+                $total_new_order_dist=0;
+                $total_repeat_order_dist=0;
+                $total_new_order_amt_dist=0;
+                $total_repeat_order_amt_dist=0;
+
+                $objPHPExcel->getActiveSheet()->getStyle('A'.$row.':'.$col_name[$col+10].$row)->getFill()->applyFromArray(array(
+                    'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                    'startcolor' => array(
+                        'rgb' => 'DDEBF7'
+                    )
+                ));
+            }
+
+            if($bl_zone_sub_total==true) {
+                $row = $row + 2;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $total_stores_zone);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, $total_stores_visited_zone);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, '=F'.$row.'/IF(OR(E'.$row.'="",E'.$row.'=0),1,E'.$row.')');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, $total_order_qty_zone);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+8].$row, $total_order_amt_zone);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+9].$row, $total_new_order_zone.' / '.$total_repeat_order_zone);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+10].$row, $total_new_order_amt_zone.' / '.$total_repeat_order_amt_zone);
+
+                $total_stores_zone=0;
+                $total_stores_visited_zone=0;
+                $total_order_qty_zone=0;
+                $total_order_amt_zone=0;
+                $total_new_order_zone=0;
+                $total_repeat_order_zone=0;
+                $total_new_order_amt_zone=0;
+                $total_repeat_order_amt_zone=0;
+
+                $objPHPExcel->getActiveSheet()->getStyle('A'.$row.':'.$col_name[$col+10].$row)->getFill()->applyFromArray(array(
+                    'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                    'startcolor' => array(
+                        'rgb' => '44546A'
+                    )
+                ));
+                $objPHPExcel->getActiveSheet()->getStyle('A'.$row.':'.$col_name[$col+10].$row)->getFont()->getColor()->setRGB('FFFFFF');
+
+                $row = $row + 1;
+            }
+
+            $row = $row + 1;
+        }
+
+        $objPHPExcel->getActiveSheet()->getStyle('A1:'.$col_name[$col+10].($row-2))->applyFromArray(array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+            )
+        ));
+
+        $objPHPExcel->getActiveSheet()->getStyle('A1')->getFill()->applyFromArray(array(
+            'type' => PHPExcel_Style_Fill::FILL_SOLID,
+            'startcolor' => array(
+                'rgb' => '44546A'
+            )
+        ));
+        $objPHPExcel->getActiveSheet()->getStyle('A2')->getFill()->applyFromArray(array(
+            'type' => PHPExcel_Style_Fill::FILL_SOLID,
+            'startcolor' => array(
+                'rgb' => 'DDEBF7'
+            )
+        ));
+        $objPHPExcel->getActiveSheet()->getStyle('A4:K4')->getFill()->applyFromArray(array(
+            'type' => PHPExcel_Style_Fill::FILL_SOLID,
+            'startcolor' => array(
+                'rgb' => 'DDEBF7'
+            )
+        ));
+
+        // for($col1 = 'A'; $col1 <= $col_name[$col]; $col1++) {
+        //     $objPHPExcel->getActiveSheet()->getColumnDimension($col1)->setAutoSize(true);
+        // }
+
+        $filename='Beat_plan_analysis_report.xls';
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="'.$filename.'"');
+        header('Cache-Control: max-age=0');
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+        $objWriter->save('php://output');
+
+        $logarray['table_id']=$this->session->userdata('session_id');
+        $logarray['module_name']='Reports';
+        $logarray['cnt_name']='Reports';
+        $logarray['action']='Beat plan analysis report generated.';
+        $this->user_access_log_model->insertAccessLog($logarray);
+    } else {
+        // echo '<script>alert("No data found");</script>';
+    }
+}
+
+public function send_daily_sales_performance_report() {
+    // $date = '2019-05-06';
+    $date = date('Y-m-d');
+    $reportpath = '';
+
+    $reportpath = $this->generate_daily_sales_performance_report($date, 'save');
+
+    if($reportpath!=''){
+        $report_date = date('d-m-Y', strtotime($date));
+
+        $message = '<html>
+                    <body>
+                        <h3>Wholesome Habits Private Limited</h3>
+                        <h4>Sales - Daily SR Performance Report</h4>
+                        <p>Reporting Date - '.$report_date.'</p>
+                        <p>PFA</p>
+                        <br/><br/>
+                        Regards,
+                        <br/><br/>
+                        CS
+                    </body>
+                    </html>';
+        $from_email = 'cs@eatanytime.co.in';
+        $from_email_sender = 'Wholesome Habits Pvt Ltd';
+        $subject = 'Sales - Daily SR Performance Report - '.$report_date;
+
+
+        /*$to_email = "dhaval.maru@pecanreams.com";
+        $cc="sangeeta.yadav@pecanreams.com";
+        $bcc="yadavsangeeta521@gmail.com";*/
+        
+        $to_email = "prasad.bhisale@pecanreams.com";
+        $cc = 'prasad.bhisale@pecanreams.com';
+        $bcc = 'prasad.bhisale@pecanreams.com';
+
+        // $to_email = "ravi.hirode@eatanytime.co.in, manorama.mishra@eatanytime.co.in, mahesh.ms@eatanytime.co.in, yash.doshi@eatanytime.in, darshan.dhany@eatanytime.co.in, girish.rai@eatanytime.in, nitin.kumar@eatanytime.co.in, mohil.telawade@eatanytime.co.in";
+        // $bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, sangeeta.yadav@pecanreams.com,prasad.bhisale@pecanreams.com";
+        // $cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, operations@eatanytime.in";
+
+        echo $attachment = $reportpath;
+        echo '<br/><br/>';
+        $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc, $cc, $attachment);
+
+        // $mailSent=1;
+        
+        // echo $message;
+        // echo '<br/><br/>';
+        echo $mailSent;
+        echo '<br/><br/>';
+
+        if($mailSent==1){
+            $logarray['table_id']=$this->session->userdata('session_id');
+            $logarray['module_name']='Reports';
+            $logarray['cnt_name']='Reports';
+            $logarray['action']='Daily Sales Performance report sent.';
+            $this->user_access_log_model->insertAccessLog($logarray);
+        }
+    }
+}
+
+function generate_daily_sales_performance_report($date='', $action='') {
+    $from_date = formatdate($this->input->post('from_date'));
+    $to_date = formatdate($this->input->post('to_date'));
+
+    if($from_date==''){
+        $from_date=$date;
+    } else {
+        $from_date = formatdate($this->input->post('from_date'));
+    }
+
+    if($to_date==''){
+        $to_date=$date;
+    } else {
+        $to_date = formatdate($this->input->post('to_date'));
+    }
+
+    if($from_date==''){
+        $from_date=NULL;
+    }
+    if($to_date==''){
+        $to_date=NULL;
+    }
+
+    // $from_date = '2018-04-01';
+    // $to_date = '2019-03-31';
+
+    $report_date = $from_date;
+
+    $cnt = 0;
+
+    $sql = "select A.id, A.sales_rep_name, A.zone, A.total_sales_rep_cnt, A.present_cnt, 
+            sum(A.planned_visit) as tot_planned_visit, sum(A.actual_visit) as tot_actual_visit, 
+            sum(A.unplanned_visit) as tot_unplanned_visit, sum(A.total_visit) as total_visit, 
+            sum(A.order_cnt) as total_order_cnt, 
+            sum(A.total_order_qty) as total_order_units, sum(A.total_order_amt) as total_order_amt, 
+            sum(A.total_new_order) as total_new_order_units, sum(A.total_repeat_order) as total_repeat_order_units, 
+            sum(A.total_new_order_amt) as total_new_order_amt, sum(A.total_repeat_order_amt) as total_repeat_order_amt from 
+            
+            (select ZZ.id, ZZ.sales_rep_name, ZZ.zone, AA.date_of_visit, AA.store_id, AA.total_cnt, BB.id as visit_id, CC.total_order_qty, CC.total_order_amt, CC.total_new_order, 
+                CC.total_repeat_order, CC.total_new_order_amt, CC.total_repeat_order_amt, 
+                case when AA.total_cnt=2 then 0 else 1 end as planned_visit, case when AA.total_cnt!=2 and BB.id is not null then 1 else 0 end as actual_visit, 
+                case when AA.total_cnt=2 and BB.id is not null then 1 else 0 end as unplanned_visit, case when BB.id is not null then 1 else 0 end as total_visit, 
+                case when CC.visit_id is not null then 1 else 0 end as order_cnt, DD.total_sales_rep_cnt, DD.present_cnt from 
+
+            (select id, sales_rep_name, zone from sales_rep_master where status = 'Approved' and sr_type='Sales Representative') ZZ 
+
+            left join 
+
+            (select F.id, F.sales_rep_name, F.zone, F.date_of_visit, F.store_id, sum(cnt) as total_cnt from 
+
+            (select distinct C.id, C.sales_rep_name, C.zone, C.date_of_visit, C.frequency, case when C.beat_id=0 then D.store_id else E.dist_id end as store_id, 1 as cnt from 
+
+            (select A.id, A.sales_rep_name, A.zone, A.date_of_visit, A.frequency, ifnull(case when A.frequency like 'Every%' then B.beat_id1 else B.beat_id2 end,0) as beat_id from 
+            (select A.id, A.sales_rep_name, A.zone, B.date_of_visit, B.frequency from 
+            (select id, sales_rep_name, zone, '1' as tempcol from sales_rep_master where status = 'Approved' and sr_type='Sales Representative') A 
+            left join 
+            (select selected_date as date_of_visit, frequency, '1' as tempcol from 
+            (select selected_date, case when ((floor((DayOfMonth(date(selected_date))-1)/7)+1 )=1 OR (floor((DayOfMonth(date(selected_date))-1)/7)+1 )=3 or (floor((DayOfMonth(date(selected_date))-1)/7)+1 )=5) then concat('Every ',DAYNAME(date(selected_date))) when ((floor((DayOfMonth(date(selected_date))-1)/7)+1 )=2 OR (floor((DayOfMonth(date(selected_date))-1)/7)+1 )=4)
+            then  concat('Alternate ',DAYNAME(date(selected_date))) end as frequency from 
+            (select adddate('1970-01-01',t4.i*10000 + t3.i*1000 + t2.i*100 + t1.i*10 + t0.i) selected_date from
+            (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t0,
+            (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t1,
+            (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t2,
+            (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t3,
+            (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t4) v
+            where selected_date between '$from_date' and '$to_date') A 
+            where A.frequency not like '%sunday%') B 
+            on (A.tempcol=B.tempcol)) A 
+
+            left join 
+
+            (select * from beat_changes where status='Approved' and date_of_visit between '$from_date' and '$to_date') B 
+            on (A.id=B.sales_rep_id and A.date_of_visit=B.date_of_visit)) C 
+
+            left join 
+
+            (select sales_rep_id, frequency, 0 as beat_id, store_id from sales_rep_beat_plan where status = 'Approved') D 
+            on (C.id=D.sales_rep_id and C.frequency COLLATE utf8_bin =D.frequency and C.beat_id=D.beat_id) 
+
+            left join 
+
+            (select * from beat_details) E 
+            on (C.beat_id=E.beat_id) 
+
+            union all 
+
+            select distinct A.sales_rep_id as id, B.sales_rep_name, B.zone, A.date_of_visit, '' as frequency, distributor_id as store_id, 2 as cnt 
+            from sales_rep_location A left join sales_rep_master B on (A.sales_rep_id=B.id) 
+            where A.status='Approved' and A.date_of_visit between '$from_date' and '$to_date') F 
+
+            group by F.id, F.sales_rep_name, F.zone, F.date_of_visit, F.store_id) AA 
+            on (ZZ.id=AA.id) 
+
+            left join 
+
+            (select distinct id, sales_rep_id, date_of_visit, distributor_id from sales_rep_location where status='Approved' and date_of_visit between '$from_date' and '$to_date') BB 
+            on (AA.id=BB.sales_rep_id and AA.date_of_visit=BB.date_of_visit and AA.store_id=BB.distributor_id) 
+
+            left join 
+
+            (select H.visit_id, sum(H.order_qty) as total_order_qty, sum(H.order_amt) as total_order_amt, sum(H.new_order) as total_new_order, 
+                sum(H.repeat_order) as total_repeat_order, sum(H.new_order_amt) as total_new_order_amt, sum(H.repeat_order_amt) as total_repeat_order_amt from 
+            (select G.visit_id, C.distributor_id, G.order_qty, G.order_amt, case when C.min_order_id=G.order_id then 1 else 0 end as new_order, 
+                case when C.min_order_id=G.order_id then 0 else 1 end as repeat_order, 
+                case when C.min_order_id=G.order_id then order_amt else 0 end as new_order_amt, 
+                case when C.min_order_id=G.order_id then 0 else order_amt end as repeat_order_amt from 
+            (select A.distributor_id, min(A.id) as min_order_id from sales_rep_orders A group by A.distributor_id) C 
+            left join 
+            (select F.visit_id, F.distributor_id, F.order_id, sum(F.item_qty) as order_qty, sum(F.item_amt) as order_amt from 
+            (select B.visit_id, B.distributor_id, B.id as order_id, C.type, C.item_id, 
+                case when C.type='Bar' then ifnull(C.qty,1) else (ifnull(C.qty,1)*ifnull(D.qty,1)) end as item_qty, 
+                case when C.type='Bar' then ifnull(C.qty,1)*ifnull(E.rate,1) else (ifnull(C.qty,1)*ifnull(D.qty,1)*ifnull(E.rate,1)) end as item_amt 
+            from sales_rep_orders B 
+            left join sales_rep_order_items C on (B.id=C.sales_rep_order_id) 
+            left join box_product D on (C.type='Box' and C.item_id=D.box_id) 
+            left join product_master E on ((C.type='Bar' and C.item_id=E.id) or (C.type='Box' and D.product_id=E.id))
+            where B.date_of_processing between '$from_date' and '$to_date') F group by F.visit_id, F.distributor_id, F.order_id) G 
+            on (C.distributor_id=G.distributor_id)) H group by H.visit_id) CC 
+            on (BB.id=CC.visit_id) 
+
+            left join 
+
+            (select C.zone, C.total_sales_rep_cnt, round(avg(C.present_cnt)) as present_cnt from 
+            (select A.zone, A.total_sales_rep_cnt, B.check_in_date, sum(case when B.sales_rep_id is not null then 1 else 0 end) as present_cnt from 
+            (select A.zone, count(A.id) as total_sales_rep_cnt from sales_rep_master A where A.status = 'Approved' and A.sr_type='Sales Representative' group by A.zone) A 
+            left join 
+            (select distinct A.zone, date(B.check_in_time) as check_in_date, B.sales_rep_id from sales_rep_master A left join sales_attendence B on (A.id=B.sales_rep_id) where A.status = 'Approved' and A.sr_type='Sales Representative' and B.working_status='Present' and date(B.check_in_time)>='$from_date' and date(B.check_in_time)<='$to_date') B 
+            on (A.zone=B.zone) 
+            group by A.zone, A.total_sales_rep_cnt, B.check_in_date) C 
+            group by C.zone, C.total_sales_rep_cnt) DD
+            on (AA.zone=DD.zone)
+
+            ) A 
+            group by A.id, A.sales_rep_name, A.zone, A.total_sales_rep_cnt, A.present_cnt 
+            order by A.zone, A.sales_rep_name";
+    $result = $this->db->query($sql)->result_array();
+
+    // echo $sql;
+    // echo '<br/><br/>';
+    // echo json_encode($result);
+
+    if(count($result)>0) {
+        // $this->load->library('excel');
+        // $objPHPExcel = new PHPExcel();
+
+        $template_path=$this->config->item('template_path');
+        $file = $template_path.'Daily_sales_performance_report.xlsx';
+        $this->load->library('excel');
+        $objPHPExcel = PHPExcel_IOFactory::load($file);
+
+        $objPHPExcel->setActiveSheetIndex(0);
+        $col_name[]=array();
+        for($i=0; $i<=$cnt+20; $i++) {
+            $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
+        }
+
+        $objPHPExcel->getActiveSheet()->setCellValue('A3','Date - '.$from_date.' to '.$to_date);
+
+        $row = 6;
+        $col = 0;
+        $row2 = 10;
+        $start_row = 11;
+
+        $tot_planned_visit = 0;
+        $tot_actual_visit = 0;
+        $tot_unplanned_visit = 0;
+        $tot_visit = 0;
+        $tot_order_cnt = 0;
+        $tot_order_units = 0;
+        $tot_order_amt = 0;
+        $tot_new_order_units = 0;
+        $tot_repeat_order_units = 0;
+        $tot_new_order_amt = 0;
+        $tot_repeat_order_amt = 0;
+
+        for($i=0; $i<count($result); $i++) {
+            $tot_planned_visit = $tot_planned_visit + intval($result[$i]['tot_planned_visit']);
+            $tot_actual_visit = $tot_actual_visit + intval($result[$i]['tot_actual_visit']);
+            $tot_unplanned_visit = $tot_unplanned_visit + intval($result[$i]['tot_unplanned_visit']);
+            $tot_visit = $tot_visit + intval($result[$i]['total_visit']);
+            $tot_order_cnt = $tot_order_cnt + intval($result[$i]['total_order_cnt']);
+            $tot_order_units = $tot_order_units + intval($result[$i]['total_order_units']);
+            $tot_order_amt = $tot_order_amt + intval($result[$i]['total_order_amt']);
+            $tot_new_order_units = $tot_new_order_units + intval($result[$i]['total_new_order_units']);
+            $tot_repeat_order_units = $tot_repeat_order_units + intval($result[$i]['total_repeat_order_units']);
+            $tot_new_order_amt = $tot_new_order_amt + intval($result[$i]['total_new_order_amt']);
+            $tot_repeat_order_amt = $tot_repeat_order_amt + intval($result[$i]['total_repeat_order_amt']);
+            if($tot_order_units==0){
+                $tot_new_order_per = 0;
+                $tot_repeat_order_per = 0;
+            } else {
+                $tot_new_order_per = round(($tot_new_order_units/$tot_order_units)*100,0);
+                $tot_repeat_order_per = round(($tot_repeat_order_units/$tot_order_units)*100,0);
+            }
+            
+            $total_order_units = $result[$i]['total_order_units'];
+            $total_new_order_units = $result[$i]['total_new_order_units'];
+            $total_repeat_order_units = $result[$i]['total_repeat_order_units'];
+            if($total_order_units==0){
+                $total_new_order_per = 0;
+                $total_repeat_order_per = 0;
+            } else {
+                $total_new_order_per = round(($total_new_order_units/$total_order_units)*100,0);
+                $total_repeat_order_per = round(($total_repeat_order_units/$total_order_units)*100,0);
+            }
+
+            if($i==0) {
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, $result[$i]['zone']);
+                $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row2)->getFont()->setBold(true);
+                $row2 = $row2 + 2;
+            }
+
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, $result[$i]['sales_rep_name']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row2, $result[$i]['tot_planned_visit']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row2, $result[$i]['tot_actual_visit']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row2, $result[$i]['tot_unplanned_visit']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row2, $result[$i]['total_visit']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row2, '=if(C'.$row2.'=0,0,(C'.$row2.'-D'.$row2.')/C'.$row2.')');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row2, intval($result[$i]['total_order_cnt']));
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+8].$row2, '=if(F'.$row2.'=0,0,H'.$row2.'/F'.$row2.')');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+9].$row2, intval($result[$i]['total_order_units']));
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+10].$row2, intval($result[$i]['total_order_amt']));
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+11].$row2, intval($result[$i]['total_new_order_units']).'/'.intval($result[$i]['total_repeat_order_units']));
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+12].$row2, intval($result[$i]['total_new_order_amt']).'/'.intval($result[$i]['total_repeat_order_amt']));
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+13].$row2, $total_new_order_per.'%/'.$total_repeat_order_per.'%');
+            $objPHPExcel->getActiveSheet()->mergeCells($col_name[$col].$row2.':'.$col_name[$col+1].$row2);
+            // $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row2)->getFont()->setBold(true);
+            $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row2)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+            $row2 = $row2 + 1;
+            
+
+            if($i!=0 && $i!=count($result)-1) {
+                if($result[$i]['zone']!=$result[$i+1]['zone']) {
+                    if($row!=6) {
+                        $objPHPExcel->getActiveSheet()->insertNewRowBefore($row, 1);
+                        $row2 = $row2 + 1;
+                    }
+                }
+            }
+
+            $bl_flag = false;
+            if($i==count($result)-1){
+                $bl_flag = true;
+            } else if($result[$i]['zone']!=$result[$i+1]['zone']) {
+                $bl_flag = true;
+            }
+
+            if($bl_flag == true) {
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $result[$i]['zone']);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $result[$i]['present_cnt'].'/'.$result[$i]['total_sales_rep_cnt']);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, $tot_planned_visit);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $tot_actual_visit);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $tot_unplanned_visit);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, $tot_visit);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, '=if(C'.$row.'=0,0,(C'.$row.'-D'.$row.')/C'.$row.')');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, $tot_order_cnt);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+8].$row, '=if(F'.$row.'=0,0,H'.$row.'/F'.$row.')');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+9].$row, $tot_order_units);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+10].$row, $tot_order_amt);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+11].$row, $tot_new_order_units.'/'.$tot_repeat_order_units);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+12].$row, $tot_new_order_amt.'/'.$tot_repeat_order_amt);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+13].$row, $tot_new_order_per.'%/'.$tot_repeat_order_per.'%');
+
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, 'Total');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row2, $tot_planned_visit);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row2, $tot_actual_visit);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row2, $tot_unplanned_visit);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row2, $tot_visit);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row2, '=if(C'.$row2.'=0,0,(C'.$row2.'-D'.$row2.')/C'.$row.')');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row2, $tot_order_cnt);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+8].$row2, '=if(F'.$row2.'=0,0,H'.$row2.'/F'.$row2.')');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+9].$row2, $tot_order_units);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+10].$row2, $tot_order_amt);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+11].$row2, $tot_new_order_units.'/'.$tot_repeat_order_units);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+12].$row2, $tot_new_order_amt.'/'.$tot_repeat_order_amt);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+13].$row2, $tot_new_order_per.'%/'.$tot_repeat_order_per.'%');
+
+                $objPHPExcel->getActiveSheet()->getStyle('A'.$row2.':'.$col_name[$col+13].($row2))->getFill()->applyFromArray(array(
+                        'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                        'startcolor' => array('rgb' => 'DDEBF7')
+                    )
+                );
+                $objPHPExcel->getActiveSheet()->mergeCells($col_name[$col].$row2.':'.$col_name[$col+1].$row2);
+                $objPHPExcel->getActiveSheet()->getStyle('A'.$row2.':'.$col_name[$col+13].($row2))->getFont()->setBold(true);
+                $objPHPExcel->getActiveSheet()->getStyle('A'.($start_row+1).':'.$col_name[$col+13].($row2))->applyFromArray(array(
+                    'borders' => array(
+                        'allborders' => array(
+                            'style' => PHPExcel_Style_Border::BORDER_THIN
+                        )
+                    )
+                ));
+                $objPHPExcel->getActiveSheet()->getStyle('A'.$row2.':'.$col_name[$col+13].($row2))->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_BLACK);
+
+                if($i!=count($result)-1) {
+                    $row2 = $row2 + 2;
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, $result[$i+1]['zone']);
+                    $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row2)->getFont()->setBold(true);
+                    $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row2.':'.$col_name[$col+1].$row2)
+                                                    ->applyFromArray(array(
+                                                        'borders' => array(
+                                                            'top' => array('style' => PHPExcel_Style_Border::BORDER_THICK),
+                                                            'right' => array('style' => PHPExcel_Style_Border::BORDER_THICK)
+                                                        )
+                                                    ));
+                    $objPHPExcel->getActiveSheet()->mergeCells($col_name[$col].$row2.':'.$col_name[$col+1].$row2);
+
+                    $row2 = $row2 + 1;
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, 'Name');
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row2, 'Planned Vists');
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row2, 'Acutal Vists');
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row2, 'Unplanned Visits');
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row2, 'Total Calls');
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row2, 'Deviation %');
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row2, 'Productive Calls');
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+8].$row2, '% Productivity');
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+9].$row2, 'Order Units');
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+10].$row2, 'Order Value');
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+11].$row2, 'New/Repeat');
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+12].$row2, 'New/Repeat V');
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+13].$row2, '%');
+
+                    $objPHPExcel->getActiveSheet()->getStyle('A'.$row2.':'.$col_name[$col+13].($row2))->applyFromArray(array(
+                        'borders' => array(
+                            'allborders' => array(
+                                'style' => PHPExcel_Style_Border::BORDER_THIN
+                            )
+                        )
+                    ));
+                    $objPHPExcel->getActiveSheet()->getStyle('A'.$row2.':'.$col_name[$col+13].($row2))->getFill()->applyFromArray(array(
+                        'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                        'startcolor' => array(
+                            'rgb' => 'DDEBF7'
+                        )
+                    ));
+                    $objPHPExcel->getActiveSheet()->getStyle('A'.$row2.':'.$col_name[$col+13].($row2))->getFont()->setBold(true);
+                    $objPHPExcel->getActiveSheet()->getStyle('A'.$row2.':'.$col_name[$col+13].($row2))->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_BLACK);
+                    $objPHPExcel->getActiveSheet()->getStyle('A'.$row2.':'.$col_name[$col+13].($row2))->getAlignment()->setWrapText(true);
+                    $objPHPExcel->getActiveSheet()->getRowDimension($row2)->setRowHeight(28.8);
+
+                    $objPHPExcel->getActiveSheet()->mergeCells($col_name[$col].$row2.':'.$col_name[$col+1].$row2);
+
+                    $start_row = $row2;
+                    $row2 = $row2 + 1;
+                }
+
+                $tot_planned_visit = 0;
+                $tot_actual_visit = 0;
+                $tot_unplanned_visit = 0;
+                $tot_visit = 0;
+                $tot_order_cnt = 0;
+                $tot_order_units = 0;
+                $tot_order_amt = 0;
+                $tot_new_order_units = 0;
+                $tot_repeat_order_units = 0;
+                $tot_new_order_amt = 0;
+                $tot_repeat_order_amt = 0;
+
+                $row = $row + 1;
+            }
+        }
+
+        // $objPHPExcel->getActiveSheet()->getStyle('A1:'.$col_name[$col+10].($row-2))->applyFromArray(array(
+        //     'borders' => array(
+        //         'allborders' => array(
+        //             'style' => PHPExcel_Style_Border::BORDER_THIN
+        //         )
+        //     )
+        // ));
+
+        $objPHPExcel->getActiveSheet()->getStyle('A1')->getFill()->applyFromArray(array(
+            'type' => PHPExcel_Style_Fill::FILL_SOLID,
+            'startcolor' => array(
+                'rgb' => '44546A'
+            )
+        ));
+        $objPHPExcel->getActiveSheet()->getStyle('A2')->getFill()->applyFromArray(array(
+            'type' => PHPExcel_Style_Fill::FILL_SOLID,
+            'startcolor' => array(
+                'rgb' => 'DDEBF7'
+            )
+        ));
+        $objPHPExcel->getActiveSheet()->getStyle('A5:N5')->getFill()->applyFromArray(array(
+            'type' => PHPExcel_Style_Fill::FILL_SOLID,
+            'startcolor' => array(
+                'rgb' => 'DDEBF7'
+            )
+        ));
+        $objPHPExcel->getActiveSheet()->getStyle('A'.$row.':N'.$row)->getFill()->applyFromArray(array(
+            'type' => PHPExcel_Style_Fill::FILL_SOLID,
+            'startcolor' => array(
+                'rgb' => 'DDEBF7'
+            )
+        ));
+        $objPHPExcel->getActiveSheet()->getStyle('A'.($row+3).':N'.($row+3))->getFill()->applyFromArray(array(
+            'type' => PHPExcel_Style_Fill::FILL_SOLID,
+            'startcolor' => array(
+                'rgb' => 'DDEBF7'
+            )
+        ));
+
+        // for($col1 = 'A'; $col1 <= $col_name[$col]; $col1++) {
+        //     $objPHPExcel->getActiveSheet()->getColumnDimension($col1)->setAutoSize(true);
+        // }
+
+        // $filename='Daily_sales_performance_report.xls';
+        // header('Content-Type: application/vnd.ms-excel');
+        // header('Content-Disposition: attachment;filename="'.$filename.'"');
+        // header('Cache-Control: max-age=0');
+        // $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+        // $objWriter->save('php://output');
+
+        // $logarray['table_id']=$this->session->userdata('session_id');
+        // $logarray['module_name']='Reports';
+        // $logarray['cnt_name']='Reports';
+        // $logarray['action']='Beat plan analysis report generated.';
+        // $this->user_access_log_model->insertAccessLog($logarray);
+
+        $filename = 'Daily_sales_performance_report_'.$report_date.'.xlsx';
+
+        if($action=="save") {
+            // $path  = '/home/eatangcp/public_html/test/assets/uploads/mt_stock_reports/';
+            // $upload_path = '/home/eatangcp/public_html/test/assets/uploads/mt_stock_reports';
+
+            $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/daily_sales_performance/';
+            $upload_path = '/home/eatangcp/public_html/eat_erp/assets/uploads/daily_sales_performance';
+
+            // $path  = 'C:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports/';
+            // $upload_path = 'C:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports';
+            if(!is_dir($upload_path)) {
+                mkdir($upload_path, 0777, TRUE);
+            }
+
+            $reportpath = $path.$filename;
+
+            // header('Content-Type: application/vnd.ms-excel');
+            // header('Content-Disposition: attachment;filename="'.$filename.'"');
+            // header('Cache-Control: max-age=0');
+
+            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007'); 
+            $objWriter->save($reportpath);
+
+            echo $reportpath;
+            echo '<br/><br/>';
+
+            return $reportpath;
+        } else {
+            // header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Type: application/openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="'.$filename.'"');
+            header('Cache-Control: max-age=0');
+            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+            $objWriter->save('php://output');
+
+            $logarray['table_id']=$this->session->userdata('session_id');
+            $logarray['module_name']='Reports';
+            $logarray['cnt_name']='Reports';
+            $logarray['action']='Daily Sales Performance Report Generated.';
+            $this->user_access_log_model->insertAccessLog($logarray);
+
+            exit;
+        }
+    } else {
+        // echo '<script>alert("No data found");</script>';
+    }
+}
+
+public function send_daily_merchandiser_performance_report() {
+    // $date = '2019-05-06';
+    $date = date('Y-m-d');
+    $reportpath = '';
+
+    $reportpath = $this->generate_daily_merchandiser_performance_report($date, 'save');
+
+    if($reportpath!=''){
+        $report_date = date('d-m-Y', strtotime($date));
+
+        $message = '<html>
+                    <body>
+                        <h3>Wholesome Habits Private Limited</h3>
+                        <h4>Sales - Daily Merchandiser Performance Report</h4>
+                        <p>Reporting Date - '.$report_date.'</p>
+                        <p>PFA</p>
+                        <br/><br/>
+                        Regards,
+                        <br/><br/>
+                        CS
+                    </body>
+                    </html>';
+        $from_email = 'cs@eatanytime.co.in';
+        $from_email_sender = 'Wholesome Habits Pvt Ltd';
+        $subject = 'Sales - Daily Merchandiser Performance Report - '.$report_date;
+
+
+        /*$to_email = "dhaval.maru@pecanreams.com";
+        $cc="sangeeta.yadav@pecanreams.com";
+        $bcc="yadavsangeeta521@gmail.com";*/
+        
+        $to_email = "prasad.bhisale@pecanreams.com";
+        $cc = 'prasad.bhisale@pecanreams.com';
+        $bcc = 'prasad.bhisale@pecanreams.com';
+
+        // $to_email = "mukesh.yadav@eatanytime.co.in, sulochana.waghmare@eatanytime.co.in, sachin.pal@eatanytime.co.in, urvi.bhayani@eatanytime.co.in";
+        // $bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, sangeeta.yadav@pecanreams.com,prasad.bhisale@pecanreams.com";
+        // $cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, operations@eatanytime.in";
+
+        echo $attachment = $reportpath;
+        echo '<br/><br/>';
+        $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc, $cc, $attachment);
+
+        // $mailSent=1;
+        
+        // echo $message;
+        // echo '<br/><br/>';
+        echo $mailSent;
+        echo '<br/><br/>';
+
+        if($mailSent==1){
+            $logarray['table_id']=$this->session->userdata('session_id');
+            $logarray['module_name']='Reports';
+            $logarray['cnt_name']='Reports';
+            $logarray['action']='Daily Merchandiser Performance report sent.';
+            $this->user_access_log_model->insertAccessLog($logarray);
+        }
+    }
+}
+
+function generate_daily_merchandiser_performance_report($date='', $action='') {
+    $from_date = formatdate($this->input->post('from_date'));
+    $to_date = formatdate($this->input->post('to_date'));
+
+    if($from_date==''){
+        $from_date=$date;
+    } else {
+        $from_date = formatdate($this->input->post('from_date'));
+    }
+
+    if($to_date==''){
+        $to_date=$date;
+    } else {
+        $to_date = formatdate($this->input->post('to_date'));
+    }
+
+    if($from_date==''){
+        $from_date=NULL;
+    }
+    if($to_date==''){
+        $to_date=NULL;
+    }
+
+    // $from_date = '2018-04-01';
+    // $to_date = '2019-03-31';
+
+    $report_date = $from_date;
+
+    $cnt = 0;
+
+    $sql = "select A.id, A.sales_rep_name, A.zone, A.total_sales_rep_cnt, A.present_cnt, 
+            sum(A.planned_visit) as tot_planned_visit, sum(A.actual_visit) as tot_actual_visit, 
+            sum(A.unplanned_visit) as tot_unplanned_visit, sum(A.total_visit) as total_visit from 
+
+            (select AA.id, AA.sales_rep_name, AA.zone, BB.date_of_visit, BB.store_id, BB.total_cnt, CC.id as visit_id, DD.total_sales_rep_cnt, DD.present_cnt, 
+                case when BB.total_cnt=2 then 0 else 1 end as planned_visit, case when BB.total_cnt!=2 and CC.id is not null then 1 else 0 end as actual_visit, 
+                case when BB.total_cnt=2 and CC.id is not null then 1 else 0 end as unplanned_visit, case when CC.id is not null then 1 else 0 end as total_visit from 
+
+            (select id, sales_rep_name, zone from sales_rep_master where status = 'Approved' and sr_type='Merchandizer') AA 
+
+            left join 
+
+            (select F.id, F.sales_rep_name, F.zone, F.date_of_visit, F.store_id, sum(cnt) as total_cnt from 
+
+            (select distinct C.id, C.sales_rep_name, C.zone, C.date_of_visit, C.frequency, case when C.beat_id=0 then D.store_id else E.dist_id end as store_id, 1 as cnt from 
+
+            (select A.id, A.sales_rep_name, A.zone, A.date_of_visit, A.frequency, ifnull(case when A.frequency like 'Every%' then B.beat_id1 else B.beat_id2 end,0) as beat_id from 
+            (select A.id, A.sales_rep_name, A.zone, B.date_of_visit, B.frequency from 
+            (select id, sales_rep_name, zone, '1' as tempcol from sales_rep_master where status = 'Approved' and sr_type='Merchandizer') A 
+            left join 
+            (select selected_date as date_of_visit, frequency, '1' as tempcol from 
+            (select selected_date, case when ((floor((DayOfMonth(date(selected_date))-1)/7)+1 )=1 OR (floor((DayOfMonth(date(selected_date))-1)/7)+1 )=3 or (floor((DayOfMonth(date(selected_date))-1)/7)+1 )=5) then concat('Every ',DAYNAME(date(selected_date))) when ((floor((DayOfMonth(date(selected_date))-1)/7)+1 )=2 OR (floor((DayOfMonth(date(selected_date))-1)/7)+1 )=4)
+            then  concat('Alternate ',DAYNAME(date(selected_date))) end as frequency from 
+            (select adddate('1970-01-01',t4.i*10000 + t3.i*1000 + t2.i*100 + t1.i*10 + t0.i) selected_date from
+            (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t0,
+            (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t1,
+            (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t2,
+            (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t3,
+            (select 0 i union select 1 union select 2 union select 3 union select 4 union select 5 union select 6 union select 7 union select 8 union select 9) t4) v
+            where selected_date between '$from_date' and '$to_date') A 
+            where A.frequency not like '%sunday%') B 
+            on (A.tempcol=B.tempcol)) A 
+
+            left join 
+
+            (select * from beat_changes where status='Approved' and date_of_visit between '$from_date' and '$to_date') B 
+            on (A.id=B.sales_rep_id and A.date_of_visit=B.date_of_visit)) C 
+
+            left join 
+
+            (select sales_rep_id, frequency, 0 as beat_id, store_id from merchandiser_beat_plan where status = 'Approved') D 
+            on (C.id=D.sales_rep_id and C.frequency COLLATE utf8_bin =D.frequency and C.beat_id=D.beat_id) 
+
+            left join 
+
+            (select * from beat_details) E 
+            on (C.beat_id=E.beat_id) 
+
+            union all 
+
+            select distinct A.m_id as id, B.sales_rep_name, B.zone, date(A.date_of_visit) as date_of_visit, '' as frequency, dist_id as store_id, 2 as cnt 
+            from merchandiser_stock A left join sales_rep_master B on (A.m_id=B.id) 
+            where date(A.date_of_visit) between '$from_date' and '$to_date') F 
+
+            group by F.id, F.sales_rep_name, F.zone, F.date_of_visit, F.store_id) BB 
+            on (AA.id=BB.id) 
+
+            left join 
+
+            (select distinct id, m_id as sales_rep_id, date(date_of_visit) as date_of_visit, dist_id as distributor_id 
+            from merchandiser_stock where date(date_of_visit) between '$from_date' and '$to_date') CC 
+            on (BB.id=CC.sales_rep_id and BB.date_of_visit=CC.date_of_visit and BB.store_id=CC.distributor_id) 
+
+            left join 
+
+            (select C.zone, C.total_sales_rep_cnt, round(avg(C.present_cnt)) as present_cnt from 
+            (select A.zone, A.total_sales_rep_cnt, B.check_in_date, sum(case when B.sales_rep_id is not null then 1 else 0 end) as present_cnt from 
+            (select A.zone, count(A.id) as total_sales_rep_cnt from sales_rep_master A where A.status = 'Approved' and A.sr_type='Merchandizer' group by A.zone) A 
+            left join 
+            (select distinct A.zone, date(B.check_in_time) as check_in_date, B.sales_rep_id from sales_rep_master A left join sales_attendence B on (A.id=B.sales_rep_id) where A.status = 'Approved' and A.sr_type='Merchandizer' and B.working_status='Present' and date(B.check_in_time)>='$from_date' and date(B.check_in_time)<='$to_date') B 
+            on (A.zone=B.zone) 
+            group by A.zone, A.total_sales_rep_cnt, B.check_in_date) C 
+            group by C.zone, C.total_sales_rep_cnt) DD
+            on (BB.zone=DD.zone)
+
+            ) A 
+            group by A.id, A.sales_rep_name, A.zone, A.total_sales_rep_cnt, A.present_cnt 
+            order by A.zone, A.sales_rep_name";
+    $result = $this->db->query($sql)->result_array();
+
+    // echo $sql;
+    // echo '<br/><br/>';
+    // echo json_encode($result);
+
+    if(count($result)>0) {
+        // $this->load->library('excel');
+        // $objPHPExcel = new PHPExcel();
+
+        $template_path=$this->config->item('template_path');
+        $file = $template_path.'Daily_merchandiser_performance_report.xlsx';
+        $this->load->library('excel');
+        $objPHPExcel = PHPExcel_IOFactory::load($file);
+
+        $objPHPExcel->setActiveSheetIndex(0);
+        $col_name[]=array();
+        for($i=0; $i<=$cnt+20; $i++) {
+            $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
+        }
+
+        $objPHPExcel->getActiveSheet()->setCellValue('A3','Date - '.$from_date.' to '.$to_date);
+
+        $row = 6;
+        $col = 0;
+        $row2 = 10;
+        $start_row = 11;
+
+        $tot_planned_visit = 0;
+        $tot_actual_visit = 0;
+        $tot_unplanned_visit = 0;
+        $tot_visit = 0;
+
+        for($i=0; $i<count($result); $i++) {
+            $tot_planned_visit = $tot_planned_visit + intval($result[$i]['tot_planned_visit']);
+            $tot_actual_visit = $tot_actual_visit + intval($result[$i]['tot_actual_visit']);
+            $tot_unplanned_visit = $tot_unplanned_visit + intval($result[$i]['tot_unplanned_visit']);
+            $tot_visit = $tot_visit + intval($result[$i]['total_visit']);
+            
+            if($i==0) {
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, $result[$i]['zone']);
+                $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row2)->getFont()->setBold(true);
+                $row2 = $row2 + 2;
+            }
+
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, $result[$i]['sales_rep_name']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row2, $result[$i]['tot_planned_visit']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row2, $result[$i]['tot_actual_visit']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row2, $result[$i]['tot_unplanned_visit']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row2, $result[$i]['total_visit']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row2, '=if(C'.$row2.'=0,0,(C'.$row2.'-D'.$row2.')/C'.$row2.')');
+            $objPHPExcel->getActiveSheet()->mergeCells($col_name[$col].$row2.':'.$col_name[$col+1].$row2);
+            // $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row2)->getFont()->setBold(true);
+            $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row2)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+            $row2 = $row2 + 1;
+            
+
+            if($i!=0 && $i!=count($result)-1) {
+                if($result[$i]['zone']!=$result[$i+1]['zone']) {
+                    if($row!=6) {
+                        $objPHPExcel->getActiveSheet()->insertNewRowBefore($row, 1);
+                        $row2 = $row2 + 1;
+                    }
+                }
+            }
+
+            $bl_flag = false;
+            if($i==count($result)-1){
+                $bl_flag = true;
+            } else if($result[$i]['zone']!=$result[$i+1]['zone']) {
+                $bl_flag = true;
+            }
+
+            if($bl_flag == true) {
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $result[$i]['zone']);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $result[$i]['present_cnt'].'/'.$result[$i]['total_sales_rep_cnt']);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, $tot_planned_visit);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $tot_actual_visit);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $tot_unplanned_visit);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, $tot_visit);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, '=if(C'.$row.'=0,0,(C'.$row.'-D'.$row.')/C'.$row.')');
+
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, 'Total');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row2, $tot_planned_visit);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row2, $tot_actual_visit);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row2, $tot_unplanned_visit);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row2, $tot_visit);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row2, '=if(C'.$row2.'=0,0,(C'.$row2.'-D'.$row.')/C'.$row2.')');
+
+                $objPHPExcel->getActiveSheet()->getStyle('A'.$row2.':'.$col_name[$col+6].($row2))->getFill()->applyFromArray(array(
+                        'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                        'startcolor' => array('rgb' => 'DDEBF7')
+                    )
+                );
+                $objPHPExcel->getActiveSheet()->mergeCells($col_name[$col].$row2.':'.$col_name[$col+1].$row2);
+                $objPHPExcel->getActiveSheet()->getStyle('A'.$row2.':'.$col_name[$col+6].($row2))->getFont()->setBold(true);
+                $objPHPExcel->getActiveSheet()->getStyle('A'.($start_row+1).':'.$col_name[$col+6].($row2))->applyFromArray(array(
+                    'borders' => array(
+                        'allborders' => array(
+                            'style' => PHPExcel_Style_Border::BORDER_THIN
+                        )
+                    )
+                ));
+                // $objPHPExcel->getActiveSheet()->getStyle('A'.$row2.':'.$col_name[$col+6].($row2))->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_BLACK);
+
+                if($i!=count($result)-1) {
+                    $row2 = $row2 + 2;
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, $result[$i+1]['zone']);
+                    $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row2)->getFont()->setBold(true);
+                    $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row2.':'.$col_name[$col+1].$row2)
+                                                    ->applyFromArray(array(
+                                                        'borders' => array(
+                                                            'top' => array('style' => PHPExcel_Style_Border::BORDER_THICK),
+                                                            'right' => array('style' => PHPExcel_Style_Border::BORDER_THICK)
+                                                        )
+                                                    ));
+                    $objPHPExcel->getActiveSheet()->mergeCells($col_name[$col].$row2.':'.$col_name[$col+1].$row2);
+
+                    $row2 = $row2 + 1;
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, 'Name');
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row2, 'Planned Vists');
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row2, 'Acutal Vists');
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row2, 'Unplanned Visits');
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row2, 'Total Calls');
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row2, 'Deviation %');
+
+                    $objPHPExcel->getActiveSheet()->getStyle('A'.$row2.':'.$col_name[$col+6].($row2))->applyFromArray(array(
+                        'borders' => array(
+                            'allborders' => array(
+                                'style' => PHPExcel_Style_Border::BORDER_THIN
+                            )
+                        )
+                    ));
+                    $objPHPExcel->getActiveSheet()->getStyle('A'.$row2.':'.$col_name[$col+6].($row2))->getFill()->applyFromArray(array(
+                        'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                        'startcolor' => array(
+                            'rgb' => 'DDEBF7'
+                        )
+                    ));
+                    $objPHPExcel->getActiveSheet()->getStyle('A'.$row2.':'.$col_name[$col+6].($row2))->getFont()->setBold(true);
+                    $objPHPExcel->getActiveSheet()->getStyle('A'.$row2.':'.$col_name[$col+6].($row2))->getFont()->getColor()->setARGB(PHPExcel_Style_Color::COLOR_BLACK);
+                    $objPHPExcel->getActiveSheet()->getStyle('A'.$row2.':'.$col_name[$col+6].($row2))->getAlignment()->setWrapText(true);
+                    $objPHPExcel->getActiveSheet()->getRowDimension($row2)->setRowHeight(28.8);
+
+                    $objPHPExcel->getActiveSheet()->mergeCells($col_name[$col].$row2.':'.$col_name[$col+1].$row2);
+
+                    $start_row = $row2;
+                    $row2 = $row2 + 1;
+                }
+
+                $tot_planned_visit = 0;
+                $tot_actual_visit = 0;
+                $tot_unplanned_visit = 0;
+                $tot_visit = 0;
+                $tot_order_cnt = 0;
+                $tot_order_units = 0;
+                $tot_order_amt = 0;
+                $tot_new_order_units = 0;
+                $tot_repeat_order_units = 0;
+                $tot_new_order_amt = 0;
+                $tot_repeat_order_amt = 0;
+
+                $row = $row + 1;
+            }
+        }
+
+        // $objPHPExcel->getActiveSheet()->getStyle('A1:'.$col_name[$col+10].($row-2))->applyFromArray(array(
+        //     'borders' => array(
+        //         'allborders' => array(
+        //             'style' => PHPExcel_Style_Border::BORDER_THIN
+        //         )
+        //     )
+        // ));
+
+        $objPHPExcel->getActiveSheet()->getStyle('A1')->getFill()->applyFromArray(array(
+            'type' => PHPExcel_Style_Fill::FILL_SOLID,
+            'startcolor' => array(
+                'rgb' => '44546A'
+            )
+        ));
+        $objPHPExcel->getActiveSheet()->getStyle('A2')->getFill()->applyFromArray(array(
+            'type' => PHPExcel_Style_Fill::FILL_SOLID,
+            'startcolor' => array(
+                'rgb' => 'DDEBF7'
+            )
+        ));
+        $objPHPExcel->getActiveSheet()->getStyle('A5:G5')->getFill()->applyFromArray(array(
+            'type' => PHPExcel_Style_Fill::FILL_SOLID,
+            'startcolor' => array(
+                'rgb' => 'DDEBF7'
+            )
+        ));
+        $objPHPExcel->getActiveSheet()->getStyle('A'.$row.':G'.$row)->getFill()->applyFromArray(array(
+            'type' => PHPExcel_Style_Fill::FILL_SOLID,
+            'startcolor' => array(
+                'rgb' => 'DDEBF7'
+            )
+        ));
+        $objPHPExcel->getActiveSheet()->getStyle('A'.($row+3).':G'.($row+3))->getFill()->applyFromArray(array(
+            'type' => PHPExcel_Style_Fill::FILL_SOLID,
+            'startcolor' => array(
+                'rgb' => 'DDEBF7'
+            )
+        ));
+
+        // for($col1 = 'A'; $col1 <= $col_name[$col]; $col1++) {
+        //     $objPHPExcel->getActiveSheet()->getColumnDimension($col1)->setAutoSize(true);
+        // }
+
+        // $filename='Daily_merchandiser_performance_report.xls';
+        // header('Content-Type: application/vnd.ms-excel');
+        // header('Content-Disposition: attachment;filename="'.$filename.'"');
+        // header('Cache-Control: max-age=0');
+        // $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+        // $objWriter->save('php://output');
+
+        // $logarray['table_id']=$this->session->userdata('session_id');
+        // $logarray['module_name']='Reports';
+        // $logarray['cnt_name']='Reports';
+        // $logarray['action']='Beat plan analysis report generated.';
+        // $this->user_access_log_model->insertAccessLog($logarray);
+
+        $filename = 'Daily_merchandiser_performance_report_'.$report_date.'.xlsx';
+
+        if($action=="save") {
+            // $path  = '/home/eatangcp/public_html/test/assets/uploads/mt_stock_reports/';
+            // $upload_path = '/home/eatangcp/public_html/test/assets/uploads/mt_stock_reports';
+
+            $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/daily_merchandiser_performance/';
+            $upload_path = '/home/eatangcp/public_html/eat_erp/assets/uploads/daily_merchandiser_performance';
+
+            // $path  = 'C:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports/';
+            // $upload_path = 'C:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports';
+            if(!is_dir($upload_path)) {
+                mkdir($upload_path, 0777, TRUE);
+            }
+
+            $reportpath = $path.$filename;
+
+            // header('Content-Type: application/vnd.ms-excel');
+            // header('Content-Disposition: attachment;filename="'.$filename.'"');
+            // header('Cache-Control: max-age=0');
+
+            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007'); 
+            $objWriter->save($reportpath);
+
+            echo $reportpath;
+            echo '<br/><br/>';
+
+            return $reportpath;
+        } else {
+            // header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Type: application/openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="'.$filename.'"');
+            header('Cache-Control: max-age=0');
+            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+            $objWriter->save('php://output');
+
+            $logarray['table_id']=$this->session->userdata('session_id');
+            $logarray['module_name']='Reports';
+            $logarray['cnt_name']='Reports';
+            $logarray['action']='Daily Merchandiser Performance Report Generated.';
+            $this->user_access_log_model->insertAccessLog($logarray);
+
+            exit;
+        }
+    } else {
+        // echo '<script>alert("No data found");</script>';
+    }
+}
 
 }
 ?>

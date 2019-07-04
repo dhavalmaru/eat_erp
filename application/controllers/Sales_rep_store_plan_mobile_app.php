@@ -1236,7 +1236,7 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
         echo json_encode($data);
     }
 
-    function get_order_data_api(){
+    public function get_order_data_api(){
         $order_id='797';
 
         if($this->input->post('order_id')){
@@ -3595,5 +3595,12 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
         $result = $this->sales_rep_location_model->save_po_qty();
         echo $result;
     }
+
+    public function get_batch_details_api(){
+        $data = $this->sales_rep_location_model->get_batch_details();
+        echo json_encode($data);
+    }
+
+
 }
 ?>
