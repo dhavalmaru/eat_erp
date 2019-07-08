@@ -354,6 +354,11 @@
                         <a href="<?php echo base_url().'index.php/Vendor_type'; ?>"   class="sub_menu--link"> Vendor Type</a>
                     </li>
                 </ul>
+
+
+                <li class="menu--item  menu--item__has_sub_menu1 main-submenu-6" <?php if ($Reports==0) echo 'style="display: none;"'; ?>>
+                    <a href="<?php echo base_url().'index.php/report_master'; ?>" class="sub_menu--link"> Report Master</a>
+                </li>
             </ul>
         </li>
 
@@ -517,8 +522,8 @@
             </a>
         </li> -->
 
-        <li class="menu--item"  <?php if ($Reports==0) echo 'style="display: none;"'; ?>>
-            <a href="<?php echo  base_url().'index.php/Reports/view_reports'; ?>" class="menu--link" title="">
+        <li class="menu--item"  <?php //if ($Reports==0) echo 'style="display: none;"'; ?>>
+            <a href="<?php //echo  base_url().'index.php/Reports/view_reports'; ?>" class="menu--link" title="">
                 <i class="menu--icon  fa fa-fw fa-bar-chart-o"></i>
                 <span class="menu--label">Report</span>
             </a>

@@ -156,6 +156,17 @@ class Sales_Attendence extends CI_controller {
 		$cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, operations@eatanytime.in, 
 				mis@eatanytime.in, priti.tripathi@eatanytime.in";
 		$bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, prasad.bhisale@pecanreams.com";
+
+		$sql = "select * from report_master where report_name = 'Sales Daily Attendance'";
+		$query = $this->db->query($sql);
+		$result = $query->result();
+		if(count($result)>0) {
+			$from_email = $result[0]->from_email;
+        	$from_email_sender = $result[0]->sender_name;
+			$to_email = $result[0]->to_email;
+			$cc = $result[0]->cc_email;
+			$bcc = $result[0]->bcc_email;
+		}
 		
 		if($status=="modified"){
 			$subject = 'Sales - Daily Attendence - Back Office Modified -'.date("d F Y",strtotime("now"));
@@ -324,13 +335,13 @@ class Sales_Attendence extends CI_controller {
 									if($tot_present_count==0) $tot_present_count=1;
 
 									$tbody.= '<tr style="border: 2px solid #000 !important;">
-											<td style="border-right: 1px solid #000;text-transform:uppercase;font-weight:bold;padding: 0 8px; border-bottom: 1px solid #000;text-align: center;color:red;">%</td>
-											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;font-weight:bold;color:red;">'.intval(round(($tot_present_count/$tot_count)*100,0)).'%</td>
-											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;font-weight:bold;color:red;">'.intval(round(($tot_absent_count/$tot_count)*100,0)).'%</td>
-											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;font-weight:bold;color:red;">'.intval(round(($tot_not_logged_in_count/$tot_count)*100,0)).'%</td>
-											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;font-weight:bold;color:red;"></td>
-											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;font-weight:bold;color:red;">'.intval(round(($tot_on_time_count/$tot_present_count)*100,0)).'%</td>
-											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;font-weight:bold;color:red;">'.intval(round(($tot_late_mark_count/$tot_present_count)*100,0)).'%</td>
+											<td style="border-right: 1px solid #000;text-transform:uppercase;font-weight:bold;padding: 0 8px; border-bottom: 1px solid #000;text-align: center;color:red !important;">%</td>
+											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;font-weight:bold;color:red !important;">'.intval(round(($tot_present_count/$tot_count)*100,0)).'%</td>
+											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;font-weight:bold;color:red !important;">'.intval(round(($tot_absent_count/$tot_count)*100,0)).'%</td>
+											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;font-weight:bold;color:red !important;">'.intval(round(($tot_not_logged_in_count/$tot_count)*100,0)).'%</td>
+											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;font-weight:bold;color:red !important;"></td>
+											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;font-weight:bold;color:red !important;">'.intval(round(($tot_on_time_count/$tot_present_count)*100,0)).'%</td>
+											<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;font-weight:bold;color:red !important;">'.intval(round(($tot_late_mark_count/$tot_present_count)*100,0)).'%</td>
 											</tr>';
 								}
         $tbody.='</tbody>
@@ -357,21 +368,23 @@ class Sales_Attendence extends CI_controller {
 						if(count($absent_data)>0) {
 							for($i=0; $i<count($absent_data); $i++) {
 								$reason = '';
-								if($absent_data[$i]->entry_by_admin=='1') {
-									if(isset($absent_data[$i]->created_by)) {
-										$reason = 'Logged - <span style="color:#FF0000;">'.$absent_data[$i]->reason.'</span>';
-									} else {
-										$reason = 'Not Logged - <span style="color:#FF0000;">'.$absent_data[$i]->reason.'</span>';
-									}
-								} else {
-									$reason = $absent_data[$i]->reason;
-								}
+								// if($absent_data[$i]->entry_by_admin=='1') {
+								// 	if(isset($absent_data[$i]->created_by)) {
+								// 		$reason = 'Logged - <span style="color:#FF0000;">'.$absent_data[$i]->reason.'</span>';
+								// 	} else {
+								// 		$reason = 'Not Logged - <span style="color:#FF0000;">'.$absent_data[$i]->reason.'</span>';
+								// 	}
+								// } else {
+								// 	$reason = $absent_data[$i]->reason;
+								// }
+
+								$reason = $absent_data[$i]->reason;
 
 								$tbody.= '<tr>
 									<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;padding: 0 8px;width:200px">'.ucwords(trim($absent_data[$i]->sales_rep_name)).'</td>
 									<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;padding: 0 8px;">'.ucwords(trim($absent_data[$i]->zone)).'</td>
 									<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;padding: 0 8px;">'.$reason.'</td>
-									<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;padding: 0 8px;">'.date("H:i", strtotime($absent_data[$i]->check_in_time)).'</td>
+									<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;padding: 0 8px;">'.((!isset($absent_data[$i]->check_in_time))?"":date("H:i", strtotime($absent_data[$i]->check_in_time))).'</td>
 									<td style="border-right: 2px solid #000;border-bottom: 1px solid #000;padding: 0 8px;width:150px">'.$absent_data[$i]->remark.'</td>
 									</tr>'; 
 							}
@@ -408,7 +421,6 @@ class Sales_Attendence extends CI_controller {
     }
 	
 	public function get_user_log(){
-	 
 		$tbody ='';
 		$from_email = 'cs@eatanytime.co.in';
         $from_email_sender = 'Wholesome Habits Pvt Ltd';
@@ -419,12 +431,25 @@ class Sales_Attendence extends CI_controller {
 		// $to_email = "prasad.bhisale@pecanreams.com";
 	 	// $bcc = "prasad.bhisale@pecanreams.com";
 		
+
+		$sql = "select * from report_master where report_name = 'Sales Daily Attendance'";
+		$query = $this->db->query($sql);
+		$result = $query->result();
+		if(count($result)>0) {
+			$from_email = $result[0]->from_email;
+        	$from_email_sender = $result[0]->sender_name;
+			$to_email = $result[0]->to_email;
+			$cc = $result[0]->cc_email;
+			$bcc = $result[0]->bcc_email;
+		}
+		
+
         $subject = 'User Login Log -'.date("d F Y",strtotime("now"));
         $data = $this->Sales_Attendence_model->user_login_list();
         
         $date = date("d.m.Y");
 
-         $tbody ='<!DOCTYPE html">
+        $tbody ='<!DOCTYPE html">
 					<html>
 					<head>
 					<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />

@@ -7025,3 +7025,50 @@ $('#form_beat_plan_upload').submit(function() {
         return true;
     }
 });
+
+
+
+
+
+// ----------------- REPORT MASTER FORM VALIDATION -------------------------------------
+$("#form_report_master").validate({
+    rules: {
+        report_name: {
+            required: true
+        },
+        sender_name: {
+            required: true
+        },
+        from_email: {
+            required: true
+        },
+        to_email: {
+            required: true
+        },
+        cc_email: {
+            required: true
+        },
+        bcc_email: {
+            required: true
+        }
+    },
+
+    ignore: false,
+
+    errorPlacement: function (error, element) {
+        var placement = $(element).data('error');
+        if (placement) {
+            $(placement).append(error);
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
+$('#form_report_master').submit(function() {
+    if (!$("#form_report_master").valid()) {
+        return false;
+    } else {
+        return true;
+    }
+});

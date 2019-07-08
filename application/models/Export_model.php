@@ -728,75 +728,41 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
 
 
 function get_distributor_out_details($from_date, $to_date) {
-
     $sql = "Select * from (select N.*, O.zone as dist_zone from 
-
             (select L.*, M.area from 
-
             (select I.*, K.location from 
-
             (select M.*, H.sales_rep_name from 
-
             (select G.*, L.distributor_type from 
-
             (select E.*, F.distributor_name, F.sell_out, F.type_id, F.zone_id,F.location_id, 
                     F.city as distributor_city, F.area_id, F.class, F.state as dist_state, 
                     F.state_code as dist_state_code, F.gst_number as dist_gst_no from 
-
             (select C.*, D.depot_name from 
-
             (select *, WEEK(invoice_date,1)-WEEK(STR_TO_DATE(concat(YEAR(invoice_date),'-',
-
                                 MONTH(invoice_date),'-',1),'%Y-%m-%d'),1)+1 as dweek 
-
                 from distributor_out where (status='Approved' or status='InActive') and 
-
                         invoice_date>='$from_date' and invoice_date<='$to_date' ) C 
-
             left join 
-
             (select * from depot_master) D 
-
             on (C.depot_id=D.id)) E 
-
             left join 
-
             (select * from distributor_master) F 
-
             on (E.distributor_id=F.id)) G 
-
-            left join
-
+            left join 
             (select * from distributor_type_master) L 
-
             on (G.type_id=L.id)) M 
-
             left join 
-
             (select * from sales_rep_master) H 
-
             on (M.sales_rep_id=H.id)) I 
-
             left join 
-
             (select * from location_master) K 
-
             on (I.location_id=K.id)) L 
-
             left join 
-
             (select * from area_master) M 
-
             on (L.area_id=M.id)) N 
-
             left join 
-
             (select * from zone_master) O 
-
-            on (N.zone_id=O.id)
-
+            on (N.zone_id=O.id) 
             where N.class!='sample' or N.class is null 
-
             order by N.invoice_date desc)A
             Left join
             (
@@ -805,11 +771,8 @@ function get_distributor_out_details($from_date, $to_date) {
             ) B on (A.id=B.distributor_out_id)";
 
     $query=$this->db->query($sql);
-
     $result=$query->result();
-
     $this->db->last_query();
-
     return $result;
 }
 
@@ -1848,6 +1811,7 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
     $filename='Sale_Invoice_Report.xls';
     // $path  = 'C:/xampp/htdocs/eat_erp/assets/uploads/excel_upload/';
     $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/excel_upload/';
+    // $path  = '/var/www/html/eat_erp/assets/uploads/excel_upload/';
     // $path  = '/home/eatangcp/public_html/test/assets/uploads/excel_upload/';
     /*$path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/excel_upload/';*/
 
@@ -3505,6 +3469,7 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
     // $path  = 'C:/wamp64/www/eat_erp_test/assets/uploads/excel_upload/';
     // $path  = '/home/eatangcp/public_html/test/assets/uploads/excel_upload/';
     $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/excel_upload/';
+    // $path  = '/var/www/html/eat_erp/assets/uploads/excel_upload/';
     if($flag==0)
     {
         header('Content-Type: application/vnd.ms-excel');
@@ -10842,12 +10807,12 @@ function generate_ledger_report() {
     $opening_bal = 0;
     $opening_bal_type = 'Cr';
     $balance = 0;
-    $result = $this->export_model->getOpeningBal($ledger_id, $from_date);
+    $result = $this->getOpeningBal($ledger_id, $from_date);
     if(count($result)>0){
         $opening_bal = floatval($result[0]['opening_bal']);
     }
 
-    $data = $this->export_model->getLedger($ledger_id, $from_date, $to_date);
+    $data = $this->getLedger($ledger_id, $from_date, $to_date);
 
     if(count($data)>0) {
         $this->load->library('excel');
@@ -12813,513 +12778,6 @@ public function get_adjustment_bal() {
     return $query->result();
 }
 
-public function send_exception_report() {
-    $date = date('Y-m-d');
-    // $date = '2019-03-01';
-    //and (A.ref_id is null or A.ref_id = '')  removed this from sales and Sales Return 
-    //and date(A.created_on)<date('".$date."') bcoz ref_id is only assign to previous approved
-    //and case When (date(A.created_on)=date('".$date."') AND (A.ref_id is not null or A.ref_id != '') Then (A.ref_id is not null or A.ref_id != '')
-
-    $sql = "select 'Sales' as temp_col, sum(case when date(A.created_on)=date('".$date."') then 1 else 0 end) as entry_done, 
-        sum(case when date(A.date_of_processing)<date('".$date."') and (A.status = 'Pending' or A.status = 'Deleted') and (A.delivery_status='Pending' or A.delivery_status='GP Issued' or A.delivery_status='Delivered Not Complete' or A.delivery_status='Delivered') then 1 else 0 end) as pending, 
-            sum(
-            case 
-            when date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')))
-                 then 1 
-            when date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')))
-                 then 0
-            when date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)<date('".$date."') ))
-                  then 1
-            else 0
-            END
-            ) as prior_pending 
-            from distributor_out A 
-            where A.date_of_processing is not null and A.distributor_id!='1' and A.distributor_id!='189' 
-
-
-            union all 
-
-            select 'Payment Received' as temp_col, sum(case when date(A.created_on)=date('".$date."') then 1 else 0 end) as entry_done, 
-            sum(case when date(A.date_of_deposit)<date('".$date."') and (A.status = 'Pending' or A.status = 'Deleted') and (A.ref_id is null or A.ref_id = '') then 1 else 0 end) as pending, 
-             sum(
-                case 
-                when date(A.date_of_deposit)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')))
-                     then 1 
-                when date(A.date_of_deposit)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')))
-                     then 0
-                when date(A.date_of_deposit)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)<date('".$date."') ))
-                      then 1
-                else 0
-                END
-                ) as prior_pending
-            from payment_details A where A.date_of_deposit is not null 
-
-            union all
-
-            select 'Sales Return' as temp_col, sum(case when date(A.created_on)=date('".$date."') then 1 else 0 end) as entry_done, 
-            sum(case when date(A.date_of_processing)<date('".$date."') and (A.status = 'Pending' or A.status = 'Deleted') then 1 else 0 end) as pending, 
-            sum(
-            case 
-            when date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')))
-                 then 1 
-            when date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')))
-                 then 0
-            when date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)<date('".$date."') ))
-                  then 1
-            else 0
-            END
-            ) as prior_pending  
-            from distributor_in A where A.date_of_processing is not null
-
-            union all 
-
-            select 'Sample' as temp_col, sum(case when date(A.created_on)=date('".$date."') then 1 else 0 end) as entry_done, 
-            sum(case when date(A.date_of_processing)<date('".$date."') and (A.status = 'Pending' or A.status = 'Deleted') and (delivery_status='Pending' or delivery_status='GP Issued' or delivery_status='Delivered Not Complete' or delivery_status='Delivered') and (A.ref_id is null or A.ref_id = '') then 1 else 0 end) as pending, 
-           sum(
-            case 
-            when date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')))
-                 then 1 
-            when date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')))
-                 then 0
-            when date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)<date('".$date."') ))
-                  then 1
-            else 0
-            END
-            ) as prior_pending 
-            from distributor_out A 
-            where A.date_of_processing is not null and (A.distributor_id='1' or A.distributor_id='189') 
-
-            union all 
-
-            select 'Credit Notes' as temp_col, sum(case when date(A.created_on)=date('".$date."') then 1 else 0 end) as entry_done, 
-            sum(case when date(A.date_of_transaction)<date('".$date."') and (A.status = 'Pending' or A.status = 'Deleted') then 1 else 0 end) as pending, 
-            sum(
-                case 
-                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != ''))) 
-                     then 1 
-                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = ''))) 
-                     then 0 
-                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)<date('".$date."') )) 
-                      then 1 
-                else 0
-                END
-            ) as prior_pending 
-            from credit_debit_note A where A.date_of_transaction is not null and transaction = 'Credit Note' 
-
-            union all 
-
-            select 'Debit Notes' as temp_col, sum(case when date(A.created_on)=date('".$date."') then 1 else 0 end) as entry_done, 
-            sum(case when date(A.date_of_transaction)<date('".$date."') and (A.status = 'Pending' or A.status = 'Deleted') then 1 else 0 end) as pending, 
-            sum(
-                case 
-                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')))
-                     then 1 
-                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')))
-                     then 0
-                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)<date('".$date."') ))
-                      then 1
-                else 0
-                END
-            ) as prior_pending
-            from credit_debit_note A where A.date_of_transaction is not null and transaction = 'Debit Note' 
-
-            union all 
-
-            select 'Expense Vouchers' as temp_col, sum(case when date(A.created_on)=date('".$date."') then 1 else 0 end) as entry_done, 
-            sum(case when date(A.date_of_transaction)<date('".$date."') and (A.status = 'Pending' or A.status = 'Deleted') then 1 else 0 end) as pending, 
-            sum(
-                case 
-                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != ''))) 
-                     then 1 
-                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = ''))) 
-                     then 0 
-                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)<date('".$date."') )) 
-                      then 1 
-                else 0
-                END
-            ) as prior_pending 
-            from credit_debit_note A where A.date_of_transaction is not null and transaction = 'Expense Voucher' 
-
-            union all 
-
-            select 'Expense Voucher Reversals' as temp_col, sum(case when date(A.created_on)=date('".$date."') then 1 else 0 end) as entry_done, 
-            sum(case when date(A.date_of_transaction)<date('".$date."') and (A.status = 'Pending' or A.status = 'Deleted') then 1 else 0 end) as pending, 
-            sum(
-                case 
-                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')))
-                     then 1 
-                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')))
-                     then 0
-                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)<date('".$date."') ))
-                      then 1
-                else 0
-                END
-            ) as prior_pending
-            from credit_debit_note A where A.date_of_transaction is not null and transaction = 'Expense Voucher Reversal'";
-
-    $query = $this->db->query($sql);
-    $result = $query->result();
-    $entry_table = '';
-    if(count($result)>0) {
-        for($i=0; $i<count($result); $i++) {
-            $link1 = '';
-            $link2 = '';
-            if(strtoupper(trim($result[$i]->temp_col))=='SALES') {
-                $link1 = base_url().'index.php/distributor_out';
-                $link2 = base_url().'index.php/distributor_out/checkstatus/pending_for_approval';
-            }
-            if(strtoupper(trim($result[$i]->temp_col))=='PAYMENT RECEIVED') {
-                $link1 = base_url().'index.php/payment';
-                $link2 = base_url().'index.php/payment/checkstatus/Pending';
-            }
-            if(strtoupper(trim($result[$i]->temp_col))=='SALES RETURN') {
-                $link1 = base_url().'index.php/Distributor_in';
-                $link2 = base_url().'index.php/Distributor_in/checkstatus/Pending';
-            }
-            if(strtoupper(trim($result[$i]->temp_col))=='SAMPLE') {
-                $link1 = base_url().'index.php/Sample_out';
-                $link2 = base_url().'index.php/Sample_out/checkstatus/pending_for_approval';
-            }
-            if(strtoupper(trim($result[$i]->temp_col))=='CREDIT NOTES' || strtoupper(trim($result[$i]->temp_col))=='DEBIT NOTES' || 
-                strtoupper(trim($result[$i]->temp_col))=='EXPENSE VOUCHERS' || strtoupper(trim($result[$i]->temp_col))=='EXPENSE VOUCHER REVERSALS') {
-                $link1 = base_url().'index.php/Credit_debit_note';
-                $link2 = base_url().'index.php/Credit_debit_note/checkstatus/Pending';
-            }
-            $entry_table = $entry_table . '<tr>
-                                <td>'.$result[$i]->temp_col.'</td>
-                                <td style="text-align: center;"><!-- <a href="'.$link1.'" target="_blank"> -->'.$result[$i]->entry_done.'<!-- </a> --></td>
-                                <td style="text-align: center; color: #F00;"><!-- <a href="'.$link2.'" target="_blank" style="color: #F00;"> -->'.$result[$i]->pending.'<!-- </a> --></td>
-                                <td style="text-align: center; color: #F00;"><!-- <a href="'.$link2.'" target="_blank" style="color: #F00;"> -->'.$result[$i]->prior_pending.'<!-- </a> --></td>
-                            </tr>';
-        }
-    }
-    // echo $sql;
-    // echo '<br/><br/>';
-
-    $sql = "select 'Sales Delivery' as temp_col, sum(case when A.delivery_status = 'Pending' then 1 else 0 end) as delivery_pending, sum(case when A.delivery_status = 'GP Issued' then 1 else 0 end) as in_transit from distributor_out A where A.status = 'Approved' and A.date_of_processing is not null and A.distributor_id!='1' and A.distributor_id!='189' 
-
-        union all 
-
-        select 'Sample Delivery' as temp_col, sum(case when A.delivery_status = 'Pending' then 1 else 0 end) as delivery_pending, sum(case when A.delivery_status = 'GP Issued' then 1 else 0 end) as in_transit from distributor_out A where A.status = 'Approved' and A.date_of_processing is not null and (A.distributor_id='1' or A.distributor_id='189')";
-    $query = $this->db->query($sql);
-    $result = $query->result();
-    $delivery_table = '';
-    if(count($result)>0) {
-        for($i=0; $i<count($result); $i++) {
-            $link1 = '';
-            $link2 = '';
-            if(strtoupper(trim($result[$i]->temp_col))=='SALES DELIVERY') {
-                $link1 = base_url().'index.php/distributor_out/checkstatus/pending_for_delivery';
-                $link2 = base_url().'index.php/distributor_out/checkstatus/gp_issued';
-            } else if(strtoupper(trim($result[$i]->temp_col))=='SAMPLE DELIVERY') {
-                $link1 = base_url().'index.php/sample_out/checkstatus/pending_for_delivery';
-                $link2 = base_url().'index.php/sample_out/checkstatus/gp_issued';
-            }
-            $delivery_table = $delivery_table . '<tr>
-                                <td>'.$result[$i]->temp_col.'</td>
-                                <td style="text-align: center; color: #F00;"><!-- <a href="'.$link1.'" target="_blank" style="color: #F00;"> -->'.$result[$i]->delivery_pending.'<!-- </a> --></td>
-                                <td style="text-align: center; color: #F00;"><!-- <a href="'.$link2.'" target="_blank" style="color: #F00;"> -->'.$result[$i]->in_transit.'<!-- </a> --></td>
-                            </tr>';
-        }
-    }
-    // echo $sql;
-    // echo '<br/><br/>';
-
-    $sql = "select Distinct 'Sales' as temp_col, A.id, A.date_of_processing as ref_date, A.invoice_no as ref_no, A.distributor_id, A.invoice_amount as amount, A.modified_by, A.modified_on, B.distributor_name, concat(ifnull(C.first_name,''),' ',ifnull(C.last_name,'')) as modifiedby 
-        from distributor_out A left join distributor_master B on (A.distributor_id=B.id) left join user_master C on (A.modified_by=C.id) 
-        where A.date_of_processing is not null and A.distributor_id!='1' and A.distributor_id!='189' and date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and 
-            (Case When 
-            date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')
-            Then 1=1
-            When date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')
-            Then 1=0
-            When date(A.created_on)<date('".$date."') 
-            Then 1=1
-            else
-            1=0
-            End )
-        ) 
-
-        union all 
-
-        select Distinct 'Payment Received' as temp_col, A.id, A.date_of_deposit as ref_date, B.ref_no, B.distributor_id, B.payment_amount as amount, A.modified_by, A.modified_on, C.distributor_name, concat(ifnull(D.first_name,''),' ',ifnull(D.last_name,'')) as modifiedby 
-        from payment_details A left join payment_details_items B on (A.id=B.payment_id) left join distributor_master C on (B.distributor_id=C.id) left join user_master D on (A.modified_by=D.id) 
-        where A.date_of_deposit is not null and date(A.date_of_deposit)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and 
-            (Case When 
-            date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')
-            Then 1=1
-            When date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')
-            Then 1=0
-            When date(A.created_on)<date('".$date."') 
-            Then 1=1
-            else
-            1=0
-            End )
-        )
-
-        union all 
-
-        select Distinct 'Sales Return' as temp_col, A.id, A.date_of_processing as ref_date, A.sales_return_no as ref_no, A.distributor_id, A.final_amount as amount, A.modified_by, A.modified_on, B.distributor_name, concat(ifnull(C.first_name,''),' ',ifnull(C.last_name,'')) as modifiedby 
-        from distributor_in A left join distributor_master B on (A.distributor_id=B.id) left join user_master C on (A.modified_by=C.id) 
-        where A.date_of_processing is not null and date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (Case When 
-            date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')
-            Then 1=1
-            When date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')
-            Then 1=0
-            When date(A.created_on)<date('".$date."') 
-            Then 1=1
-            else
-            1=0
-            End ))
-
-        union all 
-
-        select Distinct 'Sample' as temp_col, A.id, A.date_of_processing as ref_date, A.voucher_no as ref_no, A.distributor_id, A.final_amount as amount, A.modified_by, A.modified_on, B.distributor_name, concat(ifnull(C.first_name,''),' ',ifnull(C.last_name,'')) as modifiedby 
-        from distributor_out A left join distributor_master B on (A.distributor_id=B.id) left join user_master C on (A.modified_by=C.id) 
-        where A.date_of_processing is not null and (A.distributor_id='1' or A.distributor_id='189') and date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (Case When 
-            date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')
-            Then 1=1
-            When date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')
-            Then 1=0
-            When date(A.created_on)<date('".$date."') 
-            Then 1=1
-            else
-            1=0
-            End )) 
-
-        union all 
-
-        select Distinct 'Credit Notes' as temp_col, A.id, A.date_of_transaction as ref_date, A.ref_no, A.distributor_id, A.amount, A.modified_by, A.modified_on, B.distributor_name, concat(ifnull(C.first_name,''),' ',ifnull(C.last_name,'')) as modifiedby 
-        from credit_debit_note A left join distributor_master B on (A.distributor_id=B.id) left join user_master C on (A.modified_by=C.id) 
-        where A.date_of_transaction is not null and date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (Case When 
-            date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')
-            Then 1=1
-            When date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')
-            Then 1=0
-            When date(A.created_on)<date('".$date."') 
-            Then 1=1
-            else
-            1=0
-            End )
-        ) and transaction = 'Credit Note' 
-
-        union all 
-
-        select Distinct 'Debit Notes' as temp_col, A.id, A.date_of_transaction as ref_date, A.ref_no, A.distributor_id, A.amount, A.modified_by, A.modified_on, B.distributor_name, concat(ifnull(C.first_name,''),' ',ifnull(C.last_name,'')) as modifiedby 
-        from credit_debit_note A left join distributor_master B on (A.distributor_id=B.id) left join user_master C on (A.modified_by=C.id) 
-        where A.date_of_transaction is not null and date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (Case When 
-            date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')
-            Then 1=1
-            When date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')
-            Then 1=0
-            When date(A.created_on)<date('".$date."') 
-            Then 1=1
-            else
-            1=0
-            End )
-        ) and transaction = 'Debit Note' 
-
-        union all 
-
-        select Distinct 'Expense Vouchers' as temp_col, A.id, A.date_of_transaction as ref_date, A.ref_no, A.distributor_id, A.amount, A.modified_by, A.modified_on, B.distributor_name, concat(ifnull(C.first_name,''),' ',ifnull(C.last_name,'')) as modifiedby 
-        from credit_debit_note A left join distributor_master B on (A.distributor_id=B.id) left join user_master C on (A.modified_by=C.id) 
-        where A.date_of_transaction is not null and date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (Case When 
-            date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')
-            Then 1=1
-            When date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')
-            Then 1=0
-            When date(A.created_on)<date('".$date."') 
-            Then 1=1
-            else
-            1=0
-            End )
-        ) and transaction = 'Expense Voucher' 
-
-        union all 
-
-        select Distinct 'Expense Voucher Reversals' as temp_col, A.id, A.date_of_transaction as ref_date, A.ref_no, A.distributor_id, A.amount, A.modified_by, A.modified_on, B.distributor_name, concat(ifnull(C.first_name,''),' ',ifnull(C.last_name,'')) as modifiedby 
-        from credit_debit_note A left join distributor_master B on (A.distributor_id=B.id) left join user_master C on (A.modified_by=C.id) 
-        where A.date_of_transaction is not null and date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (Case When 
-            date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')
-            Then 1=1
-            When date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')
-            Then 1=0
-            When date(A.created_on)<date('".$date."') 
-            Then 1=1
-            else
-            1=0
-            End )
-        ) and transaction = 'Expense Voucher Reversal'";
-
-    $query = $this->db->query($sql);
-    $result = $query->result();
-    $filename = '';
-    $path = '';
-    if(count($result)>0) {
-        $this->load->library('excel');
-        $objPHPExcel = new PHPExcel();
-        $objPHPExcel->setActiveSheetIndex(0);
-
-        $col_name[]=array();
-        for($i=0; $i<=20; $i++) {
-            $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
-        }
-
-        $row=1;
-        $col=0;
-
-        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Wholesome Habits Private Limited");
-        $row=$row+2;
-        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Exception Reporting - Operations");
-        $row=$row+2;
-        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Reporting Date - " . (($date!=null && $date!="")?date("d/m/Y",strtotime($date)):""));
-
-        //------------ setting headers of excel -------------
-        $row=$row+2;
-        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, 'Entry Type');
-        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, 'System ID');
-        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, 'Ref Date');
-        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, 'Reference');
-        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, 'Distributor');
-        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, 'Amount');
-        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, 'Modified By');
-        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, 'Modified On');
-
-        for($i=0; $i<count($result); $i++) {
-
-            if($result[$i]->temp_col=='Sample')
-            {
-                $url = base_url('index.php/sample_out/edit/d_'.$result[$i]->id);
-            }
-            else if($result[$i]->temp_col=='Sales')
-            {
-                $url = base_url('index.php/Distributor_out/edit/d_'.$result[$i]->id);
-            }
-            else if($result[$i]->temp_col=='Payment Received')
-            {
-                $url = base_url('index.php/payment/edit/'.$result[$i]->id);
-            }
-            else if($result[$i]->temp_col=='Sales Return')
-            {
-                $url = base_url('index.php/distributor_in/edit/'.$result[$i]->id);
-            }
-            else if($result[$i]->temp_col=='Credit Notes' || $result[$i]->temp_col=='Debit Notes' || 
-                    $result[$i]->temp_col=='Expense Vouchers' || $result[$i]->temp_col=='Expense Voucher Reversals')
-            {
-                $url = base_url('index.php/credit_debit_note/edit/'.$result[$i]->id);
-            }
-
-            
-           
-            $row=$row+1;
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $result[$i]->temp_col);
-            /*$objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row,'=Hyperlink("'.$url.'",'.$result[$i]->id.')');*/
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row,$result[$i]->id);
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, (($result[$i]->ref_date!=null && $result[$i]->ref_date!="")?date("d/m/Y",strtotime($result[$i]->ref_date)):""));
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $result[$i]->ref_no);
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $result[$i]->distributor_name);
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, $result[$i]->amount);
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, $result[$i]->modifiedby);
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, (($result[$i]->modified_on!=null && $result[$i]->modified_on!="")?date("d/m/Y",strtotime($result[$i]->modified_on)):""));
-        }
-
-        $objPHPExcel->getActiveSheet()->getStyle('A7:H7')->getFont()->setBold(true);
-        $objPHPExcel->getActiveSheet()->getStyle('A7:'.$col_name[$col+7].$row)->applyFromArray(array(
-            'borders' => array(
-                'allborders' => array(
-                    'style' => PHPExcel_Style_Border::BORDER_THIN
-                )
-            )
-        ));
-
-        for ($col = 0; $col <= PHPExcel_Cell::columnIndexFromString($objPHPExcel->getActiveSheet()->getHighestDataColumn()); $col++) {
-            $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn($col)->setAutoSize(true);
-        }
-
-        $filename='Exception_Report.xls';
-        //$path  = 'C:\xampp\htdocs\eat_erp_new_30\assets\uploads\exception_reports';
-        // $path  = '/home/eatangcp/public_html/test/assets/uploads/exception_reports/';
-        $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/exception_reports/';
-
-        // header('Content-Type: application/vnd.ms-excel');
-        // header('Content-Disposition: attachment;filename="'.$filename.'"');
-        // header('Cache-Control: max-age=0');
-        // $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
-        // $objWriter->save('php://output');
-
-        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5'); 
-        $objWriter->save($path.$filename);
-    }
-
-    $message = '<html>
-                <body>
-                    <h3>Wholesome Habits Private Limited</h3>
-                    <h4>Exception Reporting - Operations</h4>
-                    <p>Reporting Date - '.(($date!=null && $date!="")?date("d/m/Y",strtotime($date)):"").'</p>
-                    <table border="1" style="border-collapse: collapse;">
-                        <thead>
-                            <tr>
-                                <th style="background-color: #44546A; color: #FFF; padding: 10px;">Type</th>
-                                <th style="background-color: #44546A; color: #FFF; padding: 10px;">Entries Done</th>
-                                <th style="background-color: #44546A; color: #FFF; padding: 10px;">Pending Approval</th>
-                                <th style="background-color: #44546A; color: #FFF; padding: 10px;">Prior Period Modifications</th>
-                            </tr>
-                        </thead>
-                        <tbody>'.$entry_table.'</tbody>
-                    </table>
-                    <br/><br/>
-                    <table border="1" style="border-collapse: collapse;">
-                        <thead>
-                            <tr>
-                                <th style="background-color: #44546A; color: #FFF; padding: 10px;">Type</th>
-                                <th style="background-color: #44546A; color: #FFF; padding: 10px;">Delivery Pending</th>
-                                <th style="background-color: #44546A; color: #FFF; padding: 10px;">In Transit</th>
-                            </tr>
-                        </thead>
-                        <tbody>'.$delivery_table.'</tbody>
-                    </table>
-                    <br/><br/>
-                    Regards,
-                    <br/><br/>
-                    CS
-                </body>
-                </html>';
-    $from_email = 'info@eatanytime.co.in';
-    $from_email_sender = 'Wholesome Habits Pvt Ltd';
-    $subject = 'Exception Report - '.(($date!=null && $date!="")?date("d/m/Y",strtotime($date)):"");
-
-    /*$to_email = "dhava.maru@pecanreams.com";
-    $cc="sangeeta.yadav@pecanreams.com";
-    $bcc="yadavsangeeta521@gmail.com";*/
-    
-    // $to_email = "prasad.bhisale@pecanreams.com";
-    // $cc = 'prasad.bhisale@pecanreams.com';
-    // $bcc = 'prasad.bhisale@pecanreams.com';
-
-    $to_email = "priti.tripathi@eatanytime.co.in, operations@eatanytime.co.in";
-    $cc="rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, dhaval.maru@pecanreams.com, prasad.bhisale@pecanreams.com";
-    $bcc="sangeeta.yadav@pecanreams.com";
-
-    echo $attachment = $path.$filename;
-    // $to_email = 'dhaval.maru@otbconsulting.co.in,dhavalbright@gmail.com';
-    // $to_email = 'rishit.sanghvi@eatanytime.in,swapnil.darekar@eatanytime.in;dhaval.maru@otbconsulting.co.in';
-    $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc, $cc, $attachment);
-
-    // $mailSent=1;
-    
-    echo $message;
-    echo '<br/><br/>';
-    echo $mailSent;
-
-    if($mailSent==1){
-        $logarray['table_id']=$this->session->userdata('session_id');
-        $logarray['module_name']='Reports';
-        $logarray['cnt_name']='Reports';
-        $logarray['action']='Exception report sent.';
-        $this->user_access_log_model->insertAccessLog($logarray);
-    }
-}
-
 public function sales_rep_route_plan() {
     $from_date = formatdate($this->input->post('from_date'));
     $to_date = formatdate($this->input->post('to_date'));
@@ -13861,28 +13319,55 @@ public function send_mt_stock_tracker() {
     // $date = '2019-05-06';
     $date = date('Y-m-d');
 
+    // $zone_id_array = ['16'];
+    // $zone_array = ['Mumbai'];
+    // $zone_email_array = ['Sulochana.yadav@eatanytime.co.in'];
+
     $zone_id_array = ['9', '10', '12', '16', '18', '29', '30'];
     $zone_array = ['Chennai', 'Pune', 'Hyderbad', 'Mumbai', 'Banglore', 'Ahmedabad', 'Delhi'];
     $zone_email_array = ['', 'mohil.telawade@eatanytime.co.in', 'vijay.spar@gmail.com', 
                         'Sulochana.yadav@eatanytime.co.in, mukesh.yadav@eatanytime.co.in, sachin.pal@eatanytime.co.in', 
                         'darshan.dhany@eatanytime.co.in, mahesh.ms@eatanytime.co.in', 'urvi.bhayani@eatanytime.co.in', 
                         'nitin.kumar@eatanytime.co.in'];
+
     $reportpath = '';
+    $tr = '';
     
     for($x=0; $x<count($zone_id_array); $x++) {
         $r_zone_id = $zone_id_array[$x];
         $r_zone = $zone_array[$x];
-        $reportpath = $this->get_mt_stock_report($date, 'save', $r_zone_id);
+        // $reportpath = $this->get_mt_stock_report($date, 'save', $r_zone_id);
+        $return_arr = $this->get_mt_stock_report($date, 'save', $r_zone_id);
+
+        if(isset($return_arr['reportpath'])){
+            $reportpath = $return_arr['reportpath'];
+        }
+        if(isset($return_arr['tr'])){
+            $tr = $return_arr['tr'];
+        }
 
         if($reportpath!=''){
             $report_date = date('d-m-Y', strtotime($date));
 
             $message = '<html>
+                        <head>
+                            <style>
+                                td { padding: 5px; width: 100px; }
+                            </style>
+                        </head>
                         <body>
                             <h3>Wholesome Habits Private Limited</h3>
                             <h4>MT Stock Tracker - '.$r_zone.'</h4>
                             <p>Reporting Date - '.$report_date.'</p>
                             <p>PFA</p>
+                            <br/><br/>
+
+                            <table class="body_table" border="1px" style="border-collapse: collapse;">
+                            <tbody>
+                            '.$tr.'
+                            </tbody>
+                            </table>
+
                             <br/><br/>
                             Regards,
                             <br/><br/>
@@ -13890,7 +13375,7 @@ public function send_mt_stock_tracker() {
                         </body>
                         </html>';
             $from_email = 'cs@eatanytime.co.in';
-            $from_email_sender = 'Wholesome Habits Pvt Ltd';
+            $from_email_sender = 'EAT MIS';
             $subject = 'MT_Stock_Tracker_'.$r_zone.'_'.$report_date;
 
 
@@ -13907,20 +13392,18 @@ public function send_mt_stock_tracker() {
             } else {
                 $to_email = "operations@eatanytime.in,priti.tripathi@eatanytime.in";
             }
-            
-            $cc = 'rishit.sanghvi@eatanytime.in,swapnil.darekar@eatanytime.in,dhaval.maru@pecanreams.com,prasad.bhisale@pecanreams.com';
-            $bcc = 'sangeeta.yadav@pecanreams.com';
+            $cc = 'rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, dhaval.maru@pecanreams.com, prasad.bhisale@pecanreams.com';
+            $bcc = 'ashwini.patil@pecanreams.com';
 
             sleep(15);
 
             echo $attachment = $reportpath;
             echo '<br/><br/>';
+            echo $message;
+            echo '<br/><br/>';
+
             $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc, $cc, $attachment);
 
-            // $mailSent=1;
-            
-            // echo $message;
-            // echo '<br/><br/>';
             echo $mailSent;
             echo '<br/><br/>';
 
@@ -13942,6 +13425,7 @@ public function get_mt_stock_report($date='', $action='save', $r_zone_id='') {
 
     $report_date = date('d-m-Y', strtotime($date));
     $reportpath = '';
+    $tr = '';
 
     $sql = "Select distinct H.store_name from 
             (Select  E.*, F.location from 
@@ -13986,10 +13470,16 @@ public function get_mt_stock_report($date='', $action='save', $r_zone_id='') {
 
         // $lst_row = 129;
 
-        $row = 3;
+        $sql = "select * from zone_master where id = '".$r_zone_id."'";
+        $result2 = $this->db->query($sql)->result();
+
+        $objPHPExcel->getActiveSheet()->setCellValue('A2', 'MT STORE TRACKER - '.strtoupper($result2[0]->zone));
+        $objPHPExcel->getActiveSheet()->setCellValue('A3', 'Date - '.$report_date.' to '.$report_date);
+
+        $row = 6;
 
         for($i=0; $i<count($result); $i++){
-            if($row>5){
+            if($row>8){
                 $objPHPExcel->getActiveSheet()->insertNewRowBefore($row, 1);
             }
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[1].$row, $result[$i]->store_name);
@@ -13997,20 +13487,20 @@ public function get_mt_stock_report($date='', $action='save', $r_zone_id='') {
             $row = $row + 1;
         }
 
-        $objPHPExcel->getActiveSheet()->getStyle($col_name[1].'2:'.$col_name[2].($row-1))->applyFromArray(array(
-            'borders' => array(
-                'allborders' => array(
-                    'style' => PHPExcel_Style_Border::BORDER_THIN
-                )
-            )
-        ));
+        // $objPHPExcel->getActiveSheet()->getStyle($col_name[1].'2:'.$col_name[2].($row-1))->applyFromArray(array(
+        //     'borders' => array(
+        //         'allborders' => array(
+        //             'style' => PHPExcel_Style_Border::BORDER_THIN
+        //         )
+        //     )
+        // ));
 
         $excel_sales_rep = array();
         $tot_sales_rep_cnt = 2;
         $start_row = $row + 1;
         $row = $start_row;
         $col = 6;
-
+        $tr = '';
 
         $sql = "Select distinct G.*, H.store_name from 
                 (Select  E.*, F.location from 
@@ -14035,6 +13525,9 @@ public function get_mt_stock_report($date='', $action='save', $r_zone_id='') {
         $result = $query->result();
 
         if(count($result)>0){
+            // $td1 = '';
+            // $td2 = '';
+
             $sql = "select distinct A.sales_rep_id, B.sales_rep_name 
                     from merchandiser_beat_plan A 
                     left join sales_rep_master B on (A.sales_rep_id=B.id) 
@@ -14052,8 +13545,24 @@ public function get_mt_stock_report($date='', $action='save', $r_zone_id='') {
                     }
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+$j].$row, $excel_sales_rep[$j]);
                     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+$j].($row+1), 'MERCHANDISER '.($j+1));
+
+                    // $td1 = $td1.'<td>'.$excel_sales_rep[$j].'</td>';
+                    // $td2 = $td2.'<td>MERCHANDISER '.($j+1).'</td>';
                 }
             }
+
+            // if($td1 == '') {
+            //     $td1 = '<td></td><td></td>';
+            //     $td2 = '<td>MERCHANDISER 1</td><td>MERCHANDISER 2</td>';
+            // } else if($tot_sales_rep_cnt==1) {
+            //     $td1 = '<td></td>';
+            //     $td2 = '<td>MERCHANDISER 2</td>';
+            // }
+
+            // $tr = '<tr><td></td><td></td><td></td><td></td>'.$td1.'<td></td><td>'.$report_date.'</td><td></td><td></td>';
+            // $tr = $tr.'<tr style="font-weight: bold;"><td>Region</td><td>MT Group</td><td>Location</td><td>STORES</td>'.$td2.'<td>STATUS</td><td>Latest Date</td><td>Username</td><td>Diff</td>';
+            $tr = $tr.'<tr style="font-weight: bold;"><td>Sr No</td><td>Region</td><td>MT Group</td><td>Location</td><td>Latest Date</td><td>Username</td><td>Diff</td>';
+            $sr_no = 1;
 
             if($tot_sales_rep_cnt<2){
                 $tot_sales_rep_cnt = 2;
@@ -14066,9 +13575,9 @@ public function get_mt_stock_report($date='', $action='save', $r_zone_id='') {
             $row = $start_row + 2;
 
             for($i=0; $i<count($result); $i++){
-                $zone = $result[$i]->zone;
-                $store = $result[$i]->store_name;
-                $location = $result[$i]->location;
+                $zone = ucwords(trim($result[$i]->zone));
+                $store = ucwords(trim($result[$i]->store_name));
+                $location = ucwords(trim($result[$i]->location));
                 $category = $result[$i]->category;
 
                 $zone_id = $result[$i]->zone_id;
@@ -14101,7 +13610,15 @@ public function get_mt_stock_report($date='', $action='save', $r_zone_id='') {
                 $t_papaya_cnt = 0;
                 $user_name = '';
 
-                $sql = "select A.*, concat(ifnull(B.first_name,''), ' ',ifnull(B.last_name,'')) as user_name 
+                // $date1=date_create($date);
+                // $date2=date_create('1900-01-00');
+                // $date_diff=date_diff($date1, $date2);
+                // $diff = intval($date_diff->format("%a"));
+
+                $diff = '';
+
+                $sql = "select A.*, concat(ifnull(B.first_name,''), ' ',ifnull(B.last_name,'')) as user_name , 
+                        DATEDIFF(curdate(),date(A.date_of_visit)) as diff 
                         from merchandiser_stock A left join user_master B on (A.created_by=B.id) 
                         where A.dist_id = '$store_id' and A.location_id = '$location_id' and 
                             date(A.date_of_visit)<=date('".$date."') 
@@ -14113,6 +13630,7 @@ public function get_mt_stock_report($date='', $action='save', $r_zone_id='') {
                     if(isset($result2[0]->date_of_visit)){
                         if($result2[0]->date_of_visit!=null && $result2[0]->date_of_visit!=''){
                             $date_of_visit = date('d-m-Y',strtotime($result2[0]->date_of_visit));
+                            $diff = $result2[0]->diff;
                         }
                     }
                     $user_name = ucwords(trim($result2[0]->user_name));
@@ -14209,91 +13727,132 @@ public function get_mt_stock_report($date='', $action='save', $r_zone_id='') {
                 // }
 
                 $col = 0;
-                // if($bl_flag==false){
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $zone);
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $store);
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, $location);
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $store."-".$location);
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $category);
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, '=VLOOKUP(E'.$row.',$E$1:$F$3,2,0)');
 
-                    $sql = "select A.*, B.sales_rep_name from merchandiser_beat_plan A 
-                            left join sales_rep_master B on (A.sales_rep_id=B.id) 
-                            where A.zone_id = '$zone_id' and A.store_id = '$store_id' and A.location_id = '$location_id' and B.sr_type = 'Merchandizer' 
-                            order by A.modified_on desc";
-                    $query = $this->db->query($sql);
-                    $result2 = $query->result();
-                    if(count($result2)>0){
-                        // if(strtoupper(trim($sales_rep_name))==strtoupper(trim($excel_sales_rep1))){
-                        //     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, $result2[0]->frequency);
-                        // } else if(strtoupper(trim($sales_rep_name))==strtoupper(trim($excel_sales_rep2))){
-                        //     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, $result2[0]->frequency);
-                        // }
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $zone);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $store);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, $location);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $store."-".$location);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $category);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, '=VLOOKUP(E'.$row.',$E$5:$F$7,2,0)');
 
-                        for($k=0; $k<count($result2); $k++){
-                            $sales_rep_name = $result2[$k]->sales_rep_name;
+                // $td1 = '';
+                $sql = "select A.*, B.sales_rep_name from merchandiser_beat_plan A 
+                        left join sales_rep_master B on (A.sales_rep_id=B.id) 
+                        where A.zone_id = '$zone_id' and A.store_id = '$store_id' and A.location_id = '$location_id' and B.sr_type = 'Merchandizer' 
+                        order by A.modified_on desc";
+                $query = $this->db->query($sql);
+                $result2 = $query->result();
+                if(count($result2)>0){
+                    // if(strtoupper(trim($sales_rep_name))==strtoupper(trim($excel_sales_rep1))){
+                    //     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, $result2[0]->frequency);
+                    // } else if(strtoupper(trim($sales_rep_name))==strtoupper(trim($excel_sales_rep2))){
+                    //     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, $result2[0]->frequency);
+                    // }
 
-                            for($j=0; $j<count($excel_sales_rep); $j++){
-                                if(strtoupper(trim($sales_rep_name))==strtoupper(trim($excel_sales_rep[$j]))){
-                                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6+$j].$row, $result2[0]->frequency);
-                                }
+                    for($k=0; $k<count($result2); $k++){
+                        $sales_rep_name = $result2[$k]->sales_rep_name;
+
+                        for($j=0; $j<count($excel_sales_rep); $j++){
+                            if(strtoupper(trim($sales_rep_name))==strtoupper(trim($excel_sales_rep[$j]))){
+                                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6+$j].$row, $result2[0]->frequency);
+                                // $td1 = $td1.'<td>'.$result2[0]->frequency.'</td>';
                             }
                         }
                     }
+                }
 
-                    // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+8].$row, '=IF(G'.$row.'="",$J$17,$I$17)');
-                    // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+9].$row, '=IF(H'.$row.'="",$J$17,$I$17)');
-                    // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+10].$row, '=IF((I'.$row.'=$J$17)*(J'.$row.'=$J$17),"NOT UPDATED","UPDATED")');
+                // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+8].$row, '=IF(G'.$row.'="",$J$17,$I$17)');
+                // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+9].$row, '=IF(H'.$row.'="",$J$17,$I$17)');
+                // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+10].$row, '=IF((I'.$row.'=$J$17)*(J'.$row.'=$J$17),"NOT UPDATED","UPDATED")');
 
+                $col = 6 + $tot_sales_rep_cnt;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF(COUNTBLANK('.$col_name[$col-$tot_sales_rep_cnt].$row.':'.$col_name[$col-1].$row.')='.$tot_sales_rep_cnt.', "NOT UPDATED", "UPDATED")');
 
-                    $col = 6 + $tot_sales_rep_cnt;
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF(COUNTBLANK('.$col_name[$col-$tot_sales_rep_cnt].$row.':'.$col_name[$col-1].$row.')='.$tot_sales_rep_cnt.', "NOT UPDATED", "UPDATED")');
-                // }
-
+                // $tr = $tr . '<td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col].$row)->getCalculatedValue().'</td>';
+                
                 $col = $col + 2;
-                // if($date_of_visit!=''){
-                    if($date_of_visit!=''){
-                        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $date_of_visit);
-                        $col = $col + 1;
-                        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $user_name);
-                        $col = $col + 1;
-                        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+$'.$col_name[$col-1].'$'.$start_row.'-'.$col_name[$col-2].$row);
-                        $col = $col + 1;
-                    } else {
-                        $col = $col + 3;
-                    }
-                    
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $butterscotch_cnt);
+                $style = "";
+
+                if($date_of_visit!='') {
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $date_of_visit);
                     $col = $col + 1;
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $orange_cnt);
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $user_name);
                     $col = $col + 1;
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $chocopeanut_cnt);
+                    // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+$'.$col_name[$col-1].'$'.$start_row.'-'.$col_name[$col-2].$row);
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $diff);
                     $col = $col + 1;
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $mango_cnt);
+                } else {
+                    $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row.':'.$col_name[$col+2].$row)->getFill()->applyFromArray(array(
+                        'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                        'startcolor' => array(
+                            'rgb' => 'FFC7CE'
+                        )
+                    ));
+                    $col = $col + 2;
+                    // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+$'.$col_name[$col-1].'$'.$start_row.'-'.$col_name[$col-2].$row);
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $diff);
                     $col = $col + 1;
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $bambaiya_cnt);
-                    $col = $col + 1;
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $berry_cnt);
-                    $col = $col + 1;
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $chyawanprash_cnt);
-                    $col = $col + 1;
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $variety_cnt);
-                    $col = $col + 1;
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $choco_cnt);
-                    $col = $col + 1;
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $dark_choco_cnt);
-                    $col = $col + 1;
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $cranb_cnt);
-                    $col = $col + 1;
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $t_cranb_cnt);
-                    $col = $col + 1;
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $t_fig_cnt);
-                    $col = $col + 1;
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $t_papaya_cnt);
-                    $col = $col + 1;
-                // } else {
-                //     $col = $col + 16;
-                // }
+                }
+
+                if($date_of_visit=='' || $date_of_visit==null) {
+                    $style = " background-color: #FFC7CE;";
+                }
+
+                // $td1 = '';
+                // $no_of_days = $objPHPExcel->getActiveSheet()->getCell($col_name[$col-1].$row)->getCalculatedValue();
+
+                if($diff=='' || $diff>7) {
+                    // for($x=$col-1; $x>=0; $x--) { 
+                    //     if($x==($col-1)) {
+                    //         $td1 = '<td>'.$diff.'</td>'.$td1;
+                    //     } else if($x==($col-2) || $x==($col-3)) {
+                    //         $td1 = '<td style="'.$style.'">'.$objPHPExcel->getActiveSheet()->getCell($col_name[$x].$row)->getCalculatedValue().'</td>'.$td1;
+                    //     } else if($x!=($col-4) && $x!=4 && $x!=5) {
+                    //         $td1 = '<td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$x].$row)->getCalculatedValue().'</td>'.$td1;
+                    //     }
+                    // }
+                    // $tr = $tr . '<tr>'.$td1.'</tr>';
+
+                    $tr = $tr . '<tr>
+                                    <td>'.$sr_no++.'</td>
+                                    <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[0].$row)->getCalculatedValue().'</td>
+                                    <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[1].$row)->getCalculatedValue().'</td>
+                                    <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[2].$row)->getCalculatedValue().'</td>
+                                    <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col-3].$row)->getCalculatedValue().'</td>
+                                    <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col-2].$row)->getCalculatedValue().'</td>
+                                    <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col-1].$row)->getCalculatedValue().'</td>
+                                </tr>';
+                }
+                
+                
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $butterscotch_cnt);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $orange_cnt);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $chocopeanut_cnt);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $mango_cnt);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $bambaiya_cnt);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $berry_cnt);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $chyawanprash_cnt);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $variety_cnt);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $choco_cnt);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $dark_choco_cnt);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $cranb_cnt);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $t_cranb_cnt);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $t_fig_cnt);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $t_papaya_cnt);
+                $col = $col + 1;
 
                 // $region = $objPHPExcel->getActiveSheet()->getCell($col_name[$col].$row)->getValue();
 
@@ -14479,15 +14038,15 @@ public function get_mt_stock_report($date='', $action='save', $r_zone_id='') {
             $row = $row - 1;
         }
 
-        for($i=3; $i<$start_row-1; $i++){
+        for($i=6; $i<$start_row-1; $i++){
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[2].$i, '=COUNTIF($B$'.($start_row + 2).':$B$'.$row.',B'.$i.')');
         }
-        $objPHPExcel->getActiveSheet()->setCellValue($col_name[2].($start_row-1), '=SUM(C3:C'.($start_row-2).')');
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[2].($start_row-1), '=SUM(C6:C'.($start_row-2).')');
 
         $col = 6 + $tot_sales_rep_cnt;
 
-        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'4', '=COUNTIF('.$col_name[$col].$start_row.':'.$col_name[$col].$row.','.$col_name[$col].'3)');
-        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].'4', '=COUNTIF('.$col_name[$col].$start_row.':'.$col_name[$col].$row.','.$col_name[$col+1].'3)');
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'7', '=COUNTIF('.$col_name[$col].$start_row.':'.$col_name[$col].$row.','.$col_name[$col].'6)');
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].'7', '=COUNTIF('.$col_name[$col].$start_row.':'.$col_name[$col].$row.','.$col_name[$col+1].'6)');
 
         $start_row = $start_row + 2;
 
@@ -14544,8 +14103,15 @@ public function get_mt_stock_report($date='', $action='save', $r_zone_id='') {
             $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/mt_stock_reports/';
             $upload_path = '/home/eatangcp/public_html/eat_erp/assets/uploads/mt_stock_reports';
 
+            // $path  = '/var/www/html/eat_erp/assets/uploads/mt_stock_reports/';
+            // $upload_path = '/var/www/html/eat_erp/assets/uploads/mt_stock_reports';
+
             // $path  = 'C:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports/';
             // $upload_path = 'C:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports';
+
+            // $path  = 'E:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports/';
+            // $upload_path = 'E:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports';
+
             if(!is_dir($upload_path)) {
                 mkdir($upload_path, 0777, TRUE);
             }
@@ -14562,7 +14128,10 @@ public function get_mt_stock_report($date='', $action='save', $r_zone_id='') {
             echo $reportpath;
             echo '<br/><br/>';
 
-            return $reportpath;
+            $return_arr = array('reportpath'=>$reportpath, 'tr'=> $tr);
+
+            // return $reportpath;
+            return $return_arr;
         } else {
             // header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             header('Content-Type: application/openxmlformats-officedocument.spreadsheetml.sheet');
@@ -15278,7 +14847,7 @@ function get_po_count() {
     return $query->result();
 }
 
-public function generate_sales_attendence_report(){   
+public function generate_sales_attendence_report(){ 
     $from_date = formatdate($this->input->post('from_date'));
     $to_date = formatdate($this->input->post('to_date'));
 
@@ -15716,6 +15285,7 @@ public function sales_rep_exception_report(){
     $filename='Sales_Exception_Report_'.$date1.'.xls';
     /*$path  = 'C:/xampp/htdocs/eat_erp_server/assets/uploads/exception_reports';*/
     $path  ='/home/eatangcp/public_html/eat_erp/assets/uploads/exception_reports/';
+    // $path  ='/var/www/html/eat_erp/assets/uploads/exception_reports/';
    /* $path  ='/home/eatangcp/public_html/eat_erp/assets/uploads/exception_reports/';*/
     $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
     $objWriter->save($path.$filename);
@@ -15765,160 +15335,8 @@ public function gt_store_report($save='',$region=array()){
     /* if($region!='' && $region!='ALL')
         $cond=' Where L.location="'.$region.'"';*/
    
-    // $sql = "select AA.distributor_name, AA.location, AA.area, AA.d_type, AA.item_id, sum(AA.item_qty) as item_qty, 
-    //             group_concat(distinct AA.sales_rep_name) as sales_rep_name, group_concat(distinct AA.remarks) as remarks, 
-    //             min(AA.order_place_aging) as order_place_aging, min(AA.last_date_aging) as last_date_aging, 
-    //             max(AA.order_date) as order_date, max(AA.last_date_of_visit) as last_date_of_visit, 
-    //             min(AA.orange) as orange, min(AA.butterscotch) as butterscotch, min(AA.chocopeanut) as chocopeanut, 
-    //             min(AA.mangoginger) as mangoginger, min(AA.berry_blast) as berry_blast, min(AA.chyawanprash) as chyawanprash, 
-    //             min(AA.dark_chocolate_cookies) as dark_chocolate_cookies, min(AA.chocolate_cookies) as chocolate_cookies, 
-    //             min(AA.cranberry_cookies) as cranberry_cookies, min(AA.cranberry_orange) as cranberry_orange, 
-    //             min(AA.papaya_pineapple) as papaya_pineapple, min(AA.fig_raisins) as fig_raisins from 
-    //         (select A.*, L.location, E.area from 
-    //         (select * from 
-    //         (select A.id as dist_id, A.distributor_name, A.sales_rep_id, A.order_id, datediff(current_date(),A.order_date) as order_place_aging,
-    //             A.order_date, A.sales_rep_name, B.item_qty, B.sales_rep_order_id, B.item_id, A.location_id, A.area_id, S.last_date_of_visit, 
-    //             S.last_date_aging, S.remarks, S.orange, S.butterscotch, S.chocopeanut, S.mangoginger, S.berry_blast, S.chyawanprash, 
-    //             S.dark_chocolate_cookies, S.chocolate_cookies, S.cranberry_cookies, S.cranberry_orange, S.papaya_pineapple, S.fig_raisins, 
-    //             1 as d_type from 
-    //         (select A.*,B.sales_rep_name from 
-    //         (select B.*, O.order_id, C.sales_rep_id, C.order_date from 
-    //         (select concat('d_',A.id) as id, A.distributor_name, A.area_id, A.location_id from 
-    //         (select * from distributor_master) A 
-    //         left join sr_mapping B on (A.area_id = B.area_id and A.zone_id = B.zone_id and  A.type_id = B.type_id) 
-    //         where A.status='approved' and A.class='normal') B 
-    //         left join 
-    //         (select A.distributor_id, A.area_id, A.location_id, max(A.id) as order_id from 
-    //         (select A.id, A.distributor_id, A.date_of_processing, B.area_id, B.location_id, A.visit_id from 
-    //         (select id, distributor_id, date_of_processing, visit_id from sales_rep_orders 
-    //             where id in (select sales_rep_order_id from sales_rep_order_items where qty is not null)) A
-    //         left join
-    //         (select * from sales_rep_location) B on A.visit_id=B.id) A 
-    //         group by A.distributor_id, A.area_id, A.location_id) O 
-    //         on (O.distributor_id=B.id and O.location_id=B.location_id and O.area_id=B.area_id) 
-    //         left join 
-    //         (select distinct A.id as order_id, A.sales_rep_id, A.distributor_id, A.date_of_processing as order_date, A.area_id, A.location_id from 
-    //         (select A.id, A.distributor_id, A.date_of_processing, B.area_id, B.location_id, A.visit_id, A.sales_rep_id from 
-    //         (select distributor_id,date_of_processing,visit_id,id,sales_rep_id from sales_rep_orders 
-    //             where id in (select sales_rep_order_id from sales_rep_order_items where qty is not null)) A 
-    //         left join
-    //         (select * from sales_rep_location) B on A.visit_id=B.id) A) C 
-    //         on (O.distributor_id=C.distributor_id and O.order_id=C.order_id and O.area_id=C.area_id and O.location_id=C.location_id) 
-    //         order by sales_rep_id desc) A 
-    //         left join
-    //         (select * from sales_rep_master) B on A.sales_rep_id=B.id 
-    //         order by sales_rep_id desc) A 
-    //         left join 
-    //         (select A.sales_rep_order_id, A.item_id, sum(item_qty) as item_qty from 
-    //         (select case when E.type='Bar' then E.qty else (E.qty*F.qty) end as item_qty, E.sales_rep_order_id, 
-    //             case when E.type='Bar' then E.item_id else F.product_id end as item_id from 
-    //         (select * from sales_rep_order_items) E 
-    //         left join box_product F on (E.type='Box' and (E.item_id=F.box_id)) 
-    //         left join product_master G on (E.type='Bar' and (E.item_id=G.id))) A 
-    //         group by A.sales_rep_order_id, A.item_id) B on (A.order_id=B.sales_rep_order_id) 
-    //         left join 
-    //         (select A.date_of_visit as last_date_of_visit, ifnull(datediff(current_date(),A.date_of_visit),0) as last_date_aging, 
-    //             A.distributor_id, A.sales_rep_id, A.sales_rep_loc_id, 
-    //             ((case when B.orange_bar is not null then B.orange_bar else 0 end)+(case when B.orange_box is not null then orange_box*6 else 0 end)) as orange, 
-    //             ((case when B.butterscotch_bar is not null then B.butterscotch_bar else 0 end)+(case when butterscotch_box is not null then butterscotch_box*6 else 0 end)) as butterscotch, 
-    //             ((case when B.chocopeanut_bar is not null then B.chocopeanut_bar else 0 end)+case when B.chocopeanut_box is not null then chocopeanut_box*6 else 0 end ) as chocopeanut, 
-    //             ((case when B.bambaiyachaat_bar is not null then B.bambaiyachaat_bar else 0 end)+case when B.bambaiyachaat_box is not null then B.bambaiyachaat_box*6 else 0 end) as bambaiyachaat, 
-    //             ((case when B.mangoginger_bar is not null then B.mangoginger_bar else 0 end)+ case when B.mangoginger_box is not null then B.mangoginger_box*6 else 0 end ) as mangoginger, 
-    //             ((case when B.berry_blast_bar is not null then B.berry_blast_bar else 0 end)+ case when B.berry_blast_box is not null then B.berry_blast_box*6 else 0 end) as berry_blast, 
-    //             ((case when B.chyawanprash_bar is not null then B.chyawanprash_bar else 0 end)+ case when B.chyawanprash_box is not null then B.chyawanprash_box*6 else 0 end) as chyawanprash, 
-    //             (case when B.chocolate_cookies_box is not null then B.chocolate_cookies_box*4 else 0 end) as chocolate_cookies, 
-    //             (case when B.cranberry_orange_box is not null then B.cranberry_orange_box*4  else 0 end) as cranberry_orange, 
-    //             (case when B.dark_chocolate_cookies_box is not null then B.dark_chocolate_cookies_box*8 else 0 end) as dark_chocolate_cookies, 
-    //             (case when B.fig_raisins_box is not null then B.fig_raisins_box*2 else 0 end) as fig_raisins, 
-    //             (case when B.papaya_pineapple_box is not null then B.papaya_pineapple_box*2 Else 0 end) as papaya_pineapple, 
-    //             (case when B.cranberry_cookies_box is not null then B.cranberry_cookies_box*4 else 0 end) as cranberry_cookies, 
-    //             B.variety_box, B.mint_box, A.remarks, A.location_id, A.area_id from 
-    //         (select A.sales_rep_loc_id, A.distributor_id, A.location_id, A.area_id, B.date_of_visit, B.sales_rep_id, B.remarks from 
-    //         (select max(id) as sales_rep_loc_id, distributor_id, location_id, area_id from sales_rep_location group by distributor_id, location_id, area_id) A 
-    //         left join 
-    //         (select id, date_of_visit, distributor_id, sales_rep_id, location_id, area_id, remarks from sales_rep_location) B 
-    //         on (A.sales_rep_loc_id=B.id and A.distributor_id=B.distributor_id and A.location_id=B.location_id and A.area_id=B.area_id)) A 
-    //         left join 
-    //         (select * from sales_rep_distributor_opening_stock) B on (A.sales_rep_loc_id=B.sales_rep_loc_id) 
-    //             where (A.distributor_id is not null and A.distributor_id<>'')) S 
-    //         on (A.id=S.distributor_id and A.location_id=S.location_id and A.area_id=S.area_id) 
-    //         union 
-    //         select A.id as dist_id, A.distributor_name, A.sales_rep_id, A.order_id, ifnull(datediff(current_date(),A.order_date),0) as order_place_aging, 
-    //             A.order_date, A.sales_rep_name, B.item_qty, B.sales_rep_order_id, B.item_id, A.location_id, A.area_id, S.last_date_of_visit, 
-    //             S.last_date_aging, S.remarks, S.orange, S.butterscotch, S.chocopeanut, S.mangoginger, S.berry_blast, S.chyawanprash, 
-    //             S.dark_chocolate_cookies, S.chocolate_cookies, S.cranberry_cookies, S.cranberry_orange, S.papaya_pineapple, S.fig_raisins, 2 as d_type from 
-    //         (select A.*,B.sales_rep_name from 
-    //         (select B.*, C.sales_rep_id, O.order_id, C.date_of_processing as order_date from 
-    //         (select concat('s_',A.id) as id, A.distributor_name, A.area_id, A.location_id from 
-    //         (select * from sales_rep_distributors) A) B 
-    //         left join 
-    //         (select A.distributor_id, A.area_id, A.location_id, max(A.id) as order_id from 
-    //         (select A.id, A.distributor_id, A.date_of_processing, B.area_id, B.location_id, A.visit_id from 
-    //         (select id, distributor_id, date_of_processing, visit_id from sales_rep_orders 
-    //             where id in (select sales_rep_order_id from sales_rep_order_items where qty is not null)) A 
-    //         left join 
-    //         (select * from sales_rep_location) B on A.visit_id=B.id) A 
-    //         group by A.distributor_id, A.area_id, A.location_id) O 
-    //         on (O.distributor_id=B.id and O.location_id=B.location_id and O.area_id=B.area_id) 
-    //         left join 
-    //         (select distinct A.id as order_id, A.sales_rep_id, A.distributor_id, A.date_of_processing, A.area_id, A.location_id from 
-    //         (select A.id, A.distributor_id, A.date_of_processing, B.area_id, B.location_id, A.visit_id, A.sales_rep_id from 
-    //         (select distributor_id, date_of_processing, visit_id, id, sales_rep_id from sales_rep_orders 
-    //             where id in (select sales_rep_order_id from sales_rep_order_items where qty is not null)) A
-    //         left join
-    //         (select * from sales_rep_location) B on A.visit_id=B.id) A) C 
-    //         on (O.distributor_id=C.distributor_id and O.order_id=C.order_id and O.area_id=C.area_id and O.location_id=C.location_id) 
-    //         order by sales_rep_id desc) A 
-    //         left join
-    //         (select * from sales_rep_master) B on A.sales_rep_id=B.id 
-    //         order by sales_rep_id desc) A 
-    //         left join
-    //         (select sales_rep_order_id, item_id, sum(item_qty) as item_qty from 
-    //         (select E.sales_rep_order_id, case when E.type='Bar' then E.qty else (E.qty*F.qty) end  as item_qty, 
-    //             case when E.type='Bar' then E.item_id else F.product_id end  as item_id from 
-    //         (select * from sales_rep_order_items) E 
-    //         left join box_product F on (E.type='Box' and (E.item_id=F.box_id)) 
-    //         left join product_master G on (E.type='Bar' and (E.item_id=G.id))) A 
-    //         group by sales_rep_order_id ,item_id) B 
-    //         on (A.order_id=B.sales_rep_order_id)
-    //         left join 
-    //         (select A.date_of_visit as last_date_of_visit, ifnull(datediff(current_date(),A.date_of_visit),0) as last_date_aging, 
-    //             A.distributor_id, A.sales_rep_id, A.sales_rep_loc_id,
-    //             ((case when B.orange_bar is not null then B.orange_bar else 0 end )+(case when B.orange_box is not null then orange_box*6 else 0 end)) as orange, 
-    //             ((case when B.butterscotch_bar is not null then B.butterscotch_bar else 0 end )+(case when butterscotch_box is not null then butterscotch_box*6 else 0 end)) as butterscotch, 
-    //             ((case when B.chocopeanut_bar is not null then B.chocopeanut_bar else 0 end)+case when B.chocopeanut_box is not null then chocopeanut_box*6 else 0 end) as chocopeanut, 
-    //             ((case when B.bambaiyachaat_bar is not null then B.bambaiyachaat_bar else 0 end)+case when B.bambaiyachaat_box is not null then B.bambaiyachaat_box*6 else 0 end) as bambaiyachaat, 
-    //             ((case when B.mangoginger_bar is not null then B.mangoginger_bar else 0 end)+case when B.mangoginger_box is not null then B.mangoginger_box*6 else 0 end) as mangoginger, 
-    //             ((case when B.berry_blast_bar is not null then B.berry_blast_bar else 0 end)+case when B.berry_blast_box is not null then B.berry_blast_box*6 else 0 end) as berry_blast, 
-    //             ((case when B.chyawanprash_bar is not null then B.chyawanprash_bar else 0 end)+case when B.chyawanprash_box is not null then B.chyawanprash_box*6 else 0 end) as chyawanprash, 
-    //             (case when B.chocolate_cookies_box is not null then B.chocolate_cookies_box*4 else 0 end) as chocolate_cookies, 
-    //             (case when B.cranberry_orange_box is not null then B.cranberry_orange_box*4  else 0 end) as cranberry_orange, 
-    //             (case when B.dark_chocolate_cookies_box is not null then B.dark_chocolate_cookies_box*8 else 0 end) as dark_chocolate_cookies, 
-    //             (case when B.fig_raisins_box is not null then B.fig_raisins_box*2 else 0 end) as fig_raisins, 
-    //             (case when B.papaya_pineapple_box is not null then B.papaya_pineapple_box*2 Else 0 end) as papaya_pineapple, 
-    //             (case when B.cranberry_cookies_box is not null then B.cranberry_cookies_box*4 else 0 end) as cranberry_cookies, 
-    //             B.variety_box, B.mint_box, A.remarks, A.location_id, A.area_id from 
-    //         (select A.id as sales_rep_loc_id, A.distributor_id, A.location_id, A.area_id, B.date_of_visit, B.sales_rep_id, B.remarks from 
-    //         (select distributor_id, location_id, area_id, max(id) as id from sales_rep_location group by distributor_id, location_id, area_id) A 
-    //         left join 
-    //         (select id, date_of_visit, distributor_id, sales_rep_id, location_id, area_id, remarks from sales_rep_location) B 
-    //         on (A.id=B.id and (A.distributor_id=B.distributor_id and A.location_id=B.location_id and A.area_id=B.area_id))) A 
-    //         left join 
-    //         (select * from sales_rep_distributor_opening_stock) B on (A.sales_rep_loc_id=B.sales_rep_loc_id) 
-    //             where (A.distributor_id is not null and A.distributor_id<>'')) S 
-    //         on (A.id=S.distributor_id and A.location_id=S.location_id and A.area_id=S.area_id) 
-    //         where (S.last_date_of_visit is not null OR A.order_date is not null)) A order by sales_rep_order_id ASC ) A
-    //         left join 
-    //         (select * from location_master) L on A.location_id=L.id
-    //         left join
-    //         (select * from area_master) E on A.area_id=E.id 
-    //         ".$cond.") AA 
-    //         group by AA.distributor_name, AA.location, AA.area, AA.d_type, AA.item_id 
-    //         order by AA.d_type, AA.distributor_name, AA.location";
-
     $sql = "select AA.*, ifnull(datediff(current_date(), AA.last_date_of_visit),0) as last_date_aging, 
-                ifnull(datediff(current_date(), AA.order_date),0) as order_place_aging from 
-
+            ifnull(datediff(current_date(), AA.order_date),0) as order_place_aging from 
             (select AA.distributor_name, AA.location, AA.area, AA.d_type, AA.item_id, sum(AA.item_qty) as item_qty, 
                 group_concat(distinct AA.sales_rep_name) as sales_rep_name, group_concat(distinct AA.remarks) as remarks, 
                 max(AA.order_date) as order_date, max(AA.date_of_visit) as last_date_of_visit, 
@@ -16138,6 +15556,7 @@ public function gt_store_report($save='',$region=array()){
     $filename='Store_wise_sales_'.$date1.'.xls';
     if($save=='') {
         $path  ='/home/eatangcp/public_html/eat_erp/assets/uploads/exception_reports/';
+        // $path  ='/var/www/html/eat_erp/assets/uploads/exception_reports/';
 
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
         $objWriter->save($path.$filename);
@@ -17342,113 +16761,1230 @@ function generate_monthly_sales_overview_zonewise_report() {
     }
 }
 
-function generate_beat_analysis_report() {
+public function send_exception_report() {
+    $date = date('Y-m-d');
+    // $date = '2019-03-01';
+    //and (A.ref_id is null or A.ref_id = '')  removed this from sales and Sales Return 
+    //and date(A.created_on)<date('".$date."') bcoz ref_id is only assign to previous approved
+    //and case When (date(A.created_on)=date('".$date."') AND (A.ref_id is not null or A.ref_id != '') Then (A.ref_id is not null or A.ref_id != '')
+
+    $sql = "select 'Sales' as temp_col, sum(case when date(A.created_on)=date('".$date."') then 1 else 0 end) as entry_done, 
+        sum(case when date(A.date_of_processing)<date('".$date."') and (A.status = 'Pending' or A.status = 'Deleted') and (A.delivery_status='Pending' or A.delivery_status='GP Issued' or A.delivery_status='Delivered Not Complete' or A.delivery_status='Delivered') then 1 else 0 end) as pending, 
+            sum(
+            case 
+            when date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')))
+                 then 1 
+            when date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')))
+                 then 0
+            when date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)<date('".$date."') ))
+                  then 1
+            else 0
+            END
+            ) as prior_pending 
+            from distributor_out A 
+            where A.date_of_processing is not null and A.distributor_id!='1' and A.distributor_id!='189' 
+
+
+            union all 
+
+            select 'Payment Received' as temp_col, sum(case when date(A.created_on)=date('".$date."') then 1 else 0 end) as entry_done, 
+            sum(case when date(A.date_of_deposit)<date('".$date."') and (A.status = 'Pending' or A.status = 'Deleted') and (A.ref_id is null or A.ref_id = '') then 1 else 0 end) as pending, 
+             sum(
+                case 
+                when date(A.date_of_deposit)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')))
+                     then 1 
+                when date(A.date_of_deposit)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')))
+                     then 0
+                when date(A.date_of_deposit)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)<date('".$date."') ))
+                      then 1
+                else 0
+                END
+                ) as prior_pending
+            from payment_details A where A.date_of_deposit is not null 
+
+            union all
+
+            select 'Sales Return' as temp_col, sum(case when date(A.created_on)=date('".$date."') then 1 else 0 end) as entry_done, 
+            sum(case when date(A.date_of_processing)<date('".$date."') and (A.status = 'Pending' or A.status = 'Deleted') then 1 else 0 end) as pending, 
+            sum(
+            case 
+            when date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')))
+                 then 1 
+            when date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')))
+                 then 0
+            when date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)<date('".$date."') ))
+                  then 1
+            else 0
+            END
+            ) as prior_pending  
+            from distributor_in A where A.date_of_processing is not null
+
+            union all 
+
+            select 'Sample' as temp_col, sum(case when date(A.created_on)=date('".$date."') then 1 else 0 end) as entry_done, 
+            sum(case when date(A.date_of_processing)<date('".$date."') and (A.status = 'Pending' or A.status = 'Deleted') and (delivery_status='Pending' or delivery_status='GP Issued' or delivery_status='Delivered Not Complete' or delivery_status='Delivered') and (A.ref_id is null or A.ref_id = '') then 1 else 0 end) as pending, 
+           sum(
+            case 
+            when date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')))
+                 then 1 
+            when date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')))
+                 then 0
+            when date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)<date('".$date."') ))
+                  then 1
+            else 0
+            END
+            ) as prior_pending 
+            from distributor_out A 
+            where A.date_of_processing is not null and (A.distributor_id='1' or A.distributor_id='189') 
+
+            union all 
+
+            select 'Credit Notes' as temp_col, sum(case when date(A.created_on)=date('".$date."') then 1 else 0 end) as entry_done, 
+            sum(case when date(A.date_of_transaction)<date('".$date."') and (A.status = 'Pending' or A.status = 'Deleted') then 1 else 0 end) as pending, 
+            sum(
+                case 
+                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != ''))) 
+                     then 1 
+                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = ''))) 
+                     then 0 
+                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)<date('".$date."') )) 
+                      then 1 
+                else 0
+                END
+            ) as prior_pending 
+            from credit_debit_note A where A.date_of_transaction is not null and transaction = 'Credit Note' 
+
+            union all 
+
+            select 'Debit Notes' as temp_col, sum(case when date(A.created_on)=date('".$date."') then 1 else 0 end) as entry_done, 
+            sum(case when date(A.date_of_transaction)<date('".$date."') and (A.status = 'Pending' or A.status = 'Deleted') then 1 else 0 end) as pending, 
+            sum(
+                case 
+                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')))
+                     then 1 
+                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')))
+                     then 0
+                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)<date('".$date."') ))
+                      then 1
+                else 0
+                END
+            ) as prior_pending
+            from credit_debit_note A where A.date_of_transaction is not null and transaction = 'Debit Note' 
+
+            union all 
+
+            select 'Expense Vouchers' as temp_col, sum(case when date(A.created_on)=date('".$date."') then 1 else 0 end) as entry_done, 
+            sum(case when date(A.date_of_transaction)<date('".$date."') and (A.status = 'Pending' or A.status = 'Deleted') then 1 else 0 end) as pending, 
+            sum(
+                case 
+                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != ''))) 
+                     then 1 
+                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = ''))) 
+                     then 0 
+                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)<date('".$date."') )) 
+                      then 1 
+                else 0
+                END
+            ) as prior_pending 
+            from credit_debit_note A where A.date_of_transaction is not null and transaction = 'Expense Voucher' 
+
+            union all 
+
+            select 'Expense Voucher Reversals' as temp_col, sum(case when date(A.created_on)=date('".$date."') then 1 else 0 end) as entry_done, 
+            sum(case when date(A.date_of_transaction)<date('".$date."') and (A.status = 'Pending' or A.status = 'Deleted') then 1 else 0 end) as pending, 
+            sum(
+                case 
+                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')))
+                     then 1 
+                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')))
+                     then 0
+                when date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (date(A.created_on)<date('".$date."') ))
+                      then 1
+                else 0
+                END
+            ) as prior_pending
+            from credit_debit_note A where A.date_of_transaction is not null and transaction = 'Expense Voucher Reversal'";
+
+    $query = $this->db->query($sql);
+    $result = $query->result();
+    $entry_table = '';
+    if(count($result)>0) {
+        for($i=0; $i<count($result); $i++) {
+            $link1 = '';
+            $link2 = '';
+            if(strtoupper(trim($result[$i]->temp_col))=='SALES') {
+                $link1 = base_url().'index.php/distributor_out';
+                $link2 = base_url().'index.php/distributor_out/checkstatus/pending_for_approval';
+            }
+            if(strtoupper(trim($result[$i]->temp_col))=='PAYMENT RECEIVED') {
+                $link1 = base_url().'index.php/payment';
+                $link2 = base_url().'index.php/payment/checkstatus/Pending';
+            }
+            if(strtoupper(trim($result[$i]->temp_col))=='SALES RETURN') {
+                $link1 = base_url().'index.php/Distributor_in';
+                $link2 = base_url().'index.php/Distributor_in/checkstatus/Pending';
+            }
+            if(strtoupper(trim($result[$i]->temp_col))=='SAMPLE') {
+                $link1 = base_url().'index.php/Sample_out';
+                $link2 = base_url().'index.php/Sample_out/checkstatus/pending_for_approval';
+            }
+            if(strtoupper(trim($result[$i]->temp_col))=='CREDIT NOTES' || strtoupper(trim($result[$i]->temp_col))=='DEBIT NOTES' || 
+                strtoupper(trim($result[$i]->temp_col))=='EXPENSE VOUCHERS' || strtoupper(trim($result[$i]->temp_col))=='EXPENSE VOUCHER REVERSALS') {
+                $link1 = base_url().'index.php/Credit_debit_note';
+                $link2 = base_url().'index.php/Credit_debit_note/checkstatus/Pending';
+            }
+            $entry_table = $entry_table . '<tr>
+                                <td>'.$result[$i]->temp_col.'</td>
+                                <td style="text-align: center;"><!-- <a href="'.$link1.'" target="_blank"> -->'.$result[$i]->entry_done.'<!-- </a> --></td>
+                                <td style="text-align: center; color: #F00;"><!-- <a href="'.$link2.'" target="_blank" style="color: #F00;"> -->'.$result[$i]->pending.'<!-- </a> --></td>
+                                <td style="text-align: center; color: #F00;"><!-- <a href="'.$link2.'" target="_blank" style="color: #F00;"> -->'.$result[$i]->prior_pending.'<!-- </a> --></td>
+                            </tr>';
+        }
+    }
+    // echo $sql;
+    // echo '<br/><br/>';
+
+    $sql = "select 'Sales Delivery' as temp_col, sum(case when A.delivery_status = 'Pending' then 1 else 0 end) as delivery_pending, sum(case when A.delivery_status = 'GP Issued' then 1 else 0 end) as in_transit from distributor_out A where A.status = 'Approved' and A.date_of_processing is not null and A.distributor_id!='1' and A.distributor_id!='189' 
+
+        union all 
+
+        select 'Sample Delivery' as temp_col, sum(case when A.delivery_status = 'Pending' then 1 else 0 end) as delivery_pending, sum(case when A.delivery_status = 'GP Issued' then 1 else 0 end) as in_transit from distributor_out A where A.status = 'Approved' and A.date_of_processing is not null and (A.distributor_id='1' or A.distributor_id='189')";
+    $query = $this->db->query($sql);
+    $result = $query->result();
+    $delivery_table = '';
+    if(count($result)>0) {
+        for($i=0; $i<count($result); $i++) {
+            $link1 = '';
+            $link2 = '';
+            if(strtoupper(trim($result[$i]->temp_col))=='SALES DELIVERY') {
+                $link1 = base_url().'index.php/distributor_out/checkstatus/pending_for_delivery';
+                $link2 = base_url().'index.php/distributor_out/checkstatus/gp_issued';
+            } else if(strtoupper(trim($result[$i]->temp_col))=='SAMPLE DELIVERY') {
+                $link1 = base_url().'index.php/sample_out/checkstatus/pending_for_delivery';
+                $link2 = base_url().'index.php/sample_out/checkstatus/gp_issued';
+            }
+            $delivery_table = $delivery_table . '<tr>
+                                <td>'.$result[$i]->temp_col.'</td>
+                                <td style="text-align: center; color: #F00;"><!-- <a href="'.$link1.'" target="_blank" style="color: #F00;"> -->'.$result[$i]->delivery_pending.'<!-- </a> --></td>
+                                <td style="text-align: center; color: #F00;"><!-- <a href="'.$link2.'" target="_blank" style="color: #F00;"> -->'.$result[$i]->in_transit.'<!-- </a> --></td>
+                            </tr>';
+        }
+    }
+    // echo $sql;
+    // echo '<br/><br/>';
+
+    $sql = "select Distinct 'Sales' as temp_col, A.id, A.date_of_processing as ref_date, A.invoice_no as ref_no, A.distributor_id, A.invoice_amount as amount, A.modified_by, A.modified_on, B.distributor_name, concat(ifnull(C.first_name,''),' ',ifnull(C.last_name,'')) as modifiedby 
+        from distributor_out A left join distributor_master B on (A.distributor_id=B.id) left join user_master C on (A.modified_by=C.id) 
+        where A.date_of_processing is not null and A.distributor_id!='1' and A.distributor_id!='189' and date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and 
+            (Case When 
+            date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')
+            Then 1=1
+            When date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')
+            Then 1=0
+            When date(A.created_on)<date('".$date."') 
+            Then 1=1
+            else
+            1=0
+            End )
+        ) 
+
+        union all 
+
+        select Distinct 'Payment Received' as temp_col, A.id, A.date_of_deposit as ref_date, B.ref_no, B.distributor_id, B.payment_amount as amount, A.modified_by, A.modified_on, C.distributor_name, concat(ifnull(D.first_name,''),' ',ifnull(D.last_name,'')) as modifiedby 
+        from payment_details A left join payment_details_items B on (A.id=B.payment_id) left join distributor_master C on (B.distributor_id=C.id) left join user_master D on (A.modified_by=D.id) 
+        where A.date_of_deposit is not null and date(A.date_of_deposit)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and 
+            (Case When 
+            date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')
+            Then 1=1
+            When date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')
+            Then 1=0
+            When date(A.created_on)<date('".$date."') 
+            Then 1=1
+            else
+            1=0
+            End )
+        )
+
+        union all 
+
+        select Distinct 'Sales Return' as temp_col, A.id, A.date_of_processing as ref_date, A.sales_return_no as ref_no, A.distributor_id, A.final_amount as amount, A.modified_by, A.modified_on, B.distributor_name, concat(ifnull(C.first_name,''),' ',ifnull(C.last_name,'')) as modifiedby 
+        from distributor_in A left join distributor_master B on (A.distributor_id=B.id) left join user_master C on (A.modified_by=C.id) 
+        where A.date_of_processing is not null and date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (Case When 
+            date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')
+            Then 1=1
+            When date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')
+            Then 1=0
+            When date(A.created_on)<date('".$date."') 
+            Then 1=1
+            else
+            1=0
+            End ))
+
+        union all 
+
+        select Distinct 'Sample' as temp_col, A.id, A.date_of_processing as ref_date, A.voucher_no as ref_no, A.distributor_id, A.final_amount as amount, A.modified_by, A.modified_on, B.distributor_name, concat(ifnull(C.first_name,''),' ',ifnull(C.last_name,'')) as modifiedby 
+        from distributor_out A left join distributor_master B on (A.distributor_id=B.id) left join user_master C on (A.modified_by=C.id) 
+        where A.date_of_processing is not null and (A.distributor_id='1' or A.distributor_id='189') and date(A.date_of_processing)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (Case When 
+            date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')
+            Then 1=1
+            When date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')
+            Then 1=0
+            When date(A.created_on)<date('".$date."') 
+            Then 1=1
+            else
+            1=0
+            End )) 
+
+        union all 
+
+        select Distinct 'Credit Notes' as temp_col, A.id, A.date_of_transaction as ref_date, A.ref_no, A.distributor_id, A.amount, A.modified_by, A.modified_on, B.distributor_name, concat(ifnull(C.first_name,''),' ',ifnull(C.last_name,'')) as modifiedby 
+        from credit_debit_note A left join distributor_master B on (A.distributor_id=B.id) left join user_master C on (A.modified_by=C.id) 
+        where A.date_of_transaction is not null and date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (Case When 
+            date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')
+            Then 1=1
+            When date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')
+            Then 1=0
+            When date(A.created_on)<date('".$date."') 
+            Then 1=1
+            else
+            1=0
+            End )
+        ) and transaction = 'Credit Note' 
+
+        union all 
+
+        select Distinct 'Debit Notes' as temp_col, A.id, A.date_of_transaction as ref_date, A.ref_no, A.distributor_id, A.amount, A.modified_by, A.modified_on, B.distributor_name, concat(ifnull(C.first_name,''),' ',ifnull(C.last_name,'')) as modifiedby 
+        from credit_debit_note A left join distributor_master B on (A.distributor_id=B.id) left join user_master C on (A.modified_by=C.id) 
+        where A.date_of_transaction is not null and date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (Case When 
+            date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')
+            Then 1=1
+            When date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')
+            Then 1=0
+            When date(A.created_on)<date('".$date."') 
+            Then 1=1
+            else
+            1=0
+            End )
+        ) and transaction = 'Debit Note' 
+
+        union all 
+
+        select Distinct 'Expense Vouchers' as temp_col, A.id, A.date_of_transaction as ref_date, A.ref_no, A.distributor_id, A.amount, A.modified_by, A.modified_on, B.distributor_name, concat(ifnull(C.first_name,''),' ',ifnull(C.last_name,'')) as modifiedby 
+        from credit_debit_note A left join distributor_master B on (A.distributor_id=B.id) left join user_master C on (A.modified_by=C.id) 
+        where A.date_of_transaction is not null and date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (Case When 
+            date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')
+            Then 1=1
+            When date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')
+            Then 1=0
+            When date(A.created_on)<date('".$date."') 
+            Then 1=1
+            else
+            1=0
+            End )
+        ) and transaction = 'Expense Voucher' 
+
+        union all 
+
+        select Distinct 'Expense Voucher Reversals' as temp_col, A.id, A.date_of_transaction as ref_date, A.ref_no, A.distributor_id, A.amount, A.modified_by, A.modified_on, B.distributor_name, concat(ifnull(C.first_name,''),' ',ifnull(C.last_name,'')) as modifiedby 
+        from credit_debit_note A left join distributor_master B on (A.distributor_id=B.id) left join user_master C on (A.modified_by=C.id) 
+        where A.date_of_transaction is not null and date(A.date_of_transaction)<date('".$date."') and (A.modified_approved_date is not null and date(A.modified_approved_date)=date('".$date."') and (Case When 
+            date(A.created_on)=date('".$date."')  AND (A.ref_id is not null or A.ref_id != '')
+            Then 1=1
+            When date(A.created_on)=date('".$date."')  AND (A.ref_id is null or A.ref_id = '')
+            Then 1=0
+            When date(A.created_on)<date('".$date."') 
+            Then 1=1
+            else
+            1=0
+            End )
+        ) and transaction = 'Expense Voucher Reversal'";
+
+    $query = $this->db->query($sql);
+    $result = $query->result();
+    $filename = '';
+    $path = '';
+    if(count($result)>0) {
+        $this->load->library('excel');
+        $objPHPExcel = new PHPExcel();
+        $objPHPExcel->setActiveSheetIndex(0);
+
+        $col_name[]=array();
+        for($i=0; $i<=20; $i++) {
+            $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
+        }
+
+        $row=1;
+        $col=0;
+
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Wholesome Habits Private Limited");
+        $row=$row+2;
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Exception Reporting - Operations");
+        $row=$row+2;
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Reporting Date - " . (($date!=null && $date!="")?date("d/m/Y",strtotime($date)):""));
+
+        //------------ setting headers of excel -------------
+        $row=$row+2;
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, 'Entry Type');
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, 'System ID');
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, 'Ref Date');
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, 'Reference');
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, 'Distributor');
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, 'Amount');
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, 'Modified By');
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, 'Modified On');
+
+        for($i=0; $i<count($result); $i++) {
+
+            if($result[$i]->temp_col=='Sample')
+            {
+                $url = base_url('index.php/sample_out/edit/d_'.$result[$i]->id);
+            }
+            else if($result[$i]->temp_col=='Sales')
+            {
+                $url = base_url('index.php/Distributor_out/edit/d_'.$result[$i]->id);
+            }
+            else if($result[$i]->temp_col=='Payment Received')
+            {
+                $url = base_url('index.php/payment/edit/'.$result[$i]->id);
+            }
+            else if($result[$i]->temp_col=='Sales Return')
+            {
+                $url = base_url('index.php/distributor_in/edit/'.$result[$i]->id);
+            }
+            else if($result[$i]->temp_col=='Credit Notes' || $result[$i]->temp_col=='Debit Notes' || 
+                    $result[$i]->temp_col=='Expense Vouchers' || $result[$i]->temp_col=='Expense Voucher Reversals')
+            {
+                $url = base_url('index.php/credit_debit_note/edit/'.$result[$i]->id);
+            }
+
+            
+           
+            $row=$row+1;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $result[$i]->temp_col);
+            /*$objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row,'=Hyperlink("'.$url.'",'.$result[$i]->id.')');*/
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row,$result[$i]->id);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, (($result[$i]->ref_date!=null && $result[$i]->ref_date!="")?date("d/m/Y",strtotime($result[$i]->ref_date)):""));
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $result[$i]->ref_no);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $result[$i]->distributor_name);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, $result[$i]->amount);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, $result[$i]->modifiedby);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, (($result[$i]->modified_on!=null && $result[$i]->modified_on!="")?date("d/m/Y",strtotime($result[$i]->modified_on)):""));
+        }
+
+        $objPHPExcel->getActiveSheet()->getStyle('A7:H7')->getFont()->setBold(true);
+        $objPHPExcel->getActiveSheet()->getStyle('A7:'.$col_name[$col+7].$row)->applyFromArray(array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+            )
+        ));
+
+        for ($col = 0; $col <= PHPExcel_Cell::columnIndexFromString($objPHPExcel->getActiveSheet()->getHighestDataColumn()); $col++) {
+            $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn($col)->setAutoSize(true);
+        }
+
+        $filename='Exception_Report.xls';
+        //$path  = 'C:\xampp\htdocs\eat_erp_new_30\assets\uploads\exception_reports';
+        // $path  = '/home/eatangcp/public_html/test/assets/uploads/exception_reports/';
+        $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/exception_reports/';
+        // $path  = '/var/www/html/eat_erp/assets/uploads/exception_reports/';
+
+        // header('Content-Type: application/vnd.ms-excel');
+        // header('Content-Disposition: attachment;filename="'.$filename.'"');
+        // header('Cache-Control: max-age=0');
+        // $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+        // $objWriter->save('php://output');
+
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5'); 
+        $objWriter->save($path.$filename);
+    }
+
+    $message = '<html>
+                <body>
+                    <h3>Wholesome Habits Private Limited</h3>
+                    <h4>Exception Reporting - Operations</h4>
+                    <p>Reporting Date - '.(($date!=null && $date!="")?date("d/m/Y",strtotime($date)):"").'</p>
+                    <table border="1" style="border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th style="background-color: #44546A; color: #FFF; padding: 10px;">Type</th>
+                                <th style="background-color: #44546A; color: #FFF; padding: 10px;">Entries Done</th>
+                                <th style="background-color: #44546A; color: #FFF; padding: 10px;">Pending Approval</th>
+                                <th style="background-color: #44546A; color: #FFF; padding: 10px;">Prior Period Modifications</th>
+                            </tr>
+                        </thead>
+                        <tbody>'.$entry_table.'</tbody>
+                    </table>
+                    <br/><br/>
+                    <table border="1" style="border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th style="background-color: #44546A; color: #FFF; padding: 10px;">Type</th>
+                                <th style="background-color: #44546A; color: #FFF; padding: 10px;">Delivery Pending</th>
+                                <th style="background-color: #44546A; color: #FFF; padding: 10px;">In Transit</th>
+                            </tr>
+                        </thead>
+                        <tbody>'.$delivery_table.'</tbody>
+                    </table>
+                    <br/><br/>
+                    Regards,
+                    <br/><br/>
+                    CS
+                </body>
+                </html>';
+    $from_email = 'info@eatanytime.co.in';
+    $from_email_sender = 'EAT MIS';
+    $subject = 'Exception Report - '.(($date!=null && $date!="")?date("d/m/Y",strtotime($date)):"");
+
+    /*$to_email = "dhava.maru@pecanreams.com";
+    $cc="sangeeta.yadav@pecanreams.com";
+    $bcc="yadavsangeeta521@gmail.com";*/
+    
+    // $to_email = "prasad.bhisale@pecanreams.com";
+    // $cc = 'prasad.bhisale@pecanreams.com';
+    // $bcc = 'prasad.bhisale@pecanreams.com';
+
+    $to_email = "priti.tripathi@eatanytime.co.in, operations@eatanytime.co.in";
+    $cc="rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, dhaval.maru@pecanreams.com";
+    $bcc="prasad.bhisale@pecanreams.com";
+
+    $sql = "select * from report_master where report_name = 'Exception Report'";
+    $query = $this->db->query($sql);
+    $result = $query->result();
+    if(count($result)>0) {
+        $from_email = $result[0]->from_email;
+        $from_email_sender = $result[0]->sender_name;
+        $to_email = $result[0]->to_email;
+        $cc = $result[0]->cc_email;
+        $bcc = $result[0]->bcc_email;
+    }
+
+    echo $attachment = $path.$filename;
+    // $to_email = 'dhaval.maru@otbconsulting.co.in,dhavalbright@gmail.com';
+    // $to_email = 'rishit.sanghvi@eatanytime.in,swapnil.darekar@eatanytime.in;dhaval.maru@otbconsulting.co.in';
+    $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc, $cc, $attachment);
+
+    // $mailSent=1;
+    
+    echo $message;
+    echo '<br/><br/>';
+    echo $mailSent;
+
+    if($mailSent==1){
+        $logarray['table_id']=$this->session->userdata('session_id');
+        $logarray['module_name']='Reports';
+        $logarray['cnt_name']='Reports';
+        $logarray['action']='Exception report sent.';
+        $this->user_access_log_model->insertAccessLog($logarray);
+    }
+}
+
+public function send_production_exception_report(){
+    $tbody ='';
+    $from_email = 'cs@eatanytime.co.in';
+    $from_email_sender = 'EAT MIS';
+    
+    $task = $this->get_task_cnt();
+    $pre_production = $this->get_pre_production_cnt();
+    $post_production = $this->get_post_production_cnt();
+    $po_count = $this->get_po_count();
+
+    $date = date("d.m.Y");
+    $tbody ='';
+
+    if(count($task)>0 || count($pre_production) || count($post_production)) {
+        $tbody ='<!DOCTYPE html">
+                    <html>
+                    <head>
+                        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+                        <style type="text/css">
+                            body {margin: 0; padding: 20px; min-width: 100%!important;font-family "Arial,Helvetica,sans-serif";}
+                            img {height: auto;}
+                            .content { max-width: 600px;}
+                            .header {padding:  20px;}
+                            .innerpadding {padding: 30px 30px 30px 30px;}
+                            /*.innerpadding1 {padding: 0px 30px 30px 30px;}*/
+
+                            .innerpadding1 tbody td  .innerpadding1 tbody th
+                            {
+                            border:1px solid #000!important;
+                            padding: 0 8px!important;
+
+                            }
+
+                            .borderbottom {border-bottom: 1px solid #f2eeed;}
+                            .subhead {font-size: 15px; color: #ffffff; font-family: sans-serif; letter-spacing: 10px;}
+                            .h1, .h2, .bodycopy {color: #fff; font-family: sans-serif;}
+                            .h1 {font-size: 33px; line-height: 38px; font-weight: bold;}
+                            .h2 {padding: 0 0 15px 0; font-size: 24px; line-height: 28px; font-weight: bold;}
+                            .bodycopy {font-size: 16px; line-height: 22px;}
+                            .button {text-align: center; font-size: 18px; font-family: sans-serif; font-weight: bold; padding: 0 30px 0 30px;}
+                            .button a {color: #ffffff; text-decoration: none;}
+                            .footer {padding: 20px 30px 15px 30px;}
+                            .footercopy {font-family: sans-serif; font-size: 14px; color: #ffffff;}
+                            .footercopy a {color: #ffffff; text-decoration: underline;}
+
+                            @media only screen and (max-width: 550px), screen and (max-device-width: 550px) {
+                            body[yahoo] .hide {display: none!important;}
+                            body[yahoo] .buttonwrapper {background-color: transparent!important;}
+                            body[yahoo] .button {padding: 0px!important;}
+                            body[yahoo] .button a {background-color: #e05443; padding: 15px 15px 13px!important;}
+                            body[yahoo] .unsubscribe {display: block; margin-top: 20px; padding: 10px 50px; background: #2f3942; border-radius: 5px; text-decoration: none!important; font-weight: bold;}
+                            }
+
+                            /*@media only screen and (min-device-width: 601px) {
+                            .content {width: 600px !important;}
+                            .col425 {width: 425px!important;}
+                            .col380 {width: 380px!important;}
+                            }*/
+                            table, th, td {
+
+                            border-collapse: collapse;
+                            padding: 0 8px!important;
+
+                            }
+                            th,td {
+                            padding: 0 8px!important;
+                            text-align: left;
+
+                            }
+
+                            th 
+                            {
+                            color: #fff!important;
+                            }
+                            .total
+                            {
+                                color: #333333;
+                                font-size: 28px;
+                                font-family: Arial,Helvetica,sans-serif;
+                            }
+                            .used
+                            {
+                                color: #666666;
+                                font-size: 20px;
+                                font-family: Arial,Helvetica,sans-serif;
+                            }
+                            .team_head
+                            {
+                                font-size:36px;
+                                font-weight:normal;
+                                color:#fff;
+                                font-family: "Arial,Helvetica,sans-serif";
+                            }
+                            .date
+                            {
+                                font-size:16px;
+                                color:#fff;
+                            }
+                            .upper_table td
+                            {
+                                border:1px solid #000;
+                                text-align:center;
+                                     padding: 10px;
+                                
+                            }
+                            .body_table tbody 
+                            {
+                                border:1px solid #000;
+                                background-color:#fff;
+                                color: #000;
+                            }
+                            .body_table tbody td
+                            {
+                                color:#000!important;
+                                padding:0 8px!important;
+                            }
+                        </style>
+                    </head>
+
+                    <body yahoo bgcolor="" style="margin-top:20px;"margin-bottom:20px;">
+                    Dear All,
+                    <br><br>
+                    
+                    Kindly find the updated Production Exception report As On '.$date.'
+                    
+                    <br><br>
+
+                    <table width="350px" bgcolor="" border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">';
+
+                    if(count($task)>0) {
+                        $tbody.='<tr>
+                            <td class="innerpadding1 " style="">
+                            <h3>Other Task </h3>
+                            <table  class="body_table" style="border-collapse: collapse;width:100%;border:1px solid #000!important;">
+                            <thead>
+                                <tr style=" background-color:#002060;color:#fff ;border-bottom: 1px solid #000;font-weight: bold;">
+                        
+                                  <th width="200" style="border-right: 1px solid #000;padding: 0 8px;text-align:left;width:200px">Employee Name</th>
+                                  <th style="border-right: 1px solid #000;padding: 0 8px;text-align: left;width:70px;">Open</th>
+                                  <th style="border-right: 1px solid #000;padding: 0 8px;text-align: left;width:70px;">Overdue</th>
+                                </tr>
+                            </thead>
+                            <tbody style="border:1px solid #000;
+                                            background-color: #fff;
+                                            color: #000;">';
+
+                        for($i=0; $i<count($task); $i++)
+                        {
+                            $tbody.= '<tr>
+                                <td style="border-right: 1px solid #000;text-transform:uppercase;font-weight:bold;padding: 0 8px; border-bottom: 1px solid #000;text-align: left;">'.$task[$i]->user_name.'</td>
+                                <td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: right;padding: 0 8px;">'.$task[$i]->open_task.'</td>
+                                <td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: right;padding: 0 8px;">'.$task[$i]->overdue.'</td>
+                            
+                                </tr>'; 
+                        }
+                        
+                        $tbody.='</tbody>
+                                      </table>
+                                    </td>
+                                  </tr>';
+                    }
+
+                    if(count($po_count)>0) {
+                        $tbody.='<tr>
+                            <td class="innerpadding1 " style="">
+                            <br>
+                            <h3>Purchase Order </h3>
+                            <table  class="body_table" style="border-collapse: collapse;width:100%;border:1px solid #000!important;">
+                            <thead>
+                                <tr style=" background-color:#002060;color:#fff ;border-bottom: 1px solid #000;font-weight: bold;">
+                        
+                                  <th width="200" style="border-right: 1px solid #000;padding: 0 8px;text-align:left;width:200px">Approval Pending</th>
+                                  <th style="border-right: 1px solid #000;padding: 0 8px;text-align: left;width:70px;">Open</th>
+                                  <th style="border-right: 1px solid #000;padding: 0 8px;text-align: left;width:70px;">Payment Pending</th>
+                                  <th style="border-right: 1px solid #000;padding: 0 8px;text-align: left;width:70px;">Advance</th>
+                                </tr>
+                            </thead>
+                            <tbody style="border:1px solid #000;
+                                            background-color: #fff;
+                                            color: #000;">
+                                <tr>
+                                    <td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;">'.$po_count[0]->pending_cnt.'</td>
+                                    <td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;">'.$po_count[0]->open_cnt.'</td>
+                                    <td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;">'.$po_count[0]->pending_payment_cnt.'</td>
+                                    <td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;">'.$po_count[0]->advance_payment_cnt.'</td>
+                                </tr>
+                            </tbody>
+                            </table>
+                            </td>
+                            </tr>';
+                    }
+
+                    if(count($pre_production)>0) {
+                        $tbody.='<tr>
+                                <td class="innerpadding1 " style="">
+                                <br>
+                                <h3>Pre Production </h3>
+                                <table  class="body_table" style="border-collapse: collapse;width:100%;border:1px solid #000!important;;">
+                                <thead>
+                                    <tr style=" background-color:#002060 ;color:#fff ;border-bottom: 1px solid #000;font-weight: bold;">
+                                        <th width="300" style="border-right: 1px solid #000;padding:0 8px;text-align:left;width:300px">Production ID</th>
+                                        <th style="border-right: 1px solid #000;padding:0 8px;text-align: left;width:70px;">Open</th>
+                                        <th style="border-right: 1px solid #000;padding:0 8px;text-align: left;width:70px;">Overdue</th>
+                                    </tr>
+                                </thead>
+                                <tbody style="border:1px solid #000;background-color: #fff;color: #000;">';
+                                
+                        for($i=0; $i<count($pre_production); $i++)
+                        {
+                            $tbody.= '<tr>
+                                <td style="border-right: 1px solid #000;border-bottom: 1px solid #000;padding: 0 8px;width:200px">'.$pre_production[$i]->p_id.'</td>
+                                <td style="border-right: 1px solid #000;text-align: center;border-bottom: 1px solid #000;padding: 0 8px;">'.$pre_production[$i]->open.'</td>
+                                <td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;">'.$pre_production[$i]->overdue.'</td>
+                                
+                                </tr>'; 
+                        }
+
+                        $tbody.='</tbody>
+                                      </table>
+                                    </td>
+                                  </tr>';
+                    }
+
+                    if(count($post_production)>0) {
+                        $tbody.='<tr>
+                                <td class="innerpadding1 " style="">
+                                <br>
+                                <h3>Post Production </h3>
+                               <table  class="body_table" style="border-collapse: collapse;width:100%;border:1px solid #000!important;;">
+                                <thead>
+                                    <tr style=" background-color:#002060 ;color:#fff ;border-bottom: 1px solid #000;font-weight: bold;">
+                            
+                                      <th width="300" style="border-right: 1px solid #000;padding:0 8px;text-align:left;width:300px">Production ID</th>
+                                      <th style="border-right: 1px solid #000;padding:0 8px;text-align: left;width:70px;" >Open</th>
+                                      <th style="border-right: 1px solid #000;padding:0 8px;text-align: left;width:70px;">  
+                                            Overdue</th>
+                                     
+                                      
+                                      
+                                    </tr>
+                                </thead>
+                                <tbody style="border:1px solid #000;background-color: #fff;color: #000;">';
+                                
+                        for($i=0; $i<count($post_production); $i++)
+                        {
+                            $tbody.= '<tr>
+                                        <td style="border-right: 1px solid #000;border-bottom: 1px solid #000;padding: 0 8px;width:200px">'.$post_production[$i]->p_id.'</td>
+                                        <td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;">'.$post_production[$i]->open.'</td>
+                                        <td style="border-right: 1px solid #000;border-bottom: 1px solid #000;text-align: center;padding: 0 8px;">'.$post_production[$i]->overdue.'</td>
+                                    </tr>'; 
+                        }
+
+                        $tbody.='</tbody>
+                                      </table>
+                                    </td>
+                                  </tr>';
+                    }
+
+                    $tbody.='</table>
+                            <!--[if (gte mso 9)|(IE)]>
+                                  </td>
+                                </tr>
+                            </table>
+                            <![endif]-->
+                            </td>
+                          </tr>
+                        </table>
+
+                        <!--analytics-->
+
+                        </body>
+                        </html>';
+    }
+    
+    echo $tbody;
+
+    $task_dtl = $this->get_task_dtl();
+    $pre_production_dtl = $this->get_pre_production_dtl();
+    $post_production_dtl = $this->get_post_production_dtl();
+
+    $filename = '';
+    $path = '';
+    if(count($task_dtl)>0 || count($pre_production_dtl)>0 || count($post_production_dtl)>0) {
+        $this->load->library('excel');
+        $objPHPExcel = new PHPExcel();
+        $objPHPExcel->setActiveSheetIndex(0);
+
+        $col_name[]=array();
+        for($i=0; $i<=20; $i++) {
+            $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
+        }
+
+        $row=1;
+        $col=0;
+
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Wholesome Habits Private Limited");
+        $row=$row+2;
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Exception Reporting - Production");
+        $row=$row+2;
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Reporting Date - " . (($date!=null && $date!="")?date("d/m/Y",strtotime($date)):""));
+
+        if(count($task_dtl)>0){
+            $row=$row+3;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, 'Task Details');
+            $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row)->getFont()->setBold(true);
+
+            $row=$row+2;
+            $start_row=$row;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, 'Sr No');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, 'Task Name');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, 'Assigned To');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, 'Priority');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, 'Due Date');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, 'Status');
+
+            $sr_no = 1;
+            for($i=0; $i<count($task_dtl); $i++) {
+                $row=$row+1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $sr_no++);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $task_dtl[$i]->subject_detail);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, $task_dtl[$i]->user_name);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $task_dtl[$i]->priority);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, date('d/m/Y',strtotime($task_dtl[$i]->due_date)));
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, $task_dtl[$i]->status);
+            }
+
+            $objPHPExcel->getActiveSheet()->getStyle('A'.$start_row.':F'.$start_row)->getFont()->setBold(true);
+            $objPHPExcel->getActiveSheet()->getStyle('A'.$start_row.':F'.$row)->applyFromArray(array(
+                'borders' => array(
+                    'allborders' => array(
+                        'style' => PHPExcel_Style_Border::BORDER_THIN
+                    )
+                )
+            ));
+        }
+
+        if(count($pre_production_dtl)>0){
+            $row=$row+3;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, 'Pre Production Details');
+            $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row)->getFont()->setBold(true);
+
+            $row=$row+2;
+            $start_row=$row;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, 'Sr No');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, 'Production Id');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, 'Manufacturer');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, 'Notification');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, 'Status');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, 'Due Date');
+
+            $sr_no = 1;
+            for($i=0; $i<count($pre_production_dtl); $i++) {
+                $row=$row+1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $sr_no++);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $pre_production_dtl[$i]->p_id);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, $pre_production_dtl[$i]->depot_name);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $pre_production_dtl[$i]->notification);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $pre_production_dtl[$i]->p_status);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, date('d/m/Y',strtotime($pre_production_dtl[$i]->notification_date)));
+            }
+
+            $objPHPExcel->getActiveSheet()->getStyle('A'.$start_row.':F'.$start_row)->getFont()->setBold(true);
+            $objPHPExcel->getActiveSheet()->getStyle('A'.$start_row.':F'.$row)->applyFromArray(array(
+                'borders' => array(
+                    'allborders' => array(
+                        'style' => PHPExcel_Style_Border::BORDER_THIN
+                    )
+                )
+            ));
+        }
+
+        if(count($post_production_dtl)>0){
+            $row=$row+3;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, 'Post Production Details');
+            $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row)->getFont()->setBold(true);
+
+            $row=$row+2;
+            $start_row=$row;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, 'Sr No');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, 'Production Id');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, 'Manufacturer');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, 'Notification');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, 'Status');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, 'Due Date');
+
+            $sr_no = 1;
+            for($i=0; $i<count($post_production_dtl); $i++) {
+                $p_status = '';
+                if($post_production_dtl[$i]->batch_master==null || $post_production_dtl[$i]->batch_master=='0') 
+                    $p_status = 'Confirm Batch Nos.';
+                else if($post_production_dtl[$i]->production_details==null || $post_production_dtl[$i]->production_details=='0') 
+                    $p_status = 'Confirm Production Details.';
+                else if($post_production_dtl[$i]->bar_conversion==null || $post_production_dtl[$i]->bar_conversion=='0') 
+                    $p_status = 'Perform Bar Conversion.';
+                else if($post_production_dtl[$i]->depot_transfer==null || $post_production_dtl[$i]->depot_transfer=='0') 
+                    $p_status = 'Perform Depot Transfer.';
+                else if($post_production_dtl[$i]->documents_upload==null || $post_production_dtl[$i]->documents_upload=='0') 
+                    $p_status = 'Perform Documents Upload.';
+                else if($post_production_dtl[$i]->raw_material_recon==null || $post_production_dtl[$i]->raw_material_recon=='0') 
+                    $p_status = 'Perform Raw Material Recon.';
+                else if($post_production_dtl[$i]->report_approved==null || $post_production_dtl[$i]->report_approved=='0') {
+                    if($post_production_dtl[$i]->report_status==null || $post_production_dtl[$i]->report_status==''){
+                        $p_status = 'Submit Production Report For Approval.';
+                    } else if(strtoupper(trim($post_production_dtl[$i]->report_status))=='PENDING'){
+                        $p_status = 'Approve Production Report.';
+                    } else if(strtoupper(trim($post_production_dtl[$i]->report_status))=='REJECTED'){
+                        $p_status = 'Production Report Rejected.';
+                    } else {
+                        $p_status = 'Approve Report.';
+                    }
+                }
+                else if($post_production_dtl[$i]->report_approved=='1') 
+                    $p_status = 'Approved.';
+                else $p_status = $post_production_dtl[$i]->p_status;
+
+                $row=$row+1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $sr_no++);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $post_production_dtl[$i]->p_id);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, $post_production_dtl[$i]->depot_name);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $post_production_dtl[$i]->notification);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $p_status);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, date('d/m/Y',strtotime($post_production_dtl[$i]->notification_date)));
+            }
+
+            $objPHPExcel->getActiveSheet()->getStyle('A'.$start_row.':F'.$start_row)->getFont()->setBold(true);
+            $objPHPExcel->getActiveSheet()->getStyle('A'.$start_row.':F'.$row)->applyFromArray(array(
+                'borders' => array(
+                    'allborders' => array(
+                        'style' => PHPExcel_Style_Border::BORDER_THIN
+                    )
+                )
+            ));
+        }
+
+        for ($col = 1; $col <= 20; $col++) {
+            $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn($col)->setAutoSize(true);
+        }
+
+        $filename = 'Production_Report_'.date('d-m-Y').'.xls';
+        // $path = 'C:/wamp64/www/eat_erp/assets/uploads/production_reports/';
+        // $path  = '/home/eatangcp/public_html/test/assets/uploads/production_reports/';
+        $path='/home/eatangcp/public_html/eat_erp/assets/uploads/production_reports/';
+
+        // $upload_path = 'C:/wamp64/www/eat_erp/assets/uploads/production_reports';
+        // $upload_path = '/home/eatangcp/public_html/test/assets/uploads/production_reports';
+        $upload_path = '/home/eatangcp/public_html/eat_erp/assets/uploads/production_reports';
+        if(!is_dir($upload_path)) {
+            mkdir($upload_path, 0777, TRUE);
+        }
+
+        // header('Content-Type: application/vnd.ms-excel');
+        // header('Content-Disposition: attachment;filename="'.$filename.'"');
+        // header('Cache-Control: max-age=0');
+        // $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+        // $objWriter->save('php://output');
+
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5'); 
+        $objWriter->save($path.$filename);
+    }
+
+    $attachment = $path.$filename;
+    // $attachment = 'C:\wamp64\www\eat_erp\assets\uploads\production_reports\Production_Report_'.date('d-m-Y').'.xls';
+    // $attachment = '';
+
+
+    //// $to_email = "dhaval.maru@pecanreams.com";
+    //$bcc = "dhaval.maru@pecanreams.com";
+
+    // $to_email = "ashwini.patil@pecanreams.com";
+    // $bcc = "ashwini.patil@pecanreams.com";
+    
+    // $to_email = "prasad.bhisale@pecanreams.com";
+    // $cc = "prasad.bhisale@pecanreams.com";
+    // $bcc = "prasad.bhisale@pecanreams.com";
+    
+    $to_email = "dinesh.parkhi@eatanytime.in, vaibhav.desai@eatanytime.in, prachi.sanghvi@eatanytime.in";
+    $bcc = "ashwini.patil@pecanreams.com";
+    $cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, operations@eatanytime.in, mis@eatanytime.in, priti.tripathi@eatanytime.in, prasad.bhisale@pecanreams.com, dhaval.maru@pecanreams.com";
+
+    $sql = "select * from report_master where report_name = 'Production Exception Report'";
+    $query = $this->db->query($sql);
+    $result = $query->result();
+    if(count($result)>0) {
+        $from_email = $result[0]->from_email;
+        $from_email_sender = $result[0]->sender_name;
+        $to_email = $result[0]->to_email;
+        $cc = $result[0]->cc_email;
+        $bcc = $result[0]->bcc_email;
+    }
+
+    $subject = 'Production Exception Report -'.date("d F Y",strtotime("now"));
+
+    echo '<br/><br/>mail '.$mailSent=send_email_new($from_email, $from_email_sender, $to_email, $subject, $tbody, $bcc, $cc, $attachment);
+    if ($mailSent==1) {
+        echo "Send";
+    } else {
+        echo "NOT Send ".$mailSent;
+    }
+
+    // load_view('invoice/emailer', $data); 
+}
+
+public function send_beat_analysis_report($report_peroid='') {
+    if($report_peroid=='Weekly'){
+        // $date = '2019-05-06';
+        $date = date('Y-m-d');
+        $reportpath = '';
+
+        $from_date = date('Y-m-d', (strtotime('-6 day', strtotime($date))));
+        $to_date = date('Y-m-d', (strtotime('-1 day', strtotime($date))));
+
+        echo $from_date;
+        echo '<br/><br/>';
+        echo $to_date;
+        echo '<br/><br/>';
+
+        $reportpath = $this->generate_beat_analysis_report($from_date, $to_date, 'save');
+    } else {
+        // $date = '2019-05-06';
+        $date = date('Y-m-d');
+        $reportpath = '';
+
+        echo $date;
+        echo '<br/><br/>';
+
+        $reportpath = $this->generate_beat_analysis_report($date, $date, 'save');
+    }
+    
+
+    if($reportpath!=''){
+        $report_date = date('d-m-Y');
+
+        $message = '<html>
+                    <body>
+                        <h3>Wholesome Habits Pvt Ltd</h3>
+                        <h4>Beat Analysis Report</h4>
+                        <p>Reporting Date - '.$report_date.'</p>
+                        <p>PFA</p>
+                        <br/><br/>
+                        Regards,
+                        <br/><br/>
+                        CS
+                    </body>
+                    </html>';
+        $from_email = 'cs@eatanytime.co.in';
+        $from_email_sender = 'EAT MIS';
+        $subject = 'Beat Analysis Report - '.$report_date;
+
+        // $to_email = "prasad.bhisale@pecanreams.com";
+        // $cc = 'prasad.bhisale@pecanreams.com';
+        // $bcc = 'prasad.bhisale@pecanreams.com';
+
+        $to_email = "swapnil.darekar@eatanytime.in";
+        $bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, prasad.bhisale@pecanreams.com";
+        $cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, operations@eatanytime.in";
+
+        $sql = "select * from report_master where report_name = 'Beat Analysis Report'";
+        $query = $this->db->query($sql);
+        $result = $query->result();
+        if(count($result)>0) {
+            $from_email = $result[0]->from_email;
+            $from_email_sender = $result[0]->sender_name;
+            $to_email = $result[0]->to_email;
+            $cc = $result[0]->cc_email;
+            $bcc = $result[0]->bcc_email;
+        }
+
+        echo $attachment = $reportpath;
+        echo '<br/><br/>';
+        $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc, $cc, $attachment);
+
+        // $mailSent=1;
+        
+        // echo $message;
+        // echo '<br/><br/>';
+        echo $mailSent;
+        echo '<br/><br/>';
+
+        if($mailSent==1){
+            $logarray['table_id']=$this->session->userdata('session_id');
+            $logarray['module_name']='Reports';
+            $logarray['cnt_name']='Reports';
+            $logarray['action']='Daily Sales Performance report sent.';
+            $this->user_access_log_model->insertAccessLog($logarray);
+        }
+    }
+}
+
+function generate_beat_analysis_report($f_date='', $t_date='', $action='') {
     $from_date = formatdate($this->input->post('from_date'));
     $to_date = formatdate($this->input->post('to_date'));
 
     if($from_date==''){
-        $from_date=NULL;
+        $from_date=$f_date;
     } else {
         $from_date = formatdate($this->input->post('from_date'));
     }
 
     if($to_date==''){
-        $to_date=NULL;
+        $to_date=$t_date;
     } else {
         $to_date = formatdate($this->input->post('to_date'));
+    }
+
+    if($from_date==''){
+        $from_date=NULL;
+    }
+    if($to_date==''){
+        $to_date=NULL;
     }
 
     // $from_date = '2018-04-01';
     // $to_date = '2019-03-31';
 
+    $report_date = date('d-m-Y');
+
     $zone_data = [];
     $zone_list = [];
     $cnt = 0;
 
-    $sql = "select AA.zone, BB.id, BB.distributor_name, BB.beat_id, BB.beat_name, BB.sales_rep_name, BB.total_stores, BB.total_stores_visited, 
-            BB.total_order_qty, BB.total_order_amt, BB.total_new_order, BB.total_repeat_order, BB.total_new_order_amt, BB.total_repeat_order_amt from 
+    $sql = "select AA.zone, BB.id, BB.distributor_name, BB.beat_id, BB.beat_name, BB.sales_rep_name, 
+            BB.total_stores, BB.total_stores_visited, BB.total_order_qty, BB.total_order_amt, BB.total_new_order, 
+            BB.total_repeat_order, BB.total_new_order_amt, BB.total_repeat_order_amt from 
             
-        (select distinct zone from zone_master where status='Approved' and type_id='3') AA 
+            (select distinct zone from zone_master where status='Approved' and type_id='3') AA 
 
-        left join 
+            left join 
 
-        (select G.*, H.total_stores, I.total_stores_visited, J.total_order_qty, J.total_order_amt, J.total_new_order, 
-            J.total_repeat_order, J.total_new_order_amt, J.total_repeat_order_amt from 
-        (select E.id, E.distributor_name, E.zone, E.beat_id, E.beat_name, group_concat(distinct F.sales_rep_name) as sales_rep_name from 
-        (select A.id, A.distributor_name, B.zone, C.beat_id, D.beat_name 
-        from distributor_master A 
-        left join zone_master B on (A.zone_id=B.id) 
-        left join distributor_beat_plans C on (A.id=C.distributor_id and C.status='Approved') 
-        left join beat_master D on (C.beat_id=D.id) 
-        where A.status = 'Approved' and A.class = 'super stockist') E 
-        left join 
-        (select A.sales_rep_id, A.dist_id1, A.beat_id1, A.dist_id2, A.beat_id2, B.sales_rep_name 
-        from beat_allocations A 
-        left join sales_rep_master B on (A.sales_rep_id=B.id) 
-        where A.status='Approved') F 
-        on ((E.id=F.dist_id1 and E.beat_id=F.beat_id1) or (E.id=F.dist_id2 and E.beat_id=F.beat_id2)) 
-        group by E.id, E.distributor_name, E.zone, E.beat_id, E.beat_name) G 
-        left join 
-        (select beat_id, count(dist_id) as total_stores from beat_details group by Beat_id) H 
-        on (G.beat_id=H.beat_id) 
-        left join 
-        (select C.beat_id, sum(C.visit_cnt) as total_stores_visited from 
-        (select A.beat_id, A.dist_id, case when B.id is null then 0 else 1 end as visit_cnt 
-        from beat_details A 
-        left join sales_rep_location B on (A.dist_id=B.distributor_id) 
-        where B.status='Approved' and B.date_of_visit>='$from_date' and B.date_of_visit<='$to_date') C group by C.beat_id) I 
-        on (G.beat_id=I.beat_id) 
-        left join 
-        (select H.beat_id, sum(H.order_qty) as total_order_qty, sum(H.order_amt) as total_order_amt, sum(H.new_order) as total_new_order, 
-            sum(H.repeat_order) as total_repeat_order, sum(H.new_order_amt) as total_new_order_amt, sum(H.repeat_order_amt) as total_repeat_order_amt from 
-        (select C.beat_id, C.dist_id, G.order_qty, G.order_amt, case when C.min_order_id=G.max_order_id then 1 else 0 end as new_order, 
-            case when C.min_order_id=G.max_order_id then 0 else 1 end as repeat_order, 
-            case when C.min_order_id=G.max_order_id then order_amt else 0 end as new_order_amt, 
-            case when C.min_order_id=G.max_order_id then 0 else order_amt end as repeat_order_amt from 
-        (select A.beat_id, A.dist_id, min(B.id) as min_order_id from beat_details A left join sales_rep_orders B on (A.dist_id=B.distributor_id) group by A.beat_id, A.dist_id) C 
-        left join 
-        (select F.beat_id, F.dist_id, max(F.order_id) as max_order_id, sum(F.item_qty) as order_qty, sum(F.item_amt) as order_amt from 
-        (select A.beat_id, A.dist_id, B.id as order_id, C.type, C.item_id, 
-            case when C.type='Bar' then ifnull(C.qty,1) else (ifnull(C.qty,1)*ifnull(D.qty,1)) end as item_qty, 
-            case when C.type='Bar' then ifnull(C.qty,1)*ifnull(E.rate,1) else (ifnull(C.qty,1)*ifnull(D.qty,1)*ifnull(E.rate,1)) end as item_amt 
-        from beat_details A 
-        left join sales_rep_orders B on (A.dist_id=B.distributor_id) 
-        left join sales_rep_order_items C on (B.id=C.sales_rep_order_id) 
-        left join box_product D on (C.type='Box' and C.item_id=D.box_id) 
-        left join product_master E on ((C.type='Bar' and C.item_id=E.id) or (C.type='Box' and D.product_id=E.id))
-        where B.date_of_processing>='$from_date' and B.date_of_processing<='$to_date') F group by F.beat_id, F.dist_id) G 
-        on(C.beat_id=G.beat_id and C.dist_id=G.dist_id)) H group by H.beat_id) J 
-        on (G.beat_id=J.beat_id) 
-        where G.beat_id is not null 
+            (select G.*, H.total_stores, I.total_stores_visited, J.total_order_qty, J.total_order_amt, J.total_new_order, 
+                J.total_repeat_order, J.total_new_order_amt, J.total_repeat_order_amt from 
+            (select E.id, E.distributor_name, E.zone, E.beat_id, E.beat_name, group_concat(distinct F.sales_rep_name) as sales_rep_name from 
+            (select A.id, A.distributor_name, B.zone, C.beat_id, D.beat_name 
+            from distributor_master A 
+            left join zone_master B on (A.zone_id=B.id) 
+            left join distributor_beat_plans C on (A.id=C.distributor_id and C.status='Approved') 
+            left join beat_master D on (C.beat_id=D.id) 
+            where A.status = 'Approved' and A.class = 'super stockist') E 
+            left join 
+            (select A.sales_rep_id, A.dist_id1, A.beat_id1, A.dist_id2, A.beat_id2, B.sales_rep_name 
+            from beat_allocations A 
+            left join sales_rep_master B on (A.sales_rep_id=B.id) 
+            where A.status='Approved') F 
+            on ((E.id=F.dist_id1 and E.beat_id=F.beat_id1) or (E.id=F.dist_id2 and E.beat_id=F.beat_id2)) 
+            group by E.id, E.distributor_name, E.zone, E.beat_id, E.beat_name) G 
+            left join 
+            (select beat_id, count(dist_id) as total_stores from beat_details group by Beat_id) H 
+            on (G.beat_id=H.beat_id) 
+            left join 
+            (select C.beat_id, sum(C.visit_cnt) as total_stores_visited from 
+            (select A.beat_id, A.dist_id, case when B.id is null then 0 else 1 end as visit_cnt 
+            from beat_details A 
+            left join sales_rep_location B on (A.dist_id=B.distributor_id) 
+            where B.status='Approved' and B.date_of_visit>='$from_date' and B.date_of_visit<='$to_date') C group by C.beat_id) I 
+            on (G.beat_id=I.beat_id) 
+            left join 
+            (select H.beat_id, sum(H.order_qty) as total_order_qty, sum(H.order_amt) as total_order_amt, sum(H.new_order) as total_new_order, 
+                sum(H.repeat_order) as total_repeat_order, sum(H.new_order_amt) as total_new_order_amt, sum(H.repeat_order_amt) as total_repeat_order_amt from 
+            (select C.beat_id, C.dist_id, G.order_qty, G.order_amt, case when C.min_order_id=G.max_order_id then G.order_qty else 0 end as new_order, 
+                case when C.min_order_id=G.max_order_id then 0 else G.order_qty end as repeat_order, 
+                case when C.min_order_id=G.max_order_id then G.order_amt else 0 end as new_order_amt, 
+                case when C.min_order_id=G.max_order_id then 0 else G.order_amt end as repeat_order_amt from 
+            (select A.beat_id, A.dist_id, min(B.id) as min_order_id from beat_details A left join sales_rep_orders B on (A.dist_id=B.distributor_id) group by A.beat_id, A.dist_id) C 
+            left join 
+            (select F.beat_id, F.dist_id, max(F.order_id) as max_order_id, sum(F.item_qty) as order_qty, sum(F.item_amt) as order_amt from 
+            (select A.beat_id, A.dist_id, B.id as order_id, C.type, C.item_id, 
+                case when C.type='Bar' then ifnull(C.qty,1) else (ifnull(C.qty,1)*ifnull(D.qty,1)) end as item_qty, 
+                case when C.type='Bar' then ifnull(C.qty,1)*ifnull(E.rate,1) else (ifnull(C.qty,1)*ifnull(D.qty,1)*ifnull(E.rate,1)) end as item_amt 
+            from beat_details A 
+            left join sales_rep_orders B on (A.dist_id=B.distributor_id) 
+            left join sales_rep_order_items C on (B.id=C.sales_rep_order_id) 
+            left join box_product D on (C.type='Box' and C.item_id=D.box_id) 
+            left join product_master E on ((C.type='Bar' and C.item_id=E.id) or (C.type='Box' and D.product_id=E.id))
+            where B.date_of_processing>='$from_date' and B.date_of_processing<='$to_date') F group by F.beat_id, F.dist_id) G 
+            on(C.beat_id=G.beat_id and C.dist_id=G.dist_id)) H group by H.beat_id) J 
+            on (G.beat_id=J.beat_id) 
+            where G.beat_id is not null 
 
-        union all 
+            union all 
 
-        select null as id, null as distributor_name, D.zone, null as beat_id, null as beat_name, null as sales_rep_name, 
-            count(D.id) as total_stores, null as total_stores_visited, null as total_order_qty, null as total_order_amt, 
-            null as total_new_order, null as total_repeat_order, null as total_new_order_amt, null as total_repeat_order_amt from 
-        (select distinct A.id, A.distributor_name, B.zone from 
-        (select concat('d_', id) as id, distributor_name, zone_id from distributor_master where status = 'Approved' and class = 'normal' 
-        union all 
-        select concat('s_', id) as id, distributor_name, zone_id from sales_rep_distributors where status = 'Approved' or status = 'Active') A 
-        left join zone_master B on (A.zone_id=B.id) 
-        left join 
-        (select distinct A.dist_id from beat_details A 
-        left join beat_allocations B on (A.beat_id=B.beat_id1) 
-        left join beat_allocations C on (A.beat_id=C.beat_id2) 
-        where B.id is not null or C.id is not null) C on (A.id=C.dist_id) 
-        where C.dist_id is null) D 
-        group by D.zone) BB 
+            select null as id, null as distributor_name, D.zone, null as beat_id, null as beat_name, null as sales_rep_name, 
+                count(D.id) as total_stores, null as total_stores_visited, null as total_order_qty, null as total_order_amt, 
+                null as total_new_order, null as total_repeat_order, null as total_new_order_amt, null as total_repeat_order_amt from 
+            (select distinct A.id, A.distributor_name, B.zone from 
+            (select concat('d_', id) as id, distributor_name, zone_id from distributor_master where status = 'Approved' and class = 'normal' 
+            union all 
+            select concat('s_', id) as id, distributor_name, zone_id from sales_rep_distributors where status = 'Approved' or status = 'Active') A 
+            left join zone_master B on (A.zone_id=B.id) 
+            left join 
+            (select distinct A.dist_id from beat_details A 
+            left join beat_allocations B on (A.beat_id=B.beat_id1) 
+            left join beat_allocations C on (A.beat_id=C.beat_id2) 
+            where B.id is not null or C.id is not null) C on (A.id=C.dist_id) 
+            where C.dist_id is null) D 
+            group by D.zone) BB 
 
-        on (AA.zone=BB.zone) 
+            on (AA.zone=BB.zone) 
 
-        order by AA.zone, BB.distributor_name desc";
+            order by AA.zone, BB.distributor_name desc";
     $result = $this->db->query($sql)->result_array();
     if(count($result)>0) {
         // $this->load->library('excel');
         // $objPHPExcel = new PHPExcel();
 
         $template_path=$this->config->item('template_path');
-        $file = $template_path.'Beat_plan_analysis.xls';
+        $file = $template_path.'Beat_plan_analysis.xlsx';
         $this->load->library('excel');
         $objPHPExcel = PHPExcel_IOFactory::load($file);
 
@@ -17458,7 +17994,7 @@ function generate_beat_analysis_report() {
             $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
         }
 
-        $objPHPExcel->getActiveSheet()->setCellValue('A3','Date - '.$from_date.' to '.$to_date);
+        $objPHPExcel->getActiveSheet()->setCellValue('A3','Date - '.date('d-m-Y',strtotime($from_date)).' to '.date('d-m-Y',strtotime($to_date)));
 
         $row = 5;
         $col = 0;
@@ -17483,10 +18019,10 @@ function generate_beat_analysis_report() {
         $total_repeat_order_amt_zone=0;
 
         for($i=0; $i<count($result); $i++) {
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $result[$i]['zone']);
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $result[$i]['distributor_name']);
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, $result[$i]['beat_name']);
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $result[$i]['sales_rep_name']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, ucwords(trim($result[$i]['zone'])));
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, ucwords(trim($result[$i]['distributor_name'])));
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, ucwords(trim($result[$i]['beat_name'])));
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, ucwords(trim($result[$i]['sales_rep_name'])));
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $result[$i]['total_stores']);
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, $result[$i]['total_stores_visited']);
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, '=F'.$row.'/IF(OR(E'.$row.'="",E'.$row.'=0),1,E'.$row.')');
@@ -17617,37 +18153,100 @@ function generate_beat_analysis_report() {
         //     $objPHPExcel->getActiveSheet()->getColumnDimension($col1)->setAutoSize(true);
         // }
 
-        $filename='Beat_plan_analysis_report.xls';
-        header('Content-Type: application/vnd.ms-excel');
-        header('Content-Disposition: attachment;filename="'.$filename.'"');
-        header('Cache-Control: max-age=0');
-        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
-        $objWriter->save('php://output');
+        // $filename='Beat_plan_analysis_report.xls';
+        // header('Content-Type: application/vnd.ms-excel');
+        // header('Content-Disposition: attachment;filename="'.$filename.'"');
+        // header('Cache-Control: max-age=0');
+        // $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+        // $objWriter->save('php://output');
 
-        $logarray['table_id']=$this->session->userdata('session_id');
-        $logarray['module_name']='Reports';
-        $logarray['cnt_name']='Reports';
-        $logarray['action']='Beat plan analysis report generated.';
-        $this->user_access_log_model->insertAccessLog($logarray);
+        $filename = 'Beat_plan_analysis_report_'.$report_date.'.xlsx';
+
+        if($action=="save") {
+            // $path  = '/home/eatangcp/public_html/test/assets/uploads/mt_stock_reports/';
+            // $upload_path = '/home/eatangcp/public_html/test/assets/uploads/mt_stock_reports';
+
+            $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/beat_plan_analysis/';
+            $upload_path = '/home/eatangcp/public_html/eat_erp/assets/uploads/beat_plan_analysis';
+
+            // $path  = '/var/www/html/eat_erp/assets/uploads/beat_plan_analysis/';
+            // $upload_path = '/var/www/html/eat_erp/assets/uploads/beat_plan_analysis';
+
+            // $path  = 'C:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports/';
+            // $upload_path = 'C:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports';
+            if(!is_dir($upload_path)) {
+                mkdir($upload_path, 0777, TRUE);
+            }
+
+            $reportpath = $path.$filename;
+
+            // header('Content-Type: application/vnd.ms-excel');
+            // header('Content-Disposition: attachment;filename="'.$filename.'"');
+            // header('Cache-Control: max-age=0');
+
+            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007'); 
+            $objWriter->save($reportpath);
+
+            echo $reportpath;
+            echo '<br/><br/>';
+
+            return $reportpath;
+        } else {
+            // header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Type: application/openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="'.$filename.'"');
+            header('Cache-Control: max-age=0');
+            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+            $objWriter->save('php://output');
+
+            $logarray['table_id']=$this->session->userdata('session_id');
+            $logarray['module_name']='Reports';
+            $logarray['cnt_name']='Reports';
+            $logarray['action']='Beat plan analysis report generated.';
+            $this->user_access_log_model->insertAccessLog($logarray);
+
+            exit;
+        }
     } else {
         // echo '<script>alert("No data found");</script>';
     }
 }
 
-public function send_daily_sales_performance_report() {
-    // $date = '2019-05-06';
-    $date = date('Y-m-d');
-    $reportpath = '';
+public function send_daily_sales_performance_report($report_peroid='') {
+    if($report_peroid=='Weekly'){
+        // $date = '2019-05-06';
+        $date = date('Y-m-d');
+        $reportpath = '';
 
-    $reportpath = $this->generate_daily_sales_performance_report($date, 'save');
+        $from_date = date('Y-m-d', (strtotime('-6 day', strtotime($date))));
+        $to_date = date('Y-m-d', (strtotime('-1 day', strtotime($date))));
+
+        echo $from_date;
+        echo '<br/><br/>';
+        echo $to_date;
+        echo '<br/><br/>';
+
+        $reportpath = $this->generate_daily_sales_performance_report($from_date, $to_date, 'save');
+    } else {
+        $report_peroid = 'Daily';
+
+        // $date = '2019-05-06';
+        $date = date('Y-m-d');
+        $reportpath = '';
+
+        echo $date;
+        echo '<br/><br/>';
+
+        $reportpath = $this->generate_daily_sales_performance_report($date, $date, 'save');
+    }
 
     if($reportpath!=''){
-        $report_date = date('d-m-Y', strtotime($date));
+        $report_date = date('d-m-Y');
 
         $message = '<html>
                     <body>
-                        <h3>Wholesome Habits Private Limited</h3>
-                        <h4>Sales - Daily SR Performance Report</h4>
+                        <h3>Wholesome Habits Pvt Ltd</h3>
+                        <h4>Sales - '.$report_peroid.' SR Performance Report</h4>
                         <p>Reporting Date - '.$report_date.'</p>
                         <p>PFA</p>
                         <br/><br/>
@@ -17657,21 +18256,27 @@ public function send_daily_sales_performance_report() {
                     </body>
                     </html>';
         $from_email = 'cs@eatanytime.co.in';
-        $from_email_sender = 'Wholesome Habits Pvt Ltd';
-        $subject = 'Sales - Daily SR Performance Report - '.$report_date;
+        $from_email_sender = 'EAT MIS';
+        $subject = 'Sales - '.$report_peroid.' SR Performance Report - '.$report_date;
 
+        // $to_email = "prasad.bhisale@pecanreams.com";
+        // $cc = 'prasad.bhisale@pecanreams.com';
+        // $bcc = 'prasad.bhisale@pecanreams.com';
 
-        /*$to_email = "dhaval.maru@pecanreams.com";
-        $cc="sangeeta.yadav@pecanreams.com";
-        $bcc="yadavsangeeta521@gmail.com";*/
-        
-        $to_email = "prasad.bhisale@pecanreams.com";
-        $cc = 'prasad.bhisale@pecanreams.com';
-        $bcc = 'prasad.bhisale@pecanreams.com';
+        $to_email = "ravi.hirode@eatanytime.co.in, manorama.mishra@eatanytime.co.in, mahesh.ms@eatanytime.co.in, yash.doshi@eatanytime.in, darshan.dhany@eatanytime.co.in, girish.rai@eatanytime.in, nitin.kumar@eatanytime.co.in, mohil.telawade@eatanytime.co.in";
+        $bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, prasad.bhisale@pecanreams.com";
+        $cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, operations@eatanytime.in";
 
-        // $to_email = "ravi.hirode@eatanytime.co.in, manorama.mishra@eatanytime.co.in, mahesh.ms@eatanytime.co.in, yash.doshi@eatanytime.in, darshan.dhany@eatanytime.co.in, girish.rai@eatanytime.in, nitin.kumar@eatanytime.co.in, mohil.telawade@eatanytime.co.in";
-        // $bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, sangeeta.yadav@pecanreams.com,prasad.bhisale@pecanreams.com";
-        // $cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, operations@eatanytime.in";
+        $sql = "select * from report_master where report_name = 'Sales Representative Performance Report'";
+        $query = $this->db->query($sql);
+        $result = $query->result();
+        if(count($result)>0) {
+            $from_email = $result[0]->from_email;
+            $from_email_sender = $result[0]->sender_name;
+            $to_email = $result[0]->to_email;
+            $cc = $result[0]->cc_email;
+            $bcc = $result[0]->bcc_email;
+        }
 
         echo $attachment = $reportpath;
         echo '<br/><br/>';
@@ -17688,24 +18293,24 @@ public function send_daily_sales_performance_report() {
             $logarray['table_id']=$this->session->userdata('session_id');
             $logarray['module_name']='Reports';
             $logarray['cnt_name']='Reports';
-            $logarray['action']='Daily Sales Performance report sent.';
+            $logarray['action']=$report_peroid.' Sales Performance report sent.';
             $this->user_access_log_model->insertAccessLog($logarray);
         }
     }
 }
 
-function generate_daily_sales_performance_report($date='', $action='') {
+function generate_daily_sales_performance_report($f_date='', $t_date='', $action='') {
     $from_date = formatdate($this->input->post('from_date'));
     $to_date = formatdate($this->input->post('to_date'));
 
     if($from_date==''){
-        $from_date=$date;
+        $from_date=$f_date;
     } else {
         $from_date = formatdate($this->input->post('from_date'));
     }
 
     if($to_date==''){
-        $to_date=$date;
+        $to_date=$t_date;
     } else {
         $to_date = formatdate($this->input->post('to_date'));
     }
@@ -17720,7 +18325,7 @@ function generate_daily_sales_performance_report($date='', $action='') {
     // $from_date = '2018-04-01';
     // $to_date = '2019-03-31';
 
-    $report_date = $from_date;
+    $report_date = date('d-m-Y');
 
     $cnt = 0;
 
@@ -17796,10 +18401,11 @@ function generate_daily_sales_performance_report($date='', $action='') {
 
             (select H.visit_id, sum(H.order_qty) as total_order_qty, sum(H.order_amt) as total_order_amt, sum(H.new_order) as total_new_order, 
                 sum(H.repeat_order) as total_repeat_order, sum(H.new_order_amt) as total_new_order_amt, sum(H.repeat_order_amt) as total_repeat_order_amt from 
-            (select G.visit_id, C.distributor_id, G.order_qty, G.order_amt, case when C.min_order_id=G.order_id then 1 else 0 end as new_order, 
-                case when C.min_order_id=G.order_id then 0 else 1 end as repeat_order, 
-                case when C.min_order_id=G.order_id then order_amt else 0 end as new_order_amt, 
-                case when C.min_order_id=G.order_id then 0 else order_amt end as repeat_order_amt from 
+            (select G.visit_id, C.distributor_id, G.order_qty, G.order_amt, 
+                case when C.min_order_id=G.order_id then G.order_qty else 0 end as new_order, 
+                case when C.min_order_id=G.order_id then 0 else G.order_qty end as repeat_order, 
+                case when C.min_order_id=G.order_id then G.order_amt else 0 end as new_order_amt, 
+                case when C.min_order_id=G.order_id then 0 else G.order_amt end as repeat_order_amt from 
             (select A.distributor_id, min(A.id) as min_order_id from sales_rep_orders A group by A.distributor_id) C 
             left join 
             (select F.visit_id, F.distributor_id, F.order_id, sum(F.item_qty) as order_qty, sum(F.item_amt) as order_amt from 
@@ -17850,7 +18456,7 @@ function generate_daily_sales_performance_report($date='', $action='') {
             $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
         }
 
-        $objPHPExcel->getActiveSheet()->setCellValue('A3','Date - '.$from_date.' to '.$to_date);
+        $objPHPExcel->getActiveSheet()->setCellValue('A3','Date - '.date('d-m-Y',strtotime($from_date)).' to '.date('d-m-Y',strtotime($to_date)));
 
         $row = 6;
         $col = 0;
@@ -17868,6 +18474,13 @@ function generate_daily_sales_performance_report($date='', $action='') {
         $tot_repeat_order_units = 0;
         $tot_new_order_amt = 0;
         $tot_repeat_order_amt = 0;
+
+        $all_tot_order_units = 0;
+        $all_tot_order_amt = 0;
+        $all_tot_new_order_units = 0;
+        $all_tot_repeat_order_units = 0;
+        $all_tot_new_order_amt = 0;
+        $all_tot_repeat_order_amt = 0;
 
         for($i=0; $i<count($result); $i++) {
             $tot_planned_visit = $tot_planned_visit + intval($result[$i]['tot_planned_visit']);
@@ -17901,12 +18514,12 @@ function generate_daily_sales_performance_report($date='', $action='') {
             }
 
             if($i==0) {
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, $result[$i]['zone']);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, ucwords(trim($result[$i]['zone'])));
                 $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row2)->getFont()->setBold(true);
                 $row2 = $row2 + 2;
             }
 
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, $result[$i]['sales_rep_name']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, ucwords(trim($result[$i]['sales_rep_name'])));
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row2, $result[$i]['tot_planned_visit']);
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row2, $result[$i]['tot_actual_visit']);
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row2, $result[$i]['tot_unplanned_visit']);
@@ -17942,7 +18555,7 @@ function generate_daily_sales_performance_report($date='', $action='') {
             }
 
             if($bl_flag == true) {
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $result[$i]['zone']);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, ucwords(trim($result[$i]['zone'])));
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $result[$i]['present_cnt'].'/'.$result[$i]['total_sales_rep_cnt']);
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, $tot_planned_visit);
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $tot_actual_visit);
@@ -18039,6 +18652,13 @@ function generate_daily_sales_performance_report($date='', $action='') {
                     $row2 = $row2 + 1;
                 }
 
+                $all_tot_order_units = $all_tot_order_units + $tot_order_units;
+                $all_tot_order_amt = $all_tot_order_amt + $tot_order_amt;
+                $all_tot_new_order_units = $all_tot_new_order_units + $tot_new_order_units;
+                $all_tot_repeat_order_units = $all_tot_repeat_order_units + $tot_repeat_order_units;
+                $all_tot_new_order_amt = $all_tot_new_order_amt + $tot_new_order_amt;
+                $all_tot_repeat_order_amt = $all_tot_repeat_order_amt + $tot_repeat_order_amt;
+
                 $tot_planned_visit = 0;
                 $tot_actual_visit = 0;
                 $tot_unplanned_visit = 0;
@@ -18054,6 +18674,18 @@ function generate_daily_sales_performance_report($date='', $action='') {
                 $row = $row + 1;
             }
         }
+
+        if($all_tot_order_units==0){
+            $all_tot_new_order_per = 0;
+            $all_tot_repeat_order_per = 0;
+        } else {
+            $all_tot_new_order_per = round(($all_tot_new_order_units/$all_tot_order_units)*100,0);
+            $all_tot_repeat_order_per = round(($all_tot_repeat_order_units/$all_tot_order_units)*100,0);
+        }
+
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+11].$row, $all_tot_new_order_units.'/'.$all_tot_repeat_order_units);
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+12].$row, $all_tot_new_order_amt.'/'.$all_tot_repeat_order_amt);
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+13].$row, $all_tot_new_order_per.'%/'.$all_tot_repeat_order_per.'%');
 
         // $objPHPExcel->getActiveSheet()->getStyle('A1:'.$col_name[$col+10].($row-2))->applyFromArray(array(
         //     'borders' => array(
@@ -18114,14 +18746,21 @@ function generate_daily_sales_performance_report($date='', $action='') {
         $filename = 'Daily_sales_performance_report_'.$report_date.'.xlsx';
 
         if($action=="save") {
-            // $path  = '/home/eatangcp/public_html/test/assets/uploads/mt_stock_reports/';
-            // $upload_path = '/home/eatangcp/public_html/test/assets/uploads/mt_stock_reports';
+            // $path  = '/home/eatangcp/public_html/test/assets/uploads/daily_sales_performance/';
+            // $upload_path = '/home/eatangcp/public_html/test/assets/uploads/daily_sales_performance';
 
             $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/daily_sales_performance/';
             $upload_path = '/home/eatangcp/public_html/eat_erp/assets/uploads/daily_sales_performance';
 
-            // $path  = 'C:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports/';
-            // $upload_path = 'C:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports';
+            // $path  = '/var/www/html/eat_erp/assets/uploads/daily_sales_performance/';
+            // $upload_path = '/var/www/html/eat_erp/assets/uploads/daily_sales_performance';
+
+            // $path  = 'C:/wamp64/www/eat_erp/assets/uploads/daily_sales_performance/';
+            // $upload_path = 'C:/wamp64/www/eat_erp/assets/uploads/daily_sales_performance';
+
+            // $path  = 'E:/wamp64/www/eat_erp/assets/uploads/daily_sales_performance/';
+            // $upload_path = 'E:/wamp64/www/eat_erp/assets/uploads/daily_sales_performance';
+
             if(!is_dir($upload_path)) {
                 mkdir($upload_path, 0777, TRUE);
             }
@@ -18160,20 +18799,41 @@ function generate_daily_sales_performance_report($date='', $action='') {
     }
 }
 
-public function send_daily_merchandiser_performance_report() {
-    // $date = '2019-05-06';
-    $date = date('Y-m-d');
-    $reportpath = '';
+public function send_daily_merchandiser_performance_report($report_peroid='') {
+    if($report_peroid=='Weekly'){
+        // $date = '2019-05-06';
+        $date = date('Y-m-d');
+        $reportpath = '';
 
-    $reportpath = $this->generate_daily_merchandiser_performance_report($date, 'save');
+        $from_date = date('Y-m-d', (strtotime('-6 day', strtotime($date))));
+        $to_date = date('Y-m-d', (strtotime('-1 day', strtotime($date))));
+
+        echo $from_date;
+        echo '<br/><br/>';
+        echo $to_date;
+        echo '<br/><br/>';
+
+        $reportpath = $this->generate_daily_merchandiser_performance_report($from_date, $to_date, 'save');
+    } else {
+        $report_peroid = 'Daily';
+
+        // $date = '2019-05-06';
+        $date = date('Y-m-d');
+        $reportpath = '';
+
+        echo $date;
+        echo '<br/><br/>';
+
+        $reportpath = $this->generate_daily_merchandiser_performance_report($date, $date, 'save');
+    }
 
     if($reportpath!=''){
-        $report_date = date('d-m-Y', strtotime($date));
+        $report_date = date('d-m-Y');
 
         $message = '<html>
                     <body>
-                        <h3>Wholesome Habits Private Limited</h3>
-                        <h4>Sales - Daily Merchandiser Performance Report</h4>
+                        <h3>Wholesome Habits Pvt Ltd</h3>
+                        <h4>Sales - '.$report_peroid.' Merchandiser Performance Report</h4>
                         <p>Reporting Date - '.$report_date.'</p>
                         <p>PFA</p>
                         <br/><br/>
@@ -18183,21 +18843,27 @@ public function send_daily_merchandiser_performance_report() {
                     </body>
                     </html>';
         $from_email = 'cs@eatanytime.co.in';
-        $from_email_sender = 'Wholesome Habits Pvt Ltd';
-        $subject = 'Sales - Daily Merchandiser Performance Report - '.$report_date;
+        $from_email_sender = 'EAT MIS';
+        $subject = 'Sales - '.$report_peroid.' Merchandiser Performance Report - '.$report_date;
 
+        // $to_email = "prasad.bhisale@pecanreams.com";
+        // $cc = 'prasad.bhisale@pecanreams.com';
+        // $bcc = 'prasad.bhisale@pecanreams.com';
 
-        /*$to_email = "dhaval.maru@pecanreams.com";
-        $cc="sangeeta.yadav@pecanreams.com";
-        $bcc="yadavsangeeta521@gmail.com";*/
-        
-        $to_email = "prasad.bhisale@pecanreams.com";
-        $cc = 'prasad.bhisale@pecanreams.com';
-        $bcc = 'prasad.bhisale@pecanreams.com';
+        $to_email = "mukesh.yadav@eatanytime.co.in, sulochana.waghmare@eatanytime.co.in, sachin.pal@eatanytime.co.in, urvi.bhayani@eatanytime.co.in";
+        $bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, prasad.bhisale@pecanreams.com";
+        $cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, operations@eatanytime.in";
 
-        // $to_email = "mukesh.yadav@eatanytime.co.in, sulochana.waghmare@eatanytime.co.in, sachin.pal@eatanytime.co.in, urvi.bhayani@eatanytime.co.in";
-        // $bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, sangeeta.yadav@pecanreams.com,prasad.bhisale@pecanreams.com";
-        // $cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, operations@eatanytime.in";
+        $sql = "select * from report_master where report_name = 'Merchandiser Performance Report'";
+        $query = $this->db->query($sql);
+        $result = $query->result();
+        if(count($result)>0) {
+            $from_email = $result[0]->from_email;
+            $from_email_sender = $result[0]->sender_name;
+            $to_email = $result[0]->to_email;
+            $cc = $result[0]->cc_email;
+            $bcc = $result[0]->bcc_email;
+        }
 
         echo $attachment = $reportpath;
         echo '<br/><br/>';
@@ -18214,24 +18880,24 @@ public function send_daily_merchandiser_performance_report() {
             $logarray['table_id']=$this->session->userdata('session_id');
             $logarray['module_name']='Reports';
             $logarray['cnt_name']='Reports';
-            $logarray['action']='Daily Merchandiser Performance report sent.';
+            $logarray['action']=$report_peroid.' Merchandiser Performance report sent.';
             $this->user_access_log_model->insertAccessLog($logarray);
         }
     }
 }
 
-function generate_daily_merchandiser_performance_report($date='', $action='') {
+function generate_daily_merchandiser_performance_report($f_date='', $t_date='', $action='') {
     $from_date = formatdate($this->input->post('from_date'));
     $to_date = formatdate($this->input->post('to_date'));
 
     if($from_date==''){
-        $from_date=$date;
+        $from_date = $f_date;
     } else {
         $from_date = formatdate($this->input->post('from_date'));
     }
 
     if($to_date==''){
-        $to_date=$date;
+        $to_date = $t_date;
     } else {
         $to_date = formatdate($this->input->post('to_date'));
     }
@@ -18246,7 +18912,7 @@ function generate_daily_merchandiser_performance_report($date='', $action='') {
     // $from_date = '2018-04-01';
     // $to_date = '2019-03-31';
 
-    $report_date = $from_date;
+    $report_date = date('d-m-Y');
 
     $cnt = 0;
 
@@ -18349,7 +19015,7 @@ function generate_daily_merchandiser_performance_report($date='', $action='') {
             $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
         }
 
-        $objPHPExcel->getActiveSheet()->setCellValue('A3','Date - '.$from_date.' to '.$to_date);
+        $objPHPExcel->getActiveSheet()->setCellValue('A3','Date - '.date('d-m-Y',strtotime($from_date)).' to '.date('d-m-Y',strtotime($to_date)));
 
         $row = 6;
         $col = 0;
@@ -18373,7 +19039,7 @@ function generate_daily_merchandiser_performance_report($date='', $action='') {
                 $row2 = $row2 + 2;
             }
 
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, $result[$i]['sales_rep_name']);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, ucwords(trim($result[$i]['sales_rep_name'])));
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row2, $result[$i]['tot_planned_visit']);
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row2, $result[$i]['tot_actual_visit']);
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row2, $result[$i]['tot_unplanned_visit']);
@@ -18402,7 +19068,7 @@ function generate_daily_merchandiser_performance_report($date='', $action='') {
             }
 
             if($bl_flag == true) {
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $result[$i]['zone']);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, ucwords(trim($result[$i]['zone'])));
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $result[$i]['present_cnt'].'/'.$result[$i]['total_sales_rep_cnt']);
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, $tot_planned_visit);
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $tot_actual_visit);
@@ -18435,7 +19101,7 @@ function generate_daily_merchandiser_performance_report($date='', $action='') {
 
                 if($i!=count($result)-1) {
                     $row2 = $row2 + 2;
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, $result[$i+1]['zone']);
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, ucwords(trim($result[$i+1]['zone'])));
                     $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row2)->getFont()->setBold(true);
                     $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row2.':'.$col_name[$col+1].$row2)
                                                     ->applyFromArray(array(
@@ -18553,14 +19219,21 @@ function generate_daily_merchandiser_performance_report($date='', $action='') {
         $filename = 'Daily_merchandiser_performance_report_'.$report_date.'.xlsx';
 
         if($action=="save") {
-            // $path  = '/home/eatangcp/public_html/test/assets/uploads/mt_stock_reports/';
-            // $upload_path = '/home/eatangcp/public_html/test/assets/uploads/mt_stock_reports';
+            // $path  = '/home/eatangcp/public_html/test/assets/uploads/daily_merchandiser_performance/';
+            // $upload_path = '/home/eatangcp/public_html/test/assets/uploads/daily_merchandiser_performance';
 
             $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/daily_merchandiser_performance/';
             $upload_path = '/home/eatangcp/public_html/eat_erp/assets/uploads/daily_merchandiser_performance';
 
-            // $path  = 'C:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports/';
-            // $upload_path = 'C:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports';
+            // $path  = '/var/www/html/eat_erp/assets/uploads/daily_merchandiser_performance/';
+            // $upload_path = '/var/www/html/eat_erp/assets/uploads/daily_merchandiser_performance';
+
+            // $path  = 'C:/wamp64/www/eat_erp/assets/uploads/daily_merchandiser_performance/';
+            // $upload_path = 'C:/wamp64/www/eat_erp/assets/uploads/daily_merchandiser_performance';
+
+            // $path  = 'E:/wamp64/www/eat_erp/assets/uploads/daily_merchandiser_performance/';
+            // $upload_path = 'E:/wamp64/www/eat_erp/assets/uploads/daily_merchandiser_performance';
+
             if(!is_dir($upload_path)) {
                 mkdir($upload_path, 0777, TRUE);
             }
