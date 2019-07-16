@@ -362,7 +362,7 @@
                                                     <td>
                                                         <input type="text" class="form-control total_amt" name="total_amt[]" id="total_amt_<?php echo $i; ?>" placeholder="Amount" value="" readonly />
                                                     </td>
-                                                     <td class="table_action" style="text-align:center; vertical-align: middle;">
+                                                    <td class="table_action" style="text-align:center; vertical-align: middle;">
                                                            <?php  
                                                                 $style = '';
                                                                 if(isset($data[0]->freezed)){

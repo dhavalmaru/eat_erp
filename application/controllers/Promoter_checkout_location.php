@@ -102,8 +102,8 @@ class Promoter_checkout_location extends CI_Controller{
     }
 
     public function email_promoter_stock(){
-        $date = date('Y-m-d');
-        // $date = '2017-06-10';
+        // $date = date('Y-m-d');
+        $date = '2019-07-12';
         $from_email = 'cs@eatanytime.in';
         $from_email_sender = 'Eat ERP';
         // $bcc = 'dhaval.maru@otbconsulting.co.in';
@@ -161,10 +161,14 @@ class Promoter_checkout_location extends CI_Controller{
             $message = '<html><head></head><body>Hi,<br /><br />
                         Please find below Promoters Stock Report for - '.$date.'. <br /><br />'.$table.'<br/>
                         <br />Thanks</body></html>';
-            $to_email = 'rishit.sanghvi@eatanytime.in,swapnil.darekar@eatanytime.in, prasad.bhisale@pecanreams.com';
-            $bcc="dhaval.maru@otbconsulting.co.in";
-            //$to_email = 'dhaval.maru@otbconsulting.co.in';
-            $mailSent=send_email($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc);
+
+            // $to_email = 'rishit.sanghvi@eatanytime.in,swapnil.darekar@eatanytime.in, prasad.bhisale@pecanreams.com';
+            // $bcc="dhaval.maru@otbconsulting.co.in";
+
+            $to_email = 'prasad.bhisale@pecanreams.com';
+            $bcc = 'prasad.bhisale@pecanreams.com';
+
+            $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc);
 
             echo $message;
             echo '<br/>';

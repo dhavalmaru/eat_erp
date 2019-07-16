@@ -691,7 +691,8 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
     $filename='Sale_Invoice_Report.xls';
     // $path  = 'C:/wamp64/www/eat_erp_test/assets/uploads/excel_upload/';
     // $path  = '/home/eatangcp/public_html/test/assets/uploads/excel_upload/';
-    $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/excel_upload/';
+    // $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/excel_upload/';
+    $path = $this->config->item('upload_path').'excel_upload/';
 
     if($flag==0)
     {
@@ -1810,10 +1811,11 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
 
     $filename='Sale_Invoice_Report.xls';
     // $path  = 'C:/xampp/htdocs/eat_erp/assets/uploads/excel_upload/';
-    $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/excel_upload/';
+    // $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/excel_upload/';
     // $path  = '/var/www/html/eat_erp/assets/uploads/excel_upload/';
     // $path  = '/home/eatangcp/public_html/test/assets/uploads/excel_upload/';
-    /*$path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/excel_upload/';*/
+
+    $path = $this->config->item('upload_path').'excel_upload/';
 
     if($flag==0)
     {
@@ -3468,8 +3470,10 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
 
     // $path  = 'C:/wamp64/www/eat_erp_test/assets/uploads/excel_upload/';
     // $path  = '/home/eatangcp/public_html/test/assets/uploads/excel_upload/';
-    $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/excel_upload/';
+    // $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/excel_upload/';
     // $path  = '/var/www/html/eat_erp/assets/uploads/excel_upload/';
+    $path = $this->config->item('upload_path').'excel_upload/';
+
     if($flag==0)
     {
         header('Content-Type: application/vnd.ms-excel');
@@ -10903,7 +10907,7 @@ function generate_ledger_report() {
 
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, ($i+1));
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $data[$i]['voucher_id']);
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, (($data[$i]['ref_date']!=null && $data[$i]['ref_date']!="")?date("d/m/Y",strtotime($data[$i]['ref_date'])):""));
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, (($data[$i]['ref_date']!=null && $data[$i]['ref_date']!="")?date("d-m-Y",strtotime($data[$i]['ref_date'])):""));
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $ledger_code);
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $ledger_name);
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, $data[$i]['ref_id']);
@@ -13299,858 +13303,6 @@ public function get_upload_telly_report($id='') {
     return  $result;
 }
 
-public function generate_mt_stock_report() {
-    $date = formatdate($this->input->post('date'));
-    // $zone_id_array = ['10', '12', '16', '18', '29'];
-    // $zone_array = ['Pune', 'Hyderbad', 'Mumbai', 'Banglore', 'Ahmedabad'];
-
-    $zone_id_array = ['16'];
-    $zone_array = ['Mumbai'];
-
-    $reportpath = '';
-    
-    for($x=0; $x<count($zone_id_array); $x++) {
-        $r_zone_id = $zone_id_array[$x];
-        $this->get_mt_stock_report($date, 'generate', $r_zone_id);
-    }
-}
-
-public function send_mt_stock_tracker() {
-    // $date = '2019-05-06';
-    $date = date('Y-m-d');
-
-    // $zone_id_array = ['16'];
-    // $zone_array = ['Mumbai'];
-    // $zone_email_array = ['Sulochana.yadav@eatanytime.co.in'];
-
-    $zone_id_array = ['9', '10', '12', '16', '18', '29', '30'];
-    $zone_array = ['Chennai', 'Pune', 'Hyderbad', 'Mumbai', 'Banglore', 'Ahmedabad', 'Delhi'];
-    $zone_email_array = ['', 'mohil.telawade@eatanytime.co.in', 'vijay.spar@gmail.com', 
-                        'Sulochana.yadav@eatanytime.co.in, mukesh.yadav@eatanytime.co.in, sachin.pal@eatanytime.co.in', 
-                        'darshan.dhany@eatanytime.co.in, mahesh.ms@eatanytime.co.in', 'urvi.bhayani@eatanytime.co.in', 
-                        'nitin.kumar@eatanytime.co.in'];
-
-    $reportpath = '';
-    $tr = '';
-    
-    for($x=0; $x<count($zone_id_array); $x++) {
-        $r_zone_id = $zone_id_array[$x];
-        $r_zone = $zone_array[$x];
-        // $reportpath = $this->get_mt_stock_report($date, 'save', $r_zone_id);
-        $return_arr = $this->get_mt_stock_report($date, 'save', $r_zone_id);
-
-        if(isset($return_arr['reportpath'])){
-            $reportpath = $return_arr['reportpath'];
-        }
-        if(isset($return_arr['tr'])){
-            $tr = $return_arr['tr'];
-        }
-
-        if($reportpath!=''){
-            $report_date = date('d-m-Y', strtotime($date));
-
-            $message = '<html>
-                        <head>
-                            <style>
-                                td { padding: 5px; width: 100px; }
-                            </style>
-                        </head>
-                        <body>
-                            <h3>Wholesome Habits Private Limited</h3>
-                            <h4>MT Stock Tracker - '.$r_zone.'</h4>
-                            <p>Reporting Date - '.$report_date.'</p>
-                            <p>PFA</p>
-                            <br/><br/>
-
-                            <table class="body_table" border="1px" style="border-collapse: collapse;">
-                            <tbody>
-                            '.$tr.'
-                            </tbody>
-                            </table>
-
-                            <br/><br/>
-                            Regards,
-                            <br/><br/>
-                            CS
-                        </body>
-                        </html>';
-            $from_email = 'cs@eatanytime.co.in';
-            $from_email_sender = 'EAT MIS';
-            $subject = 'MT_Stock_Tracker_'.$r_zone.'_'.$report_date;
-
-
-            /*$to_email = "dhaval.maru@pecanreams.com";
-            $cc="sangeeta.yadav@pecanreams.com";
-            $bcc="yadavsangeeta521@gmail.com";*/
-            
-            // $to_email = "prasad.bhisale@pecanreams.com";
-            // $cc = 'prasad.bhisale@pecanreams.com';
-            // $bcc = 'prasad.bhisale@pecanreams.com';
-
-            if($zone_email_array[$x]!=''){
-                $to_email = "operations@eatanytime.in,priti.tripathi@eatanytime.in,".$zone_email_array[$x];
-            } else {
-                $to_email = "operations@eatanytime.in,priti.tripathi@eatanytime.in";
-            }
-            $cc = 'rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, dhaval.maru@pecanreams.com, prasad.bhisale@pecanreams.com';
-            $bcc = 'ashwini.patil@pecanreams.com';
-
-            sleep(15);
-
-            echo $attachment = $reportpath;
-            echo '<br/><br/>';
-            echo $message;
-            echo '<br/><br/>';
-
-            $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc, $cc, $attachment);
-
-            echo $mailSent;
-            echo '<br/><br/>';
-
-            if($mailSent==1){
-                $logarray['table_id']=$this->session->userdata('session_id');
-                $logarray['module_name']='Reports';
-                $logarray['cnt_name']='Reports';
-                $logarray['action']='Exception report sent.';
-                $this->user_access_log_model->insertAccessLog($logarray);
-            }
-        }
-    }
-}
-
-public function get_mt_stock_report($date='', $action='save', $r_zone_id='') {
-    if($date==''){
-        $date = date('Y-m-d');
-    }
-
-    $report_date = date('d-m-Y', strtotime($date));
-    $reportpath = '';
-    $tr = '';
-
-    $sql = "Select distinct H.store_name from 
-            (Select  E.*, F.location from 
-            (Select  J.*, D.zone from 
-            (Select I.*, A.category from
-            (select distinct store_id, location_id, zone_id from merchandiser_beat_plan 
-            where status='Approved' and zone_id='".$r_zone_id."') I
-            left join
-            (select * from store_master where status='Approved' and zone_id='".$r_zone_id."') A
-            on (I.store_id=A.store_id and I.location_id=A.location_id and I.zone_id=A.zone_id)) J
-            left join 
-            (select * from zone_master) D 
-            on (J.zone_id=D.id)) E 
-            left join 
-            (select * from location_master) F 
-            on (E.location_id=F.id)) G 
-            left join 
-            (select * from relationship_master) H 
-            on (G.store_id=H.id) 
-            order by H.store_name";
-    $query = $this->db->query($sql);
-    $result = $query->result();
-
-    if(count($result)>0){
-        $template_path = $this->config->item('template_path');
-        $file = $template_path.'MT_Stock_Tracker.xlsx';
-        $this->load->library('excel');
-        $objPHPExcel = PHPExcel_IOFactory::load($file);
-
-        $col_name[]=array();
-        for($i=0; $i<=200; $i++) {
-            $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
-        }
-
-        // echo count($result);
-        // echo '<br/>';
-
-        // $j = 19;
-        // $region = $objPHPExcel->getActiveSheet()->getCell('A'.strval($j))->getValue();
-        // echo $region;
-        // echo '<br/>';
-
-        // $lst_row = 129;
-
-        $sql = "select * from zone_master where id = '".$r_zone_id."'";
-        $result2 = $this->db->query($sql)->result();
-
-        $objPHPExcel->getActiveSheet()->setCellValue('A2', 'MT STORE TRACKER - '.strtoupper($result2[0]->zone));
-        $objPHPExcel->getActiveSheet()->setCellValue('A3', 'Date - '.$report_date.' to '.$report_date);
-
-        $row = 6;
-
-        for($i=0; $i<count($result); $i++){
-            if($row>8){
-                $objPHPExcel->getActiveSheet()->insertNewRowBefore($row, 1);
-            }
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[1].$row, $result[$i]->store_name);
-            // $objPHPExcel->getActiveSheet()->setCellValue($col_name[2].$row, '=COUNTIF($B$8:$B$118,B3)');
-            $row = $row + 1;
-        }
-
-        // $objPHPExcel->getActiveSheet()->getStyle($col_name[1].'2:'.$col_name[2].($row-1))->applyFromArray(array(
-        //     'borders' => array(
-        //         'allborders' => array(
-        //             'style' => PHPExcel_Style_Border::BORDER_THIN
-        //         )
-        //     )
-        // ));
-
-        $excel_sales_rep = array();
-        $tot_sales_rep_cnt = 2;
-        $start_row = $row + 1;
-        $row = $start_row;
-        $col = 6;
-        $tr = '';
-
-        $sql = "Select distinct G.*, H.store_name from 
-                (Select  E.*, F.location from 
-                (Select  J.*, D.zone from 
-                (Select I.*, A.category from
-                (select distinct store_id, location_id, zone_id from merchandiser_beat_plan 
-                where status='Approved' and zone_id='".$r_zone_id."') I
-                left join
-                (select * from store_master where status='Approved' and zone_id='".$r_zone_id."') A
-                on (I.store_id=A.store_id and I.location_id=A.location_id and I.zone_id=A.zone_id)) J
-                left join 
-                (select * from zone_master) D 
-                on (J.zone_id=D.id)) E 
-                left join 
-                (select * from location_master) F 
-                on (E.location_id=F.id)) G 
-                left join 
-                (select * from relationship_master) H 
-                on (G.store_id=H.id) 
-                order by G.zone, H.store_name, G.location";
-        $query = $this->db->query($sql);
-        $result = $query->result();
-
-        if(count($result)>0){
-            // $td1 = '';
-            // $td2 = '';
-
-            $sql = "select distinct A.sales_rep_id, B.sales_rep_name 
-                    from merchandiser_beat_plan A 
-                    left join sales_rep_master B on (A.sales_rep_id=B.id) 
-                    where A.zone_id = '$r_zone_id' and B.sales_rep_name is not null and B.sr_type = 'Merchandizer' 
-                    order by B.sales_rep_name";
-            $query = $this->db->query($sql);
-            $result2 = $query->result();
-            if(count($result2)>0){
-                $tot_sales_rep_cnt = count($result2);
-
-                for($j=0; $j<count($result2); $j++){
-                    $excel_sales_rep[$j] = ucwords(trim($result2[$j]->sales_rep_name));
-                    if($j>1){
-                        $objPHPExcel->getActiveSheet()->insertNewColumnBefore($col_name[$col+$j], 1);
-                    }
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+$j].$row, $excel_sales_rep[$j]);
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+$j].($row+1), 'MERCHANDISER '.($j+1));
-
-                    // $td1 = $td1.'<td>'.$excel_sales_rep[$j].'</td>';
-                    // $td2 = $td2.'<td>MERCHANDISER '.($j+1).'</td>';
-                }
-            }
-
-            // if($td1 == '') {
-            //     $td1 = '<td></td><td></td>';
-            //     $td2 = '<td>MERCHANDISER 1</td><td>MERCHANDISER 2</td>';
-            // } else if($tot_sales_rep_cnt==1) {
-            //     $td1 = '<td></td>';
-            //     $td2 = '<td>MERCHANDISER 2</td>';
-            // }
-
-            // $tr = '<tr><td></td><td></td><td></td><td></td>'.$td1.'<td></td><td>'.$report_date.'</td><td></td><td></td>';
-            // $tr = $tr.'<tr style="font-weight: bold;"><td>Region</td><td>MT Group</td><td>Location</td><td>STORES</td>'.$td2.'<td>STATUS</td><td>Latest Date</td><td>Username</td><td>Diff</td>';
-            $tr = $tr.'<tr style="font-weight: bold;"><td>Sr No</td><td>Region</td><td>MT Group</td><td>Location</td><td>Latest Date</td><td>Username</td><td>Diff</td>';
-            $sr_no = 1;
-
-            if($tot_sales_rep_cnt<2){
-                $tot_sales_rep_cnt = 2;
-            }
-
-            $col = 9 + $tot_sales_rep_cnt;
-
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $report_date);
-
-            $row = $start_row + 2;
-
-            for($i=0; $i<count($result); $i++){
-                $zone = ucwords(trim($result[$i]->zone));
-                $store = ucwords(trim($result[$i]->store_name));
-                $location = ucwords(trim($result[$i]->location));
-                $category = $result[$i]->category;
-
-                $zone_id = $result[$i]->zone_id;
-                $store_id = $result[$i]->store_id;
-                $location_id = $result[$i]->location_id;
-
-                // echo $i;
-                // echo '<br/>';
-                // echo $zone_id;
-                // echo '<br/>';
-                // echo $store_id;
-                // echo '<br/>';
-                // echo $location_id;
-                // echo '<br/>';
-
-                $date_of_visit = '';
-                $butterscotch_cnt = 0;
-                $orange_cnt = 0;
-                $chocopeanut_cnt = 0;
-                $mango_cnt = 0;
-                $bambaiya_cnt = 0;
-                $berry_cnt = 0;
-                $chyawanprash_cnt = 0;
-                $variety_cnt = 0;
-                $choco_cnt = 0;
-                $dark_choco_cnt = 0;
-                $cranb_cnt = 0;
-                $t_cranb_cnt = 0;
-                $t_fig_cnt = 0;
-                $t_papaya_cnt = 0;
-                $user_name = '';
-
-                // $date1=date_create($date);
-                // $date2=date_create('1900-01-00');
-                // $date_diff=date_diff($date1, $date2);
-                // $diff = intval($date_diff->format("%a"));
-
-                $diff = '';
-
-                $sql = "select A.*, concat(ifnull(B.first_name,''), ' ',ifnull(B.last_name,'')) as user_name , 
-                        DATEDIFF(curdate(),date(A.date_of_visit)) as diff 
-                        from merchandiser_stock A left join user_master B on (A.created_by=B.id) 
-                        where A.dist_id = '$store_id' and A.location_id = '$location_id' and 
-                            date(A.date_of_visit)<=date('".$date."') 
-                        order by A.date_of_visit desc";
-                $query = $this->db->query($sql);
-                $result2 = $query->result();
-                if(count($result2)>0){
-                    $merchandiser_stock_id = $result2[0]->id;
-                    if(isset($result2[0]->date_of_visit)){
-                        if($result2[0]->date_of_visit!=null && $result2[0]->date_of_visit!=''){
-                            $date_of_visit = date('d-m-Y',strtotime($result2[0]->date_of_visit));
-                            $diff = $result2[0]->diff;
-                        }
-                    }
-                    $user_name = ucwords(trim($result2[0]->user_name));
-
-                    // $sql = "select AA.merchandiser_stock_id, AA.item_id, sum(AA.qty) as qty from 
-                    //         (select A.merchandiser_stock_id, case when A.type = 'Bar' then A.item_id else B.product_id end as item_id, 
-                    //         case when A.type = 'Bar' then A.qty when (B.product_id='16' or B.product_id='17' or B.product_id='18' or 
-                    //             B.product_id='19' or B.product_id='20' or B.product_id='21') then A.qty else A.qty*B.qty end as qty 
-                    //         from merchandiser_stock_details A left join box_product B on (A.type = 'Box' and A.item_id = B.box_id) 
-                    //         where A.merchandiser_stock_id = '$merchandiser_stock_id') AA 
-                    //         group by AA.merchandiser_stock_id, AA.item_id";
-
-
-                    $sql = "select E.merchandiser_stock_id, E.item_id, sum(E.qty) as qty from 
-                            (select A.merchandiser_stock_id, A.item_id, A.qty from merchandiser_stock_details A 
-                            where A.merchandiser_stock_id = '$merchandiser_stock_id' and (A.type = 'Bar' or (A.type = 'Box' and A.item_id='32')) 
-                            union all 
-                            select D.* from 
-                            (select C.merchandiser_stock_id, C.item_id, sum(C.qty) as qty from 
-                            (select A.merchandiser_stock_id, B.product_id as item_id, 
-                            case when (B.product_id='16' or B.product_id='17' or B.product_id='18' or 
-                                B.product_id='19' or B.product_id='20' or B.product_id='21') then A.qty else A.qty*B.qty end as qty 
-                            from merchandiser_stock_details A left join box_product B on (A.type = 'Box' and A.item_id = B.box_id) 
-                            where A.merchandiser_stock_id = '$merchandiser_stock_id' and A.type = 'Box' and A.item_id<>'32') C 
-                            group by C.merchandiser_stock_id, C.item_id) D) E 
-                            group by E.merchandiser_stock_id, E.item_id";
-
-                    $query = $this->db->query($sql);
-                    $result2 = $query->result();
-                    if(count($result2)>0){
-                        for($j=0; $j<count($result2); $j++){
-                            if($result2[$j]->item_id=='1'){
-                                $orange_cnt = $result2[$j]->qty;
-                            } else if($result2[$j]->item_id=='3'){
-                                $butterscotch_cnt = $result2[$j]->qty;
-                            } else if($result2[$j]->item_id=='4'){
-                                $bambaiya_cnt = $result2[$j]->qty;
-                            } else if($result2[$j]->item_id=='5'){
-                                $chocopeanut_cnt = $result2[$j]->qty;
-                            } else if($result2[$j]->item_id=='6'){
-                                $mango_cnt = $result2[$j]->qty;
-                            } else if($result2[$j]->item_id=='9'){
-                                $berry_cnt = $result2[$j]->qty;
-                            } else if($result2[$j]->item_id=='10'){
-                                $chyawanprash_cnt = $result2[$j]->qty;
-                            } else if($result2[$j]->item_id=='32'){
-                                $variety_cnt = $result2[$j]->qty;
-                            } else if($result2[$j]->item_id=='16'){
-                                $choco_cnt = $result2[$j]->qty;
-                            } else if($result2[$j]->item_id=='17'){
-                                $dark_choco_cnt = $result2[$j]->qty;
-                            } else if($result2[$j]->item_id=='18'){
-                                $cranb_cnt = $result2[$j]->qty;
-                            } else if($result2[$j]->item_id=='19'){
-                                $t_cranb_cnt = $result2[$j]->qty;
-                            } else if($result2[$j]->item_id=='20'){
-                                $t_fig_cnt = $result2[$j]->qty;
-                            } else if($result2[$j]->item_id=='21'){
-                                $t_papaya_cnt = $result2[$j]->qty;
-                            }
-                        }
-                    }
-                }
-
-                // $bl_flag = false;
-                // $row = 19;
-
-                // for($j=19; $j<1000; $j++){
-                //     $region = $objPHPExcel->getActiveSheet()->getCell('A'.strval($j))->getValue();
-                //     $group = $objPHPExcel->getActiveSheet()->getCell('B'.strval($j))->getValue();
-                //     $loc = $objPHPExcel->getActiveSheet()->getCell('C'.strval($j))->getValue();
-
-                //     if($region==''){
-                //         $row = $j;
-                //         $lst_row = $j;
-                //         break;
-                //     }
-
-                //     if(strtoupper(trim($zone))==strtoupper(trim($region)) && 
-                //        strtoupper(trim($store))==strtoupper(trim($group)) && 
-                //        strtoupper(trim($location))==strtoupper(trim($loc))){
-                //             $bl_flag = true;
-                //             $row = $j;
-                //             break;
-                //     }
-                // }
-
-                // if($bl_flag==false){
-                //     echo 'Not Found';
-                //     echo '<br/>';
-                // } else {
-                //     echo 'Found';
-                //     echo '<br/>';
-                // }
-
-                $col = 0;
-
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $zone);
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $store);
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, $location);
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $store."-".$location);
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $category);
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, '=VLOOKUP(E'.$row.',$E$5:$F$7,2,0)');
-
-                // $td1 = '';
-                $sql = "select A.*, B.sales_rep_name from merchandiser_beat_plan A 
-                        left join sales_rep_master B on (A.sales_rep_id=B.id) 
-                        where A.zone_id = '$zone_id' and A.store_id = '$store_id' and A.location_id = '$location_id' and B.sr_type = 'Merchandizer' 
-                        order by A.modified_on desc";
-                $query = $this->db->query($sql);
-                $result2 = $query->result();
-                if(count($result2)>0){
-                    // if(strtoupper(trim($sales_rep_name))==strtoupper(trim($excel_sales_rep1))){
-                    //     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, $result2[0]->frequency);
-                    // } else if(strtoupper(trim($sales_rep_name))==strtoupper(trim($excel_sales_rep2))){
-                    //     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, $result2[0]->frequency);
-                    // }
-
-                    for($k=0; $k<count($result2); $k++){
-                        $sales_rep_name = $result2[$k]->sales_rep_name;
-
-                        for($j=0; $j<count($excel_sales_rep); $j++){
-                            if(strtoupper(trim($sales_rep_name))==strtoupper(trim($excel_sales_rep[$j]))){
-                                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6+$j].$row, $result2[0]->frequency);
-                                // $td1 = $td1.'<td>'.$result2[0]->frequency.'</td>';
-                            }
-                        }
-                    }
-                }
-
-                // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+8].$row, '=IF(G'.$row.'="",$J$17,$I$17)');
-                // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+9].$row, '=IF(H'.$row.'="",$J$17,$I$17)');
-                // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+10].$row, '=IF((I'.$row.'=$J$17)*(J'.$row.'=$J$17),"NOT UPDATED","UPDATED")');
-
-                $col = 6 + $tot_sales_rep_cnt;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF(COUNTBLANK('.$col_name[$col-$tot_sales_rep_cnt].$row.':'.$col_name[$col-1].$row.')='.$tot_sales_rep_cnt.', "NOT UPDATED", "UPDATED")');
-
-                // $tr = $tr . '<td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col].$row)->getCalculatedValue().'</td>';
-                
-                $col = $col + 2;
-                $style = "";
-
-                if($date_of_visit!='') {
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $date_of_visit);
-                    $col = $col + 1;
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $user_name);
-                    $col = $col + 1;
-                    // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+$'.$col_name[$col-1].'$'.$start_row.'-'.$col_name[$col-2].$row);
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $diff);
-                    $col = $col + 1;
-                } else {
-                    $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row.':'.$col_name[$col+2].$row)->getFill()->applyFromArray(array(
-                        'type' => PHPExcel_Style_Fill::FILL_SOLID,
-                        'startcolor' => array(
-                            'rgb' => 'FFC7CE'
-                        )
-                    ));
-                    $col = $col + 2;
-                    // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+$'.$col_name[$col-1].'$'.$start_row.'-'.$col_name[$col-2].$row);
-                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $diff);
-                    $col = $col + 1;
-                }
-
-                if($date_of_visit=='' || $date_of_visit==null) {
-                    $style = " background-color: #FFC7CE;";
-                }
-
-                // $td1 = '';
-                // $no_of_days = $objPHPExcel->getActiveSheet()->getCell($col_name[$col-1].$row)->getCalculatedValue();
-
-                if($diff=='' || $diff>7) {
-                    // for($x=$col-1; $x>=0; $x--) { 
-                    //     if($x==($col-1)) {
-                    //         $td1 = '<td>'.$diff.'</td>'.$td1;
-                    //     } else if($x==($col-2) || $x==($col-3)) {
-                    //         $td1 = '<td style="'.$style.'">'.$objPHPExcel->getActiveSheet()->getCell($col_name[$x].$row)->getCalculatedValue().'</td>'.$td1;
-                    //     } else if($x!=($col-4) && $x!=4 && $x!=5) {
-                    //         $td1 = '<td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$x].$row)->getCalculatedValue().'</td>'.$td1;
-                    //     }
-                    // }
-                    // $tr = $tr . '<tr>'.$td1.'</tr>';
-
-                    $tr = $tr . '<tr>
-                                    <td>'.$sr_no++.'</td>
-                                    <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[0].$row)->getCalculatedValue().'</td>
-                                    <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[1].$row)->getCalculatedValue().'</td>
-                                    <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[2].$row)->getCalculatedValue().'</td>
-                                    <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col-3].$row)->getCalculatedValue().'</td>
-                                    <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col-2].$row)->getCalculatedValue().'</td>
-                                    <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col-1].$row)->getCalculatedValue().'</td>
-                                </tr>';
-                }
-                
-                
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $butterscotch_cnt);
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $orange_cnt);
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $chocopeanut_cnt);
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $mango_cnt);
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $bambaiya_cnt);
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $berry_cnt);
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $chyawanprash_cnt);
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $variety_cnt);
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $choco_cnt);
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $dark_choco_cnt);
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $cranb_cnt);
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $t_cranb_cnt);
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $t_fig_cnt);
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $t_papaya_cnt);
-                $col = $col + 1;
-
-                // $region = $objPHPExcel->getActiveSheet()->getCell($col_name[$col].$row)->getValue();
-
-                // $objConditionalStyle = new PHPExcel_Style_Conditional();
-                // $objConditionalStyle->setConditionType(PHPExcel_Style_Conditional::CONDITION_CELLIS)
-                //     ->setOperatorType(PHPExcel_Style_Conditional::OPERATOR_LESSTHAN)
-                //     ->addCondition('7');
-                // $objConditionalStyle->getStyle()->getFont()->getColor()->setRGB('FF0000');
-
-                // $conditionalStyles = $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row)->getConditionalStyles();
-                // array_push($conditionalStyles, $objConditionalStyle);
-                // $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row)->setConditionalStyles($conditionalStyles);
-
-
-                $objConditional = new PHPExcel_Style_Conditional();
-                $objConditional->setConditionType(PHPExcel_Style_Conditional::CONDITION_CELLIS)
-                                ->setOperatorType(PHPExcel_Style_Conditional::OPERATOR_EQUAL)
-                                ->addCondition('""')
-                                ->getStyle()
-                                ->applyFromArray(
-                                        array(
-                                                'font'=>array(
-                                                    'color'=>array('argb'=>'FF000000')
-                                                ),
-                                                'fill'=>array(
-                                                    'type' =>PHPExcel_Style_Fill::FILL_SOLID,
-                                                    'startcolor' =>array('argb' => 'FFFFFFFF'),
-                                                    'endcolor' =>array('argb' => 'FFFFFFFF')
-                                                )
-                                            )
-                                    );
-
-                $objConditional2 = new PHPExcel_Style_Conditional();
-                $objConditional2->setConditionType(PHPExcel_Style_Conditional::CONDITION_CELLIS)
-                                ->setOperatorType(PHPExcel_Style_Conditional::OPERATOR_GREATERTHAN)
-                                ->addCondition('7')
-                                ->getStyle()
-                                ->applyFromArray(
-                                        array(
-                                                'font'=>array(
-                                                    'color'=>array('argb'=>'FF000000')
-                                                ),
-                                                'fill'=>array(
-                                                    'type' =>PHPExcel_Style_Fill::FILL_SOLID,
-                                                    'startcolor' =>array('argb' => 'FFFF0000'),
-                                                    'endcolor' =>array('argb' => 'FFFF0000')
-                                                )
-                                            )
-                                    );
-
-                $objConditional3 = new PHPExcel_Style_Conditional();
-                $objConditional3->setConditionType(PHPExcel_Style_Conditional::CONDITION_CELLIS)
-                                ->setOperatorType(PHPExcel_Style_Conditional::OPERATOR_LESSTHANOREQUAL)
-                                ->addCondition('7')
-                                ->getStyle()
-                                ->applyFromArray(
-                                        array(
-                                                'font'=>array(
-                                                    'color'=>array('argb'=>'FF000000')
-                                                ),
-                                                'fill'=>array(
-                                                    'type' =>PHPExcel_Style_Fill::FILL_SOLID,
-                                                    'startcolor' =>array('argb' => 'FF00B050'),
-                                                    'endcolor' =>array('argb' => 'FF00B050')
-                                                )
-                                            )
-                                    );
-
-                $conditionalStyles = $objPHPExcel->getActiveSheet()->getStyle($col_name[$col-15].$row)->getConditionalStyles();
-                array_push($conditionalStyles,$objConditional,$objConditional2,$objConditional3);
-                $objPHPExcel->getActiveSheet()->getStyle($col_name[$col-15].$row)->setConditionalStyles($conditionalStyles);
-                
-
-                $objConditional = new PHPExcel_Style_Conditional();
-                $objConditional->setConditionType(PHPExcel_Style_Conditional::CONDITION_CELLIS)
-                                ->setOperatorType(PHPExcel_Style_Conditional::OPERATOR_LESSTHAN)
-                                ->addCondition('1')
-                                ->getStyle()
-                                ->applyFromArray(
-                                        array(
-                                                'font'=>array(
-                                                    'color'=>array('argb'=>'FF000000')
-                                                ),
-                                                'fill'=>array(
-                                                    'type' =>PHPExcel_Style_Fill::FILL_SOLID,
-                                                    'startcolor' =>array('argb' => 'FFFF0000'),
-                                                    'endcolor' =>array('argb' => 'FFFF0000')
-                                                )
-                                            )
-                                    );
-
-                $objConditional2 = new PHPExcel_Style_Conditional();
-                $objConditional2->setConditionType(PHPExcel_Style_Conditional::CONDITION_CELLIS)
-                                ->setOperatorType(PHPExcel_Style_Conditional::OPERATOR_GREATERTHANOREQUAL)
-                                ->addCondition('1')
-                                ->getStyle()
-                                ->applyFromArray(
-                                        array(
-                                                'font'=>array(
-                                                    'color'=>array('argb'=>'FF000000')
-                                                ),
-                                                'fill'=>array(
-                                                    'type' =>PHPExcel_Style_Fill::FILL_SOLID,
-                                                    'startcolor' =>array('argb' => 'FF00B050'),
-                                                    'endcolor' =>array('argb' => 'FF00B050')
-                                                )
-                                            )
-                                    );
-                $conditionalStyles = $objPHPExcel->getActiveSheet()->getStyle(($col_name[$col-14].$row).':'.($col_name[$col-1].$row))->getConditionalStyles();
-                array_push($conditionalStyles,$objConditional,$objConditional2);
-                $objPHPExcel->getActiveSheet()->getStyle(($col_name[$col-14].$row).':'.($col_name[$col-1].$row))->setConditionalStyles($conditionalStyles);
-
-
-                // echo $date_of_visit;
-                // echo '<br/>';
-
-                $col = $col + 19;
-
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=SUM('.$col_name[$col+1].$row.':'.$col_name[$col+14].$row.')');
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+'.$col_name[$col-16].$row.'-'.$col_name[$col-28].$row);
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+'.$col_name[$col-16].$row.'-'.$col_name[$col-28].$row);
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+'.$col_name[$col-16].$row.'-'.$col_name[$col-28].$row);
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+'.$col_name[$col-16].$row.'-'.$col_name[$col-28].$row);
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+'.$col_name[$col-16].$row.'-'.$col_name[$col-28].$row);
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+'.$col_name[$col-16].$row.'-'.$col_name[$col-28].$row);
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+'.$col_name[$col-16].$row.'-'.$col_name[$col-28].$row);
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+'.$col_name[$col-16].$row.'-'.$col_name[$col-28].$row);
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+'.$col_name[$col-16].$row.'-'.$col_name[$col-28].$row);
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+'.$col_name[$col-16].$row.'-'.$col_name[$col-28].$row);
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+'.$col_name[$col-16].$row.'-'.$col_name[$col-28].$row);
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+'.$col_name[$col-16].$row.'-'.$col_name[$col-28].$row);
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+'.$col_name[$col-16].$row.'-'.$col_name[$col-28].$row);
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+'.$col_name[$col-16].$row.'-'.$col_name[$col-28].$row);
-                $col = $col + 2;
-
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=SUM('.$col_name[$col+1].$row.':'.$col_name[$col+14].$row.')');
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF('.$col_name[$col-50].$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF('.$col_name[$col-50].$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF('.$col_name[$col-50].$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF('.$col_name[$col-50].$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF('.$col_name[$col-50].$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF('.$col_name[$col-50].$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF('.$col_name[$col-50].$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF('.$col_name[$col-50].$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF('.$col_name[$col-50].$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF('.$col_name[$col-50].$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF('.$col_name[$col-50].$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF('.$col_name[$col-50].$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF('.$col_name[$col-50].$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
-                $col = $col + 1;
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF('.$col_name[$col-50].$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
-
-                $row = $row + 1;
-            }
-
-            $row = $row - 1;
-        }
-
-        for($i=6; $i<$start_row-1; $i++){
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[2].$i, '=COUNTIF($B$'.($start_row + 2).':$B$'.$row.',B'.$i.')');
-        }
-        $objPHPExcel->getActiveSheet()->setCellValue($col_name[2].($start_row-1), '=SUM(C6:C'.($start_row-2).')');
-
-        $col = 6 + $tot_sales_rep_cnt;
-
-        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'7', '=COUNTIF('.$col_name[$col].$start_row.':'.$col_name[$col].$row.','.$col_name[$col].'6)');
-        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].'7', '=COUNTIF('.$col_name[$col].$start_row.':'.$col_name[$col].$row.','.$col_name[$col+1].'6)');
-
-        $start_row = $start_row + 2;
-
-        $objPHPExcel->getActiveSheet()->getStyle('A'.$start_row.':'.$col_name[$col].$row)->applyFromArray(array(
-            'borders' => array(
-                'allborders' => array(
-                    'style' => PHPExcel_Style_Border::BORDER_THIN
-                )
-            )
-        ));
-
-        $col = $col + 2;
-        $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$start_row.':'.$col_name[$col+16].$row)->applyFromArray(array(
-            'borders' => array(
-                'allborders' => array(
-                    'style' => PHPExcel_Style_Border::BORDER_THIN
-                )
-            )
-        ));
-        
-        $col = $col + 19;
-        $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$start_row.':'.$col_name[$col+15].$row)->applyFromArray(array(
-            'borders' => array(
-                'allborders' => array(
-                    'style' => PHPExcel_Style_Border::BORDER_THIN
-                )
-            )
-        ));
-        
-        $col = $col + 17;
-        $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$start_row.':'.$col_name[$col+14].$row)->applyFromArray(array(
-            'borders' => array(
-                'allborders' => array(
-                    'style' => PHPExcel_Style_Border::BORDER_THIN
-                )
-            )
-        ));
-        
-        $col = $col + 16;
-        $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$start_row.':'.$col_name[$col+14].$row)->applyFromArray(array(
-            'borders' => array(
-                'allborders' => array(
-                    'style' => PHPExcel_Style_Border::BORDER_THIN
-                )
-            )
-        ));
-        
-        $filename = 'MT_Stock_Tracker_For_'.$zone.'_'.$report_date.'.xlsx';
-
-        if($action=="save") {
-            // $path  = '/home/eatangcp/public_html/test/assets/uploads/mt_stock_reports/';
-            // $upload_path = '/home/eatangcp/public_html/test/assets/uploads/mt_stock_reports';
-
-            $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/mt_stock_reports/';
-            $upload_path = '/home/eatangcp/public_html/eat_erp/assets/uploads/mt_stock_reports';
-
-            // $path  = '/var/www/html/eat_erp/assets/uploads/mt_stock_reports/';
-            // $upload_path = '/var/www/html/eat_erp/assets/uploads/mt_stock_reports';
-
-            // $path  = 'C:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports/';
-            // $upload_path = 'C:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports';
-
-            // $path  = 'E:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports/';
-            // $upload_path = 'E:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports';
-
-            if(!is_dir($upload_path)) {
-                mkdir($upload_path, 0777, TRUE);
-            }
-
-            $reportpath = $path.$filename;
-
-            // header('Content-Type: application/vnd.ms-excel');
-            // header('Content-Disposition: attachment;filename="'.$filename.'"');
-            // header('Cache-Control: max-age=0');
-
-            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007'); 
-            $objWriter->save($reportpath);
-
-            echo $reportpath;
-            echo '<br/><br/>';
-
-            $return_arr = array('reportpath'=>$reportpath, 'tr'=> $tr);
-
-            // return $reportpath;
-            return $return_arr;
-        } else {
-            // header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-            header('Content-Type: application/openxmlformats-officedocument.spreadsheetml.sheet');
-            header('Content-Disposition: attachment;filename="'.$filename.'"');
-            header('Cache-Control: max-age=0');
-            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
-            $objWriter->save('php://output');
-
-            $logarray['table_id']=$this->session->userdata('session_id');
-            $logarray['module_name']='Reports';
-            $logarray['cnt_name']='Reports';
-            $logarray['action']='MT Stock Tracker Report Generated.';
-            $this->user_access_log_model->insertAccessLog($logarray);
-
-            exit;
-        }
-    }
-}
-
 public function get_raw_material_stock_report() {
     $from_date = formatdate($this->input->post('from_date'));
     $to_date = formatdate($this->input->post('to_date'));
@@ -14930,7 +14082,7 @@ public function generate_sales_attendence_report(){
             $out_time = '';
 
         /*$dateValue = PHPExcel_Shared_Date::PHPToExcel( 
-        DateTime::createFromFormat('d/m/Y', ) 
+        DateTime::createFromFormat('d-m-Y', ) 
         );*/
         /*$dateValue = PHPExcel_Style_NumberFormat::toFormattedString(date('d-m-Y',strtotime($dist->selected_date)), 'YYYY-MM-DD');*/
 
@@ -14963,7 +14115,7 @@ public function generate_sales_attendence_report(){
 }
 
 public function sales_rep_exception_report(){
-    $sql="Select    not_mapped,mapped,A.type from 
+    $sql="Select not_mapped, mapped, A.type from 
         (SELECT count(*) as not_mapped ,'Store' as type from 
         (Select A.store_name,Z.zone, L.location from 
         (SELECT F.store_name,D.zone_id,D.store_id,D.location_id from 
@@ -15099,13 +14251,13 @@ public function sales_rep_exception_report(){
          $entry_table.="<td style='text-align: center;'>".$result[$i]['not_mapped']."</td></tr>";
     }
 
-    $subject = 'Sales Rep Exception Report - '.date("d/m/Y");
+    $subject = 'Sales Rep Exception Report - '.date("d-m-Y");
 
     $message = '<html>
                 <body>
                     <h3>Wholesome Habits Private Limited</h3>
                     <h4>Sales Rep Exception Reporting</h4>
-                    <p>Reporting Date - '.date("d/m/Y").'</p>
+                    <p>Reporting Date - '.date("d-m-Y").'</p>
                     <table border="1" style="border-collapse: collapse;">
                         <thead>
                             <tr>
@@ -15284,9 +14436,11 @@ public function sales_rep_exception_report(){
     $date1 = date('d-m-Y_H-i-A');
     $filename='Sales_Exception_Report_'.$date1.'.xls';
     /*$path  = 'C:/xampp/htdocs/eat_erp_server/assets/uploads/exception_reports';*/
-    $path  ='/home/eatangcp/public_html/eat_erp/assets/uploads/exception_reports/';
+    // $path  ='/home/eatangcp/public_html/eat_erp/assets/uploads/exception_reports/';
     // $path  ='/var/www/html/eat_erp/assets/uploads/exception_reports/';
-   /* $path  ='/home/eatangcp/public_html/eat_erp/assets/uploads/exception_reports/';*/
+
+    $path = $this->config->item('upload_path').'exception_reports/';
+
     $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
     $objWriter->save($path.$filename);
     $attachment = $path.$filename;
@@ -15555,8 +14709,10 @@ public function gt_store_report($save='',$region=array()){
     $date1 = date('d-m-Y_H-i-A');
     $filename='Store_wise_sales_'.$date1.'.xls';
     if($save=='') {
-        $path  ='/home/eatangcp/public_html/eat_erp/assets/uploads/exception_reports/';
+        // $path  ='/home/eatangcp/public_html/eat_erp/assets/uploads/exception_reports/';
         // $path  ='/var/www/html/eat_erp/assets/uploads/exception_reports/';
+
+        $path = $this->config->item('upload_path').'exception_reports/';
 
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
         $objWriter->save($path.$filename);
@@ -15567,6 +14723,7 @@ public function gt_store_report($save='',$region=array()){
         $from_email = 'cs@eatanytime.co.in';
         $from_email_sender = 'Wholesome Habits Pvt Ltd';
         $subject='GT Store Report';
+        // $report_date = '11-07-2019';
         $report_date = date('d-m-Y');
         $message = '<html>
                     <body>
@@ -15913,7 +15070,7 @@ function generate_monthly_sales_overview_report() {
     }
 
     $sql = "select distinct G.distributor_type as item, G.distributor_type as item_name from 
-            (select distinct D.distributor_id, E.type_id, F.distributor_type from 
+            (select distinct D.distributor_id, E.type_id, case when E.type_id='13' then 'Modern Trade' when E.type_id='6' then 'Alternate Channel' else F.distributor_type end as distributor_type from 
             (select distinct A.distributor_id from distributor_out A where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and (A.distributor_id!='1' and A.distributor_id!='189')) D 
             left join distributor_master E on (D.distributor_id=E.id) 
             left join distributor_type_master F on (E.type_id=F.id)) G 
@@ -15922,7 +15079,7 @@ function generate_monthly_sales_overview_report() {
 
     $sql = "select G.year_no, G.mon_no, G.mon_name, G.distributor_type as item, 
             G.distributor_type as item_name, sum(G.item_qty) as tot_qty from 
-            (select D.year_no, D.mon_no, D.mon_name, D.distributor_id, D.item_qty, E.type_id, F.distributor_type from 
+            (select D.year_no, D.mon_no, D.mon_name, D.distributor_id, D.item_qty, E.type_id, case when E.type_id='13' then 'Modern Trade' when E.type_id='6' then 'Alternate Channel' else F.distributor_type end as distributor_type from 
             (select DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, A.distributor_id, 
                 case when B.type='Bar' then B.qty else B.qty*C.qty end as item_qty 
             from distributor_out A 
@@ -15947,7 +15104,7 @@ function generate_monthly_sales_overview_report() {
     }
 
     $sql = "select distinct G.distributor_type as item, G.distributor_type as item_name from 
-            (select D.distributor_id, E.type_id, F.distributor_type from 
+            (select D.distributor_id, E.type_id, case when E.type_id='13' then 'Modern Trade' when E.type_id='6' then 'Alternate Channel' else F.distributor_type end as distributor_type from 
             (select distinct A.distributor_id from distributor_in A where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and (A.distributor_id!='1' and A.distributor_id!='189')) D 
             left join distributor_master E on (D.distributor_id=E.id) 
             left join distributor_type_master F on (E.type_id=F.id)) G 
@@ -15956,7 +15113,7 @@ function generate_monthly_sales_overview_report() {
 
     $sql = "select G.year_no, G.mon_no, G.mon_name, G.distributor_type as item, 
             G.distributor_type as item_name, sum(G.item_qty) as tot_qty from 
-            (select D.year_no, D.mon_no, D.mon_name, D.distributor_id, D.item_qty, E.type_id, F.distributor_type from 
+            (select D.year_no, D.mon_no, D.mon_name, D.distributor_id, D.item_qty, E.type_id, case when E.type_id='13' then 'Modern Trade' when E.type_id='6' then 'Alternate Channel' else F.distributor_type end as distributor_type from 
             (select DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, A.distributor_id, 
                 case when B.type='Bar' then B.qty else B.qty*C.qty end as item_qty 
             from distributor_in A 
@@ -16038,8 +15195,8 @@ function generate_monthly_sales_overview_report() {
             $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
         }
 
-        $objPHPExcel->getActiveSheet()->setCellValue('B7', $from_date);
-        $objPHPExcel->getActiveSheet()->setCellValue('B8', $to_date);
+        $objPHPExcel->getActiveSheet()->setCellValue('B7', date('d-m-Y', strtotime($from_date)));
+        $objPHPExcel->getActiveSheet()->setCellValue('B8', date('d-m-Y', strtotime($to_date)));
 
         $row = 46;
         $sales_return_row = 49;
@@ -16163,6 +15320,7 @@ function generate_monthly_sales_overview_report() {
                 $row2 = $row2 + 1;
             }
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'45', '=sum('.$col_name[$col].'46:'.$col_name[$col].($row2-1).')');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, '='.$col_name[$col].'45-'.$col_name[$col].'16');
 
             $row2 = $sales_return_row;
             $arr = $mon_period[$mon]['productwise_sales_return'];
@@ -16173,6 +15331,7 @@ function generate_monthly_sales_overview_report() {
                 $row2 = $row2 + 1;
             }
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($sales_return_row-1), '=sum('.$col_name[$col].$sales_return_row.':'.$col_name[$col].($row2-1).')');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, '='.$col_name[$col].($sales_return_row-1).'-'.$col_name[$col].'20');
 
             $row2 = $channelwise_sales_row;
             $arr = $mon_period[$mon]['channelwise_sales'];
@@ -16183,6 +15342,7 @@ function generate_monthly_sales_overview_report() {
                 $row2 = $row2 + 1;
             }
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($channelwise_sales_row-1), '=sum('.$col_name[$col].$channelwise_sales_row.':'.$col_name[$col].($row2-1).')');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, '='.$col_name[$col].($channelwise_sales_row-1).'-'.$col_name[$col].'16');
 
             $row2 = $channelwise_sales_return_row;
             $arr = $mon_period[$mon]['channelwise_sales_return'];
@@ -16193,6 +15353,7 @@ function generate_monthly_sales_overview_report() {
                 $row2 = $row2 + 1;
             }
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($channelwise_sales_return_row-1), '=sum('.$col_name[$col].$channelwise_sales_return_row.':'.$col_name[$col].($row2-1).')');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, '='.$col_name[$col].($channelwise_sales_return_row-1).'-'.$col_name[$col].'20');
 
             $row2 = $zonewise_sales_row;
             $arr = $mon_period[$mon]['zonewise_sales'];
@@ -16203,6 +15364,21 @@ function generate_monthly_sales_overview_report() {
                 $row2 = $row2 + 1;
             }
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($zonewise_sales_row-1), '=sum('.$col_name[$col].$zonewise_sales_row.':'.$col_name[$col].($row2-1).')');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, '='.$col_name[$col].($zonewise_sales_row-1).'-'.$col_name[$col].'24');
+            $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row2)->applyFromArray(array(
+                'borders' => array(
+                    'allborders' => array(
+                        'style' => PHPExcel_Style_Border::BORDER_THIN
+                    )
+                )
+            ));
+            $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row2)->applyFromArray(array(
+                'font'  => [
+                    'color' => ['rgb' => 'FF0000']
+                ]
+            ));
+            $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row2)->getNumberFormat()->setFormatCode("_(* #,##0_);_(* (#,##0);_(* \"-\"??_);_(@_)");
+
 
             if($mon_no=='03' || $mon_no=='06' || $mon_no=='09' || $mon_no=='12' || $cnt2==$cnt) {
                 $col = $col + 1;
@@ -16249,6 +15425,7 @@ function generate_monthly_sales_overview_report() {
                     $row2 = $row2 + 1;
                 }
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'45', '=sum('.$col_name[$col].'46:'.$col_name[$col].($row2-1).')');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, '='.$col_name[$col].'45-'.$col_name[$col].'16');
 
                 $row2 = $sales_return_row;
                 for($i=0; $i<count($sales_return_items); $i++) {
@@ -16256,6 +15433,7 @@ function generate_monthly_sales_overview_report() {
                     $row2 = $row2 + 1;
                 }
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($sales_return_row-1), '=sum('.$col_name[$col].$sales_return_row.':'.$col_name[$col].($row2-1).')');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, '='.$col_name[$col].($sales_return_row-1).'-'.$col_name[$col].'20');
 
                 $row2 = $channelwise_sales_row;
                 for($i=0; $i<count($channelwise_sales); $i++) {
@@ -16263,6 +15441,7 @@ function generate_monthly_sales_overview_report() {
                     $row2 = $row2 + 1;
                 }
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($channelwise_sales_row-1), '=sum('.$col_name[$col].$channelwise_sales_row.':'.$col_name[$col].($row2-1).')');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, '='.$col_name[$col].($channelwise_sales_row-1).'-'.$col_name[$col].'16');
 
                 $row2 = $channelwise_sales_return_row;
                 for($i=0; $i<count($channelwise_sales_return); $i++) {
@@ -16270,6 +15449,7 @@ function generate_monthly_sales_overview_report() {
                     $row2 = $row2 + 1;
                 }
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($channelwise_sales_return_row-1), '=sum('.$col_name[$col].$channelwise_sales_return_row.':'.$col_name[$col].($row2-1).')');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, '='.$col_name[$col].($channelwise_sales_return_row-1).'-'.$col_name[$col].'20');
 
                 $row2 = $zonewise_sales_row;
                 for($i=0; $i<count($zonewise_sales); $i++) {
@@ -16277,6 +15457,22 @@ function generate_monthly_sales_overview_report() {
                     $row2 = $row2 + 1;
                 }
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].($zonewise_sales_row-1), '=sum('.$col_name[$col].$zonewise_sales_row.':'.$col_name[$col].($row2-1).')');
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row2, '='.$col_name[$col].($zonewise_sales_row-1).'-'.$col_name[$col].'24');
+                $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row2)->applyFromArray(array(
+                    'borders' => array(
+                        'allborders' => array(
+                            'style' => PHPExcel_Style_Border::BORDER_THIN
+                        )
+                    )
+                ));
+
+                $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row2)->applyFromArray(array(
+                    'font'  => [
+                        'color' => ['rgb' => 'FF0000']
+                    ]
+                ));
+                $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row2)->getNumberFormat()->setFormatCode("_(* #,##0_);_(* (#,##0);_(* \"-\"??_);_(@_)");
+
 
                 $start_col = $col + 1;
             }
@@ -16372,7 +15568,7 @@ function generate_monthly_sales_overview_zonewise_report() {
         $cnt++;
     }
 
-    $sql = "select distinct C.distributor_type from 
+    $sql = "select distinct (case when B.type_id='13' then 'Modern Trade' when B.type_id='6' then 'Alternate Channel' else C.distributor_type end) as distributor_type from 
             (select distinct distributor_id from distributor_out where status='Approved' and 
             date_of_processing>='$from_date' and date_of_processing<='$to_date' and 
             (distributor_id!='1' and distributor_id!='189') 
@@ -16390,7 +15586,7 @@ function generate_monthly_sales_overview_zonewise_report() {
     $channel_data = $this->db->query($sql)->result_array();
 
     $sql = "select H.zone, H.distributor_type as item, H.distributor_type as item_name, sum(H.item_qty) as tot_qty from 
-            (select D.distributor_id, D.item_qty, F.distributor_type, G.zone from 
+            (select D.distributor_id, D.item_qty, case when E.type_id='13' then 'Modern Trade' when E.type_id='6' then 'Alternate Channel' else F.distributor_type end distributor_type, G.zone from 
             (select A.distributor_id, case when B.type='Bar' then B.qty else B.qty*C.qty end as item_qty 
             from distributor_out A 
             left join distributor_out_items B on (A.id=B.distributor_out_id) 
@@ -16416,7 +15612,7 @@ function generate_monthly_sales_overview_zonewise_report() {
     }
 
     $sql = "select H.zone, H.distributor_type as item, H.distributor_type as item_name, sum(H.final_amount) as tot_amount from 
-            (select D.distributor_id, D.final_amount, F.distributor_type, G.zone from 
+            (select D.distributor_id, D.final_amount, case when E.type_id='13' then 'Modern Trade' when E.type_id='6' then 'Alternate Channel' else F.distributor_type end distributor_type, G.zone from 
             (select A.distributor_id, A.final_amount 
             from distributor_out A 
             where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and (A.distributor_id!='1' and A.distributor_id!='189')) D 
@@ -16439,7 +15635,7 @@ function generate_monthly_sales_overview_zonewise_report() {
     }
 
     $sql = "select H.zone, H.distributor_type as item, H.distributor_type as item_name, sum(H.item_qty)*-1 as tot_qty from 
-            (select D.distributor_id, D.item_qty, F.distributor_type, G.zone from 
+            (select D.distributor_id, D.item_qty, case when E.type_id='13' then 'Modern Trade' when E.type_id='6' then 'Alternate Channel' else F.distributor_type end distributor_type, G.zone from 
             (select A.distributor_id, case when B.type='Bar' then B.qty else B.qty*C.qty end as item_qty 
             from distributor_in A 
             left join distributor_in_items B on (A.id=B.distributor_in_id) 
@@ -16465,7 +15661,7 @@ function generate_monthly_sales_overview_zonewise_report() {
     }
 
     $sql = "select H.zone, H.distributor_type as item, H.distributor_type as item_name, sum(H.final_amount)*-1 as tot_amount from 
-            (select D.distributor_id, D.final_amount, F.distributor_type, G.zone from 
+            (select D.distributor_id, D.final_amount, case when E.type_id='13' then 'Modern Trade' when E.type_id='6' then 'Alternate Channel' else F.distributor_type end distributor_type, G.zone from 
             (select A.distributor_id, A.final_amount 
             from distributor_in A 
             where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and 
@@ -16489,7 +15685,7 @@ function generate_monthly_sales_overview_zonewise_report() {
     }
 
     $sql = "select H.zone, H.distributor_type as item, H.distributor_type as item_name, sum(H.amount) as tot_amount from 
-            (select D.distributor_id, D.amount, F.distributor_type, G.zone from 
+            (select D.distributor_id, D.amount, case when E.type_id='13' then 'Modern Trade' when E.type_id='6' then 'Alternate Channel' else F.distributor_type end distributor_type, G.zone from 
             (select A.distributor_id, case when (A.transaction='Credit Note' or A.transaction='Expense Voucher') then A.amount 
                     else (A.amount*-1) end as amount 
             from credit_debit_note A 
@@ -16761,9 +15957,1335 @@ function generate_monthly_sales_overview_zonewise_report() {
     }
 }
 
-public function send_exception_report() {
+public function generate_mt_stock_report() {
+    $date = formatdate($this->input->post('date'));
+    // $zone_id_array = ['10', '12', '16', '18', '29'];
+    // $zone_array = ['Pune', 'Hyderbad', 'Mumbai', 'Banglore', 'Ahmedabad'];
+
+    $zone_id_array = ['16'];
+    $zone_array = ['Mumbai'];
+
+    $reportpath = '';
+    
+    for($x=0; $x<count($zone_id_array); $x++) {
+        $r_zone_id = $zone_id_array[$x];
+        $this->get_mt_stock_report($date, 'generate', $r_zone_id);
+    }
+}
+
+public function send_mt_stock_tracker() {
+    // $date = '2019-07-11';
     $date = date('Y-m-d');
-    // $date = '2019-03-01';
+
+    // $zone_id_array = ['16'];
+    // $zone_array = ['Mumbai'];
+    // $zone_email_array = ['Sulochana.yadav@eatanytime.co.in'];
+
+    $zone_id_array = ['9', '10', '12', '16', '18', '29', '30'];
+    $zone_array = ['Chennai', 'Pune', 'Hyderbad', 'Mumbai', 'Banglore', 'Ahmedabad', 'Delhi'];
+    // $zone_email_array = ['', 'mohil.telawade@eatanytime.co.in', 'vijay.spar@gmail.com', 
+    //                     'Sulochana.yadav@eatanytime.co.in, mukesh.yadav@eatanytime.co.in, sachin.pal@eatanytime.co.in', 
+    //                     'darshan.dhany@eatanytime.co.in, mahesh.ms@eatanytime.co.in', 'urvi.bhayani@eatanytime.co.in', 
+    //                     'nitin.kumar@eatanytime.co.in'];
+
+    $reportpath = '';
+    $tr = '';
+    
+    for($x=0; $x<count($zone_id_array); $x++) {
+        $r_zone_id = $zone_id_array[$x];
+        $r_zone = $zone_array[$x];
+        // $reportpath = $this->get_mt_stock_report($date, 'save', $r_zone_id);
+        $return_arr = $this->get_mt_stock_report($date, 'save', $r_zone_id);
+
+        if(isset($return_arr['reportpath'])){
+            $reportpath = $return_arr['reportpath'];
+        }
+        if(isset($return_arr['tr'])){
+            $tr = $return_arr['tr'];
+        }
+
+        if($reportpath!=''){
+            $report_date = date('d-m-Y', strtotime($date));
+
+            $message = '<html>
+                        <head>
+                            <style>
+                                td { padding: 5px; width: 100px; }
+                            </style>
+                        </head>
+                        <body>
+                            <h3>Wholesome Habits Private Limited</h3>
+                            <h4>MT Stock Tracker - '.$r_zone.'</h4>
+                            <p>Reporting Date - '.$report_date.'</p>
+                            <p>PFA</p>
+                            <br/><br/>
+
+                            <table class="body_table" border="1px" style="border-collapse: collapse;">
+                            <tbody>
+                            '.$tr.'
+                            </tbody>
+                            </table>
+
+                            <br/><br/>
+                            Regards,
+                            <br/><br/>
+                            CS
+                        </body>
+                        </html>';
+            $from_email = 'cs@eatanytime.co.in';
+            $from_email_sender = 'EAT MIS';
+            $subject = 'MT_Stock_Tracker_'.$r_zone.'_'.$report_date;
+
+
+            /*$to_email = "dhaval.maru@pecanreams.com";
+            $cc="sangeeta.yadav@pecanreams.com";
+            $bcc="yadavsangeeta521@gmail.com";*/
+            
+            // $to_email = "prasad.bhisale@pecanreams.com";
+            // $cc = 'prasad.bhisale@pecanreams.com';
+            // $bcc = 'prasad.bhisale@pecanreams.com';
+
+            // if($zone_email_array[$x]!=''){
+            //     $to_email = "operations@eatanytime.in,priti.tripathi@eatanytime.in,".$zone_email_array[$x];
+            // } else {
+            //     $to_email = "operations@eatanytime.in,priti.tripathi@eatanytime.in";
+            // }
+
+            $to_email = "operations@eatanytime.in, priti.tripathi@eatanytime.in";
+            $cc = 'rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, dhaval.maru@pecanreams.com, prasad.bhisale@pecanreams.com';
+            $bcc = 'ashwini.patil@pecanreams.com';
+
+            sleep(15);
+
+            echo $attachment = $reportpath;
+            echo '<br/><br/>';
+            echo $message;
+            echo '<br/><br/>';
+
+            $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc, $cc, $attachment);
+
+            echo $mailSent;
+            echo '<br/><br/>';
+
+            if($mailSent==1){
+                $logarray['table_id']=$this->session->userdata('session_id');
+                $logarray['module_name']='Reports';
+                $logarray['cnt_name']='Reports';
+                $logarray['action']='MT Stock report sent.';
+                $this->user_access_log_model->insertAccessLog($logarray);
+            }
+        }
+    }
+}
+
+public function get_mt_stock_report($date='', $action='save', $r_zone_id='') {
+    if($date==''){
+        $date = date('Y-m-d');
+    }
+
+    $report_date = date('d-m-Y', strtotime($date));
+    $reportpath = '';
+    $tr = '';
+
+    $sql = "Select distinct H.store_name from 
+            (Select  E.*, F.location from 
+            (Select  J.*, D.zone from 
+            (Select I.*, A.category from
+            (select distinct store_id, location_id, zone_id from merchandiser_beat_plan 
+            where status='Approved' and zone_id='".$r_zone_id."') I
+            left join
+            (select * from store_master where status='Approved' and zone_id='".$r_zone_id."') A
+            on (I.store_id=A.store_id and I.location_id=A.location_id and I.zone_id=A.zone_id)) J
+            left join 
+            (select * from zone_master) D 
+            on (J.zone_id=D.id)) E 
+            left join 
+            (select * from location_master) F 
+            on (E.location_id=F.id)) G 
+            left join 
+            (select * from relationship_master) H 
+            on (G.store_id=H.id) 
+            order by H.store_name";
+    $query = $this->db->query($sql);
+    $result = $query->result();
+
+    if(count($result)>0){
+        $template_path = $this->config->item('template_path');
+        $file = $template_path.'MT_Stock_Tracker.xlsx';
+        $this->load->library('excel');
+        $objPHPExcel = PHPExcel_IOFactory::load($file);
+
+        $col_name[]=array();
+        for($i=0; $i<=200; $i++) {
+            $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
+        }
+
+        // echo count($result);
+        // echo '<br/>';
+
+        // $j = 19;
+        // $region = $objPHPExcel->getActiveSheet()->getCell('A'.strval($j))->getValue();
+        // echo $region;
+        // echo '<br/>';
+
+        // $lst_row = 129;
+
+        $sql = "select * from zone_master where id = '".$r_zone_id."'";
+        $result2 = $this->db->query($sql)->result();
+
+        $objPHPExcel->getActiveSheet()->setCellValue('A2', 'MT STORE TRACKER - '.strtoupper($result2[0]->zone));
+        $objPHPExcel->getActiveSheet()->setCellValue('A3', 'Date - '.$report_date.' to '.$report_date);
+
+        $row = 6;
+
+        for($i=0; $i<count($result); $i++){
+            if($row>8){
+                $objPHPExcel->getActiveSheet()->insertNewRowBefore($row, 1);
+            }
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[1].$row, $result[$i]->store_name);
+            // $objPHPExcel->getActiveSheet()->setCellValue($col_name[2].$row, '=COUNTIF($B$8:$B$118,B3)');
+            $row = $row + 1;
+        }
+
+        // $objPHPExcel->getActiveSheet()->getStyle($col_name[1].'2:'.$col_name[2].($row-1))->applyFromArray(array(
+        //     'borders' => array(
+        //         'allborders' => array(
+        //             'style' => PHPExcel_Style_Border::BORDER_THIN
+        //         )
+        //     )
+        // ));
+
+        $excel_sales_rep = array();
+        $tot_sales_rep_cnt = 2;
+        $start_row = $row + 1;
+        $row = $start_row;
+        $col = 6;
+        $tr = '';
+
+        $sql = "Select distinct G.*, H.store_name from 
+                (Select  E.*, F.location from 
+                (Select  J.*, D.zone from 
+                (Select I.*, A.category from
+                (select distinct store_id, location_id, zone_id from merchandiser_beat_plan 
+                where status='Approved' and zone_id='".$r_zone_id."') I
+                left join
+                (select * from store_master where status='Approved' and zone_id='".$r_zone_id."') A
+                on (I.store_id=A.store_id and I.location_id=A.location_id and I.zone_id=A.zone_id)) J
+                left join 
+                (select * from zone_master) D 
+                on (J.zone_id=D.id)) E 
+                left join 
+                (select * from location_master) F 
+                on (E.location_id=F.id)) G 
+                left join 
+                (select * from relationship_master) H 
+                on (G.store_id=H.id) 
+                order by G.zone, H.store_name, G.location";
+        $query = $this->db->query($sql);
+        $result = $query->result();
+
+        if(count($result)>0){
+            // $td1 = '';
+            // $td2 = '';
+
+            $sql = "select distinct A.sales_rep_id, B.sales_rep_name 
+                    from merchandiser_beat_plan A 
+                    left join sales_rep_master B on (A.sales_rep_id=B.id) 
+                    where A.zone_id = '$r_zone_id' and B.sales_rep_name is not null and B.sr_type = 'Merchandizer' 
+                    order by B.sales_rep_name";
+            $query = $this->db->query($sql);
+            $result2 = $query->result();
+            if(count($result2)>0){
+                $tot_sales_rep_cnt = count($result2);
+
+                for($j=0; $j<count($result2); $j++){
+                    $excel_sales_rep[$j] = ucwords(trim($result2[$j]->sales_rep_name));
+                    if($j>1){
+                        $objPHPExcel->getActiveSheet()->insertNewColumnBefore($col_name[$col+$j], 1);
+                    }
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+$j].$row, $excel_sales_rep[$j]);
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+$j].($row+1), 'MERCHANDISER '.($j+1));
+
+                    // $td1 = $td1.'<td>'.$excel_sales_rep[$j].'</td>';
+                    // $td2 = $td2.'<td>MERCHANDISER '.($j+1).'</td>';
+                }
+            }
+
+            // if($td1 == '') {
+            //     $td1 = '<td></td><td></td>';
+            //     $td2 = '<td>MERCHANDISER 1</td><td>MERCHANDISER 2</td>';
+            // } else if($tot_sales_rep_cnt==1) {
+            //     $td1 = '<td></td>';
+            //     $td2 = '<td>MERCHANDISER 2</td>';
+            // }
+
+            // $tr = '<tr><td></td><td></td><td></td><td></td>'.$td1.'<td></td><td>'.$report_date.'</td><td></td><td></td>';
+            // $tr = $tr.'<tr style="font-weight: bold;"><td>Region</td><td>MT Group</td><td>Location</td><td>STORES</td>'.$td2.'<td>STATUS</td><td>Latest Date</td><td>Username</td><td>Diff</td>';
+            $tr = $tr.'<tr style="font-weight: bold;"><td>Sr No</td><td>Region</td><td>MT Group</td><td>Location</td><td>Latest Date</td><td>Username</td><td>Diff</td>';
+            $sr_no = 1;
+
+            if($tot_sales_rep_cnt<2){
+                $tot_sales_rep_cnt = 2;
+            }
+
+            $col = 9 + $tot_sales_rep_cnt;
+
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $report_date);
+
+            $row = $start_row + 2;
+
+            for($i=0; $i<count($result); $i++){
+                $zone = ucwords(trim($result[$i]->zone));
+                $store = ucwords(trim($result[$i]->store_name));
+                $location = ucwords(trim($result[$i]->location));
+                $category = $result[$i]->category;
+
+                $zone_id = $result[$i]->zone_id;
+                $store_id = $result[$i]->store_id;
+                $location_id = $result[$i]->location_id;
+
+                // echo $i;
+                // echo '<br/>';
+                // echo $zone_id;
+                // echo '<br/>';
+                // echo $store_id;
+                // echo '<br/>';
+                // echo $location_id;
+                // echo '<br/>';
+
+                $date_of_visit = '';
+                $butterscotch_cnt = 0;
+                $orange_cnt = 0;
+                $chocopeanut_cnt = 0;
+                $mango_cnt = 0;
+                $bambaiya_cnt = 0;
+                $berry_cnt = 0;
+                $chyawanprash_cnt = 0;
+                $variety_cnt = 0;
+                $choco_cnt = 0;
+                $dark_choco_cnt = 0;
+                $cranb_cnt = 0;
+                $t_cranb_cnt = 0;
+                $t_fig_cnt = 0;
+                $t_papaya_cnt = 0;
+                $user_name = '';
+
+                // $date1=date_create($date);
+                // $date2=date_create('1900-01-00');
+                // $date_diff=date_diff($date1, $date2);
+                // $diff = intval($date_diff->format("%a"));
+
+                $diff = '';
+
+                $sql = "select A.*, concat(ifnull(B.first_name,''), ' ',ifnull(B.last_name,'')) as user_name , 
+                        DATEDIFF(curdate(),date(A.date_of_visit)) as diff 
+                        from merchandiser_stock A left join user_master B on (A.created_by=B.id) 
+                        where A.dist_id = '$store_id' and A.location_id = '$location_id' and 
+                            date(A.date_of_visit)<=date('".$date."') 
+                        order by A.date_of_visit desc";
+                $query = $this->db->query($sql);
+                $result2 = $query->result();
+                if(count($result2)>0){
+                    $merchandiser_stock_id = $result2[0]->id;
+                    if(isset($result2[0]->date_of_visit)){
+                        if($result2[0]->date_of_visit!=null && $result2[0]->date_of_visit!=''){
+                            $date_of_visit = date('d-m-Y',strtotime($result2[0]->date_of_visit));
+                            $diff = $result2[0]->diff;
+                        }
+                    }
+                    $user_name = ucwords(trim($result2[0]->user_name));
+
+                    // $sql = "select AA.merchandiser_stock_id, AA.item_id, sum(AA.qty) as qty from 
+                    //         (select A.merchandiser_stock_id, case when A.type = 'Bar' then A.item_id else B.product_id end as item_id, 
+                    //         case when A.type = 'Bar' then A.qty when (B.product_id='16' or B.product_id='17' or B.product_id='18' or 
+                    //             B.product_id='19' or B.product_id='20' or B.product_id='21') then A.qty else A.qty*B.qty end as qty 
+                    //         from merchandiser_stock_details A left join box_product B on (A.type = 'Box' and A.item_id = B.box_id) 
+                    //         where A.merchandiser_stock_id = '$merchandiser_stock_id') AA 
+                    //         group by AA.merchandiser_stock_id, AA.item_id";
+
+
+                    $sql = "select E.merchandiser_stock_id, E.item_id, sum(E.qty) as qty from 
+                            (select A.merchandiser_stock_id, A.item_id, A.qty from merchandiser_stock_details A 
+                            where A.merchandiser_stock_id = '$merchandiser_stock_id' and (A.type = 'Bar' or (A.type = 'Box' and A.item_id='32')) 
+                            union all 
+                            select D.* from 
+                            (select C.merchandiser_stock_id, C.item_id, sum(C.qty) as qty from 
+                            (select A.merchandiser_stock_id, B.product_id as item_id, 
+                            case when (B.product_id='16' or B.product_id='17' or B.product_id='18' or 
+                                B.product_id='19' or B.product_id='20' or B.product_id='21') then A.qty else A.qty*B.qty end as qty 
+                            from merchandiser_stock_details A left join box_product B on (A.type = 'Box' and A.item_id = B.box_id) 
+                            where A.merchandiser_stock_id = '$merchandiser_stock_id' and A.type = 'Box' and A.item_id<>'32') C 
+                            group by C.merchandiser_stock_id, C.item_id) D) E 
+                            group by E.merchandiser_stock_id, E.item_id";
+
+                    $query = $this->db->query($sql);
+                    $result2 = $query->result();
+                    if(count($result2)>0){
+                        for($j=0; $j<count($result2); $j++){
+                            if($result2[$j]->item_id=='1'){
+                                $orange_cnt = $result2[$j]->qty;
+                            } else if($result2[$j]->item_id=='3'){
+                                $butterscotch_cnt = $result2[$j]->qty;
+                            } else if($result2[$j]->item_id=='4'){
+                                $bambaiya_cnt = $result2[$j]->qty;
+                            } else if($result2[$j]->item_id=='5'){
+                                $chocopeanut_cnt = $result2[$j]->qty;
+                            } else if($result2[$j]->item_id=='6'){
+                                $mango_cnt = $result2[$j]->qty;
+                            } else if($result2[$j]->item_id=='9'){
+                                $berry_cnt = $result2[$j]->qty;
+                            } else if($result2[$j]->item_id=='10'){
+                                $chyawanprash_cnt = $result2[$j]->qty;
+                            } else if($result2[$j]->item_id=='32'){
+                                $variety_cnt = $result2[$j]->qty;
+                            } else if($result2[$j]->item_id=='16'){
+                                $choco_cnt = $result2[$j]->qty;
+                            } else if($result2[$j]->item_id=='17'){
+                                $dark_choco_cnt = $result2[$j]->qty;
+                            } else if($result2[$j]->item_id=='18'){
+                                $cranb_cnt = $result2[$j]->qty;
+                            } else if($result2[$j]->item_id=='19'){
+                                $t_cranb_cnt = $result2[$j]->qty;
+                            } else if($result2[$j]->item_id=='20'){
+                                $t_fig_cnt = $result2[$j]->qty;
+                            } else if($result2[$j]->item_id=='21'){
+                                $t_papaya_cnt = $result2[$j]->qty;
+                            }
+                        }
+                    }
+                }
+
+                // $bl_flag = false;
+                // $row = 19;
+
+                // for($j=19; $j<1000; $j++){
+                //     $region = $objPHPExcel->getActiveSheet()->getCell('A'.strval($j))->getValue();
+                //     $group = $objPHPExcel->getActiveSheet()->getCell('B'.strval($j))->getValue();
+                //     $loc = $objPHPExcel->getActiveSheet()->getCell('C'.strval($j))->getValue();
+
+                //     if($region==''){
+                //         $row = $j;
+                //         $lst_row = $j;
+                //         break;
+                //     }
+
+                //     if(strtoupper(trim($zone))==strtoupper(trim($region)) && 
+                //        strtoupper(trim($store))==strtoupper(trim($group)) && 
+                //        strtoupper(trim($location))==strtoupper(trim($loc))){
+                //             $bl_flag = true;
+                //             $row = $j;
+                //             break;
+                //     }
+                // }
+
+                // if($bl_flag==false){
+                //     echo 'Not Found';
+                //     echo '<br/>';
+                // } else {
+                //     echo 'Found';
+                //     echo '<br/>';
+                // }
+
+                $col = 0;
+
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $zone);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $store);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, $location);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $store."-".$location);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $category);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, '=VLOOKUP(E'.$row.',$E$5:$F$7,2,0)');
+
+                // $td1 = '';
+                $sql = "select A.*, B.sales_rep_name from merchandiser_beat_plan A 
+                        left join sales_rep_master B on (A.sales_rep_id=B.id) 
+                        where A.zone_id = '$zone_id' and A.store_id = '$store_id' and A.location_id = '$location_id' and B.sr_type = 'Merchandizer' 
+                        order by A.modified_on desc";
+                $query = $this->db->query($sql);
+                $result2 = $query->result();
+                if(count($result2)>0){
+                    // if(strtoupper(trim($sales_rep_name))==strtoupper(trim($excel_sales_rep1))){
+                    //     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, $result2[0]->frequency);
+                    // } else if(strtoupper(trim($sales_rep_name))==strtoupper(trim($excel_sales_rep2))){
+                    //     $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, $result2[0]->frequency);
+                    // }
+
+                    for($k=0; $k<count($result2); $k++){
+                        $sales_rep_name = $result2[$k]->sales_rep_name;
+
+                        for($j=0; $j<count($excel_sales_rep); $j++){
+                            if(strtoupper(trim($sales_rep_name))==strtoupper(trim($excel_sales_rep[$j]))){
+                                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6+$j].$row, $result2[0]->frequency);
+                                // $td1 = $td1.'<td>'.$result2[0]->frequency.'</td>';
+                            }
+                        }
+                    }
+                }
+
+                // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+8].$row, '=IF(G'.$row.'="",$J$17,$I$17)');
+                // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+9].$row, '=IF(H'.$row.'="",$J$17,$I$17)');
+                // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+10].$row, '=IF((I'.$row.'=$J$17)*(J'.$row.'=$J$17),"NOT UPDATED","UPDATED")');
+
+                $col = 6 + $tot_sales_rep_cnt;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF(COUNTBLANK('.$col_name[$col-$tot_sales_rep_cnt].$row.':'.$col_name[$col-1].$row.')='.$tot_sales_rep_cnt.', "NOT UPDATED", "UPDATED")');
+
+                // $tr = $tr . '<td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col].$row)->getCalculatedValue().'</td>';
+                
+                $col = $col + 2;
+                $style = "";
+
+                if($date_of_visit!='') {
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $date_of_visit);
+                    $col = $col + 1;
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $user_name);
+                    $col = $col + 1;
+                    // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+$'.$col_name[$col-1].'$'.$start_row.'-'.$col_name[$col-2].$row);
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $diff);
+                    $col = $col + 1;
+                } else {
+                    $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row.':'.$col_name[$col+2].$row)->getFill()->applyFromArray(array(
+                        'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                        'startcolor' => array(
+                            'rgb' => 'FFC7CE'
+                        )
+                    ));
+                    $col = $col + 2;
+                    // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+$'.$col_name[$col-1].'$'.$start_row.'-'.$col_name[$col-2].$row);
+                    $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $diff);
+                    $col = $col + 1;
+                }
+
+                if($date_of_visit=='' || $date_of_visit==null) {
+                    $style = " background-color: #FFC7CE;";
+                }
+
+                // $td1 = '';
+                // $no_of_days = $objPHPExcel->getActiveSheet()->getCell($col_name[$col-1].$row)->getCalculatedValue();
+
+                if($diff=='' || $diff>7) {
+                    // for($x=$col-1; $x>=0; $x--) { 
+                    //     if($x==($col-1)) {
+                    //         $td1 = '<td>'.$diff.'</td>'.$td1;
+                    //     } else if($x==($col-2) || $x==($col-3)) {
+                    //         $td1 = '<td style="'.$style.'">'.$objPHPExcel->getActiveSheet()->getCell($col_name[$x].$row)->getCalculatedValue().'</td>'.$td1;
+                    //     } else if($x!=($col-4) && $x!=4 && $x!=5) {
+                    //         $td1 = '<td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$x].$row)->getCalculatedValue().'</td>'.$td1;
+                    //     }
+                    // }
+                    // $tr = $tr . '<tr>'.$td1.'</tr>';
+
+                    $tr = $tr . '<tr>
+                                    <td>'.$sr_no++.'</td>
+                                    <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[0].$row)->getCalculatedValue().'</td>
+                                    <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[1].$row)->getCalculatedValue().'</td>
+                                    <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[2].$row)->getCalculatedValue().'</td>
+                                    <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col-3].$row)->getCalculatedValue().'</td>
+                                    <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col-2].$row)->getCalculatedValue().'</td>
+                                    <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col-1].$row)->getCalculatedValue().'</td>
+                                </tr>';
+                }
+                
+                
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $butterscotch_cnt);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $orange_cnt);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $chocopeanut_cnt);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $mango_cnt);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $bambaiya_cnt);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $berry_cnt);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $chyawanprash_cnt);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $variety_cnt);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $choco_cnt);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $dark_choco_cnt);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $cranb_cnt);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $t_cranb_cnt);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $t_fig_cnt);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $t_papaya_cnt);
+                $col = $col + 1;
+
+                // $region = $objPHPExcel->getActiveSheet()->getCell($col_name[$col].$row)->getValue();
+
+                // $objConditionalStyle = new PHPExcel_Style_Conditional();
+                // $objConditionalStyle->setConditionType(PHPExcel_Style_Conditional::CONDITION_CELLIS)
+                //     ->setOperatorType(PHPExcel_Style_Conditional::OPERATOR_LESSTHAN)
+                //     ->addCondition('7');
+                // $objConditionalStyle->getStyle()->getFont()->getColor()->setRGB('FF0000');
+
+                // $conditionalStyles = $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row)->getConditionalStyles();
+                // array_push($conditionalStyles, $objConditionalStyle);
+                // $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row)->setConditionalStyles($conditionalStyles);
+
+
+                $objConditional = new PHPExcel_Style_Conditional();
+                $objConditional->setConditionType(PHPExcel_Style_Conditional::CONDITION_CELLIS)
+                                ->setOperatorType(PHPExcel_Style_Conditional::OPERATOR_EQUAL)
+                                ->addCondition('""')
+                                ->getStyle()
+                                ->applyFromArray(
+                                        array(
+                                                'font'=>array(
+                                                    'color'=>array('argb'=>'FF000000')
+                                                ),
+                                                'fill'=>array(
+                                                    'type' =>PHPExcel_Style_Fill::FILL_SOLID,
+                                                    'startcolor' =>array('argb' => 'FFFFFFFF'),
+                                                    'endcolor' =>array('argb' => 'FFFFFFFF')
+                                                )
+                                            )
+                                    );
+
+                $objConditional2 = new PHPExcel_Style_Conditional();
+                $objConditional2->setConditionType(PHPExcel_Style_Conditional::CONDITION_CELLIS)
+                                ->setOperatorType(PHPExcel_Style_Conditional::OPERATOR_GREATERTHAN)
+                                ->addCondition('7')
+                                ->getStyle()
+                                ->applyFromArray(
+                                        array(
+                                                'font'=>array(
+                                                    'color'=>array('argb'=>'FF000000')
+                                                ),
+                                                'fill'=>array(
+                                                    'type' =>PHPExcel_Style_Fill::FILL_SOLID,
+                                                    'startcolor' =>array('argb' => 'FFFF0000'),
+                                                    'endcolor' =>array('argb' => 'FFFF0000')
+                                                )
+                                            )
+                                    );
+
+                $objConditional3 = new PHPExcel_Style_Conditional();
+                $objConditional3->setConditionType(PHPExcel_Style_Conditional::CONDITION_CELLIS)
+                                ->setOperatorType(PHPExcel_Style_Conditional::OPERATOR_LESSTHANOREQUAL)
+                                ->addCondition('7')
+                                ->getStyle()
+                                ->applyFromArray(
+                                        array(
+                                                'font'=>array(
+                                                    'color'=>array('argb'=>'FF000000')
+                                                ),
+                                                'fill'=>array(
+                                                    'type' =>PHPExcel_Style_Fill::FILL_SOLID,
+                                                    'startcolor' =>array('argb' => 'FF00B050'),
+                                                    'endcolor' =>array('argb' => 'FF00B050')
+                                                )
+                                            )
+                                    );
+
+                $conditionalStyles = $objPHPExcel->getActiveSheet()->getStyle($col_name[$col-15].$row)->getConditionalStyles();
+                array_push($conditionalStyles,$objConditional,$objConditional2,$objConditional3);
+                $objPHPExcel->getActiveSheet()->getStyle($col_name[$col-15].$row)->setConditionalStyles($conditionalStyles);
+                
+
+                $objConditional = new PHPExcel_Style_Conditional();
+                $objConditional->setConditionType(PHPExcel_Style_Conditional::CONDITION_CELLIS)
+                                ->setOperatorType(PHPExcel_Style_Conditional::OPERATOR_LESSTHAN)
+                                ->addCondition('1')
+                                ->getStyle()
+                                ->applyFromArray(
+                                        array(
+                                                'font'=>array(
+                                                    'color'=>array('argb'=>'FF000000')
+                                                ),
+                                                'fill'=>array(
+                                                    'type' =>PHPExcel_Style_Fill::FILL_SOLID,
+                                                    'startcolor' =>array('argb' => 'FFFF0000'),
+                                                    'endcolor' =>array('argb' => 'FFFF0000')
+                                                )
+                                            )
+                                    );
+
+                $objConditional2 = new PHPExcel_Style_Conditional();
+                $objConditional2->setConditionType(PHPExcel_Style_Conditional::CONDITION_CELLIS)
+                                ->setOperatorType(PHPExcel_Style_Conditional::OPERATOR_GREATERTHANOREQUAL)
+                                ->addCondition('1')
+                                ->getStyle()
+                                ->applyFromArray(
+                                        array(
+                                                'font'=>array(
+                                                    'color'=>array('argb'=>'FF000000')
+                                                ),
+                                                'fill'=>array(
+                                                    'type' =>PHPExcel_Style_Fill::FILL_SOLID,
+                                                    'startcolor' =>array('argb' => 'FF00B050'),
+                                                    'endcolor' =>array('argb' => 'FF00B050')
+                                                )
+                                            )
+                                    );
+                $conditionalStyles = $objPHPExcel->getActiveSheet()->getStyle(($col_name[$col-14].$row).':'.($col_name[$col-1].$row))->getConditionalStyles();
+                array_push($conditionalStyles,$objConditional,$objConditional2);
+                $objPHPExcel->getActiveSheet()->getStyle(($col_name[$col-14].$row).':'.($col_name[$col-1].$row))->setConditionalStyles($conditionalStyles);
+
+
+                // echo $date_of_visit;
+                // echo '<br/>';
+
+                $col = $col + 19;
+
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=SUM('.$col_name[$col+1].$row.':'.$col_name[$col+14].$row.')');
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+'.$col_name[$col-16].$row.'-'.$col_name[$col-28].$row);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+'.$col_name[$col-16].$row.'-'.$col_name[$col-28].$row);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+'.$col_name[$col-16].$row.'-'.$col_name[$col-28].$row);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+'.$col_name[$col-16].$row.'-'.$col_name[$col-28].$row);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+'.$col_name[$col-16].$row.'-'.$col_name[$col-28].$row);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+'.$col_name[$col-16].$row.'-'.$col_name[$col-28].$row);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+'.$col_name[$col-16].$row.'-'.$col_name[$col-28].$row);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+'.$col_name[$col-16].$row.'-'.$col_name[$col-28].$row);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+'.$col_name[$col-16].$row.'-'.$col_name[$col-28].$row);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+'.$col_name[$col-16].$row.'-'.$col_name[$col-28].$row);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+'.$col_name[$col-16].$row.'-'.$col_name[$col-28].$row);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+'.$col_name[$col-16].$row.'-'.$col_name[$col-28].$row);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+'.$col_name[$col-16].$row.'-'.$col_name[$col-28].$row);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=+'.$col_name[$col-16].$row.'-'.$col_name[$col-28].$row);
+                $col = $col + 2;
+
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=SUM('.$col_name[$col+1].$row.':'.$col_name[$col+14].$row.')');
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF('.$col_name[$col-50].$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF('.$col_name[$col-50].$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF('.$col_name[$col-50].$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF('.$col_name[$col-50].$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF('.$col_name[$col-50].$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF('.$col_name[$col-50].$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF('.$col_name[$col-50].$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF('.$col_name[$col-50].$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF('.$col_name[$col-50].$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF('.$col_name[$col-50].$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF('.$col_name[$col-50].$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF('.$col_name[$col-50].$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF('.$col_name[$col-50].$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, '=IF('.$col_name[$col-50].$row.'<$F$'.$row.'/2,$F$'.$row.',0)');
+
+                $row = $row + 1;
+            }
+
+            $row = $row - 1;
+        }
+
+        for($i=6; $i<$start_row-1; $i++){
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[2].$i, '=COUNTIF($B$'.($start_row + 2).':$B$'.$row.',B'.$i.')');
+        }
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[2].($start_row-1), '=SUM(C6:C'.($start_row-2).')');
+
+        $col = 6 + $tot_sales_rep_cnt;
+
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].'7', '=COUNTIF('.$col_name[$col].$start_row.':'.$col_name[$col].$row.','.$col_name[$col].'6)');
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].'7', '=COUNTIF('.$col_name[$col].$start_row.':'.$col_name[$col].$row.','.$col_name[$col+1].'6)');
+
+        $start_row = $start_row + 2;
+
+        $objPHPExcel->getActiveSheet()->getStyle('A'.$start_row.':'.$col_name[$col].$row)->applyFromArray(array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+            )
+        ));
+
+        $col = $col + 2;
+        $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$start_row.':'.$col_name[$col+16].$row)->applyFromArray(array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+            )
+        ));
+        
+        $col = $col + 19;
+        $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$start_row.':'.$col_name[$col+15].$row)->applyFromArray(array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+            )
+        ));
+        
+        $col = $col + 17;
+        $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$start_row.':'.$col_name[$col+14].$row)->applyFromArray(array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+            )
+        ));
+        
+        $col = $col + 16;
+        $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$start_row.':'.$col_name[$col+14].$row)->applyFromArray(array(
+            'borders' => array(
+                'allborders' => array(
+                    'style' => PHPExcel_Style_Border::BORDER_THIN
+                )
+            )
+        ));
+        
+        $filename = 'MT_Stock_Tracker_For_'.$zone.'_'.$report_date.'.xlsx';
+
+        if($action=="save") {
+            // $path  = '/home/eatangcp/public_html/test/assets/uploads/mt_stock_reports/';
+            // $upload_path = '/home/eatangcp/public_html/test/assets/uploads/mt_stock_reports';
+
+            // $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/mt_stock_reports/';
+            // $upload_path = '/home/eatangcp/public_html/eat_erp/assets/uploads/mt_stock_reports';
+
+            // $path  = '/var/www/html/eat_erp/assets/uploads/mt_stock_reports/';
+            // $upload_path = '/var/www/html/eat_erp/assets/uploads/mt_stock_reports';
+
+            // $path  = 'C:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports/';
+            // $upload_path = 'C:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports';
+
+            // $path  = 'E:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports/';
+            // $upload_path = 'E:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports';
+
+
+            $path = $this->config->item('upload_path').'mt_stock_reports/';
+            $upload_path = $this->config->item('upload_path').'mt_stock_reports';
+
+            if(!is_dir($upload_path)) {
+                mkdir($upload_path, 0777, TRUE);
+            }
+
+            $reportpath = $path.$filename;
+
+            // header('Content-Type: application/vnd.ms-excel');
+            // header('Content-Disposition: attachment;filename="'.$filename.'"');
+            // header('Cache-Control: max-age=0');
+
+            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007'); 
+            $objWriter->save($reportpath);
+
+            echo $reportpath;
+            echo '<br/><br/>';
+
+            $return_arr = array('reportpath'=>$reportpath, 'tr'=> $tr);
+
+            // return $reportpath;
+            return $return_arr;
+        } else {
+            // header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Type: application/openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="'.$filename.'"');
+            header('Cache-Control: max-age=0');
+            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+            $objWriter->save('php://output');
+
+            $logarray['table_id']=$this->session->userdata('session_id');
+            $logarray['module_name']='Reports';
+            $logarray['cnt_name']='Reports';
+            $logarray['action']='MT Stock Tracker Report Generated.';
+            $this->user_access_log_model->insertAccessLog($logarray);
+
+            exit;
+        }
+    }
+}
+
+public function send_mt_stock_tracker_weekly() {
+    // $date = '2019-07-11';
+    $date = date('Y-m-d');
+
+    // $zone_id_array = ['16'];
+    // $zone_array = ['Mumbai'];
+    // $zone_email_array = ['Sulochana.yadav@eatanytime.co.in'];
+
+    // $zone_id_array = ['9', '10', '12', '16', '18', '29', '30'];
+    // $zone_array = ['Chennai', 'Pune', 'Hyderbad', 'Mumbai', 'Banglore', 'Ahmedabad', 'Delhi'];
+    // $zone_email_array = ['', 'mohil.telawade@eatanytime.co.in', 'vijay.spar@gmail.com', 
+    //                     'Sulochana.yadav@eatanytime.co.in, mukesh.yadav@eatanytime.co.in, sachin.pal@eatanytime.co.in', 
+    //                     'darshan.dhany@eatanytime.co.in, mahesh.ms@eatanytime.co.in', 'urvi.bhayani@eatanytime.co.in', 
+    //                     'nitin.kumar@eatanytime.co.in'];
+
+    $reportpath = '';
+    $tr = '';
+    
+    $return_arr = $this->get_mt_stock_report_weekly($date, 'save');
+    // $return_arr = $this->get_mt_stock_report_weekly($date);
+
+    if(isset($return_arr['reportpath'])){
+        $reportpath = $return_arr['reportpath'];
+    }
+    if(isset($return_arr['tr'])){
+        $tr = $return_arr['tr'];
+    }
+
+    if($reportpath!=''){
+        $report_date = date('d-m-Y', strtotime($date));
+
+        $message = '<html>
+                    <head>
+                        <style>
+                            td { padding: 5px; width: 100px; }
+                        </style>
+                    </head>
+                    <body>
+                        <h3>Wholesome Habits Private Limited</h3>
+                        <h4>MT Stock Tracker Weekly</h4>
+                        <p>Reporting Date - '.$report_date.'</p>
+                        <p>PFA</p>
+
+                        <br/><br/>
+                        Regards,
+                        <br/><br/>
+                        CS
+                    </body>
+                    </html>';
+        $from_email = 'cs@eatanytime.co.in';
+        $from_email_sender = 'EAT MIS';
+        $subject = 'MT_Stock_Tracker_Weekly_'.$report_date;
+
+
+        /*$to_email = "dhaval.maru@pecanreams.com";
+        $cc="sangeeta.yadav@pecanreams.com";
+        $bcc="yadavsangeeta521@gmail.com";*/
+        
+        $to_email = 'prasad.bhisale@pecanreams.com';
+        $cc = 'prasad.bhisale@pecanreams.com';
+        $bcc = 'prasad.bhisale@pecanreams.com';
+
+        // $to_email = "priti.tripathi@eatanytime.co.in, operations@eatanytime.co.in, swapnil.darekar@eatanytime.in";
+        // $cc = "rishit.sanghvi@eatanytime.in";
+        // $bcc = "ashwini.patil@pecanreams.com, prasad.bhisale@pecanreams.com, dhaval.maru@pecanreams.com";
+
+        $sql = "select * from report_master where report_name = 'MT Stock Tracker Weekly'";
+        $query = $this->db->query($sql);
+        $result = $query->result();
+        if(count($result)>0) {
+            $from_email = $result[0]->from_email;
+            $from_email_sender = $result[0]->sender_name;
+            $to_email = $result[0]->to_email;
+            $cc = $result[0]->cc_email;
+            $bcc = $result[0]->bcc_email;
+        }
+
+        echo $attachment = $reportpath;
+        echo '<br/><br/>';
+        echo $message;
+        echo '<br/><br/>';
+
+        $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc, $cc, $attachment);
+
+        echo $mailSent;
+        echo '<br/><br/>';
+
+        if($mailSent==1){
+            $logarray['table_id']=$this->session->userdata('session_id');
+            $logarray['module_name']='Reports';
+            $logarray['cnt_name']='Reports';
+            $logarray['action']='MT Stock report weekly sent.';
+            $this->user_access_log_model->insertAccessLog($logarray);
+        }
+    }
+}
+
+public function get_mt_stock_report_weekly($date='', $action='save') {
+    if($date==''){
+        $date = date('Y-m-d');
+    }
+
+    $report_date = date('d-m-Y', strtotime($date));
+    $reportpath = '';
+
+    $template_path = $this->config->item('template_path');
+    $file = $template_path.'MT_Stock_Tracker_Weekly.xlsx';
+    $this->load->library('excel');
+    $objPHPExcel = PHPExcel_IOFactory::load($file);
+
+    $col_name[]=array();
+    for($i=0; $i<=200; $i++) {
+        $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
+    }
+
+    $start_row = 27;
+    $row = $start_row;
+    $col = 6;
+    $tr = '';
+
+    $sql = "Select distinct G.*, H.store_name from 
+            (Select  E.*, F.location from 
+            (Select  J.*, D.zone from 
+            (Select I.*, A.category from
+            (select distinct store_id, location_id, zone_id from merchandiser_beat_plan where status='Approved') I
+            left join
+            (select * from store_master where status='Approved') A
+            on (I.store_id=A.store_id and I.location_id=A.location_id and I.zone_id=A.zone_id)) J
+            left join 
+            (select * from zone_master) D 
+            on (J.zone_id=D.id)) E 
+            left join 
+            (select * from location_master) F 
+            on (E.location_id=F.id)) G 
+            left join 
+            (select * from relationship_master) H 
+            on (G.store_id=H.id) 
+            order by G.zone, H.store_name, G.location";
+    $query = $this->db->query($sql);
+    $result = $query->result();
+
+    if(count($result)>0){
+        for($i=0; $i<count($result); $i++){
+            $zone = ucwords(trim($result[$i]->zone));
+            $store = ucwords(trim($result[$i]->store_name));
+            $location = ucwords(trim($result[$i]->location));
+
+            $zone_id = $result[$i]->zone_id;
+            $store_id = $result[$i]->store_id;
+            $location_id = $result[$i]->location_id;
+
+            $date_of_visit = '';
+            $butterscotch_cnt = 0;
+            $orange_cnt = 0;
+            $chocopeanut_cnt = 0;
+            $mango_cnt = 0;
+            $bambaiya_cnt = 0;
+            $berry_cnt = 0;
+            $chyawanprash_cnt = 0;
+            $variety_cnt = 0;
+            $choco_cnt = 0;
+            $dark_choco_cnt = 0;
+            $cranb_cnt = 0;
+            $t_cranb_cnt = 0;
+            $t_fig_cnt = 0;
+            $t_papaya_cnt = 0;
+            $user_name = '';
+
+            $diff = '';
+            $sql = "select A.*, concat(ifnull(B.first_name,''), ' ',ifnull(B.last_name,'')) as user_name , 
+                    DATEDIFF(curdate(),date(A.date_of_visit)) as diff 
+                    from merchandiser_stock A left join user_master B on (A.created_by=B.id) 
+                    where A.dist_id = '$store_id' and A.location_id = '$location_id' and 
+                        date(A.date_of_visit)<=date('".$date."') 
+                    order by A.date_of_visit desc";
+            $query = $this->db->query($sql);
+            $result2 = $query->result();
+            if(count($result2)>0){
+                $merchandiser_stock_id = $result2[0]->id;
+                if(isset($result2[0]->date_of_visit)){
+                    if($result2[0]->date_of_visit!=null && $result2[0]->date_of_visit!=''){
+                        $date_of_visit = date('d-m-Y',strtotime($result2[0]->date_of_visit));
+                        $diff = $result2[0]->diff;
+                    }
+                }
+                $user_name = ucwords(trim($result2[0]->user_name));
+
+                $sql = "select E.merchandiser_stock_id, E.item_id, sum(E.qty) as qty from 
+                        (select A.merchandiser_stock_id, A.item_id, A.qty from merchandiser_stock_details A 
+                        where A.merchandiser_stock_id = '$merchandiser_stock_id' and (A.type = 'Bar' or (A.type = 'Box' and A.item_id='32')) 
+                        union all 
+                        select D.* from 
+                        (select C.merchandiser_stock_id, C.item_id, sum(C.qty) as qty from 
+                        (select A.merchandiser_stock_id, B.product_id as item_id, 
+                        case when (B.product_id='16' or B.product_id='17' or B.product_id='18' or 
+                            B.product_id='19' or B.product_id='20' or B.product_id='21') then A.qty else A.qty*B.qty end as qty 
+                        from merchandiser_stock_details A left join box_product B on (A.type = 'Box' and A.item_id = B.box_id) 
+                        where A.merchandiser_stock_id = '$merchandiser_stock_id' and A.type = 'Box' and A.item_id<>'32') C 
+                        group by C.merchandiser_stock_id, C.item_id) D) E 
+                        group by E.merchandiser_stock_id, E.item_id";
+
+                $query = $this->db->query($sql);
+                $result2 = $query->result();
+                if(count($result2)>0){
+                    for($j=0; $j<count($result2); $j++){
+                        if($result2[$j]->item_id=='1'){
+                            $orange_cnt = $result2[$j]->qty;
+                        } else if($result2[$j]->item_id=='3'){
+                            $butterscotch_cnt = $result2[$j]->qty;
+                        } else if($result2[$j]->item_id=='4'){
+                            $bambaiya_cnt = $result2[$j]->qty;
+                        } else if($result2[$j]->item_id=='5'){
+                            $chocopeanut_cnt = $result2[$j]->qty;
+                        } else if($result2[$j]->item_id=='6'){
+                            $mango_cnt = $result2[$j]->qty;
+                        } else if($result2[$j]->item_id=='9'){
+                            $berry_cnt = $result2[$j]->qty;
+                        } else if($result2[$j]->item_id=='10'){
+                            $chyawanprash_cnt = $result2[$j]->qty;
+                        } else if($result2[$j]->item_id=='32'){
+                            $variety_cnt = $result2[$j]->qty;
+                        } else if($result2[$j]->item_id=='16'){
+                            $choco_cnt = $result2[$j]->qty;
+                        } else if($result2[$j]->item_id=='17'){
+                            $dark_choco_cnt = $result2[$j]->qty;
+                        } else if($result2[$j]->item_id=='18'){
+                            $cranb_cnt = $result2[$j]->qty;
+                        } else if($result2[$j]->item_id=='19'){
+                            $t_cranb_cnt = $result2[$j]->qty;
+                        } else if($result2[$j]->item_id=='20'){
+                            $t_fig_cnt = $result2[$j]->qty;
+                        } else if($result2[$j]->item_id=='21'){
+                            $t_papaya_cnt = $result2[$j]->qty;
+                        }
+                    }
+                }
+            }
+
+            $col = 0;
+
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $zone);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $store);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, $location);
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $store."-".$location);
+
+            $col = $col + 4;
+            $style = "";
+
+            if($date_of_visit!='') {
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $date_of_visit);
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $diff);
+                $col = $col + 1;
+            } else {
+                $objPHPExcel->getActiveSheet()->getStyle($col_name[$col].$row.':'.$col_name[$col+1].$row)->getFill()->applyFromArray(array(
+                    'type' => PHPExcel_Style_Fill::FILL_SOLID,
+                    'startcolor' => array(
+                        'rgb' => 'FFC7CE'
+                    )
+                ));
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, " ");
+                $col = $col + 1;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $diff);
+                $col = $col + 1;
+            }
+            
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $butterscotch_cnt);
+            $col = $col + 1;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $orange_cnt);
+            $col = $col + 1;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $chocopeanut_cnt);
+            $col = $col + 1;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $mango_cnt);
+            $col = $col + 1;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $bambaiya_cnt);
+            $col = $col + 1;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $berry_cnt);
+            $col = $col + 1;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $chyawanprash_cnt);
+            $col = $col + 1;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $variety_cnt);
+            $col = $col + 1;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $choco_cnt);
+            $col = $col + 1;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $dark_choco_cnt);
+            $col = $col + 1;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $cranb_cnt);
+            $col = $col + 1;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $t_cranb_cnt);
+            $col = $col + 1;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $t_fig_cnt);
+            $col = $col + 1;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $t_papaya_cnt);
+            $col = $col + 1;
+
+            $objConditional = new PHPExcel_Style_Conditional();
+            $objConditional->setConditionType(PHPExcel_Style_Conditional::CONDITION_CELLIS)
+                            ->setOperatorType(PHPExcel_Style_Conditional::OPERATOR_EQUAL)
+                            ->addCondition('""')
+                            ->getStyle()
+                            ->applyFromArray(
+                                    array(
+                                            'font'=>array(
+                                                'color'=>array('argb'=>'FF000000')
+                                            ),
+                                            'fill'=>array(
+                                                'type' =>PHPExcel_Style_Fill::FILL_SOLID,
+                                                'startcolor' =>array('argb' => 'FFFFC7CE'),
+                                                'endcolor' =>array('argb' => 'FFFFC7CE')
+                                            )
+                                        )
+                                );
+
+            $objConditional2 = new PHPExcel_Style_Conditional();
+            $objConditional2->setConditionType(PHPExcel_Style_Conditional::CONDITION_CELLIS)
+                            ->setOperatorType(PHPExcel_Style_Conditional::OPERATOR_GREATERTHAN)
+                            ->addCondition('7')
+                            ->getStyle()
+                            ->applyFromArray(
+                                    array(
+                                            'font'=>array(
+                                                'color'=>array('argb'=>'FF000000')
+                                            ),
+                                            'fill'=>array(
+                                                'type' =>PHPExcel_Style_Fill::FILL_SOLID,
+                                                'startcolor' =>array('argb' => 'FFFF0000'),
+                                                'endcolor' =>array('argb' => 'FFFF0000')
+                                            )
+                                        )
+                                );
+
+            $objConditional3 = new PHPExcel_Style_Conditional();
+            $objConditional3->setConditionType(PHPExcel_Style_Conditional::CONDITION_CELLIS)
+                            ->setOperatorType(PHPExcel_Style_Conditional::OPERATOR_LESSTHANOREQUAL)
+                            ->addCondition('7')
+                            ->getStyle()
+                            ->applyFromArray(
+                                    array(
+                                            'font'=>array(
+                                                'color'=>array('argb'=>'FF000000')
+                                            ),
+                                            'fill'=>array(
+                                                'type' =>PHPExcel_Style_Fill::FILL_SOLID,
+                                                'startcolor' =>array('argb' => 'FF00B050'),
+                                                'endcolor' =>array('argb' => 'FF00B050')
+                                            )
+                                        )
+                                );
+
+            $conditionalStyles = $objPHPExcel->getActiveSheet()->getStyle($col_name[$col-15].$row)->getConditionalStyles();
+            array_push($conditionalStyles,$objConditional,$objConditional2,$objConditional3);
+            $objPHPExcel->getActiveSheet()->getStyle($col_name[$col-15].$row)->setConditionalStyles($conditionalStyles);
+            
+
+            $objConditional = new PHPExcel_Style_Conditional();
+            $objConditional->setConditionType(PHPExcel_Style_Conditional::CONDITION_CELLIS)
+                            ->setOperatorType(PHPExcel_Style_Conditional::OPERATOR_LESSTHAN)
+                            ->addCondition('1')
+                            ->getStyle()
+                            ->applyFromArray(
+                                    array(
+                                            'font'=>array(
+                                                'color'=>array('argb'=>'FF000000')
+                                            ),
+                                            'fill'=>array(
+                                                'type' =>PHPExcel_Style_Fill::FILL_SOLID,
+                                                'startcolor' =>array('argb' => 'FFFF0000'),
+                                                'endcolor' =>array('argb' => 'FFFF0000')
+                                            )
+                                        )
+                                );
+
+            $objConditional2 = new PHPExcel_Style_Conditional();
+            $objConditional2->setConditionType(PHPExcel_Style_Conditional::CONDITION_CELLIS)
+                            ->setOperatorType(PHPExcel_Style_Conditional::OPERATOR_GREATERTHANOREQUAL)
+                            ->addCondition('1')
+                            ->getStyle()
+                            ->applyFromArray(
+                                    array(
+                                            'font'=>array(
+                                                'color'=>array('argb'=>'FF000000')
+                                            ),
+                                            'fill'=>array(
+                                                'type' =>PHPExcel_Style_Fill::FILL_SOLID,
+                                                'startcolor' =>array('argb' => 'FF00B050'),
+                                                'endcolor' =>array('argb' => 'FF00B050')
+                                            )
+                                        )
+                                );
+            $conditionalStyles = $objPHPExcel->getActiveSheet()->getStyle(($col_name[$col-14].$row).':'.($col_name[$col-1].$row))->getConditionalStyles();
+            array_push($conditionalStyles,$objConditional,$objConditional2);
+            $objPHPExcel->getActiveSheet()->getStyle(($col_name[$col-14].$row).':'.($col_name[$col-1].$row))->setConditionalStyles($conditionalStyles);
+
+            $row = $row + 1;
+        }
+
+        $row = $row - 1;
+    }
+
+    $objPHPExcel->getActiveSheet()->getStyle('A'.$start_row.':'.$col_name[$col-1].$row)->applyFromArray(array(
+        'borders' => array(
+            'allborders' => array(
+                'style' => PHPExcel_Style_Border::BORDER_THIN
+            )
+        )
+    ));
+
+    $filename = 'MT_Stock_Tracker_Weekly_'.$report_date.'.xlsx';
+
+    if($action=="save") {
+        // $path  = '/home/eatangcp/public_html/test/assets/uploads/mt_stock_reports/';
+        // $upload_path = '/home/eatangcp/public_html/test/assets/uploads/mt_stock_reports';
+
+        // $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/mt_stock_reports/';
+        // $upload_path = '/home/eatangcp/public_html/eat_erp/assets/uploads/mt_stock_reports';
+
+        // $path  = '/var/www/html/eat_erp/assets/uploads/mt_stock_reports/';
+        // $upload_path = '/var/www/html/eat_erp/assets/uploads/mt_stock_reports';
+
+        // $path  = 'C:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports/';
+        // $upload_path = 'C:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports';
+
+        // $path  = 'E:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports/';
+        // $upload_path = 'E:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports';
+
+
+        $path = $this->config->item('upload_path').'mt_stock_reports/';
+        $upload_path = $this->config->item('upload_path').'mt_stock_reports';
+
+        if(!is_dir($upload_path)) {
+            mkdir($upload_path, 0777, TRUE);
+        }
+
+        $reportpath = $path.$filename;
+
+        // header('Content-Type: application/vnd.ms-excel');
+        // header('Content-Disposition: attachment;filename="'.$filename.'"');
+        // header('Cache-Control: max-age=0');
+
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007'); 
+        $objWriter->save($reportpath);
+
+        echo $reportpath;
+        echo '<br/><br/>';
+
+        $return_arr = array('reportpath'=>$reportpath, 'tr'=> $tr);
+
+        // return $reportpath;
+        return $return_arr;
+    } else {
+        // header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Type: application/openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="'.$filename.'"');
+        header('Cache-Control: max-age=0');
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $objWriter->save('php://output');
+
+        $logarray['table_id']=$this->session->userdata('session_id');
+        $logarray['module_name']='Reports';
+        $logarray['cnt_name']='Reports';
+        $logarray['action']='MT Stock Tracker Report Generated.';
+        $this->user_access_log_model->insertAccessLog($logarray);
+
+        exit;
+    }
+}
+
+public function send_exception_report() {
+    // $date = '2019-07-11';
+    $date = date('Y-m-d');
+
     //and (A.ref_id is null or A.ref_id = '')  removed this from sales and Sales Return 
     //and date(A.created_on)<date('".$date."') bcoz ref_id is only assign to previous approved
     //and case When (date(A.created_on)=date('".$date."') AND (A.ref_id is not null or A.ref_id != '') Then (A.ref_id is not null or A.ref_id != '')
@@ -17120,7 +17642,7 @@ public function send_exception_report() {
         $row=$row+2;
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Exception Reporting - Operations");
         $row=$row+2;
-        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Reporting Date - " . (($date!=null && $date!="")?date("d/m/Y",strtotime($date)):""));
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Reporting Date - " . (($date!=null && $date!="")?date("d-m-Y",strtotime($date)):""));
 
         //------------ setting headers of excel -------------
         $row=$row+2;
@@ -17163,12 +17685,12 @@ public function send_exception_report() {
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, $result[$i]->temp_col);
             /*$objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row,'=Hyperlink("'.$url.'",'.$result[$i]->id.')');*/
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row,$result[$i]->id);
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, (($result[$i]->ref_date!=null && $result[$i]->ref_date!="")?date("d/m/Y",strtotime($result[$i]->ref_date)):""));
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, (($result[$i]->ref_date!=null && $result[$i]->ref_date!="")?date("d-m-Y",strtotime($result[$i]->ref_date)):""));
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $result[$i]->ref_no);
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $result[$i]->distributor_name);
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, $result[$i]->amount);
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+6].$row, $result[$i]->modifiedby);
-            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, (($result[$i]->modified_on!=null && $result[$i]->modified_on!="")?date("d/m/Y",strtotime($result[$i]->modified_on)):""));
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+7].$row, (($result[$i]->modified_on!=null && $result[$i]->modified_on!="")?date("d-m-Y",strtotime($result[$i]->modified_on)):""));
         }
 
         $objPHPExcel->getActiveSheet()->getStyle('A7:H7')->getFont()->setBold(true);
@@ -17187,8 +17709,10 @@ public function send_exception_report() {
         $filename='Exception_Report.xls';
         //$path  = 'C:\xampp\htdocs\eat_erp_new_30\assets\uploads\exception_reports';
         // $path  = '/home/eatangcp/public_html/test/assets/uploads/exception_reports/';
-        $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/exception_reports/';
+        // $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/exception_reports/';
         // $path  = '/var/www/html/eat_erp/assets/uploads/exception_reports/';
+
+        $path = $this->config->item('upload_path').'exception_reports/';
 
         // header('Content-Type: application/vnd.ms-excel');
         // header('Content-Disposition: attachment;filename="'.$filename.'"');
@@ -17204,7 +17728,7 @@ public function send_exception_report() {
                 <body>
                     <h3>Wholesome Habits Private Limited</h3>
                     <h4>Exception Reporting - Operations</h4>
-                    <p>Reporting Date - '.(($date!=null && $date!="")?date("d/m/Y",strtotime($date)):"").'</p>
+                    <p>Reporting Date - '.(($date!=null && $date!="")?date("d-m-Y",strtotime($date)):"").'</p>
                     <table border="1" style="border-collapse: collapse;">
                         <thead>
                             <tr>
@@ -17235,19 +17759,15 @@ public function send_exception_report() {
                 </html>';
     $from_email = 'info@eatanytime.co.in';
     $from_email_sender = 'EAT MIS';
-    $subject = 'Exception Report - '.(($date!=null && $date!="")?date("d/m/Y",strtotime($date)):"");
+    $subject = 'Exception Report - '.(($date!=null && $date!="")?date("d-m-Y",strtotime($date)):"");
 
-    /*$to_email = "dhava.maru@pecanreams.com";
-    $cc="sangeeta.yadav@pecanreams.com";
-    $bcc="yadavsangeeta521@gmail.com";*/
-    
-    // $to_email = "prasad.bhisale@pecanreams.com";
-    // $cc = 'prasad.bhisale@pecanreams.com';
-    // $bcc = 'prasad.bhisale@pecanreams.com';
+    $to_email = 'prasad.bhisale@pecanreams.com';
+    $cc = 'prasad.bhisale@pecanreams.com';
+    $bcc = 'prasad.bhisale@pecanreams.com';
 
-    $to_email = "priti.tripathi@eatanytime.co.in, operations@eatanytime.co.in";
-    $cc="rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, dhaval.maru@pecanreams.com";
-    $bcc="prasad.bhisale@pecanreams.com";
+    // $to_email = "priti.tripathi@eatanytime.co.in, operations@eatanytime.co.in";
+    // $cc="rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in";
+    // $bcc="ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, prasad.bhisale@pecanreams.com";
 
     $sql = "select * from report_master where report_name = 'Exception Report'";
     $query = $this->db->query($sql);
@@ -17290,6 +17810,7 @@ public function send_production_exception_report(){
     $post_production = $this->get_post_production_cnt();
     $po_count = $this->get_po_count();
 
+    // $date = '11.07.2019';
     $date = date("d.m.Y");
     $tbody ='';
 
@@ -17579,7 +18100,7 @@ public function send_production_exception_report(){
         $row=$row+2;
         $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Exception Reporting - Production");
         $row=$row+2;
-        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Reporting Date - " . (($date!=null && $date!="")?date("d/m/Y",strtotime($date)):""));
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row, "Reporting Date - " . (($date!=null && $date!="")?date("d-m-Y",strtotime($date)):""));
 
         if(count($task_dtl)>0){
             $row=$row+3;
@@ -17602,7 +18123,7 @@ public function send_production_exception_report(){
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+1].$row, $task_dtl[$i]->subject_detail);
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, $task_dtl[$i]->user_name);
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $task_dtl[$i]->priority);
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, date('d/m/Y',strtotime($task_dtl[$i]->due_date)));
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, date('d-m-Y',strtotime($task_dtl[$i]->due_date)));
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, $task_dtl[$i]->status);
             }
 
@@ -17638,7 +18159,7 @@ public function send_production_exception_report(){
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, $pre_production_dtl[$i]->depot_name);
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $pre_production_dtl[$i]->notification);
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $pre_production_dtl[$i]->p_status);
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, date('d/m/Y',strtotime($pre_production_dtl[$i]->notification_date)));
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, date('d-m-Y',strtotime($pre_production_dtl[$i]->notification_date)));
             }
 
             $objPHPExcel->getActiveSheet()->getStyle('A'.$start_row.':F'.$start_row)->getFont()->setBold(true);
@@ -17701,7 +18222,7 @@ public function send_production_exception_report(){
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+2].$row, $post_production_dtl[$i]->depot_name);
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+3].$row, $post_production_dtl[$i]->notification);
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+4].$row, $p_status);
-                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, date('d/m/Y',strtotime($post_production_dtl[$i]->notification_date)));
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+5].$row, date('d-m-Y',strtotime($post_production_dtl[$i]->notification_date)));
             }
 
             $objPHPExcel->getActiveSheet()->getStyle('A'.$start_row.':F'.$start_row)->getFont()->setBold(true);
@@ -17720,12 +18241,20 @@ public function send_production_exception_report(){
 
         $filename = 'Production_Report_'.date('d-m-Y').'.xls';
         // $path = 'C:/wamp64/www/eat_erp/assets/uploads/production_reports/';
-        // $path  = '/home/eatangcp/public_html/test/assets/uploads/production_reports/';
-        $path='/home/eatangcp/public_html/eat_erp/assets/uploads/production_reports/';
-
         // $upload_path = 'C:/wamp64/www/eat_erp/assets/uploads/production_reports';
+
+        // $path  = '/home/eatangcp/public_html/test/assets/uploads/production_reports/';
         // $upload_path = '/home/eatangcp/public_html/test/assets/uploads/production_reports';
-        $upload_path = '/home/eatangcp/public_html/eat_erp/assets/uploads/production_reports';
+
+        // $path='/home/eatangcp/public_html/eat_erp/assets/uploads/production_reports/';
+        // $upload_path = '/home/eatangcp/public_html/eat_erp/assets/uploads/production_reports';
+        
+        // $path  = '/var/www/html/eat_erp/assets/uploads/production_reports/';
+        // $upload_path = '/var/www/html/eat_erp/assets/uploads/production_reports';
+
+        $path = $this->config->item('upload_path').'production_reports/';
+        $upload_path = $this->config->item('upload_path').'production_reports';
+
         if(!is_dir($upload_path)) {
             mkdir($upload_path, 0777, TRUE);
         }
@@ -17751,13 +18280,13 @@ public function send_production_exception_report(){
     // $to_email = "ashwini.patil@pecanreams.com";
     // $bcc = "ashwini.patil@pecanreams.com";
     
-    // $to_email = "prasad.bhisale@pecanreams.com";
-    // $cc = "prasad.bhisale@pecanreams.com";
-    // $bcc = "prasad.bhisale@pecanreams.com";
+    $to_email = "prasad.bhisale@pecanreams.com";
+    $cc = "prasad.bhisale@pecanreams.com";
+    $bcc = "prasad.bhisale@pecanreams.com";
     
-    $to_email = "dinesh.parkhi@eatanytime.in, vaibhav.desai@eatanytime.in, prachi.sanghvi@eatanytime.in";
-    $bcc = "ashwini.patil@pecanreams.com";
-    $cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, operations@eatanytime.in, mis@eatanytime.in, priti.tripathi@eatanytime.in, prasad.bhisale@pecanreams.com, dhaval.maru@pecanreams.com";
+    // $to_email = "dinesh.parkhi@eatanytime.in, vaibhav.desai@eatanytime.in, prachi.sanghvi@eatanytime.in";
+    // $cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in";
+    // $bcc = "ashwini.patil@pecanreams.com, prasad.bhisale@pecanreams.com, dhaval.maru@pecanreams.com";
 
     $sql = "select * from report_master where report_name = 'Production Exception Report'";
     $query = $this->db->query($sql);
@@ -17777,6 +18306,14 @@ public function send_production_exception_report(){
         echo "Send";
     } else {
         echo "NOT Send ".$mailSent;
+    }
+
+    if($mailSent==1){
+        $logarray['table_id']=$this->session->userdata('session_id');
+        $logarray['module_name']='Reports';
+        $logarray['cnt_name']='Reports';
+        $logarray['action']='Production Exception report sent.';
+        $this->user_access_log_model->insertAccessLog($logarray);
     }
 
     // load_view('invoice/emailer', $data); 
@@ -17828,13 +18365,13 @@ public function send_beat_analysis_report($report_peroid='') {
         $from_email_sender = 'EAT MIS';
         $subject = 'Beat Analysis Report - '.$report_date;
 
-        // $to_email = "prasad.bhisale@pecanreams.com";
-        // $cc = 'prasad.bhisale@pecanreams.com';
-        // $bcc = 'prasad.bhisale@pecanreams.com';
+        $to_email = 'prasad.bhisale@pecanreams.com';
+        $cc = 'prasad.bhisale@pecanreams.com';
+        $bcc = 'prasad.bhisale@pecanreams.com';
 
-        $to_email = "swapnil.darekar@eatanytime.in";
-        $bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, prasad.bhisale@pecanreams.com";
-        $cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, operations@eatanytime.in";
+        // $to_email = "swapnil.darekar@eatanytime.in";
+        // $cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, operations@eatanytime.in";
+        // $bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, prasad.bhisale@pecanreams.com";
 
         $sql = "select * from report_master where report_name = 'Beat Analysis Report'";
         $query = $this->db->query($sql);
@@ -17862,7 +18399,7 @@ public function send_beat_analysis_report($report_peroid='') {
             $logarray['table_id']=$this->session->userdata('session_id');
             $logarray['module_name']='Reports';
             $logarray['cnt_name']='Reports';
-            $logarray['action']='Daily Sales Performance report sent.';
+            $logarray['action']='Beat Analysis report sent.';
             $this->user_access_log_model->insertAccessLog($logarray);
         }
     }
@@ -18166,14 +18703,18 @@ function generate_beat_analysis_report($f_date='', $t_date='', $action='') {
             // $path  = '/home/eatangcp/public_html/test/assets/uploads/mt_stock_reports/';
             // $upload_path = '/home/eatangcp/public_html/test/assets/uploads/mt_stock_reports';
 
-            $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/beat_plan_analysis/';
-            $upload_path = '/home/eatangcp/public_html/eat_erp/assets/uploads/beat_plan_analysis';
+            // $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/beat_plan_analysis/';
+            // $upload_path = '/home/eatangcp/public_html/eat_erp/assets/uploads/beat_plan_analysis';
 
             // $path  = '/var/www/html/eat_erp/assets/uploads/beat_plan_analysis/';
             // $upload_path = '/var/www/html/eat_erp/assets/uploads/beat_plan_analysis';
 
             // $path  = 'C:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports/';
             // $upload_path = 'C:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports';
+
+            $path = $this->config->item('upload_path').'beat_plan_analysis/';
+            $upload_path = $this->config->item('upload_path').'beat_plan_analysis';
+
             if(!is_dir($upload_path)) {
                 mkdir($upload_path, 0777, TRUE);
             }
@@ -18214,7 +18755,7 @@ function generate_beat_analysis_report($f_date='', $t_date='', $action='') {
 
 public function send_daily_sales_performance_report($report_peroid='') {
     if($report_peroid=='Weekly'){
-        // $date = '2019-05-06';
+        // $date = '2019-07-11';
         $date = date('Y-m-d');
         $reportpath = '';
 
@@ -18226,21 +18767,22 @@ public function send_daily_sales_performance_report($report_peroid='') {
         echo $to_date;
         echo '<br/><br/>';
 
-        $reportpath = $this->generate_daily_sales_performance_report($from_date, $to_date, 'save');
+        $reportpath = $this->generate_daily_sales_performance_report($from_date, $to_date, 'save', $report_peroid);
     } else {
         $report_peroid = 'Daily';
 
-        // $date = '2019-05-06';
+        // $date = '2019-07-11';
         $date = date('Y-m-d');
         $reportpath = '';
 
         echo $date;
         echo '<br/><br/>';
 
-        $reportpath = $this->generate_daily_sales_performance_report($date, $date, 'save');
+        $reportpath = $this->generate_daily_sales_performance_report($date, $date, 'save', $report_peroid);
     }
 
     if($reportpath!=''){
+        // $report_date = '11-07-2019';
         $report_date = date('d-m-Y');
 
         $message = '<html>
@@ -18259,13 +18801,13 @@ public function send_daily_sales_performance_report($report_peroid='') {
         $from_email_sender = 'EAT MIS';
         $subject = 'Sales - '.$report_peroid.' SR Performance Report - '.$report_date;
 
-        // $to_email = "prasad.bhisale@pecanreams.com";
-        // $cc = 'prasad.bhisale@pecanreams.com';
-        // $bcc = 'prasad.bhisale@pecanreams.com';
+        $to_email = 'prasad.bhisale@pecanreams.com';
+        $cc = 'prasad.bhisale@pecanreams.com';
+        $bcc = 'prasad.bhisale@pecanreams.com';
 
-        $to_email = "ravi.hirode@eatanytime.co.in, manorama.mishra@eatanytime.co.in, mahesh.ms@eatanytime.co.in, yash.doshi@eatanytime.in, darshan.dhany@eatanytime.co.in, girish.rai@eatanytime.in, nitin.kumar@eatanytime.co.in, mohil.telawade@eatanytime.co.in";
-        $bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, prasad.bhisale@pecanreams.com";
-        $cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, operations@eatanytime.in";
+        // $to_email = "ravi.hirode@eatanytime.co.in, manorama.mishra@eatanytime.co.in, mahesh.ms@eatanytime.co.in, yash.doshi@eatanytime.in, darshan.dhany@eatanytime.co.in, girish.rai@eatanytime.in, nitin.kumar@eatanytime.co.in, mohil.telawade@eatanytime.co.in";
+        // $cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, operations@eatanytime.in";
+        // $bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, prasad.bhisale@pecanreams.com";
 
         $sql = "select * from report_master where report_name = 'Sales Representative Performance Report'";
         $query = $this->db->query($sql);
@@ -18293,13 +18835,13 @@ public function send_daily_sales_performance_report($report_peroid='') {
             $logarray['table_id']=$this->session->userdata('session_id');
             $logarray['module_name']='Reports';
             $logarray['cnt_name']='Reports';
-            $logarray['action']=$report_peroid.' Sales Performance report sent.';
+            $logarray['action']=$report_peroid.' Sales Representative Performance report sent.';
             $this->user_access_log_model->insertAccessLog($logarray);
         }
     }
 }
 
-function generate_daily_sales_performance_report($f_date='', $t_date='', $action='') {
+function generate_daily_sales_performance_report($f_date='', $t_date='', $action='', $report_peroid='Daily') {
     $from_date = formatdate($this->input->post('from_date'));
     $to_date = formatdate($this->input->post('to_date'));
 
@@ -18325,6 +18867,7 @@ function generate_daily_sales_performance_report($f_date='', $t_date='', $action
     // $from_date = '2018-04-01';
     // $to_date = '2019-03-31';
 
+    // $report_date = '11-07-2019';
     $report_date = date('d-m-Y');
 
     $cnt = 0;
@@ -18456,6 +18999,7 @@ function generate_daily_sales_performance_report($f_date='', $t_date='', $action
             $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
         }
 
+        $objPHPExcel->getActiveSheet()->setCellValue('A2','Sales - '.$report_peroid.' Sales Performance Report');
         $objPHPExcel->getActiveSheet()->setCellValue('A3','Date - '.date('d-m-Y',strtotime($from_date)).' to '.date('d-m-Y',strtotime($to_date)));
 
         $row = 6;
@@ -18743,14 +19287,14 @@ function generate_daily_sales_performance_report($f_date='', $t_date='', $action
         // $logarray['action']='Beat plan analysis report generated.';
         // $this->user_access_log_model->insertAccessLog($logarray);
 
-        $filename = 'Daily_sales_performance_report_'.$report_date.'.xlsx';
+        $filename = $report_peroid.'_sales_performance_report_'.$report_date.'.xlsx';
 
         if($action=="save") {
             // $path  = '/home/eatangcp/public_html/test/assets/uploads/daily_sales_performance/';
             // $upload_path = '/home/eatangcp/public_html/test/assets/uploads/daily_sales_performance';
 
-            $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/daily_sales_performance/';
-            $upload_path = '/home/eatangcp/public_html/eat_erp/assets/uploads/daily_sales_performance';
+            // $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/daily_sales_performance/';
+            // $upload_path = '/home/eatangcp/public_html/eat_erp/assets/uploads/daily_sales_performance';
 
             // $path  = '/var/www/html/eat_erp/assets/uploads/daily_sales_performance/';
             // $upload_path = '/var/www/html/eat_erp/assets/uploads/daily_sales_performance';
@@ -18760,6 +19304,9 @@ function generate_daily_sales_performance_report($f_date='', $t_date='', $action
 
             // $path  = 'E:/wamp64/www/eat_erp/assets/uploads/daily_sales_performance/';
             // $upload_path = 'E:/wamp64/www/eat_erp/assets/uploads/daily_sales_performance';
+
+            $path = $this->config->item('upload_path').'daily_sales_performance/';
+            $upload_path = $this->config->item('upload_path').'daily_sales_performance';
 
             if(!is_dir($upload_path)) {
                 mkdir($upload_path, 0777, TRUE);
@@ -18789,7 +19336,7 @@ function generate_daily_sales_performance_report($f_date='', $t_date='', $action
             $logarray['table_id']=$this->session->userdata('session_id');
             $logarray['module_name']='Reports';
             $logarray['cnt_name']='Reports';
-            $logarray['action']='Daily Sales Performance Report Generated.';
+            $logarray['action']=$report_peroid.' Sales Performance Report Generated.';
             $this->user_access_log_model->insertAccessLog($logarray);
 
             exit;
@@ -18801,7 +19348,7 @@ function generate_daily_sales_performance_report($f_date='', $t_date='', $action
 
 public function send_daily_merchandiser_performance_report($report_peroid='') {
     if($report_peroid=='Weekly'){
-        // $date = '2019-05-06';
+        // $date = '2019-07-11';
         $date = date('Y-m-d');
         $reportpath = '';
 
@@ -18813,21 +19360,22 @@ public function send_daily_merchandiser_performance_report($report_peroid='') {
         echo $to_date;
         echo '<br/><br/>';
 
-        $reportpath = $this->generate_daily_merchandiser_performance_report($from_date, $to_date, 'save');
+        $reportpath = $this->generate_daily_merchandiser_performance_report($from_date, $to_date, 'save', $report_peroid);
     } else {
         $report_peroid = 'Daily';
 
-        // $date = '2019-05-06';
+        // $date = '2019-07-11';
         $date = date('Y-m-d');
         $reportpath = '';
 
         echo $date;
         echo '<br/><br/>';
 
-        $reportpath = $this->generate_daily_merchandiser_performance_report($date, $date, 'save');
+        $reportpath = $this->generate_daily_merchandiser_performance_report($date, $date, 'save', $report_peroid);
     }
 
     if($reportpath!=''){
+        // $report_date = '11-07-2019';
         $report_date = date('d-m-Y');
 
         $message = '<html>
@@ -18846,13 +19394,13 @@ public function send_daily_merchandiser_performance_report($report_peroid='') {
         $from_email_sender = 'EAT MIS';
         $subject = 'Sales - '.$report_peroid.' Merchandiser Performance Report - '.$report_date;
 
-        // $to_email = "prasad.bhisale@pecanreams.com";
-        // $cc = 'prasad.bhisale@pecanreams.com';
-        // $bcc = 'prasad.bhisale@pecanreams.com';
+        $to_email = 'prasad.bhisale@pecanreams.com';
+        $cc = 'prasad.bhisale@pecanreams.com';
+        $bcc = 'prasad.bhisale@pecanreams.com';
 
-        $to_email = "mukesh.yadav@eatanytime.co.in, sulochana.waghmare@eatanytime.co.in, sachin.pal@eatanytime.co.in, urvi.bhayani@eatanytime.co.in";
-        $bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, prasad.bhisale@pecanreams.com";
-        $cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, operations@eatanytime.in";
+        // $to_email = "mukesh.yadav@eatanytime.co.in, sulochana.waghmare@eatanytime.co.in, sachin.pal@eatanytime.co.in, urvi.bhayani@eatanytime.co.in";
+        // $cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, operations@eatanytime.in";
+        // $bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, prasad.bhisale@pecanreams.com";
 
         $sql = "select * from report_master where report_name = 'Merchandiser Performance Report'";
         $query = $this->db->query($sql);
@@ -18886,7 +19434,7 @@ public function send_daily_merchandiser_performance_report($report_peroid='') {
     }
 }
 
-function generate_daily_merchandiser_performance_report($f_date='', $t_date='', $action='') {
+function generate_daily_merchandiser_performance_report($f_date='', $t_date='', $action='', $report_peroid='Daily') {
     $from_date = formatdate($this->input->post('from_date'));
     $to_date = formatdate($this->input->post('to_date'));
 
@@ -18912,6 +19460,7 @@ function generate_daily_merchandiser_performance_report($f_date='', $t_date='', 
     // $from_date = '2018-04-01';
     // $to_date = '2019-03-31';
 
+    // $report_date = '11-07-2019';
     $report_date = date('d-m-Y');
 
     $cnt = 0;
@@ -19015,6 +19564,7 @@ function generate_daily_merchandiser_performance_report($f_date='', $t_date='', 
             $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
         }
 
+        $objPHPExcel->getActiveSheet()->setCellValue('A2','Sales - '.$report_peroid.' Merchandiser Performance Report');
         $objPHPExcel->getActiveSheet()->setCellValue('A3','Date - '.date('d-m-Y',strtotime($from_date)).' to '.date('d-m-Y',strtotime($to_date)));
 
         $row = 6;
@@ -19216,14 +19766,14 @@ function generate_daily_merchandiser_performance_report($f_date='', $t_date='', 
         // $logarray['action']='Beat plan analysis report generated.';
         // $this->user_access_log_model->insertAccessLog($logarray);
 
-        $filename = 'Daily_merchandiser_performance_report_'.$report_date.'.xlsx';
+        $filename = $report_peroid.'_merchandiser_performance_report_'.$report_date.'.xlsx';
 
         if($action=="save") {
             // $path  = '/home/eatangcp/public_html/test/assets/uploads/daily_merchandiser_performance/';
             // $upload_path = '/home/eatangcp/public_html/test/assets/uploads/daily_merchandiser_performance';
 
-            $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/daily_merchandiser_performance/';
-            $upload_path = '/home/eatangcp/public_html/eat_erp/assets/uploads/daily_merchandiser_performance';
+            // $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/daily_merchandiser_performance/';
+            // $upload_path = '/home/eatangcp/public_html/eat_erp/assets/uploads/daily_merchandiser_performance';
 
             // $path  = '/var/www/html/eat_erp/assets/uploads/daily_merchandiser_performance/';
             // $upload_path = '/var/www/html/eat_erp/assets/uploads/daily_merchandiser_performance';
@@ -19233,6 +19783,9 @@ function generate_daily_merchandiser_performance_report($f_date='', $t_date='', 
 
             // $path  = 'E:/wamp64/www/eat_erp/assets/uploads/daily_merchandiser_performance/';
             // $upload_path = 'E:/wamp64/www/eat_erp/assets/uploads/daily_merchandiser_performance';
+
+            $path = $this->config->item('upload_path').'daily_merchandiser_performance/';
+            $upload_path = $this->config->item('upload_path').'daily_merchandiser_performance';
 
             if(!is_dir($upload_path)) {
                 mkdir($upload_path, 0777, TRUE);
@@ -19262,7 +19815,7 @@ function generate_daily_merchandiser_performance_report($f_date='', $t_date='', 
             $logarray['table_id']=$this->session->userdata('session_id');
             $logarray['module_name']='Reports';
             $logarray['cnt_name']='Reports';
-            $logarray['action']='Daily Merchandiser Performance Report Generated.';
+            $logarray['action']=$report_peroid.' Merchandiser Performance Report Generated.';
             $this->user_access_log_model->insertAccessLog($logarray);
 
             exit;

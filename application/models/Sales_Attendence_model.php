@@ -102,10 +102,7 @@ function weekOfMonth($date) {
     return $frequency = $result[0]->frequency;
 }
 
-
-
-public function sales_emp_log($value='')
-{
+public function sales_emp_log($value='') {
 	
 	$now1=date('Y-m-d');
 	/*$now = date('Y-m-d', strtotime($now1 .' -1 day'));
@@ -285,9 +282,6 @@ public function sales_emp_log($value='')
 	$result = $this->db->query($sql)->result();
 	return $result;
 }
-
-
-
 
 }
 ?>

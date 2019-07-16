@@ -522,6 +522,13 @@ $config['rewrite_short_tags'] = FALSE;
 $config['proxy_ips'] = '';
 
 $config['txnTypeArray']=array("p"=>"purchase","s"=>"sales","r"=>"rent","l"=>"loan","e"=>"expense","m"=>"maintenance","o"=>"other_expense","t"=>"other_schedule");
+
 // $config['template_path']="/home/eatangcp/public_html/eat_erp/assets/templates/";
+// $config['template_path']="/var/www/html/eat_erp/assets/templates/";
 // $config['template_path']="C:/xampp/htdocs/eat_erp/assets/templates/";
 $config['template_path']="E:/wamp64/www/eat_erp/assets/templates/";
+
+// $config['upload_path']="/home/eatangcp/public_html/eat_erp/assets/uploads/";
+// $config['upload_path']="/var/www/html/eat_erp/assets/uploads/";
+// $config['upload_path']="C:/xampp/htdocs/eat_erp/assets/uploads/";
+$config['upload_path']="E:/wamp64/www/eat_erp/assets/uploads/";

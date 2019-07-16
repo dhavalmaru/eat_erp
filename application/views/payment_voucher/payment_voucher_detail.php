@@ -336,7 +336,20 @@
                                                             <input type="text" class="form-control total_amt" name="total_amt[]" id="total_amt_<?=$i?>" 
                                                             placeholder="Total Amount" value="<?=$payment_voucher[$i]->total_amt?>" readonly />
                                                         </td>
-                                                        <td></td>
+                                                        <td class="table_action" style="text-align:center; vertical-align: middle;">
+                                                               <?php  
+                                                                    $style = 'display: none;';
+                                                                    if(isset($data[0]->freezed)){
+                                                                        if($data[0]->freezed==1){
+                                                                            $style =  'display: none;';
+                                                                        }
+                                                                    } elseif($i>=1) {
+                                                                         $style =  'display: block;';
+                                                                    }
+                                                                ?>
+
+                                                            <a id="row_<?php echo $i; ?>_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  style="<?=$style?>"></span></a>
+                                                        </td>
                                                     </tr>
                                                 <?php } }
                                                 else
@@ -372,7 +385,20 @@
                                                     <td>
                                                         <input type="text" class="form-control total_amt" name="total_amt[]" id="total_amt_0" placeholder="Total Amount" value="" readonly />
                                                     </td>
-                                                    <td></td>
+                                                    <td class="table_action" style="text-align:center; vertical-align: middle;">
+                                                        <?php  
+                                                            if(isset($data[0]->freezed)){
+                                                                if($data[0]->freezed==1){
+                                                                    $style =  'display: none;';
+                                                                }
+                                                            }else
+                                                                {
+                                                                     $style =  'display: none;';
+                                                                }
+                                                        ?>
+
+                                                        <a id="row_0_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  style="<?=$style?>"></span></a>
+                                                    </td>
                                                 </tr>
                                                 <?php }
                                                 ?>

@@ -1793,7 +1793,6 @@ function send_po_delivery_report() {
                 }
             }
 
-
             if(strtoupper(trim($data[$i]->delivery_status))!='DELIVERED' && strtoupper(trim($data[$i]->delivery_status))!='PENDING' && strtoupper(trim($data[$i]->delivery_status))!='CANCELLED' || strtoupper(trim($data[$i]->delivery_status))=='GP ISSUED' || strtoupper(trim($data[$i]->delivery_status))=='INPROCESS' || strtoupper(trim($data[$i]->mismatch))=='1'){
                 $distributor_id=$data[$i]->distributor_id;
 
@@ -2121,22 +2120,28 @@ function send_po_delivery_report() {
             $objPHPExcel->getActiveSheet()->getColumnDimension($col)->setAutoSize(true);
         }
         
-        $filename='PO_Delivery_Report'.date('Y-F-d').'.xls';
+        $filename='PO_Delivery_Report'.date('d-m-Y').'.xls';
         // $path  = '/home/eatangcp/public_html/test/assets/uploads/daily_sales_rep_reports/';
         // $path  = 'C:/xampp/htdocs/eat_erp/assets/uploads/daily_sales_rep_reports/';
 
         // $path  = '/home/eatangcp/public_html/test/assets/uploads/distributor_po_reports/';
         // $upload_path = '/home/eatangcp/public_html/test/assets/uploads/distributor_po_reports';
 
-        $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/distributor_po_reports/';
-        $upload_path = '/home/eatangcp/public_html/eat_erp/assets/uploads/distributor_po_reports';
+        // $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/distributor_po_reports/';
+        // $upload_path = '/home/eatangcp/public_html/eat_erp/assets/uploads/distributor_po_reports';
+
+        // $path  = '/var/www/html/eat_erp/assets/uploads/distributor_po_reports/';
+        // $upload_path = '/var/www/html/eat_erp/assets/uploads/distributor_po_reports';
 
         // $path  = 'C:/xampp/htdocs/eat_erp/assets/uploads/distributor_po_reports/';
         // $upload_path = 'C:/xampp/htdocs/eat_erp/assets/uploads/distributor_po_reports';
         
         // $path  = 'E:/wamp64/www/eat_erp/assets/uploads/distributor_po_reports/';
         // $upload_path = 'E:/wamp64/www/eat_erp/assets/uploads/distributor_po_reports';
-        
+    
+        $path = $this->config->item('upload_path').'distributor_po_reports/';
+        $upload_path = $this->config->item('upload_path').'distributor_po_reports';
+
         if(!is_dir($upload_path)) {
             mkdir($upload_path, 0777, TRUE);
         }
@@ -2147,14 +2152,24 @@ function send_po_delivery_report() {
         $objWriter->save($reportpath); 
         $attachment = $reportpath;
 
-		$to_email = 'priti.tripathi@eatanytime.in, operations@eatanytime.in, rishit.sanghvi@eatanytime.in, 
-                          dhaval.maru@pecanreams.com, swapnil.darekar@eatanytime.in, ashwini.patil@pecanreams.com, 
-                          prasad.bhisale@pecanreams.com';
-        // $to_email = 'prasad.bhisale@pecanreams.com';
-        $bcc = 'prasad.bhisale@pecanreams.com';
         $from_email = 'cs@eatanytime.co.in';
         $from_email_sender = 'Wholesome Habits Pvt Ltd';
-        $subject = 'PO Tracker Report - '.date('dS F Y');
+        $to_email = "priti.tripathi@eatanytime.in, operations@eatanytime.in";
+        $cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, rohit@pecanadvisors.com";
+        $bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, prasad.bhisale@pecanreams.com";
+
+        $sql = "select * from report_master where report_name = 'Distributor Po Delivery Report'";
+        $query = $this->db->query($sql);
+        $result = $query->result();
+        if(count($result)>0) {
+            $from_email = $result[0]->from_email;
+            $from_email_sender = $result[0]->sender_name;
+            $to_email = $result[0]->to_email;
+            $cc = $result[0]->cc_email;
+            $bcc = $result[0]->bcc_email;
+        }
+
+        $subject = 'PO Tracker Report - '.date('d-m-Y');
         $table = $this->po_summary_report();
         $tbody = "<html><head>
                     <style>
@@ -2183,17 +2198,25 @@ function send_po_delivery_report() {
                     </style>
                 </head>
                 <body>Hii ,<br /><br />
-                Please find the PO tracker report attached for ".date('dS F Y')."
+                Please find the PO tracker report attached for ".date('d-m-Y')."
                 <br>
                 ".$table."
                 <br /><br />Thanks,<br />Team EAT Anytime
                 </body></html>";
 
-        echo 'mailsent'.$mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $tbody, $bcc,'',$attachment);
+        echo 'mailsent'.$mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $tbody, $bcc, $cc, $attachment);
         if ($mailSent==1) {
             echo "Send";
         } else {
             echo "NOT Send".$mailSent;
+        }
+
+        if($mailSent==1){
+            $logarray['table_id']=$this->session->userdata('session_id');
+            $logarray['module_name']='Reports';
+            $logarray['cnt_name']='Reports';
+            $logarray['action']='Distributor Po Delivery Report sent.';
+            $this->user_access_log_model->insertAccessLog($logarray);
         }
 
     } else {
@@ -3185,7 +3208,7 @@ public function po_summary_report(){
                     </style>
                 </head>
                 <body>Hii ,<br /><br />
-                Please find the PO tracker report attached for ".date('dS F Y')." ,
+                Please find the PO tracker report attached for ".date('d-m-Y')." ,
                 <br>
                 ".$table."
                 <br /><br />Thanks,<br />Team EAT Anytime

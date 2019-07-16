@@ -169,9 +169,9 @@ class Sales_Attendence extends CI_controller {
 		}
 		
 		if($status=="modified"){
-			$subject = 'Sales - Daily Attendence - Back Office Modified -'.date("d F Y",strtotime("now"));
+			$subject = 'Sales - Daily Attendance - Back Office Modified -'.date("d F Y",strtotime("now"));
 		} else {
-			$subject = 'Sales - Daily Attendence - Original -'.date("d F Y",strtotime("now"));
+			$subject = 'Sales - Daily Attendance - Original -'.date("d F Y",strtotime("now"));
 		}
         
         $data = $this->Sales_Attendence_model->sales_attendence_list();
@@ -417,6 +417,14 @@ class Sales_Attendence extends CI_controller {
 			echo "NOT Send".$mailSent;
 		}
 
+        if($mailSent==1){
+            $logarray['table_id']=$this->session->userdata('session_id');
+            $logarray['module_name']='Reports';
+            $logarray['cnt_name']='Reports';
+            $logarray['action']='Sales Daily Attendance report sent.';
+            $this->user_access_log_model->insertAccessLog($logarray);
+        }
+
 		// load_view('invoice/emailer', $data);	
     }
 	
@@ -425,14 +433,15 @@ class Sales_Attendence extends CI_controller {
 		$from_email = 'cs@eatanytime.co.in';
         $from_email_sender = 'Wholesome Habits Pvt Ltd';
        
-		$to_email = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, prasad.bhisale@pecanreams.com";
-		// $to_email = "ashwini.patil@pecanreams.com";
-	 	$bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, sangeeta.yadav@pecanreams.com";
+		$to_email = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in";
+		$cc = "";
+		$bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, prasad.bhisale@pecanreams.com";
+
 		// $to_email = "prasad.bhisale@pecanreams.com";
+		// $cc = "prasad.bhisale@pecanreams.com";
 	 	// $bcc = "prasad.bhisale@pecanreams.com";
 		
-
-		$sql = "select * from report_master where report_name = 'Sales Daily Attendance'";
+		$sql = "select * from report_master where report_name = 'Monthly User Login Log'";
 		$query = $this->db->query($sql);
 		$result = $query->result();
 		if(count($result)>0) {
@@ -443,7 +452,6 @@ class Sales_Attendence extends CI_controller {
 			$bcc = $result[0]->bcc_email;
 		}
 		
-
         $subject = 'User Login Log -'.date("d F Y",strtotime("now"));
         $data = $this->Sales_Attendence_model->user_login_list();
         
@@ -562,85 +570,74 @@ class Sales_Attendence extends CI_controller {
 
 					<table width="850px" bgcolor="" border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
 					<tr>
-		
-    
-	
-	  		<tr>
-		
-    
-			<td class="innerpadding1 " style="">
-           	<table  class="body_table" style="border-collapse: collapse;width:100%;border:1px solid #000!important;;">
-			<thead>
-				<tr style=" background-color:yellow ;border-bottom: 1px solid #000;font-weight: bold;">
-		
-				  <th width="300" style="border-right: 1px solid #000;padding:0 8px;text-align:left;width:300px">Name OF User</th>
-				  <th style="border-right: 1px solid #000;padding:0 8px;text-align: left;">Email Id</th>
-				
-				  <th style="border-right: 1px solid #000;padding:0 8px;text-align: left;">Last Date Of Login</th>
-				  
-				  
+		  		<tr>
+				<td class="innerpadding1 " style="">
+	           	<table  class="body_table" style="border-collapse: collapse;width:100%;border:1px solid #000!important;;">
+				<thead>
+					<tr style=" background-color:yellow ;border-bottom: 1px solid #000;font-weight: bold;">
+					  <th width="300" style="border-right: 1px solid #000;padding:0 8px;text-align:left;width:300px">Name OF User</th>
+					  <th style="border-right: 1px solid #000;padding:0 8px;text-align: left;">Email Id</th>
+					  <th style="border-right: 1px solid #000;padding:0 8px;text-align: left;">Last Date Of Login</th>
+					</tr>
+				</thead>
+				<tbody style="border:1px solid #000;background-color: #fff;color: #000;">';
+
+		if(count($data)>0) {
+			for($i=0; $i<count($data); $i++) {
+				if($data[$i]->date==NULL) {
+					$date=' ';
+				} else {
+					$date = date("d-m-Y H:i:s", strtotime($data[$i]->date));
+				}
+				$tbody.= '<tr>
+					<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;padding: 0 8px;">'.$data[$i]->user_name.'</td>
+					<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;padding: 0 8px;">'.$data[$i]->email_id.'</td>
+					<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;padding: 0 8px;">'.$date.'</td>
+					</tr>'; 
+			}
+		}
+
+        $tbody.='</tbody>
+				</table>
+				</td>
 				</tr>
-			</thead>
-			<tbody style="border:1px solid #000;background-color: #fff;color: #000;">';
-				if(count($data)>0) {
-					for($i=0; $i<count($data); $i++)
-					{
-						if($data[$i]->date==NULL)
-						{
-							$date=' ';
-						}
-						else
-						{
-							$date = date("d-m-Y H:i:s", strtotime($data[$i]->date));
-						}
-						$tbody.= '<tr>
-							<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;padding: 0 8px;">'.$data[$i]->user_name.'</td>
-							<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;padding: 0 8px;">'.$data[$i]->email_id.'</td>
-							
-							<td style="border-right: 1px solid #000;border-bottom: 1px solid #000;padding: 0 8px;">'.$date.'</td>
-							</tr>'; 
-					}
-				}		
-		
-								
-          
-				
-			
-            $tbody.=   '</tbody>
-          </table>
-        </td>
-	  </tr>
-   
-   
-		    </table>
-		    <!--[if (gte mso 9)|(IE)]>
-		          </td>
-		        </tr>
-		    </table>
-		    <![endif]-->
-		    </td>
-		  </tr>
-		</table>
+				</table>
+				<!--[if (gte mso 9)|(IE)]>
+				</td>
+				</tr>
+				</table>
+				<![endif]-->
+				</td>
+				</tr>
+				</table>
 
-		<!--analytics-->
+				<!--analytics-->
 
-		</body>
-		</html>' ;
+				</body>
+				</html>' ;
 
-		 echo $tbody;
-            
-           echo 'mailsent'.$mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $tbody, $bcc,'');
-             if ($mailSent==1) {
-                 echo "Send";
-             } else {
-                echo "NOT Send".$mailSent;
-             }
+	 	echo $tbody;
+	 	echo '<br/><br/>';
+        
+		$mailSent=send_email_new($from_email, $from_email_sender, $to_email, $subject, $tbody, $bcc, $cc);
+		if ($mailSent==1) {
+			echo "Send.";
+		} else {
+			echo "NOT Send.";
+		}
 
-        // load_view('invoice/emailer', $data);	
+        if($mailSent==1){
+            $logarray['table_id']=$this->session->userdata('session_id');
+            $logarray['module_name']='Reports';
+            $logarray['cnt_name']='Reports';
+            $logarray['action']='User Login Log sent.';
+            $this->user_access_log_model->insertAccessLog($logarray);
+        }
+
+    	// load_view('invoice/emailer', $data);	
     }
 	
 	public function get_sales_log(){
-	 
 		$tbody ='';
 		$from_email = 'cs@eatanytime.co.in';
         $from_email_sender = 'Wholesome Habits Pvt Ltd';

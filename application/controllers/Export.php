@@ -284,7 +284,9 @@ class Export extends CI_Controller {
 
             // $path  = 'C:/wamp64/www/eat_erp_test/assets/uploads/excel_upload/';
             // $path  = '/home/eatangcp/public_html/test/assets/uploads/excel_upload/';
-            $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/excel_upload/';
+            // $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/excel_upload/';
+
+            $path = $this->config->item('upload_path').'excel_upload/';
             
             $flag = 0;
 
@@ -1027,6 +1029,10 @@ class Export extends CI_Controller {
         $this->export_model->send_mt_stock_tracker();
     }
     
+    public function send_mt_stock_tracker_weekly() {
+        $this->export_model->send_mt_stock_tracker_weekly();
+    }
+    
     public function send_production_exception_report(){
         $this->export_model->send_production_exception_report();
     }
@@ -1072,12 +1078,20 @@ class Export extends CI_Controller {
         $this->export_model->send_beat_analysis_report('Weekly');
     }
     
-    public function send_daily_sales_performance_report($report_peroid='') {
-        $this->export_model->send_daily_sales_performance_report($report_peroid);
+    public function send_daily_sales_performance_report() {
+        $this->export_model->send_daily_sales_performance_report();
     }
     
-    public function send_daily_merchandiser_performance_report($report_peroid='') {
-        $this->export_model->send_daily_merchandiser_performance_report($report_peroid);
+    public function send_daily_merchandiser_performance_report() {
+        $this->export_model->send_daily_merchandiser_performance_report();
+    }
+    
+    public function send_weekly_sales_performance_report() {
+        $this->export_model->send_daily_sales_performance_report('Weekly');
+    }
+    
+    public function send_weekly_merchandiser_performance_report() {
+        $this->export_model->send_daily_merchandiser_performance_report('Weekly');
     }
     
 } 

@@ -117,7 +117,7 @@
                                                 <select class="form-control" name="sr_type"> <?php if(isset($data)) {if ($data[0]->sr_type=='Promoter') echo 'selected';}?>
                                                     <option value="">Select</option>
                                                     <option value="Sales Representative" <?php if(isset($data)) {if ($data[0]->sr_type=='Sales Representative') echo 'selected';}?>>Sales Representative</option>
-                                                    <option value="Promoter">Promoter</option>
+                                                    <option value="Promoter" <?php if(isset($data)) {if ($data[0]->sr_type=='Promoter') echo 'selected';}?>>Promoter</option>
                                                     <option value="Merchandizer" <?php if(isset($data)) {if ($data[0]->sr_type=='Merchandizer') echo 'selected';}?>>Merchandizer</option>
                                                 </select>
                                             </div>

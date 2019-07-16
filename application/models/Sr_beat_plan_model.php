@@ -52,7 +52,6 @@ function get_data($status='', $id=''){
     return $query->result();
 }
 
-
 function save_data($id=''){
     $now=date('Y-m-d H:i:s');
     $curusr=$this->session->userdata('session_id');
@@ -60,34 +59,26 @@ function save_data($id=''){
     $date_of_processing=$this->input->post('date_of_processing');
     if($date_of_processing==''){
         $date_of_processing=NULL;
-    }
-    else{
+    } else {
         $date_of_processing=formatdate($date_of_processing);
     }
 
     $due_date=$this->input->post('due_date');
     if($due_date==''){
         $due_date=NULL;
-    }
-    else{
+    } else {
         $due_date=formatdate($due_date);
     }
     
-	
-	
     $data = array(
         'date_of_processing' => $date_of_processing,
         'distributor_id' => $this->input->post('distributor_id'),
         'sales_rep_id' => $this->input->post('sales_rep_id'),
         'frequency' => $this->input->post('frequency'),
         'sequence' => $this->input->post('sequence'),
- 
-    
         'status' => 'Approved',
-     
         'modified_by' => $curusr,
-        'modified_on' => $now,
-      
+        'modified_on' => $now
     );
 
     if($id==''){
@@ -102,8 +93,6 @@ function save_data($id=''){
         $this->db->update('sales_rep_beat_plan',$data);
         $action='Distributor Sale Entry Modified.';
     }
-
-  
 
     $logarray['table_id']=$id;
     $logarray['module_name']='sales_rep_beat_plan';
@@ -124,11 +113,6 @@ function get_sales_rep_details(){
     return $query->result();
 }
 
-
-
-
-
-
 // function get_location_data($postData){
     // $sql = "Select  A.*,D.location from 
             // (select * from store_master) A 
@@ -147,18 +131,16 @@ function get_sales_rep_order_email(){
 }
 
 function get_sales_rep_total_visits_email($frequency=''){
-	  $day = date('l');
-        $m = date('F');
-        $year = date('Y');
-        $get_alternate  = $this->get_alternate($day,$m,$year);
-        if($get_alternate)
-        {
-            $frequency = 'Alternate '.$day;
-        }
-        else
-        {
-            $frequency = 'Every '.$day;
-        }
+    $day = date('l');
+    $m = date('F');
+    $year = date('Y');
+    $get_alternate  = $this->get_alternate($day,$m,$year);
+    if($get_alternate) {
+        $frequency = 'Alternate '.$day;
+    } else {
+        $frequency = 'Every '.$day;
+    }
+
     $sql = "SELECT (A.unplan+A.temp_count) as unplan, sales_rep_id from (SELECT count(store_id) as unplan,(Select count(id) as tem_visit_count from sales_rep_detailed_beat_plan Where bit_plan_id=0 and is_edit='edit' and date(date_of_visit)=date(now()) and frequency='".$frequency."' ) as temp_count,sales_rep_id from sales_rep_detailed_beat_plan Where date(date_of_visit)=date(now()) and store_id IN ( Select DISTINCT store_id from sales_rep_beat_plan Where date(created_on)= date(now()))and frequency='".$frequency."'  ) A UNION SELECT count(store_id) as unplan,sales_rep_id from sales_rep_detailed_beat_plan Where date(date_of_visit)=date(now()) and store_id IN ( Select DISTINCT store_id from sales_rep_beat_plan Where date(created_on)<>date(now())) and frequency='".$frequency."' UNION SELECT count(store_id) as unplan,sales_rep_id from sales_rep_detailed_beat_plan Where date(date_of_visit)=date(now()) and store_id IN ( Select DISTINCT store_id from sales_rep_beat_plan Where date(created_on)<>date(now()))and is_edit='edit' and frequency='".$frequency."'";
     $query=$this->db->query($sql);
     return $query->result();
@@ -226,19 +208,14 @@ function get_sales_rep_email($frequency=''){
         return $query->result();
 }
 
-
-public function get_sales_rep_daily_route_plan($frequency='')
-{
+public function get_sales_rep_daily_route_plan($frequency='') {
     $day = date('l');
     $m = date('F');
     $year = date('Y');
     $get_alternate  = $this->get_alternate($day,$m,$year);
-    if($get_alternate)
-    {
+    if($get_alternate) {
         $frequency = 'Alternate '.$day;
-    }
-    else
-    {
+    } else {
         $frequency = 'Every '.$day;
     }
 
@@ -289,61 +266,65 @@ public function get_sales_rep_daily_route_plan($frequency='')
         return $query->result();
 }
 
-
 function get_sales_rep1_email($frequency=''){
-	 $day = date('l');
-        $m = date('F');
-        $year = date('Y');
-        $get_alternate  = $this->get_alternate($day,$m,$year);
-        if($get_alternate)
-        {
-            $frequency = 'Alternate '.$day;
-        }
-        else
-        {
-            $frequency = 'Every '.$day;
-        }
+    $day = date('l');
+    $m = date('F');
+    $year = date('Y');
+    $get_alternate  = $this->get_alternate($day,$m,$year);
+    if($get_alternate) {
+        $frequency = 'Alternate '.$day;
+    } else {
+        $frequency = 'Every '.$day;
+    }
     $sql = "select count(distinct(sales_rep_id)) as total_sales_rep from sales_rep_detailed_beat_plan where frequency='".$frequency."' and sales_rep_id NOT IN(2) ";
     $query=$this->db->query($sql);
     return $query->result();
 }
+
 function get_sales_rep2_email($frequency=''){
-		 $day = date('l');
-        $m = date('F');
-        $year = date('Y');
-        $get_alternate  = $this->get_alternate($day,$m,$year);
-        if($get_alternate)
-        {
-            $frequency = 'Alternate '.$day;
-        }
-        else
-        {
-            $frequency = 'Every '.$day;
-        }
+    $day = date('l');
+    $m = date('F');
+    $year = date('Y');
+    $get_alternate  = $this->get_alternate($day,$m,$year);
+    if($get_alternate) {
+        $frequency = 'Alternate '.$day;
+    } else {
+        $frequency = 'Every '.$day;
+    }
     $sql = "select count(distinct(sales_rep_id)) as present_sales_rep from sales_rep_detailed_beat_plan Where date(date_of_visit)=date(now()) and frequency='".$frequency."' and sales_rep_id NOT IN(2)";
     $query=$this->db->query($sql);
     return $query->result();
 }
 
- public function get_alternate($day,$m,$year)
-    {
-        
-        $date1 = date('d-m-Y', strtotime('second '.$day.' of '.$m.' '.$year));
-        $date2 = date('d-m-Y', strtotime('fourth '.$day.' of '.$m.' '.$year));
+public function get_alternate($day,$m,$year){
+    $date1 = date('d-m-Y', strtotime('second '.$day.' of '.$m.' '.$year));
+    $date2 = date('d-m-Y', strtotime('fourth '.$day.' of '.$m.' '.$year));
 
-        $todaysdate = date('d-m-Y');
-        if($date1==$todaysdate) 
-        {
-            return true;
-        }
-        elseif($date2==$todaysdate)
-        {
-            return true;
-        }
-        else
-        {
-           return false;
-        }
+    $todaysdate = date('d-m-Y');
+    if($date1==$todaysdate) {
+     return true;
+    } elseif($date2==$todaysdate) {
+        return true;
+    } else {
+        return false;
     }
+}
+
+public function get_sales_rep_list(){
+    // $sales_rep_id = '148';
+    $sales_rep_id = '';
+    if($this->input->post('sales_rep_id')) {
+        $sales_rep_id = $this->input->post('sales_rep_id');
+    }
+
+    $sql = "select distinct A.sales_rep_id, B.id, B.sales_rep_name, B.mobile, B.zone, C.zone as my_zone 
+            from beat_allocations A 
+            left join sales_rep_master B on (A.sales_rep_id=B.id) 
+            left join sales_rep_master C on (A.reporting_manager_id=C.id) 
+            where A.reporting_manager_id = '$sales_rep_id' and B.id is not null";
+    $result = $this->db->query($sql)->result();
+    return $result;
+}
+
 }
 ?>

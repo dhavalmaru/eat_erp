@@ -12,6 +12,7 @@ class Dashboard_mobile_app extends CI_Controller
         $this->load->helper('form');
         $this->load->library('session');
         $this->load->library('email');
+        $this->load->database();
         $this->load->helper('common_functions');
         $this->load->model('dashboard_sales_rep_model');
         $this->load->model('sales_rep_distributor_model');
@@ -21,12 +22,11 @@ class Dashboard_mobile_app extends CI_Controller
 		$this->load->model('store_model');
         $this->load->model('product_model');
         $this->load->model('sr_beat_plan_model');
-        $this->load->database();
         $this->load->model('Sales_Attendence_model');
+        $this->load->model('Notification_model');
     }
 
     public function get_alternate($day,$m,$year){
-        
         $date1 = date('d-m-Y', strtotime('second '.$day.' of '.$m.' '.$year));
         $date2 = date('d-m-Y', strtotime('fourth '.$day.' of '.$m.' '.$year));
 
@@ -308,6 +308,20 @@ class Dashboard_mobile_app extends CI_Controller
         }
 
         echo $version;
+    }
+
+    public function get_sales_rep_list_api(){
+        $result = $this->sr_beat_plan_model->get_sales_rep_list();
+        echo json_encode($result);
+    }
+
+    public function set_notifications_api(){
+        $this->Notification_model->add_app_notification();
+    }
+
+    public function get_notifications_api(){
+        $result = $this->Notification_model->get_app_notification();
+        echo json_encode($result);
     }
 }
 ?>

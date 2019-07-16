@@ -177,38 +177,12 @@ class Sales_rep extends CI_Controller{
     }
 
     public function email_route_plan(){
-        // $date = date('Y-m-d');
-        // // $date = '2017-04-15';
-        // $from_email = 'cs@eatanytime.in';
-        // $from_email_sender = 'Eat ERP';
-        // // $to_email = 'rishit.sanghvi@eatanytime.in';
-        // // $to_email = 'prasad.bhisale@otbconsulting.co.in';
-        // $to_email = 'dhaval.maru@otbconsulting.co.in';
-        // $subject = 'Route Plan For - ' . $date;
-        // $links = '';
-
-        // $data = $this->sales_rep_model->get_sales_rep_details($date);
-        // for($i=0; $i<count($data); $i++){
-        //     $links = $links.($i+1).'. <a href="'.base_url().'index.php/sales_rep/get_route_plan/'.$data[$i]->sales_rep_id.'/'.$date.'" target="_new">'.$data[$i]->sales_rep_name.'</a><br/>';
-        // }
-
-        // if($links!=''){
-        //     $message = '<html><head></head><body>Hi,<br /><br />
-        //             Please find Sales Representative Route Plan For - '.$date.'. <br /><br />'.$links.'<br/>
-        //             <br />Thanks</body></html>';
-        //     $mailSent=send_email($from_email,  $from_email_sender, $to_email, $subject, $message);
-
-        //     echo $message;
-        //     echo '<br/>';
-        //     echo $mailSent;
-        // }
-
-        $this->email_sales_rep_loc();
+        // $this->email_sales_rep_loc();
     }
 
     public function email_sales_rep_loc(){
         $date = date('Y-m-d');
-        // $date = '2017-03-22';
+        // $date = '2019-07-12';
         $from_email = 'cs@eatanytime.in';
         $from_email_sender = 'Eat ERP';
         // $bcc = 'prasad.bhisale@otbconsulting.co.in';
@@ -370,11 +344,14 @@ class Sales_rep extends CI_Controller{
                 $message = '<html><head></head><body>Hi,<br /><br />
                             Please find below '.$data[$i]->sales_rep_name.' Location For - '.$date.'. <br /><br />'.$table.'<br/>
                             <br />Thanks</body></html>';
-                $to_email = $data[$i]->email_id.',rishit.sanghvi@eatanytime.in,swapnil.darekar@eatanytime.in';
-                $bcc="dhaval.maru@otbconsulting.co.in";
-                // $to_email = 'dhaval.maru@otbconsulting.co.in,dhavalbright@gmail.com';
-                // $to_email = 'dhaval.maru@otbconsulting.co.in';
-                $mailSent=send_email($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc);
+
+                // $to_email = 'prasad.bhisale@pecanreams.com';
+                // $bcc = 'prasad.bhisale@pecanreams.com';
+
+                $to_email = $data[$i]->email_id.', rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in';
+                $bcc="ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, prasad.bhisale@pecanreams.com";
+
+                $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc);
 
                 echo $message;
                 echo '<br/>';

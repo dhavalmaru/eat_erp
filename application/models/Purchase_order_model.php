@@ -444,7 +444,10 @@ function send_email($id){
                             '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Purchase Order Date: '.(($order_date!=null && $order_date!='')?date('d-M-y',strtotime($order_date)):'').'<br />' .
                             '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Total: Rs '.$total_amount.'<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--------------------------------------------------------------------------' .
                             '</body></html>';
-                $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/'; 
+
+                // $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/';
+                $path = $this->config->item('upload_path');
+
                 $pdfFilePath = $path."purchase_order_".time().".pdf";            
                 $this->generate_purchase_order($id,$pdfFilePath);
                 $now=date('Y-m-d H:i:s');
@@ -542,7 +545,9 @@ function send_email($id){
                     $output = $this->parser->parse('purchase_order/purchase_order.php',$data,true);
                 }
                 
-                $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/'; 
+                // $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/';
+                $path = $this->config->item('upload_path');
+
                 $pdfFilePath = $path."purchase_order_".time().".pdf";
                 $this->load->library('m_pdf');
                 $this->m_pdf->pdf->WriteHTML($output);

@@ -31,12 +31,11 @@ function get_sales_rep_route($status='', $id=''){
     } else if($status=="Approved") {
         $cond=" where status='Approved' ";
     } else if($status!="") {
-        $cond=" where status='Approved' and sr_type='Sales Representative
-'";
+        $cond=" where status='Approved' and sr_type='Sales Representative'";
     }
-   // else {
-       // $cond=" where status='Approved'";   
-   // }
+    // else {
+        // $cond=" where status='Approved'";   
+    // }
 
 
     if($id!=""){
