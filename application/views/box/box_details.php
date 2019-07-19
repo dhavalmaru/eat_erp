@@ -22,13 +22,13 @@
             input[readonly] {background-color: white !important; 
                             color: #0b385f !important; 
                             cursor: not-allowed !important;}
-		.form-control[disabled], .form-control[readonly]
+            .form-control[disabled], .form-control[readonly]
 			{
 				border:none!important;
 				background-color:transparent!important;
 				box-shadow:none!important;
 			}
-		#total_amount,#total_grams
+            #total_amount,#total_grams
 			{
 				border:none!important;
 				background-color:transparent!important;
@@ -41,14 +41,17 @@
     </head>
     <body>								
         <!-- START PAGE CONTAINER -->
-         <div class="page-container page-navigation-top">            
+        <div class="page-container page-navigation-top">            
             <!-- PAGE CONTENT -->
-			   <?php $this->load->view('templates/menus');?>
-              <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
-                   <div class="heading-h2"><a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp; <a href="<?php echo base_url().'index.php/box'; ?>" > Box List </a>  &nbsp; &#10095; &nbsp; Box Details</div>
+            <?php $this->load->view('templates/menus');?>
+            <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
+                <div class="heading-h2">
+                    <a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp; 
+                    <a href="<?php echo base_url().'index.php/box'; ?>" > Box List </a>  &nbsp; &#10095; &nbsp; Box Details
+                </div>
 				   
                 <!-- PAGE CONTENT WRAPPER -->
-               <div class="page-content-wrap">
+                <div class="page-content-wrap">
                     <div class="row main-wrapper">
 					    <div class="main-container">           
                          <div class="box-shadow">
@@ -80,6 +83,14 @@
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Short Name <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="short_name" id="short_name" placeholder="Short Name" value="<?php if(isset($data)) { echo $data[0]->short_name; } ?>"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">ASIN <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="asin" id="asin" placeholder="ASIN" value="<?php if(isset($data)) { echo $data[0]->asin; } ?>"/>
                                             </div>
                                         </div>
                                     </div>

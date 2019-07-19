@@ -15974,8 +15974,8 @@ public function generate_mt_stock_report() {
 }
 
 public function send_mt_stock_tracker() {
-    // $date = '2019-07-11';
     $date = date('Y-m-d');
+    // $date = '2019-07-16';
 
     // $zone_id_array = ['16'];
     // $zone_array = ['Mumbai'];
@@ -17283,8 +17283,8 @@ public function get_mt_stock_report_weekly($date='', $action='save') {
 }
 
 public function send_exception_report() {
-    // $date = '2019-07-11';
     $date = date('Y-m-d');
+    // $date = '2019-07-16';
 
     //and (A.ref_id is null or A.ref_id = '')  removed this from sales and Sales Return 
     //and date(A.created_on)<date('".$date."') bcoz ref_id is only assign to previous approved
@@ -17810,8 +17810,8 @@ public function send_production_exception_report(){
     $post_production = $this->get_post_production_cnt();
     $po_count = $this->get_po_count();
 
-    // $date = '11.07.2019';
-    $date = date("d.m.Y");
+    $date = date("Y-m-d");
+    // $date = '2019-07-16';
     $tbody ='';
 
     if(count($task)>0 || count($pre_production) || count($post_production)) {
@@ -17924,7 +17924,7 @@ public function send_production_exception_report(){
                     Dear All,
                     <br><br>
                     
-                    Kindly find the updated Production Exception report As On '.$date.'
+                    Kindly find the updated Production Exception report As On '.date('d-m-Y',strtotime($date)).'
                     
                     <br><br>
 
@@ -18239,7 +18239,7 @@ public function send_production_exception_report(){
             $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn($col)->setAutoSize(true);
         }
 
-        $filename = 'Production_Report_'.date('d-m-Y').'.xls';
+        $filename = 'Production_Report_'.date('d-m-Y',strtotime($date)).'.xls';
         // $path = 'C:/wamp64/www/eat_erp/assets/uploads/production_reports/';
         // $upload_path = 'C:/wamp64/www/eat_erp/assets/uploads/production_reports';
 
@@ -18299,7 +18299,7 @@ public function send_production_exception_report(){
         $bcc = $result[0]->bcc_email;
     }
 
-    $subject = 'Production Exception Report -'.date("d F Y",strtotime("now"));
+    $subject = 'Production Exception Report -'.date("d-m-Y",strtotime($date));
 
     echo '<br/><br/>mail '.$mailSent=send_email_new($from_email, $from_email_sender, $to_email, $subject, $tbody, $bcc, $cc, $attachment);
     if ($mailSent==1) {
@@ -18755,8 +18755,8 @@ function generate_beat_analysis_report($f_date='', $t_date='', $action='') {
 
 public function send_daily_sales_performance_report($report_peroid='') {
     if($report_peroid=='Weekly'){
-        // $date = '2019-07-11';
         $date = date('Y-m-d');
+        // $date = '2019-07-16';
         $reportpath = '';
 
         $from_date = date('Y-m-d', (strtotime('-6 day', strtotime($date))));
@@ -18771,8 +18771,8 @@ public function send_daily_sales_performance_report($report_peroid='') {
     } else {
         $report_peroid = 'Daily';
 
-        // $date = '2019-07-11';
         $date = date('Y-m-d');
+        // $date = '2019-07-16';
         $reportpath = '';
 
         echo $date;
@@ -18782,8 +18782,8 @@ public function send_daily_sales_performance_report($report_peroid='') {
     }
 
     if($reportpath!=''){
-        // $report_date = '11-07-2019';
         $report_date = date('d-m-Y');
+        // $report_date = '16-07-2019';
 
         $message = '<html>
                     <body>
@@ -18867,8 +18867,8 @@ function generate_daily_sales_performance_report($f_date='', $t_date='', $action
     // $from_date = '2018-04-01';
     // $to_date = '2019-03-31';
 
-    // $report_date = '11-07-2019';
     $report_date = date('d-m-Y');
+    // $report_date = '16-07-2019';
 
     $cnt = 0;
 
@@ -19348,8 +19348,8 @@ function generate_daily_sales_performance_report($f_date='', $t_date='', $action
 
 public function send_daily_merchandiser_performance_report($report_peroid='') {
     if($report_peroid=='Weekly'){
-        // $date = '2019-07-11';
         $date = date('Y-m-d');
+        // $date = '2019-07-16';
         $reportpath = '';
 
         $from_date = date('Y-m-d', (strtotime('-6 day', strtotime($date))));
@@ -19364,8 +19364,8 @@ public function send_daily_merchandiser_performance_report($report_peroid='') {
     } else {
         $report_peroid = 'Daily';
 
-        // $date = '2019-07-11';
         $date = date('Y-m-d');
+        // $date = '2019-07-16';
         $reportpath = '';
 
         echo $date;
@@ -19375,8 +19375,8 @@ public function send_daily_merchandiser_performance_report($report_peroid='') {
     }
 
     if($reportpath!=''){
-        // $report_date = '11-07-2019';
         $report_date = date('d-m-Y');
+        // $report_date = '16-07-2019';
 
         $message = '<html>
                     <body>
@@ -19460,8 +19460,8 @@ function generate_daily_merchandiser_performance_report($f_date='', $t_date='', 
     // $from_date = '2018-04-01';
     // $to_date = '2019-03-31';
 
-    // $report_date = '11-07-2019';
     $report_date = date('d-m-Y');
+    // $report_date = '16-07-2019';
 
     $cnt = 0;
 
