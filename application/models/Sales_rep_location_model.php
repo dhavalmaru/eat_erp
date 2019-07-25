@@ -1186,6 +1186,81 @@ function get_batch_details(){
     return $query->result();
 }
 
+function get_batch_qty_details($visit_id, $channel_type){
+    $batch_detail = array();
+
+    $sql = "select * from store_batch_details where visit_id = '$visit_id' and channel_type = '$channel_type'";
+    $result = $this->db->query($sql)->result();
+
+    for($i=0; $i<count($result); $i++) {
+        if($result[$i]->item_id==37 && $result[$i]->type=='Box') {
+            $batch_detail['chocolate_cookies'][] = array($result[$i]->batch_no=>$result[$i]->qty);
+        }
+        if($result[$i]->item_id==38 && $result[$i]->type=='Box') {
+            $batch_detail['dark_chocolate_cookies'][] = array($result[$i]->batch_no=>$result[$i]->qty);
+        }
+        if($result[$i]->item_id==39 && $result[$i]->type=='Box') {
+            $batch_detail['cranberry_cookies'][] = array($result[$i]->batch_no=>$result[$i]->qty);
+        }
+        if($result[$i]->item_id==42 && $result[$i]->type=='Box') {
+            $batch_detail['cranberry_orange_zest'][] = array($result[$i]->batch_no=>$result[$i]->qty);
+        }
+        if($result[$i]->item_id==41 && $result[$i]->type=='Box') {
+            $batch_detail['fig_raisins'][] = array($result[$i]->batch_no=>$result[$i]->qty);
+        }
+        if($result[$i]->item_id==40 && $result[$i]->type=='Box') {
+            $batch_detail['papaya_pineapple'][] = array($result[$i]->batch_no=>$result[$i]->qty);
+        }
+        if($result[$i]->item_id==1 && $result[$i]->type=='Bar') {
+            $batch_detail['orange_bar'][] = array($result[$i]->batch_no=>$result[$i]->qty);
+        }
+        if($result[$i]->item_id==1 && $result[$i]->type=='Box') {
+            $batch_detail['orange_box'][] = array($result[$i]->batch_no=>$result[$i]->qty);
+        }
+        if($result[$i]->item_id==3 && $result[$i]->type=='Bar') {
+            $batch_detail['butterscotch_bar'][] = array($result[$i]->batch_no=>$result[$i]->qty);
+        }
+        if($result[$i]->item_id==3 && $result[$i]->type=='Box') {
+            $batch_detail['butterscotch_box'][] = array($result[$i]->batch_no=>$result[$i]->qty);
+        }
+        if($result[$i]->item_id==5 && $result[$i]->type=='Bar') {
+            $batch_detail['chocopeanut_bar'][] = array($result[$i]->batch_no=>$result[$i]->qty);
+        }
+        if($result[$i]->item_id==9 && $result[$i]->type=='Box') {
+            $batch_detail['chocopeanut_box'][] = array($result[$i]->batch_no=>$result[$i]->qty);
+        }
+        if($result[$i]->item_id==4 && $result[$i]->type=='Bar') {
+            $batch_detail['bambaiyachaat_bar'][] = array($result[$i]->batch_no=>$result[$i]->qty);
+        }
+        if($result[$i]->item_id==8 && $result[$i]->type=='Box') {
+            $batch_detail['bambaiyachaat_box'][] = array($result[$i]->batch_no=>$result[$i]->qty);
+        }
+        if($result[$i]->item_id==6 && $result[$i]->type=='Bar') {
+            $batch_detail['mangoginger_bar'][] = array($result[$i]->batch_no=>$result[$i]->qty);
+        }
+        if($result[$i]->item_id==12 && $result[$i]->type=='Box') {
+            $batch_detail['mangoginger_box'][] = array($result[$i]->batch_no=>$result[$i]->qty);
+        }
+        if($result[$i]->item_id==9 && $result[$i]->type=='Bar') {
+            $batch_detail['berry_blast_bar'][] = array($result[$i]->batch_no=>$result[$i]->qty);
+        }
+        if($result[$i]->item_id==29 && $result[$i]->type=='Box') {
+            $batch_detail['berry_blast_box'][] = array($result[$i]->batch_no=>$result[$i]->qty);
+        }
+        if($result[$i]->item_id==10 && $result[$i]->type=='Bar') {
+            $batch_detail['chyawanprash_bar'][] = array($result[$i]->batch_no=>$result[$i]->qty);
+        }
+        if($result[$i]->item_id==31 && $result[$i]->type=='Box') {
+            $batch_detail['chyawanprash_box'][] = array($result[$i]->batch_no=>$result[$i]->qty);
+        }
+        if($result[$i]->item_id==32 && $result[$i]->type=='Box') {
+            $batch_detail['variety_box'][] = array($result[$i]->batch_no=>$result[$i]->qty);
+        }
+    }
+
+    return $batch_detail;
+}
+
 
 }
 ?>

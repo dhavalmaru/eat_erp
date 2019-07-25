@@ -323,5 +323,19 @@ class Dashboard_mobile_app extends CI_Controller
         $result = $this->Notification_model->get_app_notification();
         echo json_encode($result);
     }
+
+    public function get_sales_rep_attendance_api() {
+        $sales_rep_id = $this->input->post('sales_rep_id');
+        $sql = "select * from sales_attendence where sales_rep_id = '$sales_rep_id'";
+        $result = $this->db->query($sql)->result();
+        echo json_encode($result);
+    }
+
+    public function get_sales_rep_visit_count_api() {
+        $sales_rep_id = $this->input->post('sales_rep_id');
+        $sql = "select * from daily_visit_count where sales_rep_id = '$sales_rep_id' order by date_of_visit";
+        $result = $this->db->query($sql)->result();
+        echo json_encode($result);
+    }
 }
 ?>

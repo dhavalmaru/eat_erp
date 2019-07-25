@@ -731,16 +731,22 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
         }
 
         if($get_channel_type=='GT') {
+            $data['created_on']='';
+            $data['created_by']='';
             if($temp!='') {
                 $result = $this->sales_rep_location_model->get_data('', $id);
-                $data['created_on']='';
-                $data['created_by']='';
             } else {
+                $bit_id = 0;
                 $result = $this->Sales_location_model->get_data('Approved', $id, '', '', $sales_rep_id);
-                $bit_id = $result[0]->bit_plan_id;
+                if(count($result)>0) {
+                    $bit_id = $result[0]->bit_plan_id;
+                }
+                
                 $get_result = $this->db->query("select created_on,created_by from sales_rep_beat_plan Where id='$bit_id'")->result_array();
-                $data['created_on'] = $get_result[0]['created_on'];
-                $data['created_by'] = $get_result[0]['created_by'];
+                if(count($get_result)>0) {
+                    $data['created_on'] = $get_result[0]['created_on'];
+                    $data['created_by'] = $get_result[0]['created_by'];
+                }
             }
 
             // echo json_encode($result);
@@ -780,6 +786,8 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                 $data['stock_detail']=$result[0];
 
                 $data['data1'] = $this->sales_rep_location_model->get_data_qty('', $data['data'][0]->mid);
+
+                $data['batch_detail'] = $this->sales_rep_location_model->get_batch_qty_details($sales_rep_loc_id, $get_channel_type);
             // }
         } else {
             if($temp!='') {
@@ -916,6 +924,8 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                 }
 
                 $data['data1'][0] = (object) $data1_obj;
+
+                $data['batch_detail'] = $this->sales_rep_location_model->get_batch_qty_details($merchandiser_stock_id, $get_channel_type);
 
             // }
         }
@@ -3528,6 +3538,90 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
             }
         }
 
+        if($visit_id!=''){
+            $batch_detail = $this->input->post('batch_detail');
+
+            if($batch_detail!=''){
+                $batch_detail = json_decode($batch_detail, true);
+
+                $batch_detail_array = array();
+                $channel_type = (isset($visit_detail['channel_type'])?$visit_detail['channel_type']:'');
+
+                foreach($batch_detail as $key => $value) {
+                    $item_id=0;
+                    $item_type='';
+
+                    switch ($key){
+                        case 'chocolate_cookies': $item_id=37; $item_type='Box';
+                        break;
+                        case 'dark_chocolate_cookies': $item_id=38; $item_type='Box';
+                        break;
+                        case 'cranberry_cookies': $item_id=39; $item_type='Box';
+                        break;
+                        case 'cranberry_orange_zest': $item_id=42; $item_type='Box';
+                        break;
+                        case 'fig_raisins': $item_id=41; $item_type='Box';
+                        break;
+                        case 'papaya_pineapple': $item_id=40; $item_type='Box';
+                        break;
+                        case 'orange_bar': $item_id=1; $item_type='Bar';
+                        break;
+                        case 'orange_box': $item_id=1; $item_type='Box';
+                        break;
+                        case 'butterscotch_bar': $item_id=3; $item_type='Bar';
+                        break;
+                        case 'butterscotch_box': $item_id=3; $item_type='Box';
+                        break;
+                        case 'chocopeanut_bar': $item_id=5; $item_type='Bar';
+                        break;
+                        case 'chocopeanut_box': $item_id=9; $item_type='Box';
+                        break;
+                        case 'bambaiyachaat_bar': $item_id=4; $item_type='Bar';
+                        break;
+                        case 'bambaiyachaat_box': $item_id=8; $item_type='Box';
+                        break;
+                        case 'mangoginger_bar': $item_id=6; $item_type='Bar';
+                        break;
+                        case 'mangoginger_box': $item_id=12; $item_type='Box';
+                        break;
+                        case 'berry_blast_bar': $item_id=9; $item_type='Bar';
+                        break;
+                        case 'berry_blast_box': $item_id=29; $item_type='Box';
+                        break;
+                        case 'chyawanprash_bar': $item_id=10; $item_type='Bar';
+                        break;
+                        case 'chyawanprash_box': $item_id=31; $item_type='Box';
+                        break;
+                        case 'variety_box': $item_id=32; $item_type='Box';
+                        break;
+                    }
+
+                    if($item_type!=''){
+                        $batch_qty = json_decode($value, true);
+
+                        foreach($batch_qty as $key2 => $value2) {
+                            $data = array(
+                                        'visit_id'=>$visit_id,
+                                        'channel_type'=>$channel_type,
+                                        'type'=>$item_type,
+                                        'item_id'=>$item_id,
+                                        'batch_no'=>$key2,
+                                        'qty'=>$value2
+                                    );
+                            $batch_detail_array[] = $data;
+                        }
+                    }
+                }
+
+                if(count($batch_detail_array)>0) {
+                    $this->db->where("visit_id='".$visit_id."' and channel_type='".$channel_type."'")->delete('store_batch_details');
+                    $this->db->insert_batch('store_batch_details',$batch_detail_array);
+                } 
+            }
+        }
+        
+
+
         // $this->session->unset_userdata('visit_detail');
         // $this->session->unset_userdata('retailer_detail');
         // $this->session->unset_userdata('temp_stock_details');
@@ -3563,7 +3657,7 @@ class Sales_rep_store_plan_mobile_app extends CI_Controller {
                 }
             }
         }
-        
+
         echo json_encode($data);
     }
 

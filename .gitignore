@@ -4,5 +4,8 @@ uploads/
 # Ignore folder named `assets/uploads`
 assets/uploads/
 
+# Ignore folder named `assets/uploads`
+assets/aws_api/src/MarketplaceWebServiceOrders/Samples/.config.inc.php
+
 # Ignore file named `application/config/config.php`
 application/config/config.php

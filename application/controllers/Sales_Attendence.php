@@ -125,6 +125,7 @@ class Sales_Attendence extends CI_controller {
     	$now=date('Y-m-d H:i:s');
     	$now1=date('Y-m-d');
     	$sales_rep_id=$this->session->userdata('sales_rep_id');
+
     	$where_array= array('date(check_in_time)'=>$now1, 'sales_rep_id'=>$sales_rep_id);
 
     	$result = $this->db->select("sales_rep_id, id")->where($where_array)->get('sales_attendence')->result();
@@ -135,6 +136,7 @@ class Sales_Attendence extends CI_controller {
     		$this->db->where('id', $result[0]->id);
     		$this->db->update('sales_attendence', $sales_attendence);
     		$this->session->set_userdata('check_out_time',$now);
+
     		redirect(base_url().'index.php/Sales_Attendence');
     	}
     	else
@@ -972,6 +974,54 @@ class Sales_Attendence extends CI_controller {
     		$data['check_out_time'] = $now;
     		$data['redirect'] = 'Dashboard_sales_rep';
 
+
+		$actual_count = 0;
+		$total_count = 0;
+		$unplanned_count = 0;
+		$p_call = 0;
+		$trailmix = 0;
+		$cookies = 0;
+		$bars = 0;
+
+		if($this->input->post('actual_count')){
+			$actual_count = $this->input->post('actual_count');
+		}
+		if($this->input->post('total_count')){
+			$total_count = $this->input->post('total_count');
+		}
+		if($this->input->post('unplanned_count')){
+			$unplanned_count = $this->input->post('unplanned_count');
+		}
+		if($this->input->post('p_call')){
+			$p_call = $this->input->post('p_call');
+		}
+		if($this->input->post('trailmix')){
+			$trailmix = $this->input->post('trailmix');
+		}
+		if($this->input->post('cookies')){
+			$cookies = $this->input->post('cookies');
+		}
+		if($this->input->post('bars')){
+			$bars = $this->input->post('bars');
+		}
+		
+		if($total_count!=0){
+			$data1 = array(
+                            'date_of_visit'=>$now1,
+                            'sales_rep_id'=>$sales_rep_id,
+                            'actual_count'=>$actual_count,
+                            'total_count'=>$total_count,
+                            'unplanned_count'=>$unplanned_count,
+                            'p_call'=>$p_call,
+                            'trailmix'=>$trailmix,
+                            'cookies'=>$cookies,
+                            'bars'=>$bars
+                        );
+			$this->db->where("date_of_visit='".$now1."' and sales_rep_id='".$sales_rep_id."'")->delete('daily_visit_count');
+            $this->db->insert('daily_visit_count',$data1);
+		}
+
+		$data['check_out_time'] = $now;
 		echo $data['check_out_time'];
     }
 }

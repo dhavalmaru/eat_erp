@@ -78,7 +78,7 @@ $serviceUrl = "https://mws.amazonservices.in/Orders/2013-09-01";
  // @TODO: set request. Action can be passed as MarketplaceWebServiceOrders_Model_GetOrder
  $request = new MarketplaceWebServiceOrders_Model_GetOrderRequest();
  $request->setSellerId(MERCHANT_ID);
- $request->setAmazonOrderId("408-1055488-9217907");
+ $request->setAmazonOrderId("407-7982199-7985130");
  // object or array of parameters
  invokeGetOrder($service, $request);
 
