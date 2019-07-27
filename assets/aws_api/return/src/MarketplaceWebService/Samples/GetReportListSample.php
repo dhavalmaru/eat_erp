@@ -49,7 +49,7 @@ include_once ('.config.inc.php');
 // Canada
 //$serviceUrl = "https://mws.amazonservices.ca";
 // India
-//$serviceUrl = "https://mws.amazonservices.in";
+$serviceUrl = "https://mws.amazonservices.in";
 
 $config = array (
   'ServiceURL' => $serviceUrl,
@@ -100,14 +100,16 @@ $config = array (
 // 
 // $request = new MarketplaceWebService_Model_GetReportListRequest($parameters);
  
-// $request = new MarketplaceWebService_Model_GetReportListRequest();
-// $request->setMerchant(MERCHANT_ID);
-// $request->setAvailableToDate(new DateTime('now', new DateTimeZone('UTC')));
-// $request->setAvailableFromDate(new DateTime('-3 months', new DateTimeZone('UTC')));
-// $request->setAcknowledged(false);
-// $request->setMWSAuthToken('<MWS Auth Token>'); // Optional
+$request = new MarketplaceWebService_Model_GetReportListRequest();
+$request->setMerchant(MERCHANT_ID);
+$request->setAvailableToDate(new DateTime('now', new DateTimeZone('UTC')));
+$request->setAvailableFromDate(new DateTime('-3 months', new DateTimeZone('UTC')));
+$request->setAcknowledged(false);
+$request->setMWSAuthToken('529421203372'); // Optional
+// $request->setReportTypeList('_GET_FBA_FULFILLMENT_CUSTOMER_RETURNS_DATA_');
+// $request->setReportRequestIdList('113078018102');
  
-// invokeGetReportList($service, $request);
+invokeGetReportList($service, $request);
                                                                     
 /**
   * Get Report List Action Sample
@@ -122,69 +124,82 @@ $config = array (
       try {
               $response = $service->getReportList($request);
               
-                echo ("Service Response\n");
-                echo ("=============================================================================\n");
+                // echo ("Service Response\n");
+                // echo ("=============================================================================\n");
 
-                echo("        GetReportListResponse\n");
+                // echo("        GetReportListResponse\n");
                 if ($response->isSetGetReportListResult()) { 
-                    echo("            GetReportListResult\n");
+                    // echo("            GetReportListResult\n");
                     $getReportListResult = $response->getGetReportListResult();
-                    if ($getReportListResult->isSetNextToken()) 
-                    {
-                        echo("                NextToken\n");
-                        echo("                    " . $getReportListResult->getNextToken() . "\n");
-                    }
-                    if ($getReportListResult->isSetHasNext()) 
-                    {
-                        echo("                HasNext\n");
-                        echo("                    " . $getReportListResult->getHasNext() . "\n");
-                    }
+                    // if ($getReportListResult->isSetNextToken()) 
+                    // {
+                    //     echo("                NextToken\n");
+                    //     echo("                    " . $getReportListResult->getNextToken() . "\n");
+                    // }
+                    // if ($getReportListResult->isSetHasNext()) 
+                    // {
+                    //     echo("                HasNext\n");
+                    //     echo("                    " . $getReportListResult->getHasNext() . "\n");
+                    // }
                     $reportInfoList = $getReportListResult->getReportInfoList();
                     foreach ($reportInfoList as $reportInfo) {
-                        echo("                ReportInfo\n");
-                        if ($reportInfo->isSetReportId()) 
-                        {
-                            echo("                    ReportId\n");
-                            echo("                        " . $reportInfo->getReportId() . "\n");
-                        }
-                        if ($reportInfo->isSetReportType()) 
-                        {
-                            echo("                    ReportType\n");
-                            echo("                        " . $reportInfo->getReportType() . "\n");
-                        }
-                        if ($reportInfo->isSetReportRequestId()) 
-                        {
-                            echo("                    ReportRequestId\n");
-                            echo("                        " . $reportInfo->getReportRequestId() . "\n");
-                        }
-                        if ($reportInfo->isSetAvailableDate()) 
-                        {
-                            echo("                    AvailableDate\n");
-                            echo("                        " . $reportInfo->getAvailableDate()->format(DATE_FORMAT) . "\n");
-                        }
-                        if ($reportInfo->isSetAcknowledged()) 
-                        {
-                            echo("                    Acknowledged\n");
-                            echo("                        " . $reportInfo->getAcknowledged() . "\n");
-                        }
-                        if ($reportInfo->isSetAcknowledgedDate()) 
-                        {
-                            echo("                    AcknowledgedDate\n");
-                            echo("                        " . $reportInfo->getAcknowledgedDate()->format(DATE_FORMAT) . "\n");
-                        }
-                    }
-                } 
-                if ($response->isSetResponseMetadata()) { 
-                    echo("            ResponseMetadata\n");
-                    $responseMetadata = $response->getResponseMetadata();
-                    if ($responseMetadata->isSetRequestId()) 
-                    {
-                        echo("                RequestId\n");
-                        echo("                    " . $responseMetadata->getRequestId() . "\n");
-                    }
-                } 
+                        $report_type = $reportInfo->getReportType();
+                        $report_request_id = $reportInfo->getReportRequestId();
+                        
+                        echo $report_type;
+                        echo '<br/><br/>';
+                        echo $report_request_id;
+                        echo '<br/><br/>';
 
-                echo("            ResponseHeaderMetadata: " . $response->getResponseHeaderMetadata() . "\n");
+                        if($report_type=='_GET_FBA_FULFILLMENT_CUSTOMER_RETURNS_DATA_' && $report_request_id=='113111018104'){
+                            // echo("                ReportInfo\n");
+                            if ($reportInfo->isSetReportId()) 
+                            {
+                                echo("                    ReportId\n");
+                                echo("                        " . $reportInfo->getReportId() . "\n");
+                            }
+                            if ($reportInfo->isSetReportType()) 
+                            {
+                                echo("                    ReportType\n");
+                                echo("                        " . $reportInfo->getReportType() . "\n");
+                            }
+                            if ($reportInfo->isSetReportRequestId()) 
+                            {
+                                echo("                    ReportRequestId\n");
+                                echo("                        " . $reportInfo->getReportRequestId() . "\n");
+                            }
+                            if ($reportInfo->isSetAvailableDate()) 
+                            {
+                                echo("                    AvailableDate\n");
+                                echo("                        " . $reportInfo->getAvailableDate()->format(DATE_FORMAT) . "\n");
+                                echo '<br><br>';
+                            }
+                            // if ($reportInfo->isSetAcknowledged()) 
+                            // {
+                            //     echo("                    Acknowledged\n");
+                            //     echo("                        " . $reportInfo->getAcknowledged() . "\n");
+                            // }
+                            // if ($reportInfo->isSetAcknowledgedDate()) 
+                            // {
+                            //     echo("                    AcknowledgedDate\n");
+                            //     echo("                        " . $reportInfo->getAcknowledgedDate()->format(DATE_FORMAT) . "\n");
+                            // }
+
+                            break;
+                        }
+                    }
+                } 
+                // if ($response->isSetResponseMetadata()) { 
+                //     echo("            ResponseMetadata\n");
+                //     $responseMetadata = $response->getResponseMetadata();
+                //     if ($responseMetadata->isSetRequestId()) 
+                //     {
+                //         echo("                RequestId\n");
+                //         echo("                    " . $responseMetadata->getRequestId() . "\n");
+                //     }
+                // } 
+
+                // echo("            ResponseHeaderMetadata: " . $response->getResponseHeaderMetadata() . "\n");
      } catch (MarketplaceWebService_Exception $ex) {
          echo("Caught Exception: " . $ex->getMessage() . "\n");
          echo("Response Status Code: " . $ex->getStatusCode() . "\n");

@@ -244,7 +244,8 @@ function save_data($id=''){
                                 A.sgst_amount = B.sgst_amount, A.igst_amount = B.igst_amount, 
                                 A.round_off_amount=B.round_off_amount, A.freezed=B.freezed,
                                 A.sales_type=B.sales_type, A.invoice_nos=B.invoice_nos, 
-                                A.modified_approved_date='$modified_approved_date', A.discount=B.discount 
+                                A.modified_approved_date='$modified_approved_date', A.discount=B.discount, 
+                                A.order_no=B.order_no 
                             WHERE A.id = '$ref_id' and B.id = '$id'";
                     }
                     else
@@ -261,7 +262,8 @@ function save_data($id=''){
                                 A.sgst_amount = B.sgst_amount, A.igst_amount = B.igst_amount, 
                                 A.round_off_amount=B.round_off_amount, A.freezed=B.freezed,
                                 A.sales_type=B.sales_type, A.invoice_nos=B.invoice_nos, 
-                                A.modified_approved_date=NULL, A.discount=B.discount 
+                                A.modified_approved_date=NULL, A.discount=B.discount, 
+                                A.order_no=B.order_no 
                             WHERE A.id = '$ref_id' and B.id = '$id'";
                     }
 
@@ -383,7 +385,8 @@ function save_data($id=''){
                     'round_off_amount' => format_number($this->input->post('round_off_amount'),2),
                     'sales_type'=>$this->input->post('sales_type'),
                     'invoice_nos'=>$this->input->post('invoice_no'),
-                    'discount' => format_number($this->input->post('discount'),2)
+                    'discount' => format_number($this->input->post('discount'),2),
+                    'order_no' => $this->input->post('order_no')
                 );
 
         $date_p=strtotime($date_of_processing);
@@ -1303,9 +1306,7 @@ function get_distributor_out_items_for_exchange($id){
     return $query->result();
 }
 
-
-public function get_product_percentage($product_id,$distributor_id)
-{
+public function get_product_percentage($product_id,$distributor_id){
     $sql = "SELECT B.inv_margin,B.pro_margin,A.category_id,A.tax_percentage from
             (Select category_id,tax_percentage from product_master Where id=$product_id ) A
             Left JOIN
@@ -1315,12 +1316,9 @@ public function get_product_percentage($product_id,$distributor_id)
     $result = $this->db->query($sql)->result();
 
     return $result;
-
 }
 
-
-public function get_box_percentage($product_id,$distributor_id)
-{
+public function get_box_percentage($product_id,$distributor_id){
     $sql = "SELECT B.inv_margin,B.pro_margin,A.category_id,A.tax_percentage from
             (Select category_id,tax_percentage from box_master Where id=$product_id ) A
             Left JOIN
@@ -1330,7 +1328,6 @@ public function get_box_percentage($product_id,$distributor_id)
     $result = $this->db->query($sql)->result();
 
     return $result;
-
 }
 
 public function get_product_details($status='', $id='', $distributor_id=''){

@@ -67,7 +67,7 @@ function save_data($id=''){
         'chalan_no' => $this->input->post('chalan_no'),
         'status' => $this->input->post('status'),
         'remarks' => $this->input->post('remarks'),
-        'production_id' => $this->input->post('production_id'),
+        'production_id' => ($this->input->post('production_id')==""?Null:$this->input->post('production_id')),
         'modified_by' => $curusr,
         'modified_on' => $now
     );

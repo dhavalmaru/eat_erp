@@ -49,7 +49,7 @@ include_once ('.config.inc.php');
 // Canada
 //$serviceUrl = "https://mws.amazonservices.ca";
 // India
-//$serviceUrl = "https://mws.amazonservices.in";
+$serviceUrl = "https://mws.amazonservices.in";
 
 $config = array (
   'ServiceURL' => $serviceUrl,
@@ -100,11 +100,12 @@ $config = array (
 // );
 // $request = new MarketplaceWebService_Model_GetReportRequest($parameters);
 
-//$request = new MarketplaceWebService_Model_GetReportRequest();
-//$request->setMerchant(MERCHANT_ID);
-//$request->setReport(@fopen('php://memory', 'rw+'));
-//$request->setReportId($reportId);
-//$request->setMWSAuthToken('<MWS Auth Token>'); // Optional
+$request = new MarketplaceWebService_Model_GetReportRequest();
+$request->setMerchant(MERCHANT_ID);
+$request->setReport(@fopen('php://memory', 'rw+'));
+// $request->setReportId('17136946868018102');
+$request->setReportId('17167514329018104');
+$request->setMWSAuthToken('529421203372'); // Optional
  
 invokeGetReport($service, $request);
 
@@ -121,34 +122,78 @@ invokeGetReport($service, $request);
   {
       try {
               $response = $service->getReport($request);
-              
-                echo ("Service Response\n");
-                echo ("=============================================================================\n");
 
-                echo("        GetReportResponse\n");
-                if ($response->isSetGetReportResult()) {
-                  $getReportResult = $response->getGetReportResult(); 
-                  echo ("            GetReport");
-                  
-                  if ($getReportResult->isSetContentMd5()) {
-                    echo ("                ContentMd5");
-                    echo ("                " . $getReportResult->getContentMd5() . "\n");
-                  }
-                }
-                if ($response->isSetResponseMetadata()) { 
-                    echo("            ResponseMetadata\n");
-                    $responseMetadata = $response->getResponseMetadata();
-                    if ($responseMetadata->isSetRequestId()) 
-                    {
-                        echo("                RequestId\n");
-                        echo("                    " . $responseMetadata->getRequestId() . "\n");
-                    }
-                }
+              // echo ("Service Response\n");
+              // echo ("=============================================================================\n");
+
+              // echo("        GetReportResponse\n");
+              // if ($response->isSetGetReportResult()) {
+              //   $getReportResult = $response->getGetReportResult(); 
+              //   echo ("            GetReport");
                 
-                echo ("        Report Contents\n");
-                echo (stream_get_contents($request->getReport()) . "\n");
+              //   if ($getReportResult->isSetContentMd5()) {
+              //     echo ("                ContentMd5");
+              //     echo ("                " . $getReportResult->getContentMd5() . "\n");
+              //   }
+              // }
+              // if ($response->isSetResponseMetadata()) { 
+              //     echo("            ResponseMetadata\n");
+              //     $responseMetadata = $response->getResponseMetadata();
+              //     if ($responseMetadata->isSetRequestId()) 
+              //     {
+              //         echo("                RequestId\n");
+              //         echo("                    " . $responseMetadata->getRequestId() . "\n");
+              //     }
+              // }
+              
+              // echo ("        Report Contents\n");
+              // echo (stream_get_contents($request->getReport()) . "\n");
+              // echo $request->getReport();
 
-                echo("            ResponseHeaderMetadata: " . $response->getResponseHeaderMetadata() . "\n");
+              $result = stream_get_contents($request->getReport());
+              // // echo $result;
+              // // echo '<br><br>';
+              // // echo '2';
+              // // echo '<br><br>';
+              // $str1 = substr($result, 5, strpos($result,'\r\n'));
+              // // echo $str1;
+              // // echo '<br><br>';
+              // $str2 = substr($report_str, strpos($report_str,'\r\n'));
+              // // echo $str2;
+              // // echo '<br><br>';
+              // $str3 = substr($str2, strpos($str2,'\r\n'));
+              // // echo $str3;
+              // // echo '<br><br>';
+              // $str4 = substr($str3, strpos($str3,'\r\n'));
+              // echo $str4;
+              // echo '<br><br>';
+
+              $x=explode("\n",$result); //new line will depend on os ("\r\n"|"\r")
+              $arr = array();
+
+              foreach($x as $line){
+                echo $line;
+                echo '<br/><br/>';
+
+                $arr[]=explode("\t",$line);
+              }
+
+              echo json_encode($arr);
+
+              
+
+              // foreach ($xmlstr as $line){
+              //   echo $line;
+              // }
+              // echo $xmlstr;
+
+              // $xml=simplexml_load_file($request->getReport()); 
+              // echo $xml->asXML();
+
+              // $xml = simplexml_load_string(stream_get_contents($request->getReport()));
+              // echo $xml;
+
+              // echo("            ResponseHeaderMetadata: " . $response->getResponseHeaderMetadata() . "\n");
      } catch (MarketplaceWebService_Exception $ex) {
          echo("Caught Exception: " . $ex->getMessage() . "\n");
          echo("Response Status Code: " . $ex->getStatusCode() . "\n");

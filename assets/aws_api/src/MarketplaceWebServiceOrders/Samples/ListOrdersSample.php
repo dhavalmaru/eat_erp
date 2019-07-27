@@ -89,9 +89,14 @@ $serviceUrl = "https://mws.amazonservices.in/Orders/2013-09-01";
  $request2->setSellerId(MERCHANT_ID);
  // $request2->setAmazonOrderId("408-1055488-9217907");
 
+ // echo "Date Time: ".date('Y-m-d H:i:s')."<br/><br/>";
+ // echo time()."<br/><br/>";
+ // echo date('H:i:s', time() - 3600)."<br/><br/>";
+
  // object or array of parameters
  $date = date('Y-m-d', strtotime('-15 days'));
  $time = date('H:i:s', time() - 3600);
+ // echo "Time: ".$date."T".$time."Z<br/><br/>";
  $request->setLastUpdatedAfter($date."T".$time."Z");
  invokeListOrders($service, $request, $request2);
 
@@ -99,6 +104,7 @@ $serviceUrl = "https://mws.amazonservices.in/Orders/2013-09-01";
 
  $date = date('Y-m-d', strtotime('-10 days'));
  $time = date('H:i:s', time() - 3600);
+ // echo "Time: ".$date."T".$time."Z<br/><br/>";
  $request->setLastUpdatedAfter($date."T".$time."Z");
  invokeListOrders($service, $request, $request2);
 
@@ -106,6 +112,7 @@ $serviceUrl = "https://mws.amazonservices.in/Orders/2013-09-01";
 
  $date = date('Y-m-d', strtotime('-3 days'));
  $time = date('H:i:s', time() - 3600);
+ // echo "Time: ".$date."T".$time."Z<br/><br/>";
  $request->setLastUpdatedAfter($date."T".$time."Z");
  invokeListOrders($service, $request, $request2);
 
@@ -113,6 +120,7 @@ $serviceUrl = "https://mws.amazonservices.in/Orders/2013-09-01";
 
  $date = date('Y-m-d', strtotime('-2 days'));
  $time = date('H:i:s', time() - 3600);
+ // echo "Time: ".$date."T".$time."Z<br/><br/>";
  $request->setLastUpdatedAfter($date."T".$time."Z");
  invokeListOrders($service, $request, $request2);
 
@@ -120,6 +128,7 @@ $serviceUrl = "https://mws.amazonservices.in/Orders/2013-09-01";
 
  $date = date('Y-m-d', strtotime('-1 days'));
  $time = date('H:i:s', time() - 3600);
+ // echo "Time: ".$date."T".$time."Z<br/><br/>";
  $request->setLastUpdatedAfter($date."T".$time."Z");
  invokeListOrders($service, $request, $request2);
 
@@ -162,23 +171,8 @@ $serviceUrl = "https://mws.amazonservices.in/Orders/2013-09-01";
         $curdate=date('Y-m-d');
         $curusr='148';
 
-        // $servername = "localhost";
-        // $username = "root";
-        // $password = "";
-        // $dbname = "eat_erp";
-
-        $servername = "localhost";
-        $username = "root";
-        $password = "eat@12345";
-        $dbname = "eatangcp_eat_erp";
-
-        // $servername = "localhost";
-        // $username = "root";
-        // $password = "eat@12345";
-        // $dbname = "eatangcp_erp";
-
         // Create connection
-        $conn = new mysqli($servername, $username, $password, $dbname);
+        $conn = new mysqli(SERVERNAME, USERNAME, PASSWORD, DBNAME);
 
         // Check connection
         if ($conn->connect_error) {
@@ -342,8 +336,8 @@ $serviceUrl = "https://mws.amazonservices.in/Orders/2013-09-01";
                 }
               }
               
-              $item_id = 'Null';
-              $item_grams = 'Null';
+              $item_id = 0;
+              $item_grams = 0;
               $item_rate = 0;
               $item_tax_per = 0;
 
@@ -411,6 +405,9 @@ $serviceUrl = "https://mws.amazonservices.in/Orders/2013-09-01";
             // echo '<br/><br/><br/>';
 
             $tot_amount = 0;
+            $tot_cgst_amount = 0;
+            $tot_sgst_amount = 0;
+            $tot_igst_amount = 0;
             $tot_tax_amount = 0;
             $tot_order_amount = 0;
 
@@ -460,6 +457,10 @@ $serviceUrl = "https://mws.amazonservices.in/Orders/2013-09-01";
               $tot_tax_amount = $tot_tax_amount + $tax_amt;
               $tot_order_amount = $tot_order_amount + $total_amt;
 
+              $tot_cgst_amount = $tot_cgst_amount + $cgst_amt;
+              $tot_sgst_amount = $tot_sgst_amount + $sgst_amt;
+              $tot_igst_amount = $tot_igst_amount + $igst_amt;
+
               $item_data[$j] = array(
                               'distributor_out_id' => $distributor_out_id,
                               'type' => $type,
@@ -482,13 +483,12 @@ $serviceUrl = "https://mws.amazonservices.in/Orders/2013-09-01";
 
             $depot_id = '3';
             $distributor_id = '214';
-            $sales_rep_id = 'Null';
 
             $round_off_amt = round(round($tot_order_amount,0) - round($tot_order_amount,2),2);
             $invoice_amount = round($tot_order_amount,0);
 
             if($invoice_amount>0){
-              $sql = "insert into distributor_out (date_of_processing, invoice_no, depot_id, distributor_id, sales_rep_id, amount, tax, tax_per, tax_amount, final_amount, due_date, order_no, order_date, supplier_ref, despatch_doc_no, despatch_through, destination, status, remarks, modified_by, modified_on, client_name, address, city, pincode, state, country, mobile_no, discount, sample_distributor_id, delivery_status, delivery_date, transport_type, vehicle_number, cgst, sgst, igst, cgst_amount, sgst_amount, igst_amount, reverse_charge, shipping_address, distributor_consignee_id, con_name, con_address, con_city, con_pincode, con_state, con_country, con_state_code, con_gst_number, state_code, round_off_amount, invoice_amount, ref_id, invoice_date, email_date_time, basis_of_sales, email_from, email_approved_by, gstin, created_by, created_on) VALUES ('".$curdate."', '', '".$depot_id."', '".$distributor_id."', Null, ".$tot_amount.", Null, 1, ".$tot_tax_amount.", ".$tot_order_amount.", '".$curdate."', '".$AmazonOrderId."', '".$order_date."', Null, Null, Null, Null, 'Pending', 'This is system generated entry.', '".$curusr."', '".$now."', '".$client_name."', '".$address."', '".$city."', '".$pincode."', '".$state."', '".$country."', '', ".$discount_per.", Null, 'Pending', Null, '', '', 1, 1, 1, ".$cgst_amt.", ".$sgst_amt.", ".$igst_amt.", 'no', 'yes', Null, Null, Null, Null, Null, Null, Null, Null, Null, '".$state_code."', ".$round_off_amt.", ".$invoice_amount.", Null, Null, '".$now."', 'PO Number', '', '', '', '".$curusr."', '".$now."')";
+              $sql = "insert into distributor_out (date_of_processing, invoice_no, depot_id, distributor_id, sales_rep_id, amount, tax, tax_per, tax_amount, final_amount, due_date, order_no, order_date, supplier_ref, despatch_doc_no, despatch_through, destination, status, remarks, modified_by, modified_on, client_name, address, city, pincode, state, country, mobile_no, discount, sample_distributor_id, delivery_status, delivery_date, transport_type, vehicle_number, cgst, sgst, igst, cgst_amount, sgst_amount, igst_amount, reverse_charge, shipping_address, distributor_consignee_id, con_name, con_address, con_city, con_pincode, con_state, con_country, con_state_code, con_gst_number, state_code, round_off_amount, invoice_amount, ref_id, invoice_date, email_date_time, basis_of_sales, email_from, email_approved_by, gstin, created_by, created_on) VALUES ('".$curdate."', '', '".$depot_id."', '".$distributor_id."', Null, ".$tot_amount.", Null, 1, ".$tot_tax_amount.", ".$tot_order_amount.", '".$curdate."', '".$AmazonOrderId."', '".$order_date."', Null, Null, Null, Null, 'Pending', 'This is system generated entry.', '".$curusr."', '".$now."', '".$client_name."', '".$address."', '".$city."', '".$pincode."', '".$state."', '".$country."', '', ".$discount_per.", Null, 'Pending', Null, '', '', 1, 1, 1, ".$tot_cgst_amount.", ".$tot_sgst_amount.", ".$tot_igst_amount.", 'no', 'yes', Null, Null, Null, Null, Null, Null, Null, Null, Null, '".$state_code."', ".$round_off_amt.", ".$invoice_amount.", Null, Null, '".$now."', 'PO Number', '', '', '', '".$curusr."', '".$now."')";
               if ($conn->query($sql) === TRUE) {
                 $distributor_out_id = $conn->insert_id;
 
@@ -504,6 +504,10 @@ $serviceUrl = "https://mws.amazonservices.in/Orders/2013-09-01";
               } else {
                 echo "Error: " . $sql . "<br>" . $conn->error;
               }
+
+              // echo $sql;
+              // echo '<br/><br/>';
+              // echo 'System Generated Sales Entry created successfully.<br/><br/>';
             } else {
               echo 'Invoice amount is zero.<br/><br/>';
             }

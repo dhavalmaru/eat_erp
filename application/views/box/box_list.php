@@ -63,6 +63,7 @@
 											<th width="65" style="text-align:center;">Edit</th>
 											<th>Box Name</th>
 											<th>Short Name</th>
+											<th width="150">ASIN</th>
 											<th width="150">Barcode</th>
 											<th width="80">Grams</th>
 											<th width="80">Rate (In Rs)</th>
@@ -77,6 +78,7 @@
 											<td style="text-align:center; vertical-align: middle; "><a href="<?php echo base_url().'index.php/box/edit/'.$data[$i]->id; ?>"><i class="fa fa-edit"></i></a></td>
 											<td><?php echo $data[$i]->box_name; ?></td>
 											<td><?php echo $data[$i]->short_name; ?></td>
+											<td><?php echo $data[$i]->asin; ?></td>
 											<td><?php echo $data[$i]->barcode; ?></td>
 											<td><?php echo format_money($data[$i]->grams,2); ?></td>
 											<td><?php echo format_money($data[$i]->rate,2); ?></td>
