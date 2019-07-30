@@ -200,6 +200,12 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="form-group">
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Order No </label>
+                                        <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <input type="text" class="form-control" name="order_no" id="order_no" placeholder="Order No" value="<?php if(isset($data)) echo $data[0]->order_no;?>"/>
+                                        </div>
+                                    </div>
                                     <div class="form-group" id="invoice_no_div" style="<?php if (isset($data)) { if($data[0]->sales_type=='Invoice'){echo 'display: block'; }else{
                                         echo 'display: none';
                                     } }

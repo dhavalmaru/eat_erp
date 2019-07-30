@@ -167,6 +167,8 @@ $serviceUrl = "https://mws.amazonservices.in/Orders/2013-09-01";
         $Orders = $ListOrdersResult->Orders;
         $Order = $Orders->Order;
 
+        date_default_timezone_set('Asia/Kolkata');
+
         $now=date('Y-m-d H:i:s');
         $curdate=date('Y-m-d');
         $curusr='148';
