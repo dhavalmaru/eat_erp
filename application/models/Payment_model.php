@@ -317,6 +317,9 @@ function save_data($id=''){
         $bank_city=$this->input->post('bank_city[]');
         $invoice_no=$this->input->post('invoice_no[]');
         $payment_amount=$this->input->post('payment_amount[]');
+        $settlement_id=$this->input->post('settlement_id[]');
+        $settlement_start_date=$this->input->post('settlement_start_date[]');
+        $settlement_end_date=$this->input->post('settlement_end_date[]');
 
         for ($k=0; $k<count($distributor_id); $k++) {
             if(isset($distributor_id[$k]) and $distributor_id[$k]!="") {
@@ -327,7 +330,10 @@ function save_data($id=''){
                             'bank_name' => $bank_name[$k],
                             'bank_city' => $bank_city[$k],
                             'invoice_no' => $invoice_no[$k],
-                            'payment_amount' => format_number($payment_amount[$k],2)
+                            'payment_amount' => format_number($payment_amount[$k],2),
+                            'settlement_id' => $settlement_id[$k],
+                            'settlement_start_date' => $settlement_start_date[$k],
+                            'settlement_end_date' => $settlement_end_date[$k]
                         );
                 $this->db->insert('payment_details_items', $data);
             }

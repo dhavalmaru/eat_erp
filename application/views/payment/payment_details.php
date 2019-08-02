@@ -124,6 +124,10 @@
                                                 for($i=0; $i<count($payment_items); $i++) { ?>
                                             <tr id="box_<?php echo $i; ?>_row">
                                                 <td>
+                                                    <input type="hidden" class="form-control" name="settlement_id[]" id="settlement_id_<?php echo $i; ?>" value="<?php if (isset($payment_items)) { echo $payment_items[$i]->settlement_id; } ?>" />
+                                                    <input type="hidden" class="form-control" name="settlement_start_date[]" id="settlement_start_date_<?php echo $i; ?>" value="<?php if (isset($payment_items)) { echo $payment_items[$i]->settlement_start_date; } ?>" />
+                                                    <input type="hidden" class="form-control" name="settlement_end_date[]" id="settlement_end_date_<?php echo $i; ?>" value="<?php if (isset($payment_items)) { echo $payment_items[$i]->settlement_end_date; } ?>" />
+
                                                     <select name="distributor_id[]" class="form-control distributor select2" id="distributor_<?php echo $i;?>">
                                                         <option value="">Select</option>
                                                         <?php if(isset($distributor)) { for ($k=0; $k < count($distributor) ; $k++) { ?>
@@ -168,6 +172,10 @@
                                         <?php }} else { ?>
                                             <tr id="box_<?php echo $i; ?>_row">
                                                 <td>
+                                                    <input type="hidden" class="form-control" name="settlement_id[]" id="settlement_id_<?php echo $i; ?>" value="" />
+                                                    <input type="hidden" class="form-control" name="settlement_start_date[]" id="settlement_start_date_<?php echo $i; ?>" value="" />
+                                                    <input type="hidden" class="form-control" name="settlement_end_date[]" id="settlement_end_date_<?php echo $i; ?>" value="" />
+
                                                     <select name="distributor_id[]" class="form-control distributor select2" id="distributor_<?php echo $i;?>">
                                                         <option value="">Select</option>
                                                         <?php if(isset($distributor)) { for ($k=0; $k < count($distributor) ; $k++) { ?>
@@ -582,6 +590,9 @@
                     event.preventDefault();
                     var newRow = jQuery('<tr id="box_'+counter+'_row">' + 
                                             '<td>' + 
+                                                '<input type="hidden" class="form-control" name="settlement_id[]" id="settlement_id_'+counter+'" value="" />' + 
+                                                '<input type="hidden" class="form-control" name="settlement_start_date[]" id="settlement_start_date_'+counter+'" value="" />' + 
+                                                '<input type="hidden" class="form-control" name="settlement_end_date[]" id="settlement_end_date_'+counter+'" value="" />' + 
                                                 '<select name="distributor_id[]" class="form-control distributor select2" id="distributor_'+counter+'">' + 
                                                     '<option value="">Select</option>' + 
                                                     '<?php if(isset($distributor)) { for ($k=0; $k < count($distributor) ; $k++) { ?>' + 
