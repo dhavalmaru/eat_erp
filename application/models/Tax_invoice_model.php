@@ -134,11 +134,15 @@ function generate_tax_invoice_old($id) {
 
                 if (isset($date_of_processing)){
                     $financial_year=calculateFiscalYearForDate($date_of_processing);
+                    if(strpos($financial_year,'-')!==false){
+                        $financial_year = substr($financial_year, 0, strpos($financial_year,'-'));
+                    }
                 } else {
                     $financial_year="";
                 }
                 
-                $voucher_no = 'WHPL/'.$financial_year.'/voucher/'.strval($series);
+                // $voucher_no = 'WHPL/'.$financial_year.'/voucher/'.strval($series);
+                $voucher_no = 'WHPL/'.$financial_year.'-VOU/'.strval($series);
 
                 $sql="update distributor_out set voucher_no = '$voucher_no' where id = '$id'";
                 $this->db->query($sql);
@@ -444,11 +448,15 @@ function generate_gate_pass_old() {
 
                     if (isset($date_of_processing)){
                         $financial_year=calculateFiscalYearForDate($date_of_processing);
+                        if(strpos($financial_year,'-')!==false){
+                            $financial_year = substr($financial_year, 0, strpos($financial_year,'-'));
+                        }
                     } else {
                         $financial_year="";
                     }
                     
-                    $voucher_no = 'WHPL/'.$financial_year.'/voucher/'.strval($series);
+                    // $voucher_no = 'WHPL/'.$financial_year.'/voucher/'.strval($series);
+                    $voucher_no = 'WHPL/'.$financial_year.'-VOU/'.strval($series);
 
                     $sql="update distributor_out set voucher_no = '$voucher_no' where id = '$id'";
                     $this->db->query($sql);
@@ -930,11 +938,15 @@ function generate_gate_pass_old_print() {
 
                     if (isset($date_of_processing)){
                         $financial_year=calculateFiscalYearForDate($date_of_processing);
+                        if(strpos($financial_year,'-')!==false){
+                            $financial_year = substr($financial_year, 0, strpos($financial_year,'-'));
+                        }
                     } else {
                         $financial_year="";
                     }
                     
-                    $voucher_no = 'WHPL/'.$financial_year.'/voucher/'.strval($series);
+                    // $voucher_no = 'WHPL/'.$financial_year.'/voucher/'.strval($series);
+                    $voucher_no = 'WHPL/'.$financial_year.'-VOU/'.strval($series);
 
                     $sql="update distributor_out set voucher_no = '$voucher_no' where id = '$id'";
                     $this->db->query($sql);
@@ -1409,11 +1421,15 @@ function view_gate_pass_old($distid) {
 
                     if (isset($date_of_processing)){
                         $financial_year=calculateFiscalYearForDate($date_of_processing);
+                        if(strpos($financial_year,'-')!==false){
+                            $financial_year = substr($financial_year, 0, strpos($financial_year,'-'));
+                        }
                     } else {
                         $financial_year="";
                     }
                     
-                    $voucher_no = 'WHPL/'.$financial_year.'/voucher/'.strval($series);
+                    // $voucher_no = 'WHPL/'.$financial_year.'/voucher/'.strval($series);
+                    $voucher_no = 'WHPL/'.$financial_year.'-VOU/'.strval($series);
 
                     $sql="update distributor_out set voucher_no = '$voucher_no' where id = '$id'";
                     $this->db->query($sql);
@@ -1972,11 +1988,15 @@ function get_final_data($check, $sales_rep_id){
 
                     if (isset($date_of_processing)){
                         $financial_year=calculateFiscalYearForDate($date_of_processing);
+                        if(strpos($financial_year,'-')!==false){
+                            $financial_year = substr($financial_year, 0, strpos($financial_year,'-'));
+                        }
                     } else {
                         $financial_year="";
                     }
                     
-                    $voucher_no = 'WHPL/'.$financial_year.'/voucher/'.strval($series);
+                    // $voucher_no = 'WHPL/'.$financial_year.'/voucher/'.strval($series);
+                    $voucher_no = 'WHPL/'.$financial_year.'-VOU/'.strval($series);
 
                     $sql="update distributor_out set voucher_no = '$voucher_no' where id = '$id'";
                     $this->db->query($sql);

@@ -26,7 +26,12 @@ class Eat_Attendence extends CI_controller {
     }
 
     public function upload_excel(){
-        $path=FCPATH.'assets/uploads/attendence_upload/';
+        $filePath='uploads/attendence_upload/';
+        $path = './' . $filePath;
+        if(!is_dir($path)) {
+            mkdir($path, 0777, TRUE);
+        }
+
         $config = array(
             'upload_path' => $path,
             'allowed_types' => "xlsx",
@@ -604,6 +609,7 @@ class Eat_Attendence extends CI_controller {
     }
 
     public function checkstatus($status='',$year='',$month=''){
+        // echo $status.'<br/>'.$year.'<br/>'.$month.'<br/><br/>';
         $data['data']=$this->attendence->get_summary($status,$year,$month);
         $employee = $this->attendence->get_employee_code();
         $data['employee'] = $employee;
@@ -636,6 +642,7 @@ class Eat_Attendence extends CI_controller {
         $data['all']=count($count_data);
 
         load_view('emp_attendence/emp_list', $data);
+
         /*$result=$this->attendence->get_access();
         if(count($result)>0) {
             $data['access']=$result;
@@ -689,9 +696,9 @@ class Eat_Attendence extends CI_controller {
         $year =   $this->input->post("year");
         $month =  $this->input->post("month");
 
-        // $status = 'pending_for_approval';
+        // $status = 'pending';
         // $year = '2019';
-        // $month = '04';
+        // $month = '07';
 
         $data=$this->attendence->get_summary($status,$year,$month);
         $records = array();

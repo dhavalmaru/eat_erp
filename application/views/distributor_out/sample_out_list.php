@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>        
+    <head>
         <!-- META SECTION -->
         <title>EAT ERP</title>            
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -17,8 +17,8 @@
         <!-- EOF CSS INCLUDE -->    
 		<style>
 		/*.fa-eye  { font-size:21px; color:#333;}
-.fa-file-pdf-o{ color:#e80b0b; font-size:21px;}
-.fa-paper-plane-o{ color:#520fbb; font-size:21px;}
+            .fa-file-pdf-o{ color:#e80b0b; font-size:21px;}
+            .fa-paper-plane-o{ color:#520fbb; font-size:21px;}
 				  @media only screen and  (min-width:645px)  and (max-width:718px) { 
 				.heading-h3-heading:first-child {     width: 44%!important;}
 		   	.heading-h3-heading:last-child {     width: 56%!important;}		
@@ -50,7 +50,6 @@
 		</style>	
     </head>
     <body>
-        
     	<!-- START PAGE CONTAINER -->
     	<div class="page-container page-navigation-top">            
     		<!-- PAGE CONTENT -->
@@ -59,7 +58,7 @@
                 <form id="form_distributor_out_list" role="form" class="form-horizontal" method="post" action="<?php echo base_url().'index.php/sample_out/authorise'; ?>" target="_blank">
             <?php } else if($status=='pending_for_delivery') { ?>
                 <!-- <form id="form_distributor_out_list" role="form" class="form-horizontal" method="post" action="<?php //echo base_url().'index.php/sample_out/set_delivery_status'; ?>"> -->
-                    <form id="form_distributor_out_list" role="form" class="form-horizontal" method="post" action="<?php echo base_url().'index.php/sample_out/get_batch_details'; ?>" target="_blank">
+                <form id="form_distributor_out_list" role="form" class="form-horizontal" method="post" action="<?php echo base_url().'index.php/sample_out/get_batch_details'; ?>" target="_blank">
             <?php } else if($status=='gp_issued') { ?>
                 <form id="form_distributor_out_list" role="form" class="form-horizontal" method="post" action="<?php echo base_url().'index.php/sample_out/set_delivery_status2'; ?>">
             <?php } else { ?>
@@ -93,7 +92,7 @@
                                 </button> -->
                             <?php } ?>
                         </div>
-                        <div class="pull-right btn-margin" style="<?php if($access[0]->r_insert=='0' || $status=='pending_for_delivery' || $status=='gp_issued' || $status=='delivered_not_complete' || $status=='pending_for_approval') echo 'display: none;';?>">
+                        <div class="pull-right btn-margin" style="<?php if($access[0]->r_insert=='0') echo 'display: none;';?>">
                             <a class="btn btn-success btn-block btn-padding" href="<?php echo base_url(); ?>index.php/sample_out/add">
                                 <span class="fa fa-plus"></span> Add Sample Entry
                             </a>
@@ -184,7 +183,7 @@
     										<table id="customers10" class="table datatable table-bordered"  >
     											<thead>
     												<tr>
-                                                   <th width="50" align="center" style="<?php if($status!='pending_for_delivery' && $status!='gp_issued' ) echo 'display: none;'; ?>">Select</th> 
+                                                        <th width="50" align="center" style="<?php if($status!='pending_for_delivery' && $status!='gp_issued' ) echo 'display: none;'; ?>">Select</th> 
                                                         <th width="50" style="text-align:center; "align="center">Sr. No.</th>
     													<th width="100">Date Of processing</th>
     													<th width="50" style="text-align:center; ">Edit</th>
@@ -302,139 +301,135 @@
     	</div>
     	<!-- END PAGE CONTAINER -->
 
-        
-
     	<?php $this->load->view('templates/footer');?>
         <script type="text/javascript">
             var BASE_URL="<?php echo base_url()?>";
         </script>
         <script type="text/javascript" src="<?php echo base_url(); ?>js/validations.js"></script>
     	<script>
-    	$(document).ready(function() {               
+        	$(document).ready(function() {
+        		var url = window.location.href;
 
-    		var url = window.location.href;
+        		if(url.includes('All')){
+        			$('.all').attr('class','active');
+        		}
+        		else if(url.includes('InActive')){
+        			$('.inactive').attr('class','active');
+        		}
+                else if(url.includes('Approved')){
+                    $('.approved').attr('class','active');
+                }
+                else if(url.includes('pending_for_approval')){
+                    // console.log('pending_for_approval');
+                    $('.pending_for_approval').attr('class','active');
+                }
+                else if(url.includes('delivery')){
+                    // console.log('delivery');
+                    $('.delivery').attr('class','active');
+                }
+                else if(url.includes('pending')){
+                    // console.log('pending');
+                    $('.pending').attr('class','active');
+                }
+                else if(url.includes('gp_issued')){
+                    $('.gp_issued').attr('class','active');
+                }
+        		else if(url.includes('delivered_not_complete')){
+                    // console.log('pending_for_delivery');
+        			$('.delivered_not_complete').attr('class','active');
+        		} 
+                else {
+                    $('.delivery').attr('class','active');
+                }
+        		$('.ahrefall').click(function(){
+        			alert(window.location.href );
+                });
+        	});
 
-    		if(url.includes('All')){
-    			$('.all').attr('class','active');
-    		}
-    		else  if(url.includes('InActive')){
-    			$('.inactive').attr('class','active');
-    		}
-            else  if(url.includes('Approved')){
-                $('.approved').attr('class','active');
-            }
-            else  if(url.includes('pending_for_approval')){
-                // console.log('pending_for_approval');
-                $('.pending_for_approval').attr('class','active');
-            }
-            else  if(url.includes('delivery')){
-                // console.log('delivery');
-                $('.delivery').attr('class','active');
-            }
-            else  if(url.includes('pending')){
-                // console.log('pending');
-                $('.pending').attr('class','active');
-            }
-            else  if(url.includes('gp_issued')){
-                $('.gp_issued').attr('class','active');
-            }
-    		else if(url.includes('delivered_not_complete')){
-                // console.log('pending_for_delivery');
-    			$('.delivered_not_complete').attr('class','active');
-    		} 
-            else {
-                $('.delivery').attr('class','active');
-            }
-    		$('.ahrefall').click(function(){
-    			alert(window.location.href );
-            });
-    	});
-
-        var blFlag = false;
-        $('#myModal').on('hidden.bs.modal', function () {
-            if(blFlag==true){
-                location.reload();
-                blFlag = false;
-            }
-        });
-
-        $('#btn_save').click(function(){
-            if (!$("#form_distributor_out_list").valid()) {
-                return false;
-            } else {
-                $('#myModal').modal('toggle');
-                blFlag = true;
-            }
-        });
-
-        var set_checkbox = function(elem){
-            var v = elem.checked?elem.value:'false';
-            var id = elem.id;
-            $('#input_'+id).val(v);
-        };
-
-        var get_batch_details = function() {
-            $('#myModal').modal('show');
-
-            // console.log('true');
-
-            // $.ajax({
-            //     url:BASE_URL+'index.php/Distributor_out/get_batch_details',
-            //     method:"post",
-            //     data:$('#form_distributor_out_list').serialize(),
-            //     dataType:"html",
-            //     async:false,
-            //     success: function(data){
-            //         $('#batch_details').html(data);
-
-            //         addMultiInputNamingRules('#form_distributor_out_list', 'input[name="batch_no[]"]', { required: true }, "");
-            //     },
-            //     error: function (response) {
-            //         var r = jQuery.parseJSON(response.responseText);
-            //         alert("Message: " + r.Message);
-            //         alert("StackTrace: " + r.StackTrace);
-            //         alert("ExceptionType: " + r.ExceptionType);
+            // var blFlag = false;
+            // $('#myModal').on('hidden.bs.modal', function () {
+            //     if(blFlag==true){
+            //         location.reload();
+            //         blFlag = false;
             //     }
             // });
-        }
 
-        var set_batch = function(elem){
-            var id = elem.id;
-            var index = id.substr(id.lastIndexOf('_')+1);
+            $('#btn_save').click(function(){
+                if (!$("#form_distributor_out_list").valid()) {
+                    return false;
+                } else {
+                    // $('#myModal').modal('toggle');
+                    // blFlag = true;
+                }
+            });
 
-            // console.log(index);
+            var set_checkbox = function(elem){
+                var v = elem.checked?elem.value:'false';
+                var id = elem.id;
+                $('#input_'+id).val(v);
+            };
 
-            var batch_no = $('#batch_no_'+index).val();
-            var item_type = $('#item_type_'+index).val();
-            var item_id = $('#item_id_'+index).val();
+            var get_batch_details = function() {
+                $('#myModal').modal('show');
 
-            var counter = $('.batch_no').length;
+                // console.log('true');
 
-            // console.log(batch_no);
-            // console.log(counter);
+                // $.ajax({
+                //     url:BASE_URL+'index.php/Distributor_out/get_batch_details',
+                //     method:"post",
+                //     data:$('#form_distributor_out_list').serialize(),
+                //     dataType:"html",
+                //     async:false,
+                //     success: function(data){
+                //         $('#batch_details').html(data);
 
-            var check_item_type = '';
-            var check_item_id = '';
+                //         addMultiInputNamingRules('#form_distributor_out_list', 'input[name="batch_no[]"]', { required: true }, "");
+                //     },
+                //     error: function (response) {
+                //         var r = jQuery.parseJSON(response.responseText);
+                //         alert("Message: " + r.Message);
+                //         alert("StackTrace: " + r.StackTrace);
+                //         alert("ExceptionType: " + r.ExceptionType);
+                //     }
+                // });
+            }
 
-            for(var i=0; i<counter; i++){
-                if(i!=index){
-                    check_item_type = $('#item_type_'+i).val();
-                    check_item_id = $('#item_id_'+i).val();
+            var set_batch = function(elem){
+                var id = elem.id;
+                var index = id.substr(id.lastIndexOf('_')+1);
 
-                    if(check_item_type==item_type && check_item_id==item_id){
-                        $('#batch_no_'+i).val(batch_no);
+                // console.log(index);
+
+                var batch_no = $('#batch_no_'+index).val();
+                var item_type = $('#item_type_'+index).val();
+                var item_id = $('#item_id_'+index).val();
+
+                var counter = $('.batch_no').length;
+
+                // console.log(batch_no);
+                // console.log(counter);
+
+                var check_item_type = '';
+                var check_item_id = '';
+
+                for(var i=0; i<counter; i++){
+                    if(i!=index){
+                        check_item_type = $('#item_type_'+i).val();
+                        check_item_id = $('#item_id_'+i).val();
+
+                        if(check_item_type==item_type && check_item_id==item_id){
+                            $('#batch_no_'+i).val(batch_no);
+                        }
                     }
                 }
             }
-        }
     	</script>
         <script>
             var table;
             var status = '<?php echo $status; ?>';
             $(document).ready(function() {
-                
                 var len=10;
-               if(status =='gp_issued') {
+                if(status =='gp_issued') {
                     columnDefs = [        
                                     {
                                         "targets": [0],
@@ -445,9 +440,7 @@
                                       { "width": "10%", "targets": 8 },
 									    { className: "dt-body-center", targets: [ 3,4 ] }
                                 ];
-                }
-
-                else if(status!='pending_for_delivery') {
+                } else if(status!='pending_for_delivery') {
                     columnDefs = [        
                                     {
                                         "targets": [0],
@@ -458,26 +451,22 @@
                                       { "width": "10%", "targets": 8 },
 									    { className: "dt-body-center", targets: [ 3,4 ] }
                                 ];
-                }
-				else
-				{
-					    columnDefs = [        
-                                    {
-                                        "targets": [0],
-                                        "visible": true,
-                                        "searchable": true
-                                    },
-										{
-                                        "targets": [4],
-                                        "visible": false,
-                                        "searchable": false
-                                    },
-                                      { "width": "10%", "targets": 8 },
-									    { className: "dt-body-center", targets: [ 3,4 ] }
-                                ];
-					
+                } else {
+				    columnDefs = [        
+                                {
+                                    "targets": [0],
+                                    "visible": true,
+                                    "searchable": true
+                                },
+									{
+                                    "targets": [4],
+                                    "visible": false,
+                                    "searchable": false
+                                },
+                                  { "width": "10%", "targets": 8 },
+								    { className: "dt-body-center", targets: [ 3,4 ] }
+                            ];
 				}
-
 
                 table =  $('#customers10');
                 var tableOptions = {
@@ -507,7 +496,6 @@
                     tableOptions.bPaginate = true;
                     table.DataTable(tableOptions);
                 });
-                
                 $("#xls").click(function(){
                     table.DataTable().destroy();
                     tableOptions.bPaginate = false;
@@ -517,9 +505,6 @@
                     tableOptions.bPaginate = true;
                     table.DataTable(tableOptions);
                 });
-
-
-
                 $("#txt").click(function(){
                     table.DataTable().destroy();
                     tableOptions.bPaginate = false;
@@ -556,8 +541,7 @@
                     tableOptions.bPaginate = true;
                     table.DataTable(tableOptions);
                 });
-
-                   $("#pdf").click(function(){
+                $("#pdf").click(function(){
                     table.DataTable().destroy();
                     tableOptions.bPaginate = false;
                     table.DataTable(tableOptions);
@@ -566,7 +550,7 @@
                     tableOptions.bPaginate = true;
                     table.DataTable(tableOptions);
                 });
-               });
+            });
         </script>
     	<!-- END SCRIPTS -->      
     </body>

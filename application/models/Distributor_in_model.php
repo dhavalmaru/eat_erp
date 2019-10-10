@@ -118,6 +118,13 @@ function save_data($id=''){
         $due_date=formatdate($due_date);
     }
     
+    $sales_return_date=$this->input->post('sales_return_date');
+    if($sales_return_date==''){
+        $sales_return_date=NULL;
+    } else {
+        $sales_return_date=formatdate($sales_return_date);
+    }
+
     if($this->input->post('btn_approve')!=null || $this->input->post('btn_reject')!=null){
         if($this->input->post('btn_approve')!=null){
             if($this->input->post('status')=="Deleted"){
@@ -157,17 +164,25 @@ function save_data($id=''){
                         $this->db->query($sql);
                     }
 
-                    if (isset($date_of_processing)){
-                        if($date_of_processing==''){
+                    if($sales_return_date==null || $sales_return_date==''){
+                        $sales_return_date = date('Y-m-d');
+                    }
+
+                    if (isset($sales_return_date)){
+                        if($sales_return_date==''){
                             $financial_year="";
                         } else {
-                            $financial_year=calculateFiscalYearForDate($date_of_processing);
+                            $financial_year=calculateFiscalYearForDate($sales_return_date);
+                            if(strpos($financial_year,'-')!==false){
+                                $financial_year = substr($financial_year, 0, strpos($financial_year,'-'));
+                            }
                         }
                     } else {
                         $financial_year="";
                     }
                     
-                    $sales_return_no = 'WHPL/'.$financial_year.'/sales_return/'.strval($series);
+                    // $sales_return_no = 'WHPL/'.$financial_year.'/sales_return/'.strval($series);
+                    $sales_return_no = 'WHPL/'.$financial_year.'-SR/'.strval($series);
                 }
 
                 if($ref_id!=null && $ref_id!=''){
@@ -196,47 +211,55 @@ function save_data($id=''){
                             $this->db->query($sql);
                         }
 
-                        if (isset($date_of_processing)){
-                            $financial_year=calculateFiscalYearForDate($date_of_processing);
+                        if($sales_return_date==null || $sales_return_date==''){
+                            $sales_return_date = date('Y-m-d');
+                        }
+
+                        if (isset($sales_return_date)){
+                            if($sales_return_date==''){
+                                $financial_year="";
+                            } else {
+                                $financial_year=calculateFiscalYearForDate($sales_return_date);
+                                if(strpos($financial_year,'-')!==false){
+                                    $financial_year = substr($financial_year, 0, strpos($financial_year,'-'));
+                                }
+                            }
                         } else {
                             $financial_year="";
                         }
-                        
-                        $voucher_no = 'WHPL/'.$financial_year.'/voucher/'.strval($series);
+
+                        // $voucher_no = 'WHPL/'.$financial_year.'/voucher/'.strval($series);
+                        $voucher_no = 'WHPL/'.$financial_year.'-VOU/'.strval($series);
                     }
                 } else {
                     $voucher_no = '';
                 }
                 
                 if($ref_id!=null && $ref_id!=''){
-
                     $modified_approved_date = NULL;
+
                     $get_modified_approved_date_result = $this->db->select('modified_approved_date')->where('id',$id)->get('distributor_in')->result();
 
-                    if(count($get_modified_approved_date_result)>0)
-                    {
-                       $modified_approved_date = $get_modified_approved_date_result[0]->modified_approved_date;
+                    if(count($get_modified_approved_date_result)>0) {
+                        $modified_approved_date = $get_modified_approved_date_result[0]->modified_approved_date;
                         
-                        if($modified_approved_date!=null && $modified_approved_date!="")
-                        {
+                        if($modified_approved_date!=null && $modified_approved_date!="") {
                             $modified_approved_date = date("Y-m-d");
-                        }else
-                        {
+                        } else {
                             $modified_approved_date = NULL;
                         }
-                    }
-                    else
-                    {
+                    } else {
                        $modified_approved_date = NULL;
                     }
 
-                    if($modified_approved_date!=null && $modified_approved_date!=null)
-                    {
+                    if($modified_approved_date!=null && $modified_approved_date!=null) {
                         $sql = "Update distributor_in A, distributor_in B 
-                            Set A.date_of_processing=B.date_of_processing, A.depot_id=B.depot_id, A.distributor_id=B.distributor_id,
+                            Set A.date_of_processing=B.date_of_processing, A.depot_id=B.depot_id, 
+                                A.distributor_id=B.distributor_id,
                                 A.sales_rep_id=B.sales_rep_id, A.amount=B.amount, A.tax=B.tax, A.cst=B.cst, 
                                 A.tax_amount=B.tax_amount, A.final_amount=B.final_amount, A.due_date=B.due_date, 
-                                A.is_expired=B.is_expired, A.is_exchanged=B.is_exchanged, A.final_cost_amount=B.final_cost_amount, 
+                                A.is_expired=B.is_expired, A.is_exchanged=B.is_exchanged, 
+                                A.final_cost_amount=B.final_cost_amount, 
                                 A.status='$status', A.remarks='$remarks', 
                                 A.modified_by=B.modified_by, A.modified_on=B.modified_on, 
                                 A.approved_by='$curusr', A.approved_on='$now', A.sales_return_no = '$sales_return_no', 
@@ -245,16 +268,16 @@ function save_data($id=''){
                                 A.round_off_amount=B.round_off_amount, A.freezed=B.freezed,
                                 A.sales_type=B.sales_type, A.invoice_nos=B.invoice_nos, 
                                 A.modified_approved_date='$modified_approved_date', A.discount=B.discount, 
-                                A.order_no=B.order_no 
+                                A.order_no=B.order_no, A.sales_return_date='$sales_return_date' 
                             WHERE A.id = '$ref_id' and B.id = '$id'";
-                    }
-                    else
-                    {
+                    } else {
                         $sql = "Update distributor_in A, distributor_in B 
-                            Set A.date_of_processing=B.date_of_processing, A.depot_id=B.depot_id, A.distributor_id=B.distributor_id,
+                            Set A.date_of_processing=B.date_of_processing, A.depot_id=B.depot_id, 
+                                A.distributor_id=B.distributor_id,
                                 A.sales_rep_id=B.sales_rep_id, A.amount=B.amount, A.tax=B.tax, A.cst=B.cst, 
                                 A.tax_amount=B.tax_amount, A.final_amount=B.final_amount, A.due_date=B.due_date, 
-                                A.is_expired=B.is_expired, A.is_exchanged=B.is_exchanged, A.final_cost_amount=B.final_cost_amount, 
+                                A.is_expired=B.is_expired, A.is_exchanged=B.is_exchanged, 
+                                A.final_cost_amount=B.final_cost_amount, 
                                 A.status='$status', A.remarks='$remarks', 
                                 A.modified_by=B.modified_by, A.modified_on=B.modified_on, 
                                 A.approved_by='$curusr', A.approved_on='$now', A.sales_return_no = '$sales_return_no', 
@@ -263,11 +286,10 @@ function save_data($id=''){
                                 A.round_off_amount=B.round_off_amount, A.freezed=B.freezed,
                                 A.sales_type=B.sales_type, A.invoice_nos=B.invoice_nos, 
                                 A.modified_approved_date=NULL, A.discount=B.discount, 
-                                A.order_no=B.order_no 
+                                A.order_no=B.order_no, A.sales_return_date='$sales_return_date' 
                             WHERE A.id = '$ref_id' and B.id = '$id'";
                     }
 
-                    
                     $this->db->query($sql);
 
                     $sql = "Delete from distributor_in where id = '$id'";
@@ -293,27 +315,29 @@ function save_data($id=''){
                     $this->db->query($sql);
 
                     $sql = "Update distributor_out set distributor_in_id='$ref_id', status = '$status', 
-                                    remarks='$remarks', approved_by='$curusr', approved_on='$now' 
+                            remarks='$remarks', approved_by='$curusr', approved_on='$now', invoice_date='$sales_return_date' 
                             WHERE distributor_in_id = '$id'";
                     $this->db->query($sql);
 
-                    $sql = "Update distributor_out set voucher_no = '$voucher_no' WHERE distributor_in_id = '$ref_id' and distributor_id = '189'";
+                    $sql = "Update distributor_out set voucher_no = '$voucher_no', invoice_date='$sales_return_date' 
+                            WHERE distributor_in_id = '$ref_id' and distributor_id = '189'";
                     $this->db->query($sql);
 
                     $id = $ref_id;
                 } else {
                     $sql = "Update distributor_in A 
                             Set A.status='$status', A.remarks='$remarks', A.approved_by='$curusr', A.approved_on='$now', 
-                                A.sales_return_no = '$sales_return_no' 
+                                A.sales_return_no = '$sales_return_no', A.sales_return_date='$sales_return_date' 
                             WHERE A.id = '$id'";
                     $this->db->query($sql);
 
-                    $sql = "Update distributor_out set status = '$status', 
-                                    remarks='$remarks', approved_by='$curusr', approved_on='$now' 
+                    $sql = "Update distributor_out set status = '$status', remarks='$remarks', 
+                            approved_by='$curusr', approved_on='$now', invoice_date='$sales_return_date' 
                             WHERE distributor_in_id = '$id'";
                     $this->db->query($sql);
 
-                    $sql = "Update distributor_out set voucher_no = '$voucher_no' WHERE distributor_in_id = '$id' and distributor_id = '189'";
+                    $sql = "Update distributor_out set voucher_no = '$voucher_no', invoice_date='$sales_return_date' 
+                            WHERE distributor_in_id = '$id' and distributor_id = '189'";
                     $this->db->query($sql);
                 }
 
@@ -386,7 +410,8 @@ function save_data($id=''){
                     'sales_type'=>$this->input->post('sales_type'),
                     'invoice_nos'=>$this->input->post('invoice_no'),
                     'discount' => format_number($this->input->post('discount'),2),
-                    'order_no' => $this->input->post('order_no')
+                    'order_no' => $this->input->post('order_no'),
+                    'sales_return_date' => $sales_return_date
                 );
 
         $date_p=strtotime($date_of_processing);
@@ -731,7 +756,11 @@ function set_debit_note($id=''){
     $query = $this->db->query($sql);
     $result = $query->result();
     if(count($result)>0){
-        $date_of_processing = $result[0]->date_of_processing;
+        if(isset($result[0]->sales_return_date) && $result[0]->sales_return_date!=''){
+            $date_of_processing = $result[0]->sales_return_date;
+        } else {
+            $date_of_processing = $result[0]->date_of_processing;
+        }
         $sales_return_no = $result[0]->sales_return_no;
         $distributor_id = $result[0]->distributor_id;
         $created_by = $result[0]->created_by;
@@ -827,12 +856,16 @@ function set_debit_note($id=''){
                         $financial_year="";
                     } else {
                         $financial_year=calculateFiscalYearForDate($ref_date);
+                        if(strpos($financial_year,'-')!==false){
+                            $financial_year = substr($financial_year, 0, strpos($financial_year,'-'));
+                        }
                     }
                 } else {
                     $financial_year="";
                 }
                 
-                $ref_no = 'WHPL/exp_rev/'.$financial_year.'/'.strval($series);
+                // $ref_no = 'WHPL/exp_rev/'.$financial_year.'/'.strval($series);
+                $ref_no = 'WHPL/'.$financial_year.'-EXPREV/'.strval($series);
                 $modified_approved_date = null;
             }
         } else {
@@ -894,7 +927,8 @@ function set_debit_note($id=''){
                 'ref_no' => $ref_no,
                 'ref_date' => $ref_date,
                 'modified_approved_date' => $modified_approved_date,
-                'distributor_in_id' => $id
+                'distributor_in_id' => $id,
+                'exp_category_id' => '1'
             );
             
 
@@ -932,6 +966,12 @@ function set_ledger($id) {
     $query=$this->db->query($sql);
     $result=$query->result();
     if(count($result)>0){
+        if(isset($result[0]->sales_return_date) && $result[0]->sales_return_date!=''){
+            $ref_date = $result[0]->sales_return_date;
+        } else {
+            $ref_date = $result[0]->date_of_processing;
+        }
+
         $data = array(
                     'ref_id' => $id,
                     'ref_type' => 'Distributor_Sales_Return',
@@ -946,7 +986,7 @@ function set_ledger($id) {
                     'is_active' => '1',
                     'ledger_type' => 'Main Entry',
                     'narration' => $result[0]->remarks,
-                    'ref_date' => $result[0]->date_of_processing,
+                    'ref_date' => $ref_date,
                     'modified_by' => $curusr,
                     'modified_on' => $now
                 );

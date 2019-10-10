@@ -15,6 +15,7 @@ class Credit_debit_note extends CI_Controller{
         $this->load->helper('common_functions');
         $this->load->model('credit_debit_note_model');
         $this->load->model('distributor_model');
+        $this->load->model('exp_cat_master_model');
         $this->load->database();
     }
 
@@ -86,6 +87,7 @@ class Credit_debit_note extends CI_Controller{
             if($result[0]->r_insert == 1) {
                 $data['access'] = $result;
                 $data['distributor'] = $this->distributor_model->get_data('Approved');
+                $data['exp_category'] = $this->exp_cat_master_model->get_data('Approved');
 
                 load_view('credit_debit_note/credit_debit_note_details', $data);
             } else {
@@ -107,6 +109,7 @@ class Credit_debit_note extends CI_Controller{
                 
                 $data['data'] = $this->credit_debit_note_model->get_data('', $id);
                 $data['distributor'] = $this->distributor_model->get_data('Approved');
+                $data['exp_category'] = $this->exp_cat_master_model->get_data('Approved');
 				$distributor_id=$data['data'][0]->distributor_id;
 				$data['invoice'] = $this->credit_debit_note_model->get_invoice($distributor_id);
 

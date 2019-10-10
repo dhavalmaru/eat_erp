@@ -46,8 +46,9 @@ function get_data($status='', $id=''){
         }
     }
 
-    $sql = "select G.id, G.date_of_processing, G.invoice_no, G.voucher_no, G.gate_pass_no, G.depot_id, G.distributor_id, G.sales_rep_id, 
-            G.amount, G.tax, G.tax_per, G.tax_amount, G.final_amount, G.due_date, G.order_no, G.order_date, G.supplier_ref, 
+    $sql = "select G.id, G.date_of_processing, G.invoice_no, G.voucher_no, G.gate_pass_no, G.depot_id, G.distributor_id, 
+            G.sales_rep_id, G.amount, G.tax, G.tax_per, G.tax_amount, G.final_amount, G.due_date, 
+            G.order_no, G.order_date, G.ref_invoice_no, G.ref_invoice_details, G.ref_invoice_date, G.supplier_ref, 
             G.despatch_doc_no, G.despatch_through, G.destination, G.status, G.remarks, G.created_by, G.created_on, 
             G.modified_by, G.modified_on, G.approved_by, G.approved_on, G.rejected_by, G.rejected_on, G.client_name, G.address, 
             G.city, G.pincode, ifnull(G.state, G.distributor_state) as state, G.country, G.mobile_no, G.discount, 
@@ -245,9 +246,9 @@ function get_distributor_out_data($status='', $id=''){
     }
     //query for approved ,approval pending, and all 
     $sql = "select * from 
-            (select concat('d_',G.id) as d_id, G.id, G.date_of_processing, G.invoice_no, G.voucher_no, G.gate_pass_no, G.depot_id, 
-            G.distributor_id, G.sales_rep_id, 
-            G.amount, G.tax, G.tax_per, G.tax_amount, G.final_amount, G.due_date, G.order_no, G.order_date, G.supplier_ref, 
+            (select concat('d_',G.id) as d_id, G.id, G.date_of_processing, G.invoice_no, G.voucher_no, G.gate_pass_no, 
+            G.depot_id, G.distributor_id, G.sales_rep_id, G.amount, G.tax, G.tax_per, G.tax_amount, G.final_amount, G.due_date, 
+            G.order_no, G.order_date, G.ref_invoice_no, G.ref_invoice_details, G.ref_invoice_date, G.supplier_ref, 
             G.despatch_doc_no, G.despatch_through, G.destination, G.status, G.remarks, G.created_by, G.created_on, 
             G.modified_by, G.modified_on, G.approved_by, G.approved_on, G.rejected_by, G.rejected_on, G.client_name, G.address, 
             G.city, G.pincode, ifnull(G.state, G.distributor_state) as state, G.country, G.mobile_no, G.discount, 
@@ -287,9 +288,11 @@ function get_distributor_out_data($status='', $id=''){
 
             union all 
 
-            select concat('s_',C.id) as d_id, null as id, C.date_of_processing, null as invoice_no, null as voucher_no, null as gate_pass_no, null as depot_id, 
-            replace(C.distributor_id,'d_','') as distributor_id, C.created_by as sales_rep_id, C.amount, null as tax, null as tax_per, null as tax_amount, 
-            C.amount as final_amount, null as due_date, null as order_no, null as order_date, null as supplier_ref, 
+            select concat('s_',C.id) as d_id, null as id, C.date_of_processing, null as invoice_no, null as voucher_no, 
+            null as gate_pass_no, null as depot_id, replace(C.distributor_id,'d_','') as distributor_id, 
+            C.created_by as sales_rep_id, C.amount, null as tax, null as tax_per, null as tax_amount, 
+            C.amount as final_amount, null as due_date, null as order_no, null as order_date, null as ref_invoice_no, 
+            null as ref_invoice_details, null as ref_invoice_date, null as supplier_ref, 
             null as despatch_doc_no, null as despatch_through, null as destination, 'Pending' as status, C.remarks, 
             C.created_by, C.created_on, C.modified_by, C.modified_on, C.approved_by, C.approved_on, 
             C.rejected_by, C.rejected_on, null as client_name, null as address, null as city, 
@@ -446,6 +449,13 @@ function save_data($id=''){
         $order_date=formatdate($order_date);
     }
 	
+    $ref_invoice_date=$this->input->post('ref_invoice_date');
+    if($ref_invoice_date==''){
+        $ref_invoice_date=NULL;
+    } else {
+        $ref_invoice_date=formatdate($ref_invoice_date);
+    }
+    
 	$email_date_time=$this->input->post('email_date_time');
     if($email_date_time==''){
         $email_date_time=NULL;
@@ -538,11 +548,14 @@ function save_data($id=''){
                     
                     if($modified_approved_date!=null && $modified_approved_date!=null){
                         $sql = "Update distributor_out A, distributor_out B 
-                            Set A.date_of_processing=B.date_of_processing, A.depot_id=B.depot_id, A.distributor_id=B.distributor_id,
+                                Set A.date_of_processing=B.date_of_processing, A.depot_id=B.depot_id, 
+                                A.distributor_id=B.distributor_id,
                                 A.sales_rep_id=B.sales_rep_id, A.amount=B.amount, A.tax=B.tax, A.tax_per=B.tax_per, 
                                 A.tax_amount=B.tax_amount, A.final_amount=B.final_amount, A.due_date=B.due_date, 
-                                A.order_no=B.order_no, A.order_date=B.order_date, A.supplier_ref=B.supplier_ref, 
-                                A.despatch_doc_no=B.despatch_doc_no, A.despatch_through=B.despatch_through, A.destination=B.destination, 
+                                A.order_no=B.order_no, A.order_date=B.order_date, A.ref_invoice_no=B.ref_invoice_no, 
+                                A.ref_invoice_details=B.ref_invoice_details, A.ref_invoice_date=B.ref_invoice_date, 
+                                A.supplier_ref=B.supplier_ref, A.despatch_doc_no=B.despatch_doc_no, 
+                                A.despatch_through=B.despatch_through, A.destination=B.destination, 
                                 A.status='$status', A.remarks='$remarks', 
                                 A.modified_by=B.modified_by, A.modified_on=B.modified_on, 
                                 A.approved_by='$curusr', A.approved_on='$now', A.invoice_no = '$invoice_no', 
@@ -567,18 +580,23 @@ function save_data($id=''){
                             Set A.date_of_processing=B.date_of_processing, A.depot_id=B.depot_id, A.distributor_id=B.distributor_id,
                                 A.sales_rep_id=B.sales_rep_id, A.amount=B.amount, A.tax=B.tax, A.tax_per=B.tax_per, 
                                 A.tax_amount=B.tax_amount, A.final_amount=B.final_amount, A.due_date=B.due_date, 
-                                A.order_no=B.order_no, A.order_date=B.order_date, A.supplier_ref=B.supplier_ref, 
-                                A.despatch_doc_no=B.despatch_doc_no, A.despatch_through=B.despatch_through, A.destination=B.destination, 
+                                A.order_no=B.order_no, A.order_date=B.order_date, A.ref_invoice_no=B.ref_invoice_no, 
+                                A.ref_invoice_details=B.ref_invoice_details, A.ref_invoice_date=B.ref_invoice_date, 
+                                A.supplier_ref=B.supplier_ref, A.despatch_doc_no=B.despatch_doc_no, 
+                                A.despatch_through=B.despatch_through, A.destination=B.destination, 
                                 A.status='$status', A.remarks='$remarks', 
                                 A.modified_by=B.modified_by, A.modified_on=B.modified_on, 
                                 A.approved_by='$curusr', A.approved_on='$now', A.invoice_no = '$invoice_no', 
                                 A.client_name=B.client_name, A.address=B.address, A.city=B.city, 
                                 A.pincode=B.pincode, A.state=B.state, A.country=B.country, A.mobile_no=B.mobile_no, 
-                                A.discount=B.discount, A.sample_distributor_id=B.sample_distributor_id, A.delivery_status=B.delivery_status, 
-                                A.delivery_date=B.delivery_date, A.receivable_doc=B.receivable_doc, A.transport_type=B.transport_type, 
+                                A.discount=B.discount, A.sample_distributor_id=B.sample_distributor_id, 
+                                A.delivery_status=B.delivery_status, 
+                                A.delivery_date=B.delivery_date, A.receivable_doc=B.receivable_doc, 
+                                A.transport_type=B.transport_type, 
                                 A.vehicle_number = B.vehicle_number, A.cgst = B.cgst, A.sgst = B.sgst, A.igst = B.igst, 
                                 A.cgst_amount = B.cgst_amount, A.sgst_amount = B.sgst_amount, A.igst_amount = B.igst_amount, 
-                                A.reverse_charge = B.reverse_charge, A.shipping_address = B.shipping_address, A.distributor_consignee_id = B.distributor_consignee_id, 
+                                A.reverse_charge = B.reverse_charge, A.shipping_address = B.shipping_address, 
+                                A.distributor_consignee_id = B.distributor_consignee_id, 
                                 A.con_name = B.con_name, A.con_address = B.con_address, A.con_city = B.con_city, 
                                 A.con_pincode = B.con_pincode, A.con_state = B.con_state, A.con_country = B.con_country, 
                                 A.con_state_code = B.con_state_code, A.con_gst_number = B.con_gst_number, A.state_code = B.state_code, 
@@ -613,6 +631,17 @@ function save_data($id=''){
 
                 $this->set_ledger($id);
                 $this->set_credit_note($id);
+
+                // $distributor_id = '';
+                // $sql = "Select * from distributor_out where id = '$id'";
+                // $query = $this->db->query($sql);
+                // $result = $query->result();
+                // if(count($result)>0) {
+                //     $distributor_id = $result[0]->distributor_id;
+                // }
+                // if($distributor_id=='214'){
+                //     $this->set_amazon_fba_delivery($id);
+                // }
 
                 // echo '<script>var win= window.open("'.base_url().'index.php/distributor_out/view_tax_invoice/'.$id.'");
                 // win.print();
@@ -718,6 +747,9 @@ function save_data($id=''){
             'due_date' => $due_date,
             'order_no' => $this->input->post('order_no'),
             'order_date' => $order_date,
+            'ref_invoice_no' => $this->input->post('ref_invoice_no'),
+            'ref_invoice_details' => $this->input->post('ref_invoice_details'),
+            'ref_invoice_date' => $ref_invoice_date,
             'supplier_ref' => $this->input->post('supplier_ref'),
             'despatch_doc_no' => $this->input->post('despatch_doc_no'),
             'despatch_through' => $this->input->post('despatch_through'),
@@ -917,12 +949,42 @@ function save_data($id=''){
     $this->user_access_log_model->insertAccessLog($logarray);
 }
 
+function set_amazon_fba_delivery($id=''){
+    $delivery_status='Delivered';
+    $sales_rep_id='104';
+    $status='Approved';
+    $tracking_id='';
+    $date_of_dispatch=date('Y-m-d');
+    $proof_of_dispatch = '';
+
+    if($id!=""){
+        $now=date('Y-m-d H:i:s');
+        $curusr=$this->session->userdata('session_id');
+
+        $sql = "update distributor_out set delivery_status = '$delivery_status', delivery_sales_rep_id = '$sales_rep_id', 
+                status = '$status', tracking_id = '$tracking_id', modified_by = '$curusr', modified_on = '$now', 
+                gatepass_date = '$now', date_of_dispatch = '$date_of_dispatch', proof_of_dispatch = '$proof_of_dispatch', 
+                delivery_date = '$date_of_dispatch', proof_of_delivery = '' 
+                where id = '$id'";
+        $this->db->query($sql);
+
+        $sql = "update distributor_out_items set batch_no = '182', batch_qty = qty 
+                where distributor_out_id = '$id'";
+        $this->db->query($sql);
+    }
+}
+
 function set_credit_note($id=''){
     $sql = "select * from distributor_out where id = '$id'";
     $query = $this->db->query($sql);
     $result = $query->result();
     if(count($result)>0){
-        $date_of_processing = $result[0]->date_of_processing;
+        // $date_of_processing = $result[0]->date_of_processing;
+        if(isset($result[0]->invoice_date) && $result[0]->invoice_date!=''){
+            $date_of_processing = $result[0]->invoice_date;
+        } else {
+            $date_of_processing = $result[0]->date_of_processing;
+        }
         $invoice_no = $result[0]->invoice_no;
         $distributor_id = $result[0]->distributor_id;
         $created_by = $result[0]->created_by;
@@ -1018,12 +1080,16 @@ function set_credit_note($id=''){
                         $financial_year="";
                     } else {
                         $financial_year=calculateFiscalYearForDate($ref_date);
+                        if(strpos($financial_year,'-')!==false){
+                            $financial_year = substr($financial_year, 0, strpos($financial_year,'-'));
+                        }
                     }
                 } else {
                     $financial_year="";
                 }
                 
-                $ref_no = 'WHPL/exp/'.$financial_year.'/'.strval($series);
+                // $ref_no = 'WHPL/exp/'.$financial_year.'/'.strval($series);
+                $ref_no = 'WHPL/'.$financial_year.'-EXP/'.strval($series);
                 $modified_approved_date = null;
             }
         } else {
@@ -1085,7 +1151,8 @@ function set_credit_note($id=''){
                 'ref_no' => $ref_no,
                 'ref_date' => $ref_date,
                 'modified_approved_date' => $modified_approved_date,
-                'distributor_out_id' => $id
+                'distributor_out_id' => $id,
+                'exp_category_id' => '1'
             );
 
             if($credit_debit_note_id==''){
@@ -1348,7 +1415,7 @@ function get_sku_details($distributor_out_id){
 }
 
 function get_batch_details(){
-    $date = date("Y-m-d", strtotime("-6 months"));
+    $date = date("Y-m-d", strtotime("-9 months"));
 
     $sql = "select * from batch_master where date_of_processing >= '$date' and status = 'Approved' and batch_no!=''";
     $query = $this->db->query($sql);

@@ -68,6 +68,14 @@
                                  <div class="panel panel-default">
 								
 								<div class="panel-body">
+                                    <div class="form-group" >
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Expiry</label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="checkbox" class="" name="chk_expiry" id="chk_expiry" onchange="set_expiry()" />
+                                            </div>
+                                        </div>
+                                    </div>
 									<div class="form-group" >
 										<div class="col-md-12 col-sm-12 col-xs-12">
 											<label class="col-md-2 col-sm-2 col-xs-12 control-label">Date <span class="asterisk_sign">*</span></label>
@@ -75,6 +83,7 @@
                                                 <input type="hidden" class="form-control" name="d_id" id="d_id" value="<?php if(isset($data)) echo $data[0]->d_id;?>"/>
                                                 <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) {if(strrpos($data[0]->d_id, "d_") !== false) echo $data[0]->id;}?>"/>
                                                 <input type="hidden" name="invoice_no" id="invoice_no" value="<?php if(isset($data)) { echo $data[0]->invoice_no; } ?>"/>
+                                                <input type="hidden" name="invoice_date" id="invoice_date" value="<?php if(isset($data)) echo (($data[0]->invoice_date!=null && $data[0]->invoice_date!='')?date('d/m/Y',strtotime($data[0]->invoice_date)):''); else echo ''; ?>"/>
                                                 <input type="hidden" name="voucher_no" id="voucher_no" value="<?php if(isset($data)) { echo $data[0]->voucher_no; } ?>"/>
                                                 <input type="text" class="form-control datepicker1" name="date_of_processing" id="date_of_processing" placeholder="Date" value="<?php if(isset($data)) echo (($data[0]->date_of_processing!=null && $data[0]->date_of_processing!='')?date('d/m/Y',strtotime($data[0]->date_of_processing)):date('d/m/Y')); else echo date('d/m/Y'); ?>"/>
                                             </div>
@@ -803,6 +812,10 @@
                     }
                 });
             });
+
+            function set_expiry() {
+                $('#sample_distributor_id').val('189');
+            }
 
             function show_item(elem){
                 var id = elem.attr('id');

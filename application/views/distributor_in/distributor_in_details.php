@@ -104,7 +104,7 @@
                                                 <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
                                                 <input type="hidden" class="form-control" name="ref_id" id="ref_id" value="<?php if(isset($data)) echo $data[0]->ref_id;?>"/>
                                                 <input type="hidden" class="form-control" name="sales_return_no" id="sales_return_no" value="<?php if(isset($data)) echo $data[0]->sales_return_no;?>"/>
-                                                <input type="hidden" class="form-control" name="order_no" id="order_no" value="<?php if(isset($data)) echo $data[0]->order_no;?>"/>
+                                                <input type="hidden" class="form-control" name="sales_return_date" id="sales_return_date" value="<?php if(isset($data)) echo (($data[0]->sales_return_date!=null && $data[0]->sales_return_date!='')?date('d/m/Y',strtotime($data[0]->sales_return_date)):''); else echo ''; ?>"/>
                                                 <input type="text" class="form-control datepicker1" name="date_of_processing" id="date_of_processing" placeholder="Date" value="<?php if(isset($data)) echo (($data[0]->date_of_processing!=null && $data[0]->date_of_processing!='')?date('d/m/Y',strtotime($data[0]->date_of_processing)):date('d/m/Y')); else echo date('d/m/Y'); ?>"/>
                                             </div>
                                         </div>

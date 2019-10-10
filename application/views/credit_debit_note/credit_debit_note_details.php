@@ -86,7 +86,7 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Distributor <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="distributor_id" id="distributor_id" class="form-control select2">
+                                                <select name="distributor_id" id="distributor_id" class="form-control select2" data-error="#distributor_id_error">
                                                     <option value="">Select</option>
                                                     <?php if(isset($distributor)) { for ($k=0; $k < count($distributor) ; $k++) { ?>
                                                             <option value="<?php echo $distributor[$k]->id; ?>" <?php if(isset($data)) { if($distributor[$k]->id==$data[0]->distributor_id) { echo 'selected'; } } ?>><?php echo $distributor[$k]->distributor_name; ?></option>
@@ -94,6 +94,7 @@
                                                 </select>
                                                 <input type="hidden" class="form-control" name="state" id="state" value=""/>
                                                 <input type="hidden" class="form-control" name="state_code" id="state_code" value=""/>
+                                                <div id="distributor_id_error" style="padding-top:10px;"></div>
                                                 <!-- <input type="hidden" name="distributor_id" id="distributor_id" value="<?php //if(isset($data)) { echo $data[0]->distributor_id; } ?>"/>
                                                 <input type="text" class="form-control load_distributor" name="distributor" id="distributor" placeholder="Type To Select Distributor...." value="<?php //if(isset($data)) { echo $data[0]->distributor_name; } ?>"/> -->
                                             </div>
@@ -120,6 +121,20 @@
                                         </div>
                                     </div>
 									
+                                    <div class="form-group" id="exp_cat_div">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Expense Category <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <select name="exp_category_id" id="exp_category_id" class="form-control">
+                                                    <option value="">Select</option>
+                                                     <?php if(isset($exp_category)) { for ($k=0; $k < count($exp_category) ; $k++) { ?>
+                                                            <option value="<?php echo $exp_category[$k]->id; ?>" <?php if (isset($data)) { if($exp_category[$k]->id==$data[0]->exp_category_id) { echo 'selected'; } } ?>><?php echo $exp_category[$k]->category; ?></option>
+                                                    <?php }} ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
 									<div class="form-group" id="invoice_no_div">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Invoice No. <span class="asterisk_sign"></span></label>

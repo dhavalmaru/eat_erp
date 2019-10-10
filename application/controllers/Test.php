@@ -16,6 +16,37 @@ class Test extends CI_Controller{
         $this->load->database();
     }
 
+    public function test_location_api() {
+        if(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ip_address = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else {
+            $ip_address = $_SERVER['REMOTE_ADDR'];
+        }
+
+        echo var_export(unserialize(file_get_contents('http://www.geoplugin.net/php.gp?ip='.$ip_address)));
+        echo '<br/><br/>';
+
+        $new_arr[]= unserialize(file_get_contents('http://www.geoplugin.net/php.gp?ip='.$ip_address));
+        echo "Latitude:".$new_arr[0]['geoplugin_latitude']." and Longitude:".$new_arr[0]['geoplugin_longitude'];
+        echo '<br/><br/>';
+
+        $lat = 0;
+        $lng = 0;
+
+        if(count($new_arr)>0){
+            if(isset($new_arr[0]['geoplugin_latitude'])){
+                $lat = $new_arr[0]['geoplugin_latitude'];
+            }
+            if(isset($new_arr[0]['geoplugin_longitude'])){
+                $lng = $new_arr[0]['geoplugin_longitude'];
+            }
+        }
+
+        echo $lat;
+        echo '<br/><br/>';
+        echo $lng;
+    }
+
     public function testabc(){
         $result = $this->db->query("SELECT * FROM `distributor_master` Where id= '1319' ORDER By id desc")->result();
         echo strlen($result[0]->distributor_name);

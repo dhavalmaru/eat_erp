@@ -1179,7 +1179,7 @@ function send_po_physical_confirmation_email($id='', $mismatch='') {
 }
 
 function get_batch_details(){
-    $date = date("Y-m-d", strtotime("-6 months"));
+    $date = date("Y-m-d", strtotime("-9 months"));
 
     $sql = "select * from batch_master where date_of_processing >= '$date' and status = 'Approved' and batch_no!=''";
     $query = $this->db->query($sql);

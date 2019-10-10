@@ -1349,6 +1349,56 @@ $('#form_payment_voucher').submit(function() {
 
 
 
+// ----------------- EXPENSE CATEGORY MASTER FORM VALIDATION -------------------------------------
+$("#form_exp_cat_master_details").validate({
+    rules: {
+        category: {
+            required: true,
+            check_category_availablity: true
+        }
+    },
+
+    ignore: false,
+
+    errorPlacement: function (error, element) {
+        var placement = $(element).data('error');
+        if (placement) {
+            $(placement).append(error);
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
+$.validator.addMethod("check_category_availablity", function (value, element) {
+    var result = 1;
+
+    $.ajax({
+        url: BASE_URL+'index.php/Exp_cat_master/check_category_availablity',
+        data: 'id='+$("#id").val()+'&category='+$("#category").val(),
+        type: "POST",
+        dataType: 'html',
+        global: false,
+        async: false,
+        success: function (data) {
+            result = parseInt(data);
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+        }
+    });
+
+    if (result) {
+        return false;
+    } else {
+        return true;
+    }
+}, 'Category already in use.');
+
+
+
+
 // ----------------- BATCH MASTER FORM VALIDATION -------------------------------------
 $("#form_batch_master_details").validate({
     rules: {
@@ -1410,6 +1460,8 @@ var remove_loader = function() {
     });
     console.log('remove_loader');
 }
+
+
 
 // ----------------- BATCH PROCESSING DETAILS FORM VALIDATION -------------------------------------
 $("#form_batch_processing_details").validate({
@@ -4276,6 +4328,9 @@ $("#form_credit_debit_note_details").validate({
             numbersandcommaanddotonly: true
         },
         remarks: {
+            required: true
+        },
+        exp_category_id: {
             required: true
         }
     },

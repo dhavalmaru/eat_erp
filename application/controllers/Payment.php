@@ -171,7 +171,7 @@ class Payment extends CI_Controller{
 
     public function save(){
         $this->payment_model->save_data();
-        // redirect(base_url().'index.php/payment');
+        redirect(base_url().'index.php/payment');
     }
 
     public function update($id){

@@ -42,7 +42,7 @@ class Bar_to_box extends CI_Controller{
                 $data['access'] = $this->bar_to_box_model->get_access();
                 $data['depot'] = $this->depot_model->get_data('Approved');
                 $data['box'] = $this->box_model->get_data('Approved');
-                $date = date("Y-m-d", strtotime("-6 months"));
+                $date = date("Y-m-d", strtotime("-9 months"));
                 $sql = "select * from batch_master where date_of_processing >= '$date' and status = 'Approved' and batch_no!=''";
                 $query = $this->db->query($sql);
                 $data['batch'] = $query->result();
@@ -72,7 +72,7 @@ class Bar_to_box extends CI_Controller{
                 $data['box'] = $this->box_model->get_data('Approved');
                 $data['data'] = $this->bar_to_box_model->get_data('', $id);
                 $data['bar_to_boxes'] = $this->bar_to_box_model->get_bar_to_box_qty($id);
-                $date = date("Y-m-d", strtotime("-6 months"));
+                $date = date("Y-m-d", strtotime("-9 months"));
                 $sql = "select * from batch_master where date_of_processing >= '$date' and status = 'Approved' and batch_no!=''";
                 $query = $this->db->query($sql);
                 $data['batch'] = $query->result();

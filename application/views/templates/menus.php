@@ -353,6 +353,11 @@
                     <li class="sub_menu--item" <?php if ($Vendors==0) echo 'style="display: none;"'; ?>>
                         <a href="<?php echo base_url().'index.php/Vendor_type'; ?>"   class="sub_menu--link"> Vendor Type</a>
                     </li>
+                    <li class="sub_menu--item" <?php if ($Credit_Debit_Note==0) echo 'style="display: none;"'; ?>>
+                        <a href="<?php echo base_url().'index.php/Exp_cat_master'; ?>" class="sub_menu--link"> 
+                            Expense Category Master
+                        </a>
+                    </li>
                 </ul>
 
 
@@ -407,7 +412,7 @@
                         <a href="<?php echo base_url().'index.php/Distributor_out'; ?>" class="sub_menu--link"> Sales </a>
                     </li>
                     <li class="sub_menu--item" <?php if ($Distributor_Out==0) echo 'style="display: none;"'; ?>>
-                        <a href="<?php echo base_url().'index.php/Sample_out'; ?>" class="sub_menu--link"> Sample </a>
+                        <a href="<?php echo base_url().'index.php/Sample_out'; ?>" class="sub_menu--link"> Sample / Expiry </a>
                     </li>
                     <li class="sub_menu--item" <?php if ($Distributor_Out==0) echo 'style="display: none;"'; ?>>
                         <a href="<?php echo base_url().'index.php/Distributor_out/product_expired'; ?>" class="sub_menu--link"> Product Expired </a>

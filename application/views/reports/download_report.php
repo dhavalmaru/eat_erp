@@ -291,7 +291,9 @@ tfoot tr th:last-child {
                                                 <div class="col-md-6 col-sm-6  col-xs-12">
                                                     <input type="checkbox" id="invoicelevel" value="Invoice Level" name="invoicelevel"> Invoice Level <br>
                                                     <input type="checkbox" id="invoicelevelsalesreturn" value="Invoice Level Sales Return" name="invoicelevelsalesreturn"> Invoice Level Sales Return <br>
+                                                    <span style="display: none;">
                                                     <input type="checkbox" id="invoicelevelsample" value="Invoice Level Sample & Product Expired" name="invoicelevelsample"> Invoice Level Sample & Product Expired <br>
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>

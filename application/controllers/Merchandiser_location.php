@@ -106,7 +106,7 @@ class Merchandiser_location extends CI_Controller{
                 $data['bar'] = $this->product_model->get_data('Approved','','1');
                 $data['bar_details'] = $this->product_model->get_data('Approved','','1');
 
-                $date = date("Y-m-d", strtotime("-6 months"));
+                $date = date("Y-m-d", strtotime("-9 months"));
 
                 // $sql = "select * from batch_processing where date_of_processing >= '$date' and status = 'Approved' and batch_id_as_per_fssai!=''";
                 // $query=$this->db->query($sql);

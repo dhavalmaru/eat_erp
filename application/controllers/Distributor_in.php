@@ -127,7 +127,7 @@ class Distributor_in extends CI_Controller{
                 $data['box'] = $this->box_model->get_data('Approved');
                 $data['bar'] = $this->product_model->get_data('Approved');
 
-                $date = date("Y-m-d", strtotime("-6 months"));
+                $date = date("Y-m-d", strtotime("-9 months"));
                 $sql = "select * from batch_master where date_of_processing >= '$date' and status = 'Approved' and batch_no!=''";
                 $query = $this->db->query($sql);
                 $data['batch'] = $query->result();
@@ -167,7 +167,7 @@ class Distributor_in extends CI_Controller{
                 }
                
                 $date = new DateTime($data['data'][0]->date_of_processing);
-                $date->modify('-6 month');
+                $date->modify('-9 month');
                 $date = $date->format('Y-m-d');
                 // echo $date;
 

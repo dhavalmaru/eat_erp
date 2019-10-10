@@ -45,7 +45,7 @@ class Depot_transfer extends CI_Controller{
                 $data['raw_material'] = $this->raw_material_model->get_data('Approved');
                 $data['box'] = $this->box_model->get_data('Approved');
                 $data['bar'] = $this->product_model->get_data('Approved');
-                $date = date("Y-m-d", strtotime("-6 months"));
+                $date = date("Y-m-d", strtotime("-9 months"));
                 $sql = "select * from batch_master where date_of_processing >= '$date' and status = 'Approved' and batch_no!=''";
                 $query = $this->db->query($sql);
                 $data['batch'] = $query->result();
@@ -76,7 +76,7 @@ class Depot_transfer extends CI_Controller{
                 $data['raw_material'] = $this->raw_material_model->get_data('Approved');
                 $data['box'] = $this->box_model->get_data('Approved');
                 $data['bar'] = $this->product_model->get_data('Approved');
-                $date = date("Y-m-d", strtotime("-6 months"));
+                $date = date("Y-m-d", strtotime("-9 months"));
                 $sql = "select * from batch_master where date_of_processing >= '$date' and status = 'Approved' and batch_no!=''";
                 $query = $this->db->query($sql);
                 $data['batch'] = $query->result();

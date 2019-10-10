@@ -536,17 +536,15 @@
                                             </div>
                                         </div>
                                     </div>
-									<div class="form-group">
+									<div class="form-group" id="shipping_address_div" style="<?php if(isset($data)) {if($data[0]->shipping_address=='no') echo ''; else echo 'display: none;';} else echo 'display: none;'; ?>">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
-                                            <div id="shipping_address_div" style="<?php if(isset($data)) {if($data[0]->shipping_address=='no') echo ''; else echo 'display: none;';} else echo 'display: none;'; ?>">
-                                                <label class="col-md-2 col-sm-2 col-xs-12 control-label">Shipping Address <span class="asterisk_sign">*</span></label>
-                                                <div class="col-md-4 col-sm-4 col-xs-12">
-                                                    <select name="distributor_consignee_id" id="distributor_consignee_id" class="form-control">
-                                                        <option value="">Select</option>
-                                                        
-                                                    </select>
-                                                    <input type="hidden" name="distributor_consignee" id="distributor_consignee" value="<?php if(isset($data)) echo $data[0]->distributor_consignee_id; ?>" />
-                                                </div>
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Shipping Address <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <select name="distributor_consignee_id" id="distributor_consignee_id" class="form-control">
+                                                    <option value="">Select</option>
+                                                    
+                                                </select>
+                                                <input type="hidden" name="distributor_consignee" id="distributor_consignee" value="<?php if(isset($data)) echo $data[0]->distributor_consignee_id; ?>" />
                                             </div>
                                         </div>
                                     </div>
@@ -565,22 +563,21 @@
                                     </div> -->
 									
 									
-										<div class="form-group">
-												<div class="col-md-12 col-sm-12 col-xs-12">
-													<label class="col-md-2 col-sm-2 col-xs-12 control-label">Option of Basis of Sales<span class="asterisk_sign">*</span></label>
-													<div class="col-md-4 col-sm-4 col-xs-12">
-														<select name="basis_of_sales" id="basis_of_sales" class="form-control select2">
-															
-														<option value="">Select</option>
-														
-														<option value="PO Number" <?php if(isset($data)){if($data[0]->basis_of_sales=='PO Number' || $data[0]->order_no!='')  echo 'selected'; } ?>>PO Number</option>
-															<option value="Emails" <?php if(isset($data)){if($data[0]->basis_of_sales=='Emails') echo 'selected'; }?>>Emails</option>
-														</select>
-														
-													</div>
-												</div>
+									<div class="form-group">
+										<div class="col-md-12 col-sm-12 col-xs-12">
+											<label class="col-md-2 col-sm-2 col-xs-12 control-label">Option of Basis of Sales<span class="asterisk_sign">*</span></label>
+											<div class="col-md-4 col-sm-4 col-xs-12">
+												<select name="basis_of_sales" id="basis_of_sales" class="form-control select2">
+													
+												<option value="">Select</option>
+												
+												<option value="PO Number" <?php if(isset($data)){if($data[0]->basis_of_sales=='PO Number' || $data[0]->order_no!='')  echo 'selected'; } ?>>PO Number</option>
+													<option value="Emails" <?php if(isset($data)){if($data[0]->basis_of_sales=='Emails') echo 'selected'; }?>>Emails</option>
+												</select>
+												
+											</div>
 										</div>
-									<br>
+									</div>
                                     <div class="form-group" id="po_num1">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Order No </label>
@@ -594,6 +591,30 @@
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Order Date </label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control datepicker" name="order_date" id="order_date" placeholder="Order Date" value="<?php if(isset($data)) { echo (($data[0]->order_date!=null && $data[0]->order_date!='')?date('d/m/Y',strtotime($data[0]->order_date)):''); } ?>" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group order_ref">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Reference Invoice No</label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="ref_invoice_no" id="ref_invoice_no" placeholder="Reference Invoice No" value="<?php if (isset($data)) { echo $data[0]->ref_invoice_no; } ?>" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group order_ref">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Reference Invoice Details</label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="ref_invoice_details" id="ref_invoice_details" placeholder="Reference Invoice Details" value="<?php if (isset($data)) { echo $data[0]->ref_invoice_details; } ?>" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group order_ref">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Reference Invoice Date</label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control datepicker" name="ref_invoice_date" id="ref_invoice_date" placeholder="Reference Invoice Date" value="<?php if(isset($data)) { echo (($data[0]->ref_invoice_date!=null && $data[0]->ref_invoice_date!='')?date('d/m/Y',strtotime($data[0]->ref_invoice_date)):''); } ?>" />
                                             </div>
                                         </div>
                                     </div>
@@ -1057,6 +1078,7 @@
 				$('#email_body3').hide();
 				$('#po_num1').hide();
 				$('#po_num2').hide();
+                $('.order_ref').hide();
 				
                 if($('#sample_distributor_id').val()!=''){
                     get_distributor_details($('#sample_distributor_id').val());
@@ -1069,12 +1091,14 @@
 						$('#email_body3').hide();
 						$('#po_num1').show();
 						$('#po_num2').show();
+                        $('.order_ref').show();
 					} else if($('#basis_of_sales').val()=='Emails' )  {
 						$('#email_body1').show();
 						$('#email_body2').show();
 						$('#email_body3').show();
 						$('#po_num1').hide();
 						$('#po_num2').hide();
+                        $('.order_ref').hide();
 					}
 				});				
 				
@@ -1084,6 +1108,7 @@
 					$('#email_body3').show();
 					$('#po_num1').hide();
 					$('#po_num2').hide();
+                    $('.order_ref').hide();
 				}
 				if($("#basis_of_sales option:selected").val() == 'PO Number') {
 					$('#email_body1').hide();
@@ -1091,6 +1116,7 @@
 					$('#email_body3').hide();
 					$('#po_num1').show();
 					$('#po_num2').show();
+                    $('.order_ref').show();
 				}
                 $('#email_date_time').datetimepicker({
 					format: 'DD-MM-YYYY hh:mm:ss A',

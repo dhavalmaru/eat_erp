@@ -12,3 +12,6 @@ assets/aws_api/return/src/MarketplaceWebService/Samples/.config.inc.php
 
 # Ignore file named `application/config/config.php`
 application/config/config.php
+
+# Ignore file named `application/config/database.php`
+application/config/database.php

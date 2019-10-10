@@ -119,7 +119,8 @@ var $kerninfo;
 var $haskernGPOS;
 var $hassmallcapsGSUB;
 
-	function TTFontFile() {
+	// function TTFontFile() {
+	public function __construct() {
 		$this->maxStrLenRead = 200000;	// Maximum size of glyf table to read in as string (otherwise reads each glyph from file)
 	}
 

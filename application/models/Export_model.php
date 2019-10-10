@@ -741,7 +741,8 @@ function get_distributor_out_details($from_date, $to_date) {
             (select *, WEEK(invoice_date,1)-WEEK(STR_TO_DATE(concat(YEAR(invoice_date),'-',
                                 MONTH(invoice_date),'-',1),'%Y-%m-%d'),1)+1 as dweek 
                 from distributor_out where (status='Approved' or status='InActive') and 
-                        invoice_date>='$from_date' and invoice_date<='$to_date' ) C 
+                        invoice_date>='$from_date' and invoice_date<='$to_date' and 
+                        (distributor_id!='1' and distributor_id!='189')) C 
             left join 
             (select * from depot_master) D 
             on (C.depot_id=D.id)) E 
@@ -781,11 +782,13 @@ function get_sample_expired_details($from_date, $to_date,$date_of_processing,$da
 
     $ddateofprocess="";
 
-    if( $date_of_processing != '' && $date_of_accounting=='') {
-        $ddateofprocess = "A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' ";
-    } else {
-        $ddateofprocess = "date(A.approved_on)>='$from_date' and date(A.approved_on)<='$to_date' ";
-    }
+    // if( $date_of_processing != '' && $date_of_accounting=='') {
+    //     $ddateofprocess = "A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' ";
+    // } else {
+    //     $ddateofprocess = "date(A.approved_on)>='$from_date' and date(A.approved_on)<='$to_date' ";
+    // }
+
+    $ddateofprocess = " date(A.invoice_date)>='$from_date' and date(A.invoice_date)<='$to_date' ";
 
 
     $sql = "Select * from (select AA.*, WEEK(date_of_processing,1)-WEEK(STR_TO_DATE(concat(YEAR(date_of_processing),'-',MONTH(date_of_processing),'-',1),'%Y-%m-%d'),1)+1 as dweek from 
@@ -865,7 +868,8 @@ function get_distributor_in_details($from_date, $to_date) {
                             
                             left join sales_rep_master F on(A.sales_rep_id=F.id AND J.reporting_manager_id=F.id) 
 
-                        where (A.status='Approved') and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date') AA ) A
+                        where (A.status='Approved') and date(A.sales_return_date)>='$from_date' and 
+                            date(A.sales_return_date)<='$to_date') AA ) A
                         Left Join
                         (
                         SELECT sum(sgst_amt) as sgst_amt,sum(igst_amt) as igst_amt ,sum(cgst_amt) as cgst_amt,tax_percentage ,sum(total_amt)-(sum(sgst_amt)+sum(cgst_amt)+sum(igst_amt)) as amt_exc_tax,sum(total_amt) as total_amt,distributor_in_id
@@ -954,7 +958,8 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
                     $pr_system_id=$system_id;
                 }
 
-                $dop=date("d-m-Y", strtotime($data[$i]->date_of_processing));
+                // $dop=date("d-m-Y", strtotime($data[$i]->date_of_processing));
+                $dop=date("d-m-Y", strtotime($data[$i]->invoice_date));
                 $mod_on=date("d-m-Y", strtotime($data[$i]->invoice_date));
 
                 $objPHPExcel->getActiveSheet()->setCellValue('A'.$row, '=TEXT(D'.$row.',"mmmm")');
@@ -1170,8 +1175,16 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
 
                     $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->depot_name);
 
-                    $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->distributor_name);
 
+                    if($data[$i]->distributor_id=='214' && intval($igst_amt)!=0) {
+                        $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, 'AMAZON DIRECT - OMS');
+                    } else if($data[$i]->distributor_id=='1319' && intval($igst_amt)!=0) {
+                        $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, 'PAYTM DIRECT - OMS');
+                    } else {
+                        $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->distributor_name);
+                    }
+                    
+                    
                     $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->distributor_type);
                     $distributor_name = $data[$i]->distributor_name;
                     if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT') {
@@ -1247,9 +1260,11 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
                 $pr_system_id=$system_id;
             }
 
-            $dop1=date("d-m-Y", strtotime($data[$i]->date_of_processing));
+            // $dop1=date("d-m-Y", strtotime($data[$i]->date_of_processing));
+            // $mod_on=date("d-m-Y", strtotime($data[$i]->approved_on));
 
-            $mod_on=date("d-m-Y", strtotime($data[$i]->approved_on));
+            $dop1=date("d-m-Y", strtotime($data[$i]->invoice_date));
+            $mod_on=date("d-m-Y", strtotime($data[$i]->invoice_date));
 
             $objPHPExcel->getActiveSheet()->setCellValue('A'.$row, '=TEXT(D'.$row.',"mmmm")');
 
@@ -1528,9 +1543,12 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
                 $pr_system_id=$system_id;
             }
 
-            $dop1=date("d-m-Y", strtotime($data[$i]->date_of_processing));
+            // $dop1=date("d-m-Y", strtotime($data[$i]->date_of_processing));
+            // $mod_on=date("d-m-Y", strtotime($data[$i]->approved_on));
 
-            $mod_on=date("d-m-Y", strtotime($data[$i]->approved_on));
+            $dop1=date("d-m-Y", strtotime($data[$i]->sales_return_date));
+            $mod_on=date("d-m-Y", strtotime($data[$i]->sales_return_date));
+
 
             $objPHPExcel->getActiveSheet()->setCellValue('A'.$row, '=TEXT(D'.$row.',"mmmm")');
 
@@ -1733,8 +1751,16 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
 
                 $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->depot_name);
 
-                $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->distributor_name);
+                // $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->distributor_name);
 
+                if($data[$i]->distributor_id=='214' && intval($igst_amt)!=0) {
+                    $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, 'AMAZON DIRECT - OMS');
+                } else if($data[$i]->distributor_id=='1319' && intval($igst_amt)!=0) {
+                    $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, 'PAYTM DIRECT - OMS');
+                } else {
+                    $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->distributor_name);
+                }
+                
                 $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->distributor_type);
 
                 $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->dist_state_code);
@@ -1755,7 +1781,7 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
 
                $objPHPExcel->getActiveSheet()->setCellValue('AM'.$row, '');
 
-               $objPHPExcel->getActiveSheet()->setCellValue('AN'.$row, '');
+               $objPHPExcel->getActiveSheet()->setCellValue('AN'.$row, $data[$i]->order_no);
 
                $objPHPExcel->getActiveSheet()->setCellValue('AO'.$row, '');
             }
@@ -1883,11 +1909,13 @@ function get_distributor_out_sku_details($from_date, $to_date, $status='', $date
 
     $ddateofprocess="";
 
-    if( $date_of_processing != '' && $date_of_accounting=='') {
-        $ddateofprocess = "A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' ";
-    } else {
-        $ddateofprocess = "A.invoice_date>='$from_date' and A.invoice_date<='$to_date' ";
-    }
+    // if( $date_of_processing != '' && $date_of_accounting=='') {
+    //     $ddateofprocess = "A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' ";
+    // } else {
+    //     $ddateofprocess = "A.invoice_date>='$from_date' and A.invoice_date<='$to_date' ";
+    // }
+
+    $ddateofprocess = " date(A.invoice_date)>='$from_date' and date(A.invoice_date)<='$to_date' ";
 
 
     
@@ -2230,8 +2258,10 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
 
         if(count($data)>0) {
             for($i=0; $i<count($data); $i++) {
-                $dop=date("d-m-Y", strtotime($data[$i]->date_of_processing));
+                // $dop=date("d-m-Y", strtotime($data[$i]->date_of_processing));
+                $dop=date("d-m-Y", strtotime($data[$i]->invoice_date));
                 $mod_on=date("d-m-Y", strtotime($data[$i]->invoice_date));
+
                 $objPHPExcel->getActiveSheet()->setCellValue('A'.$row, '=TEXT(D'.$row.',"mmmm")');
                 $objPHPExcel->getActiveSheet()->setCellValue('B'.$row, '=CONCATENATE("Q"&ROUNDUP(MONTH(D'.$row.')/3,0))');
                 $objPHPExcel->getActiveSheet()->setCellValue('C'.$row, '=YEAR(D'.$row.')');
@@ -2303,7 +2333,15 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                     $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, $tax_amt);
                     $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, $data[$i]->total_amt);
                     $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, $data[$i]->depot_name);
-                    $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $data[$i]->distributor_name);
+
+                    if($data[$i]->distributor_id=='214' && $igst_amt!=0) {
+                        $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, 'AMAZON DIRECT - OMS');
+                    } else if($data[$i]->distributor_id=='1319' && $igst_amt!=0) {
+                        $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, 'PAYTM DIRECT - OMS');
+                    } else {
+                        $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $data[$i]->distributor_name);
+                    }
+                    
                     $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$i]->distributor_type);
 
                     if($data[$i]->shipping_address == 'no'){
@@ -2915,15 +2953,25 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
         $data = $this->get_sample_expired_SKU_details($from_date, $to_date,$date_of_processing, $date_of_accounting);
 
         for($i=0; $i<count($data); $i++) {
-            $dop1=date("d-m-Y", strtotime($data[$i]->date_of_processing));
-            $mod_on2=date("d-m-Y", strtotime($data[$i]->approved_on));
+            // $dop1=date("d-m-Y", strtotime($data[$i]->date_of_processing));
+            // $mod_on2=date("d-m-Y", strtotime($data[$i]->approved_on));
+
+            $dop1=date("d-m-Y", strtotime($data[$i]->invoice_date));
+            $mod_on2=date("d-m-Y", strtotime($data[$i]->invoice_date));
+
             $objPHPExcel->getActiveSheet()->setCellValue('A'.$row, '=TEXT(D'.$row.',"mmmm")');
             $objPHPExcel->getActiveSheet()->setCellValue('B'.$row, '=CONCATENATE("Q"&ROUNDUP(MONTH(D'.$row.')/3,0))');
             $objPHPExcel->getActiveSheet()->setCellValue('C'.$row, '=YEAR(D'.$row.')');
 			$objPHPExcel->getActiveSheet()->setCellValue('D'.$row, $mod_on2);
             $objPHPExcel->getActiveSheet()->setCellValue('E'.$row, $dop1);
             $objPHPExcel->getActiveSheet()->setCellValue('F'.$row, $data[$i]->dweek);
-            $objPHPExcel->getActiveSheet()->setCellValue('G'.$row, strtoupper($data[$i]->distributor_name));
+            
+            if(strtoupper(trim($data[$i]->dname))=='PRODUCT EXPIRED') {
+                $objPHPExcel->getActiveSheet()->setCellValue('G'.$row, 'PRODUCT EXPIRED');
+            } else {
+                $objPHPExcel->getActiveSheet()->setCellValue('G'.$row, strtoupper($data[$i]->distributor_name));
+            }
+            
             $objPHPExcel->getActiveSheet()->setCellValue('H'.$row, $data[$i]->voucher_no);
             $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, $data[$i]->item_name);
             $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, $data[$i]->short_name);
@@ -3005,7 +3053,13 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
             }
 
             $objPHPExcel->getActiveSheet()->setCellValue('AM'.$row, $data[$i]->remarks);
-            $objPHPExcel->getActiveSheet()->setCellValue('AN'.$row, $data[$i]->sampleid);
+
+            if($data[$i]->distributor_id=='1') {
+                $objPHPExcel->getActiveSheet()->setCellValue('AN'.$row, $data[$i]->sampleid);
+            } else {
+                $objPHPExcel->getActiveSheet()->setCellValue('AN'.$row, $data[$i]->distributor_in_id);
+            }
+            
 
             $status = $data[$i]->status;
             // if($status=="InActive") {
@@ -3022,8 +3076,12 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
 
         $data = $this->get_distributor_in_sku_details($from_date, $to_date);
         for($i=0; $i<count($data); $i++) {
-            $dop1=date("d-m-Y", strtotime($data[$i]->date_of_processing));
-            $mod_on3=date("d-m-Y", strtotime($data[$i]->modified_on));
+            // $dop1=date("d-m-Y", strtotime($data[$i]->date_of_processing));
+            // $mod_on3=date("d-m-Y", strtotime($data[$i]->modified_on));
+
+            $dop1=date("d-m-Y", strtotime($data[$i]->sales_return_date));
+            $mod_on3=date("d-m-Y", strtotime($data[$i]->sales_return_date));
+
             $objPHPExcel->getActiveSheet()->setCellValue('A'.$row, '=TEXT(D'.$row.',"mmmm")');
             $objPHPExcel->getActiveSheet()->setCellValue('B'.$row, '=CONCATENATE("Q"&ROUNDUP(MONTH(D'.$row.')/3,0))');
             $objPHPExcel->getActiveSheet()->setCellValue('C'.$row, '=YEAR(D'.$row.')');
@@ -3036,7 +3094,7 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
 			}
 			else
 			{
-				    $objPHPExcel->getActiveSheet()->setCellValue('G'.$row, 'SALES RETURN');
+				$objPHPExcel->getActiveSheet()->setCellValue('G'.$row, 'SALES RETURN');
 			}
             $objPHPExcel->getActiveSheet()->setCellValue('H'.$row, $data[$i]->sales_return_no);
             $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, $data[$i]->item_name);
@@ -3108,7 +3166,16 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                 }
                 $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, floatval($total_amt)*-1);
                 $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, $data[$i]->depot_name);
-                $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $data[$i]->distributor_name);
+                // $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $data[$i]->distributor_name);
+            
+                if($data[$i]->distributor_id=='214' && $igst_amt!=0) {
+                    $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, 'AMAZON DIRECT - OMS');
+                } else if($data[$i]->distributor_id=='1319' && $igst_amt!=0) {
+                    $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, 'PAYTM DIRECT - OMS');
+                } else {
+                    $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $data[$i]->distributor_name);
+                }
+                
                 $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$i]->distributor_type);
                 $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->dist_state_code);
                 $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->dist_state);
@@ -3121,7 +3188,7 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                 $objPHPExcel->getActiveSheet()->setCellValue('AH'.$row, $data[$i]->salesrepname);
                 $objPHPExcel->getActiveSheet()->setCellValue('AI'.$row, $data[$i]->salesrepname1);
                 $objPHPExcel->getActiveSheet()->setCellValue('AJ'.$row, '');
-                $objPHPExcel->getActiveSheet()->setCellValue('AK'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('AK'.$row, $data[$i]->order_no);
                 $objPHPExcel->getActiveSheet()->setCellValue('AL'.$row, '');
             }
 
@@ -3237,6 +3304,7 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
             for($i=0; $i<count($data); $i++) {
                 $dop=date("d-m-Y", strtotime($data[$i]->date_of_transaction));
                 $dop1=date("d-m-Y", strtotime($data[$i]->modified_on));
+
 				$objPHPExcel->getActiveSheet()->setCellValue('A'.$row, '=TEXT(D'.$row.',"mmmm")');
                 $objPHPExcel->getActiveSheet()->setCellValue('B'.$row, '=CONCATENATE("Q"&ROUNDUP(MONTH(D'.$row.')/3,0))');
                 $objPHPExcel->getActiveSheet()->setCellValue('C'.$row, '=YEAR(D'.$row.')');
@@ -3331,6 +3399,7 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                 // }
 
                 $objPHPExcel->getActiveSheet()->setCellValue('AO'.$row, $status);
+                $objPHPExcel->getActiveSheet()->setCellValue('AP'.$row, $data[$i]->category);
 
                 $row=$row+1;
 
@@ -3441,7 +3510,7 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
 
 
 
-    $objPHPExcel->getActiveSheet()->getStyle('A10:AO10')->getFont()->setBold(true);
+    $objPHPExcel->getActiveSheet()->getStyle('A10:AP10')->getFont()->setBold(true);
 
 
     for ($col = 0; $col <= PHPExcel_Cell::columnIndexFromString($objPHPExcel->getActiveSheet()->getHighestDataColumn()); $col++) {
@@ -3451,7 +3520,7 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
     }
 
 
-    $objPHPExcel->getActiveSheet()->getStyle('A10'.':AO'.$row)->applyFromArray(array(
+    $objPHPExcel->getActiveSheet()->getStyle('A10'.':AP'.$row)->applyFromArray(array(
 
         'borders' => array(
 
@@ -3487,7 +3556,7 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
     }
     else
     {
-       $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
 
         $objWriter->setPreCalculateFormulas(TRUE); 
 
@@ -3519,33 +3588,34 @@ function get_credit_debit_sku_details($from_date, $to_date, $date_of_processing,
 
     $ddateofprocess = '';
 
-    if($from_date!='' && $to_date!='')
-    {
-       if( $date_of_processing != '' && $date_of_accounting=='') {
-            $ddateofprocess = " and A.date_of_transaction>='$from_date' and A.date_of_transaction<='$to_date' ";
-        }
-        else {
-            $ddateofprocess = " and A.approved_on>='$from_date' and A.approved_on<='$to_date' ";
-        } 
+    if($from_date!='' && $to_date!='') {
+        // if( $date_of_processing != '' && $date_of_accounting=='') {
+        //     $ddateofprocess = " and A.date_of_transaction>='$from_date' and A.date_of_transaction<='$to_date' ";
+        // } else {
+        //     $ddateofprocess = " and A.approved_on>='$from_date' and A.approved_on<='$to_date' ";
+        // }
+
+        $ddateofprocess = " and date(A.date_of_transaction)>='$from_date' and date(A.date_of_transaction)<='$to_date' ";
     }
     
 
     $sql = "select AA.*, WEEK(date_of_transaction,1)-WEEK(STR_TO_DATE(concat(YEAR(date_of_transaction),'-',MONTH(date_of_transaction),'-',1),'%Y-%m-%d'),1)+1 as dweek from 
             (select A.id, A.date_of_transaction, A.distributor_id, A.transaction, A.amount_without_tax, A.amount, A.tax, 
                 A.igst, A.cgst, A.sgst, A.status, A.remarks, A.created_by, A.created_on, A.modified_by, A.modified_on, 
-                A.approved_by, A.approved_on, A.rejected_by, A.rejected_on, A.ref_id, A.ref_no, A.ref_date,
+                A.approved_by, A.approved_on, A.rejected_by, A.rejected_on, A.ref_id, A.ref_no, A.ref_date, B.category, 
                 D.distributor_name, D.sell_out, D.type_id, D.location_id, D.city as distributor_city, 
                 D.class, D.state as dist_state, D.state_code as dist_state_code, D.gst_number as dist_gst_no, 
-                D.area_id,D.zone_id,K.zone,E.distributor_type, F.sales_rep_name, G.location, H.area ,
-                (Select sales_rep_name from sales_rep_master where id=J.sales_rep_id1) as salesrepname,
+                D.area_id,D.zone_id,K.zone,E.distributor_type, F.sales_rep_name, G.location, H.area, 
+                (Select sales_rep_name from sales_rep_master where id=J.sales_rep_id1) as salesrepname, 
                 (Select sales_rep_name from sales_rep_master where id=J.sales_rep_id2) as salesrepname1 
             from credit_debit_note A 
+                left join exp_cat_master B on(A.exp_category_id=B.id) 
                 left join distributor_master D on(A.distributor_id=D.id) 
                 left join distributor_type_master E on(D.type_id=E.id) 
                 left join location_master G on(D.location_id=G.id) 
                 left join area_master H on(D.area_id=H.id) 
                 left join zone_master K on(D.zone_id=K.id) 
-				left join sr_mapping J on(D.area_id=J.area_id and D.type_id=J.type_id and D.zone_id=J.zone_id ) 
+				left join sr_mapping J on(D.area_id=J.area_id and D.type_id=J.type_id and D.zone_id=J.zone_id) 
 				left join sales_rep_master F on(J.reporting_manager_id=F.id) 
             where (A.status='Approved' ) ".$ddateofprocess.") AA ";
 
@@ -3560,81 +3630,13 @@ function get_sample_expired_SKU_details($from_date, $to_date,$date_of_processing
 
     $ddateofprocess="";
 
-    if( $date_of_processing != '' && $date_of_accounting=='') {
-        $ddateofprocess = "A.date_of_processing>='$from_date' and 
-                    A.date_of_processing<='$to_date' ";
-    } else {
-        $ddateofprocess = "date(A.approved_on)>='$from_date' and date(A.approved_on)<='$to_date' ";
-    }
+    // if($date_of_processing != '' && $date_of_accounting=='') {
+    //     $ddateofprocess = "A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' ";
+    // } else {
+    //     $ddateofprocess = "date(A.approved_on)>='$from_date' and date(A.approved_on)<='$to_date' ";
+    // }
 
-
-    // $sql = "select AA.*, WEEK(date_of_processing,1)-WEEK(STR_TO_DATE(concat(YEAR(date_of_processing),'-',MONTH(date_of_processing),'-',1),'%Y-%m-%d'),1)+1 as dweek, 
-
-    //             BB.item_name, BB.quantity, BB.short_name from 
-
-    //         (select A.*, A.id as sampleid, B.type, B.item_id, B.qty, B.sell_rate, B.grams, B.rate, B.amount as item_amount, 
-
-    //             C.depot_name, D.distributor_name, D.sell_out, D.type_id, D.location_id, D.city as distributor_city, D.class, 
-
-    //             D.area_id,D.zone_id,K.zone,E.distributor_type, F.sales_rep_name, G.location, I.distributor_name as dname, H.area ,
-
-    //             L.sales_rep_name as salesrepname,
-
-    //             M.sales_rep_name as salesrepname1
-
-    //         from distributor_out A 
-
-    //             left join distributor_out_items B on(A.id=B.distributor_out_id) 
-
-    //             left join depot_master C on(A.depot_id=C.id) 
-
-    //             left join distributor_master D on(A.distributor_id=D.id) 
-
-    //             left join distributor_master I on(A.sample_distributor_id=I.id) 
-
-    //             left join distributor_type_master E on(D.type_id=E.id) 
-
-             
-
-    //             left join location_master G on(D.location_id=G.id) 
-
-    //             left join area_master H on(D.area_id=H.id) 
-
-    //             left join zone_master K on(D.zone_id=K.id) 
-				
-				// left join sr_mapping J on(D.area_id=J.area_id and D.type_id=J.type_id and D.zone_id=J.zone_id ) 
-				
-				// left join sales_rep_master F on(J.reporting_manager_id=F.id) 
-
-    //             left join sales_rep_master L on(J.sales_rep_id1=L.id) 
-
-    //             left join sales_rep_master M on(J.sales_rep_id2=M.id) 
-
-    //         where (A.status='Approved' or A.status='InActive') and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date') AA 
-
-    //         left join 
-
-    //         (select id, 'Bar' as type, product_name as item_name, null as quantity, short_name from product_master 
-
-    //             where status='Approved' 
-
-    //         union all 
-
-    //         select m.id, 'Box' as type, m.box_name as item_name, sum(p.qty) as quantity, m.short_name 
-
-    //         from box_master m left join box_product p on m.id=p.box_id 
-
-    //         where m.status='Approved' group by m.id) BB 
-
-    //         on (AA.item_id=BB.id and AA.type=BB.type) 
-
-    //         where AA.class='sample' and AA.class is not null";
-
-    // $query=$this->db->query($sql);
-
-    // $result=$query->result();
-
-    // return $result;
+    $ddateofprocess = " date(A.invoice_date)>='$from_date' and date(A.invoice_date)<='$to_date' ";
 
     $sql = "select AA.*, WEEK(date_of_processing,1)-WEEK(STR_TO_DATE(concat(YEAR(date_of_processing),'-',MONTH(date_of_processing),'-',1),'%Y-%m-%d'),1)+1 as dweek, 
 
@@ -3666,8 +3668,6 @@ function get_sample_expired_SKU_details($from_date, $to_date,$date_of_processing
 
                 left join distributor_type_master E on(D.type_id=E.id) 
 
-             
-
                 left join location_master G on(D.location_id=G.id) 
 
                 left join area_master H on(D.area_id=H.id) 
@@ -3682,13 +3682,13 @@ function get_sample_expired_SKU_details($from_date, $to_date,$date_of_processing
 
                 left join sales_rep_master M on(J.sales_rep_id2=M.id) 
 
-            where (A.status='Approved') and ".$ddateofprocess." and D.class='sample' and D.class is not null) AA 
+            where (A.status='Approved') and ".$ddateofprocess." and (A.distributor_id='1' or A.distributor_id='189')) AA 
 
             left join 
 
-            (select id, 'Bar' as type, short_name as item_name, null as quantity, short_name from product_master 
+            (select id, 'Bar' as type, short_name as item_name, null as quantity, short_name 
 
-                where status='Approved' 
+            from product_master where status='Approved' 
 
             union all 
 
@@ -3698,9 +3698,7 @@ function get_sample_expired_SKU_details($from_date, $to_date,$date_of_processing
 
             where m.status='Approved' group by m.id) BB 
 
-            on (AA.item_id=BB.id and AA.type=BB.type) 
-
-            where AA.class='sample' and AA.class is not null";
+            on (AA.item_id=BB.id and AA.type=BB.type)";
 
     $query=$this->db->query($sql);
 
@@ -4049,7 +4047,7 @@ function get_distributor_in_sku_details($from_date, $to_date) {
 
                 left join sales_rep_master M on(J.sales_rep_id2=M.id) 
 
-            where (A.status='Approved') and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date') AA 
+            where (A.status='Approved') and date(A.sales_return_date)>='$from_date' and date(A.sales_return_date)<='$to_date') AA 
 
             left join 
 
@@ -6569,7 +6567,7 @@ function generate_distributor_ledger_report($remark_visibility='') {
 
                 from distributor_out where status = 'Approved' and distributor_id = '$distributor_id' and 
 
-                date_of_processing<'$from_date' 
+                invoice_date<'$from_date' 
 
             union all 
 
@@ -6581,7 +6579,7 @@ function generate_distributor_ledger_report($remark_visibility='') {
 
                 from distributor_in where status = 'Approved' and distributor_id = '$distributor_id' and 
 
-                date_of_processing<'$from_date' 
+                sales_return_date<'$from_date' 
 
             union all 
 
@@ -6639,7 +6637,7 @@ function generate_distributor_ledger_report($remark_visibility='') {
 
                 from distributor_out where status = 'Approved' and distributor_id = '$distributor_id' and 
 
-                date_of_processing>='$from_date' and date_of_processing<='$to_date' 
+                invoice_date>='$from_date' and invoice_date<='$to_date' 
 
             union all 
 
@@ -6651,7 +6649,7 @@ function generate_distributor_ledger_report($remark_visibility='') {
 
                 from distributor_in where status = 'Approved' and distributor_id = '$distributor_id' and 
 
-                date_of_processing>='$from_date' and date_of_processing<='$to_date' 
+                sales_return_date>='$from_date' and sales_return_date<='$to_date' 
 
             union all 
 
@@ -6968,7 +6966,7 @@ function view_distributor_ledger_report($remark_visibility='') {
 
                 from distributor_out where status = 'Approved' and distributor_id = '$distributor_id' and 
 
-                date_of_processing<'$from_date' 
+                invoice_date<'$from_date' 
 
             union all 
 
@@ -6982,7 +6980,7 @@ function view_distributor_ledger_report($remark_visibility='') {
 
                 from distributor_in where status = 'Approved' and distributor_id = '$distributor_id' and 
 
-                date_of_processing<'$from_date' 
+                sales_return_date<'$from_date' 
 
             union all 
 
@@ -7040,7 +7038,7 @@ function view_distributor_ledger_report($remark_visibility='') {
 
                 from distributor_out where status = 'Approved' and distributor_id = '$distributor_id' and 
 
-                date_of_processing>='$from_date' and date_of_processing<='$to_date' 
+                invoice_date>='$from_date' and invoice_date<='$to_date' 
 
             union all 
 
@@ -7054,7 +7052,7 @@ function view_distributor_ledger_report($remark_visibility='') {
 
                 from distributor_in where status = 'Approved' and distributor_id = '$distributor_id' and 
 
-                date_of_processing>='$from_date' and date_of_processing<='$to_date' 
+                sales_return_date>='$from_date' and sales_return_date<='$to_date' 
 
             union all 
 
@@ -7383,210 +7381,182 @@ function generate_agingwise_report() {
 
     $date = formatdate($this->input->post('date'));
 
-    
+   //  $sql = "select I.*, J.distributor_type, J.sales_rep_name,J.area,J.location,J.zone,J.so1,J.so2 from 
 
-    // $sql = "select G.*, H.distributor_name from 
+			// (select G.*, H.type_id,H.distributor_name from 
 
-    //         (select F.distributor_id, F.days_30_45, F.days_46_60, F.days_61_90, F.days_91_above, 
+   //          (select F.distributor_id, round(F.days_0_30,0) as days_0_30, round(F.days_30_45,0) as days_30_45, 
 
-    //             (F.days_30_45+F.days_46_60+F.days_61_90+F.days_91_above) as tot_receivable from 
+   //              round(F.days_46_60,0) as days_46_60, round(F.days_61_90,0) as days_61_90, round(F.days_91_above,0) as days_91_above, 
 
-    //         (select E.distributor_id, case when (E.days_30_45-E.paid_amount)>0 then 
+   //              round((F.days_0_30+F.days_30_45+F.days_46_60+F.days_61_90+F.days_91_above),0) as tot_receivable from 
 
-    //             (E.days_30_45-E.paid_amount) else 0 end as days_30_45, 
+   //          (select E.distributor_id, case when (E.days_91_above-E.paid_amount)>0 then 
 
-    //         case when (E.days_30_45-E.paid_amount)>0 then E.days_46_60 else case when 
+   //              (E.days_91_above-E.paid_amount) else 0 end as days_91_above, 
 
-    //             (E.days_46_60-(E.paid_amount-E.days_30_45))>0 then 
+   //          case when (E.days_91_above-E.paid_amount)>0 then E.days_61_90 else case when 
 
-    //             (E.days_46_60-(E.paid_amount-E.days_30_45)) else 0 end end as days_46_60, 
+   //              (E.days_61_90-(E.paid_amount-E.days_91_above))>0 then 
 
-    //         case when (E.days_46_60-(E.paid_amount-E.days_30_45))>0 then 
+   //              (E.days_61_90-(E.paid_amount-E.days_91_above)) else 0 end end as days_61_90, 
 
-    //         E.days_61_90 else case when (E.days_61_90-(E.paid_amount-E.days_30_45-E.days_46_60))>0 then 
+   //          case when (E.days_61_90-(E.paid_amount-E.days_91_above))>0 then 
 
-    //         (E.days_61_90-(E.paid_amount-E.days_30_45-E.days_46_60)) else 0 end end as days_61_90, 
+   //              E.days_46_60 else case when (E.days_46_60-(E.paid_amount-E.days_91_above-E.days_61_90))>0 then 
 
-    //         case when (E.days_61_90-(E.paid_amount-E.days_30_45-E.days_46_60))>0 then E.days_91_above else case 
+   //              (E.days_46_60-(E.paid_amount-E.days_91_above-E.days_61_90)) else 0 end end as days_46_60, 
 
-    //             when (E.days_91_above-(E.paid_amount-E.days_30_45-E.days_46_60-E.days_61_90))>0 
+   //          case when (E.days_46_60-(E.paid_amount-E.days_91_above-E.days_61_90))>0 then E.days_30_45 else case 
 
-    //             then (E.days_91_above-(E.paid_amount-E.days_30_45-E.days_46_60-E.days_61_90)) else 0 end end as days_91_above from 
+   //              when (E.days_30_45-(E.paid_amount-E.days_91_above-E.days_61_90-E.days_46_60))>0 
 
-    //         (select C.distributor_id, C.days_30_45, C.days_46_60, C.days_61_90, C.days_91_above, 
+   //              then (E.days_30_45-(E.paid_amount-E.days_91_above-E.days_61_90-E.days_46_60)) else 0 end end as days_30_45, 
 
-    //             ifnull(D.paid_amount,0) as paid_amount from 
+   //          case when (E.days_30_45-(E.paid_amount-E.days_91_above-E.days_61_90-E.days_46_60))>0 then E.days_0_30 else case 
 
-    //         (select distributor_id, ifnull(round(sum(days_30_45),0),0) as days_30_45, 
+   //              when (E.days_0_30-(E.paid_amount-E.days_91_above-E.days_61_90-E.days_46_60-E.days_30_45))>0 
 
-    //             ifnull(round(sum(days_46_60),0),0) as days_46_60, 
+   //              then (E.days_0_30-(E.paid_amount-E.days_91_above-E.days_61_90-E.days_46_60-E.days_30_45)) else 0 end end as days_0_30 from 
 
-    //         ifnull(round(sum(days_61_90),0),0) as days_61_90, ifnull(round(sum(days_91_above),0),0) as days_91_above from 
+   //          (select C.distributor_id, C.days_0_30, C.days_30_45, C.days_46_60, C.days_61_90, C.days_91_above, 
 
-    //         (select distributor_id, case when no_of_days>=30 and no_of_days<=45 then final_amount else 0 end as days_30_45, 
+   //              ifnull(D.paid_amount,0) as paid_amount from 
 
-    //         case when no_of_days>=46 and no_of_days<=60 then final_amount else 0 end as days_46_60, 
+   //          (select distributor_id, ifnull(round(sum(days_0_30),0),2) as days_0_30, 
 
-    //         case when no_of_days>=61 and no_of_days<=90 then final_amount else 0 end as days_61_90, 
+   //              ifnull(round(sum(days_30_45),0),2) as days_30_45, 
 
-    //         case when no_of_days>=91 then final_amount else 0 end as days_91_above from 
+   //              ifnull(round(sum(days_46_60),0),2) as days_46_60, 
 
-    //         (select id, distributor_id, datediff('$date', date_of_processing) as no_of_days, 
+   //              ifnull(round(sum(days_61_90),0),2) as days_61_90, 
 
-    //             final_amount from distributor_out where status = 'Approved' and date_of_processing<='$date') A) B 
+   //              ifnull(round(sum(days_91_above),2),0) as days_91_above from 
 
-    //         group by distributor_id) C 
+   //          (select distributor_id, case when no_of_days<30 then invoice_amount else 0 end as days_0_30, 
 
-    //         left join 
+   //              case when no_of_days>=30 and no_of_days<=45 then invoice_amount else 0 end as days_30_45, 
 
-    //         (select distributor_id, round(sum(payment_amount),0) as paid_amount from payment_details_items 
+   //              case when no_of_days>=46 and no_of_days<=60 then invoice_amount else 0 end as days_46_60, 
 
-    //             where payment_id in (select distinct id from payment_details where status = 'Approved' and 
+   //              case when no_of_days>=61 and no_of_days<=90 then invoice_amount else 0 end as days_61_90, 
 
-    //                 date_of_deposit<='$date') group by distributor_id) D 
+   //              case when no_of_days>=91 then invoice_amount else 0 end as days_91_above from 
 
-    //         on (C.distributor_id = D.distributor_id)) E) F) G 
+   //          (select id, distributor_id, datediff('$date', date_of_processing) as no_of_days, invoice_amount 
 
-    //         left join 
+   //              from distributor_out where status = 'Approved' and invoice_date<='$date' and distributor_id NOT IN(1,64,65,66,189,237)) A) B 
 
-    //         (select * from distributor_master) H 
+   //          group by distributor_id) C 
 
-    //         on (G.distributor_id = H.id) where G.tot_receivable > 0";
+   //          left join 
+
+   //          (select distributor_id, round(sum(paid_amount),2) as paid_amount from 
+
+   //          (select distributor_id, sum(payment_amount) as paid_amount from payment_details_items 
+
+   //              where payment_id in (select distinct id from payment_details where status = 'Approved' and 
+
+   //                  date_of_deposit<='$date') group by distributor_id 
+
+   //          union all 
+
+   //          select distributor_id, sum(final_amount) as paid_amount from distributor_in 
+
+   //              where status = 'Approved' and sales_return_date<='$date' group by distributor_id 
+
+   //          union all 
+
+   //          select distributor_id, sum(case when (transaction = 'Credit Note' or transaction='Expense Voucher') then amount else amount*-1 end) paid_amount 
+
+   //              from credit_debit_note where status = 'Approved' and 
+
+   //              date_of_transaction<='$date' group by distributor_id) AA group by distributor_id) D 
+
+   //          on (C.distributor_id = D.distributor_id)) E) F) G 
+
+   //          left join 
+
+   //          (select * FROM distributor_master) H 
+
+   //          on (G.distributor_id = H.id) where G.tot_receivable <> 0) I 
+
+			// left join 
+
+			// (select P.id, P.type_id,P.distributor_name,P.location_id,S.distributor_type,T.sales_rep_name,Q.area,
+   //                  U.location,V.sales_rep_id1,V.sales_rep_id2,W.zone,X.sales_rep_name as so1,
+   //                  Y.sales_rep_name as so2 
+
+			// from distributor_master P 
+
+			// left join distributor_type_master S on P.type_id=S.id 
+
+			// left join sales_rep_master T on P.sales_rep_id=T.id
+
+			// left join area_master Q on P.area_id=Q.id
+
+			// left join location_master U on P.location_id=U.id
+
+   //          left join sr_mapping V on (P.type_id=V.type_id and P.zone_id=V.zone_id and P.area_id=V.area_id)
+
+   //          left join zone_master W on P.zone_id=W.id
+
+   //          left join sales_rep_master X on V.sales_rep_id1=X.id
+
+   //          left join sales_rep_master Y on V.sales_rep_id2=Y.id) J 
+
+			// on (I.distributor_id = J.id)";
 
 
-
-    $sql = "select I.*, J.distributor_type, J.sales_rep_name,J.area,J.location,J.zone,J.so1,J.so2 from 
-
-			(select G.*, H.type_id,H.distributor_name from 
-
+	$sql = "select I.*, J.distributor_type, J.sales_rep_name,J.area,J.location,J.zone,J.so1,J.so2 from 
+            (select G.*, H.type_id,H.distributor_name from 
             (select F.distributor_id, round(F.days_0_30,0) as days_0_30, round(F.days_30_45,0) as days_30_45, 
-
                 round(F.days_46_60,0) as days_46_60, round(F.days_61_90,0) as days_61_90, round(F.days_91_above,0) as days_91_above, 
-
                 round((F.days_0_30+F.days_30_45+F.days_46_60+F.days_61_90+F.days_91_above),0) as tot_receivable from 
-
-            (select E.distributor_id, case when (E.days_91_above-E.paid_amount)>0 then 
-
-                (E.days_91_above-E.paid_amount) else 0 end as days_91_above, 
-
-            case when (E.days_91_above-E.paid_amount)>0 then E.days_61_90 else case when 
-
-                (E.days_61_90-(E.paid_amount-E.days_91_above))>0 then 
-
-                (E.days_61_90-(E.paid_amount-E.days_91_above)) else 0 end end as days_61_90, 
-
-            case when (E.days_61_90-(E.paid_amount-E.days_91_above))>0 then 
-
-                E.days_46_60 else case when (E.days_46_60-(E.paid_amount-E.days_91_above-E.days_61_90))>0 then 
-
-                (E.days_46_60-(E.paid_amount-E.days_91_above-E.days_61_90)) else 0 end end as days_46_60, 
-
-            case when (E.days_46_60-(E.paid_amount-E.days_91_above-E.days_61_90))>0 then E.days_30_45 else case 
-
-                when (E.days_30_45-(E.paid_amount-E.days_91_above-E.days_61_90-E.days_46_60))>0 
-
-                then (E.days_30_45-(E.paid_amount-E.days_91_above-E.days_61_90-E.days_46_60)) else 0 end end as days_30_45, 
-
-            case when (E.days_30_45-(E.paid_amount-E.days_91_above-E.days_61_90-E.days_46_60))>0 then E.days_0_30 else case 
-
-                when (E.days_0_30-(E.paid_amount-E.days_91_above-E.days_61_90-E.days_46_60-E.days_30_45))>0 
-
-                then (E.days_0_30-(E.paid_amount-E.days_91_above-E.days_61_90-E.days_46_60-E.days_30_45)) else 0 end end as days_0_30 from 
-
-            (select C.distributor_id, C.days_0_30, C.days_30_45, C.days_46_60, C.days_61_90, C.days_91_above, 
-
-                ifnull(D.paid_amount,0) as paid_amount from 
-
+            (select C.distributor_id, C.days_0_30, C.days_30_45, C.days_46_60, C.days_61_90, C.days_91_above from 
             (select distributor_id, ifnull(round(sum(days_0_30),0),2) as days_0_30, 
-
                 ifnull(round(sum(days_30_45),0),2) as days_30_45, 
-
                 ifnull(round(sum(days_46_60),0),2) as days_46_60, 
-
                 ifnull(round(sum(days_61_90),0),2) as days_61_90, 
-
                 ifnull(round(sum(days_91_above),2),0) as days_91_above from 
-
             (select distributor_id, case when no_of_days<30 then invoice_amount else 0 end as days_0_30, 
-
                 case when no_of_days>=30 and no_of_days<=45 then invoice_amount else 0 end as days_30_45, 
-
                 case when no_of_days>=46 and no_of_days<=60 then invoice_amount else 0 end as days_46_60, 
-
                 case when no_of_days>=61 and no_of_days<=90 then invoice_amount else 0 end as days_61_90, 
-
                 case when no_of_days>=91 then invoice_amount else 0 end as days_91_above from 
-
-            (select id, distributor_id, datediff('$date', date_of_processing) as no_of_days, invoice_amount 
-
-                from distributor_out where status = 'Approved' and date_of_processing<='$date' and distributor_id NOT IN(1,64,65,66,189,237)) A) B 
-
-            group by distributor_id) C 
-
-            left join 
-
-            (select distributor_id, round(sum(paid_amount),2) as paid_amount from 
-
-            (select distributor_id, sum(payment_amount) as paid_amount from payment_details_items 
-
-                where payment_id in (select distinct id from payment_details where status = 'Approved' and 
-
-                    date_of_deposit<='$date') group by distributor_id 
-
+            (select distributor_id, datediff('$date', date_of_processing) as no_of_days, invoice_amount 
+                from distributor_out where status = 'Approved' and invoice_date<='$date' and distributor_id NOT IN(1,64,65,66,189,237) 
             union all 
-
-            select distributor_id, sum(final_amount) as paid_amount from distributor_in 
-
-                where status = 'Approved' and date_of_processing<='$date' group by distributor_id 
-
+            select B.distributor_id, datediff('$date', A.date_of_deposit) as no_of_days, (B.payment_amount*-1) as invoice_amount 
+                from payment_details A left join payment_details_items B on (A.id=B.payment_id) 
+                where A.status = 'Approved' and A.date_of_deposit<='$date' and B.distributor_id NOT IN(1,64,65,66,189,237) 
             union all 
-
-            select distributor_id, sum(case when (transaction = 'Credit Note' or transaction='Expense Voucher') then amount else amount*-1 end) paid_amount 
-
+            select distributor_id, datediff('$date', sales_return_date) as no_of_days, (final_amount*-1) as invoice_amount 
+                from distributor_in where status = 'Approved' and sales_return_date<='$date' and distributor_id NOT IN(1,64,65,66,189,237) 
+            union all 
+            select distributor_id, datediff('$date', date_of_transaction) as no_of_days, case when (transaction = 'Credit Note' or transaction='Expense Voucher') then amount*-1 else amount end as invoice_amount 
                 from credit_debit_note where status = 'Approved' and 
-
-                date_of_transaction<='$date' group by distributor_id) AA group by distributor_id) D 
-
-            on (C.distributor_id = D.distributor_id)) E) F) G 
-
+                date_of_transaction<='$date' and distributor_id NOT IN(1,64,65,66,189,237)) A) B 
+            group by distributor_id) C) F) G 
             left join 
-
             (select * FROM distributor_master) H 
-
             on (G.distributor_id = H.id) where G.tot_receivable <> 0) I 
-
-			left join 
-
-			(select P.id, P.type_id,P.distributor_name,P.location_id,S.distributor_type,T.sales_rep_name,Q.area,
+            left join 
+            (select P.id, P.type_id,P.distributor_name,P.location_id,S.distributor_type,T.sales_rep_name,Q.area,
                     U.location,V.sales_rep_id1,V.sales_rep_id2,W.zone,X.sales_rep_name as so1,
                     Y.sales_rep_name as so2 
-
-			from distributor_master P 
-
-			left join distributor_type_master S on P.type_id=S.id 
-
-			left join sales_rep_master T on P.sales_rep_id=T.id
-
-			left join area_master Q on P.area_id=Q.id
-
-			left join location_master U on P.location_id=U.id
-
-            left join sr_mapping V on (P.type_id=V.type_id and P.zone_id=V.zone_id and P.area_id=V.area_id)
-
-            left join zone_master W on P.zone_id=W.id
-
-            left join sales_rep_master X on V.sales_rep_id1=X.id
-
+            from distributor_master P 
+            left join distributor_type_master S on P.type_id=S.id 
+            left join sales_rep_master T on P.sales_rep_id=T.id 
+            left join area_master Q on P.area_id=Q.id 
+            left join location_master U on P.location_id=U.id 
+            left join sr_mapping V on (P.type_id=V.type_id and P.zone_id=V.zone_id and P.area_id=V.area_id) 
+            left join zone_master W on P.zone_id=W.id 
+            left join sales_rep_master X on V.sales_rep_id1=X.id 
             left join sales_rep_master Y on V.sales_rep_id2=Y.id) J 
-
-			on (I.distributor_id = J.id)";
-
-			
-
-
+            on (I.distributor_id = J.id)";
 
     $query=$this->db->query($sql);
-
     $data=$query->result();
 
     
@@ -8387,7 +8357,7 @@ function generate_sales_return_report() {
 
             (select * from distributor_in where status = 'Approved' and 
 
-                date_of_processing >= '$from_date' and date_of_processing <= '$to_date') A 
+                sales_return_date >= '$from_date' and sales_return_date <= '$to_date') A 
 
             left join 
 
@@ -8620,62 +8590,6 @@ function generate_payment_receivable_report() {
 
     $to_date = formatdate($this->input->post('to_date'));
 
-    
-
-    // $sql = "select K.*, case when K.type = 'Box' then K.box_name else K.product_name end as item_name, L.sales_rep_name from 
-
-    //         (select I.*, J.product_name from 
-
-    //         (select G.*, H.box_name from 
-
-    //         (select E.*, F.depot_name from 
-
-    //         (select C.*, D.distributor_name, D.sell_out from 
-
-    //         (select A.*, B.type, B.item_id, B.qty, B.sell_rate, B.grams, B.rate from 
-
-    //         (select * from distributor_out where status = 'Approved' and 
-
-    //             date_of_processing >= '$from_date' and date_of_processing <= '$to_date') A 
-
-    //         left join 
-
-    //         (select * from distributor_out_items) B 
-
-    //         on (A.id = B.distributor_out_id)) C 
-
-    //         left join 
-
-    //         (select * from distributor_master) D 
-
-    //         on (C.distributor_id = D.id)) E 
-
-    //         left join 
-
-    //         (select * from depot_master) F 
-
-    //         on (E.depot_id = F.id)) G 
-
-    //         left join 
-
-    //         (select * from box_master) H 
-
-    //         on (G.item_id = H.id)) I 
-
-    //         left join 
-
-    //         (select * from product_master) J 
-
-    //         on (I.item_id = J.id)) K 
-
-    //         left join 
-
-    //         (select * from sales_rep_master) L 
-
-    //         on (K.sales_rep_id = L.id)
-
-    //         order by K.id";
-
     $sql = "select DD.distributor_id, DD.distributor_name, DD.total_pending_amount, EE.invoice_date, EE.invoice_no, EE.voucher_no, EE.due_date, EE.invoice_amount, DD.location from 
 
             (select CC.distributor_id, CC.distributor_name, sum(CC.pending_amount) as total_pending_amount, CC.location from 
@@ -8684,7 +8598,7 @@ function generate_payment_receivable_report() {
 
             (select A.*, B.distributor_name,F.location from distributor_out A left join distributor_master B on(A.distributor_id=B.id) left join location_master F on B.location_id=F.id 
 
-                where A.status = 'Approved' and A.invoice_no is not null and A.invoice_no!='' and (A.date_of_processing >= '$from_date' and A.date_of_processing <= '$to_date')) AA 
+                where A.status = 'Approved' and A.invoice_no is not null and A.invoice_no!='' and (A.invoice_date >= '$from_date' and A.invoice_date <= '$to_date')) AA 
 
             left join 
 
@@ -8706,7 +8620,7 @@ function generate_payment_receivable_report() {
 
             (select A.*, B.distributor_name from distributor_out A left join distributor_master B on(A.distributor_id=B.id) 
 
-                where A.status = 'Approved' and A.invoice_no is not null and A.invoice_no!='' and (A.date_of_processing >= '$from_date' and A.date_of_processing <= '$to_date')) AA 
+                where A.status = 'Approved' and A.invoice_no is not null and A.invoice_no!='' and (A.invoice_date >= '$from_date' and A.invoice_date <= '$to_date')) AA 
 
             left join 
 
@@ -9750,7 +9664,7 @@ function generate_credit_debit_report() {
 
                 from distributor_out d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
 
-                d.date_of_processing>='$from_date' and d.date_of_processing<='$to_date' 
+                d.invoice_date>='$from_date' and d.invoice_date<='$to_date' 
 
             union all 
 
@@ -9758,7 +9672,7 @@ function generate_credit_debit_report() {
 
                 from distributor_in d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
 
-                d.date_of_processing>='$from_date' and d.date_of_processing<='$to_date' 
+                d.sales_return_date>='$from_date' and d.sales_return_date<='$to_date' 
 
             union all 
 
@@ -11567,7 +11481,7 @@ function generate_distributor_balance_ledger_report() {
 
                 from distributor_out d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
 
-                d.date_of_processing<'$from_date' 
+                d.invoice_date<'$from_date' 
 
             union all 
 
@@ -11577,7 +11491,7 @@ function generate_distributor_balance_ledger_report() {
 
                 from distributor_in d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
 
-                d.date_of_processing<'$from_date'
+                d.sales_return_date<'$from_date'
 
             union all 
 
@@ -11587,9 +11501,7 @@ function generate_distributor_balance_ledger_report() {
 
                 B.payment_amount as credit_amount,E.distributor_name from 
 
-            (select * from payment_details where status = 'Approved' and 
-
-                date_of_deposit<'$from_date') A 
+            (select * from payment_details where status = 'Approved' and date_of_deposit<'$from_date') A 
 
             left join 
 
@@ -11628,7 +11540,7 @@ function generate_distributor_balance_ledger_report() {
 
                 from distributor_out d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
 
-                d.date_of_processing>='$from_date' and d.date_of_processing<='$to_date' 
+                d.invoice_date>='$from_date' and d.invoice_date<='$to_date' 
 
             union all 
 
@@ -11638,7 +11550,7 @@ function generate_distributor_balance_ledger_report() {
 
                 from distributor_in d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
 
-                d.date_of_processing>='$from_date' and d.date_of_processing<='$to_date' 
+                d.sales_return_date>='$from_date' and d.sales_return_date<='$to_date' 
 
             union all 
 
@@ -11889,7 +11801,7 @@ function upload_distributor_balance_ledger_report() {
 
                 from distributor_out d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
 
-                d.date_of_processing<'$from_date' 
+                d.invoice_date<'$from_date' 
 
             union all 
 
@@ -11899,7 +11811,7 @@ function upload_distributor_balance_ledger_report() {
 
                 from distributor_in d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
 
-                d.date_of_processing<'$from_date'
+                d.sales_return_date<'$from_date'
 
             union all 
 
@@ -11951,7 +11863,7 @@ function upload_distributor_balance_ledger_report() {
 
                                 from distributor_out d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' 
 
-                                and d.date_of_processing>='$from_date' and d.date_of_processing<='$to_date'
+                                and d.invoice_date>='$from_date' and d.invoice_date<='$to_date'
 
                             union all 
 
@@ -11960,7 +11872,7 @@ function upload_distributor_balance_ledger_report() {
                                 null as debit_amount, final_amount as credit_amount, m.distributor_name,m.tally_name
 
                                 from distributor_in d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' 
-                                            and d.date_of_processing>='$from_date' and d.date_of_processing<='$to_date'
+                                            and d.sales_return_date>='$from_date' and d.sales_return_date<='$to_date'
 
                             union all 
 
@@ -12270,7 +12182,7 @@ function view_generate_distributor_balance_ledger_report() {
 
                 from distributor_out d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
 
-                d.date_of_processing<'$from_date' 
+                d.invoice_date<'$from_date' 
 
             union all 
 
@@ -12280,7 +12192,7 @@ function view_generate_distributor_balance_ledger_report() {
 
                 from distributor_in d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
 
-                d.date_of_processing<'$from_date'
+                d.sales_return_date<'$from_date'
 
             union all 
 
@@ -12331,7 +12243,7 @@ function view_generate_distributor_balance_ledger_report() {
 
                 from distributor_out d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
 
-                d.date_of_processing>='$from_date' and d.date_of_processing<='$to_date' 
+                d.invoice_date>='$from_date' and d.invoice_date<='$to_date' 
 
             union all 
 
@@ -12341,7 +12253,7 @@ function view_generate_distributor_balance_ledger_report() {
 
                 from distributor_in d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
 
-                d.date_of_processing>='$from_date' and d.date_of_processing<='$to_date' 
+                d.sales_return_date>='$from_date' and d.sales_return_date<='$to_date' 
 
             union all 
 
@@ -12535,8 +12447,8 @@ public function get_ledger_details() {
                        LEFT JOIN distributor_master m 
                               ON d.distributor_id = m.id 
                 WHERE  d.status = 'Approved' 
-                       AND d.date_of_processing >= '$from_date' 
-                       AND d.date_of_processing <= '$to_date' 
+                       AND d.invoice_date >= '$from_date' 
+                       AND d.invoice_date <= '$to_date' 
                 UNION ALL 
                 SELECT NULL         AS debit_amount, 
                        final_amount AS credit_amount, 
@@ -12545,8 +12457,8 @@ public function get_ledger_details() {
                        LEFT JOIN distributor_master m 
                               ON d.distributor_id = m.id 
                 WHERE  d.status = 'Approved' 
-                       AND d.date_of_processing >= '$from_date' 
-                       AND d.date_of_processing <= '$to_date' 
+                       AND d.sales_return_date >= '$from_date' 
+                       AND d.sales_return_date <= '$to_date' 
                 UNION ALL 
                 SELECT * 
                 FROM   (SELECT NULL             AS debit_amount, 
@@ -12590,7 +12502,7 @@ public function get_ledger_details() {
 
                         from distributor_out d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
 
-                        d.date_of_processing<'$from_date' 
+                        d.invoice_date<'$from_date' 
 
                     union all 
 
@@ -12600,7 +12512,7 @@ public function get_ledger_details() {
 
                         from distributor_in d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
 
-                        d.date_of_processing<'$from_date'
+                        d.sales_return_date<'$from_date'
 
                     union all 
 
@@ -12674,8 +12586,8 @@ public function get_adjustment_bal() {
                            LEFT JOIN distributor_master m 
                                   ON d.distributor_id = m.id 
                     WHERE  d.status = 'Approved' 
-                           AND d.date_of_processing >= '$from_date' 
-                           AND d.date_of_processing <= '$to_date' 
+                           AND d.invoice_date >= '$from_date' 
+                           AND d.invoice_date <= '$to_date' 
                     UNION ALL 
                     SELECT NULL         AS debit_amount, 
                            final_amount AS credit_amount, 
@@ -12684,8 +12596,8 @@ public function get_adjustment_bal() {
                            LEFT JOIN distributor_master m 
                                   ON d.distributor_id = m.id 
                     WHERE  d.status = 'Approved' 
-                           AND d.date_of_processing >= '$from_date' 
-                           AND d.date_of_processing <= '$to_date' 
+                           AND d.sales_return_date >= '$from_date' 
+                           AND d.sales_return_date <= '$to_date' 
                     UNION ALL 
                     SELECT * 
                     FROM   (SELECT NULL             AS debit_amount, 
@@ -12729,7 +12641,7 @@ public function get_adjustment_bal() {
 
                             from distributor_out d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
 
-                            d.date_of_processing<'$from_date' 
+                            d.invoice_date<'$from_date' 
 
                         union all 
 
@@ -12739,7 +12651,7 @@ public function get_adjustment_bal() {
 
                             from distributor_in d left join distributor_master m on d.distributor_id=m.id where d.status = 'Approved' and 
 
-                            d.date_of_processing<'$from_date'
+                            d.sales_return_date<'$from_date'
 
                         union all 
 
@@ -13684,7 +13596,10 @@ public function generate_gt_stock_report(){
     $to_date = formatdate($this->input->post('to_date'));
 
 
-		$sql = "select K.*, L.rt_distributor_name from (select I.*,J.sales_rep_name from (SELECT G.*,H.location from (select E.*, F.area from(select C.*,D.zone from(select A.id,A.zone_id,A.area_id,A.distributor_id,A.distributor_name,A.location_id,A.sales_rep_id,A.date_of_visit,B.orange_bar,B.butterscotch_bar,B.chocopeanut_bar,B.bambaiyachaat_bar,B.mangoginger_bar,B.berry_blast_bar,B.chyawanprash_bar,B.chocolate_cookies_box,B.cranberry_orange_box,B.dark_chocolate_cookies_box,B.fig_raisins_box,papaya_pineapple_box,B.variety_box,B.mint_box,butterscotch_box,B.chocopeanut_box,B.bambaiyachaat_box,B.berry_blast_box,B.mangoginger_box,B.cranberry_cookies_box,B.orange_box,B.chyawanprash_box from(SELECT * FROM sales_rep_location WHERE date(date_of_visit)>= '$from_date'  AND date(date_of_visit)<= '$to_date' ) A
+		$sql = "select K.*, L.rt_distributor_name from (select I.*,J.sales_rep_name from 
+        (SELECT G.*,H.location from (select E.*, F.area from(select C.*,D.zone from 
+        (select A.id,A.zone_id,A.area_id,A.distributor_id,A.distributor_name,A.location_id,A.sales_rep_id,A.date_of_visit,B.orange_bar,B.butterscotch_bar,B.chocopeanut_bar,B.bambaiyachaat_bar,B.mangoginger_bar,B.berry_blast_bar,B.chyawanprash_bar,B.chocolate_cookies_box,B.cranberry_orange_box,B.dark_chocolate_cookies_box,B.fig_raisins_box,papaya_pineapple_box,B.variety_box,B.mint_box,butterscotch_box,B.chocopeanut_box,B.bambaiyachaat_box,B.berry_blast_box,B.mangoginger_box,B.cranberry_cookies_box,B.orange_box,B.chyawanprash_box from 
+        (SELECT * FROM sales_rep_location WHERE date(date_of_visit)>= '$from_date'  AND date(date_of_visit)<= '$to_date' ) A
 		left join
 		(SELECT * FROM sales_rep_distributor_opening_stock) B 
 		on(A.id=B.sales_rep_loc_id)) C
@@ -14830,13 +14745,13 @@ function generate_monthly_sales_overview_report() {
 
     $sql = "select A.particular, A.year_no, A.mon_no, A.mon_name, sum(qty) as tot_qty from 
             (select case when A.distributor_id='1' then 'Sample' when A.distributor_id='189' then 'Expired' else 'Sales' end as particular, 
-                DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, 
-                DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, 
+                DATE_FORMAT(A.invoice_date,'%Y') as year_no, DATE_FORMAT(A.invoice_date,'%y%m') as mon_no, 
+                DATE_FORMAT(A.invoice_date,'%b-%y') as mon_name, 
                 case when B.type='Bar' then B.qty else B.qty*C.qty end as qty 
             from distributor_out A 
             left join distributor_out_items B on (A.id=B.distributor_out_id) 
             left join box_product C on (B.type='Box' and B.item_id=C.box_id) 
-            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date') A 
+            where A.status='Approved' and A.invoice_date>='$from_date' and A.invoice_date<='$to_date') A 
             group by A.particular, A.year_no, A.mon_no, A.mon_name 
             order by A.year_no, A.mon_no";
     $data = $this->db->query($sql)->result_array();
@@ -14853,14 +14768,14 @@ function generate_monthly_sales_overview_report() {
     $sql = "select A.particular, A.year_no, A.mon_no, A.mon_name, A.category_name, sum(qty) as tot_qty from 
             (select D.*, F.category_name from 
             (select case when A.distributor_id='1' then 'Sample' when A.distributor_id='189' then 'Expired' else 'Sales' end as particular, 
-                DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, 
-                DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, 
+                DATE_FORMAT(A.invoice_date,'%Y') as year_no, DATE_FORMAT(A.invoice_date,'%y%m') as mon_no, 
+                DATE_FORMAT(A.invoice_date,'%b-%y') as mon_name, 
                 case when B.type='Bar' then B.item_id else C.product_id end as item_id, 
                 case when B.type='Bar' then B.qty else B.qty*C.qty end as qty 
             from distributor_out A 
             left join distributor_out_items B on (A.id=B.distributor_out_id) 
             left join box_product C on (B.type='Box' and B.item_id=C.box_id) 
-            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date') D 
+            where A.status='Approved' and A.invoice_date>='$from_date' and A.invoice_date<='$to_date') D 
             left join product_master E on (D.item_id=E.id) 
             left join category_master F on (E.category_id=F.id))A 
             group by A.particular, A.year_no, A.mon_no, A.mon_name, A.category_name 
@@ -14894,11 +14809,11 @@ function generate_monthly_sales_overview_report() {
         }
     }
 
-    $sql = "select A.year_no, A.mon_no, A.mon_name, sum(A.final_amount) as tot_amount from 
-            (select DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, 
-                DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, A.final_amount 
+    $sql = "select A.year_no, A.mon_no, A.mon_name, sum(final_amount) as tot_amount from 
+            (select DATE_FORMAT(A.invoice_date,'%Y') as year_no, DATE_FORMAT(A.invoice_date,'%y%m') as mon_no, 
+                DATE_FORMAT(A.invoice_date,'%b-%y') as mon_name, (ifnull(A.final_amount,0)+ifnull(A.round_off_amount,0)) as final_amount 
             from distributor_out A 
-            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and 
+            where A.status='Approved' and A.invoice_date>='$from_date' and A.invoice_date<='$to_date' and 
                 (A.distributor_id!='1' and A.distributor_id!='189')) A 
             group by A.year_no, A.mon_no, A.mon_name 
             order by A.year_no, A.mon_no";
@@ -14908,13 +14823,13 @@ function generate_monthly_sales_overview_report() {
     }
 
     $sql = "select A.year_no, A.mon_no, A.mon_name, sum(qty) as tot_qty from 
-            (select DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, 
-                DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, 
+            (select DATE_FORMAT(A.sales_return_date,'%Y') as year_no, DATE_FORMAT(A.sales_return_date,'%y%m') as mon_no, 
+                DATE_FORMAT(A.sales_return_date,'%b-%y') as mon_name, 
                 case when B.type='Bar' then B.qty else B.qty*C.qty end as qty 
             from distributor_in A 
             left join distributor_in_items B on (A.id=B.distributor_in_id) 
             left join box_product C on (B.type='Box' and B.item_id=C.box_id) 
-            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and 
+            where A.status='Approved' and A.sales_return_date>='$from_date' and A.sales_return_date<='$to_date' and 
                 (A.distributor_id!='1' and A.distributor_id!='189')) A 
             group by A.year_no, A.mon_no, A.mon_name 
             order by A.year_no, A.mon_no";
@@ -14925,14 +14840,14 @@ function generate_monthly_sales_overview_report() {
 
     $sql = "select A.year_no, A.mon_no, A.mon_name, A.category_name, sum(qty) as tot_qty from 
             (select D.*, F.category_name from 
-            (select DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, 
-                DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, 
+            (select DATE_FORMAT(A.sales_return_date,'%Y') as year_no, DATE_FORMAT(A.sales_return_date,'%y%m') as mon_no, 
+                DATE_FORMAT(A.sales_return_date,'%b-%y') as mon_name, 
                 case when B.type='Bar' then B.item_id else C.product_id end as item_id, 
                 case when B.type='Bar' then B.qty else B.qty*C.qty end as qty 
             from distributor_in A 
             left join distributor_in_items B on (A.id=B.distributor_in_id) 
             left join box_product C on (B.type='Box' and B.item_id=C.box_id) 
-            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and 
+            where A.status='Approved' and A.sales_return_date>='$from_date' and A.sales_return_date<='$to_date' and 
                 (A.distributor_id!='1' and A.distributor_id!='189')) D 
             left join product_master E on (D.item_id=E.id) 
             left join category_master F on (E.category_id=F.id)) A 
@@ -14950,10 +14865,10 @@ function generate_monthly_sales_overview_report() {
     }
 
     $sql = "select A.year_no, A.mon_no, A.mon_name, sum(A.final_amount) as tot_amount from 
-            (select DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, 
-                DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, A.final_amount 
+            (select DATE_FORMAT(A.sales_return_date,'%Y') as year_no, DATE_FORMAT(A.sales_return_date,'%y%m') as mon_no, 
+                DATE_FORMAT(A.sales_return_date,'%b-%y') as mon_name, (ifnull(A.final_amount,0)+ifnull(A.round_off_amount,0)) as final_amount 
             from distributor_in A 
-            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and 
+            where A.status='Approved' and A.sales_return_date>='$from_date' and A.sales_return_date<='$to_date' and 
                 (A.distributor_id!='1' and A.distributor_id!='189')) A 
             group by A.year_no, A.mon_no, A.mon_name 
             order by A.year_no, A.mon_no";
@@ -14965,8 +14880,8 @@ function generate_monthly_sales_overview_report() {
     $sql = "select A.year_no, A.mon_no, A.mon_name, sum(A.amount) as tot_amount from 
             (select DATE_FORMAT(A.date_of_transaction,'%Y') as year_no, DATE_FORMAT(A.date_of_transaction,'%y%m') as mon_no, 
                 DATE_FORMAT(A.date_of_transaction,'%b-%y') as mon_name, 
-                case when (A.transaction='Credit Note' or A.transaction='Expense Voucher') then A.amount 
-                    else (A.amount*-1) end as amount 
+                case when (A.transaction='Credit Note' or A.transaction='Expense Voucher') then round(A.amount,0) 
+                    else (round(A.amount,0)*-1) end as amount 
             from credit_debit_note A 
             where A.status='Approved' and A.date_of_transaction>='$from_date' and A.date_of_transaction<='$to_date' and 
                 (A.distributor_id!='1' and A.distributor_id!='189')) A 
@@ -14980,14 +14895,15 @@ function generate_monthly_sales_overview_report() {
     $sql = "select distinct concat(H.item_type, '-', H.item_name) as item, H.item_type, H.item_name from 
             (select G.year_no, G.mon_no, G.mon_name, G.item_type, G.item_name, sum(G.item_qty) as tot_qty from 
             (select D.year_no, D.mon_no, D.mon_name, D.item_type, case when D.item_type='Bar' then E.short_name else F.short_name end as item_name, D.item_qty from 
-            (select DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, 
+            (select DATE_FORMAT(A.invoice_date,'%Y') as year_no, DATE_FORMAT(A.invoice_date,'%y%m') as mon_no, DATE_FORMAT(A.invoice_date,'%b-%y') as mon_name, 
                 case when B.type='Box' and B.item_id in (4, 13, 14, 32) then 'Box' else 'Bar' end as item_type, 
                 case when B.type='Box' and B.item_id in (4, 13, 14, 32) then B.item_id when B.type='Bar' then B.item_id else C.product_id end as item_id, 
                 case when B.type='Bar' then B.qty else B.qty*C.qty end as item_qty 
             from distributor_out A 
             left join distributor_out_items B on (A.id=B.distributor_out_id) 
             left join box_product C on (B.type='Box' and B.item_id=C.box_id) 
-            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and (A.distributor_id!='1' and A.distributor_id!='189')) D 
+            where A.status='Approved' and A.invoice_date>='$from_date' and A.invoice_date<='$to_date' and 
+                (A.distributor_id!='1' and A.distributor_id!='189')) D 
             left join product_master E on (D.item_type='Bar' and D.item_id=E.id) 
             left join box_master F on (D.item_type='Box' and D.item_id=F.id)) G 
             group by G.year_no, G.mon_no, G.mon_name, G.item_type, G.item_name 
@@ -14998,14 +14914,15 @@ function generate_monthly_sales_overview_report() {
     $sql = "select G.year_no, G.mon_no, G.mon_name, concat(G.item_type, '-', G.item_name) as item, G.item_type, G.item_name, 
             sum(G.item_qty) as tot_qty from 
             (select D.year_no, D.mon_no, D.mon_name, D.item_type, case when D.item_type='Bar' then E.short_name else F.short_name end as item_name, D.item_qty from 
-            (select DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, 
+            (select DATE_FORMAT(A.invoice_date,'%Y') as year_no, DATE_FORMAT(A.invoice_date,'%y%m') as mon_no, DATE_FORMAT(A.invoice_date,'%b-%y') as mon_name, 
                 case when B.type='Box' and B.item_id in (4, 13, 14, 32) then 'Box' else 'Bar' end as item_type, 
                 case when B.type='Box' and B.item_id in (4, 13, 14, 32) then B.item_id when B.type='Bar' then B.item_id else C.product_id end as item_id, 
                 case when B.type='Bar' then B.qty else B.qty*C.qty end as item_qty 
             from distributor_out A 
             left join distributor_out_items B on (A.id=B.distributor_out_id) 
             left join box_product C on (B.type='Box' and B.item_id=C.box_id) 
-            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and (A.distributor_id!='1' and A.distributor_id!='189')) D 
+            where A.status='Approved' and A.invoice_date>='$from_date' and A.invoice_date<='$to_date' and 
+                (A.distributor_id!='1' and A.distributor_id!='189')) D 
             left join product_master E on (D.item_type='Bar' and D.item_id=E.id) 
             left join box_master F on (D.item_type='Box' and D.item_id=F.id)) G 
             group by G.year_no, G.mon_no, G.mon_name, G.item_type, G.item_name 
@@ -15026,14 +14943,15 @@ function generate_monthly_sales_overview_report() {
     $sql = "select distinct concat(H.item_type, '-', H.item_name) as item, H.item_type, H.item_name from 
             (select G.year_no, G.mon_no, G.mon_name, G.item_type, G.item_name, sum(G.item_qty) as tot_qty from 
             (select D.year_no, D.mon_no, D.mon_name, D.item_type, case when D.item_type='Bar' then E.short_name else F.short_name end as item_name, D.item_qty from 
-            (select DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, 
+            (select DATE_FORMAT(A.sales_return_date,'%Y') as year_no, DATE_FORMAT(A.sales_return_date,'%y%m') as mon_no, DATE_FORMAT(A.sales_return_date,'%b-%y') as mon_name, 
                 case when B.type='Box' and B.item_id in (4, 13, 14, 32) then 'Box' else 'Bar' end as item_type, 
                 case when B.type='Box' and B.item_id in (4, 13, 14, 32) then B.item_id when B.type='Bar' then B.item_id else C.product_id end as item_id, 
                 case when B.type='Bar' then B.qty else B.qty*C.qty end as item_qty 
             from distributor_in A 
             left join distributor_in_items B on (A.id=B.distributor_in_id) 
             left join box_product C on (B.type='Box' and B.item_id=C.box_id) 
-            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and (A.distributor_id!='1' and A.distributor_id!='189')) D 
+            where A.status='Approved' and A.sales_return_date>='$from_date' and A.sales_return_date<='$to_date' and 
+                (A.distributor_id!='1' and A.distributor_id!='189')) D 
             left join product_master E on (D.item_type='Bar' and D.item_id=E.id) 
             left join box_master F on (D.item_type='Box' and D.item_id=F.id)) G 
             group by G.year_no, G.mon_no, G.mon_name, G.item_type, G.item_name 
@@ -15044,14 +14962,15 @@ function generate_monthly_sales_overview_report() {
     $sql = "select G.year_no, G.mon_no, G.mon_name, concat(G.item_type, '-', G.item_name) as item, G.item_type, G.item_name, 
             sum(G.item_qty) as tot_qty from 
             (select D.year_no, D.mon_no, D.mon_name, D.item_type, case when D.item_type='Bar' then E.short_name else F.short_name end as item_name, D.item_qty from 
-            (select DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, 
+            (select DATE_FORMAT(A.sales_return_date,'%Y') as year_no, DATE_FORMAT(A.sales_return_date,'%y%m') as mon_no, DATE_FORMAT(A.sales_return_date,'%b-%y') as mon_name, 
                 case when B.type='Box' and B.item_id in (4, 13, 14, 32) then 'Box' else 'Bar' end as item_type, 
                 case when B.type='Box' and B.item_id in (4, 13, 14, 32) then B.item_id when B.type='Bar' then B.item_id else C.product_id end as item_id, 
                 case when B.type='Bar' then B.qty else B.qty*C.qty end as item_qty 
             from distributor_in A 
             left join distributor_in_items B on (A.id=B.distributor_in_id) 
             left join box_product C on (B.type='Box' and B.item_id=C.box_id) 
-            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and (A.distributor_id!='1' and A.distributor_id!='189')) D 
+            where A.status='Approved' and A.sales_return_date>='$from_date' and A.sales_return_date<='$to_date' and 
+                (A.distributor_id!='1' and A.distributor_id!='189')) D 
             left join product_master E on (D.item_type='Bar' and D.item_id=E.id) 
             left join box_master F on (D.item_type='Box' and D.item_id=F.id)) G 
             group by G.year_no, G.mon_no, G.mon_name, G.item_type, G.item_name 
@@ -15071,7 +14990,9 @@ function generate_monthly_sales_overview_report() {
 
     $sql = "select distinct G.distributor_type as item, G.distributor_type as item_name from 
             (select distinct D.distributor_id, E.type_id, case when E.type_id='13' then 'Modern Trade' when E.type_id='6' then 'Alternate Channel' else F.distributor_type end as distributor_type from 
-            (select distinct A.distributor_id from distributor_out A where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and (A.distributor_id!='1' and A.distributor_id!='189')) D 
+            (select distinct A.distributor_id from distributor_out A where A.status='Approved' and 
+                A.invoice_date>='$from_date' and A.invoice_date<='$to_date' and 
+                (A.distributor_id!='1' and A.distributor_id!='189')) D 
             left join distributor_master E on (D.distributor_id=E.id) 
             left join distributor_type_master F on (E.type_id=F.id)) G 
             order by G.distributor_type";
@@ -15080,12 +15001,13 @@ function generate_monthly_sales_overview_report() {
     $sql = "select G.year_no, G.mon_no, G.mon_name, G.distributor_type as item, 
             G.distributor_type as item_name, sum(G.item_qty) as tot_qty from 
             (select D.year_no, D.mon_no, D.mon_name, D.distributor_id, D.item_qty, E.type_id, case when E.type_id='13' then 'Modern Trade' when E.type_id='6' then 'Alternate Channel' else F.distributor_type end as distributor_type from 
-            (select DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, A.distributor_id, 
+            (select DATE_FORMAT(A.invoice_date,'%Y') as year_no, DATE_FORMAT(A.invoice_date,'%y%m') as mon_no, DATE_FORMAT(A.invoice_date,'%b-%y') as mon_name, A.distributor_id, 
                 case when B.type='Bar' then B.qty else B.qty*C.qty end as item_qty 
             from distributor_out A 
             left join distributor_out_items B on (A.id=B.distributor_out_id) 
             left join box_product C on (B.type='Box' and B.item_id=C.box_id) 
-            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and (A.distributor_id!='1' and A.distributor_id!='189')) D 
+            where A.status='Approved' and A.invoice_date>='$from_date' and A.invoice_date<='$to_date' and 
+                (A.distributor_id!='1' and A.distributor_id!='189')) D 
             left join distributor_master E on (D.distributor_id=E.id) 
             left join distributor_type_master F on (E.type_id=F.id)) G 
             group by G.year_no, G.mon_no, G.mon_name, G.distributor_type 
@@ -15105,7 +15027,9 @@ function generate_monthly_sales_overview_report() {
 
     $sql = "select distinct G.distributor_type as item, G.distributor_type as item_name from 
             (select D.distributor_id, E.type_id, case when E.type_id='13' then 'Modern Trade' when E.type_id='6' then 'Alternate Channel' else F.distributor_type end as distributor_type from 
-            (select distinct A.distributor_id from distributor_in A where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and (A.distributor_id!='1' and A.distributor_id!='189')) D 
+            (select distinct A.distributor_id from distributor_in A 
+            where A.status='Approved' and A.sales_return_date>='$from_date' and A.sales_return_date<='$to_date' and 
+                (A.distributor_id!='1' and A.distributor_id!='189')) D 
             left join distributor_master E on (D.distributor_id=E.id) 
             left join distributor_type_master F on (E.type_id=F.id)) G 
             order by G.distributor_type";
@@ -15114,12 +15038,13 @@ function generate_monthly_sales_overview_report() {
     $sql = "select G.year_no, G.mon_no, G.mon_name, G.distributor_type as item, 
             G.distributor_type as item_name, sum(G.item_qty) as tot_qty from 
             (select D.year_no, D.mon_no, D.mon_name, D.distributor_id, D.item_qty, E.type_id, case when E.type_id='13' then 'Modern Trade' when E.type_id='6' then 'Alternate Channel' else F.distributor_type end as distributor_type from 
-            (select DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, A.distributor_id, 
+            (select DATE_FORMAT(A.sales_return_date,'%Y') as year_no, DATE_FORMAT(A.sales_return_date,'%y%m') as mon_no, DATE_FORMAT(A.sales_return_date,'%b-%y') as mon_name, A.distributor_id, 
                 case when B.type='Bar' then B.qty else B.qty*C.qty end as item_qty 
             from distributor_in A 
             left join distributor_in_items B on (A.id=B.distributor_in_id) 
             left join box_product C on (B.type='Box' and B.item_id=C.box_id) 
-            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and (A.distributor_id!='1' and A.distributor_id!='189')) D 
+            where A.status='Approved' and A.sales_return_date>='$from_date' and A.sales_return_date<='$to_date' and 
+                (A.distributor_id!='1' and A.distributor_id!='189')) D 
             left join distributor_master E on (D.distributor_id=E.id) 
             left join distributor_type_master F on (E.type_id=F.id)) G 
             group by G.year_no, G.mon_no, G.mon_name, G.distributor_type 
@@ -15139,10 +15064,12 @@ function generate_monthly_sales_overview_report() {
 
     $sql = "select distinct C.zone as item, C.zone as item_name from 
             (select distinct distributor_id from distributor_out where status='Approved' and 
-            date_of_processing>='$from_date' and date_of_processing<='$to_date' and (distributor_id!='1' and distributor_id!='189') 
+                invoice_date>='$from_date' and invoice_date<='$to_date' and 
+                (distributor_id!='1' and distributor_id!='189') 
             union all 
             select distinct distributor_id from distributor_in where status='Approved' and 
-            date_of_processing>='$from_date' and date_of_processing<='$to_date' and (distributor_id!='1' and distributor_id!='189')) A 
+                sales_return_date>='$from_date' and sales_return_date<='$to_date' and 
+                (distributor_id!='1' and distributor_id!='189')) A 
             left join distributor_master B on (A.distributor_id=B.id) 
             left join zone_master C on (B.zone_id=C.id)";
     $zonewise_sales = $this->db->query($sql)->result_array();
@@ -15150,19 +15077,21 @@ function generate_monthly_sales_overview_report() {
     $sql = "select G.year_no, G.mon_no, G.mon_name, G.zone as item, 
             G.zone as item_name, sum(G.item_qty) as tot_qty from 
             (select D.year_no, D.mon_no, D.mon_name, D.distributor_id, D.item_qty, E.zone_id, F.zone from 
-            (select DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, A.distributor_id, 
+            (select DATE_FORMAT(A.invoice_date,'%Y') as year_no, DATE_FORMAT(A.invoice_date,'%y%m') as mon_no, DATE_FORMAT(A.invoice_date,'%b-%y') as mon_name, A.distributor_id, 
                 case when B.type='Bar' then B.qty else B.qty*C.qty end as item_qty 
             from distributor_out A 
             left join distributor_out_items B on (A.id=B.distributor_out_id) 
             left join box_product C on (B.type='Box' and B.item_id=C.box_id) 
-            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and (A.distributor_id!='1' and A.distributor_id!='189') 
+            where A.status='Approved' and A.invoice_date>='$from_date' and A.invoice_date<='$to_date' and 
+                (A.distributor_id!='1' and A.distributor_id!='189') 
             union all 
-            select DATE_FORMAT(A.date_of_processing,'%Y') as year_no, DATE_FORMAT(A.date_of_processing,'%y%m') as mon_no, DATE_FORMAT(A.date_of_processing,'%b-%y') as mon_name, A.distributor_id, 
+            select DATE_FORMAT(A.sales_return_date,'%Y') as year_no, DATE_FORMAT(A.sales_return_date,'%y%m') as mon_no, DATE_FORMAT(A.sales_return_date,'%b-%y') as mon_name, A.distributor_id, 
                 (case when B.type='Bar' then B.qty else B.qty*C.qty end)*-1 as item_qty 
             from distributor_in A 
             left join distributor_in_items B on (A.id=B.distributor_in_id) 
             left join box_product C on (B.type='Box' and B.item_id=C.box_id) 
-            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and (A.distributor_id!='1' and A.distributor_id!='189')) D 
+            where A.status='Approved' and A.sales_return_date>='$from_date' and A.sales_return_date<='$to_date' and 
+                (A.distributor_id!='1' and A.distributor_id!='189')) D 
             left join distributor_master E on (D.distributor_id=E.id) 
             left join zone_master F on (E.zone_id=F.id)) G 
             group by G.year_no, G.mon_no, G.mon_name, G.zone 
@@ -15542,11 +15471,11 @@ function generate_monthly_sales_overview_zonewise_report() {
 
     $sql = "select distinct C.zone from 
             (select distinct distributor_id from distributor_out where status='Approved' and 
-            date_of_processing>='$from_date' and date_of_processing<='$to_date' and 
+            invoice_date>='$from_date' and invoice_date<='$to_date' and 
             (distributor_id!='1' and distributor_id!='189') 
             union all 
             select distinct distributor_id from distributor_in where status='Approved' and 
-            date_of_processing>='$from_date' and date_of_processing<='$to_date' and 
+            sales_return_date>='$from_date' and sales_return_date<='$to_date' and 
             (distributor_id!='1' and distributor_id!='189') 
             union all 
             select distinct distributor_id from credit_debit_note where status='Approved' and 
@@ -15570,11 +15499,11 @@ function generate_monthly_sales_overview_zonewise_report() {
 
     $sql = "select distinct (case when B.type_id='13' then 'Modern Trade' when B.type_id='6' then 'Alternate Channel' else C.distributor_type end) as distributor_type from 
             (select distinct distributor_id from distributor_out where status='Approved' and 
-            date_of_processing>='$from_date' and date_of_processing<='$to_date' and 
+            invoice_date>='$from_date' and invoice_date<='$to_date' and 
             (distributor_id!='1' and distributor_id!='189') 
             union all 
             select distinct distributor_id from distributor_in where status='Approved' and 
-            date_of_processing>='$from_date' and date_of_processing<='$to_date' and 
+            sales_return_date>='$from_date' and sales_return_date<='$to_date' and 
             (distributor_id!='1' and distributor_id!='189') 
             union all 
             select distinct distributor_id from credit_debit_note where status='Approved' and 
@@ -15591,8 +15520,8 @@ function generate_monthly_sales_overview_zonewise_report() {
             from distributor_out A 
             left join distributor_out_items B on (A.id=B.distributor_out_id) 
             left join box_product C on (B.type='Box' and B.item_id=C.box_id) 
-            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and 
-            (A.distributor_id!='1' and A.distributor_id!='189')) D 
+            where A.status='Approved' and A.invoice_date>='$from_date' and A.invoice_date<='$to_date' and 
+                (A.distributor_id!='1' and A.distributor_id!='189')) D 
             left join distributor_master E on (D.distributor_id=E.id) 
             left join distributor_type_master F on (E.type_id=F.id) 
             left join zone_master G on (E.zone_id=G.id)) H 
@@ -15615,7 +15544,8 @@ function generate_monthly_sales_overview_zonewise_report() {
             (select D.distributor_id, D.final_amount, case when E.type_id='13' then 'Modern Trade' when E.type_id='6' then 'Alternate Channel' else F.distributor_type end distributor_type, G.zone from 
             (select A.distributor_id, A.final_amount 
             from distributor_out A 
-            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and (A.distributor_id!='1' and A.distributor_id!='189')) D 
+            where A.status='Approved' and A.invoice_date>='$from_date' and A.invoice_date<='$to_date' and 
+                (A.distributor_id!='1' and A.distributor_id!='189')) D 
             left join distributor_master E on (D.distributor_id=E.id) 
             left join distributor_type_master F on (E.type_id=F.id) 
             left join zone_master G on (E.zone_id=G.id)) H 
@@ -15640,8 +15570,8 @@ function generate_monthly_sales_overview_zonewise_report() {
             from distributor_in A 
             left join distributor_in_items B on (A.id=B.distributor_in_id) 
             left join box_product C on (B.type='Box' and B.item_id=C.box_id) 
-            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and 
-            (A.distributor_id!='1' and A.distributor_id!='189')) D 
+            where A.status='Approved' and A.sales_return_date>='$from_date' and A.sales_return_date<='$to_date' and 
+                (A.distributor_id!='1' and A.distributor_id!='189')) D 
             left join distributor_master E on (D.distributor_id=E.id) 
             left join distributor_type_master F on (E.type_id=F.id) 
             left join zone_master G on (E.zone_id=G.id)) H 
@@ -15664,8 +15594,8 @@ function generate_monthly_sales_overview_zonewise_report() {
             (select D.distributor_id, D.final_amount, case when E.type_id='13' then 'Modern Trade' when E.type_id='6' then 'Alternate Channel' else F.distributor_type end distributor_type, G.zone from 
             (select A.distributor_id, A.final_amount 
             from distributor_in A 
-            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and 
-            (A.distributor_id!='1' and A.distributor_id!='189')) D 
+            where A.status='Approved' and A.sales_return_date>='$from_date' and A.sales_return_date<='$to_date' and 
+                (A.distributor_id!='1' and A.distributor_id!='189')) D 
             left join distributor_master E on (D.distributor_id=E.id) 
             left join distributor_type_master F on (E.type_id=F.id) 
             left join zone_master G on (E.zone_id=G.id)) H 
@@ -18274,49 +18204,51 @@ public function send_production_exception_report(){
     // $attachment = '';
 
 
-    //// $to_email = "dhaval.maru@pecanreams.com";
-    //$bcc = "dhaval.maru@pecanreams.com";
+    if(count($task)>0 || count($pre_production) || count($post_production)) {
+        //// $to_email = "dhaval.maru@pecanreams.com";
+        //$bcc = "dhaval.maru@pecanreams.com";
 
-    // $to_email = "ashwini.patil@pecanreams.com";
-    // $bcc = "ashwini.patil@pecanreams.com";
-    
-    $to_email = "prasad.bhisale@pecanreams.com";
-    $cc = "prasad.bhisale@pecanreams.com";
-    $bcc = "prasad.bhisale@pecanreams.com";
-    
-    // $to_email = "dinesh.parkhi@eatanytime.in, vaibhav.desai@eatanytime.in, prachi.sanghvi@eatanytime.in";
-    // $cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in";
-    // $bcc = "ashwini.patil@pecanreams.com, prasad.bhisale@pecanreams.com, dhaval.maru@pecanreams.com";
+        // $to_email = "ashwini.patil@pecanreams.com";
+        // $bcc = "ashwini.patil@pecanreams.com";
+        
+        $to_email = "prasad.bhisale@pecanreams.com";
+        $cc = "prasad.bhisale@pecanreams.com";
+        $bcc = "prasad.bhisale@pecanreams.com";
+        
+        // $to_email = "dinesh.parkhi@eatanytime.in, vaibhav.desai@eatanytime.in, prachi.sanghvi@eatanytime.in";
+        // $cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in";
+        // $bcc = "ashwini.patil@pecanreams.com, prasad.bhisale@pecanreams.com, dhaval.maru@pecanreams.com";
 
-    $sql = "select * from report_master where report_name = 'Production Exception Report'";
-    $query = $this->db->query($sql);
-    $result = $query->result();
-    if(count($result)>0) {
-        $from_email = $result[0]->from_email;
-        $from_email_sender = $result[0]->sender_name;
-        $to_email = $result[0]->to_email;
-        $cc = $result[0]->cc_email;
-        $bcc = $result[0]->bcc_email;
+        $sql = "select * from report_master where report_name = 'Production Exception Report'";
+        $query = $this->db->query($sql);
+        $result = $query->result();
+        if(count($result)>0) {
+            $from_email = $result[0]->from_email;
+            $from_email_sender = $result[0]->sender_name;
+            $to_email = $result[0]->to_email;
+            $cc = $result[0]->cc_email;
+            $bcc = $result[0]->bcc_email;
+        }
+
+        $subject = 'Production Exception Report -'.date("d-m-Y",strtotime($date));
+
+        echo '<br/><br/>mail '.$mailSent=send_email_new($from_email, $from_email_sender, $to_email, $subject, $tbody, $bcc, $cc, $attachment);
+        if ($mailSent==1) {
+            echo "Send";
+        } else {
+            echo "NOT Send ".$mailSent;
+        }
+
+        if($mailSent==1){
+            $logarray['table_id']=$this->session->userdata('session_id');
+            $logarray['module_name']='Reports';
+            $logarray['cnt_name']='Reports';
+            $logarray['action']='Production Exception report sent.';
+            $this->user_access_log_model->insertAccessLog($logarray);
+        }
+
+        // load_view('invoice/emailer', $data); 
     }
-
-    $subject = 'Production Exception Report -'.date("d-m-Y",strtotime($date));
-
-    echo '<br/><br/>mail '.$mailSent=send_email_new($from_email, $from_email_sender, $to_email, $subject, $tbody, $bcc, $cc, $attachment);
-    if ($mailSent==1) {
-        echo "Send";
-    } else {
-        echo "NOT Send ".$mailSent;
-    }
-
-    if($mailSent==1){
-        $logarray['table_id']=$this->session->userdata('session_id');
-        $logarray['module_name']='Reports';
-        $logarray['cnt_name']='Reports';
-        $logarray['action']='Production Exception report sent.';
-        $this->user_access_log_model->insertAccessLog($logarray);
-    }
-
-    // load_view('invoice/emailer', $data); 
 }
 
 public function send_beat_analysis_report($report_peroid='') {

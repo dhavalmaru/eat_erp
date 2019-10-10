@@ -106,13 +106,17 @@ function save_data($id=''){
             if($id!='' || $ref_id!=''){
                 $reference = '';
                 if($transaction=='Credit Note'){
-                    $reference = 'credit_note';
+                    // $reference = 'credit_note';
+                    $reference = 'CN';
                 } else if($transaction=='Debit Note'){
-                    $reference = 'debit_note';
+                    // $reference = 'debit_note';
+                    $reference = 'DN';
                 } else if($transaction=='Expense Voucher'){
-                    $reference = 'exp';
+                    // $reference = 'exp';
+                    $reference = 'EXP';
                 } else {
-                    $reference = 'exp_rev';
+                    // $reference = 'exp_rev';
+                    $reference = 'EXPREV';
                 }
 
                 if($ref_no==null || $ref_no==''){
@@ -140,13 +144,16 @@ function save_data($id=''){
                             $financial_year="";
                         } else {
                             $financial_year=calculateFiscalYearForDate($ref_date);
+                            if(strpos($financial_year,'-')!==false){
+                                $financial_year = substr($financial_year, 0, strpos($financial_year,'-')-1);
+                            }
                         }
                     } else {
                         $financial_year="";
                     }
                     
-                    
-                    $ref_no = 'WHPL/'.$reference.'/'.$financial_year.'/'.strval($series);
+                    // $ref_no = 'WHPL/'.$reference.'/'.$financial_year.'/'.strval($series);
+                    $ref_no = 'WHPL/'.$financial_year.'-'.$reference.'/'.strval($series);
                 } else {
                     // if($transaction=='Credit Note'){
                     //     $ref_no = str_replace('debit_note', 'credit_note', $ref_no);
@@ -187,7 +194,7 @@ function save_data($id=''){
                                 A.amount_without_tax=B.amount_without_tax, A.tax=B.tax, 
                                 A.igst=B.igst, A.cgst=B.cgst, A.sgst=B.sgst, A.distributor_type=B.distributor_type, 
                                 A.invoice_no=B.invoice_no, A.freezed=B.freezed, A.distributor_out_id=B.distributor_out_id, 
-                                A.distributor_in_id=B.distributor_in_id 
+                                A.distributor_in_id=B.distributor_in_id, A.exp_category_id=B.exp_category_id 
                             WHERE A.id = '$ref_id' and B.id = '$id'";
                     } else {
                         $sql = "Update credit_debit_note A, credit_debit_note B 
@@ -199,7 +206,7 @@ function save_data($id=''){
                                 A.amount_without_tax=B.amount_without_tax, A.tax=B.tax, 
                                 A.igst=B.igst, A.cgst=B.cgst, A.sgst=B.sgst, A.distributor_type=B.distributor_type, 
                                 A.invoice_no=B.invoice_no, A.freezed=B.freezed, A.distributor_out_id=B.distributor_out_id, 
-                                A.distributor_in_id=B.distributor_in_id 
+                                A.distributor_in_id=B.distributor_in_id, A.exp_category_id=B.exp_category_id 
                             WHERE A.id = '$ref_id' and B.id = '$id'";
                     }
                     
@@ -265,7 +272,8 @@ function save_data($id=''){
             'modified_on' => $now,
             'ref_id' => $ref_id,
             'ref_no' => $this->input->post('ref_no'),
-            'ref_date' => $ref_date
+            'ref_date' => $ref_date,
+            'exp_category_id' => $this->input->post('exp_category_id')
         );
 
         $date_p=strtotime($date_of_transaction);

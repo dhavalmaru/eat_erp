@@ -314,19 +314,26 @@ input[readonly], input[readonly], select[readonly], textarea[readonly] {
               var endHappyHourD = new Date("January 1, 1970 ");
               endHappyHourD.setHours(11,00); // 11.00 pm
 
-              if((currentD >= startHappyHourD && currentD < endHappyHourD) && parseInt(effective_time)>=9)
-              {
-                 if((in_time=='' && out_time!='') || (in_time!='' && out_time==''))
-                 {
-                    Late_marks = 'H';
-                    effective_time = 0;
-                 }
-                 else
-                {
-                   Late_marks = 'L';
-                }
-              }
-              else if((currentD > endHappyHourD || (parseInt(effective_time)<9)) && (emp_status!='WeeklyOff' && (emp_status!='Absent' || effective_time<9) && emp_status!='Holiday'))
+              // if((currentD >= startHappyHourD && currentD < endHappyHourD) && parseInt(effective_time)>=9)
+              // {
+              //    if((in_time=='' && out_time!='') || (in_time!='' && out_time==''))
+              //    {
+              //       Late_marks = 'H';
+              //       effective_time = 0;
+              //    }
+              //    else
+              //   {
+              //      Late_marks = 'L';
+              //   }
+              // }
+
+              if((in_time=='' && out_time!='') || (in_time!='' && out_time==''))
+               {
+                  Late_marks = 'H';
+                  effective_time = 0;
+               }
+
+              if((currentD > endHappyHourD || (parseInt(effective_time)<9)) && (emp_status!='WeeklyOff' && (emp_status!='Absent' || effective_time<9) && emp_status!='Holiday'))
               {
                   /*if(parseInt(effective_time)==0)
                   {
@@ -353,18 +360,18 @@ input[readonly], input[readonly], select[readonly], textarea[readonly] {
                 lcount = lcount+1;
               }*/
 
-              if(($(this).attr('name').indexOf("adjusted_in_time[]") > -1) && Late_marks=='L')
-              {
-                lcount = lcount+1;
-              }
+              // if(($(this).attr('name').indexOf("adjusted_in_time[]") > -1) && Late_marks=='L')
+              // {
+              //   lcount = lcount+1;
+              // }
 
               switch (Late_marks) {
-                  case ( lcount>3 && parseInt(effective_time)>=10 && 'L'):
-                     employee_adjusted_time = 0.66;
-                  break;
-                  case ((lcount>3 &&  parseInt(effective_time)<10) && 'L'):
-                     employee_adjusted_time = 0.50;
-                  break;
+                  // case ( lcount>3 && parseInt(effective_time)>=10 && 'L'):
+                  //    employee_adjusted_time = 0.66;
+                  // break;
+                  // case ((lcount>3 &&  parseInt(effective_time)<10) && 'L'):
+                  //    employee_adjusted_time = 0.50;
+                  // break;
                   case 'H':
                      employee_adjusted_time = 0.50;
                   break;
