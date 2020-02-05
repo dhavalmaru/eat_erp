@@ -278,21 +278,16 @@
 														<th width="50" style="text-align:center;">Proof of Delivery</th>
     													<th width="135">Invoice No</th>
                                                         <th width="80">Invoice Date</th>
-
+                                                        <th width="150">Depot Name</th>
     													<th width="150">Distributor Name</th>
-                                                        <th width="140">PO No</th>
+                                                        <th width="50">PO No</th>
                                                         <th width="140">Location</th>
-    											
     													<th width="70" >Amount (In Rs)</th>
                                                         <th width="110" >Delivery Status</th>
-                                                     
-                                                      
-    													
                                                         <th width="50" style="text-align:center; <?php //if($status!='gp_issued') echo 'display: none;'; ?>">View GP</th>
     													<th width="50" style="display:none;">Resend Invoice</th>
     													<th width="50" style=" <?php //if($status!='gp_issued') echo 'display: none;'; ?>">Tracking Id</th>
     													<th width="50" style=" <?php //if($status!='gp_issued') echo 'display: none;'; ?>">Credit Note</th>
-														
     												</tr>
     											</thead>
     											<tbody>
@@ -643,17 +638,17 @@
                 if(status == 'gp_issued') {
                     columnDefs = [        
                                     {
-                                        "targets": [13],
+                                        "targets": [14],
                                         "visible": false,
                                         "searchable": false
                                     },
 									 {
-                                        "targets": [14],
+                                        "targets": [15],
                                         "visible": true,
                                         "searchable": true
                                     },
-									{ "width": "10%", "targets": 8 },
-									{ className: "dt-body-center", targets: [ 3, 4,12,13 ] }
+									{ "width": "10%", "targets": 9 },
+									{ className: "dt-body-center", targets: [ 3, 4, 13, 14 ] }
                                 ];
                 } else if(status == 'pending_for_approval') {
                     columnDefs = [    
@@ -663,42 +658,42 @@
                                         "searchable": false
                                     },       
                                     {
-                                        "targets": [12],
+                                        "targets": [13],
                                         "visible": false,
                                         "searchable": false
                                     }, 
                                     {
-                                        "targets": [13],
+                                        "targets": [14],
                                         "visible": false,
                                         "searchable": false
                                     },
 									{
-                                        "targets": [14],
+                                        "targets": [15],
                                         "visible": false,
                                         "searchable": false
                                     },
 									  { "width": "10%", "targets": 8 },
-									{ className: "dt-body-center", targets: [ 3,4,12,13 ] }
+									{ className: "dt-body-center", targets: [ 3,4,13,14 ] }
                                 ];
                 } else {
                     columnDefs = [      
-                                    {
-                                        "targets": [12],
-                                        "visible": false,
-                                        "searchable": false
-                                    },
                                     {
                                         "targets": [13],
                                         "visible": false,
                                         "searchable": false
                                     },
-										{
+                                    {
                                         "targets": [14],
                                         "visible": false,
                                         "searchable": false
                                     },
+										{
+                                        "targets": [15],
+                                        "visible": false,
+                                        "searchable": false
+                                    },
 									  { "width": "10%", "targets": 8 },
-									{ className: "dt-body-center", targets: [ 3, 4 ,12,13] }
+									{ className: "dt-body-center", targets: [ 3, 4 ,13, 14] }
                                 ];
                 }
             } else {
@@ -712,22 +707,22 @@
                                     },
 									
                                     {
-                                        "targets": [12],
-                                        "visible": false,
-                                        "searchable": false
-                                    },
-                                    {
                                         "targets": [13],
                                         "visible": false,
                                         "searchable": false
                                     },
-									{
+                                    {
                                         "targets": [14],
                                         "visible": false,
                                         "searchable": false
                                     },
+									{
+                                        "targets": [15],
+                                        "visible": false,
+                                        "searchable": false
+                                    },
 									  { "width": "10%", "targets": 8 },
-									   { className: "dt-body-center", targets: [ 3, 4,12,13 ] }
+									   { className: "dt-body-center", targets: [ 3, 4, 13, 14 ] }
                                 ];
             }
 

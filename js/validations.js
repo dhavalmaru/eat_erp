@@ -1893,20 +1893,20 @@ function check_product_availablity_for_distributor_out() {
         }
     }
 
-    if($('#basis_of_sales').val()=='PO Number')
-    {
-        if($("#distributor_id").val()=="214"){
-            var order=$("#order_no").val();
-            var pattern= /^\d{3}-?\d{7}-?\d{7}$/;
-            if(!pattern.test(order)) {
-                var errors = {};
-                var name = $('#order_no').attr('name');
-                errors[name] = "Please Enter Valid Order No eg. 123-1234567-1234567.";
-                validator.showErrors(errors);
-                valid = false;
-            }
-        }
-    }
+    // if($('#basis_of_sales').val()=='PO Number')
+    // {
+    //     if($("#distributor_id").val()=="214"){
+    //         var order=$("#order_no").val();
+    //         var pattern= /^\d{3}-?\d{7}-?\d{7}$/;
+    //         if(!pattern.test(order)) {
+    //             var errors = {};
+    //             var name = $('#order_no').attr('name');
+    //             errors[name] = "Please Enter Valid Order No eg. 123-1234567-1234567.";
+    //             validator.showErrors(errors);
+    //             valid = false;
+    //         }
+    //     }
+    // }
     
 	
     if($('.type').length=='0'){
@@ -2104,6 +2104,14 @@ function check_product_availablity_for_distributor_out() {
                 }
             }
         });
+
+        if($('#final_amount').val()=='0.00' || $('#final_amount').val()=='0' || $('#final_amount').val()==''){
+            var errors = {};
+            var name = $('#final_amount').attr('name');
+            errors[name] = "Amount cannot be zero.";
+            validator.showErrors(errors);
+            valid = false;
+        }
     }
 
     return valid;
@@ -3059,6 +3067,10 @@ $("#form_box_details").validate({
         },
         tax_percentage:{
             required: true
+        },
+        sku_code:{
+            required: true,
+            check_sku_code_availablity: true
         }
     },
 
@@ -3125,6 +3137,32 @@ $.validator.addMethod("check_barcode_availablity", function (value, element) {
         return true;
     }
 }, 'Barcode already in use.');
+
+$.validator.addMethod("check_sku_code_availablity", function (value, element) {
+    var result = 1;
+
+    $.ajax({
+        url: BASE_URL+'index.php/Box/check_sku_code_availablity',
+        data: 'id='+$("#id").val()+'&sku_code='+$("#sku_code").val(),
+        type: "POST",
+        dataType: 'html',
+        global: false,
+        async: false,
+        success: function (data) {
+            result = parseInt(data);
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+        }
+    });
+
+    if (result) {
+        return false;
+    } else {
+        return true;
+    }
+}, 'SKU Code already in use.');
 
 $('#form_box_details').submit(function() {
     removeMultiInputNamingRules('#form_box_details', 'select[alt="product[]"]');

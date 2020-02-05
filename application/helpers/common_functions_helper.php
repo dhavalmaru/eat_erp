@@ -369,6 +369,9 @@
     function FormatDate($date, $format = 'd/m/Y') {
         $d = DateTime::createFromFormat($format, $date);
         $returnDate = null;
+        if(strpos($date, '-')>0){
+            str_replace('-', '/', $date);
+        }
         if ($d && $d->format($format) == $date) {
             // $returnDate = DateTime::createFromFormat($format, $date)->format('Y-m-d');
             $dateInput = explode('/',$date);
@@ -413,15 +416,15 @@
         try {
             $CI =& get_instance();
 
-            $from_email = 'cs@eatanytime.co.in';
+            $from_email1 = 'orders@eatanytime.in';
 
             //configure email settings
             $config['protocol'] = 'smtp';
             // $config['smtp_host'] = 'smtp.rediffmailpro.com'; //smtp host name
-            $config['smtp_host'] = 'mail.eatanytime.co.in'; //smtp host name
-            $config['smtp_port'] = '587'; //smtp port number
-            $config['smtp_user'] = $from_email;
-            $config['smtp_pass'] = 'Customer@12345'; //$from_email password
+            $config['smtp_host'] = 'ssl://smtp.googlemail.com'; //smtp host name
+            $config['smtp_port'] = '465'; //smtp port number
+            $config['smtp_user'] = $from_email1;
+            $config['smtp_pass'] = 'team@003'; //$from_email password
             $config['mailtype'] = 'html';
             $config['charset'] = 'iso-8859-1';
             $config['wordwrap'] = TRUE;

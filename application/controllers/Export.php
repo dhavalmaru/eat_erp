@@ -1056,13 +1056,13 @@ class Export extends CI_Controller {
                         CS
                     </body>
                     </html>';
-        $from_email = 'cs@eatanytime.co.in';
+        $from_email = 'cs@eatanytime.in';
         $from_email_sender = 'Wholesome Habits Pvt Ltd';
         $subject = 'Test Mail';
 
-        $to_email = "prasad.bhisale@pecanreams.com";
-        $cc = 'prasad.bhisale@pecanreams.com';
-        $bcc = 'prasad.bhisale@pecanreams.com';
+        $to_email = "prasad.bhisale@otbconsulting.co.in";
+        $cc = 'prasad.bhisale@otbconsulting.co.in';
+        $bcc = 'prasad.bhisale@otbconsulting.co.in';
 
         $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc, $cc, '');
 

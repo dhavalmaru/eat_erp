@@ -212,4 +212,14 @@ class Test extends CI_Controller{
 
         }
     }
+
+    public function test_redirect(){
+        load_view_without_data('area/test');
+    }
+
+    public function test11(){
+        // echo 'hello';
+        $islogin = $_GET['islogin'];
+        echo $islogin;
+    }
 }

@@ -58,7 +58,7 @@ class Production extends CI_Controller {
                     Team EAT Anytime<br/><br/>
                     </body></html>';
 
-        $mailSent=send_email_new('prasad.bhisale@pecanreams.com',  'Wholesome Habits Pvt Ltd', 'prasad.bhisale@pecanreams.com', $subject, $message, 'prasad.bhisale@pecanreams.com', 'prasad.bhisale@pecanreams.com');
+        $mailSent=send_email_new('prasad.bhisale@otbconsulting.co.in', 'Wholesome Habits Pvt Ltd', 'prasad.bhisale@otbconsulting.co.in', $subject, $message, 'prasad.bhisale@otbconsulting.co.in', 'prasad.bhisale@otbconsulting.co.in');
         echo $mailSent;
     }
 

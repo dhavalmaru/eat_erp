@@ -721,13 +721,13 @@ class Production_model Extends CI_Model{
             
             $to_email = $this->get_manufacturer_emails($id);
             $cc = 'vaibhav.desai@eatanytime.in, rishit.sanghvi@eatanytime.in, dinesh.parkhi@eatanytime.in';
-            // $bcc = $curusr_email . ', prasad.bhisale@pecanreams.com';
-            $bcc = 'prasad.bhisale@pecanreams.com';
+            // $bcc = $curusr_email . ', prasad.bhisale@otbconsulting.co.in';
+            $bcc = 'prasad.bhisale@otbconsulting.co.in';
 
-            // $to_email = 'prasad.bhisale@pecanreams.com';
-            // $cc = 'prasad.bhisale@pecanreams.com';
+            // $to_email = 'prasad.bhisale@otbconsulting.co.in';
+            // $cc = 'prasad.bhisale@otbconsulting.co.in';
             // // $bcc = 'rishit.sanghvi@eatanytime.in';
-            // $bcc = 'prasad.bhisale@pecanreams.com';
+            // $bcc = 'prasad.bhisale@otbconsulting.co.in';
 
             if($email_type=='request_date'){
                 $login_name = $this->session->userdata('login_name');

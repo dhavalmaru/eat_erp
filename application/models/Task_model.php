@@ -419,8 +419,8 @@ function insertDetails($form_data) {
 		    $from_email = 'cs@eatanytime.co.in';
             $from_email_sender = 'Wholesome Habits Pvt Ltd';
 		    $subject = 'Task Intimation';
-		    // $assignee_email = 'prasad.bhisale@pecanreams.com';
-		    $bcc = 'prasad.bhisale@pecanreams.com, dhaval.maru@pecanreams.com';
+		    // $assignee_email = 'prasad.bhisale@otbconsulting.co.in';
+		    $bcc = 'prasad.bhisale@otbconsulting.co.in, dhaval.maru@otbconsulting.co.in';
 
 		    $table=$this->get_task_list_table($subject_detail, $assignee_name, $priority, $repeat, $from_date, $to_date, 'Pending');
 
@@ -470,8 +470,8 @@ function insertDetails($form_data) {
 	    $from_email = 'cs@eatanytime.co.in';
         $from_email_sender = 'Wholesome Habits Pvt Ltd';
 	    $subject = 'Task Intimation';
-	    // $assigner_email = 'prasad.bhisale@pecanreams.com';
-	    $bcc = 'prasad.bhisale@pecanreams.com, dhaval.maru@pecanreams.com';
+	    // $assigner_email = 'prasad.bhisale@otbconsulting.co.in';
+	    $bcc = 'prasad.bhisale@otbconsulting.co.in, dhaval.maru@otbconsulting.co.in';
 
 	    $table=$this->get_task_list_table($subject_detail, $assignee_names, $priority, $repeat, $from_date, $to_date, 'Pending');
 
@@ -499,8 +499,8 @@ function insertDetails($form_data) {
 		    $from_email = 'cs@eatanytime.co.in';
 	        $from_email_sender = 'Wholesome Habits Pvt Ltd';
 		    $subject = 'Task Intimation';
-		    // $follower_email = 'prasad.bhisale@pecanreams.com';
-		    $bcc = 'prasad.bhisale@pecanreams.com, dhaval.maru@pecanreams.com';
+		    // $follower_email = 'prasad.bhisale@otbconsulting.co.in';
+		    $bcc = 'prasad.bhisale@otbconsulting.co.in, dhaval.maru@otbconsulting.co.in';
 
 		    $table=$this->get_task_list_table($subject_detail, $assignee_names, $priority, $repeat, $from_date, $to_date, 'Pending');
 

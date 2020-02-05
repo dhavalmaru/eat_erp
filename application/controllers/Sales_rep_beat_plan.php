@@ -842,9 +842,9 @@ class Sales_rep_beat_plan extends CI_Controller{
 		$from_email_sender = 'Wholesome Habits Pvt Ltd';
 	   
 		 //$to_email = "rishit.sanghvi@eatanytime.in,sales@eatanytime.co.in,manorma@eatanytime.in,raveer66@gmail.com";
-		$to_email = "ashwini.patil@pecanreams.com, prasad.bhisale@pecanreams.com";
-		 $bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com";
-	 //$bcc = "dhaval.maru@pecanreams.com,swapnil.darekar@eatanytime.in,ashwini.patil@pecanreams.com,sangeeta.yadav@pecanreams.com";
+		$to_email = "prasad.bhisale@otbconsulting.co.in";
+		 $bcc = "dhaval.maru@otbconsulting.co.in";
+	 //$bcc = "swapnil.darekar@eatanytime.in";
 	
 		$subject = 'Daily Performance Report For Sales Representative-'.date("d F Y",strtotime("now"));
 
@@ -1293,9 +1293,9 @@ class Sales_rep_beat_plan extends CI_Controller{
 
 	   $tbody ='';
 	  
-		$to_email = "sangeeta.yadav@pecanreams.com";
-		$bcc = "sangeeta.yadav@pecanreams.com";
-		/*$bcc = "dhaval.maru@pecanreams.com,swapnil.darekar@eatanytime.in,ashwini.patil@pecanreams.com,sangeeta.yadav@pecanreams.com";*/
+		$to_email = "prasad.bhisale@otbconsulting.co.in";
+		$bcc = "prasad.bhisale@otbconsulting.co.in";
+		/*$bcc = "dhaval.maru@otbconsulting.co.in,swapnil.darekar@eatanytime.in";*/
 
 		$subject = 'Daily Performance Report For Sales Representative-'.date("d F Y",strtotime("now"));
 
@@ -1759,13 +1759,13 @@ class Sales_rep_beat_plan extends CI_Controller{
 
 	   $data2=$this->db->query($sql2)->result();
 	   $to_email = "ravi.hirode@eatanytime.co.in, manorama.mishra@eatanytime.co.in, mahesh.ms@eatanytime.co.in, yash.doshi@eatanytime.in, darshan.dhany@eatanytime.co.in, girish.rai@eatanytime.in, nitin.kumar@eatanytime.co.in, mohil.telawade@eatanytime.co.in";
-		$bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, sangeeta.yadav@pecanreams.com,prasad.bhisale@pecanreams.com";
+		$bcc = "dhaval.maru@otbconsulting.co.in, prasad.bhisale@otbconsulting.co.in";
 		$cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, operations@eatanytime.in";
-		/*$to_email = "sangeeta.yadav@pecanreams.com,prasad.bhisale@pecanreams.com,dhaval.maru@pecanreams.com";
-		$bcc = "sangeeta.yadav@pecanreams.com";
-		$cc = "ashwini.patil@pecanreams.com";*/
+		/*$to_email = "prasad.bhisale@otbconsulting.co.in,dhaval.maru@otbconsulting.co.in";
+		$bcc = "prasad.bhisale@otbconsulting.co.in";
+		$cc = "prasad.bhisale@otbconsulting.co.in";*/
 			
-		//$bcc = "dhaval.maru@pecanreams.com,swapnil.darekar@eatanytime.in,ashwini.patil@pecanreams.com,sangeeta.yadav@pecanreams.com";
+		//$bcc = "dhaval.maru@otbconsulting.co.in,swapnil.darekar@eatanytime.in";
 
 		$subject = 'Daily Performance Report For Sales Representative-'.date("d F Y",strtotime("now"));
 
@@ -2266,11 +2266,11 @@ class Sales_rep_beat_plan extends CI_Controller{
 
 	   $tbody ='';
 		$to_email = "mukesh.yadav@eatanytime.co.in, sulochana.waghmare@eatanytime.co.in, sachin.pal@eatanytime.co.in, urvi.bhayani@eatanytime.co.in";
-		$bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, sangeeta.yadav@pecanreams.com,prasad.bhisale@pecanreams.com";
+		$bcc = "dhaval.maru@otbconsulting.co.in, prasad.bhisale@otbconsulting.co.in";
 		$cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, operations@eatanytime.in";
-		/*$to_email = "sangeeta.yadav@pecanreams.com,prasad.bhisale@pecanreams.com,dhaval.maru@pecanreams.com";
-		$bcc = "sangeeta.yadav@pecanreams.com";
-	    $cc = "ashwini.patil@pecanreams.com";*/
+		/*$to_email = "prasad.bhisale@otbconsulting.co.in,dhaval.maru@otbconsulting.co.in";
+		$bcc = "prasad.bhisale@otbconsulting.co.in";
+	    $cc = "prasad.bhisale@otbconsulting.co.in";*/
 
 		$subject = 'Daily Performance Report For Merchandiser -'.date("d F Y",strtotime("now"));
 

@@ -162,10 +162,27 @@ function save_data($id='') {
 
                 $module = $this->input->post('module');
                 $production_id = $this->input->post('production_id');
+
+                if($production_id==null || $production_id==''){
+                    $sql="select * from batch_processing where id = '$id'";
+                    $query=$this->db->query($sql);
+                    $result=$query->result();
+                    if(count($result)>0){
+                        $production_id=$result[0]->production_id;
+
+                        if(isset($production_id)) {
+                            if($production_id!='') {
+                                $module='production';
+                            }
+                        }
+                    }
+                }
+
                 if($module=='production'){
                     $sql = "update production_details set production_details = '1' where id = '$production_id'";
                     $this->db->query($sql);
                 }
+                
 
                 $action='batch_raw_material '.$status.'.';
 				echo '<script>var win = window.open("'.base_url().'index.php/batch_processing/view_batch_processing_receipt/'.$id.'") 	win.print();</script>';

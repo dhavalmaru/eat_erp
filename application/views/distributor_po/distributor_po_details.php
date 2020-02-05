@@ -601,7 +601,7 @@
                                 <input type="submit" class="btn btn-success btn-sm" id="btn_submit" name="btn_submit" value="Submit For Approval" style="<?php if(isset($access)) { if(isset($data)) { if($data[0]->freezed) { echo 'display: none;'; } else if($data[0]->mismatch=='1') { echo ''; } else { if($access[0]->r_edit=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved' || $data[0]->status=='InActive')) echo ''; else echo 'display: none;'; } } else if($access[0]->r_insert=='1') echo ''; else echo 'display: none;'; ?>" />
                                 <?php if(isset($data) && $data[0]->freezed!=1) { ?>
                                 <input type="submit" class="btn btn-danger btn-sm" id="btn_delete" name="btn_delete" value="Delete" style="<?php if(isset($access) ) {
-                                if(isset($data)) {if($access[0]->r_delete=='1' && ($data[0]->modified_by==$curusr || $data[0]->status=='Approved') && $data[0]->status!='InActive') echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
+                                if(isset($data)) {if($access[0]->r_delete=='1' && $data[0]->status=='Approved' && $data[0]->status!='InActive') echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
                                 <?php } ?>
                                 <input type="submit" class="btn btn-success btn-sm" id="btn_approve" name="btn_approve" value="Approve" style="<?php if(isset($access)) {if(isset($data)) {if($data[0]->mismatch=='1') { echo 'display: none;'; } else if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive')) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
                                 <input type="submit" class="btn btn-danger btn-sm" id="btn_reject" name="btn_reject" value="Reject" style="<?php if(isset($access)) {if(isset($data)) {if($data[0]->mismatch=='1') { echo 'display: none;'; } else if($access[0]->r_approvals=='1' && ($data[0]->modified_by!=$curusr && $data[0]->status!='Approved' && $data[0]->status!='InActive' )) echo ''; else echo 'display: none;';} else echo 'display: none;';} else echo 'display: none;'; ?>" />
@@ -1006,7 +1006,7 @@
                                     $("#discount").val(25)
                                 }
                             }
-                            if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352){
+                            if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352 || distributor_id==1379 || distributor_id==1381 || distributor_id==1416){
                                 $('#sell_out').val($("#discount").val());
                             } else {
                                 $('#sell_out').val(data.sell_out);
@@ -1016,7 +1016,7 @@
                                 $('#distributor_name').val(data.product_name);
                             }
 
-                            if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550" && $('#distributor_id').val()!="622" && $('#distributor_id').val()!="626" && $('#distributor_id').val()!="640" && $('#distributor_id').val()!="1299" && $('#distributor_id').val()!="1319" && $('#distributor_id').val()!="1327" && $('#distributor_id').val()!="1352") {
+                            if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550" && $('#distributor_id').val()!="622" && $('#distributor_id').val()!="626" && $('#distributor_id').val()!="640" && $('#distributor_id').val()!="1299" && $('#distributor_id').val()!="1319" && $('#distributor_id').val()!="1327" && $('#distributor_id').val()!="1352" && $('#distributor_id').val()!="1379" && $('#distributor_id').val()!="1381" && $('#distributor_id').val()!="1416") {
 
                                 $('#state').val(data.state);
                                 $('#state_code').val(data.state_code);
@@ -1076,7 +1076,7 @@
                     }
                 });
 
-                if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352){
+                if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352 || distributor_id==1379 || distributor_id==1381 || distributor_id==1416){
                     $('.direct').show();
                 } else {
                     $('.direct').hide();
@@ -1138,7 +1138,7 @@
                     var id = elem.attr('id');
                     var index = id.substr(id.lastIndexOf('_')+1);
                     var sell_out = 0;
-                    if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352){
+                    if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352 || distributor_id==1379 || distributor_id==1381 || distributor_id==1416){
                         sell_out = parseFloat($('#sell_out').val());
                     } else {
                         sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
@@ -1349,7 +1349,7 @@
                 var qty = parseFloat(get_number($("#qty_"+index).val(),2));
                 var sell_out = 0;
                 var delivery_through = $("input[name=delivery_through]:checked").val();
-                if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352){
+                if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352 || distributor_id==1379 || distributor_id==1381 || distributor_id==1416){
                     sell_out = parseFloat($('#sell_out').val());
                 } else {
                     sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
@@ -1376,7 +1376,7 @@
                         if(data.result==1){
                             grams = parseFloat(data.grams);
                             rate = parseFloat(data.rate);
-                            if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352){
+                            if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352 || distributor_id==1379 || distributor_id==1381 || distributor_id==1416){
                                 sell_out = parseFloat($('#sell_out').val());
                             } else {
                                 sell_out = parseFloat(data.margin);
@@ -1458,7 +1458,7 @@
                 var index = id.substr(id.lastIndexOf('_')+1);
                 var qty = parseFloat(get_number($("#qty_"+index).val(),2));
                 var sell_out = 0;
-                if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352){
+                if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352 || distributor_id==1379 || distributor_id==1381 || distributor_id==1416){
                     sell_out = parseFloat($('#sell_out').val());
                 } else {
                     sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
@@ -1484,7 +1484,7 @@
                         if(data.result==1){
                             grams = parseFloat(data.grams);
                             rate = parseFloat(data.rate);
-                            if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352){
+                            if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352 || distributor_id==1379 || distributor_id==1381 || distributor_id==1416){
                                 sell_out = parseFloat($('#sell_out').val());
                             } else {
                                 sell_out = parseFloat(data.margin);

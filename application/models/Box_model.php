@@ -74,7 +74,8 @@ function save_data($id=''){
         'short_name' => $this->input->post('short_name'),
         'category_id' => $this->input->post('category_id'),
         'tax_percentage' => $this->input->post('tax_percentage'),
-        'asin' => $this->input->post('asin')
+        'asin' => $this->input->post('asin'),
+        'sku_code' => $this->input->post('sku_code')
     );
 
     if($id==''){
@@ -141,6 +142,20 @@ function check_barcode_availablity(){
     $barcode=$this->input->post('barcode');
 
     $query=$this->db->query("SELECT * FROM box_master WHERE id!='".$id."' and barcode='".$barcode."'");
+    $result=$query->result();
+
+    if (count($result)>0){
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+function check_sku_code_availablity(){
+    $id=$this->input->post('id');
+    $sku_code=$this->input->post('sku_code');
+
+    $query=$this->db->query("SELECT * FROM box_master WHERE id!='".$id."' and sku_code='".$sku_code."'");
     $result=$query->result();
 
     if (count($result)>0){

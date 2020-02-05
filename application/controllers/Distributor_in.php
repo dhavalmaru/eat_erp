@@ -55,6 +55,7 @@ class Distributor_in extends CI_Controller{
                   
                        
                         ''.$data[$i]->sales_return_no.'',
+                        ''.$data[$i]->order_no.'',
                       
                         ''.$data[$i]->distributor_name.'',
                     

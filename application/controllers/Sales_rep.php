@@ -345,11 +345,11 @@ class Sales_rep extends CI_Controller{
                             Please find below '.$data[$i]->sales_rep_name.' Location For - '.$date.'. <br /><br />'.$table.'<br/>
                             <br />Thanks</body></html>';
 
-                // $to_email = 'prasad.bhisale@pecanreams.com';
-                // $bcc = 'prasad.bhisale@pecanreams.com';
+                // $to_email = 'prasad.bhisale@otbconsulting.co.in';
+                // $bcc = 'prasad.bhisale@otbconsulting.co.in';
 
                 $to_email = $data[$i]->email_id.', rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in';
-                $bcc="ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, prasad.bhisale@pecanreams.com";
+                $bcc="dhaval.maru@otbconsulting.co.in, prasad.bhisale@otbconsulting.co.in";
 
                 $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc);
 

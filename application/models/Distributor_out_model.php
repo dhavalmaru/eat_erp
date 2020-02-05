@@ -53,7 +53,7 @@ function get_data($status='', $id=''){
             G.modified_by, G.modified_on, G.approved_by, G.approved_on, G.rejected_by, G.rejected_on, G.client_name, G.address, 
             G.city, G.pincode, ifnull(G.state, G.distributor_state) as state, G.country, G.mobile_no, G.discount, 
             G.distributor_name, G.sell_out, G.class, G.depot_name, G.depot_address, G.depot_city, G.depot_pincode, 
-            G.depot_state, G.depot_state_code, G.depot_country, G.sales_rep_name, 
+            G.depot_state, G.depot_state_code, G.depot_country, G.depot_gst_no, G.sales_rep_name, 
             concat(ifnull(H.first_name,''),' ',ifnull(H.last_name,'')) as user_name, 
             concat(ifnull(I.first_name,''),' ',ifnull(I.last_name,'')) as approver_name, 
             G.sample_distributor_id, G.delivery_status, G.delivery_date, G.receivable_doc, G.transport_type, 
@@ -63,7 +63,8 @@ function get_data($status='', $id=''){
             G.invoice_date,G.gatepass_date,G.freezed,G.gstin from 
             (select E.*, F.sales_rep_name from 
             (select C.*, D.depot_name, D.address as depot_address, D.city as depot_city, D.pincode as depot_pincode, 
-                D.state as depot_state, D.state_code as depot_state_code, D.country as depot_country from 
+                D.state as depot_state, D.state_code as depot_state_code, D.country as depot_country, 
+                D.gst_no as depot_gst_no from 
             (select A.*, B.distributor_name, B.sell_out, B.state as distributor_state, B.class from 
             (select * from distributor_out".$cond.") A 
             left join 
@@ -145,18 +146,21 @@ function get_distributor_out_data1($status='', $id=''){
         }
     }
     
-    $sql = "select Z.*, Y.id as credit_debit_note_id from(select * from 
-            (select concat('d_',I.id) as d_id, I.id, I.date_of_processing, I.invoice_no, I.voucher_no, I.gate_pass_no,  
-            I.distributor_id, I.sales_rep_id, 
-            I.final_amount,  I.status, I.created_on, I.modified_by, I.modified_on, I.class,
-            I.client_name, I.depot_name,
-            I.distributor_name, I.sales_rep_name, I.user_name, I.sample_distributor_id, I.delivery_status, I.location, 
-            J.sales_rep_name as del_person_name, I.invoice_amount, I.invoice_date,I.order_no,I.tracking_id,I.proof_of_delivery from 
+    $sql = "select Z.*, Y.id as credit_debit_note_id from 
+            (select * from 
+            (select concat('d_',I.id) as d_id, I.id, I.date_of_processing, I.invoice_no, 
+                I.voucher_no, I.gate_pass_no, I.distributor_id, I.sales_rep_id, 
+                I.final_amount,  I.status, I.created_on, I.modified_by, I.modified_on, I.class,
+                I.client_name, I.depot_name, I.distributor_name, I.sales_rep_name, I.user_name, 
+                I.sample_distributor_id, I.delivery_status, I.location, 
+                J.sales_rep_name as del_person_name, I.invoice_amount, I.invoice_date, 
+                I.order_no, I.tracking_id, I.proof_of_delivery from 
             (select G.*, concat(ifnull(H.first_name,''),' ',ifnull(H.last_name,'')) as user_name from 
             (select E.*, F.sales_rep_name from 
             (select Q.*, D.depot_name from 
             (select C.*, P.location from 
-            (select A.*, B.distributor_name, B.sell_out, B.state as distributor_state,B.location_id, B.class from 
+            (select A.*, B.distributor_name, B.sell_out, B.state as distributor_state, 
+                B.location_id, B.class from 
             (select * from distributor_out) A 
             left join 
             (select * from distributor_master) B 
@@ -179,16 +183,19 @@ function get_distributor_out_data1($status='', $id=''){
 
             union all 
 
-            select concat('s_',C.id) as d_id, null as id, C.date_of_processing, null as invoice_no, null as voucher_no, null as gate_pass_no, 
-            replace(C.distributor_id,'d_','') as distributor_id, C.created_by as sales_rep_id, 
-            C.amount as final_amount, 'Pending' as status, C.created_on, C.modified_by, C.modified_on, null as class,null as tracking_id,
-            null as client_name, null as depot_name, 
-            C.distributor_name, 
-            concat(ifnull(D.first_name,''),' ',ifnull(D.last_name,'')) as sales_rep_name, 
-            concat(ifnull(D.first_name,''),' ',ifnull(D.last_name,'')) as user_name, 
-            null as sample_distributor_id, null as delivery_status, C.location, null as del_person_name, C.amount as invoice_amount, 
-            null as invoice_date,null as order_no,null as proof_of_delivery from 
-            (select A.*, B.distributor_name, B.state, B.sell_out, B.contact_person, B.contact_no, B.area, B.location from 
+            select concat('s_',C.id) as d_id, null as id, C.date_of_processing, null as invoice_no, 
+                null as voucher_no, null as gate_pass_no, 
+                replace(C.distributor_id,'d_','') as distributor_id, C.created_by as sales_rep_id, 
+                C.amount as final_amount, 'Pending' as status, C.created_on, C.modified_by, 
+                C.modified_on, null as class,null as tracking_id, null as client_name, 
+                null as depot_name, C.distributor_name, 
+                concat(ifnull(D.first_name,''),' ',ifnull(D.last_name,'')) as sales_rep_name, 
+                concat(ifnull(D.first_name,''),' ',ifnull(D.last_name,'')) as user_name, 
+                null as sample_distributor_id, null as delivery_status, C.location, 
+                null as del_person_name, C.amount as invoice_amount, null as invoice_date, 
+                null as order_no,null as proof_of_delivery from 
+            (select A.*, B.distributor_name, B.state, B.sell_out, B.contact_person, B.contact_no, 
+                B.area, B.location from 
             (select * from sales_rep_orders where status = 'Approved') A 
             left join 
             (select concat('s_',id) as id, distributor_name, state, margin as sell_out, contact_person, contact_no, city as area , null as location
@@ -941,6 +948,108 @@ function save_data($id=''){
         //     $this->set_ledger($id);
         // }
     }
+
+    $logarray['table_id']=$id;
+    $logarray['module_name']='Distributor_Out';
+    $logarray['cnt_name']='Distributor_Out';
+    $logarray['action']=$action;
+    $this->user_access_log_model->insertAccessLog($logarray);
+}
+
+function save_approved_data($id=''){
+    // $now=date('Y-m-d H:i:s', strtotime('-1 days'));
+    $now=date('Y-m-d H:i:s');
+    $curusr=$this->session->userdata('session_id');
+
+    // $curusr=148;
+
+    $invoice_no = '';
+    $invoice_date = '';
+    $delivery_status = '';
+    $remarks = '';
+    $distributor_in_type = '';
+
+    $status = 'Approved';
+
+    $sql = "select * from distributor_out where id='$id'";
+    $result = $this->db->query($sql)->result();
+    if(count($result)>0){
+        // echo 'found';
+        // echo '<br/><br/>';
+        // echo $result[0]->id;
+        // echo '<br/><br/>';
+        $invoice_no = $result[0]->invoice_no;
+        $invoice_date = $result[0]->invoice_date;
+        $delivery_status = $result[0]->delivery_status;
+        $remarks = $result[0]->remarks;
+        $distributor_in_type = $result[0]->distributor_in_type;
+    }
+
+    $remarks = str_replace("'", "", $remarks);
+
+    // echo $now;
+    // echo '<br/><br/>';
+    // echo $curusr;
+    // echo '<br/><br/>';
+    // echo $invoice_no;
+    // echo '<br/><br/>';
+    // echo $invoice_date;
+    // echo '<br/><br/>';
+    // echo $delivery_status;
+    // echo '<br/><br/>';
+    // echo $remarks;
+    // echo '<br/><br/>';
+    // echo $distributor_in_type;
+    // echo '<br/><br/>';
+
+    if(($invoice_no==null || $invoice_no=='' ) && $distributor_in_type!='exchanged'){
+        $sql="select * from series_master where type='Tax_Invoice'";
+        $query=$this->db->query($sql);
+        $result=$query->result();
+        if(count($result)>0){
+            $series=intval($result[0]->series)+1;
+
+            $sql="update series_master set series = '$series' where type = 'Tax_Invoice'";
+            $this->db->query($sql);
+        } else {
+            $series=1;
+
+            $sql="insert into series_master (type, series) values ('Tax_Invoice', '$series')";
+            $this->db->query($sql);
+        }
+
+        if($invoice_date==null || $invoice_date==''){
+            $invoice_date = date('Y-m-d');
+            // $invoice_date = date('Y-m-d', strtotime('-1 days'));
+        }
+
+        if (isset($invoice_date)){
+            if($invoice_date==''){
+                $financial_year="";
+            } else {
+                $financial_year=calculateFiscalYearForDate($invoice_date);
+            }
+        } else {
+            $financial_year="";
+        }
+        
+        $invoice_no = 'WHPL/'.$financial_year.'/'.strval($series);
+    }
+    
+    // $sql = "Update distributor_out A 
+    //         Set A.status='$status', A.remarks='$remarks', A.approved_by='$curusr', A.approved_on='$now', 
+    //             A.invoice_no = '$invoice_no', A.invoice_date = '$invoice_date' 
+    //         WHERE A.id = '$id'";
+    $sql = "Update distributor_out A 
+            Set A.status='$status', A.approved_by='$curusr', A.approved_on='$now', 
+                A.invoice_no = '$invoice_no', A.invoice_date = '$invoice_date' 
+            WHERE A.id = '$id'";
+    $this->db->query($sql);
+
+    $this->set_ledger($id);
+    $this->set_credit_note($id);
+
+    $action='Distributor Out Entry '.$status.'. Delivery Status: ' . $delivery_status;
 
     $logarray['table_id']=$id;
     $logarray['module_name']='Distributor_Out';

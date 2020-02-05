@@ -345,7 +345,7 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
 
                     $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, $data[$i]->distributor_type);
 
-                   if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT')
+                   if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT' || strtoupper(trim($distributor_name))=='NEULIFE DIRECT' || strtoupper(trim($distributor_name))=='FLIPKART DIRECT' || strtoupper(trim($distributor_name))=='GOQII DIRECT')
                          {
                                 $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->state_code);
                                 $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->state);
@@ -1187,7 +1187,7 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
                     
                     $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->distributor_type);
                     $distributor_name = $data[$i]->distributor_name;
-                    if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT') {
+                    if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT' || strtoupper(trim($distributor_name))=='NEULIFE DIRECT' || strtoupper(trim($distributor_name))=='FLIPKART DIRECT' || strtoupper(trim($distributor_name))=='GOQII DIRECT') {
                         $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->state_code);
                         $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->state);
                     } else {
@@ -1220,6 +1220,8 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
                 $objPHPExcel->getActiveSheet()->setCellValue('AQ'.$row, $data[$i]->id);
 
                 $objPHPExcel->getActiveSheet()->setCellValue('AR'.$row, $status);
+
+                $objPHPExcel->getActiveSheet()->setCellValue('AS'.$row, $data[$i]->mobile_no);
 
             }
 
@@ -1811,11 +1813,11 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
 
 
 
-    $objPHPExcel->getActiveSheet()->getStyle('A8:AR8')->getFont()->setBold(true);
+    $objPHPExcel->getActiveSheet()->getStyle('A8:AS8')->getFont()->setBold(true);
 
     
 
-    $objPHPExcel->getActiveSheet()->getStyle('A8'.':AR'.$row)->applyFromArray(array(
+    $objPHPExcel->getActiveSheet()->getStyle('A8'.':AS'.$row)->applyFromArray(array(
 
         'borders' => array(
 
@@ -2349,7 +2351,7 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                         $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->con_state);
                         $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->con_gst_number);
                     } else {
-                       if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT')
+                       if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT' || strtoupper(trim($distributor_name))=='NEULIFE DIRECT' || strtoupper(trim($distributor_name))=='FLIPKART DIRECT' || strtoupper(trim($distributor_name))=='GOQII DIRECT')
 						 {
 								$objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->state_code);
 								$objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->state);
@@ -14359,10 +14361,10 @@ public function sales_rep_exception_report(){
     $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
     $objWriter->save($path.$filename);
     $attachment = $path.$filename;
-    $to_email = "sangeeta.yadav@pecanreams.com";
-    $bcc = "dhaval.maru@pecanreams.com,ashwini.patil@pecanreams.com";
-    $cc = "prasad.bhisale@pecanreams.com";
-    $from_email = 'cs@eatanytime.co.in';
+    $to_email = "prasad.bhisale@otbconsulting.co.in";
+    $bcc = "dhaval.maru@otbconsulting.co.in";
+    $cc = "prasad.bhisale@otbconsulting.co.in";
+    $from_email = 'cs@eatanytime.in';
     $from_email_sender = 'Wholesome Habits Pvt Ltd';
 
     $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc, $cc, $attachment);
@@ -14632,10 +14634,10 @@ public function gt_store_report($save='',$region=array()){
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
         $objWriter->save($path.$filename);
         $attachment = $path.$filename;
-        $to_email = "sangeeta.yadav@pecanreams.com";
+        $to_email = "prasad.bhisale@otbconsulting.co.in";
         $bcc = "";
         $cc = "";
-        $from_email = 'cs@eatanytime.co.in';
+        $from_email = 'cs@eatanytime.in';
         $from_email_sender = 'Wholesome Habits Pvt Ltd';
         $subject='GT Store Report';
         // $report_date = '11-07-2019';
@@ -15909,14 +15911,14 @@ public function send_mt_stock_tracker() {
 
     // $zone_id_array = ['16'];
     // $zone_array = ['Mumbai'];
-    // $zone_email_array = ['Sulochana.yadav@eatanytime.co.in'];
+    // $zone_email_array = ['Sulochana.yadav@eatanytime.in'];
 
     $zone_id_array = ['9', '10', '12', '16', '18', '29', '30'];
     $zone_array = ['Chennai', 'Pune', 'Hyderbad', 'Mumbai', 'Banglore', 'Ahmedabad', 'Delhi'];
-    // $zone_email_array = ['', 'mohil.telawade@eatanytime.co.in', 'vijay.spar@gmail.com', 
-    //                     'Sulochana.yadav@eatanytime.co.in, mukesh.yadav@eatanytime.co.in, sachin.pal@eatanytime.co.in', 
-    //                     'darshan.dhany@eatanytime.co.in, mahesh.ms@eatanytime.co.in', 'urvi.bhayani@eatanytime.co.in', 
-    //                     'nitin.kumar@eatanytime.co.in'];
+    // $zone_email_array = ['', 'mohil.telawade@eatanytime.in', 'vijay.spar@gmail.com', 
+    //                     'Sulochana.yadav@eatanytime.in, mukesh.yadav@eatanytime.in, sachin.pal@eatanytime.in', 
+    //                     'darshan.dhany@eatanytime.in, mahesh.ms@eatanytime.in', 'urvi.bhayani@eatanytime.in', 
+    //                     'nitin.kumar@eatanytime.in'];
 
     $reportpath = '';
     $tr = '';
@@ -15962,18 +15964,18 @@ public function send_mt_stock_tracker() {
                             CS
                         </body>
                         </html>';
-            $from_email = 'cs@eatanytime.co.in';
+            $from_email = 'cs@eatanytime.in';
             $from_email_sender = 'EAT MIS';
             $subject = 'MT_Stock_Tracker_'.$r_zone.'_'.$report_date;
 
 
-            /*$to_email = "dhaval.maru@pecanreams.com";
-            $cc="sangeeta.yadav@pecanreams.com";
-            $bcc="yadavsangeeta521@gmail.com";*/
+            /*$to_email = "dhaval.maru@otbconsulting.co.in";
+            $cc="prasad.bhisale@otbconsulting.co.in";
+            $bcc="prasad.bhisale@otbconsulting.co.in";*/
             
-            // $to_email = "prasad.bhisale@pecanreams.com";
-            // $cc = 'prasad.bhisale@pecanreams.com';
-            // $bcc = 'prasad.bhisale@pecanreams.com';
+            // $to_email = "prasad.bhisale@otbconsulting.co.in";
+            // $cc = 'prasad.bhisale@otbconsulting.co.in';
+            // $bcc = 'prasad.bhisale@otbconsulting.co.in';
 
             // if($zone_email_array[$x]!=''){
             //     $to_email = "operations@eatanytime.in,priti.tripathi@eatanytime.in,".$zone_email_array[$x];
@@ -15982,8 +15984,8 @@ public function send_mt_stock_tracker() {
             // }
 
             $to_email = "operations@eatanytime.in, priti.tripathi@eatanytime.in";
-            $cc = 'rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, dhaval.maru@pecanreams.com, prasad.bhisale@pecanreams.com';
-            $bcc = 'ashwini.patil@pecanreams.com';
+            $cc = 'rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, dhaval.maru@otbconsulting.co.in';
+            $bcc = 'prasad.bhisale@otbconsulting.co.in';
 
             sleep(15);
 
@@ -16751,14 +16753,14 @@ public function send_mt_stock_tracker_weekly() {
 
     // $zone_id_array = ['16'];
     // $zone_array = ['Mumbai'];
-    // $zone_email_array = ['Sulochana.yadav@eatanytime.co.in'];
+    // $zone_email_array = ['Sulochana.yadav@eatanytime.in'];
 
     // $zone_id_array = ['9', '10', '12', '16', '18', '29', '30'];
     // $zone_array = ['Chennai', 'Pune', 'Hyderbad', 'Mumbai', 'Banglore', 'Ahmedabad', 'Delhi'];
-    // $zone_email_array = ['', 'mohil.telawade@eatanytime.co.in', 'vijay.spar@gmail.com', 
-    //                     'Sulochana.yadav@eatanytime.co.in, mukesh.yadav@eatanytime.co.in, sachin.pal@eatanytime.co.in', 
-    //                     'darshan.dhany@eatanytime.co.in, mahesh.ms@eatanytime.co.in', 'urvi.bhayani@eatanytime.co.in', 
-    //                     'nitin.kumar@eatanytime.co.in'];
+    // $zone_email_array = ['', 'mohil.telawade@eatanytime.in', 'vijay.spar@gmail.com', 
+    //                     'Sulochana.yadav@eatanytime.in, mukesh.yadav@eatanytime.in, sachin.pal@eatanytime.in', 
+    //                     'darshan.dhany@eatanytime.in, mahesh.ms@eatanytime.in', 'urvi.bhayani@eatanytime.in', 
+    //                     'nitin.kumar@eatanytime.in'];
 
     $reportpath = '';
     $tr = '';
@@ -16794,22 +16796,22 @@ public function send_mt_stock_tracker_weekly() {
                         CS
                     </body>
                     </html>';
-        $from_email = 'cs@eatanytime.co.in';
+        $from_email = 'cs@eatanytime.in';
         $from_email_sender = 'EAT MIS';
         $subject = 'MT_Stock_Tracker_Weekly_'.$report_date;
 
 
-        /*$to_email = "dhaval.maru@pecanreams.com";
-        $cc="sangeeta.yadav@pecanreams.com";
-        $bcc="yadavsangeeta521@gmail.com";*/
+        /*$to_email = "dhaval.maru@otbconsulting.co.in";
+        $cc="prasad.bhisale@otbconsulting.co.in";
+        $bcc="prasad.bhisale@otbconsulting.co.in";*/
         
-        $to_email = 'prasad.bhisale@pecanreams.com';
-        $cc = 'prasad.bhisale@pecanreams.com';
-        $bcc = 'prasad.bhisale@pecanreams.com';
+        $to_email = 'prasad.bhisale@otbconsulting.co.in';
+        $cc = 'prasad.bhisale@otbconsulting.co.in';
+        $bcc = 'prasad.bhisale@otbconsulting.co.in';
 
-        // $to_email = "priti.tripathi@eatanytime.co.in, operations@eatanytime.co.in, swapnil.darekar@eatanytime.in";
+        // $to_email = "priti.tripathi@eatanytime.in, operations@eatanytime.in, swapnil.darekar@eatanytime.in";
         // $cc = "rishit.sanghvi@eatanytime.in";
-        // $bcc = "ashwini.patil@pecanreams.com, prasad.bhisale@pecanreams.com, dhaval.maru@pecanreams.com";
+        // $bcc = "prasad.bhisale@otbconsulting.co.in, dhaval.maru@otbconsulting.co.in";
 
         $sql = "select * from report_master where report_name = 'MT Stock Tracker Weekly'";
         $query = $this->db->query($sql);
@@ -17687,17 +17689,17 @@ public function send_exception_report() {
                     CS
                 </body>
                 </html>';
-    $from_email = 'info@eatanytime.co.in';
+    $from_email = 'info@eatanytime.in';
     $from_email_sender = 'EAT MIS';
     $subject = 'Exception Report - '.(($date!=null && $date!="")?date("d-m-Y",strtotime($date)):"");
 
-    $to_email = 'prasad.bhisale@pecanreams.com';
-    $cc = 'prasad.bhisale@pecanreams.com';
-    $bcc = 'prasad.bhisale@pecanreams.com';
+    $to_email = 'prasad.bhisale@otbconsulting.co.in';
+    $cc = 'prasad.bhisale@otbconsulting.co.in';
+    $bcc = 'prasad.bhisale@otbconsulting.co.in';
 
-    // $to_email = "priti.tripathi@eatanytime.co.in, operations@eatanytime.co.in";
+    // $to_email = "priti.tripathi@eatanytime.in, operations@eatanytime.in";
     // $cc="rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in";
-    // $bcc="ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, prasad.bhisale@pecanreams.com";
+    // $bcc="dhaval.maru@otbconsulting.co.in, prasad.bhisale@otbconsulting.co.in";
 
     $sql = "select * from report_master where report_name = 'Exception Report'";
     $query = $this->db->query($sql);
@@ -17732,7 +17734,7 @@ public function send_exception_report() {
 
 public function send_production_exception_report(){
     $tbody ='';
-    $from_email = 'cs@eatanytime.co.in';
+    $from_email = 'cs@eatanytime.in';
     $from_email_sender = 'EAT MIS';
     
     $task = $this->get_task_cnt();
@@ -18205,19 +18207,16 @@ public function send_production_exception_report(){
 
 
     if(count($task)>0 || count($pre_production) || count($post_production)) {
-        //// $to_email = "dhaval.maru@pecanreams.com";
-        //$bcc = "dhaval.maru@pecanreams.com";
+        //// $to_email = "dhaval.maru@otbconsulting.co.in";
+        //$bcc = "dhaval.maru@otbconsulting.co.in";
 
-        // $to_email = "ashwini.patil@pecanreams.com";
-        // $bcc = "ashwini.patil@pecanreams.com";
-        
-        $to_email = "prasad.bhisale@pecanreams.com";
-        $cc = "prasad.bhisale@pecanreams.com";
-        $bcc = "prasad.bhisale@pecanreams.com";
+        $to_email = "prasad.bhisale@otbconsulting.co.in";
+        $cc = "prasad.bhisale@otbconsulting.co.in";
+        $bcc = "prasad.bhisale@otbconsulting.co.in";
         
         // $to_email = "dinesh.parkhi@eatanytime.in, vaibhav.desai@eatanytime.in, prachi.sanghvi@eatanytime.in";
         // $cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in";
-        // $bcc = "ashwini.patil@pecanreams.com, prasad.bhisale@pecanreams.com, dhaval.maru@pecanreams.com";
+        // $bcc = "prasad.bhisale@otbconsulting.co.in, dhaval.maru@otbconsulting.co.in";
 
         $sql = "select * from report_master where report_name = 'Production Exception Report'";
         $query = $this->db->query($sql);
@@ -18293,17 +18292,17 @@ public function send_beat_analysis_report($report_peroid='') {
                         CS
                     </body>
                     </html>';
-        $from_email = 'cs@eatanytime.co.in';
+        $from_email = 'cs@eatanytime.in';
         $from_email_sender = 'EAT MIS';
         $subject = 'Beat Analysis Report - '.$report_date;
 
-        $to_email = 'prasad.bhisale@pecanreams.com';
-        $cc = 'prasad.bhisale@pecanreams.com';
-        $bcc = 'prasad.bhisale@pecanreams.com';
+        $to_email = 'prasad.bhisale@otbconsulting.co.in';
+        $cc = 'prasad.bhisale@otbconsulting.co.in';
+        $bcc = 'prasad.bhisale@otbconsulting.co.in';
 
         // $to_email = "swapnil.darekar@eatanytime.in";
         // $cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, operations@eatanytime.in";
-        // $bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, prasad.bhisale@pecanreams.com";
+        // $bcc = "dhaval.maru@otbconsulting.co.in, prasad.bhisale@otbconsulting.co.in";
 
         $sql = "select * from report_master where report_name = 'Beat Analysis Report'";
         $query = $this->db->query($sql);
@@ -18729,17 +18728,17 @@ public function send_daily_sales_performance_report($report_peroid='') {
                         CS
                     </body>
                     </html>';
-        $from_email = 'cs@eatanytime.co.in';
+        $from_email = 'cs@eatanytime.in';
         $from_email_sender = 'EAT MIS';
         $subject = 'Sales - '.$report_peroid.' SR Performance Report - '.$report_date;
 
-        $to_email = 'prasad.bhisale@pecanreams.com';
-        $cc = 'prasad.bhisale@pecanreams.com';
-        $bcc = 'prasad.bhisale@pecanreams.com';
+        $to_email = 'prasad.bhisale@otbconsulting.co.in';
+        $cc = 'prasad.bhisale@otbconsulting.co.in';
+        $bcc = 'prasad.bhisale@otbconsulting.co.in';
 
-        // $to_email = "ravi.hirode@eatanytime.co.in, manorama.mishra@eatanytime.co.in, mahesh.ms@eatanytime.co.in, yash.doshi@eatanytime.in, darshan.dhany@eatanytime.co.in, girish.rai@eatanytime.in, nitin.kumar@eatanytime.co.in, mohil.telawade@eatanytime.co.in";
+        // $to_email = "ravi.hirode@eatanytime.in, manorama.mishra@eatanytime.in, mahesh.ms@eatanytime.in, yash.doshi@eatanytime.in, darshan.dhany@eatanytime.in, girish.rai@eatanytime.in, nitin.kumar@eatanytime.in, mohil.telawade@eatanytime.in";
         // $cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, operations@eatanytime.in";
-        // $bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, prasad.bhisale@pecanreams.com";
+        // $bcc = "dhaval.maru@otbconsulting.co.in, prasad.bhisale@otbconsulting.co.in";
 
         $sql = "select * from report_master where report_name = 'Sales Representative Performance Report'";
         $query = $this->db->query($sql);
@@ -19322,17 +19321,17 @@ public function send_daily_merchandiser_performance_report($report_peroid='') {
                         CS
                     </body>
                     </html>';
-        $from_email = 'cs@eatanytime.co.in';
+        $from_email = 'cs@eatanytime.in';
         $from_email_sender = 'EAT MIS';
         $subject = 'Sales - '.$report_peroid.' Merchandiser Performance Report - '.$report_date;
 
-        $to_email = 'prasad.bhisale@pecanreams.com';
-        $cc = 'prasad.bhisale@pecanreams.com';
-        $bcc = 'prasad.bhisale@pecanreams.com';
+        $to_email = 'prasad.bhisale@otbconsulting.co.in';
+        $cc = 'prasad.bhisale@otbconsulting.co.in';
+        $bcc = 'prasad.bhisale@otbconsulting.co.in';
 
-        // $to_email = "mukesh.yadav@eatanytime.co.in, sulochana.waghmare@eatanytime.co.in, sachin.pal@eatanytime.co.in, urvi.bhayani@eatanytime.co.in";
+        // $to_email = "mukesh.yadav@eatanytime.in, sulochana.waghmare@eatanytime.in, sachin.pal@eatanytime.in, urvi.bhayani@eatanytime.in";
         // $cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, operations@eatanytime.in";
-        // $bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, prasad.bhisale@pecanreams.com";
+        // $bcc = "dhaval.maru@otbconsulting.co.in, prasad.bhisale@otbconsulting.co.in";
 
         $sql = "select * from report_master where report_name = 'Merchandiser Performance Report'";
         $query = $this->db->query($sql);

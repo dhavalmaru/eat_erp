@@ -125,5 +125,10 @@ class Box extends CI_Controller{
         $result = $this->box_model->check_barcode_availablity();
         echo $result;
     }
+    
+    public function check_sku_code_availablity(){
+        $result = $this->box_model->check_sku_code_availablity();
+        echo $result;
+    }
 }
 ?>

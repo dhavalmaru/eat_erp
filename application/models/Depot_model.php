@@ -64,7 +64,8 @@ function save_data($id=''){
         'remarks' => $this->input->post('remarks'),
         'modified_by' => $curusr,
         'modified_on' => $now,
-        'state_code' =>  $this->input->post('state_code')
+        'state_code' =>  $this->input->post('state_code'),
+        'depot_fc_id' => $this->input->post('depot_fc_id')
     );
 
     if($id==''){

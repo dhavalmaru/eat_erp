@@ -183,7 +183,7 @@ invokeGetReport($service, $request3);
 
               $now=date('Y-m-d H:i:s');
               $curdate=date('Y-m-d');
-              $curusr='148';
+              $curusr='191';
 
               // echo $now;
               // echo '<br/><br/>';
@@ -196,13 +196,13 @@ invokeGetReport($service, $request3);
               $arr = array();
 
               foreach($x as $line){
-                // echo $line;
-                // echo '<br/><br/>';
+                echo $line;
+                echo '<br/><br/>';
 
                 $arr[]=explode("\t",$line);
               }
 
-              echo json_encode($arr);
+              echo print_r($arr);
               echo '<br/><br/>';
 
               $order_data = array();
@@ -212,10 +212,11 @@ invokeGetReport($service, $request3);
                   $order_no = $arr[$i][1];
                   $asin = $arr[$i][3];
                   $qty = intval(trim($arr[$i][6]));
+                  $fc_id = $arr[$i][7];
 
                   $index = '';
                   for($j=0; $j<count($order_data); $j++) {
-                      if($order_data[$j]['order_no']==$order_no) {
+                      if($order_data[$j]['order_no']==$order_no && $order_data[$j]['fc_id']==$fc_id) {
                           $index = $j;
                           break;
                       }
@@ -224,6 +225,7 @@ invokeGetReport($service, $request3);
                       $index = count($order_data);
                       $order_data[$index]['order_no']=$order_no;
                       $order_data[$index]['return_date']=$return_date;
+                      $order_data[$index]['fc_id']=$fc_id;
                       $order_data[$index]['sku_data']=array();
                   }
 
@@ -246,7 +248,7 @@ invokeGetReport($service, $request3);
                   $order_data[$index]['sku_data'] = $sku_data;
               }
 
-              // echo json_encode($order_data);
+              // echo '<pre>'.print_r($order_data).'</pre>';
               // echo '<br/><br/>';
               // echo json_encode($sku_data);
 
@@ -256,9 +258,13 @@ invokeGetReport($service, $request3);
               }
 
               for($i=0; $i<count($order_data); $i++) {
+                  echo '<pre>'.print_r($order_data[$i]).'</pre>';
+                  echo '<br/><br/>';
+                  
                   $order_no = $order_data[$i]['order_no'];
+                  $fc_id = $order_data[$i]['fc_id'];
 
-                  $sql = "select * from distributor_in where order_no='".$order_no."' or remarks like '%".$order_no."%'";
+                  $sql = "select * from distributor_in where (order_no='".$order_no."' and fc_id='".$fc_id."') or remarks like '%".$order_no."%'";
                   $result = $conn->query($sql);
                   if ($result->num_rows > 0) {
                     $row_arr = $result->fetch_all(MYSQLI_ASSOC);
@@ -269,17 +275,66 @@ invokeGetReport($service, $request3);
                     }
                   }
 
+
+                  $depot_id = '3';
+                  $depot_state = 'MAHARASHTRA';
+
+                  $sql = "select * from depot_master where depot_fc_id='".$fc_id."'";
+                  $result = $conn->query($sql);
+                  if ($result->num_rows > 0) {
+                    $row_arr = $result->fetch_all(MYSQLI_ASSOC);
+                    if(count($row_arr)>0) {
+                      if(isset($row_arr[0]['state'])) {
+                        $depot_state = strtoupper(trim($row_arr[0]['state']));
+                        $depot_id = $row_arr[0]['id'];
+                      }
+                    } else {
+                      // $result->free();
+                      // echo 'Order No '.$AmazonOrderId.' & Order Item Id '.$OrderItemId.' depot state not found.<br/><br/>';
+                      // continue;
+                    }
+                  }
+
+                  // if($fc_id=='') {
+                  //   echo 'Order No '.$AmazonOrderId.' & Order Item Id '.$OrderItemId.' fulfillment details not found.<br/><br/>';
+                  //   continue;
+                  // }
+                  // if($depot_id=='') {
+                  //   echo 'Order No '.$AmazonOrderId.' & Order Item Id '.$OrderItemId.' depot state not found.<br/><br/>';
+                  //   continue;
+                  // }
+
+
                   $return_date = $order_data[$i]['return_date'];
                   $date = new DateTime($return_date, new DateTimeZone('UTC'));
                   $return_date = $date->format('Y-m-d');
 
                   $sku_data = $order_data[$i]['sku_data'];
+                  $item_id = 0;
 
+                  if(count($sku_data)>0){
+                    $asin = $sku_data[0]['asin'];
+
+                    $sql = "select * from box_master where asin ='".$asin."'";
+                    $result = $conn->query($sql);
+                    if ($result->num_rows > 0) {
+                      $row_arr = $result->fetch_all(MYSQLI_ASSOC);
+
+                      if(count($row_arr)>0) {
+                        if(isset($row_arr[0]['id'])) {
+                          $item_id = $row_arr[0]['id'];
+                        }
+                      }
+                      $result->free();
+                    }
+                  }
+                  
                   $discount = 0;
                   $distributor_out_id = 0;
                   $invoice_no = '';
                   $tax_type = 'Intra';
-                  $sql = "select * from distributor_out where order_no='".$order_no."'";
+                  $sql = "select A.* from distributor_out A left join distributor_out_items B on (A.id=B.distributor_out_id) 
+                          where A.order_no='".$order_no."' and B.type='Box' and B.item_id='".$item_id."'";
                   $result = $conn->query($sql);
                   if ($result->num_rows > 0) {
                     $row_arr = $result->fetch_all(MYSQLI_ASSOC);
@@ -314,11 +369,11 @@ invokeGetReport($service, $request3);
                   echo print_r($sku_data);
                   echo '<br/><br/>';
 
-                  echo count($sku_data);
-                  echo '<br/><br/>';
+                  // echo count($sku_data);
+                  // echo '<br/><br/>';
 
-                  echo $sku_data[0]['asin'];
-                  echo '<br/><br/>';
+                  // echo $sku_data[0]['asin'];
+                  // echo '<br/><br/>';
 
                   for($k=0; $k<count($sku_data); $k++) {
                     $asin = $sku_data[$k]['asin'];
@@ -427,14 +482,18 @@ invokeGetReport($service, $request3);
                                   );
                   }
 
-                  $depot_id = '3';
                   $distributor_id = '214';
 
                   $round_off_amt = round(round($tot_order_amount,0) - round($tot_order_amount,2),2);
                   $final_amount = round($tot_order_amount,0);
 
+                  echo $final_amount;
+                  echo '<br/><br/>';
+                  echo json_encode($item_data);
+                  echo '<br/><br/>';
+
                   if($final_amount>0){
-                      $sql = "insert into distributor_in (date_of_processing, depot_id, distributor_id, sales_rep_id, amount, tax, cst, tax_amount, final_amount, due_date, status, remarks, created_by, created_on, modified_by, modified_on, approved_by, approved_on, rejected_by, rejected_on, is_expired, is_exchanged, final_cost_amount, ref_id, sales_return_no, cgst, sgst, igst, cgst_amount, sgst_amount, igst_amount, freezed, round_off_amount, sales_type, invoice_nos, modified_approved_date, discount, order_no) VALUES ('".$curdate."', '".$depot_id."', '".$distributor_id."', Null, ".$tot_amount.", Null, 1, ".$tot_tax_amount.", ".$tot_order_amount.", '".$curdate."', 'Pending', 'This is system generated entry.', '".$curusr."', '".$now."', '".$curusr."', '".$now."', Null, Null, Null, Null, 'no', 'no', ".$final_cost_amount.", Null, Null, 1, 1, 1, ".$tot_cgst_amount.", ".$tot_sgst_amount.", ".$tot_igst_amount.", 0, ".$round_off_amt.", 'Invoice', '".$invoice_no."', Null, ".$discount.", '".$order_no."')";
+                      $sql = "insert into distributor_in (date_of_processing, depot_id, distributor_id, sales_rep_id, amount, tax, cst, tax_amount, final_amount, due_date, status, remarks, created_by, created_on, modified_by, modified_on, approved_by, approved_on, rejected_by, rejected_on, is_expired, is_exchanged, final_cost_amount, ref_id, sales_return_no, cgst, sgst, igst, cgst_amount, sgst_amount, igst_amount, freezed, round_off_amount, sales_type, invoice_nos, modified_approved_date, discount, order_no, fc_id) VALUES ('".$curdate."', '".$depot_id."', '".$distributor_id."', Null, ".$tot_amount.", Null, 1, ".$tot_tax_amount.", ".$tot_order_amount.", '".$curdate."', 'Pending', 'This is system generated entry.', '".$curusr."', '".$now."', '".$curusr."', '".$now."', Null, Null, Null, Null, 'no', 'no', ".$final_cost_amount.", Null, Null, 1, 1, 1, ".$tot_cgst_amount.", ".$tot_sgst_amount.", ".$tot_igst_amount.", 0, ".$round_off_amt.", 'Invoice', '".$invoice_no."', Null, ".$discount.", '".$order_no."', '".$fc_id."')";
                       echo $sql.'<br/><br/>';
                       echo json_encode($item_data);
                       echo '<br/><br/>';

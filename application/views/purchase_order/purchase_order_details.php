@@ -110,6 +110,7 @@
                                                 <th width="600">Item Description <span class="asterisk_sign">*</span></th>
                                                 <th width="180">Qty In Kg <span class="asterisk_sign">*</span></th>
 												<th width="180">HSN Code </th>
+                                                <th width="180">Org Rate </th>
                                                 <th width="180">Rate </th>
                                                 <th width="180">Amount (In Rs) </th>
                                                 <th width="180">CGST (In Rs) </th>
@@ -141,8 +142,11 @@
                                                 <td>
                                                     <input type="text" class="form-control hsn_code" name="hsn_code[]" id="hsn_code_<?php echo $i; ?>" placeholder="HSN Code" value="<?php if (isset($purchase_order_items)) { echo $purchase_order_items[$i]->hsn_code; } ?>" readonly />
                                                 </td>
+                                                <td id="org_rate_<?php echo $i; ?>" style="vertical-align: middle; text-align: right;">
+                                                    <?php if (isset($purchase_order_items)) { echo $purchase_order_items[$i]->old_rate; } ?>
+                                                </td>
                                                 <td>
-                                                    <input type="text" class="form-control rate" name="rate[]" id="rate_<?php echo $i; ?>" placeholder="Rate" value="<?php if (isset($purchase_order_items)) { echo $purchase_order_items[$i]->rate; } ?>"  />
+                                                    <input type="text" class="form-control rate" name="rate[]" id="rate_<?php echo $i; ?>" placeholder="Rate" value="<?php if (isset($purchase_order_items)) { echo $purchase_order_items[$i]->rate; } ?>" onchange="get_amount(this)" style="<?php if (isset($purchase_order_items)) { if($purchase_order_items[$i]->old_rate<$purchase_order_items[$i]->rate) echo 'color:red;'; else echo 'color:green;'; } else echo 'color:green;'; ?>" />
                                                     <input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_<?php echo $i; ?>" placeholder="Tax %" value="<?php if (isset($purchase_order_items)) { echo $purchase_order_items[$i]->tax_per; } ?>"  />
                                                 </td>
                                                 <td>
@@ -186,8 +190,9 @@
                                                 <td>
                                                     <input type="text" class="form-control hsn_code" name="hsn_code[]" id="hsn_code_<?php echo $i; ?>" placeholder="HSN Code" value="" readonly />
                                                 </td>
+                                                <td id="org_rate_<?php echo $i; ?>" style="vertical-align: middle; text-align: right;">0</td>
                                                 <td>
-                                                    <input type="text" class="form-control rate" name="rate[]" id="rate_<?php echo $i; ?>" placeholder="Rate" value=""  onchange="get_amount(this)"/>
+                                                    <input type="text" class="form-control rate" name="rate[]" id="rate_<?php echo $i; ?>" placeholder="Rate" value=""  onchange="get_amount(this)" />
                                                     <input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_<?php echo $i; ?>" placeholder="Tax %" value=""  />
                                                 </td>
                                                 <td>
@@ -293,8 +298,8 @@
 							  </div>
                                 </div>
                                 <!-- <div class="panel-footer">
-									<a href="<?php echo base_url(); ?>index.php/purchase_order" class="btn btn-danger" type="reset" id="reset">Cancel</a>
-                                    <button class="btn btn-success pull-right" style="<?php if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</button>
+									<a href="<?php //echo base_url(); ?>index.php/purchase_order" class="btn btn-danger" type="reset" id="reset">Cancel</a>
+                                    <button class="btn btn-success pull-right" style="<?php //if(isset($data[0]->id)) {if($access[0]->r_edit=='0') echo 'display: none;';} else if($access[0]->r_insert=='0' && $access[0]->r_edit=='0') echo 'display: none;'; ?>">Save</button>
                                 </div> -->
                                   <?php
                                 /*if(isset($data[0]->po_status))
@@ -553,6 +558,7 @@
 
                 var total_amount = parseFloat(amount,2) + parseFloat(tax_amt,2);
 
+                $("#org_rate_"+index).html(rate);
                 $("#rate_"+index).val(rate);
                 $("#tax_per_"+index).val(tax_per);
                 $("#hsn_code_"+index).val(hsn_code);
@@ -572,12 +578,24 @@
                 var index = id.substr(id.lastIndexOf('_')+1);
 
                 var qty = parseFloat(get_number($("#qty_"+index).val(),2));
+                var org_rate = parseFloat(get_number($("#org_rate_"+index).html(),2));
                 var rate = parseFloat(get_number($("#rate_"+index).val(),2));
                 var tax_per = parseFloat(get_number($("#tax_per_"+index).val(),2));
 
                 if (isNaN(qty)) qty=0;
+                if (isNaN(org_rate)) org_rate=0;
                 if (isNaN(rate)) rate=0;
                 if (isNaN(tax_per)) tax_per=0;
+
+                console.log(org_rate);
+                console.log(rate);
+
+                if(org_rate<rate) {
+                    $("#rate_"+index).css('color','red');
+                } else {
+                    console.log('green');
+                    $("#rate_"+index).css('color','green');
+                }
 
                 var cgst = 0;
                 var sgst = 0;
@@ -656,6 +674,7 @@
                                         '<td>' + 
                                             '<input type="text" class="form-control hsn_code" name="hsn_code[]" id="hsn_code_'+counter+'" placeholder="HSN Code" value="" readonly />' + 
                                         '</td>' + 
+                                        '<td id="org_rate_'+counter+'" style="vertical-align: middle; text-align: right;"></td>' + 
                                         '<td>' + 
                                             '<input type="text" class="form-control rate" name="rate[]" id="rate_'+counter+'" placeholder="Rate" value="" onchange="get_amount(this)" />' + 
                                             '<input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_'+counter+'" placeholder="Tax %" value=""  />' + 

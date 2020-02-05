@@ -145,19 +145,19 @@ class Sales_Attendence extends CI_controller {
 	
 	public function get_sales_attendance($status=''){
 		$tbody ='';
-		$from_email = 'cs@eatanytime.co.in';
+		$from_email = 'cs@eatanytime.in';
         $from_email_sender = 'Wholesome Habits Pvt Ltd';
        	
-		// $to_email = "prasad.bhisale@pecanreams.com";
-		// $cc = "prasad.bhisale@pecanreams.com";
-		// $bcc = "prasad.bhisale@pecanreams.com";
+		// $to_email = "prasad.bhisale@otbconsulting.co.in";
+		// $cc = "prasad.bhisale@otbconsulting.co.in";
+		// $bcc = "prasad.bhisale@otbconsulting.co.in";
 	   	
-		$to_email = "mukesh.yadav@eatanytime.co.in, sulochana.waghmare@eatanytime.co.in, manorama.mishra@eatanytime.co.in, 
-					yash.doshi@eatanytime.in, sachin.pal@eatanytime.co.in, girish.rai@eatanytime.in, 
-					urvi.bhayani@eatanytime.co.in, vijay@eatanytime.in";
+		$to_email = "mukesh.yadav@eatanytime.in, sulochana.waghmare@eatanytime.in, manorama.mishra@eatanytime.in, 
+					yash.doshi@eatanytime.in, sachin.pal@eatanytime.in, girish.rai@eatanytime.in, 
+					urvi.bhayani@eatanytime.in, vijay@eatanytime.in";
 		$cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, operations@eatanytime.in, 
 				mis@eatanytime.in, priti.tripathi@eatanytime.in";
-		$bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, prasad.bhisale@pecanreams.com";
+		$bcc = "dhaval.maru@otbconsulting.co.in, prasad.bhisale@otbconsulting.co.in";
 
 		$sql = "select * from report_master where report_name = 'Sales Daily Attendance'";
 		$query = $this->db->query($sql);
@@ -432,16 +432,16 @@ class Sales_Attendence extends CI_controller {
 	
 	public function get_user_log(){
 		$tbody ='';
-		$from_email = 'cs@eatanytime.co.in';
+		$from_email = 'cs@eatanytime.in';
         $from_email_sender = 'Wholesome Habits Pvt Ltd';
        
 		$to_email = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in";
 		$cc = "";
-		$bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, prasad.bhisale@pecanreams.com";
+		$bcc = "dhaval.maru@otbconsulting.co.in, prasad.bhisale@otbconsulting.co.in";
 
-		// $to_email = "prasad.bhisale@pecanreams.com";
-		// $cc = "prasad.bhisale@pecanreams.com";
-	 	// $bcc = "prasad.bhisale@pecanreams.com";
+		// $to_email = "prasad.bhisale@otbconsulting.co.in";
+		// $cc = "prasad.bhisale@otbconsulting.co.in";
+	 	// $bcc = "prasad.bhisale@otbconsulting.co.in";
 		
 		$sql = "select * from report_master where report_name = 'Monthly User Login Log'";
 		$query = $this->db->query($sql);
@@ -641,14 +641,14 @@ class Sales_Attendence extends CI_controller {
 	
 	public function get_sales_log(){
 		$tbody ='';
-		$from_email = 'cs@eatanytime.co.in';
+		$from_email = 'cs@eatanytime.in';
         $from_email_sender = 'Wholesome Habits Pvt Ltd';
        
-		//$to_email = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, prasad.bhisale@pecanreams.com";
-		 $to_email = "ashwini.patil@pecanreams.com";
-	 	$bcc = "ashwini.patil@pecanreams.com, dhaval.maru@pecanreams.com, sangeeta.yadav@pecanreams.com";
-		// $to_email = "prasad.bhisale@pecanreams.com";
-		//$bcc = "ashwini.patil@pecanreams.com";
+		//$to_email = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, prasad.bhisale@otbconsulting.co.in";
+		 $to_email = "prasad.bhisale@otbconsulting.co.in";
+	 	$bcc = "prasad.bhisale@otbconsulting.co.in, dhaval.maru@otbconsulting.co.in";
+		// $to_email = "prasad.bhisale@otbconsulting.co.in";
+		//$bcc = "prasad.bhisale@otbconsulting.co.in";
 		
         $subject = 'Sales Login Log -'.date("d F Y",strtotime("now"));
         $data = $this->Sales_Attendence_model->sales_emp_log();

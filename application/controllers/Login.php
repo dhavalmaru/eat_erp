@@ -352,6 +352,69 @@ class Login extends CI_Controller
             echo 'Invalid';
         }
     }
+
+    public function test_email() {
+        try {
+                $from_email_sender = 'Wholesome Habits Pvt Ltd';
+                $from_email = 'cs@eatanytime.co.in';
+                // $to_email = 'prasad.bhisale@otbconsulting.co.in';
+                $to_email = 'ashwini.patil@otbconsulting.co.in';
+                // $to_email = 'priti.tripathi@eatanytime.in';
+                $subject = 'Your password for Eat ERP';
+
+                $message = '<html>
+                            <head></head>
+                            <body>
+                                <div style="background-color:#7bceeb;">
+                                    <!--[if gte mso 9]>
+                                    <v:background xmlns:v="urn:schemas-microsoft-com:vml" fill="t">
+                                    <v:fill type="tile" src="https://i.imgur.com/YJOX1PC.png" color="#7bceeb"/>
+                                    </v:background>
+                                    <![endif]-->
+                                    <table height="100%" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td valign="top" align="left" background="https://i.imgur.com/YJOX1PC.png">
+                                            Password
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </body>
+                            </html>';
+
+                // $message = '<html>
+                //             <head></head>
+                //             <body>
+                //                 <div style="background-color:#ffffff;">
+                //                     <!--[if gte mso 9]>
+                //                     <v:background xmlns:v="urn:schemas-microsoft-com:vml" fill="t">
+                //                     <v:fill type="tile" src="https://www.eatanytime.in/BG.png" color="#ffffff"/>
+                //                     </v:background>
+                //                     <![endif]-->
+                //                     <table height="100%" width="100%" cellpadding="0" cellspacing="0" border="0">
+                //                         <tr>
+                //                             <td valign="top" align="left" background="https://www.eatanytime.in/BG.png">
+                //                             Password
+                //                             </td>
+                //                         </tr>
+                //                     </table>
+                //                 </div>
+                //             </body>
+                //             </html>';
+
+                $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message);
+
+                echo $message.'<br/><br/>';
+
+                if($mailSent==1){
+                    echo 'Valid';
+                } else {
+                    echo 'Invalid';
+                }
+        } catch (Exception $ex) {
+            echo 'Invalid';
+        }
+    }
 }
 	  
 ?>

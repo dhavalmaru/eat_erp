@@ -64,6 +64,7 @@
 											<th>Box Name</th>
 											<th>Short Name</th>
 											<th width="150">ASIN</th>
+											<th width="150">SKU Code</th>
 											<th width="150">Barcode</th>
 											<th width="80">Grams</th>
 											<th width="80">Rate (In Rs)</th>
@@ -79,6 +80,7 @@
 											<td><?php echo $data[$i]->box_name; ?></td>
 											<td><?php echo $data[$i]->short_name; ?></td>
 											<td><?php echo $data[$i]->asin; ?></td>
+											<td><?php echo $data[$i]->sku_code; ?></td>
 											<td><?php echo $data[$i]->barcode; ?></td>
 											<td><?php echo format_money($data[$i]->grams,2); ?></td>
 											<td><?php echo format_money($data[$i]->rate,2); ?></td>

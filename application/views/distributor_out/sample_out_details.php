@@ -846,7 +846,7 @@
                     async:false,
                     success: function(data){
                         if(data.result==1){
-                            if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352){
+                            if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352 || distributor_id==1379 || distributor_id==1381 || distributor_id==1416){
                                 $('#sell_out').val($("#discount").val());
                             } else {
                                 $('#sell_out').val(data.sell_out);
@@ -906,7 +906,7 @@
                     }
                 });
 
-                if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352){
+                if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352 || distributor_id==1379 || distributor_id==1381 || distributor_id==1416){
                     $('.direct').show();
                 } else {
                     $('.direct').hide();

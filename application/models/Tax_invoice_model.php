@@ -180,7 +180,7 @@ function generate_tax_invoice_old($id) {
             $data['gate_pass_no']=$gate_pass_no;
             $data['date_of_processing']=$date_of_processing;
 
-            if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT'){
+            if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT' || strtoupper(trim($distributor_name))=='NEULIFE DIRECT' || strtoupper(trim($distributor_name))=='FLIPKART DIRECT' || strtoupper(trim($distributor_name))=='GOQII DIRECT'){
                 $data['distributor_name']=$client_name;
                 $data['address']=$client_address;
             } else {
@@ -254,7 +254,7 @@ function generate_tax_invoice_old($id) {
             $data['invoice_no']=$invoice_no;
             $data['date_of_processing']=$date_of_processing;
 
-            if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT'){
+            if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT' || strtoupper(trim($distributor_name))=='NEULIFE DIRECT' || strtoupper(trim($distributor_name))=='FLIPKART DIRECT' || strtoupper(trim($distributor_name))=='GOQII DIRECT'){
                 $data['distributor_name']=$client_name;
                 $data['address']=$client_address;
             } else {
@@ -494,7 +494,7 @@ function generate_gate_pass_old() {
                 $data['gate_pass_no']=$gate_pass_no;
                 $data['date_of_processing']=$date_of_processing;
 
-                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT'){
+                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT' || strtoupper(trim($distributor_name))=='NEULIFE DIRECT' || strtoupper(trim($distributor_name))=='FLIPKART DIRECT' || strtoupper(trim($distributor_name))=='GOQII DIRECT'){
                     $data['distributor_name']=$client_name;
                     $data['address']=$client_address;
                 } else {
@@ -557,7 +557,7 @@ function generate_gate_pass_old() {
                 $data['invoice_no']=$invoice_no;
                 $data['date_of_processing']=$date_of_processing;
 
-                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT'){
+                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT' || strtoupper(trim($distributor_name))=='NEULIFE DIRECT' || strtoupper(trim($distributor_name))=='FLIPKART DIRECT' || strtoupper(trim($distributor_name))=='GOQII DIRECT'){
                     $data['distributor_name']=$client_name;
                     $data['address']=$client_address;
                 } else {
@@ -984,7 +984,7 @@ function generate_gate_pass_old_print() {
                 $data['gate_pass_no']=$gate_pass_no;
                 $data['date_of_processing']=$date_of_processing;
 
-                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT'){
+                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT' || strtoupper(trim($distributor_name))=='NEULIFE DIRECT' || strtoupper(trim($distributor_name))=='FLIPKART DIRECT' || strtoupper(trim($distributor_name))=='GOQII DIRECT'){
                     $data['distributor_name']=$client_name;
                     $data['address']=$client_address;
                 } else {
@@ -1047,7 +1047,7 @@ function generate_gate_pass_old_print() {
                 $data['invoice_no']=$invoice_no;
                 $data['date_of_processing']=$date_of_processing;
 
-                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT'){
+                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT' || strtoupper(trim($distributor_name))=='NEULIFE DIRECT' || strtoupper(trim($distributor_name))=='FLIPKART DIRECT' || strtoupper(trim($distributor_name))=='GOQII DIRECT'){
                     $data['distributor_name']=$client_name;
                     $data['address']=$client_address;
                 } else {
@@ -1467,7 +1467,7 @@ function view_gate_pass_old($distid) {
                 $data['gate_pass_no']=$gate_pass_no;
                 $data['date_of_processing']=$date_of_processing;
 
-                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT'){
+                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT' || strtoupper(trim($distributor_name))=='NEULIFE DIRECT' || strtoupper(trim($distributor_name))=='FLIPKART DIRECT' || strtoupper(trim($distributor_name))=='GOQII DIRECT'){
                     $data['distributor_name']=$client_name;
                     $data['address']=$client_address;
                 } else {
@@ -1530,7 +1530,7 @@ function view_gate_pass_old($distid) {
                 $data['invoice_no']=$invoice_no;
                 $data['date_of_processing']=$date_of_processing;
 
-                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT'){
+                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT' || strtoupper(trim($distributor_name))=='NEULIFE DIRECT' || strtoupper(trim($distributor_name))=='FLIPKART DIRECT' || strtoupper(trim($distributor_name))=='GOQII DIRECT'){
                     $data['distributor_name']=$client_name;
                     $data['address']=$client_address;
                 } else {
@@ -1715,6 +1715,7 @@ function get_final_data($check, $sales_rep_id){
             $depot_address = get_address($result[0]->depot_address, "", $result[0]->depot_city, $result[0]->depot_pincode, $result[0]->depot_state, $result[0]->depot_country);
             $depot_state=$result[0]->depot_state;
             $depot_state_code=$result[0]->depot_state_code;
+            $depot_gst_no=$result[0]->depot_gst_no;
             $reverse_charge=$result[0]->reverse_charge;
             $transport_type=$result[0]->transport_type;
             $vehicle_number=$result[0]->vehicle_number;
@@ -1784,6 +1785,7 @@ function get_final_data($check, $sales_rep_id){
             $depot_address = null;
             $depot_state = null;
             $depot_state_code = null;
+            $depot_gst_no=null;
             $reverse_charge = null;
             $transport_type = null;
             $vehicle_number = null;
@@ -1823,6 +1825,7 @@ function get_final_data($check, $sales_rep_id){
         $data['depot_address']=$depot_address;
         $data['depot_state']=$depot_state;
         $data['depot_state_code']=$depot_state_code;
+        $data['depot_gst_no']=$depot_gst_no;
 
         $data['round_off_amount']=$round_off_amount;
         $data['invoice_amount']=$invoice_amount;
@@ -2034,7 +2037,7 @@ function get_final_data($check, $sales_rep_id){
                 $data['gate_pass_no']=$gate_pass_no;
                 $data['date_of_processing']=$date_of_processing;
 
-                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT'){
+                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT' || strtoupper(trim($distributor_name))=='NEULIFE DIRECT' || strtoupper(trim($distributor_name))=='FLIPKART DIRECT' || strtoupper(trim($distributor_name))=='GOQII DIRECT'){
                         $data['distributor_name']=$client_name;
                         $data['address']=$client_address;
                         $data['state']=$client_state;
@@ -2129,7 +2132,7 @@ function get_final_data($check, $sales_rep_id){
                 $data['invoice_no']=$invoice_no;
                 $data['date_of_processing']=$date_of_processing;
 
-                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT'){
+                if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT' || strtoupper(trim($distributor_name))=='NEULIFE DIRECT' || strtoupper(trim($distributor_name))=='FLIPKART DIRECT' || strtoupper(trim($distributor_name))=='GOQII DIRECT'){
                         $data['distributor_name']=$client_name;
                         $data['address']=$client_address;
                         $data['state']=$client_state;
@@ -2260,7 +2263,8 @@ function get_final_data($check, $sales_rep_id){
                 (select M.*, N.location from 
                 (select K.*, L.sales_rep_name from 
                 (select I.*, J.depot_name, J.address as depot_address, J.city as depot_city, J.pincode as depot_pincode, 
-                    J.state as depot_state, J.state_code as depot_state_code, J.country as depot_country from 
+                    J.state as depot_state, J.state_code as depot_state_code, J.country as depot_country, 
+                    J.gst_no as depot_gst_no from 
                 (select G.*, H.distributor_name, H.sell_out, H.state as distributor_state, H.class, H.location_id from 
                 (select E.*, F.product_name from 
                 (select C.*, D.box_name from 

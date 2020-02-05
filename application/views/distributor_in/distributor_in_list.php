@@ -115,6 +115,7 @@
 											<th width="58" style="text-align:center;">Edit</th>
 											<th width="105" class="hide_col">View Receipt</th>
 											<th width="250">Sales Return No</th>
+											<th width="250">Order No</th>
 									
 											<th width="250"  >Distributor Name</th>
 								

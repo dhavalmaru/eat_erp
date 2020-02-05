@@ -1058,9 +1058,9 @@ public function get_sales_rep_email(){
         $from_email_sender = 'Wholesome Habits Pvt Ltd';
        
 		//$to_email = "mukesh@eatanytime.in,sulochana@eatanytime.co.in";
-		$to_email = "ashwini.patil@pecanreams.com";
-		// $bcc = "sangeeta.yadav@pecanreams.com, dhaval.maru@pecanreams.com";
-		//$bcc = "rishit.sanghvi@eatanytime.in, dhaval.maru@pecanreams.com, swapnil.darekar@eatanytime.in, mis@eatanytime.co.in, ashwini.patil@pecanreams.com, sangeeta.yadav@pecanreams.com ";
+		$to_email = "ashwini.patil@otbconsulting.co.in";
+		// $bcc = "sangeeta.yadav@otbconsulting.co.in, dhaval.maru@otbconsulting.co.in";
+		//$bcc = "rishit.sanghvi@eatanytime.in, dhaval.maru@otbconsulting.co.in, swapnil.darekar@eatanytime.in, mis@eatanytime.co.in";
 	
         $subject = 'Daily Performance Report For Merchandiser - '.date("d F Y",strtotime("now"));
 

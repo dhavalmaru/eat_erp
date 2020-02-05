@@ -831,7 +831,7 @@ class Eat_Attendence extends CI_controller {
             /*$bcc = 'vaibhav.desai@eatanytime.in, rishit.sanghvi@eatanytime.in, swapnil.darekar@otbconsulting.co.in';*/
             $subject = $emp_name.' Attendence For Month - '.date('F Y ',strtotime($result[0]->date));
 
-            /*$cc='sangeeta.yadav@pecanreams.com';  */
+            /*$cc='prasad.bhisale@otbconsulting.co.in';  */
             if($to_email!='')
             {
               $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $tbody );
@@ -1106,7 +1106,7 @@ class Eat_Attendence extends CI_controller {
           }
 
 
-          /*$cc='sangeeta.yadav@pecanreams.com';  */
+          /*$cc='prasad.bhisale@otbconsulting.co.in';  */
           if($to_email!='')
           {
             $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $tbody );
@@ -1291,7 +1291,7 @@ class Eat_Attendence extends CI_controller {
     {
          $from_email = 'contact@eatanytime.co.in';
          $from_email_sender = 'Wholesome Habits Pvt Ltd';
-         $to_email = "prasad.bhisale@pecanreams.com";
+         $to_email = "prasad.bhisale@otbconsulting.co.in";
          /* $bcc = 'vaibhav.desai@eatanytime.in, rishit.sanghvi@eatanytime.in, swapnil.darekar@otbconsulting.co.in';*/
          $subject = 'Attendence For Month';
 

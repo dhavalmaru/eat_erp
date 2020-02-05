@@ -44,16 +44,16 @@ require_once('.config.inc.php');
 $serviceUrl = "https://mws.amazonservices.in/Orders/2013-09-01";
 
 
-$config = array (
-  'ServiceURL' => $serviceUrl,
-  'ProxyHost' => null,
-  'ProxyPort' => -1,
-  'ProxyUsername' => null,
-  'ProxyPassword' => null,
-  'MaxErrorRetry' => 3,
-);
+ $config = array (
+   'ServiceURL' => $serviceUrl,
+   'ProxyHost' => null,
+   'ProxyPort' => -1,
+   'ProxyUsername' => null,
+   'ProxyPassword' => null,
+   'MaxErrorRetry' => 3,
+ );
 
-$service = new MarketplaceWebServiceOrders_Client(
+ $service = new MarketplaceWebServiceOrders_Client(
         AWS_ACCESS_KEY_ID,
         AWS_SECRET_ACCESS_KEY,
         APPLICATION_NAME,
@@ -76,220 +76,61 @@ $service = new MarketplaceWebServiceOrders_Client(
  * Setup request parameters and uncomment invoke to try out
  * sample for List Orders Action
  ***********************************************************************/
+ // @TODO: set request. Action can be passed as MarketplaceWebServiceOrders_Model_ListOrders
+ $request = new MarketplaceWebServiceOrders_Model_ListOrdersRequest();
+ $request->setSellerId(MERCHANT_ID);
+ $request->setMarketplaceId(MARKETPLACE_ID);
 
-// @TODO: set request. Action can be passed as MarketplaceWebServiceOrders_Model_ListOrders
-$request = new MarketplaceWebServiceOrders_Model_ListOrdersRequest();
-$request->setSellerId(MERCHANT_ID);
-$request->setMarketplaceId(MARKETPLACE_ID);
+ // $request->setFulfillmentChannel("MFN");
+ // $request->setOrderStatus("Shipped");
+ $request->setMaxResultsPerPage(100);
 
-// $request->setFulfillmentChannel("MFN");
-// $request->setOrderStatus("Shipped");
-$request->setMaxResultsPerPage(100);
+ $request2 = new MarketplaceWebServiceOrders_Model_ListOrderItemsRequest();
+ $request2->setSellerId(MERCHANT_ID);
+ // $request2->setAmazonOrderId("408-1055488-9217907");
 
-$request2 = new MarketplaceWebServiceOrders_Model_ListOrderItemsRequest();
-$request2->setSellerId(MERCHANT_ID);
-// $request2->setAmazonOrderId("408-1055488-9217907");
+ // echo "Date Time: ".date('Y-m-d H:i:s')."<br/><br/>";
+ // echo time()."<br/><br/>";
+ // echo date('H:i:s', time() - 3600)."<br/><br/>";
 
-// echo "Date Time: ".date('Y-m-d H:i:s')."<br/><br/>";
-// echo time()."<br/><br/>";
-// echo date('H:i:s', time() - 3600)."<br/><br/>";
+ // object or array of parameters
+ // $date = date('Y-m-d', strtotime('-15 days'));
+ // $time = date('H:i:s', time() - 3600);
+ // echo "Time: ".$date."T".$time."Z<br/><br/>";
+ // $request->setLastUpdatedAfter($date."T".$time."Z");
+ // invokeListOrders($service, $request, $request2);
 
-// object or array of parameters
-// 1hr = 3600 sec
+ // sleep(3);
 
-// $request->setSellerOrderId("408-5824084-9615543");
+ // $date = date('Y-m-d', strtotime('-10 days'));
+ // $time = date('H:i:s', time() - 3600);
+ // echo "Time: ".$date."T".$time."Z<br/><br/>";
+ // $request->setLastUpdatedAfter($date."T".$time."Z");
+ // invokeListOrders($service, $request, $request2);
 
-// $date = date('Y-m-d');
-// $time = date('H:i:s');
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $date = date('Y-m-d');
-// $time = date('H:i:s', time()-3600);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
+ // sleep(3);
 
-$date = date('Y-m-d', strtotime('-1 days'));
-$time = date('H:i:s', time() + 5400);
-echo "Time: ".$date."T".$time."Z<br/><br/>";
-$request->setLastUpdatedAfter($date."T".$time."Z");
-invokeListOrders($service, $request, $request2);
+ // $date = date('Y-m-d', strtotime('-3 days'));
+ // $time = date('H:i:s', time() - 3600);
+ // echo "Time: ".$date."T".$time."Z<br/><br/>";
+ // $request->setLastUpdatedAfter($date."T".$time."Z");
+ // invokeListOrders($service, $request, $request2);
 
-sleep(3);
+ // sleep(3);
 
-$date = date('Y-m-d', strtotime('-1 days'));
-$time = date('H:i:s');
-echo "Time: ".$date."T".$time."Z<br/><br/>";
-$request->setLastUpdatedAfter($date."T".$time."Z");
-invokeListOrders($service, $request, $request2);
+ // $date = date('Y-m-d', strtotime('-2 days'));
+ // $time = date('H:i:s', time() - 3600);
+ // echo "Time: ".$date."T".$time."Z<br/><br/>";
+ // $request->setLastUpdatedAfter($date."T".$time."Z");
+ // invokeListOrders($service, $request, $request2);
 
-sleep(3);
+ // sleep(3);
 
-$date = date('Y-m-d', strtotime('-1 days'));
-$time = date('H:i:s', time() + 9000);
-echo "Time: ".$date."T".$time."Z<br/><br/>";
-$request->setLastUpdatedAfter($date."T".$time."Z");
-invokeListOrders($service, $request, $request2);
-
-sleep(3);
-
-$date = date('Y-m-d', strtotime('-1 days'));
-$time = date('H:i:s', time() + 18000);
-echo "Time: ".$date."T".$time."Z<br/><br/>";
-$request->setLastUpdatedAfter($date."T".$time."Z");
-invokeListOrders($service, $request, $request2);
-
-sleep(3);
-
-$date = date('Y-m-d');
-$time = date('H:i:s', time()-18000);
-echo "Time: ".$date."T".$time."Z<br/><br/>";
-$request->setLastUpdatedAfter($date."T".$time."Z");
-invokeListOrders($service, $request, $request2);
-
-sleep(3);
-
-$date = date('Y-m-d');
-$time = date('H:i:s', time() - 9000);
-echo "Time: ".$date."T".$time."Z<br/><br/>";
-$request->setLastUpdatedAfter($date."T".$time."Z");
-invokeListOrders($service, $request, $request2);
-
-sleep(3);
-
-$date = date('Y-m-d', strtotime('-2 days'));
-$time = date('H:i:s', time() + 18000);
-echo "Time: ".$date."T".$time."Z<br/><br/>";
-$request->setLastUpdatedAfter($date."T".$time."Z");
-invokeListOrders($service, $request, $request2);
-
-sleep(3);
-
-$date = date('Y-m-d', strtotime('-3 days'));
-$time = date('H:i:s', time() + 18000);
-echo "Time: ".$date."T".$time."Z<br/><br/>";
-$request->setLastUpdatedAfter($date."T".$time."Z");
-invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d', strtotime('-10 days'));
-// $time = date('H:i:s', time() + 18000);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d', strtotime('-15 days'));
-// $time = date('H:i:s', time() + 18000);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d', strtotime('-1 days'));
-// $time = date('H:i:s', time() + 9000);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d', strtotime('-1 days'));
-// $time = date('H:i:s', time() + 18000);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d', strtotime('-1 days'));
-// $time = date('H:i:s', time() + 27000);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d', strtotime('-1 days'));
-// $time = date('H:i:s', time() + 36000);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d', strtotime('-1 days'));
-// $time = date('H:i:s', time() + 45000);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d', strtotime('-1 days'));
-// $time = date('H:i:s', time() + 54000);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d', strtotime('-1 days'));
-// $time = date('H:i:s', time() + 63000);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d', strtotime('-1 days'));
-// $time = date('H:i:s', time() + 72000);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d', strtotime('-1 days'));
-// $time = date('H:i:s', time() + 81000);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d', strtotime('-1 days'));
-// $time = date('H:i:s', time() + 90000);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d');
-// $time = date('H:i:s');
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d');
-// $time = date('H:i:s', time() + 1800);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d');
-// $time = date('H:i:s', time() + 3600);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
+ $date = date('Y-m-d', strtotime('-1 days'));
+ $time = date('H:i:s', time() - 3600);
+ echo "Time: ".$date."T".$time."Z<br/><br/>";
+ $request->setLastUpdatedAfter($date."T".$time."Z");
+ invokeListOrders($service, $request, $request2);
 
 /**
   * Get List Orders Action Sample
@@ -344,14 +185,6 @@ invokeListOrders($service, $request, $request2);
           try {
             $row = $Order[$i];
 
-            $AmazonOrderId = $row->AmazonOrderId;
-            $OrderStatus = $row->OrderStatus;
-            $FulfillmentChannel = $row->FulfillmentChannel;
-
-            // if($AmazonOrderId!='408-3029702-8198761'){
-            //   continue;
-            // }
-
             echo json_encode($row);
             echo '<br/><br/>';
             // $AmazonOrderId = $row->AmazonOrderId;
@@ -370,6 +203,10 @@ invokeListOrders($service, $request, $request2);
             // $ShippingAddress = $row->ShippingAddress;
             // echo json_encode($ShippingAddress);
             // echo '<br/>';
+
+            $AmazonOrderId = $row->AmazonOrderId;
+            $OrderStatus = $row->OrderStatus;
+            $FulfillmentChannel = $row->FulfillmentChannel;
 
             $bl_place_order = false;
 
@@ -480,8 +317,8 @@ invokeListOrders($service, $request, $request2);
             for($j=0; $j<count($OrderItem); $j++) {
               $row2 = $OrderItem[$j];
 
-              // echo json_encode($row2);
-              // echo '<br/><br/>';
+              echo json_encode($row2);
+              echo '<br/><br/>';
 
               $ASIN = '';
               $OrderItemId = '';
@@ -559,15 +396,6 @@ invokeListOrders($service, $request, $request2);
                     continue;
                   }
                 }
-
-                if($fc_id=='') {
-                  echo 'Order No '.$AmazonOrderId.' & Order Item Id '.$OrderItemId.' fulfillment details not found.<br/><br/>';
-                  continue;
-                }
-                if($depot_id=='') {
-                  echo 'Order No '.$AmazonOrderId.' & Order Item Id '.$OrderItemId.' depot state not found.<br/><br/>';
-                  continue;
-                }
               }
 
               $tax_type = 'Intra';
@@ -606,20 +434,13 @@ invokeListOrders($service, $request, $request2);
               }
 
               $total_amt = $ItemAmt - $PromotionAmt;
-
-              if(strtoupper(trim($FulfillmentChannel))=='MFN'){
-                $qty = $QuantityOrdered;
-              } else {
-                $qty = $QuantityShipped;
-              }
-              
-              $total_order_amt = $total_order_amt + ($qty*$item_rate);
+              $total_order_amt = $total_order_amt + ($QuantityShipped*$item_rate);
 
               $item_data[$j] = array(
                               'distributor_out_id' => 0,
                               'type' => 'Box',
                               'item_id' => $item_id,
-                              'qty' => $qty,
+                              'qty' => $QuantityShipped,
                               'sell_rate' => $item_rate,
                               'grams' => $item_grams,
                               'rate' => $item_rate,
@@ -639,9 +460,6 @@ invokeListOrders($service, $request, $request2);
                           );
             }
 
-            // echo json_encode($item_data);
-            // echo '<br/><br/>';
-
             $total_discount_amt = $total_order_amt - $OrderAmt;
             $discount_per = 0;
             if($total_order_amt!=0){
@@ -654,7 +472,7 @@ invokeListOrders($service, $request, $request2);
             // echo '<br/>';
             // echo 'total_discount_amt: '.$total_discount_amt;
             // echo '<br/>';
-            // echo 'discount_per: '.$discount_per;
+            // echo 'dicount_per: '.$dicount_per;
             // echo '<br/><br/><br/>';
 
             $tot_amount = 0;
@@ -665,12 +483,7 @@ invokeListOrders($service, $request, $request2);
             $tot_order_amount = 0;
             $k = 0;
 
-            $order_item_data = array();
-
             for($j=0; $j<count($item_data); $j++) {
-              // echo json_encode($item_data[$j]);
-              // echo '<br/><br/>';
-
               $distributor_out_id = $item_data[$j]['distributor_out_id'];
               $type = $item_data[$j]['type'];
               $item_id = $item_data[$j]['item_id'];
@@ -724,25 +537,23 @@ invokeListOrders($service, $request, $request2);
               // $tot_sgst_amount = $tot_sgst_amount + $sgst_amt;
               // $tot_igst_amount = $tot_igst_amount + $igst_amt;
 
-              $l=$j;
-
               $bl_flag = false;
               for($k=0; $k<count($order_data); $k++) {
                 if($order_data[$k]['fc_id']==$fc_id) {
                   $bl_flag = true;
 
                   $k = $k;
-                  $order_item_data = array();
-                  $order_item_data = $order_data[$k]['item_data'];
-                  $l = count($order_item_data);
+                  $item_data = array();
+                  $item_data = $order_data[$k]['item_data'];
+                  $j = count($item_data);
 
-                  $order_data[$k]['amount'] = $order_data[$k]['amount'] + $amount;
-                  $order_data[$k]['tax_amount'] = $order_data[$k]['tax_amount'] + $tax_amt;
-                  $order_data[$k]['final_amount'] = $order_data[$k]['final_amount'] + $total_amt;
+                  $order_data[$k]['tot_amount'] = $order_data[$k]['tot_amount'] + $amount;
+                  $order_data[$k]['tot_tax_amount'] = $order_data[$k]['tot_tax_amount'] + $tax_amt;
+                  $order_data[$k]['tot_order_amount'] = $order_data[$k]['tot_order_amount'] + $total_amt;
 
-                  $order_data[$k]['cgst_amount'] = $order_data[$k]['cgst_amount'] + $cgst_amt;
-                  $order_data[$k]['sgst_amount'] = $order_data[$k]['sgst_amount'] + $sgst_amt;
-                  $order_data[$k]['igst_amount'] = $order_data[$k]['igst_amount'] + $igst_amt;
+                  $order_data[$k]['tot_cgst_amount'] = $order_data[$k]['tot_cgst_amount'] + $cgst_amt;
+                  $order_data[$k]['tot_sgst_amount'] = $order_data[$k]['tot_sgst_amount'] + $sgst_amt;
+                  $order_data[$k]['tot_igst_amount'] = $order_data[$k]['tot_igst_amount'] + $igst_amt;
 
                   break;
                 }
@@ -750,13 +561,8 @@ invokeListOrders($service, $request, $request2);
 
               if($bl_flag==false) {
                 $k = count($order_data);
-                $order_item_data = array();
-                $l = 0;
-
-                // echo $k;
-                // echo '<br/><br/>';
-                // echo $AmazonOrderId;
-                // echo '<br/><br/>';
+                $item_data = array();
+                $j = 0;
 
                 if($k==0) {
                   $order_data[$k]['order_no'] = $AmazonOrderId;
@@ -764,18 +570,17 @@ invokeListOrders($service, $request, $request2);
                   $order_data[$k]['order_no'] = $AmazonOrderId.'$'.$k;
                 }
                 
-                $order_data[$k]['amount'] = $amount;
-                $order_data[$k]['tax_amount'] = $tax_amt;
-                $order_data[$k]['final_amount'] = $total_amt;
+                
+                $order_data[$k]['tot_amount'] = $amount;
+                $order_data[$k]['tot_tax_amount'] = $tax_amt;
+                $order_data[$k]['tot_order_amount'] = $total_amt;
 
-                $order_data[$k]['cgst_amount'] = $cgst_amt;
-                $order_data[$k]['sgst_amount'] = $sgst_amt;
-                $order_data[$k]['igst_amount'] = $igst_amt;
-
-                $order_data[$k]['fc_id']=$fc_id;
+                $order_data[$k]['tot_cgst_amount'] = $cgst_amt;
+                $order_data[$k]['tot_sgst_amount'] = $sgst_amt;
+                $order_data[$k]['tot_igst_amount'] = $igst_amt;
               }
 
-              $order_item_data[$l] = array(
+              $item_data[$j] = array(
                               'distributor_out_id' => $distributor_out_id,
                               'type' => $type,
                               'item_id' => $item_id,
@@ -798,7 +603,7 @@ invokeListOrders($service, $request, $request2);
                               'tax_type' => $tax_type
                           );
 
-              $tot_order_amount = $order_data[$k]['final_amount'];
+              $tot_order_amount = $order_data[$k]['tot_order_amount'];
 
               $distributor_id = '214';
 
@@ -819,21 +624,16 @@ invokeListOrders($service, $request, $request2);
                 $delivery_date="'".$curdate."'";
               }
 
-              // $round_off_amt = round(round($tot_order_amount,0) - round($tot_order_amount,2),2);
-              // $invoice_amount = round($tot_order_amount,0);
-              // $delivery_status='Delivered';
-              // $delivery_date="'".$curdate."'";
-
               $order_data[$k]['date_of_processing'] = $curdate;
               $order_data[$k]['invoice_no'] = '';
               $order_data[$k]['depot_id'] = $depot_id;
               $order_data[$k]['distributor_id'] = $distributor_id;
               $order_data[$k]['sales_rep_id'] = Null;
-              // $order_data[$k]['amount'] = $tot_amount;
+              $order_data[$k]['amount'] = $tot_amount;
               $order_data[$k]['tax'] = Null;
               $order_data[$k]['tax_per'] = 1;
-              // $order_data[$k]['tax_amount'] = $tot_tax_amount;
-              // $order_data[$k]['final_amount'] = $tot_order_amount;
+              $order_data[$k]['tax_amount'] = $tot_tax_amount;
+              $order_data[$k]['final_amount'] = $tot_order_amount;
               $order_data[$k]['due_date'] = $curdate;
               $order_data[$k]['order_date'] = $order_date;
               $order_data[$k]['supplier_ref'] = Null;
@@ -862,9 +662,9 @@ invokeListOrders($service, $request, $request2);
               $order_data[$k]['cgst'] = 1;
               $order_data[$k]['sgst'] = 1;
               $order_data[$k]['igst'] = 1;
-              // $order_data[$k]['cgst_amount'] = $tot_cgst_amount;
-              // $order_data[$k]['sgst_amount'] = $tot_sgst_amount;
-              // $order_data[$k]['igst_amount'] = $tot_igst_amount;
+              $order_data[$k]['cgst_amount'] = $tot_cgst_amount;
+              $order_data[$k]['sgst_amount'] = $tot_sgst_amount;
+              $order_data[$k]['igst_amount'] = $tot_igst_amount;
               $order_data[$k]['reverse_charge'] = 'no';
               $order_data[$k]['shipping_address'] = 'yes';
               $order_data[$k]['distributor_consignee_id'] = Null;
@@ -889,14 +689,9 @@ invokeListOrders($service, $request, $request2);
               $order_data[$k]['created_by'] = $curusr;
               $order_data[$k]['created_on'] = $now;
 
-              $order_data[$k]['fc_id'] = $fc_id;
-              $order_data[$k]['depot_state'] = $depot_state;
-
-              $order_data[$k]['item_data'] = $order_item_data;
+              $order_data[$k]['item_data'] = $item_data;
             }
 
-            echo json_encode($order_data);
-            echo '<br/><br/>';
 
             for($k=0; $k<count($order_data); $k++) {
               $depot_id = $order_data[$k]['depot_id'];
@@ -914,7 +709,7 @@ invokeListOrders($service, $request, $request2);
 
               $item_data = $order_data[$k]['item_data'];
 
-              if(strtoupper(trim($FulfillmentChannel))=='MFN' || $invoice_amount>0){
+              if($invoice_amount>0){
                 $sql = "insert into distributor_out (date_of_processing, invoice_no, depot_id, distributor_id, sales_rep_id, amount, tax, tax_per, tax_amount, final_amount, due_date, order_no, order_date, supplier_ref, despatch_doc_no, despatch_through, destination, status, remarks, modified_by, modified_on, client_name, address, city, pincode, state, country, mobile_no, discount, sample_distributor_id, date_of_dispatch, delivery_status, delivery_date, delivery_sales_rep_id, transport_type, vehicle_number, cgst, sgst, igst, cgst_amount, sgst_amount, igst_amount, reverse_charge, shipping_address, distributor_consignee_id, con_name, con_address, con_city, con_pincode, con_state, con_country, con_state_code, con_gst_number, state_code, round_off_amount, invoice_amount, ref_id, invoice_date, email_date_time, basis_of_sales, email_from, email_approved_by, gstin, created_by, created_on) VALUES ('".$curdate."', '', '".$depot_id."', '".$distributor_id."', Null, ".$tot_amount.", Null, 1, ".$tot_tax_amount.", ".$tot_order_amount.", '".$curdate."', '".$AmazonOrderId."', '".$order_date."', Null, Null, Null, Null, 'Pending', 'This is system generated entry.', '".$curusr."', '".$now."', '".$client_name."', '".$address."', '".$city."', '".$pincode."', '".$state."', '".$country."', '".$phone."', ".$discount_per.", Null, '".$curdate."', '".$delivery_status."', ".$delivery_date.", '".$sales_rep_id."', '', '', 1, 1, 1, ".$tot_cgst_amount.", ".$tot_sgst_amount.", ".$tot_igst_amount.", 'no', 'yes', Null, Null, Null, Null, Null, Null, Null, Null, Null, '".$state_code."', ".$round_off_amt.", ".$invoice_amount.", Null, Null, '".$now."', 'PO Number', '', '', '', '".$curusr."', '".$now."')";
                 if ($conn->query($sql) === TRUE) {
                   $distributor_out_id = $conn->insert_id;

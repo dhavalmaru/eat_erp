@@ -65,7 +65,8 @@ function get_data($status='', $id=''){
 }
 
 function get_purchase_order_items($id){
-    $sql = "select * from purchase_order_items where purchase_order_id = '$id'";
+    $sql = "select A.*, B.rate as old_rate from purchase_order_items A left join raw_material_master B on (A.item_id=B.id) 
+            where A.purchase_order_id = '$id'";
     $query=$this->db->query($sql);
     return $query->result();
 }
@@ -555,7 +556,7 @@ function send_email($id){
 
                 echo $attachment = $pdfFilePath;
                 /*$mailSent=send_email($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc);*/
-                /*$to_email = 'sangeeta.yadav@pecanreams.com';*/
+                /*$to_email = 'prasad.bhisale@otbconsulting.co.in';*/
 
                 $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc,'',$attachment);
                   if ($mailSent==1) {

@@ -39,13 +39,13 @@ function set_email_details($email_ref_id, $email_type, $email_from, $email_sende
     // $email_type = 'distributor_po_mismatch';
     // $email_from = 'cs@eatanytime.in';
     // $email_sender = 'Wholesome Habits Pvt Ltd';
-    // $email_to = 'prasad.bhisale@pecanreams.com';
-    // $email_cc = 'prasad.bhisale@pecanreams.com';
-    // $email_bcc = 'prasad.bhisale@pecanreams.com';
+    // $email_to = 'prasad.bhisale@otbconsulting.co.in';
+    // $email_cc = 'prasad.bhisale@otbconsulting.co.in';
+    // $email_bcc = 'prasad.bhisale@otbconsulting.co.in';
     // $email_subject = 'PO Amount Mismatch';
     // $email_body = 'Hi, PO Amount Mismatch Regards, Team EatAnyTime';
     
-    $email_cc = 'dhaval.maru@pecanreams.com';
+    $email_cc = 'dhaval.maru@otbconsulting.co.in';
 
     $message = '<html>
                     <head>
