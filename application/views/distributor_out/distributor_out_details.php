@@ -467,7 +467,14 @@
                                     </div>
 									</div>
 									
-									
+									<div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Shipping Charges <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="shipping_charges" id="shipping_charges" placeholder="Shipping Charges" value="<?php if(isset($data)) { echo $data[0]->shipping_charges; } ?>"/>
+                                            </div>
+                                        </div>
+                                    </div>
 									<div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-6 col-sm-6 col-xs-12 control-label"  >Round Off Amount (In Rs)<span class="asterisk_sign">*</span>:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span id="round_off_amount1"> <?php if (isset($data)) { echo $data[0]->round_off_amount; } ?></span></label>
@@ -1081,7 +1088,7 @@
                 $('.order_ref').hide();
 				
                 if($('#sample_distributor_id').val()!=''){
-                    get_distributor_details($('#sample_distributor_id').val());
+                    get_distributor_details($('#sample_distributor_id').val(), false);
                     // console.log('4');
                 }
 				$("#basis_of_sales").change(function(){
@@ -1136,11 +1143,18 @@
                         //if(data.result==1){
                             // console.log(data.state);
                             //alert($('#distributor_id').val());
-                            if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550" && $('#distributor_id').val()!="622" && $('#distributor_id').val()!="626" && $('#distributor_id').val()!="640" && $('#distributor_id').val()!="1299" && $('#distributor_id').val()!="1319" && $('#distributor_id').val()!="1327" && $('#distributor_id').val()!="1352" && $('#distributor_id').val()!="1379" && $('#distributor_id').val()!="1381" && $('#distributor_id').val()!="1416") {
-                                // alert($('#distributor_id').val());
+                            // if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550" && $('#distributor_id').val()!="622" && $('#distributor_id').val()!="626" && $('#distributor_id').val()!="640" && $('#distributor_id').val()!="1299" && $('#distributor_id').val()!="1319" && $('#distributor_id').val()!="1327" && $('#distributor_id').val()!="1352" && $('#distributor_id').val()!="1379" && $('#distributor_id').val()!="1381" && $('#distributor_id').val()!="1416") {
+                            //     // alert($('#distributor_id').val());
+                            //     $('#state').val(data.state);
+                            //     $('#state_code').val(data.state_code);
+                            // }
+
+                            var dist_class = $('#class').val();
+                            if(dist_class.toUpperCase().trim()!="DIRECT"){
                                 $('#state').val(data.state);
                                 $('#state_code').val(data.state_code);
                             }
+
                             // alert(data.state);
                             get_sell_rate();
 
@@ -1277,12 +1291,18 @@
                             if($('#distributor_id').val()!=""){
                                 $('#distributor_name').val(data.product_name);
                             }
+                            $('#class').val(data.class);
 
-                            if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550" && $('#distributor_id').val()!="622" && $('#distributor_id').val()!="626" && $('#distributor_id').val()!="640" && $('#distributor_id').val()!="1299" && $('#distributor_id').val()!="1319" && $('#distributor_id').val()!="1327" && $('#distributor_id').val()!="1352" && $('#distributor_id').val()!="1379" && $('#distributor_id').val()!="1381" && $('#distributor_id').val()!="1416") {
+                            // if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550" && $('#distributor_id').val()!="622" && $('#distributor_id').val()!="626" && $('#distributor_id').val()!="640" && $('#distributor_id').val()!="1299" && $('#distributor_id').val()!="1319" && $('#distributor_id').val()!="1327" && $('#distributor_id').val()!="1352" && $('#distributor_id').val()!="1379" && $('#distributor_id').val()!="1381" && $('#distributor_id').val()!="1416") {
+                            //     $('#state').val(data.state);
+                            //     $('#state_code').val(data.state_code);
+                            // }
+
+                            var dist_class = data.class;
+                            if(dist_class.toUpperCase().trim()!="DIRECT"){
                                 $('#state').val(data.state);
                                 $('#state_code').val(data.state_code);
                             }
-                            $('#class').val(data.class);
                             $('#sales_rep_id').val(data.sales_rep_id);
                             $('#sales_rep_id').trigger('change');
                             // $("#sales_rep_id").select2("val", data.sales_rep_id);
@@ -1349,7 +1369,13 @@
                     }
                 });
 
-                if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352 || distributor_id==1379 || distributor_id==1381 || distributor_id==1416){
+                // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352 || distributor_id==1379 || distributor_id==1381 || distributor_id==1416){
+                //     $('.direct').show();
+                // } else {
+                //     $('.direct').hide();
+                // }
+
+                if($('#class').val()=='direct'){
                     $('.direct').show();
                 } else {
                     $('.direct').hide();
@@ -1754,13 +1780,33 @@
                 $("#tax_amount").val(tax_amt.toFixed(2));
                 $("#final_amount").val(final_amt.toFixed(2));
 
-                var round_off_amt = Math.round(final_amt) - (Math.round(final_amt*100)/100);
+                var shipping_charges = parseFloat(get_number($('#shipping_charges').val(),2));
+                if (isNaN(shipping_charges)) shipping_charges=0;
+
+                var invoice_amt = final_amt + shipping_charges;
+
+                var round_off_amt = Math.round(invoice_amt) - (Math.round(invoice_amt*100)/100);
 
                 $("#round_off_amount").val(round_off_amt.toFixed(2));
-                $("#invoice_amount").val(final_amt.toFixed(0));
+                $("#invoice_amount").val(Math.round(invoice_amt));
 				$("#round_off_amount1").text(round_off_amt.toFixed(2));
-                $("#invoice_amount1").text(final_amt.toFixed(0));
+                $("#invoice_amount1").text(Math.round(invoice_amt));
             }
+
+            $('#shipping_charges').on('change', function(){
+                var shipping_charges = parseFloat(get_number($('#shipping_charges').val(),2));
+                if (isNaN(shipping_charges)) shipping_charges=0;
+                var final_amt = parseFloat(get_number($('#final_amount').val(),2));
+                if (isNaN(final_amt)) final_amt=0;
+
+                var invoice_amt = final_amt + shipping_charges;
+                var round_off_amt = Math.round(invoice_amt) - (Math.round(invoice_amt*100)/100);
+
+                $("#round_off_amount").val(round_off_amt.toFixed(2));
+                $("#invoice_amount").val(Math.round(invoice_amt));
+                $("#round_off_amount1").text(round_off_amt.toFixed(2));
+                $("#invoice_amount1").text(Math.round(invoice_amt));
+            });
 
             $(document).ready(function(){
                 $.each($('.cgst_amt'), function(i, item) {

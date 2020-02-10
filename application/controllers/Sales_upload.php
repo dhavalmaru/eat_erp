@@ -132,18 +132,17 @@ class Sales_upload extends CI_Controller{
         $objPHPExcel->getSheetByName('Sheet2')->setSheetState(PHPExcel_Worksheet::SHEETSTATE_HIDDEN);
         $filename='sales_upload_format.xlsx';
         
-        // header('Content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        // header('Content-Disposition: attachment;filename="'.$filename.'"');
-        // header('Cache-Control: max-age=0');
-        // $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
-        // $objWriter->save('php://output');
-
-        header('Content-Type: application/pdf');
-        header('Content-Disposition: attachment;filename="01simple.pdf"');
+        header('Content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="'.$filename.'"');
         header('Cache-Control: max-age=0');
-
-        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'PDF');
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
         $objWriter->save('php://output');
+
+        // header('Content-Type: application/pdf');
+        // header('Content-Disposition: attachment;filename="01simple.pdf"');
+        // header('Cache-Control: max-age=0');
+        // $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'PDF');
+        // $objWriter->save('php://output');
     }
 
     public function test(){

@@ -382,8 +382,8 @@
                 $tot_igst_amt=0;
                 $tot_gst_amt=0;
 
-                $tax_desc_body='<td width="840" colspan="4" rowspan="3" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;padding:0;">
-                    <table style="width: 100%;border-spacing: 0;height: 100%; min-height: 100%">
+                $tax_desc_body='<td width="840" colspan="4" rowspan="4" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;padding:0;">
+                    <table style="width: 100%;border-spacing: 0;height: 83px; min-height: 83px;">
                         <tr>
                             <td colspan="2" style="border-right:1px solid #666;border-bottom:0px solid #666;text-align: center;font-weight:900;background:#ececec">CGST</td>
                             <td colspan="2" style="border-right:1px solid #666;border-bottom:0px solid #666;text-align: center;font-weight:900;background:#ececec">SGST</td>
@@ -448,6 +448,13 @@
             <td style=" font-size:10px; font-weight:900; background:#ececec;">  
                 <span style="text-align:left; float:left"> &#8377; </span> 
                 <span style="text-align:right; float:right"><?php if (isset($tot_gst_amt)) echo $tot_gst_amt; ?></span> 
+            </td>
+        </tr>
+        <tr>
+            <td colspan="1" valign="top" style="font-size:10px; font-weight:500;">Shipping Amount</td>
+            <td style=" font-size:10px; font-weight:500;"  >  
+                <span style="text-align:left; float:left"> &#8377; </span> 
+                <span style="text-align:right; float:right"><?php if (isset($invoice_details[$inv_cnt]['shipping_charges'])) echo $invoice_details[$inv_cnt]['shipping_charges']; ?></span> 
             </td>
         </tr>
         <tr>
@@ -883,6 +890,13 @@
             </td>
         </tr>
         <tr>
+            <td colspan="1" valign="top" style="font-size:10px; font-weight:500;">Shipping Amount</td>
+            <td style=" font-size:10px; font-weight:500;"  >  
+                <span style="text-align:left; float:left"> &#8377; </span> 
+                <span style="text-align:right; float:right"><?php if (isset($invoice_details[$inv_cnt]['shipping_charges'])) echo $invoice_details[$inv_cnt]['shipping_charges']; ?></span> 
+            </td>
+        </tr>
+        <tr>
             <td colspan="1" valign="top" style="font-size:10px; font-weight:500;">Round Off Amount</td>
             <td style=" font-size:10px; font-weight:500;"  >  
                 <span style="text-align:left; float:left"> &#8377; </span> 
@@ -1310,6 +1324,13 @@
             <td  style=" font-size:10px; font-weight:900;background:#ececec;">  
                 <span style="text-align:left; float:left"> &#8377; </span> 
                 <span style="text-align:right; float:right"><?php if (isset($tot_gst_amt)) echo $tot_gst_amt; ?></span> 
+            </td>
+        </tr>
+        <tr>
+            <td colspan="1" valign="top" style="font-size:10px; font-weight:500;">Shipping Amount</td>
+            <td style=" font-size:10px; font-weight:500;"  >  
+                <span style="text-align:left; float:left"> &#8377; </span> 
+                <span style="text-align:right; float:right"><?php if (isset($invoice_details[$inv_cnt]['shipping_charges'])) echo $invoice_details[$inv_cnt]['shipping_charges']; ?></span> 
             </td>
         </tr>
         <tr>

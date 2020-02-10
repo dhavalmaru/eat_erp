@@ -194,7 +194,7 @@ class Attendance extends CI_Controller{
 
 
             $objPHPExcel->setActiveSheetIndex(1);
-            $sqlqueries = "select * from distributor_master where class='normal' and type_id=3 and status='Approved'";
+            $sqlqueries = "select * from distributor_master where class in ('normal', 'direct') and type_id=3 and status='Approved'";
              $row = 1;
 
             $distributor_result  = $this->db->query($sqlqueries)->result();
@@ -435,7 +435,7 @@ class Attendance extends CI_Controller{
                         $inactive=$inactive+1;
                     else if (strtoupper(trim($count_data[$i]->status))=="PENDING")
                         $pending=$pending+1;
-                    else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && strtoupper(trim($count_data[$i]->class))=="NORMAL")
+                    else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && (strtoupper(trim($count_data[$i]->class))=="NORMAL" || strtoupper(trim($count_data[$i]->class))=="DIRECT"))
                         $retailer=$retailer+1;
                 }
             }

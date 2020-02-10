@@ -53,21 +53,16 @@
     			<div class="nav-contacts ng-scope" ui-view="@nav">
     				<div class="u-borderBottom u-bgColorBreadcrumb ng-scope">
     					<div class="container u-posRelative u-textRight">
-    						<div class="pull-left   btn-top" style="<?php if($access[0]->r_insert=='0') echo 'display: none;';?>">
+    						<div class="pull-left btn-top" style="<?php if($access[0]->r_insert=='0') echo 'display: none;';?> margin-right: 5px;">
     							<a class="btn btn-success btn-block btn-padding" href="<?php echo base_url(); ?>index.php/Distributor/add">
     								<span class="fa fa-plus"></span> Add Distributor/Retailer
     							</a>
-
-
     						</div>
-    						<div class="pull-left   btn-top" style="<?php if($access[0]->r_view=='0') echo 'display: none;';?>">
+    						<div class="pull-left btn-top" style="<?php if($access[0]->r_view=='0') echo 'display: none;';?>">
     							<a class="btn btn-success btn-block btn-padding" href="<?php echo base_url(); ?>index.php/Distributor/locations" target="_blank">
     								<span class="fa fa-plus"></span> Distributor Locations
     							</a>
-
-
     						</div>
-
 
     						<ul class="m-nav--linetriangle" ng-swipe-left="app.onInnerSwipe($event);" ng-swipe-right="app.onInnerSwipe($event);">
     							<li class="all">

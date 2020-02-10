@@ -141,7 +141,7 @@ function get_data($status='', $id='', $frequency='', $temp_date='', $sales_rep_i
             (select * from distributor_master) A 
             left join sr_mapping B 
             on (A.area_id = B.area_id and A.zone_id = B.zone_id and  A.type_id = B.type_id) 
-            where A.status='approved' and A.class='normal') B 
+            where A.status='approved' and A.class in ('normal', 'direct')) B 
             union 
             (select concat('s_',A.id) as id, A.distributor_name, '' as google_address, A.latitude, 
                 A.longitude, A.gst_number, A.margin, A.doc_document, A.document_name from 
@@ -235,7 +235,7 @@ public function get_lat_long($store_id) {
                 Select concat('d_',A.id) as id , A.distributor_name ,A.google_address,A.latitude,A.longitude,'' as gst_number,'' as margin,'' as doc_document,' ' as document_name FROM
                 (Select * from distributor_master )A
                 LEFT JOIN sr_mapping B ON (A.area_id = B.area_id and A.zone_id = B.zone_id and  A.type_id = B.type_id) 
-                Where A.status='approved' and A.class='normal'
+                Where A.status='approved' and A.class in ('normal', 'direct') 
             ) B
             Union 
             (
@@ -924,7 +924,7 @@ function save_data($id='',$status='') {
                                                 Select concat('d_',A.id) as id , A.distributor_name ,A.area_id,A.zone_id,A.location_id FROM
                                                 (Select * from distributor_master )A
                                                 LEFT JOIN sr_mapping B ON (A.area_id = B.area_id and A.zone_id = B.zone_id and  A.type_id = B.type_id) 
-                                                Where A.status='approved' and A.class='normal'
+                                                Where A.status='approved' and A.class in ('normal', 'direct') 
                                         ) B
                                         Union 
                                         (
@@ -1041,7 +1041,7 @@ function save_data($id='',$status='') {
                                                 Select concat('d_',A.id) as id , A.distributor_name ,A.area_id,A.zone_id,A.location_id FROM
                                                 (Select * from distributor_master )A
                                                 LEFT JOIN sr_mapping B ON (A.area_id = B.area_id and A.zone_id = B.zone_id and  A.type_id = B.type_id) 
-                                                Where A.status='approved' and A.class='normal'
+                                                Where A.status='approved' and A.class in ('normal', 'direct') 
                                         ) B
                                         Union 
                                         (
@@ -3972,7 +3972,7 @@ public function get_gtfollowup($id='', $temp_date='', $sales_rep_id='') {
             left join 
             sr_mapping B 
             on (A.area_id = B.area_id and A.zone_id = B.zone_id and A.type_id = B.type_id) 
-            Where A.status='approved' and A.class='normal') B 
+            Where A.status='approved' and A.class in ('normal', 'direct')) B 
             union 
             (select concat('s_',A.id) as id, A.distributor_name, '' as google_address, A.latitude, 
                 A.longitude, A.gst_number, A.margin, A.doc_document, A.document_name from 
@@ -4088,7 +4088,7 @@ public function get_todaysorder($sales_rep_id='') {
             left join 
             sr_mapping B 
             on (A.area_id = B.area_id and A.zone_id = B.zone_id and  A.type_id = B.type_id) 
-            where A.status='approved' and A.class='normal') B 
+            where A.status='approved' and A.class in ('normal', 'direct')) B 
             Union 
             (select concat('s_',A.id) as id, A.distributor_name, '' as google_address, A.latitude, 
                 A.longitude, A.gst_number, A.margin, A.doc_document, A.document_name from 
@@ -4166,7 +4166,7 @@ public function get_pendingsorder($sales_rep_id='') {
             left join 
             sr_mapping B 
             on (A.area_id = B.area_id and A.zone_id = B.zone_id and  A.type_id = B.type_id) 
-            where A.status='approved' and A.class='normal') B 
+            where A.status='approved' and A.class in ('normal', 'direct')) B 
             Union 
             (select concat('s_',A.id) as id, A.distributor_name, '' as google_address, A.latitude, A.longitude, 
                 A.gst_number, A.margin, A.doc_document, A.document_name from 

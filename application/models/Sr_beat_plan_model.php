@@ -235,7 +235,7 @@ public function get_sales_rep_daily_route_plan($frequency='') {
                             Select concat('d_',A.id) as id , A.distributor_name   FROM
                             (Select * from distributor_master )A
                             LEFT JOIN sr_mapping B ON (A.area_id = B.area_id and A.zone_id = B.zone_id and  A.type_id = B.type_id) 
-                            Where A.status='approved' and A.class='normal'
+                            Where A.status='approved' and A.class in ('normal', 'direct')
                     ) B
                     Union 
                     (

@@ -3111,13 +3111,13 @@ function get_distributor($status='', $id='', $class=''){
     }
 
     if($class!=""){
-        if($class=='normal')
-            {
-                if($cond=="") {
-                  $cond=" where class IN ('normal','super stockist')";
-                } else {
-                    $cond=$cond." and class IN ('normal','super stockist')";
-                }
+        if(strtoupper(trim($class))=='NORMAL' || strtoupper(trim($class))=='DIRECT')
+        {
+            if($cond=="") {
+              $cond=" where class IN ('normal','direct','super stockist')";
+            } else {
+                $cond=$cond." and class IN ('normal','direct','super stockist')";
+            }
         }
         else
         {

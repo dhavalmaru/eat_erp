@@ -895,7 +895,7 @@ $("#form_distributor_details").validate({
         location_id: {
             required: {
                 depends: function() {
-                    return ($('#classes').val() == "normal");
+                    return ($('#classes').val() == "normal" || $('#classes').val() == "direct");
                 }
             }
         },
@@ -916,6 +916,13 @@ $("#form_distributor_details").validate({
         },
         'pro_margin[]': {
             required: true
+        },
+        prefix: {
+            required: {
+                depends: function() {
+                    return ($('#classes').val() == "direct");
+                }
+            }
         }
     },
 

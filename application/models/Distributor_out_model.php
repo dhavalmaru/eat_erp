@@ -60,7 +60,7 @@ function get_data($status='', $id=''){
             G.vehicle_number, G.cgst, G.sgst, G.igst, G.cgst_amount, G.sgst_amount, G.igst_amount, G.reverse_charge, 
             G.shipping_address, G.distributor_consignee_id, G.con_name, G.con_address, G.con_city, G.con_pincode, 
             G.con_state, G.con_country, G.con_state_code, G.con_gst_number, G.state_code, G.round_off_amount, G.invoice_amount, G.ref_id, 
-            G.invoice_date,G.gatepass_date,G.freezed,G.gstin from 
+            G.invoice_date,G.gatepass_date,G.freezed,G.gstin,G.shipping_charges from 
             (select E.*, F.sales_rep_name from 
             (select C.*, D.depot_name, D.address as depot_address, D.city as depot_city, D.pincode as depot_pincode, 
                 D.state as depot_state, D.state_code as depot_state_code, D.country as depot_country, 
@@ -117,8 +117,7 @@ function get_distributor_out_data1($status='', $id=''){
         if ($status=="Approved"){
             $cond=" where status='Approved' and (distributor_id!='1' and distributor_id!='189')";
         } else if ($status=="pending"){
-            $cond=" where ((status='Pending' and (delivery_status is null or delivery_status = '')) or status='Rejected') and 
-                            (distributor_id!='1' and distributor_id!='189')";
+            $cond=" where (status='Pending' and (delivery_status is null or delivery_status = '')) and (distributor_id!='1' and distributor_id!='189')";
         } else if ($status=="pending_for_approval"){
             $cond=" where ((status='Pending' and (delivery_status='Pending' or delivery_status='GP Issued' or 
                                 delivery_status='Delivered Not Complete' or delivery_status='Delivered')) or status='Deleted') and 
@@ -154,7 +153,7 @@ function get_distributor_out_data1($status='', $id=''){
                 I.client_name, I.depot_name, I.distributor_name, I.sales_rep_name, I.user_name, 
                 I.sample_distributor_id, I.delivery_status, I.location, 
                 J.sales_rep_name as del_person_name, I.invoice_amount, I.invoice_date, 
-                I.order_no, I.tracking_id, I.proof_of_delivery from 
+                I.order_no, I.tracking_id, I.proof_of_delivery, I.shipping_charges from 
             (select G.*, concat(ifnull(H.first_name,''),' ',ifnull(H.last_name,'')) as user_name from 
             (select E.*, F.sales_rep_name from 
             (select Q.*, D.depot_name from 
@@ -193,7 +192,7 @@ function get_distributor_out_data1($status='', $id=''){
                 concat(ifnull(D.first_name,''),' ',ifnull(D.last_name,'')) as user_name, 
                 null as sample_distributor_id, null as delivery_status, C.location, 
                 null as del_person_name, C.amount as invoice_amount, null as invoice_date, 
-                null as order_no,null as proof_of_delivery from 
+                null as order_no,null as proof_of_delivery, null as shipping_charges from 
             (select A.*, B.distributor_name, B.state, B.sell_out, B.contact_person, B.contact_no, 
                 B.area, B.location from 
             (select * from sales_rep_orders where status = 'Approved') A 
@@ -268,7 +267,7 @@ function get_distributor_out_data($status='', $id=''){
             G.promoter_sales_rep_id, G.blogger_name, G.blogger_address, G.blogger_phone_no, G.blogger_email_id, 
             G.round_off_amount, G.invoice_amount, G.ref_id, G.invoice_date, G.freezed, 
             G.distributor_in_type, G.basis_of_sales, G.email_from, G.email_approved_by, G.email_date_time,
-            G.gstin, I.status as po_status, I.mismatch from 
+            G.gstin, I.status as po_status, I.mismatch, G.shipping_charges from 
             (select E.*, F.sales_rep_name from 
             (select Q.*, D.depot_name, D.state as depot_state from 
             (select C.*, P.location from 
@@ -315,7 +314,7 @@ function get_distributor_out_data($status='', $id=''){
             null as gifting_remarks, null as promoter_sales_rep_id, null as blogger_name, null as blogger_address, 
             null as blogger_phone_no, null as blogger_email_id, null as round_off_amount, null as invoice_amount, null as ref_id, 
             null as invoice_date,null as freezed, null as distributor_in_type, null as basis_of_sales, null as email_from, 
-            null as email_approved_by, null as email_date_time, null as gstin, null as po_status, null as mismatch from 
+            null as email_approved_by, null as email_date_time, null as gstin, null as po_status, null as mismatch, null as shipping_charges from 
             (select A.*, B.distributor_name, B.state, B.sell_out, B.contact_person, B.contact_no, B.area, B.location from 
             (select * from sales_rep_orders where status = 'Approved') A 
             left join 
@@ -580,7 +579,7 @@ function save_data($id=''){
                                 A.blogger_name = B.blogger_name, A.blogger_address = B.blogger_address, A.blogger_phone_no = B.blogger_phone_no, 
                                 A.blogger_email_id = B.blogger_email_id, A.round_off_amount = B.round_off_amount, A.invoice_amount = B.invoice_amount, 
                                 A.invoice_date = '$invoice_date',A.modified_approved_date='$modified_approved_date' ,
-                                A.gstin=B.gstin
+                                A.gstin=B.gstin, A.shipping_charges = B.shipping_charges 
                             WHERE A.id = '$ref_id' and B.id = '$id'";
                     } else {
                         $sql = "Update distributor_out A, distributor_out B 
@@ -611,7 +610,7 @@ function save_data($id=''){
                                 A.blogger_name = B.blogger_name, A.blogger_address = B.blogger_address, A.blogger_phone_no = B.blogger_phone_no, 
                                 A.blogger_email_id = B.blogger_email_id, A.round_off_amount = B.round_off_amount, A.invoice_amount = B.invoice_amount, 
                                 A.invoice_date = '$invoice_date',
-                                A.gstin=B.gstin,A.modified_approved_date=NULL
+                                A.gstin=B.gstin,A.modified_approved_date=NULL, A.shipping_charges = B.shipping_charges 
                             WHERE A.id = '$ref_id' and B.id = '$id'";
                     }
 
@@ -804,7 +803,8 @@ function save_data($id=''){
             'basis_of_sales' => $this->input->post('basis_of_sales'),
             'email_from' => $this->input->post('email_from'),
             'email_approved_by' => $this->input->post('email_approved_by'),
-            'gstin'=> $this->input->post('gstin')
+            'gstin'=> $this->input->post('gstin'),
+            'shipping_charges' => format_number($this->input->post('shipping_charges'),2)
             //'tracking_id' => $this->input->post('tracking_id')
         );
 
@@ -1662,7 +1662,8 @@ function set_ledger($id) {
                     'acc_id' => $result[0]->acc_id,
                     'ledger_name' => $result[0]->ledger_name,
                     'type' => 'Debit',
-                    'amount' => $result[0]->final_amount,
+                    // 'amount' => $result[0]->final_amount,
+                    'amount' => $result[0]->invoice_amount,
                     'status' => $result[0]->status,
                     'is_active' => '1',
                     'ledger_type' => 'Main Entry',
@@ -1675,6 +1676,7 @@ function set_ledger($id) {
         $ledger_array[0] = $data;
         $ledger_array[1] = $data;
         $ledger_array[2] = $data;
+        $ledger_array[3] = $data;
 
         // echo json_encode($ledger_array);
         // echo '<br/>';
@@ -1692,6 +1694,13 @@ function set_ledger($id) {
         $ledger_array[2]['type'] = 'Credit';
         $ledger_array[2]['amount'] = $result[0]->tax_amount;
         $ledger_array[2]['ledger_type'] = 'Sub Entry';
+
+        $ledger_array[3]['entry_type'] = 'Shipping Charges';
+        $ledger_array[3]['acc_id'] = '2';
+        $ledger_array[3]['ledger_name'] = 'Shipping Charges';
+        $ledger_array[3]['type'] = 'Credit';
+        $ledger_array[3]['amount'] = $result[0]->shipping_charges;
+        $ledger_array[3]['ledger_type'] = 'Sub Entry';
 
         // echo json_encode($ledger_array);
         // echo '<br/>';
@@ -1716,6 +1725,11 @@ function set_ledger($id) {
             $this->db->where('ref_type', 'Distributor_Sales');
             $this->db->where('entry_type', 'Tax');
             $this->db->update('account_ledger_entries', $ledger_array[2]);
+
+            $this->db->where('ref_id', $id);
+            $this->db->where('ref_type', 'Distributor_Sales');
+            $this->db->where('entry_type', 'Shipping Charges');
+            $this->db->update('account_ledger_entries', $ledger_array[3]);
         } else {
             $series = 1;
             $sql = "select * from series_master where type = 'Account_Voucher'";
@@ -1747,9 +1761,14 @@ function set_ledger($id) {
             $ledger_array[2]['created_by']=$curusr;
             $ledger_array[2]['created_on']=$now;
 
+            $ledger_array[3]['voucher_id'] = $voucher_id;
+            $ledger_array[3]['created_by']=$curusr;
+            $ledger_array[3]['created_on']=$now;
+
             $this->db->insert('account_ledger_entries', $ledger_array[0]);
             $this->db->insert('account_ledger_entries', $ledger_array[1]);
             $this->db->insert('account_ledger_entries', $ledger_array[2]);
+            $this->db->insert('account_ledger_entries', $ledger_array[3]);
         }
 
         // echo json_encode($ledger_array);

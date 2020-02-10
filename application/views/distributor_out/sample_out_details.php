@@ -846,19 +846,28 @@
                     async:false,
                     success: function(data){
                         if(data.result==1){
-                            if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352 || distributor_id==1379 || distributor_id==1381 || distributor_id==1416){
+                            $('#state').val(data.state);
+                            $('#class').val(data.class);
+                            //$('#sales_rep_id').val(data.sales_rep_id);
+
+                            // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352 || distributor_id==1379 || distributor_id==1381 || distributor_id==1416){
+                            //     $('#sell_out').val($("#discount").val());
+                            // } else {
+                            //     $('#sell_out').val(data.sell_out);
+                            // }
+
+                            var dist_class = data.class;
+                            if(dist_class.toUpperCase().trim()!="DIRECT"){
                                 $('#sell_out').val($("#discount").val());
                             } else {
                                 $('#sell_out').val(data.sell_out);
                             }
-                            
+
                             if($('#distributor_id').val()!=""){
                                 $('#distributor_name').val(data.product_name);
                             }
 
-                            $('#state').val(data.state);
-                            $('#class').val(data.class);
-                            //$('#sales_rep_id').val(data.sales_rep_id);
+                            
 
                             var credit_period = data.credit_period;
                             if (credit_period==null || isNaN(credit_period)) credit_period=1;
@@ -906,11 +915,18 @@
                     }
                 });
 
-                if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352 || distributor_id==1379 || distributor_id==1381 || distributor_id==1416){
+                // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352 || distributor_id==1379 || distributor_id==1381 || distributor_id==1416){
+                //     $('.direct').show();
+                // } else {
+                //     $('.direct').hide();
+                // }
+
+                if($('#class').val()=='direct'){
                     $('.direct').show();
                 } else {
                     $('.direct').hide();
                 }
+                
             }
 
             function get_sell_rate(){

@@ -463,6 +463,23 @@ invokeListOrders($service, $request, $request2);
                   }
                 }
                 $result->free();
+              } else {
+                $sql = "select A.pincode, B.state_name, B.state_code 
+                        from pincode_master A left join state_master B on(A.state_id=B.id) 
+                        where A.pincode='".$pincode."'";
+                $result = $conn->query($sql);
+                if ($result->num_rows > 0) {
+                  $row_arr = $result->fetch_all(MYSQLI_ASSOC);
+                  if(count($row_arr)>0) {
+                    if(isset($row_arr[0]['state_name'])) {
+                      $state = $row_arr[0]['state_name'];
+                    }
+                    if(isset($row_arr[0]['state_code'])) {
+                      $state_code = $row_arr[0]['state_code'];
+                    }
+                  }
+                  $result->free();
+                }
               }
             }
 

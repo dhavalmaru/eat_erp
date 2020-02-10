@@ -406,9 +406,9 @@ class Sales_rep extends CI_Controller{
                     (Select Distinct C.* FROM(
                         Select B.* from (
                             Select concat('d_',A.id) as id , A.distributor_name ,A.google_address,A.latitude,A.longitude,'' as gst_number,'' as margin,'' as doc_document,' ' as document_name FROM
-                            (Select * from distributor_master )A
+                            (Select * from distributor_master) A 
                             LEFT JOIN sr_mapping B ON (A.area_id = B.area_id and A.zone_id = B.zone_id and  A.type_id = B.type_id) 
-                            Where A.status='approved' and A.class='normal'
+                            Where A.status='approved' and A.class in ('normal', 'direct') 
                         ) B
                         Union 
                         (
@@ -434,9 +434,9 @@ class Sales_rep extends CI_Controller{
                     left join 
                     (Select C.* FROM(
                         Select concat('d_',A.id) as id , A.distributor_name ,A.google_address,A.latitude,A.longitude FROM
-                        (Select * from distributor_master  )A
+                        (Select * from distributor_master) A 
                         LEFT JOIN sr_mapping B ON (A.area_id = B.area_id and A.zone_id = B.zone_id and  A.type_id = B.type_id) 
-                        Where A.status='approved' and A.class='normal'
+                        Where A.status='approved' and A.class in ('normal', 'direct') 
                         ) C GROUP BY id, distributor_name ,google_address,latitude,longitude
                     ) B 
                     on (A.store_id=B.id COLLATE utf8_unicode_ci))C)E
@@ -549,7 +549,7 @@ class Sales_rep extends CI_Controller{
     public function retailer_not_mapped($status='')
     {
       $sqlqueries = "Select A.distributor_name,A.id from 
-                        (select * from distributor_master where class='normal') A 
+                        (select * from distributor_master where class in ('normal', 'direct')) A 
                         left join 
                         (select * from sales_rep_master) B 
                         on (A.sales_rep_id=B.id) GROUP BY  A.distributor_name order by A.distributor_name asc";

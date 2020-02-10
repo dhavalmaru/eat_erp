@@ -31,10 +31,16 @@ function get_data($status='', $id='', $class=''){
     }
 
     if($class!=""){
-        if($cond=="") {
-            $cond=" where class='".$class."'";
+        if(strtoupper(trim($class))=='NORMAL'){
+            $class = "'normal', 'direct'";
         } else {
-            $cond=$cond." and class='".$class."'";
+            $class = "'".$class."'";
+        }
+
+        if($cond=="") {
+            $cond=" where class in (".$class.")";
+        } else {
+            $cond=$cond." and class in (".$class.")";
         }
     }
 
@@ -63,10 +69,16 @@ function get_data_without_sample($status='', $id='', $class=''){
     }
 
     if($class!=""){
-        if($cond=="") {
-            $cond=" where class='".$class."'";
+        if(strtoupper(trim($class))=='NORMAL'){
+            $class = "'normal', 'direct'";
         } else {
-            $cond=$cond." and class='".$class."'";
+            $class = "'".$class."'";
+        }
+
+        if($cond=="") {
+            $cond=" where class in (".$class.")";
+        } else {
+            $cond=$cond." and class in (".$class.")";
         }
     }
 
@@ -100,10 +112,16 @@ function get_data_with_sample($status='', $id='', $class=''){
     }
 
     if($class!=""){
-        if($cond=="") {
-            $cond=" where class='".$class."'";
+        if(strtoupper(trim($class))=='NORMAL'){
+            $class = "'normal', 'direct'";
         } else {
-            $cond=$cond." and class='".$class."'";
+            $class = "'".$class."'";
+        }
+
+        if($cond=="") {
+            $cond=" where class in (".$class.")";
+        } else {
+            $cond=$cond." and class in (".$class.")";
         }
     }
 
@@ -136,27 +154,37 @@ function get_distributor_data($status='', $id='', $class=''){
         }
     }
 
+    $cond2="";
     if($class!=""){
-        $cond2=" where class='".$class."'";
-    } else {
-        $cond2="";
+        if(strtoupper(trim($class))=='NORMAL'){
+            $class = "'normal', 'direct'";
+        } else {
+            $class = "'".$class."'";
+        }
+
+        $cond2=" where class in (".$class.")";
     }
 
     $sql = "select D.*, E.sales_rep_name, G.location from 
             (select * from 
-            ((select id, concat('d_', id) as d_id, distributor_name, address, city, pincode, state, country, email_id, mobile, 
-                    tin_number, cst_number, contact_person, sales_rep_id, sell_out, send_invoice, credit_period, class, area_id, 
-                    type_id, zone_id, location_id, status, remarks, created_by, created_on, modified_by, modified_on, approved_by, approved_on, 
-                    rejected_by, rejected_on, google_address, doc_document, document_name, state_code, gst_number, latitude, longitude,tally_name, 
-                    master_distributor_id 
+            ((select id, concat('d_', id) as d_id, distributor_name, address, city, pincode, state, 
+                country, email_id, mobile, tin_number, cst_number, contact_person, sales_rep_id, 
+                sell_out, send_invoice, credit_period, class, area_id, type_id, zone_id, location_id, 
+                status, remarks, created_by, created_on, modified_by, modified_on, approved_by, 
+                approved_on, rejected_by, rejected_on, google_address, doc_document, document_name, 
+                state_code, gst_number, latitude, longitude, tally_name, master_distributor_id, 
+                prefix  
                 from distributor_master".$cond2.") 
               union all 
-            (select id, concat('s_', id) as d_id, distributor_name, address, city, pincode, state, country, null as email_id, 
-                    contact_no as mobile, vat_no as tin_number, null as cst_number, contact_person, sales_rep_id, 
-                    margin as sell_out, null as send_invoice, null as credit_period, null as class, area_id, null as type_id, 
-                    zone_id, location_id,'Pending' as status, remarks, created_by, created_on, modified_by, modified_on, 
-                    approved_by, approved_on, rejected_by, rejected_on, null as google_address, doc_document, document_name, 
-                    state_code, gst_number, null as latitude, null as longitude, null as tally_name, master_distributor_id 
+            (select id, concat('s_', id) as d_id, distributor_name, address, city, pincode, state, 
+                country, null as email_id, contact_no as mobile, vat_no as tin_number, 
+                null as cst_number, contact_person, sales_rep_id, margin as sell_out, 
+                null as send_invoice, null as credit_period, null as class, area_id, 
+                null as type_id, zone_id, location_id,'Pending' as status, remarks, 
+                created_by, created_on, modified_by, modified_on, approved_by, approved_on, 
+                rejected_by, rejected_on, null as google_address, doc_document, document_name, 
+                state_code, gst_number, null as latitude, null as longitude, null as tally_name, 
+                master_distributor_id, null as prefix 
                 from sales_rep_distributors where status = 'Approved')) C ".$cond.") D 
             left join 
             (select * from sales_rep_master) E 
@@ -236,7 +264,8 @@ function save_data($id=''){
         'latitude' => ($this->input->post('d_latitude')==''?null:$this->input->post('d_latitude')),
         'longitude' => ($this->input->post('d_longitude')==''?null:$this->input->post('d_longitude')),
         'tally_name' => $this->input->post('tally_name'),
-        'master_distributor_id' => ($this->input->post('master_distributor_id')==''?null:$this->input->post('master_distributor_id'))
+        'master_distributor_id' => ($this->input->post('master_distributor_id')==''?null:$this->input->post('master_distributor_id')),
+        'prefix' => $this->input->post('prefix')
     );
 
     if($id==''){

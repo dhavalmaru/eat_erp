@@ -230,7 +230,7 @@ function get_data2($status='',$id='', $zone_id='', $area_id='', $location_id='')
             null as doc_document, null as document_name, A.area_id, A.status, A.remarks, 
             A.zone_id, A.location_id, 
             A.modified_by, A.modified_on FROM distributor_master A 
-            where  A.type_id=3  and A.class='normal' and A.distributor_name<>'' 
+            where  A.type_id=3  and A.class in ('normal', 'direct') and A.distributor_name<>'' 
         Union All
         select Distinct concat('s_',id) as id, B.sales_rep_id, B.distributor_name, 
             B.address, B.city, B.pincode, B.state, 

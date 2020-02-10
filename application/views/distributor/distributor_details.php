@@ -204,6 +204,7 @@
                                                 <select class="form-control" name="class" id="classes">
                                                     <option value="">Select</option>
                                                     <option value="normal" <?php if(isset($data)) {if ($data[0]->class=='normal') echo 'selected';}?>>Retailer</option>
+                                                    <option value="direct" <?php if(isset($data)) {if ($data[0]->class=='direct') echo 'selected';}?>>Direct</option>
                                                     <option value="super stockist" <?php if(isset($data)) {if ($data[0]->class=='super stockist') echo 'selected';}?>>Distributor</option>
                                                     <option value="sample" <?php if(isset($data)) {if ($data[0]->class=='sample') echo 'selected';}?>>Sample</option>
                                                 </select>
@@ -289,6 +290,15 @@
                                            <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control" name="tally_name" placeholder="Tally Name" value="<?php if (isset($data)) { echo $data[0]->tally_name; } ?>"/>
                                             </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                           <label class="col-md-2 col-sm-2 col-xs-12 control-label">Prefix<span class="asterisk_sign"></span></label>
+                                           <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="prefix" placeholder="Prefix" value="<?php if (isset($data)) { echo $data[0]->prefix; } ?>"/>
+                                            </div>
+                                            <label class="col-md-4 col-sm-4 col-xs-12 control-label">(Don't use "Direct" or "OOS" in Prefix)</label>
                                         </div>
                                     </div>
                                     <div class="form-group">

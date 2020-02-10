@@ -28,716 +28,17 @@ function get_access(){
     return $query->result();
 }
 
-
-/*
 function get_distributor_out_details($from_date, $to_date) {
-
-    $sql = "select N.*, O.zone as dist_zone from 
-
-            (select L.*, M.area from 
-
-            (select I.*, K.location from 
-
-            (select M.*, H.sales_rep_name from 
-
-            (select G.*, L.distributor_type from 
-
-            (select E.*, F.distributor_name, F.sell_out, F.type_id, F.zone_id,F.location_id, 
-                    F.city as distributor_city, F.area_id, F.class, F.state as dist_state, 
-                    F.state_code as dist_state_code, F.gst_number as dist_gst_no from 
-
-            (select C.*, D.depot_name from 
-
-            (select *, WEEK(invoice_date,1)-WEEK(STR_TO_DATE(concat(YEAR(invoice_date),'-',
-
-                                MONTH(invoice_date),'-',1),'%Y-%m-%d'),1)+1 as dweek 
-
-                from distributor_out where (status='Approved' or status='InActive') and 
-
-                        invoice_date>='$from_date' and invoice_date<='$to_date' ) C 
-
-            left join 
-
-            (select * from depot_master) D 
-
-            on (C.depot_id=D.id)) E 
-
-            left join 
-
-            (select * from distributor_master) F 
-
-            on (E.distributor_id=F.id)) G 
-
-            left join
-
-            (select * from distributor_type_master) L 
-
-            on (G.type_id=L.id)) M 
-
-            left join 
-
-            (select * from sales_rep_master) H 
-
-            on (M.sales_rep_id=H.id)) I 
-
-            left join 
-
-            (select * from location_master) K 
-
-            on (I.location_id=K.id)) L 
-
-            left join 
-
-            (select * from area_master) M 
-
-            on (L.area_id=M.id)) N 
-
-            left join 
-
-            (select * from zone_master) O 
-
-            on (N.zone_id=O.id)
-
-            where N.class!='sample' or N.class is null 
-
-            order by N.invoice_date desc";
-
-    $query=$this->db->query($sql);
-
-    $result=$query->result();
-
-    $this->db->last_query();
-
-    return $result;
-
-}
-
-function get_sample_expired_details($from_date, $to_date,$date_of_processing,$date_of_accounting) {
-
-    $ddateofprocess="";
-
-    if( $date_of_processing != '' && $date_of_accounting=='') {
-        $ddateofprocess = "A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' ";
-    } else {
-        $ddateofprocess = "date(A.approved_on)>='$from_date' and date(A.approved_on)<='$to_date' ";
-    }
-
-
-    $sql = "select AA.*, WEEK(date_of_processing,1)-WEEK(STR_TO_DATE(concat(YEAR(date_of_processing),'-',MONTH(date_of_processing),'-',1),'%Y-%m-%d'),1)+1 as dweek from 
-
-            (select A.*, A.id as sampleid, C.depot_name, D.distributor_name, D.sell_out, D.type_id,
-
-                D.zone_id,D.area_id, D.location_id, D.city as distributor_city, D.class, 
-
-                E.distributor_type, F.sales_rep_name, G.location, I.distributor_name as dname, H.area, 
-
-                D.state as dist_state, D.state_code as dist_state_code, D.gst_number as dist_gst_no, 
-
-                J.zone as dist_zone 
-
-                from distributor_out A 
-
-                left join depot_master C on(A.depot_id=C.id) 
-
-                left join distributor_master D on(A.distributor_id=D.id) 
-
-                left join distributor_master I on(A.sample_distributor_id=I.id) 
-
-                left join distributor_type_master E on(D.type_id=E.id) 
-                
-                left join sales_rep_master F on(A.sales_rep_id=F.id)
-
-                left join location_master G on(D.location_id=G.id) 
-
-                left join area_master H on(D.area_id=H.id) 
-				
-                left join zone_master J on(D.zone_id=J.id) 
-                
-            where (A.status='Approved' ) and ".$ddateofprocess." ) AA 
-
-            where AA.class='sample' and AA.class is not null";
-
-    $query=$this->db->query($sql);
-
-    $result=$query->result();
-
-    return $result;
-
-}
-
-function get_distributor_in_details($from_date, $to_date) {
-
-    $sql = "select AA.*, WEEK(date_of_processing,1)-WEEK(STR_TO_DATE(concat(YEAR(date_of_processing),'-',MONTH(date_of_processing),'-',1),'%Y-%m-%d'),1)+1 as dweek from 
-
-            (select A.*, A.id as srid, C.depot_name, D.distributor_name, D.sell_out, D.type_id, D.location_id, 
-
-                D.city as distributor_city, D.class, D.state as dist_state, D.state_code as dist_state_code, 
-
-                D.gst_number as dist_gst_no, I.zone as dist_zone, 
-
-                E.distributor_type, F.sales_rep_name, G.location, H.area 
-
-            from distributor_in A 
-
-                left join depot_master C on(A.depot_id=C.id) 
-
-                left join distributor_master D on(A.distributor_id=D.id) 
-
-                left join distributor_type_master E on(D.type_id=E.id) 
-
-                left join location_master G on(D.location_id=G.id) 
-
-                left join area_master H on(D.area_id=H.id) 
-
-                left join zone_master I on(D.zone_id=I.id) 
-				
-				left join sr_mapping J on(D.area_id=J.area_id and D.type_id=J.type_id and D.zone_id=J.zone_id ) 
-				
-				left join sales_rep_master F on(A.sales_rep_id=F.id AND J.reporting_manager_id=F.id) 
-
-            where (A.status='Approved') and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date') AA ";
-
-    $query=$this->db->query($sql);
-
-    $result=$query->result();
-
-    return $result;
-
-}
-
-function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $invoicelevelsample,$date_of_processing,$date_of_accounting,$flag) {
-
-    if($this->input->post('from_date')=="" && $this->input->post('to_date')=="")
-    {
-        $from_date = '2017-01-01';
-        $to_date = date("Y-m-d");
-    }
-    else
-    {
-        $from_date = formatdate($this->input->post('from_date'));
-        $to_date = formatdate($this->input->post('to_date'));
-    }
-
-    
-
-    $row=9;
-
-    $template_path=$this->config->item('template_path');
-
-    $file = $template_path.'Sale_Invoice.xls';
-
-    $this->load->library('excel');
-
-    $objPHPExcel = PHPExcel_IOFactory::load($file);
-
-    $tax_per=0;
-
-    $cstamt=0;
-
-    $round_off_amt=0;
-
-    $include="";
-
-    $fromdate=date("d-m-Y", strtotime($from_date));
-
-    $todate=date("d-m-Y", strtotime($to_date));
-
-    $objPHPExcel->getActiveSheet()->setCellValue('B5', $fromdate);
-
-    $objPHPExcel->getActiveSheet()->setCellValue('E5', $todate);
-
-    if($invoicelevel!="") {
-
-        $include=$include.'Sales, ';
-
-        $data = $this->get_distributor_out_details($from_date, $to_date);
-
-        // echo $invoicelevel;
-        // echo '<br>';
-        // echo count($data);
-        // echo '<br>';
-
-        if(count($data)>0) {
-
-            for($i=0; $i<count($data); $i++) {
-
-                $dop=date("d-m-Y", strtotime($data[$i]->date_of_processing));
-                $mod_on=date("d-m-Y", strtotime($data[$i]->invoice_date));
-                $distributor_name=$data[$i]->distributor_name;
-
-
-                $objPHPExcel->getActiveSheet()->setCellValue('A'.$row, '=TEXT(D'.$row.',"mmmm")');
-
-                $objPHPExcel->getActiveSheet()->setCellValue('B'.$row, '=CONCATENATE("Q"&ROUNDUP(MONTH(D'.$row.')/3,0))');
-
-                $objPHPExcel->getActiveSheet()->setCellValue('C'.$row, '=YEAR(D'.$row.')');
-
-                $objPHPExcel->getActiveSheet()->setCellValue('D'.$row, $dop);
-                $objPHPExcel->getActiveSheet()->setCellValue('E'.$row, $mod_on);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('F'.$row, $data[$i]->dweek);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('G'.$row, "SALES");
-
-                $objPHPExcel->getActiveSheet()->setCellValue('H'.$row, $data[$i]->invoice_no);
-
-                $status = $data[$i]->status;
-
-                if($status=="InActive") {
-
-                    $status='Cancelled';
-
-                }
-
-                if($status=='Cancelled') {
-
-                    $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, '0');
-
-                    $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, '0');
-
-                    // $round_off_amt=round($data[$i]->final_amount)-$data[$i]->final_amount;
-
-                    $objPHPExcel->getActiveSheet()->setCellValue('K'.$row, '0');
-
-                    $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, '0');
-                    $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, '0');
-                    $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, '0');
-                    $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, '0');
-
-                } else {
-
-                    $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, $data[$i]->amount);
-
-                    $cstamt=$data[$i]->amount;
-
-                    if($data[$i]->tax_amount==null || $data[$i]->tax_amount==''){
-                        $tax_amt = 0;
-                        $cgst_amt = 0;
-                        $sgst_amt = 0;
-                        $igst_amt = 0;
-                    } else {
-                        $tax_amt = $data[$i]->tax_amount;
-                        if($data[$i]->igst_amount==null || $data[$i]->igst_amount=='' || $data[$i]->igst_amount==0){
-                            $cgst_amt = round($tax_amt/2,2);
-                            $sgst_amt = $tax_amt - $cgst_amt;
-                            $igst_amt = 0;
-                        } else {
-                            $cgst_amt = 0;
-                            $sgst_amt = 0;
-                            $igst_amt = $tax_amt;
-                        }
-                    }
-                    
-                    $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, $cgst_amt);
-                    $objPHPExcel->getActiveSheet()->setCellValue('K'.$row, $sgst_amt);
-                    $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, $igst_amt);
-                    $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, $tax_amt);
-
-                    $round_off_amt=round($data[$i]->final_amount)-$data[$i]->final_amount;
-
-                    $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, $round_off_amt);
-
-                    $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, round($data[$i]->final_amount));
-
-                    $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, $data[$i]->depot_name);
-
-                    $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, $data[$i]->distributor_name);
-
-                    $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, $data[$i]->distributor_type);
-
-                   if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT' || strtoupper(trim($distributor_name))=='NEULIFE DIRECT' || strtoupper(trim($distributor_name))=='FLIPKART DIRECT' || strtoupper(trim($distributor_name))=='GOQII DIRECT')
-                         {
-                                $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->state_code);
-                                $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->state);
-                         }
-                        else
-                        {
-                            $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->dist_state_code);
-                            $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->dist_state);
-                        }
-                    
-
-                    $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, $data[$i]->dist_gst_no);
-
-                    $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, $data[$i]->dist_zone);
-
-                    $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, $data[$i]->area);
-
-                    $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $data[$i]->distributor_city);
-
-                    $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$i]->location);
-
-                    $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->sales_rep_name);
-
-                    $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->due_date);
-
-                    $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->order_no);
-
-                    $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->order_date);
-
-                }
-
-                $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->remarks);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->id);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $status);
-
-                $row=$row+1;
-
-            }
-
-        }
-
-    }
-
-    if($invoicelevelsample!="") {
-
-        $include=$include.'Sample & Product Expired, ';
-
-        $data = $this->get_sample_expired_details($from_date, $to_date,$date_of_processing,$date_of_accounting);
-
-        // echo $invoicelevelsample;
-        // echo '<br>';
-        // echo count($data);
-        // echo '<br>';
-    
-        for($i=0; $i<count($data); $i++) {
-
-            $dop1=date("d-m-Y", strtotime($data[$i]->date_of_processing));
-            $mod_on=date("d-m-Y", strtotime($data[$i]->approved_on));
-
-            $objPHPExcel->getActiveSheet()->setCellValue('A'.$row, '=TEXT(D'.$row.',"mmmm")');
-
-            $objPHPExcel->getActiveSheet()->setCellValue('B'.$row, '=CONCATENATE("Q"&ROUNDUP(MONTH(D'.$row.')/3,0))');
-
-            $objPHPExcel->getActiveSheet()->setCellValue('C'.$row, '=YEAR(D'.$row.')');
-
-            $objPHPExcel->getActiveSheet()->setCellValue('D'.$row, $dop1);
-
-            $objPHPExcel->getActiveSheet()->setCellValue('E'.$row, $mod_on);
-
-            $objPHPExcel->getActiveSheet()->setCellValue('F'.$row, $data[$i]->dweek);
-
-            $objPHPExcel->getActiveSheet()->setCellValue('G'.$row, "Sample & Product Expired");
-
-            $objPHPExcel->getActiveSheet()->setCellValue('H'.$row, $data[$i]->voucher_no);
-
-            $status = $data[$i]->status;
-            if($status=="InActive") {
-                $status='Cancelled';
-            }
-            if($status=='Cancelled') {
-                $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, '0');
-
-                $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, '0');
-
-                $objPHPExcel->getActiveSheet()->setCellValue('K'.$row, '0');
-
-                $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, '0');
-
-                $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, '0');
-
-                $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, '0');
-
-                $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, '0');
-            } else {
-                $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, $data[$i]->amount);
-
-                $cstamt=$data[$i]->amount;
-
-                if($data[$i]->tax_amount==null || $data[$i]->tax_amount==''){
-                    $tax_amt = 0;
-                    $cgst_amt = 0;
-                    $sgst_amt = 0;
-                    $igst_amt = 0;
-                } else {
-                    $tax_amt = $data[$i]->tax_amount;
-                    if($data[$i]->igst_amount==null || $data[$i]->igst_amount=='' || $data[$i]->igst_amount==0){
-                        $cgst_amt = round($tax_amt/2,2);
-                        $sgst_amt = $tax_amt - $cgst_amt;
-                        $igst_amt = 0;
-                    } else {
-                        $cgst_amt = 0;
-                        $sgst_amt = 0;
-                        $igst_amt = $tax_amt;
-                    }
-                }
-                
-                $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, $cgst_amt);
-                $objPHPExcel->getActiveSheet()->setCellValue('K'.$row, $sgst_amt);
-                $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, $igst_amt);
-                $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, $tax_amt);
-
-                $round_off_amt=round($data[$i]->final_amount)-$data[$i]->final_amount;
-
-                $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, $round_off_amt);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, round($data[$i]->final_amount));
-
-                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, $data[$i]->depot_name);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, $data[$i]->dname);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, $data[$i]->distributor_type);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, $data[$i]->dist_state_code);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, $data[$i]->dist_state);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, $data[$i]->dist_gst_no);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, $data[$i]->dist_zone);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, $data[$i]->area);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $data[$i]->distributor_city);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$i]->location);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->sales_rep_name);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->due_date);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->sample_type);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->order_date);
-            }
-
-            $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->remarks);
-
-            $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->sampleid);
-
-            // $status = $data[$i]->status;
-
-            // if($status=="InActive") {
-
-            //     $status='Cancelled';
-
-            // }
-
-            $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $status);
-            $row=$row+1;
-
-        }
-
-    }
-
-    if($invoicelevelsalesreturn!="") {
-
-        $include=$include.'Sales Return, ';
-        $data = $this->get_distributor_in_details($from_date, $to_date);    
-
-        // echo $invoicelevelsalesreturn;
-        // echo '<br>';
-        // echo count($data);
-        // echo '<br>';
-    
-        for($i=0; $i<count($data); $i++) {
-
-            $dop1=date("d-m-Y", strtotime($data[$i]->date_of_processing));
-            $mod_on=date("d-m-Y", strtotime($data[$i]->approved_on));
-
-            $objPHPExcel->getActiveSheet()->setCellValue('A'.$row, '=TEXT(D'.$row.',"mmmm")');
-
-            $objPHPExcel->getActiveSheet()->setCellValue('B'.$row, '=CONCATENATE("Q"&ROUNDUP(MONTH(D'.$row.')/3,0))');
-
-            $objPHPExcel->getActiveSheet()->setCellValue('C'.$row, '=YEAR(D'.$row.')');
-
-            $objPHPExcel->getActiveSheet()->setCellValue('D'.$row, $dop1);
-            $objPHPExcel->getActiveSheet()->setCellValue('E'.$row, $mod_on);
-
-            $objPHPExcel->getActiveSheet()->setCellValue('F'.$row, $data[$i]->dweek);
-
-            $objPHPExcel->getActiveSheet()->setCellValue('G'.$row, 'SALES RETURN');
-
-            $objPHPExcel->getActiveSheet()->setCellValue('H'.$row, $data[$i]->sales_return_no);
-
-            $status = $data[$i]->status;
-            if($status=="InActive") {
-                $status='Cancelled';
-            }
-            if($status=='Cancelled') {
-                $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, '0');
-
-                $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, '0');
-
-                $objPHPExcel->getActiveSheet()->setCellValue('K'.$row, '0');
-
-                $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, '0');
-
-                $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, '0');
-
-                $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, '0');
-
-                $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, '0');
-
-            } else {
-                $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, $data[$i]->amount);
-
-                $cstamt=$data[$i]->amount;
-
-                if($data[$i]->tax_amount==null || $data[$i]->tax_amount==''){
-                    $tax_amt = 0;
-                    $cgst_amt = 0;
-                    $sgst_amt = 0;
-                    $igst_amt = 0;
-                } else {
-                    $tax_amt = $data[$i]->tax_amount;
-                    if($data[$i]->igst_amount==null || $data[$i]->igst_amount=='' || $data[$i]->igst_amount==0){
-                        $cgst_amt = round($tax_amt/2,2);
-                        $sgst_amt = $tax_amt - $cgst_amt;
-                        $igst_amt = 0;
-                    } else {
-                        $cgst_amt = 0;
-                        $sgst_amt = 0;
-                        $igst_amt = $tax_amt;
-                    }
-                }
-                
-                $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, $cgst_amt);
-                $objPHPExcel->getActiveSheet()->setCellValue('K'.$row, $sgst_amt);
-                $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, $igst_amt);
-                $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, $tax_amt);
-
-                $round_off_amt=round($data[$i]->final_amount)-$data[$i]->final_amount;
-
-                $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, $round_off_amt);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, round($data[$i]->final_amount));
-
-                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, $data[$i]->depot_name);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, $data[$i]->distributor_name);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, $data[$i]->distributor_type);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, $data[$i]->dist_state_code);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, $data[$i]->dist_state);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, $data[$i]->dist_gst_no);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, $data[$i]->dist_zone);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, $data[$i]->area);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $data[$i]->distributor_city);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$i]->location);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->sales_rep_name);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, '');
-
-                $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, '');
-
-                $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, '');
-            }
-
-
-
-            $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->remarks);
-
-            $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->srid);
-
-            // $status = $data[$i]->status;
-
-            // if($status=="InActive") {
-
-            //     $status='Cancelled';
-
-            // }
-
-            $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $status);
-            
-            $row=$row+1;
-        }
-
-    }
-
-    $row=$row-1;
-
-    // $include=substr($include, 0, strlen($include)-2);
-
-    // $objPHPExcel->getActiveSheet()->setCellValue('B5', $include);
-
-
-
-    $objPHPExcel->getActiveSheet()->getStyle('A8:AF8')->getFont()->setBold(true);
-
-    
-
-    $objPHPExcel->getActiveSheet()->getStyle('A8'.':AF'.$row)->applyFromArray(array(
-
-        'borders' => array(
-
-            'allborders' => array(
-
-                'style' => PHPExcel_Style_Border::BORDER_THIN
-
-            )
-
-        )
-
-    ));
-
-
-    for ($col = 0; $col <= PHPExcel_Cell::columnIndexFromString($objPHPExcel->getActiveSheet()->getHighestDataColumn()); $col++) {
-        $objPHPExcel->getActiveSheet()->getColumnDimensionByColumn($col)->setAutoSize(true);
-    }
-
-
-    $filename='Sale_Invoice_Report.xls';
-    // $path  = 'C:/wamp64/www/eat_erp_test/assets/uploads/excel_upload/';
-    // $path  = '/home/eatangcp/public_html/test/assets/uploads/excel_upload/';
-    // $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/excel_upload/';
-    $path = $this->config->item('upload_path').'excel_upload/';
-
-    if($flag==0)
-    {
-        header('Content-Type: application/vnd.ms-excel');
-        header('Content-Disposition: attachment;filename="'.$filename.'"');
-        header('Cache-Control: max-age=0'); 
-        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
-        $objWriter->save('php://output');
-    }
-    else
-    {
-       $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5'); 
-        $objWriter->save($path.$filename);
-    }
-
-    $logarray['table_id']=$this->session->userdata('session_id');
-
-    $logarray['module_name']='Reports';
-
-    $logarray['cnt_name']='Reports';
-
-    $logarray['action']='Sale Invoice report generated.';
-
-    $this->user_access_log_model->insertAccessLog($logarray);
-
-    // } else {
-
-    //     echo '<script>alert("No data found");</script>';
-
-    // }
-
-}
-*/
-
-
-function get_distributor_out_details($from_date, $to_date) {
-    $sql = "Select * from (select N.*, O.zone as dist_zone from 
+    $sql = "Select * from 
+            (select N.*, O.zone as dist_zone from 
             (select L.*, M.area from 
             (select I.*, K.location from 
             (select M.*, H.sales_rep_name from 
             (select G.*, L.distributor_type from 
             (select E.*, F.distributor_name, F.sell_out, F.type_id, F.zone_id,F.location_id, 
                     F.city as distributor_city, F.area_id, F.class, F.state as dist_state, 
-                    F.state_code as dist_state_code, F.gst_number as dist_gst_no from 
-            (select C.*, D.depot_name from 
+                    F.state_code as dist_state_code, F.gst_number as dist_gst_no, F.prefix from 
+            (select C.*, D.depot_name, D.state as Depot_state, D.state_code as depot_state_code from 
             (select *, WEEK(invoice_date,1)-WEEK(STR_TO_DATE(concat(YEAR(invoice_date),'-',
                                 MONTH(invoice_date),'-',1),'%Y-%m-%d'),1)+1 as dweek 
                 from distributor_out where (status='Approved' or status='InActive') and 
@@ -779,7 +80,6 @@ function get_distributor_out_details($from_date, $to_date) {
 }
 
 function get_sample_expired_details($from_date, $to_date,$date_of_processing,$date_of_accounting) {
-
     $ddateofprocess="";
 
     // if( $date_of_processing != '' && $date_of_accounting=='') {
@@ -793,15 +93,17 @@ function get_sample_expired_details($from_date, $to_date,$date_of_processing,$da
 
     $sql = "Select * from (select AA.*, WEEK(date_of_processing,1)-WEEK(STR_TO_DATE(concat(YEAR(date_of_processing),'-',MONTH(date_of_processing),'-',1),'%Y-%m-%d'),1)+1 as dweek from 
 
-            (select A.*, A.id as sampleid, C.depot_name, D.distributor_name, D.sell_out, D.type_id,
+            (select A.*, A.id as sampleid, C.depot_name, C.state as depot_state, 
 
-                D.zone_id,D.area_id, D.location_id, D.city as distributor_city, D.class, 
+                C.state_code as depot_state_code, D.distributor_name, D.sell_out, D.type_id,
+
+                D.zone_id, D.area_id, D.location_id, D.city as distributor_city, D.class, 
 
                 E.distributor_type, F.sales_rep_name, G.location, I.distributor_name as dname, H.area, 
 
                 D.state as dist_state, D.state_code as dist_state_code, D.gst_number as dist_gst_no, 
 
-                J.zone as dist_zone 
+                J.zone as dist_zone, D.prefix 
 
                 from distributor_out A 
 
@@ -838,43 +140,43 @@ function get_sample_expired_details($from_date, $to_date,$date_of_processing,$da
 }
 
 function get_distributor_in_details($from_date, $to_date) {
+    $sql = "Select A.*, B.sgst_amt, B.igst_amt, B.cgst_amt, B.tax_percentage, B.amt_exc_tax, 
+        B.total_amt, B.distributor_in_id, C.state, C.state_code from 
+        (select AA.*, WEEK(date_of_processing,1)-WEEK(STR_TO_DATE(concat(YEAR(date_of_processing),'-',MONTH(date_of_processing),'-',1),'%Y-%m-%d'),1)+1 as dweek from 
 
-    $sql = "Select * from 
-            (select AA.*, WEEK(date_of_processing,1)-WEEK(STR_TO_DATE(concat(YEAR(date_of_processing),'-',MONTH(date_of_processing),'-',1),'%Y-%m-%d'),1)+1 as dweek from 
+        (select A.*,A.id as srid, A.cst as tax_per, C.depot_name, C.state as depot_state, 
+            C.state_code as depot_state_code, D.distributor_name, D.sell_out, D.type_id, 
+            D.location_id, D.city as distributor_city, D.class, D.state as dist_state, 
+            D.state_code as dist_state_code, D.gst_number as dist_gst_no, D.prefix, 
+            I.zone as dist_zone, E.distributor_type, F.sales_rep_name, G.location, H.area 
 
-                        (select A.*,A.id as srid, A.cst as tax_per, C.depot_name, D.distributor_name, D.sell_out, D.type_id, D.location_id, 
+        from distributor_in A 
 
-                            D.city as distributor_city, D.class, D.state as dist_state, D.state_code as dist_state_code, 
+            left join depot_master C on(A.depot_id=C.id) 
 
-                            D.gst_number as dist_gst_no, I.zone as dist_zone, 
+            left join distributor_master D on(A.distributor_id=D.id) 
 
-                            E.distributor_type, F.sales_rep_name, G.location, H.area 
+            left join distributor_type_master E on(D.type_id=E.id) 
 
-                        from distributor_in A 
+            left join location_master G on(D.location_id=G.id) 
 
-                            left join depot_master C on(A.depot_id=C.id) 
+            left join area_master H on(D.area_id=H.id) 
 
-                            left join distributor_master D on(A.distributor_id=D.id) 
+            left join zone_master I on(D.zone_id=I.id) 
+            
+            left join sr_mapping J on(D.area_id=J.area_id and D.type_id=J.type_id and D.zone_id=J.zone_id ) 
+            
+            left join sales_rep_master F on(A.sales_rep_id=F.id AND J.reporting_manager_id=F.id) 
 
-                            left join distributor_type_master E on(D.type_id=E.id) 
-
-                            left join location_master G on(D.location_id=G.id) 
-
-                            left join area_master H on(D.area_id=H.id) 
-
-                            left join zone_master I on(D.zone_id=I.id) 
-                            
-                            left join sr_mapping J on(D.area_id=J.area_id and D.type_id=J.type_id and D.zone_id=J.zone_id ) 
-                            
-                            left join sales_rep_master F on(A.sales_rep_id=F.id AND J.reporting_manager_id=F.id) 
-
-                        where (A.status='Approved') and date(A.sales_return_date)>='$from_date' and 
-                            date(A.sales_return_date)<='$to_date') AA ) A
-                        Left Join
-                        (
-                        SELECT sum(sgst_amt) as sgst_amt,sum(igst_amt) as igst_amt ,sum(cgst_amt) as cgst_amt,tax_percentage ,sum(total_amt)-(sum(sgst_amt)+sum(cgst_amt)+sum(igst_amt)) as amt_exc_tax,sum(total_amt) as total_amt,distributor_in_id
-                        from distributor_in_items  GROUP BY distributor_in_id,tax_percentage
-                        ) B on (A.id=B.distributor_in_id)";
+        where (A.status='Approved') and date(A.sales_return_date)>='$from_date' and 
+            date(A.sales_return_date)<='$to_date') AA ) A
+        Left Join
+        (
+        SELECT sum(sgst_amt) as sgst_amt, sum(igst_amt) as igst_amt, sum(cgst_amt) as cgst_amt, tax_percentage, sum(total_amt)-(sum(sgst_amt)+sum(cgst_amt)+sum(igst_amt)) as amt_exc_tax, sum(total_amt) as total_amt, distributor_in_id
+        from distributor_in_items  GROUP BY distributor_in_id,tax_percentage
+        ) B on (A.id=B.distributor_in_id) 
+        left join 
+        (select order_no, min(state) as state, min(state_code) as state_code from distributor_out where status='Approved' and order_no is not null and order_no!='' and state is not null and state!='' and state_code is not null and state_code!='' group by order_no) C on (A.order_no=C.order_no)";
 
     $query=$this->db->query($sql);
 
@@ -1176,25 +478,40 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
                     $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->depot_name);
 
 
-                    if($data[$i]->distributor_id=='214' && intval($igst_amt)!=0) {
-                        $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, 'AMAZON DIRECT - OMS');
-                    } else if($data[$i]->distributor_id=='1319' && intval($igst_amt)!=0) {
-                        $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, 'PAYTM DIRECT - OMS');
-                    } else {
-                        $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->distributor_name);
-                    }
+                    // if($data[$i]->distributor_id=='214' && intval($igst_amt)!=0) {
+                    //     $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, 'AMAZON DIRECT - OMS');
+                    // } else if($data[$i]->distributor_id=='1319' && intval($igst_amt)!=0) {
+                    //     $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, 'PAYTM DIRECT - OMS');
+                    // } else {
+                    //     $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->distributor_name);
+                    // }
                     
-                    
-                    $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->distributor_type);
-                    $distributor_name = $data[$i]->distributor_name;
-                    if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT' || strtoupper(trim($distributor_name))=='NEULIFE DIRECT' || strtoupper(trim($distributor_name))=='FLIPKART DIRECT' || strtoupper(trim($distributor_name))=='GOQII DIRECT') {
+                    // $distributor_name = $data[$i]->distributor_name;
+                    // if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT' || strtoupper(trim($distributor_name))=='NEULIFE DIRECT' || strtoupper(trim($distributor_name))=='FLIPKART DIRECT' || strtoupper(trim($distributor_name))=='GOQII DIRECT') {
+                    //     $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->state_code);
+                    //     $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->state);
+                    // } else {
+                    //     $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->dist_state_code);
+                    //     $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->dist_state);
+                    // }
+
+                    if(strtoupper(trim($data[$i]->class))=='DIRECT') {
+                        if($data[$i]->state_code==$data[$i]->depot_state_code) {
+                            $distributor_name = $data[$i]->prefix.' Direct-Local';
+                        } else {
+                            $distributor_name = $data[$i]->prefix.' OOS-'.$data[$i]->state_code.'_'.$data[$i]->state;
+                        }
+                        $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $distributor_name);
                         $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->state_code);
                         $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->state);
                     } else {
+                        $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->distributor_name);
                         $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->dist_state_code);
                         $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->dist_state);
                     }
                     
+                    $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->distributor_type);
+
                     $objPHPExcel->getActiveSheet()->setCellValue('AG'.$row, $data[$i]->dist_gst_no);
 
                     $objPHPExcel->getActiveSheet()->setCellValue('AH'.$row, $data[$i]->dist_zone);
@@ -1755,19 +1072,40 @@ function generate_sale_invoice_report($invoicelevel, $invoicelevelsalesreturn, $
 
                 // $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->distributor_name);
 
-                if($data[$i]->distributor_id=='214' && intval($igst_amt)!=0) {
-                    $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, 'AMAZON DIRECT - OMS');
-                } else if($data[$i]->distributor_id=='1319' && intval($igst_amt)!=0) {
-                    $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, 'PAYTM DIRECT - OMS');
+                // if($data[$i]->distributor_id=='214' && intval($igst_amt)!=0) {
+                //     $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, 'AMAZON DIRECT - OMS');
+                // } else if($data[$i]->distributor_id=='1319' && intval($igst_amt)!=0) {
+                //     $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, 'PAYTM DIRECT - OMS');
+                // } else {
+                //     $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->distributor_name);
+                // }
+                
+                // if($data[$i]->order_no=='' || $data[$i]->order_no==null){
+                //     $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->dist_state_code);
+
+                //     $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->dist_state);
+                // } else {
+                //     $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->state_code);
+
+                //     $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->state);
+                // }
+                
+                if(strtoupper(trim($data[$i]->class))=='DIRECT') {
+                    if($data[$i]->state_code==$data[$i]->depot_state_code) {
+                        $distributor_name = $data[$i]->prefix.' Direct-Local';
+                    } else {
+                        $distributor_name = $data[$i]->prefix.' OOS-'.$data[$i]->state_code.'_'.$data[$i]->state;
+                    }
+                    $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $distributor_name);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->state_code);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->state);
                 } else {
                     $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->distributor_name);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->dist_state_code);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->dist_state);
                 }
-                
+
                 $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->distributor_type);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->dist_state_code);
-
-                $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->dist_state);
 
                 $objPHPExcel->getActiveSheet()->setCellValue('AG'.$row, $data[$i]->dist_gst_no);
 
@@ -1930,15 +1268,19 @@ function get_distributor_out_sku_details($from_date, $to_date, $status='', $date
 
             (select AA.*, WEEK(invoice_date,1)-WEEK(STR_TO_DATE(concat(YEAR(invoice_date),'-',MONTH(invoice_date),'-',1),'%Y-%m-%d'),1)+1 as dweek, 
 
-                BB.item_name, BB.quantity, BB.short_name from 
+                BB.item_name, BB.quantity, BB.short_name, CC.category_name from 
 
             (select A.*,A.id as saleid, B.type, B.item_id, B.qty, B.sell_rate, B.grams, B.rate, B.amount as item_amount, 
 
                 B.cgst_amt, B.sgst_amt, B.igst_amt, B.tax_amt, B.total_amt, 
 
-                C.depot_name, D.distributor_name, D.sell_out, D.type_id, D.location_id,D.area_id,D.zone_id,
+                C.depot_name, C.state as depot_state, C.state_code as depot_state_code, 
 
-                D.city as distributor_city, D.class, D.state as dist_state, D.state_code as dist_state_code, D.gst_number as dist_gst_no, 
+                D.distributor_name, D.sell_out, D.type_id, D.location_id,D.area_id,D.zone_id,
+
+                D.city as distributor_city, D.class, D.state as dist_state, 
+
+                D.state_code as dist_state_code, D.gst_number as dist_gst_no, D.prefix, 
 
                 E.distributor_type, F.sales_rep_name, G.location, H.area ,K.zone,
 
@@ -1970,21 +1312,25 @@ function get_distributor_out_sku_details($from_date, $to_date, $status='', $date
 
             left join 
 
-            (select id, 'Bar' as type, short_name as item_name, null as quantity, short_name from product_master 
+            (select id, 'Bar' as type, short_name as item_name, null as quantity, short_name, category_id from product_master 
 
                 where status='Approved' 
 
             union all 
 
-            select m.id, 'Box' as type, m.box_name as item_name, sum(p.qty) as quantity, m.short_name 
+            select m.id, 'Box' as type, m.box_name as item_name, sum(p.qty) as quantity, m.short_name, m.category_id 
 
             from box_master m left join box_product p on m.id=p.box_id 
 
             where m.status='Approved' group by m.id) BB 
 
             on (AA.item_id=BB.id and AA.type=BB.type) 
+            
+            left join 
+            
+            category_master CC on (BB.category_id=CC.id) 
 
-            where AA.class!='sample' or AA.class is null) CC 
+            where AA.class!='sample' or AA.class is null) DD 
             
             ".$cond."
             
@@ -1998,12 +1344,11 @@ function get_distributor_out_sku_details($from_date, $to_date, $status='', $date
 }
 
 function get_distributor_sale_sku_details($from_date, $to_date) {
-
     $sql = "select AA.*, WEEK(date_of_processing,1)-WEEK(STR_TO_DATE(concat(YEAR(date_of_processing),'-',
 
                                 MONTH(date_of_processing),'-',1),'%Y-%m-%d'),1)+1 as dweek, 
 
-                BB.item_name, BB.quantity, BB.short_name from 
+                BB.item_name, BB.quantity, BB.short_name, CC.category_name from 
 
             (select A.*,A.id as ssid, B.type, B.item_id, B.qty, B.sell_rate, B.grams, B.rate, B.amount as item_amount, 
 
@@ -2051,19 +1396,23 @@ function get_distributor_sale_sku_details($from_date, $to_date) {
 
             left join 
 
-            (select id, 'Bar' as type, short_name as item_name, null as quantity, short_name from product_master 
+            (select id, 'Bar' as type, short_name as item_name, null as quantity, short_name, category_id from product_master 
 
                 where status='Approved' 
 
             union all 
 
-            select m.id, 'Box' as type, m.box_name as item_name, sum(p.qty) as quantity, m.short_name 
+            select m.id, 'Box' as type, m.box_name as item_name, sum(p.qty) as quantity, m.short_name, m.category_id 
 
             from box_master m left join box_product p on m.id=p.box_id 
 
             where m.status='Approved' group by m.id) BB 
 
-            on (AA.item_id=BB.id and AA.type=BB.type) ";
+            on (AA.item_id=BB.id and AA.type=BB.type) 
+            
+            left join 
+            
+            category_master CC on (BB.category_id=CC.id)";
 
     $query=$this->db->query($sql);
 
@@ -2073,12 +1422,11 @@ function get_distributor_sale_sku_details($from_date, $to_date) {
 }
 
 function get_distributor_sale_sku_details_positive($from_date, $to_date) {
-
     $sql = "select AA.*, WEEK(date_of_processing,1)-WEEK(STR_TO_DATE(concat(YEAR(date_of_processing),'-',
 
                                 MONTH(date_of_processing),'-',1),'%Y-%m-%d'),1)+1 as dweek, 
 
-                BB.item_name, BB.quantity, BB.short_name from 
+                BB.item_name, BB.quantity, BB.short_name, CC.category_name from 
 
             (select A.*,A.id as ssid, B.type, B.item_id, B.qty, B.sell_rate, B.grams, B.rate, B.amount as item_amount, 
 
@@ -2118,19 +1466,23 @@ function get_distributor_sale_sku_details_positive($from_date, $to_date) {
 
             left join 
 
-            (select id, 'Bar' as type, short_name as item_name, null as quantity, short_name from product_master 
+            (select id, 'Bar' as type, short_name as item_name, null as quantity, short_name, category_id from product_master 
 
                 where status='Approved' 
 
             union all 
 
-            select m.id, 'Box' as type, m.box_name as item_name, sum(p.qty) as quantity, m.short_name 
+            select m.id, 'Box' as type, m.box_name as item_name, sum(p.qty) as quantity, m.short_name, m.category_id 
 
             from box_master m left join box_product p on m.id=p.box_id 
 
             where m.status='Approved' group by m.id) BB 
 
-            on (AA.item_id=BB.id and AA.type=BB.type) ";
+            on (AA.item_id=BB.id and AA.type=BB.type) 
+            
+            left join 
+            
+            category_master CC on (BB.category_id=CC.id)";
 
     $query=$this->db->query($sql);
 
@@ -2142,7 +1494,7 @@ function get_distributor_sale_sku_details_positive($from_date, $to_date) {
 function get_distributor_transfer_sku_details($from_date, $to_date) {
     $sql = "select * from 
             (select AA.*, WEEK(date_of_transfer,1)-WEEK(STR_TO_DATE(concat(YEAR(date_of_transfer),'-',MONTH(date_of_transfer),'-',1),'%Y-%m-%d'),1)+1 as dweek, 
-                BB.item_name, BB.quantity, BB.short_name from 
+                BB.item_name, BB.quantity, BB.short_name, CC.category_name from 
             (select A.*, A.id as transferid, B.type, B.item_id, B.qty, null as sell_rate, null as grams, 
                 null as rate, null as amount, null as item_amount, null as cgst_amt, null as sgst_amt, 
                 null as igst_amt, null as tax_amt, null as total_amt, 
@@ -2162,14 +1514,16 @@ function get_distributor_transfer_sku_details($from_date, $to_date) {
                 left join sales_rep_master F on(J.reporting_manager_id=F.id) 
             where A.status='Approved' and A.date_of_transfer>='$from_date' and A.date_of_transfer<='$to_date') AA 
             left join 
-            (select id, 'Bar' as type, short_name as item_name, null as quantity, short_name from product_master 
+            (select id, 'Bar' as type, short_name as item_name, null as quantity, short_name, category_id from product_master 
                 where status='Approved' 
             union all 
-            select m.id, 'Box' as type, m.box_name as item_name, sum(p.qty) as quantity, m.short_name 
+            select m.id, 'Box' as type, m.box_name as item_name, sum(p.qty) as quantity, m.short_name, m.category_id 
             from box_master m left join box_product p on m.id=p.box_id 
             where m.status='Approved' group by m.id) BB 
             on (AA.item_id=BB.id and AA.type=BB.type) 
-            where AA.class!='sample' or AA.class is null) CC 
+            left join 
+            category_master CC on (BB.category_id=CC.id) 
+            where AA.class!='sample' or AA.class is null) DD 
             order by date_of_transfer";
 
     $query=$this->db->query($sql);
@@ -2180,7 +1534,7 @@ function get_distributor_transfer_sku_details($from_date, $to_date) {
 function get_distributor_transfer_sku_details_positive($from_date, $to_date) {
     $sql = "select * from 
             (select AA.*, WEEK(date_of_transfer,1)-WEEK(STR_TO_DATE(concat(YEAR(date_of_transfer),'-',MONTH(date_of_transfer),'-',1),'%Y-%m-%d'),1)+1 as dweek, 
-                BB.item_name, BB.quantity, BB.short_name from 
+                BB.item_name, BB.quantity, BB.short_name, CC.category_name from 
             (select A.*, A.id as transferid, B.type, B.item_id, B.qty, null as sell_rate, null as grams, 
                 null as rate, null as amount, null as item_amount, null as cgst_amt, null as sgst_amt, 
                 null as igst_amt, null as tax_amt, null as total_amt, 
@@ -2200,13 +1554,15 @@ function get_distributor_transfer_sku_details_positive($from_date, $to_date) {
                 left join sales_rep_master F on(J.reporting_manager_id=F.id) 
             where A.status='Approved' and A.date_of_transfer>='$from_date' and A.date_of_transfer<='$to_date') AA 
             left join 
-            (select id, 'Bar' as type, short_name as item_name, null as quantity, short_name from product_master 
+            (select id, 'Bar' as type, short_name as item_name, null as quantity, short_name, category_id from product_master 
                 where status='Approved' 
             union all 
-            select m.id, 'Box' as type, m.box_name as item_name, sum(p.qty) as quantity, m.short_name 
+            select m.id, 'Box' as type, m.box_name as item_name, sum(p.qty) as quantity, m.short_name, m.category_id 
             from box_master m left join box_product p on m.id=p.box_id 
             where m.status='Approved' group by m.id) BB 
             on (AA.item_id=BB.id and AA.type=BB.type) 
+            left join 
+            category_master CC on (BB.category_id=CC.id) 
             where AA.class!='sample' or AA.class is null) CC 
             order by date_of_transfer";
 
@@ -2275,7 +1631,8 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                 $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, $data[$i]->item_name);
                 $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, $data[$i]->short_name);
                 $objPHPExcel->getActiveSheet()->setCellValue('K'.$row, $data[$i]->type);
-                $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, $data[$i]->qty);
+                $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, $data[$i]->category_name);
+                $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, $data[$i]->qty);
                 $quantity=$data[$i]->quantity;
 				$distributor_name=$data[$i]->distributor_name;
                 $barquantity=0;
@@ -2285,24 +1642,24 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                     $barquantity=$data[$i]->quantity*$data[$i]->qty;
                 }
 
-                $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, $barquantity);
-                $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, $data[$i]->rate);
-                $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, $data[$i]->sell_rate);
+                $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, $barquantity);
+                $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, $data[$i]->rate);
+                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, $data[$i]->sell_rate);
 
                 $status = $data[$i]->status;
                 if($status=="InActive") {
                     $status='Cancelled';
                 }
                 if($status=='Cancelled') {
-                    $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, '0');
                     $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, '0');
                     $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, '0');
                     $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, '0');
                     $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, '0');
                     $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, '0');
                     $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, '0');
+                    $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, '0');
                 } else {
-                    $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, $data[$i]->item_amount);
+                    $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, $data[$i]->item_amount);
 
                     // $tax=($data[$i]->tax_per/100)*($data[$i]->item_amount);
                     // $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, $tax);
@@ -2329,62 +1686,78 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                         }
                     }
                     
-                    $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, $cgst_amt);
-                    $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, $sgst_amt);
-                    $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, $igst_amt);
-                    $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, $tax_amt);
-                    $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, $data[$i]->total_amt);
-                    $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, $data[$i]->depot_name);
+                    $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, $cgst_amt);
+                    $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, $sgst_amt);
+                    $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, $igst_amt);
+                    $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, $tax_amt);
+                    $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, $data[$i]->total_amt);
+                    $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $data[$i]->depot_name);
 
-                    if($data[$i]->distributor_id=='214' && $igst_amt!=0) {
-                        $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, 'AMAZON DIRECT - OMS');
-                    } else if($data[$i]->distributor_id=='1319' && $igst_amt!=0) {
-                        $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, 'PAYTM DIRECT - OMS');
+                    $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->distributor_type);
+
+                    // if($data[$i]->distributor_id=='214' && $igst_amt!=0) {
+                    //     $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, 'AMAZON DIRECT - OMS');
+                    // } else if($data[$i]->distributor_id=='1319' && $igst_amt!=0) {
+                    //     $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, 'PAYTM DIRECT - OMS');
+                    // } else {
+                    //     $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$i]->distributor_name);
+                    // }
+
+                    // if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT' || strtoupper(trim($distributor_name))=='NEULIFE DIRECT' || strtoupper(trim($distributor_name))=='FLIPKART DIRECT' || strtoupper(trim($distributor_name))=='GOQII DIRECT')
+                    // {
+                    //     $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->state_code);
+                    //     $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->state);
+                    // }
+                    // else
+                    // {
+                    //     $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->dist_state_code);
+                    //     $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->dist_state);
+                    // }
+                    // $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->dist_gst_no);
+
+                    if(strtoupper(trim($data[$i]->class))=='DIRECT') {
+                        if($data[$i]->state_code==$data[$i]->depot_state_code) {
+                            $distributor_name = $data[$i]->prefix.' Direct-Local';
+                        } else {
+                            $distributor_name = $data[$i]->prefix.' OOS-'.$data[$i]->state_code.'_'.$data[$i]->state;
+                        }
+                        $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $distributor_name);
+                        $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->state_code);
+                        $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->state);
                     } else {
-                        $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $data[$i]->distributor_name);
+                        $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$i]->distributor_name);
+                        $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->dist_state_code);
+                        $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->dist_state);
+                        $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->dist_gst_no);
                     }
-                    
-                    $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$i]->distributor_type);
 
                     if($data[$i]->shipping_address == 'no'){
-                        $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->con_state_code);
-                        $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->con_state);
-                        $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->con_gst_number);
-                    } else {
-                       if(strtoupper(trim($distributor_name))=='DIRECT' || strtoupper(trim($distributor_name))=='AMAZON DIRECT' || strtoupper(trim($distributor_name))=='EAT ANYTIME DIRECT' || strtoupper(trim($distributor_name))=='SHOPCLUES DIRECT' || strtoupper(trim($distributor_name))=='NYKAA DIRECT' || strtoupper(trim($distributor_name))=='HEALTHIFYME WELLNESS PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='1MG TECHNOLOGIES PRIVATE LIMITED' || strtoupper(trim($distributor_name))=='PAYTM DIRECT' || strtoupper(trim($distributor_name))=='UNFACTORY DIRECT' || strtoupper(trim($distributor_name))=='EMBRACE DIRECT' || strtoupper(trim($distributor_name))=='NEULIFE DIRECT' || strtoupper(trim($distributor_name))=='FLIPKART DIRECT' || strtoupper(trim($distributor_name))=='GOQII DIRECT')
-						 {
-								$objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->state_code);
-								$objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->state);
-						 }
-						else
-						{
-							$objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->dist_state_code);
-							$objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->dist_state);
-						}
-                        $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->dist_gst_no);
+                        $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->con_state_code);
+                        $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->con_state);
+                        $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->con_gst_number);
                     }
 
-                    $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->zone);
-                    $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->area);
-					$objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->distributor_city);
-                    $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->location);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->zone);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->area);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->distributor_city);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AG'.$row, $data[$i]->location);
                     $objPHPExcel->getActiveSheet()->setCellValue('AH'.$row, $data[$i]->sales_rep_name);
-                    $objPHPExcel->getActiveSheet()->setCellValue('AH'.$row, $data[$i]->salesrepname);
-                    $objPHPExcel->getActiveSheet()->setCellValue('AI'.$row, $data[$i]->salesrepname1);
-                    $objPHPExcel->getActiveSheet()->setCellValue('AJ'.$row, $data[$i]->due_date);
-                    $objPHPExcel->getActiveSheet()->setCellValue('AK'.$row, $data[$i]->order_no);
-                    $objPHPExcel->getActiveSheet()->setCellValue('AL'.$row, $data[$i]->order_date);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AI'.$row, $data[$i]->salesrepname);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AJ'.$row, $data[$i]->salesrepname1);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AK'.$row, $data[$i]->due_date);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AL'.$row, $data[$i]->order_no);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AM'.$row, $data[$i]->order_date);
                 }
 
-                $objPHPExcel->getActiveSheet()->setCellValue('AM'.$row, $data[$i]->remarks);
-                $objPHPExcel->getActiveSheet()->setCellValue('AN'.$row, $data[$i]->saleid);
+                $objPHPExcel->getActiveSheet()->setCellValue('AN'.$row, $data[$i]->remarks);
+                $objPHPExcel->getActiveSheet()->setCellValue('AO'.$row, $data[$i]->saleid);
 
                 // $status = $data[$i]->status;
                 // if($status=="InActive") {
                 //     $status='Cancelled';
                 // }
 
-                $objPHPExcel->getActiveSheet()->setCellValue('AO'.$row, $status);
+                $objPHPExcel->getActiveSheet()->setCellValue('AP'.$row, $status);
 
                 $row=$row+1;
                 $bl_insert = false;
@@ -2410,10 +1783,10 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                     // $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, 'Round Off Amount');
                     // $round_off_amt=round($data[$i]->final_amount)-$data[$i]->final_amount;
 
-                    $objPHPExcel->getActiveSheet()->setCellValue('U'.($row-1), $data[$i]->round_off_amount);
-				    $rounding_amt=$data[$i]->round_off_amount;
-					$cstamt=$rounding_amt+$cstamt;
-                    $objPHPExcel->getActiveSheet()->setCellValue('V'.($row-1), $cstamt);
+                    $objPHPExcel->getActiveSheet()->setCellValue('V'.($row-1), $data[$i]->round_off_amount);
+                    $rounding_amt=$data[$i]->round_off_amount;
+                    $cstamt=$rounding_amt+$cstamt;
+                    $objPHPExcel->getActiveSheet()->setCellValue('W'.($row-1), $cstamt);
 
                     // $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, $data[$i]->depot_name);
                     // $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, $data[$i]->distributor_name);
@@ -2472,7 +1845,8 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
             $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, $data[$i]->item_name);
             $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, $data[$i]->short_name);
             $objPHPExcel->getActiveSheet()->setCellValue('K'.$row, $data[$i]->type);
-            $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, floatval($data[$i]->qty)*-1);
+            $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, $data[$i]->category_name);
+            $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, floatval($data[$i]->qty)*-1);
 
             $quantity=$data[$i]->quantity;
             $barquantity=0;
@@ -2482,55 +1856,55 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                 $barquantity=$data[$i]->quantity*$data[$i]->qty;    
             }
 
-            $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, floatval($barquantity)*-1);
-            $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, $data[$i]->rate);
-            $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, $data[$i]->sell_rate);
+            $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, floatval($barquantity)*-1);
+            $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, $data[$i]->rate);
+            $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, $data[$i]->sell_rate);
 
             $status = $data[$i]->status;
             if($status=="InActive") {
                 $status='Cancelled';
             }
             if($status=='Cancelled') {
-                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, '0');
             } else {
-                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, floatval($data[$i]->item_amount)*-1);
+                $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, floatval($data[$i]->item_amount)*-1);
 
                 // $tax=($data[$i]->tax_per/100)*($data[$i]->item_amount);
                 // $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, $tax);
                 // $cstamt=$tax+$data[$i]->item_amount;
 
-                $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, '');
                 $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, '');
                 $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, '');
                 $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, '');
                 $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, '');
-                $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, floatval($data[$i]->item_amount)*-1);
-                $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, '');
-                $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $data[$i]->distributor_name);
-                $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$i]->distributor_type);
-                $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->dist_state_code);
-                $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->dist_state);
-                $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->dist_gst_no);
-                $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->zone);
-                $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->area);
-                $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->distributor_city);
-                $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->location);
-                $objPHPExcel->getActiveSheet()->setCellValue('AG'.$row, $data[$i]->sales_rep_name);
-                $objPHPExcel->getActiveSheet()->setCellValue('AH'.$row, $data[$i]->salesrepname);
-                $objPHPExcel->getActiveSheet()->setCellValue('AI'.$row, $data[$i]->salesrepname1);
-                $objPHPExcel->getActiveSheet()->setCellValue('AJ'.$row, '');
-                $objPHPExcel->getActiveSheet()->setCellValue('AK'.$row, $data[$i]->ssid);
-                $objPHPExcel->getActiveSheet()->setCellValue('AL'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, floatval($data[$i]->item_amount)*-1);
+                $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$i]->distributor_name);
+                $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->distributor_type);
+                $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->dist_state_code);
+                $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->dist_state);
+                $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->dist_gst_no);
+                $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->zone);
+                $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->area);
+                $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->distributor_city);
+                $objPHPExcel->getActiveSheet()->setCellValue('AG'.$row, $data[$i]->location);
+                $objPHPExcel->getActiveSheet()->setCellValue('AH'.$row, $data[$i]->sales_rep_name);
+                $objPHPExcel->getActiveSheet()->setCellValue('AI'.$row, $data[$i]->salesrepname);
+                $objPHPExcel->getActiveSheet()->setCellValue('AJ'.$row, $data[$i]->salesrepname1);
+                $objPHPExcel->getActiveSheet()->setCellValue('AK'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('AL'.$row, $data[$i]->ssid);
+                $objPHPExcel->getActiveSheet()->setCellValue('AM'.$row, '');
             }
 
-            $objPHPExcel->getActiveSheet()->setCellValue('AM'.$row, $data[$i]->remarks);
-            $objPHPExcel->getActiveSheet()->setCellValue('AN'.$row, $data[$i]->ssid);
+            $objPHPExcel->getActiveSheet()->setCellValue('AN'.$row, $data[$i]->remarks);
+            $objPHPExcel->getActiveSheet()->setCellValue('AO'.$row, $data[$i]->ssid);
 
             $status = $data[$i]->status;
 
@@ -2540,7 +1914,8 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
 
             // }
 
-            $objPHPExcel->getActiveSheet()->setCellValue('AO'.$row, $status);
+            $objPHPExcel->getActiveSheet()->setCellValue('AP'.$row, $status);
+
             $row=$row+1;
 
             $bl_insert = false;
@@ -2658,7 +2033,8 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
             $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, $data[$k]->item_name);
             $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, $data[$k]->short_name);
             $objPHPExcel->getActiveSheet()->setCellValue('K'.$row, $data[$k]->type);
-            $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, $data[$k]->qty);
+            $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, $data[$i]->category_name);
+            $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, $data[$k]->qty);
 
             $quantity=$data[$k]->quantity;
             $barquantity=0;
@@ -2668,9 +2044,9 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                 $barquantity=$data[$k]->quantity*$data[$k]->qty;
             }
 
-            $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, $barquantity);
-            $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, $data[$k]->rate);
-            $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, $data[$k]->sell_rate);
+            $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, $barquantity);
+            $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, $data[$k]->rate);
+            $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, $data[$k]->sell_rate);
 
             
             $status = $data[$k]->status;
@@ -2678,52 +2054,52 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                 $status='Cancelled';
             }
             if($status=='Cancelled') {
-                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, '0');
             } else {
-                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, $data[$k]->item_amount);
+                $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, $data[$k]->item_amount);
 
                 // $tax=($data[$k]->tax_per/100)*($data[$k]->item_amount);
                 // $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, $tax);
                 // $cstamt=$tax+$data[$k]->item_amount;
 
-				$objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, '');
 				$objPHPExcel->getActiveSheet()->setCellValue('R'.$row, '');
                 $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, '');
                 $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, '');
                 $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, '');
-				$objPHPExcel->getActiveSheet()->setCellValue('V'.$row, $data[$k]->item_amount);
-				$objPHPExcel->getActiveSheet()->setCellValue('W'.$row, '');
-                $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $data[$k]->store_name);
-                $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$k]->d_type);
-                $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, $data[$k]->item_amount);
+                $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$k]->store_name);
+                $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$k]->d_type);
                 $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, '');
                 $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, '');
-                $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$k]->d_zone);
-                $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$k]->store_name);
-                $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$k]->distributor_city);
-                $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$k]->m_distributor_location);
-                $objPHPExcel->getActiveSheet()->setCellValue('AG'.$row, $data[$k]->reporting_manager);
-                $objPHPExcel->getActiveSheet()->setCellValue('AH'.$row, $data[$k]->sales1);
-                $objPHPExcel->getActiveSheet()->setCellValue('AI'.$row, $data[$k]->sales2);
-                $objPHPExcel->getActiveSheet()->setCellValue('AJ'.$row, '');
-                $objPHPExcel->getActiveSheet()->setCellValue('AK'.$row, $data[$k]->ssid);
-                $objPHPExcel->getActiveSheet()->setCellValue('AL'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$k]->d_zone);
+                $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$k]->store_name);
+                $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$k]->distributor_city);
+                $objPHPExcel->getActiveSheet()->setCellValue('AG'.$row, $data[$k]->m_distributor_location);
+                $objPHPExcel->getActiveSheet()->setCellValue('AH'.$row, $data[$k]->reporting_manager);
+                $objPHPExcel->getActiveSheet()->setCellValue('AI'.$row, $data[$k]->sales1);
+                $objPHPExcel->getActiveSheet()->setCellValue('AJ'.$row, $data[$k]->sales2);
+                $objPHPExcel->getActiveSheet()->setCellValue('AK'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('AL'.$row, $data[$k]->ssid);
+                $objPHPExcel->getActiveSheet()->setCellValue('AM'.$row, '');
             }
 
-            $objPHPExcel->getActiveSheet()->setCellValue('AM'.$row, $data[$k]->remarks);
-            $objPHPExcel->getActiveSheet()->setCellValue('AN'.$row, $data[$k]->ssid);
+            $objPHPExcel->getActiveSheet()->setCellValue('AN'.$row, $data[$k]->remarks);
+            $objPHPExcel->getActiveSheet()->setCellValue('AO'.$row, $data[$k]->ssid);
 
             $status = $data[$k]->status;
             // if($status=="InActive") {
             //     $status='Cancelled';
             // }
-            $objPHPExcel->getActiveSheet()->setCellValue('AO'.$row, $status);
+            $objPHPExcel->getActiveSheet()->setCellValue('AP'.$row, $status);
 
             $row=$row+1;
         }
@@ -2760,7 +2136,8 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
             $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, $data[$i]->item_name);
             $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, $data[$i]->short_name);
             $objPHPExcel->getActiveSheet()->setCellValue('K'.$row, $data[$i]->type);
-            $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, floatval($data[$i]->qty)*-1);
+            $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, $data[$i]->category_name);
+            $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, floatval($data[$i]->qty)*-1);
 
             $quantity=$data[$i]->quantity;
             $barquantity=0;
@@ -2770,55 +2147,55 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                 $barquantity=$data[$i]->quantity*$data[$i]->qty;    
             }
 
-            $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, floatval($barquantity)*-1);
-            $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, $data[$i]->rate);
-            $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, $data[$i]->sell_rate);
+            $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, floatval($barquantity)*-1);
+            $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, $data[$i]->rate);
+            $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, $data[$i]->sell_rate);
 
             $status = $data[$i]->status;
             if($status=="InActive") {
                 $status='Cancelled';
             }
             if($status=='Cancelled') {
-                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, '0');
             } else {
-                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, floatval($data[$i]->item_amount)*-1);
+                $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, floatval($data[$i]->item_amount)*-1);
 
                 // $tax=($data[$i]->tax_per/100)*($data[$i]->item_amount);
                 // $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, $tax);
                 // $cstamt=$tax+$data[$i]->item_amount;
 
-                $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, '');
                 $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, '');
                 $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, '');
                 $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, '');
                 $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, '');
-                $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, floatval($data[$i]->item_amount)*-1);
-                $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, '');
-                $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $data[$i]->distributor_name);
-                $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$i]->distributor_type);
-                $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->dist_state_code);
-                $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->dist_state);
-                $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->dist_gst_no);
-                $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->zone);
-                $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->area);
-                $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->distributor_city);
-                $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->location);
-                $objPHPExcel->getActiveSheet()->setCellValue('AG'.$row, $data[$i]->sales_rep_name);
-                $objPHPExcel->getActiveSheet()->setCellValue('AH'.$row, $data[$i]->salesrepname);
-                $objPHPExcel->getActiveSheet()->setCellValue('AI'.$row, $data[$i]->salesrepname1);
-                $objPHPExcel->getActiveSheet()->setCellValue('AJ'.$row, '');
-                $objPHPExcel->getActiveSheet()->setCellValue('AK'.$row, $data[$i]->transferid);
-                $objPHPExcel->getActiveSheet()->setCellValue('AL'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, floatval($data[$i]->item_amount)*-1);
+                $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$i]->distributor_name);
+                $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->distributor_type);
+                $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->dist_state_code);
+                $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->dist_state);
+                $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->dist_gst_no);
+                $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->zone);
+                $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->area);
+                $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->distributor_city);
+                $objPHPExcel->getActiveSheet()->setCellValue('AG'.$row, $data[$i]->location);
+                $objPHPExcel->getActiveSheet()->setCellValue('AH'.$row, $data[$i]->sales_rep_name);
+                $objPHPExcel->getActiveSheet()->setCellValue('AI'.$row, $data[$i]->salesrepname);
+                $objPHPExcel->getActiveSheet()->setCellValue('AJ'.$row, $data[$i]->salesrepname1);
+                $objPHPExcel->getActiveSheet()->setCellValue('AK'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('AL'.$row, $data[$i]->transferid);
+                $objPHPExcel->getActiveSheet()->setCellValue('AM'.$row, '');
             }
 
-            $objPHPExcel->getActiveSheet()->setCellValue('AM'.$row, $data[$i]->remarks);
-            $objPHPExcel->getActiveSheet()->setCellValue('AN'.$row, $data[$i]->transferid);
+            $objPHPExcel->getActiveSheet()->setCellValue('AN'.$row, $data[$i]->remarks);
+            $objPHPExcel->getActiveSheet()->setCellValue('AO'.$row, $data[$i]->transferid);
 
             $status = $data[$i]->status;
 
@@ -2828,7 +2205,8 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
 
             // }
 
-            $objPHPExcel->getActiveSheet()->setCellValue('AO'.$row, $status);
+            $objPHPExcel->getActiveSheet()->setCellValue('AP'.$row, $status);
+
             $row=$row+1;
 
             $bl_insert = false;
@@ -2866,7 +2244,8 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
             $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, $data[$i]->item_name);
             $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, $data[$i]->short_name);
             $objPHPExcel->getActiveSheet()->setCellValue('K'.$row, $data[$i]->type);
-            $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, floatval($data[$i]->qty));
+            $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, $data[$i]->category_name);
+            $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, floatval($data[$i]->qty));
 
             $quantity=$data[$i]->quantity;
             $barquantity=0;
@@ -2876,55 +2255,55 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                 $barquantity=$data[$i]->quantity*$data[$i]->qty;    
             }
 
-            $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, floatval($barquantity));
-            $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, $data[$i]->rate);
-            $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, $data[$i]->sell_rate);
+            $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, floatval($barquantity));
+            $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, $data[$i]->rate);
+            $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, $data[$i]->sell_rate);
 
             $status = $data[$i]->status;
             if($status=="InActive") {
                 $status='Cancelled';
             }
             if($status=='Cancelled') {
-                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, '0');
             } else {
-                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, floatval($data[$i]->item_amount));
+                $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, floatval($data[$i]->item_amount));
 
                 // $tax=($data[$i]->tax_per/100)*($data[$i]->item_amount);
                 // $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, $tax);
                 // $cstamt=$tax+$data[$i]->item_amount;
 
-                $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, '');
                 $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, '');
                 $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, '');
                 $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, '');
                 $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, '');
-                $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, floatval($data[$i]->item_amount));
-                $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, '');
-                $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $data[$i]->distributor_name);
-                $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$i]->distributor_type);
-                $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->dist_state_code);
-                $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->dist_state);
-                $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->dist_gst_no);
-                $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->zone);
-                $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->area);
-                $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->distributor_city);
-                $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->location);
-                $objPHPExcel->getActiveSheet()->setCellValue('AG'.$row, $data[$i]->sales_rep_name);
-                $objPHPExcel->getActiveSheet()->setCellValue('AH'.$row, $data[$i]->salesrepname);
-                $objPHPExcel->getActiveSheet()->setCellValue('AI'.$row, $data[$i]->salesrepname1);
-                $objPHPExcel->getActiveSheet()->setCellValue('AJ'.$row, '');
-                $objPHPExcel->getActiveSheet()->setCellValue('AK'.$row, $data[$i]->transferid);
-                $objPHPExcel->getActiveSheet()->setCellValue('AL'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, floatval($data[$i]->item_amount));
+                $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$i]->distributor_name);
+                $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->distributor_type);
+                $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->dist_state_code);
+                $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->dist_state);
+                $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->dist_gst_no);
+                $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->zone);
+                $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->area);
+                $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->distributor_city);
+                $objPHPExcel->getActiveSheet()->setCellValue('AG'.$row, $data[$i]->location);
+                $objPHPExcel->getActiveSheet()->setCellValue('AH'.$row, $data[$i]->sales_rep_name);
+                $objPHPExcel->getActiveSheet()->setCellValue('AI'.$row, $data[$i]->salesrepname);
+                $objPHPExcel->getActiveSheet()->setCellValue('AJ'.$row, $data[$i]->salesrepname1);
+                $objPHPExcel->getActiveSheet()->setCellValue('AK'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('AL'.$row, $data[$i]->transferid);
+                $objPHPExcel->getActiveSheet()->setCellValue('AM'.$row, '');
             }
 
-            $objPHPExcel->getActiveSheet()->setCellValue('AM'.$row, $data[$i]->remarks);
-            $objPHPExcel->getActiveSheet()->setCellValue('AN'.$row, $data[$i]->transferid);
+            $objPHPExcel->getActiveSheet()->setCellValue('AN'.$row, $data[$i]->remarks);
+            $objPHPExcel->getActiveSheet()->setCellValue('AO'.$row, $data[$i]->transferid);
 
             $status = $data[$i]->status;
 
@@ -2978,7 +2357,8 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
             $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, $data[$i]->item_name);
             $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, $data[$i]->short_name);
             $objPHPExcel->getActiveSheet()->setCellValue('K'.$row, $data[$i]->type);
-            $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, $data[$i]->qty);
+            $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, $data[$i]->category_name);
+            $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, $data[$i]->qty);
             $quantity=$data[$i]->quantity;
 
             $barquantity=0;
@@ -2988,24 +2368,24 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                 $barquantity=$data[$i]->quantity*$data[$i]->qty;
             }
 
-            $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, $barquantity);
-            $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, $data[$i]->rate);
-            $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, $data[$i]->sell_rate);
+            $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, $barquantity);
+            $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, $data[$i]->rate);
+            $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, $data[$i]->sell_rate);
 
             $status = $data[$i]->status;
             if($status=="InActive") {
                 $status='Cancelled';
             }
             if($status=='Cancelled') {
-                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, '0');
             } else {
-                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, $data[$i]->item_amount);
+                $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, $data[$i]->item_amount);
                 // $tax=($data[$i]->tax_per/100)*($data[$i]->item_amount);
                 // $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, $tax);
                 // $cstamt=$tax+$data[$i]->item_amount;
@@ -3031,35 +2411,35 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
 
                 $total_amt = $cstamt + $tax_amt;
                 
-                $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, $cgst_amt);
-                $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, $sgst_amt);
-                $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, $igst_amt);
-                $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, $tax_amt);
-                $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, $total_amt);
-                $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, $data[$i]->depot_name);
-                $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $data[$i]->dname);
-                $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$i]->distributor_type);
-                $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->dist_state_code);
-                $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->dist_state);
-                $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->dist_gst_no);
-                $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->zone);
-                $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->area);
-                $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->distributor_city);
-                $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->location);
-                $objPHPExcel->getActiveSheet()->setCellValue('AG'.$row, $data[$i]->sales_rep_name);
-                $objPHPExcel->getActiveSheet()->setCellValue('AH'.$row, $data[$i]->salesrepname);
-                $objPHPExcel->getActiveSheet()->setCellValue('AI'.$row, $data[$i]->salesrepname1);
-                $objPHPExcel->getActiveSheet()->setCellValue('AJ'.$row, $data[$i]->due_date);
-                $objPHPExcel->getActiveSheet()->setCellValue('AK'.$row, $data[$i]->sample_type);
-                $objPHPExcel->getActiveSheet()->setCellValue('AL'.$row, $data[$i]->order_date);
+                $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, $cgst_amt);
+                $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, $sgst_amt);
+                $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, $igst_amt);
+                $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, $tax_amt);
+                $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, $total_amt);
+                $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $data[$i]->depot_name);
+                $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$i]->dname);
+                $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->distributor_type);
+                $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->dist_state_code);
+                $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->dist_state);
+                $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->dist_gst_no);
+                $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->zone);
+                $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->area);
+                $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->distributor_city);
+                $objPHPExcel->getActiveSheet()->setCellValue('AG'.$row, $data[$i]->location);
+                $objPHPExcel->getActiveSheet()->setCellValue('AH'.$row, $data[$i]->sales_rep_name);
+                $objPHPExcel->getActiveSheet()->setCellValue('AI'.$row, $data[$i]->salesrepname);
+                $objPHPExcel->getActiveSheet()->setCellValue('AJ'.$row, $data[$i]->salesrepname1);
+                $objPHPExcel->getActiveSheet()->setCellValue('AK'.$row, $data[$i]->due_date);
+                $objPHPExcel->getActiveSheet()->setCellValue('AL'.$row, $data[$i]->sample_type);
+                $objPHPExcel->getActiveSheet()->setCellValue('AM'.$row, $data[$i]->order_date);
             }
 
-            $objPHPExcel->getActiveSheet()->setCellValue('AM'.$row, $data[$i]->remarks);
+            $objPHPExcel->getActiveSheet()->setCellValue('AN'.$row, $data[$i]->remarks);
 
             if($data[$i]->distributor_id=='1') {
-                $objPHPExcel->getActiveSheet()->setCellValue('AN'.$row, $data[$i]->sampleid);
+                $objPHPExcel->getActiveSheet()->setCellValue('AO'.$row, $data[$i]->sampleid);
             } else {
-                $objPHPExcel->getActiveSheet()->setCellValue('AN'.$row, $data[$i]->distributor_in_id);
+                $objPHPExcel->getActiveSheet()->setCellValue('AO'.$row, $data[$i]->distributor_in_id);
             }
             
 
@@ -3067,7 +2447,7 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
             // if($status=="InActive") {
             //     $status='Cancelled';
             // }
-            $objPHPExcel->getActiveSheet()->setCellValue('AO'.$row, $status);
+            $objPHPExcel->getActiveSheet()->setCellValue('AP'.$row, $status);
 
             $row=$row+1;
         }
@@ -3102,7 +2482,8 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
             $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, $data[$i]->item_name);
             $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, $data[$i]->short_name);
             $objPHPExcel->getActiveSheet()->setCellValue('K'.$row, $data[$i]->type);
-            $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, floatval($data[$i]->qty)*-1);
+            $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, $data[$i]->category_name);
+            $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, floatval($data[$i]->qty)*-1);
 
             $quantity=$data[$i]->quantity;
             $barquantity=0;
@@ -3112,24 +2493,24 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                 $barquantity=$data[$i]->quantity*$data[$i]->qty;
             }
 
-            $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, floatval($barquantity)*-1);
-            $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, $data[$i]->rate);
-            $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, $data[$i]->sell_rate);
+            $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, floatval($barquantity)*-1);
+            $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, $data[$i]->rate);
+            $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, $data[$i]->sell_rate);
 
             $status = $data[$i]->status;
             if($status=="InActive") {
                 $status='Cancelled';
             }
             if($status=='Cancelled') {
-                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, '0');
                 $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, '0');
+                $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, '0');
             } else {
-                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, floatval($data[$i]->item_amount)*-1);
+                $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, floatval($data[$i]->item_amount)*-1);
                 // $tax=($data[$i]->cst/100)*($data[$i]->item_amount);
                 // $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, '-'.$tax);
                 // $cstamt=$tax+$data[$i]->item_amount;
@@ -3157,52 +2538,72 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                 $round_off_amount = round($total_amt,0) - $total_amt;
                 $total_amt=$round_off_amt+$total_amt;
                 
-                $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, floatval($cgst_amt)*-1);
-                $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, floatval($sgst_amt)*-1);
-                $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, floatval($igst_amt)*-1);
-                $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, floatval($tax_amt)*-1);
+                $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, floatval($cgst_amt)*-1);
+                $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, floatval($sgst_amt)*-1);
+                $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, floatval($igst_amt)*-1);
+                $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, floatval($tax_amt)*-1);
                 if($round_off_amount<0){
-                    $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, $round_off_amount);
+                    $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, $round_off_amount);
                 } else {
-                    $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, floatval($round_off_amount)*-1);
+                    $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, floatval($round_off_amount)*-1);
                 }
-                $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, floatval($total_amt)*-1);
-                $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, $data[$i]->depot_name);
+                $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, floatval($total_amt)*-1);
+                $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $data[$i]->depot_name);
                 // $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $data[$i]->distributor_name);
             
-                if($data[$i]->distributor_id=='214' && $igst_amt!=0) {
-                    $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, 'AMAZON DIRECT - OMS');
-                } else if($data[$i]->distributor_id=='1319' && $igst_amt!=0) {
-                    $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, 'PAYTM DIRECT - OMS');
-                } else {
-                    $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $data[$i]->distributor_name);
-                }
+                $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->distributor_type);
+
+                // if($data[$i]->distributor_id=='214' && $igst_amt!=0) {
+                //     $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, 'AMAZON DIRECT - OMS');
+                // } else if($data[$i]->distributor_id=='1319' && $igst_amt!=0) {
+                //     $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, 'PAYTM DIRECT - OMS');
+                // } else {
+                //     $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$i]->distributor_name);
+                // }
                 
-                $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$i]->distributor_type);
-                $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->dist_state_code);
-                $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->dist_state);
-                $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->dist_gst_no);
-                $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->zone);
-                $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->area);
-                $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->distributor_city);
-                $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->location);
-                $objPHPExcel->getActiveSheet()->setCellValue('AG'.$row, $data[$i]->sales_rep_name);
-                $objPHPExcel->getActiveSheet()->setCellValue('AH'.$row, $data[$i]->salesrepname);
-                $objPHPExcel->getActiveSheet()->setCellValue('AI'.$row, $data[$i]->salesrepname1);
-                $objPHPExcel->getActiveSheet()->setCellValue('AJ'.$row, '');
-                $objPHPExcel->getActiveSheet()->setCellValue('AK'.$row, $data[$i]->order_no);
-                $objPHPExcel->getActiveSheet()->setCellValue('AL'.$row, '');
+                // $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->dist_state_code);
+                // $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->dist_state);
+                // $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->dist_gst_no);
+
+
+                if(strtoupper(trim($data[$i]->class))=='DIRECT') {
+                    if($data[$i]->state_code==$data[$i]->depot_state_code) {
+                        $distributor_name = $data[$i]->prefix.' Direct-Local';
+                    } else {
+                        $distributor_name = $data[$i]->prefix.' OOS-'.$data[$i]->state_code.'_'.$data[$i]->state;
+                    }
+                    $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $distributor_name);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->state_code);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->state);
+                } else {
+                    $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$i]->distributor_name);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->dist_state_code);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->dist_state);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->dist_gst_no);
+                }
+
+                $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->zone);
+                $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->area);
+                $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->distributor_city);
+                $objPHPExcel->getActiveSheet()->setCellValue('AG'.$row, $data[$i]->location);
+                $objPHPExcel->getActiveSheet()->setCellValue('AH'.$row, $data[$i]->sales_rep_name);
+                $objPHPExcel->getActiveSheet()->setCellValue('AI'.$row, $data[$i]->salesrepname);
+                $objPHPExcel->getActiveSheet()->setCellValue('AJ'.$row, $data[$i]->salesrepname1);
+                $objPHPExcel->getActiveSheet()->setCellValue('AK'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('AL'.$row, $data[$i]->order_no);
+                $objPHPExcel->getActiveSheet()->setCellValue('AM'.$row, '');
             }
 
-            $objPHPExcel->getActiveSheet()->setCellValue('AM'.$row, $data[$i]->remarks);
-            $objPHPExcel->getActiveSheet()->setCellValue('AN'.$row, $data[$i]->srid);
+            $objPHPExcel->getActiveSheet()->setCellValue('AN'.$row, $data[$i]->remarks);
+            $objPHPExcel->getActiveSheet()->setCellValue('AO'.$row, $data[$i]->srid);
 
             // $status = $data[$i]->status;
             // if($status=="InActive") {
             //     $status='Cancelled';
             // }
 
-            $objPHPExcel->getActiveSheet()->setCellValue('AO'.$row, $status);
+            $objPHPExcel->getActiveSheet()->setCellValue('AP'.$row, $status);
+
             $row=$row+1;
 
             $bl_insert = false;
@@ -3245,11 +2646,11 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                 $round_off_amount = round($total_amt,0) - $total_amt;
                 $total_amt=$round_off_amt+$total_amt;
                 if($round_off_amount<0){
-                    $objPHPExcel->getActiveSheet()->setCellValue('U'.($row-1), $round_off_amount);
+                    $objPHPExcel->getActiveSheet()->setCellValue('V'.($row-1), $round_off_amount);
                 } else {
-                    $objPHPExcel->getActiveSheet()->setCellValue('U'.($row-1), floatval($round_off_amount)*-1);
+                    $objPHPExcel->getActiveSheet()->setCellValue('V'.($row-1), floatval($round_off_amount)*-1);
                 }
-                $objPHPExcel->getActiveSheet()->setCellValue('V'.($row-1), floatval($total_amt)*-1);
+                $objPHPExcel->getActiveSheet()->setCellValue('W'.($row-1), floatval($total_amt)*-1);
 
 
 
@@ -3319,25 +2720,26 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                 $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, '');
                 $objPHPExcel->getActiveSheet()->setCellValue('K'.$row, '');
                 $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, '');
-
-               // $quantity=$data[$i]->quantity;
-
                 $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, '');
+
+                // $quantity=$data[$i]->quantity;
+
                 $objPHPExcel->getActiveSheet()->setCellValue('N'.$row, '');
-                $objPHPExcel->getActiveSheet()->setCellValue('O'.$row,'');
+                $objPHPExcel->getActiveSheet()->setCellValue('O'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('P'.$row,'');
 
                 $status = $data[$i]->status;
                 if($status=="InActive") {
                     $status='Cancelled';
                 }
                 if($status=='Cancelled') {
-                    $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, '0');
                     $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, '0');
                     $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, '0');
                     $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, '0');
                     $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, '0');
                     $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, '0');
                     $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, '0');
+                    $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, '0');
                 } else {
 					$cgst=$data[$i]->cgst;
 					$sgst=$data[$i]->sgst;
@@ -3353,55 +2755,55 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
                     }
 
 				    if ($data[$i]->transaction=='Credit Note' || $data[$i]->transaction=='Expense Voucher') {
-                        $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, floatval($amount_without_tax)*-1);
-                        $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, floatval($cgst)*-1);
-                        $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, floatval($sgst)*-1);
-                        $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, floatval($igst)*-1);
-                        $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, floatval($totaltax)*-1);
+                        $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, floatval($amount_without_tax)*-1);
+                        $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, floatval($cgst)*-1);
+                        $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, floatval($sgst)*-1);
+                        $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, floatval($igst)*-1);
+                        $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, floatval($totaltax)*-1);
                         if($round_off_amount<0){
-                            $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, $round_off_amount);
+                            $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, $round_off_amount);
                         } else {
-                            $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, floatval($round_off_amount)*-1);
+                            $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, floatval($round_off_amount)*-1);
                         }
-                        $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, floatval($amount)*-1);
+                        $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, floatval($amount)*-1);
                     } else {
-                        $objPHPExcel->getActiveSheet()->setCellValue('P'.$row, $amount_without_tax);
-                        $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, $cgst);
-                        $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, $sgst);
-                        $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, $igst);
-						$objPHPExcel->getActiveSheet()->setCellValue('T'.$row, $totaltax);
-                        $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, $round_off_amount);
-                        $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, $amount);
+                        $objPHPExcel->getActiveSheet()->setCellValue('Q'.$row, $amount_without_tax);
+                        $objPHPExcel->getActiveSheet()->setCellValue('R'.$row, $cgst);
+                        $objPHPExcel->getActiveSheet()->setCellValue('S'.$row, $sgst);
+                        $objPHPExcel->getActiveSheet()->setCellValue('T'.$row, $igst);
+                        $objPHPExcel->getActiveSheet()->setCellValue('U'.$row, $totaltax);
+                        $objPHPExcel->getActiveSheet()->setCellValue('V'.$row, $round_off_amount);
+                        $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, $amount);
                     }
 
-                    $objPHPExcel->getActiveSheet()->setCellValue('W'.$row, '');
-                    $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, $data[$i]->distributor_name);
-                    $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$i]->distributor_type);
-                    $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->dist_state_code);
-                    $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->dist_state);
-                    $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->dist_gst_no);
-                    $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->zone);
-                    $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->area);
-					$objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->distributor_city);
-                    $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->location);
-                    $objPHPExcel->getActiveSheet()->setCellValue('AG'.$row, $data[$i]->sales_rep_name);
-                    $objPHPExcel->getActiveSheet()->setCellValue('AH'.$row, $data[$i]->salesrepname);
-                    $objPHPExcel->getActiveSheet()->setCellValue('AI'.$row, $data[$i]->salesrepname1);
-                    $objPHPExcel->getActiveSheet()->setCellValue('AJ'.$row, '');
+                    $objPHPExcel->getActiveSheet()->setCellValue('X'.$row, '');
+                    $objPHPExcel->getActiveSheet()->setCellValue('Y'.$row, $data[$i]->distributor_name);
+                    $objPHPExcel->getActiveSheet()->setCellValue('Z'.$row, $data[$i]->distributor_type);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AA'.$row, $data[$i]->dist_state_code);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AB'.$row, $data[$i]->dist_state);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AC'.$row, $data[$i]->dist_gst_no);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AD'.$row, $data[$i]->zone);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AE'.$row, $data[$i]->area);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AF'.$row, $data[$i]->distributor_city);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AG'.$row, $data[$i]->location);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AH'.$row, $data[$i]->sales_rep_name);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AI'.$row, $data[$i]->salesrepname);
+                    $objPHPExcel->getActiveSheet()->setCellValue('AJ'.$row, $data[$i]->salesrepname1);
                     $objPHPExcel->getActiveSheet()->setCellValue('AK'.$row, '');
                     $objPHPExcel->getActiveSheet()->setCellValue('AL'.$row, '');
+                    $objPHPExcel->getActiveSheet()->setCellValue('AM'.$row, '');
                 }
 
-                $objPHPExcel->getActiveSheet()->setCellValue('AM'.$row, $data[$i]->remarks);
-                $objPHPExcel->getActiveSheet()->setCellValue('AN'.$row, '');
+                $objPHPExcel->getActiveSheet()->setCellValue('AN'.$row, $data[$i]->remarks);
+                $objPHPExcel->getActiveSheet()->setCellValue('AO'.$row, '');
 
                 // $status = $data[$i]->status;
                 // if($status=="InActive") {
                 //     $status='Cancelled';
                 // }
 
-                $objPHPExcel->getActiveSheet()->setCellValue('AO'.$row, $status);
-                $objPHPExcel->getActiveSheet()->setCellValue('AP'.$row, $data[$i]->category);
+                $objPHPExcel->getActiveSheet()->setCellValue('AP'.$row, $status);
+                $objPHPExcel->getActiveSheet()->setCellValue('AQ'.$row, $data[$i]->category);
 
                 $row=$row+1;
 
@@ -3512,7 +2914,7 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
 
 
 
-    $objPHPExcel->getActiveSheet()->getStyle('A10:AP10')->getFont()->setBold(true);
+    $objPHPExcel->getActiveSheet()->getStyle('A10:AQ10')->getFont()->setBold(true);
 
 
     for ($col = 0; $col <= PHPExcel_Cell::columnIndexFromString($objPHPExcel->getActiveSheet()->getHighestDataColumn()); $col++) {
@@ -3522,7 +2924,7 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
     }
 
 
-    $objPHPExcel->getActiveSheet()->getStyle('A10'.':AP'.$row)->applyFromArray(array(
+    $objPHPExcel->getActiveSheet()->getStyle('A10'.':AQ'.$row)->applyFromArray(array(
 
         'borders' => array(
 
@@ -3642,7 +3044,7 @@ function get_sample_expired_SKU_details($from_date, $to_date,$date_of_processing
 
     $sql = "select AA.*, WEEK(date_of_processing,1)-WEEK(STR_TO_DATE(concat(YEAR(date_of_processing),'-',MONTH(date_of_processing),'-',1),'%Y-%m-%d'),1)+1 as dweek, 
 
-                BB.item_name, BB.quantity, BB.short_name from 
+                BB.item_name, BB.quantity, BB.short_name, CC.category_name from 
 
             (select A.*, A.id as sampleid, B.type, B.item_id, B.qty, B.sell_rate, B.grams, B.rate, B.amount as item_amount, 
 
@@ -3688,19 +3090,23 @@ function get_sample_expired_SKU_details($from_date, $to_date,$date_of_processing
 
             left join 
 
-            (select id, 'Bar' as type, short_name as item_name, null as quantity, short_name 
+            (select id, 'Bar' as type, short_name as item_name, null as quantity, short_name, category_id 
 
             from product_master where status='Approved' 
 
             union all 
 
-            select m.id, 'Box' as type, m.box_name as item_name, sum(p.qty) as quantity, m.short_name 
+            select m.id, 'Box' as type, m.box_name as item_name, sum(p.qty) as quantity, m.short_name, m.category_id 
 
             from box_master m left join box_product p on m.id=p.box_id 
 
             where m.status='Approved' group by m.id) BB 
 
-            on (AA.item_id=BB.id and AA.type=BB.type)";
+            on (AA.item_id=BB.id and AA.type=BB.type) 
+            
+            left join 
+            
+            category_master CC on (BB.category_id=CC.id)";
 
     $query=$this->db->query($sql);
 
@@ -3961,66 +3367,19 @@ function generate_sample_expired_report() {
 }
 
 function get_distributor_in_sku_details($from_date, $to_date) {
-
-    // $sql = "select AA.*, WEEK(date_of_processing,2)-WEEK(STR_TO_DATE(concat(YEAR(date_of_processing),'-',MONTH(date_of_processing),'-',1),'%Y-%m-%d'),2)+1 as dweek, 
-
-    //             BB.item_name, BB.quantity, BB.short_name from 
-
-    //         (select A.*, A.id as srid, B.type, B.item_id, B.qty, B.sell_rate, B.grams, B.rate, B.amount as item_amount, 
-
-    //             C.depot_name, D.distributor_name, D.sell_out, D.type_id, D.location_id, D.city as distributor_city, 
-
-    //             E.distributor_type, F.sales_rep_name, G.location, H.area 
-
-    //         from distributor_in A 
-
-    //             left join distributor_in_items B on(A.id=B.distributor_in_id) 
-
-    //             left join depot_master C on(A.depot_id=C.id) 
-
-    //             left join distributor_master D on(A.distributor_id=D.id) 
-
-    //             left join distributor_type_master E on(D.type_id=E.id) 
-
-    //             left join sales_rep_master F on(A.sales_rep_id=F.id) 
-
-    //             left join location_master G on(D.location_id=G.id) 
-
-    //             left join area_master H on(D.area_id=H.id) 
-
-    //         where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date') AA 
-
-    //         left join 
-
-    //         (select id, 'Bar' as type, product_name as item_name, null as quantity, short_name from product_master 
-
-    //             where status='Approved' 
-
-    //         union all 
-
-    //         select m.id, 'Box' as type, m.box_name as item_name, sum(p.qty) as quantity, m.short_name 
-
-    //         from box_master m left join box_product p on m.id=p.box_id 
-
-    //         where m.status='Approved' group by m.id) BB 
-
-    //         on (AA.item_id=BB.id and AA.type=BB.type) 
-
-    //         where AA.distributor_name not like '%sample%' and AA.distributor_name!='Product Expired'";
-
-
-
     $sql = "select AA.*, WEEK(date_of_processing,1)-WEEK(STR_TO_DATE(concat(YEAR(date_of_processing),'-',MONTH(date_of_processing),'-',1),'%Y-%m-%d'),1)+1 as dweek, 
 
-                BB.item_name, BB.quantity, BB.short_name from 
+                BB.item_name, BB.quantity, BB.short_name, CC.state, CC.state_code, DD.category_name  from 
 
             (select A.*, A.id as srid, B.type, B.item_id, B.qty, B.sell_rate, B.grams, B.rate, B.amount as item_amount, 
 
                 B.cgst_amt, B.sgst_amt, B.igst_amt, B.tax_amt, B.total_amt, 
 
-                C.depot_name, D.distributor_name,K.zone, D.sell_out, D.type_id, D.location_id,D.area_id,D.zone_id, 
+                C.depot_name, C.state as depot_state, C.state_code as depot_state_code, 
 
-                D.city as distributor_city, D.class, D.state as dist_state, D.state_code as dist_state_code, D.gst_number as dist_gst_no, 
+                D.distributor_name, K.zone, D.sell_out, D.type_id, D.location_id, D.area_id, D.zone_id, 
+
+                D.city as distributor_city, D.class, D.state as dist_state, D.state_code as dist_state_code, D.gst_number as dist_gst_no, D.prefix, 
 
                 E.distributor_type, F.sales_rep_name, G.location, H.area, L.sales_rep_name as salesrepname, M.sales_rep_name as salesrepname1 
 
@@ -4034,11 +3393,10 @@ function get_distributor_in_sku_details($from_date, $to_date) {
 
                 left join distributor_type_master E on(D.type_id=E.id) 
 
-             
-
                 left join location_master G on(D.location_id=G.id) 
 
                 left join area_master H on(D.area_id=H.id) 
+
                 left join zone_master K on(D.zone_id=K.id) 
 			
 				left join sr_mapping J on(D.area_id=J.area_id and D.type_id=J.type_id and D.zone_id=J.zone_id ) 
@@ -4053,19 +3411,27 @@ function get_distributor_in_sku_details($from_date, $to_date) {
 
             left join 
 
-            (select id, 'Bar' as type, short_name as item_name, null as quantity, short_name from product_master 
+            (select id, 'Bar' as type, short_name as item_name, null as quantity, short_name, category_id from product_master 
 
                 where status='Approved' 
 
             union all 
 
-            select m.id, 'Box' as type, m.box_name as item_name, sum(p.qty) as quantity, m.short_name 
+            select m.id, 'Box' as type, m.box_name as item_name, sum(p.qty) as quantity, m.short_name, m.category_id 
 
             from box_master m left join box_product p on m.id=p.box_id 
 
             where m.status='Approved' group by m.id) BB 
 
-            on (AA.item_id=BB.id and AA.type=BB.type)";
+            on (AA.item_id=BB.id and AA.type=BB.type) 
+
+            left join 
+
+            (select order_no, min(state) as state, min(state_code) as state_code from distributor_out where status='Approved' and order_no is not null and order_no!='' and state is not null and state!='' and state_code is not null and state_code!='' group by order_no) CC on (AA.order_no=CC.order_no) 
+
+            left join 
+
+            category_master DD on (BB.category_id=DD.id)";
 
     $query=$this->db->query($sql);
 
@@ -12758,7 +12124,7 @@ public function sales_rep_route_plan() {
                             Select concat('d_',A.id) as id , A.distributor_name   FROM
                             (Select * from distributor_master )A
                             LEFT JOIN sr_mapping B ON (A.area_id = B.area_id and A.zone_id = B.zone_id and  A.type_id = B.type_id) 
-                            Where A.status='approved' and A.class='normal'
+                            Where A.status='approved' and A.class in ('normal', 'direct') 
                     ) B
                     Union 
                     (
@@ -14099,7 +13465,7 @@ public function sales_rep_exception_report(){
         Select  not_mapped,mapped,A.type from 
         (SELECT count(*) as not_mapped ,'Retailer' as type from  (
         SELECT distributor_name,Z.zone, L.location,A.area from 
-        (select *,concat('d_',id) as store_id from distributor_master Where  type_id=3  and class='normal' and distributor_name<>'') D
+        (select *,concat('d_',id) as store_id from distributor_master Where  type_id=3  and class in ('normal', 'direct') and distributor_name<>'') D
         Left JOIN location_master L On D.location_id=L.id
         Left JOIN zone_master Z On D.zone_id=Z.id
         Left JOIN area_master A On D.area_id=A.id
@@ -14111,7 +13477,7 @@ public function sales_rep_exception_report(){
         (
         SELECT count(*) as mapped ,'Retailer' as type from  (
         SELECT distributor_name,Z.zone, L.location,A.area from 
-        (select *,concat('d_',id) as store_id from distributor_master Where  type_id=3  and class='normal' and distributor_name<>'') D
+        (select *,concat('d_',id) as store_id from distributor_master Where  type_id=3  and class in ('normal', 'direct') and distributor_name<>'') D
         Left JOIN location_master L On D.location_id=L.id
         Left JOIN zone_master Z On D.zone_id=Z.id
         Left JOIN area_master A On D.area_id=A.id
@@ -14284,7 +13650,7 @@ public function sales_rep_exception_report(){
     $col2 = 0;
     $row=1;
     $sql = "SELECT CONCAT(distributor_name,' (',IFNULL(Z.zone,'') ,'-',IFNULL(L.location,'') ,'-',IFNULL(A.area,'') ,')') as distributor_name ,Z.zone, L.location,A.area from 
-        (select *,concat('d_',id) as store_id from distributor_master Where  type_id=3  and class='normal' and distributor_name<>'') D
+        (select *,concat('d_',id) as store_id from distributor_master Where  type_id=3  and class in ('normal', 'direct') and distributor_name<>'') D
         Left JOIN location_master L On D.location_id=L.id
         Left JOIN zone_master Z On D.zone_id=Z.id
         Left JOIN area_master A On D.area_id=A.id
@@ -14421,7 +13787,7 @@ public function gt_store_report($save='',$region=array()){
                 CC.orange, CC.butterscotch, CC.chocopeanut, CC.mangoginger, CC.berry_blast, CC.chyawanprash, CC.dark_chocolate_cookies, CC.chocolate_cookies, 
                 CC.cranberry_cookies, CC.cranberry_orange, CC.papaya_pineapple, CC.fig_raisins, DD.item_id, DD.item_qty, EE.order_date from 
 
-            (select concat('d_',id) as id, distributor_name, area_id, location_id, 1 as d_type from distributor_master where status='approved' and class='normal' 
+            (select concat('d_',id) as id, distributor_name, area_id, location_id, 1 as d_type from distributor_master where status='approved' and class in ('normal', 'direct') 
             union 
             select concat('s_',id) as id, distributor_name, area_id, location_id, 2 as d_type from sales_rep_distributors) AA 
 
@@ -18431,7 +17797,7 @@ function generate_beat_analysis_report($f_date='', $t_date='', $action='') {
                 count(D.id) as total_stores, null as total_stores_visited, null as total_order_qty, null as total_order_amt, 
                 null as total_new_order, null as total_repeat_order, null as total_new_order_amt, null as total_repeat_order_amt from 
             (select distinct A.id, A.distributor_name, B.zone from 
-            (select concat('d_', id) as id, distributor_name, zone_id from distributor_master where status = 'Approved' and class = 'normal' 
+            (select concat('d_', id) as id, distributor_name, zone_id from distributor_master where status = 'Approved' and class in ('normal', 'direct') 
             union all 
             select concat('s_', id) as id, distributor_name, zone_id from sales_rep_distributors where status = 'Approved' or status = 'Active') A 
             left join zone_master B on (A.zone_id=B.id) 

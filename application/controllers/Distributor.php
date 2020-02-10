@@ -65,7 +65,7 @@ class Distributor extends CI_Controller{
                         $inactive=$inactive+1;
                     else if (strtoupper(trim($count_data[$i]->status))=="PENDING")
                         $pending=$pending+1;
-                    else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && strtoupper(trim($count_data[$i]->class))=="NORMAL")
+                    else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && (strtoupper(trim($count_data[$i]->class))=="NORMAL" || strtoupper(trim($count_data[$i]->class))=="DIRECT"))
                         $retailer=$retailer+1;
                 }
             }

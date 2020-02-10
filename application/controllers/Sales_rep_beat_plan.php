@@ -138,7 +138,7 @@ class Sales_rep_beat_plan extends CI_Controller{
 			$objPHPExcel = PHPExcel_IOFactory::load($file);
 			$objPHPExcel->setActiveSheetIndex(1);
 			$row = 1;
-			$sqlqueries = "select * from distributor_master where class='normal' and type_id=3 and status='Approved'";
+			$sqlqueries = "select * from distributor_master where class in ('normal', 'direct') and type_id=3 and status='Approved'";
 
 			$distributor_result  = $this->db->query($sqlqueries)->result();
 			foreach($distributor_result  as $dist)
@@ -527,7 +527,7 @@ class Sales_rep_beat_plan extends CI_Controller{
 
 
 				$objPHPExcel->setActiveSheetIndex(1);
-				$sqlqueries = "select * from distributor_master where class='normal' and type_id=3 and status='Approved'";
+				$sqlqueries = "select * from distributor_master where class in ('normal', 'direct') and type_id=3 and status='Approved'";
 				 $row = 1;
 
 				$distributor_result  = $this->db->query($sqlqueries)->result();

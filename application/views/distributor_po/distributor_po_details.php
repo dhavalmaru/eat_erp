@@ -180,7 +180,7 @@
                                                             <option value="<?php echo $distributor[$k]->id; ?>" <?php if(isset($data)) { if($distributor[$k]->id==$data[0]->distributor_id) { echo 'selected'; } } ?>><?php echo $distributor[$k]->distributor_name; ?></option>
                                                     <?php }} ?>
                                                 </select>
-                                                <input type="hidden" name="sell_out" id="sell_out" value="<?php if(isset($data)) { echo $data[0]->sell_out; } ?>"/>
+                                                <input type="hidden" name="sell_out" id="sell_out" value="<?php if(isset($data)) { if($data[0]->discount!=0) echo $data[0]->discount; /*else echo $data[0]->sell_out;*/ } ?>"/>
                                                 <!-- <input type="hidden" name="state" id="state" value="<?php //if(isset($data)) { echo $data[0]->state; } ?>"/> -->
                                                 <input type="hidden" name="class" id="class" value="<?php if(isset($data)) { echo $data[0]->class; } ?>"/>
                                                 <!-- <input type="hidden" name="distributor_id" id="distributor_id" value="<?php //if(isset($data)) { echo $data[0]->distributor_id; } ?>"/>
@@ -250,7 +250,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group direct" style="display: none;">
+                                    <div class="form-group">
                                         <label class="col-md-2 col-sm-2 col-xs-12 control-label">Discount </label>
                                         <div class="col-md-4 col-sm-4 col-xs-12">
                                             <input type="text" class="form-control" name="discount" id="discount" placeholder="Discount" value="<?php if(isset($data)) { echo $data[0]->discount; } ?>" />
@@ -863,11 +863,11 @@
                     get_total();
                 });
                 $('#distributor_id').on('change', function(event){
-                    set_distributor_details();
+                    set_distributor_details(true);
                 });
                 $('#depot_id').on('change', function(event){
                     get_depot_details($('#depot_id').val());
-                    get_distributor_details($('#distributor_id').val());
+                    get_distributor_details($('#distributor_id').val(), false);
                     // if($('#distributor_consignee_id').val()!='') {
                     //     get_consignee_details1($('#distributor_consignee_id').val());
                     // }
@@ -883,18 +883,25 @@
 
                 $("#discount").change(function(){
                     $('#sell_out').val($("#discount").val());
+
+                    $('.type').each(function(){
+                        show_item($(this));
+                        // console.log('show_item');
+                        // get_product_detail($(this));
+                    });
+
                     get_sell_rate();
                 });
                 $('input[type=radio][name=tax]').on('change', function() {
                     switch($(this).val()) {
                         case 'gst':
-                            $('#tax_per').val(5);
+                            // $('#tax_per').val(5);
                             break;
                         case 'vat':
-                            $('#tax_per').val(6);
+                            // $('#tax_per').val(6);
                             break;
                         case 'cst':
-                            $('#tax_per').val(2);
+                            // $('#tax_per').val(2);
                             break;
                     }
 
@@ -910,7 +917,7 @@
                 addMultiInputNamingRules('#form_distributor_po_details', 'input[name="sell_rate[]"]', { required: true }, "");
 
                 // get_distributor_details($('#distributor_id').val());
-                set_distributor_details();
+                set_distributor_details(false);
 
                 // if($('#distributor_consignee_id').val()!='') {
                 //     get_consignee_details1($('#distributor_consignee_id').val());
@@ -931,13 +938,13 @@
                 if($('#shipping_address_yes').is(':checked')==false){
                     $('#shipping_address_div').show();
                 } else {
-                    get_distributor_details($('#distributor_id').val());
+                    get_distributor_details($('#distributor_id').val(), false);
                     $('#shipping_address_div').hide();
                 }
             }
 
-            function set_distributor_details(){
-                get_distributor_details($('#distributor_id').val());
+            function set_distributor_details(set_discount){
+                get_distributor_details($('#distributor_id').val(), set_discount);
                     
                 // if($('#distributor_consignee_id').val()!='') {
                 //     get_consignee_details1($('#distributor_consignee_id').val());
@@ -957,13 +964,15 @@
                 if(elem.val()=="Bar"){
                     $("#bar_"+index).show();
                     $("#box_"+index).hide();
+                    get_bar_details($("#bar_"+index));
                 } else {
                     $("#box_"+index).show();
                     $("#bar_"+index).hide();
+                    get_box_details($("#box_"+index));
                 }
 
-                $("#grams_"+index).val('');
-                $("#rate_"+index).val('');
+                // $("#grams_"+index).val('');
+                // $("#rate_"+index).val('');
 
                 // get_total();
             }
@@ -989,7 +998,7 @@
                 });
             }
 
-            function get_distributor_details(distributor_id){
+            function get_distributor_details(distributor_id, set_discount=true){
                 // var distributor_id = $('#distributor_id').val();
                 var sell_out = 0;
                
@@ -1001,27 +1010,41 @@
                     async:false,
                     success: function(data){
                         if(data.result==1){
-                            if(distributor_id==640){
-                                if($("#discount").val()==''){
-                                    $("#discount").val(25)
+                            $('#class').val(data.class);
+
+                            if(set_discount==true){
+                                if(distributor_id==640){
+                                    if($("#discount").val()==''){
+                                        $("#discount").val(25);
+                                        $("#sell_out").val(25);
+                                    }
+                                } else {
+                                    $("#discount").val(data.sell_out);
+                                    $("#sell_out").val(data.sell_out);
                                 }
                             }
-                            if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352 || distributor_id==1379 || distributor_id==1381 || distributor_id==1416){
-                                $('#sell_out').val($("#discount").val());
-                            } else {
-                                $('#sell_out').val(data.sell_out);
-                            }
-                            
+
+                            // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352 || distributor_id==1379 || distributor_id==1381 || distributor_id==1416){
+                            //     $('#sell_out').val($("#discount").val());
+                            // } else {
+                            //     $('#sell_out').val(data.sell_out);
+                            // }
+
                             if($('#distributor_id').val()!=""){
                                 $('#distributor_name').val(data.product_name);
                             }
 
-                            if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550" && $('#distributor_id').val()!="622" && $('#distributor_id').val()!="626" && $('#distributor_id').val()!="640" && $('#distributor_id').val()!="1299" && $('#distributor_id').val()!="1319" && $('#distributor_id').val()!="1327" && $('#distributor_id').val()!="1352" && $('#distributor_id').val()!="1379" && $('#distributor_id').val()!="1381" && $('#distributor_id').val()!="1416") {
+                            // if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550" && $('#distributor_id').val()!="622" && $('#distributor_id').val()!="626" && $('#distributor_id').val()!="640" && $('#distributor_id').val()!="1299" && $('#distributor_id').val()!="1319" && $('#distributor_id').val()!="1327" && $('#distributor_id').val()!="1352" && $('#distributor_id').val()!="1379" && $('#distributor_id').val()!="1381" && $('#distributor_id').val()!="1416") {
 
+                            //     $('#state').val(data.state);
+                            //     $('#state_code').val(data.state_code);
+                            // }
+
+                            var dist_class = data.class;
+                            if(dist_class.toUpperCase().trim()!="DIRECT"){
                                 $('#state').val(data.state);
                                 $('#state_code').val(data.state_code);
                             }
-                            $('#class').val(data.class);
 
                             var credit_period = data.credit_period;
                             if (credit_period==null || isNaN(credit_period)) credit_period=1;
@@ -1065,6 +1088,12 @@
 
                             $('#tax_per').val(tax_per);
 
+
+                            $('.type').each(function(){
+                                show_item($(this));
+                                // console.log('show_item');
+                                // get_product_detail($(this));
+                            });
                             get_sell_rate();
                         }
                     },
@@ -1076,7 +1105,13 @@
                     }
                 });
 
-                if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352 || distributor_id==1379 || distributor_id==1381 || distributor_id==1416){
+                // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352 || distributor_id==1379 || distributor_id==1381 || distributor_id==1416){
+                //     $('.direct').show();
+                // } else {
+                //     $('.direct').hide();
+                // }
+
+                if($('#class').val()=='direct'){
                     $('.direct').show();
                 } else {
                     $('.direct').hide();
@@ -1138,11 +1173,14 @@
                     var id = elem.attr('id');
                     var index = id.substr(id.lastIndexOf('_')+1);
                     var sell_out = 0;
-                    if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352 || distributor_id==1379 || distributor_id==1381 || distributor_id==1416){
-                        sell_out = parseFloat($('#sell_out').val());
-                    } else {
-                        sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
-                    }
+                    // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352 || distributor_id==1379 || distributor_id==1381 || distributor_id==1416){
+                    //     sell_out = parseFloat($('#sell_out').val());
+                    // } else {
+                    //     sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
+                    // }
+
+                    sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
+
                     var qty = parseFloat(get_number($("#qty_"+index).val(),2));
                     var rate = parseFloat(get_number($("#rate_"+index).val(),2));
                     var cgst = 0;
@@ -1170,6 +1208,9 @@
                     if (isNaN(rate)) rate=0;
                     if (isNaN(sell_out)) sell_out=0;
 
+                    sell_out = sell_out + parseFloat(get_number($("#sell_out").val(),2));
+                    if (isNaN(sell_out)) sell_out=0;
+
                     var sell_rate = rate-((rate*sell_out)/100);
                     sell_rate = sell_rate/(100+tax_per)*100;
                     if (isNaN(sell_rate)) sell_rate=0;
@@ -1179,25 +1220,26 @@
                     if (isNaN(igst)) igst=0;
                     if (isNaN(tax_per)) tax_per=0;
 
-                    var cgst_amt = (qty*((sell_rate*cgst)/100)).toFixed(2);
-                    var sgst_amt = (qty*((sell_rate*sgst)/100)).toFixed(2);
-                    var igst_amt = (qty*((sell_rate*igst)/100)).toFixed(2);
-                    var tax_amt = (qty*((sell_rate*tax_per)/100)).toFixed(2);
+                    var cgst_amt = Math.round(qty*((sell_rate*cgst)/100)*100)/100;
+                    var sgst_amt = Math.round(qty*((sell_rate*sgst)/100)*100)/100;
+                    var igst_amt = Math.round(qty*((sell_rate*igst)/100)*100)/100;
+                    // var tax_amt = Math.round(qty*((sell_rate*tax_per)/100)*100)/100;
+                    var tax_amt = cgst_amt+sgst_amt+igst_amt;
                     
                     if (isNaN(cgst_amt)) cgst_amt=0;
                     if (isNaN(sgst_amt)) sgst_amt=0;
                     if (isNaN(igst_amt)) igst_amt=0;
                     if (isNaN(tax_amt)) tax_amt=0;
 
-                    var amount = (qty*sell_rate).toFixed(2);
-                    var total_amount = parseFloat(amount,2) + parseFloat(tax_amt,2);
+                    var amount = Math.round(qty*sell_rate*100)/100;
+                    var total_amount = Math.round((parseFloat(amount,2) + parseFloat(tax_amt,2))*100)/100;
 
                     $("#sell_rate_"+index).val(Math.round(sell_rate*10000)/10000);
-                    $("#amount_"+index).val(amount);
-                    $("#cgst_amt_"+index).val(cgst_amt);
-                    $("#sgst_amt_"+index).val(sgst_amt);
-                    $("#igst_amt_"+index).val(igst_amt);
-                    $("#tax_amt_"+index).val(tax_amt);
+                    $("#amount_"+index).val(amount.toFixed(2));
+                    $("#cgst_amt_"+index).val(cgst_amt.toFixed(2));
+                    $("#sgst_amt_"+index).val(sgst_amt.toFixed(2));
+                    $("#igst_amt_"+index).val(igst_amt.toFixed(2));
+                    $("#tax_amt_"+index).val(tax_amt.toFixed(2));
                     $("#total_amt_"+index).val(total_amount.toFixed(2));
                 });
 
@@ -1349,13 +1391,20 @@
                 var qty = parseFloat(get_number($("#qty_"+index).val(),2));
                 var sell_out = 0;
                 var delivery_through = $("input[name=delivery_through]:checked").val();
-                if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352 || distributor_id==1379 || distributor_id==1381 || distributor_id==1416){
-                    sell_out = parseFloat($('#sell_out').val());
-                } else {
-                    sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
-                }
+                // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352 || distributor_id==1379 || distributor_id==1381 || distributor_id==1416){
+                //     sell_out = parseFloat($('#sell_out').val());
+                // } else {
+                //     sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
+                // }
+
+                sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
+                if (isNaN(sell_out)) sell_out=0;
+
                 var tax_per = parseFloat(get_number($("#tax_per_"+index).val(),2));
                 var distributor_id = $("#distributor_id").val();
+                var rate = parseFloat(get_number($("#rate_"+index).val(),2));
+                var grams = parseFloat(get_number($("#grams_"+index).val(),2));
+                
                 var grams_in_bar = 0;
                 var rate = 0;
                 var cgst = 0;
@@ -1376,11 +1425,13 @@
                         if(data.result==1){
                             grams = parseFloat(data.grams);
                             rate = parseFloat(data.rate);
-                            if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352 || distributor_id==1379 || distributor_id==1381 || distributor_id==1416){
-                                sell_out = parseFloat($('#sell_out').val());
-                            } else {
-                                sell_out = parseFloat(data.margin);
-                            }
+                            // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352 || distributor_id==1379 || distributor_id==1381 || distributor_id==1416){
+                            //     sell_out = parseFloat($('#sell_out').val());
+                            // } else {
+                            //     sell_out = parseFloat(data.margin);
+                            // }
+
+                            sell_out = parseFloat(data.margin);
                             tax_per = parseFloat(data.tax_percentage);
                             pro_margin = parseFloat(data.pro_margin);
                         }
@@ -1400,8 +1451,10 @@
                 if (isNaN(tax_per)) tax_per=0;
                 if (isNaN(pro_margin)) pro_margin=0;
 
+                var discount = parseFloat(get_number($("#sell_out").val(),2));
+                if (isNaN(discount)) discount=0;
+
                 if(delivery_through=="WHPL" || (delivery_through=="Distributor" && store_id!='' )){
-                    tax_per = parseFloat(get_number($("#tax_per_"+index).val(),2));
                     if(delivery_through!="Distributor"){
                         if(depot_state==state){
                             cgst = parseFloat(tax_per/2,2);
@@ -1416,13 +1469,14 @@
                 $("#sgst_"+index).val(sgst);
                 $("#igst_"+index).val(igst);
 
-                var sell_rate = rate-((rate*sell_out)/100);
+                var sell_rate = rate-((rate*(sell_out+discount))/100);
                 sell_rate = sell_rate/(100+tax_per)*100;
 
-                var cgst_amt = (qty*((sell_rate*cgst)/100)).toFixed(2);
-                var sgst_amt = (qty*((sell_rate*sgst)/100)).toFixed(2);
-                var igst_amt = (qty*((sell_rate*igst)/100)).toFixed(2);
-                var tax_amt = (qty*((sell_rate*tax_per)/100)).toFixed(2);
+                var cgst_amt = Math.round(qty*((sell_rate*cgst)/100)*100)/100;
+                var sgst_amt = Math.round(qty*((sell_rate*sgst)/100)*100)/100;
+                var igst_amt = Math.round(qty*((sell_rate*igst)/100)*100)/100;
+                // var tax_amt = Math.round(qty*((sell_rate*tax_per)/100)*100)/100;
+                var tax_amt = cgst_amt+sgst_amt+igst_amt;
                 
                 if (isNaN(cgst_amt)) cgst_amt=0;
                 if (isNaN(sgst_amt)) sgst_amt=0;
@@ -1430,7 +1484,7 @@
                 if (isNaN(tax_amt)) tax_amt=0;
 
                 var amount = (qty*sell_rate).toFixed(2);
-                var total_amount = parseFloat(amount,2) + parseFloat(tax_amt,2);
+                var total_amount = Math.round((parseFloat(amount,2) + parseFloat(tax_amt,2))*100)/100;
 
                 $("#grams_"+index).val(grams);
                 $("#rate_"+index).val(rate);
@@ -1458,11 +1512,14 @@
                 var index = id.substr(id.lastIndexOf('_')+1);
                 var qty = parseFloat(get_number($("#qty_"+index).val(),2));
                 var sell_out = 0;
-                if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352 || distributor_id==1379 || distributor_id==1381 || distributor_id==1416){
-                    sell_out = parseFloat($('#sell_out').val());
-                } else {
-                    sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
-                }
+                // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352 || distributor_id==1379 || distributor_id==1381 || distributor_id==1416){
+                //     sell_out = parseFloat($('#sell_out').val());
+                // } else {
+                //     sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
+                // }
+
+                sell_out = parseFloat(get_number($("#sell_margin_"+index).val(),2));
+
                 var tax_per = parseFloat(get_number($("#tax_per_"+index).val(),2));
                 var distributor_id = $("#distributor_id").val();
                 var grams_in_bar = 0;
@@ -1484,11 +1541,12 @@
                         if(data.result==1){
                             grams = parseFloat(data.grams);
                             rate = parseFloat(data.rate);
-                            if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352 || distributor_id==1379 || distributor_id==1381 || distributor_id==1416){
-                                sell_out = parseFloat($('#sell_out').val());
-                            } else {
-                                sell_out = parseFloat(data.margin);
-                            }
+                            // if(distributor_id==42 || distributor_id==214 || distributor_id==550 || distributor_id==622 || distributor_id==626 || distributor_id==640 || distributor_id==1299 || distributor_id==1319 || distributor_id==1327 || distributor_id==1352 || distributor_id==1379 || distributor_id==1381 || distributor_id==1416){
+                            //     sell_out = parseFloat($('#sell_out').val());
+                            // } else {
+                            //     sell_out = parseFloat(data.margin);
+                            // }
+                            sell_out = parseFloat(data.margin);
                             tax_per = parseFloat(data.tax_percentage);
                             pro_margin = parseFloat(data.pro_margin);
                         }
@@ -1508,8 +1566,10 @@
                 if (isNaN(tax_per)) tax_per=0;
                 if (isNaN(pro_margin)) pro_margin=0;
 
+                var discount = parseFloat(get_number($("#sell_out").val(),2));
+                if (isNaN(discount)) discount=0;
+
                 if(delivery_through=="WHPL" || (delivery_through=="Distributor" && store_id!='' )){
-                    tax_per = parseFloat(get_number($("#tax_per_"+index).val(),2));
                     if(delivery_through!="Distributor"){
                         if(depot_state==state){
                             cgst = parseFloat(tax_per/2,2);
@@ -1524,21 +1584,22 @@
                 $("#sgst_"+index).val(sgst);
                 $("#igst_"+index).val(igst);
 
-                var sell_rate = rate-((rate*sell_out)/100);
+                var sell_rate = rate-((rate*(sell_out+discount))/100);
                 sell_rate = sell_rate/(100+tax_per)*100;
 
-                var cgst_amt = (qty*((sell_rate*cgst)/100)).toFixed(2);
-                var sgst_amt = (qty*((sell_rate*sgst)/100)).toFixed(2);
-                var igst_amt = (qty*((sell_rate*igst)/100)).toFixed(2);
-                var tax_amt = (qty*((sell_rate*tax_per)/100)).toFixed(2);
+                var cgst_amt = Math.round(qty*((sell_rate*cgst)/100)*100)/100;
+                var sgst_amt = Math.round(qty*((sell_rate*sgst)/100)*100)/100;
+                var igst_amt = Math.round(qty*((sell_rate*igst)/100)*100)/100;
+                // var tax_amt = Math.round(qty*((sell_rate*tax_per)/100)*100)/100;
+                var tax_amt = cgst_amt+sgst_amt+igst_amt;
                 
                 if (isNaN(cgst_amt)) cgst_amt=0;
                 if (isNaN(sgst_amt)) sgst_amt=0;
                 if (isNaN(igst_amt)) igst_amt=0;
                 if (isNaN(tax_amt)) tax_amt=0;
 
-                var amount = (qty*sell_rate).toFixed(2);
-                var total_amount = parseFloat(amount,2) + parseFloat(tax_amt,2);
+                var amount = Math.round((qty*sell_rate)*100)/100;
+                var total_amount = Math.round((parseFloat(amount,2) + parseFloat(tax_amt,2))*100)/100;
 
                 $("#grams_"+index).val(grams);
                 $("#rate_"+index).val(rate);
@@ -1561,15 +1622,16 @@
                 var index = id.substr(id.lastIndexOf('_')+1);
                 var qty = parseFloat(get_number($("#qty_"+index).val(),2));
                 var sell_rate = parseFloat(get_number($("#sell_rate_"+index).val(),2));
-                var tax_per = parseFloat(get_number($("#tax_per").val(),2));
-                var cgst = parseFloat(get_number($("#cgst").val(),2));
-                var sgst = parseFloat(get_number($("#sgst").val(),2));
-                var igst = parseFloat(get_number($("#igst").val(),2));
+                var tax_per = parseFloat(get_number($("#tax_per_"+index).val(),2));
+                var cgst = parseFloat(get_number($("#cgst_"+index).val(),2));
+                var sgst = parseFloat(get_number($("#sgst_"+index).val(),2));
+                var igst = parseFloat(get_number($("#igst_"+index).val(),2));
                 var amount = qty*sell_rate;
-                var cgst_amt = parseFloat((amount*cgst)/100);
-                var sgst_amt = parseFloat((amount*sgst)/100);
-                var igst_amt = parseFloat((amount*igst)/100);
-                var tax_amt = parseFloat((amount*tax_per)/100);
+                var cgst_amt = Math.round((amount*cgst)*100)/100;
+                var sgst_amt = Math.round((amount*sgst)*100)/100;
+                var igst_amt = Math.round((amount*igst)*100)/100;
+                // var tax_amt = Math.round((amount*tax_per)*100)/100;
+                var tax_amt = cgst_amt+sgst_amt+igst_amt;
 
                 $("#amount_"+index).val(amount.toFixed(2));
                 $("#cgst_amt_"+index).val((cgst_amt).toFixed(2));
@@ -1577,7 +1639,7 @@
                 $("#igst_amt_"+index).val((igst_amt).toFixed(2));
                 $("#tax_amt_"+index).val((tax_amt).toFixed(2));
 
-                var total_amt = parseFloat(tax_amt+amount);
+                var total_amt = Math.round((tax_amt+amount)*100)/100;
                 $("#total_amt_"+index).val((total_amt).toFixed(2));
 
                 get_total();
@@ -1737,15 +1799,15 @@
                                             '<td>' + 
                                                 '<select name="bar[]" class="form-control bar" id="bar_'+counter+'" data-error="#err_item_'+counter+'" style="">' + 
                                                     '<option value="">Select</option>' + 
-                                                    '<?php if(isset($bar)) { for ($k=0; $k < count($bar) ; $k++) { ?>' + 
-                                                            '<option value="<?php echo $bar[$k]->id; ?>"><?php echo $bar[$k]->product_name; ?></option>' + 
-                                                    '<?php }} ?>' + 
+                                                    '<?php //if(isset($bar)) { for ($k=0; $k < count($bar) ; $k++) { ?>' + 
+                                                            '<option value="<?php //echo $bar[$k]->id; ?>"><?php //echo $bar[$k]->product_name; ?></option>' + 
+                                                    '<?php //}} ?>' + 
                                                 '</select>' + 
                                                 '<select name="box[]" class="form-control box" id="box_'+counter+'" data-error="#err_item_'+counter+'" style="display: none;">' + 
                                                     '<option value="">Select</option>' + 
-                                                    '<?php if(isset($box)) { for ($k=0; $k < count($box) ; $k++) { ?>' + 
-                                                            '<option value="<?php echo $box[$k]->id; ?>"><?php echo $box[$k]->box_name; ?></option>' + 
-                                                    '<?php }} ?>' + 
+                                                    '<?php //if(isset($box)) { for ($k=0; $k < count($box) ; $k++) { ?>' + 
+                                                            '<option value="<?php //echo $box[$k]->id; ?>"><?php //echo $box[$k]->box_name; ?></option>' + 
+                                                    '<?php //}} ?>' + 
                                                 '</select>' + 
                                                 '<div id="err_item_'+counter+'"></div>' + 
                                             '</td>' + 
