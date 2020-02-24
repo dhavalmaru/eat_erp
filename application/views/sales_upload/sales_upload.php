@@ -159,6 +159,10 @@
                                   <a href="<?php echo base_url();?>index.php/Sales_upload/reject_file_data/<?php echo $data[$i]->id;?>">
                                     <button type="button" class="btn btn-danger">Reject File</button>
                                   </a>
+                                <?php } else if($data[$i]->status=='Approved') { ?>
+                                  <a href="<?php echo base_url();?>index.php/Sales_upload/get_file_invoices/<?php echo $data[$i]->id;?>" style="margin-right: 5px;" target="_blank">
+                                    <button type="button" class="btn btn-success">Get Invoices</button>
+                                  </a>
                                 <?php } ?>
                               </td>
                             </tr>

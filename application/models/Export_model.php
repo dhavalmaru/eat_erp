@@ -2033,7 +2033,7 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
             $objPHPExcel->getActiveSheet()->setCellValue('I'.$row, $data[$k]->item_name);
             $objPHPExcel->getActiveSheet()->setCellValue('J'.$row, $data[$k]->short_name);
             $objPHPExcel->getActiveSheet()->setCellValue('K'.$row, $data[$k]->type);
-            $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, $data[$i]->category_name);
+            $objPHPExcel->getActiveSheet()->setCellValue('L'.$row, $data[$k]->category_name);
             $objPHPExcel->getActiveSheet()->setCellValue('M'.$row, $data[$k]->qty);
 
             $quantity=$data[$k]->quantity;
@@ -2313,7 +2313,7 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
 
             // }
 
-            $objPHPExcel->getActiveSheet()->setCellValue('AO'.$row, $status);
+            $objPHPExcel->getActiveSheet()->setCellValue('AP'.$row, $status);
             $row=$row+1;
 
             $bl_insert = false;
@@ -5668,6 +5668,9 @@ function get_product_stock_details($from_date, $to_date) {
             (select A.id, A.depot_in_id as depot_id, B.type, B.item_id as product_id from depot_transfer A left join depot_transfer_items B on (A.id=B.depot_transfer_id) where A.status = 'Approved' and A.date_of_transfer>'2018-09-21' and B.item_id is not null) C 
             union all 
             select distinct C.depot_id, C.type, C.product_id from 
+            (select A.id, A.depot_id, B.type, B.item_id as product_id from distributor_out A left join distributor_out_items B on (A.id=B.distributor_out_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and B.item_id is not null) C 
+            union all 
+            select distinct C.depot_id, C.type, C.product_id from 
             (select A.id, A.depot_id, B.type, B.item_id as product_id from distributor_in A left join distributor_in_items B on (A.id=B.distributor_in_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and B.item_id is not null) C 
             union all 
             select distinct C.depot_id, C.type, C.product_id from 
@@ -5743,7 +5746,7 @@ function get_product_stock_details($from_date, $to_date) {
             left join 
 
             (select C.depot_id, C.type, C.product_id, sum(C.qty) as sale_qty from 
-            (select A.id, A.depot_id as depot_id, B.type, B.item_id as product_id, B.qty from distributor_out A left join distributor_out_items B on (A.id=B.distributor_out_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date' and distributor_id not in (1, 63, 64, 65, 66, 189) and B.item_id is not null) C 
+            (select A.id, A.depot_id as depot_id, B.type, B.item_id as product_id, B.qty from distributor_out A left join distributor_out_items B on (A.id=B.distributor_out_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and A.invoice_date>='$from_date' and A.invoice_date<='$to_date' and distributor_id not in (1, 63, 64, 65, 66, 189) and B.item_id is not null) C 
             group by C.depot_id, C.type, C.product_id) JJ 
             on (II.depot_id=JJ.depot_id and II.type=JJ.type and II.product_id=JJ.product_id)) KK 
 

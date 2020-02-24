@@ -1978,5 +1978,35 @@ public function save_comments(){
    }
 }
 
+public function get_sales_item_data($status){
+    if ($status=="pending_for_delivery"){
+        $cond=" where status='Approved' and delivery_status='Pending' and (distributor_id!='1' and distributor_id!='189')";
+    }
+
+    $sql = "select A.*, B.distributor_name, B.location_id, C.location, D.depot_name, 
+            E.sales_item_id, E.type, E.item_id, E.qty, E.item_name from 
+            (select id, date_of_processing, distributor_id, depot_id, modified_on from distributor_out".$cond.") A 
+            left join 
+            (select id, distributor_name, location_id from distributor_master) B 
+            on (A.distributor_id=B.id) 
+            left join 
+            (select id, location from location_master) C 
+            on (B.location_id=C.id) 
+            left join
+            (select id, depot_name from depot_master) D 
+            on (A.depot_id=D.id) 
+            left join 
+            (select A.id as sales_item_id, A.distributor_out_id, A.type, A.item_id, A.qty, 
+                case when A.type='Bar' then B.product_name else C.box_name end as item_name 
+            from distributor_out_items A 
+            left join product_master B on (A.type='Bar' and A.item_id=B.id) 
+            left join box_master C on (A.type='Box' and A.item_id=C.id)) E 
+            on (A.id=E.distributor_out_id) 
+            order by A.id desc, E.sales_item_id desc";
+
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
 }
 ?>

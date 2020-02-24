@@ -153,6 +153,12 @@
                                 <!-- <button class="btn btn-success" type="submit">
                                     <span class="fa fa-shopping-cart"></span> Select Delivery Person
                                 </button> -->
+                                <a class="btn btn-success" data-toggle="modal" href="#excelUploadModal">
+                                    <span class="fa fa-file-excel-o"></span> Upload Excel
+                                </a>
+                                <a class="btn btn-default-danger pull-right " style="margin-left:8px!important;" href="<?php echo base_url().'index.php/distributor_out/download_sales_data/pending_for_delivery'; ?>" >
+                                    <i class="fa fa-file-excel-o "></i> Download Upload Format
+                                </a>
                             <?php } else if($status=='gp_issued') { ?>
                                 <!-- <button class="btn btn-success btn-block btn-padding" type="button" onClick="get_batch_details();">
                                     <span class="fa fa-shopping-cart"></span> Select Delivery Status
@@ -174,7 +180,7 @@
     						</a>
     					</div> -->
     				</div>	
-<!-- <span class="mysidenav" onclick="openNav()" style="text-align:center;">Live Status of Sale</span>	  #2c2c2c-->
+                    <!-- <span class="mysidenav" onclick="openNav()" style="text-align:center;">Live Status of Sale</span>	  #2c2c2c-->
 					<select onchange="dp_status(this.value);" class="mysidenav">
 						<option value="0"><?php if($selectedstatus!=""){echo $selectedstatus;}else{echo 'Select Status';} ?></option>
 						<option value="1">Approved (<?php echo $active; ?>)</option>
@@ -187,17 +193,9 @@
 					</select>			
     			</div>
 				
-<!-- Use any element to open the sidenav -->
-
-
     			<div class="nav-contacts ng-scope" ui-view="@nav">
-				
-
-
     				<div class="u-borderBottom u-bgColorBreadcrumb ng-scope">
     					<div class="container u-posRelative u-textRight">
-    						
-
     						<ul class="m-nav--linetriangle" ng-swipe-left="app.onInnerSwipe($event);" ng-swipe-right="app.onInnerSwipe($event);">
     							<!--<li class="all">
     								<a  href="<?php //echo base_url(); ?>index.php/distributor_out/checkstatus/All">
@@ -262,6 +260,22 @@
     			</div>
 
     			<div class="page-content-wrap">
+
+                    <?php if($this->session->flashdata('error')){?>
+                        <div class="alert alert-danger alert-dismissible fade in">
+                            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                            <strong style="display: block;">Error! </strong>
+                            <?php echo rtrim($this->session->flashdata('error'),',');?>
+                        </div>
+                    <?php } ?>
+                    <?php if($this->session->flashdata('success')){?>
+                        <div class="alert alert-success alert-dismissible fade in">
+                            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+                            <strong style="display: block;">Success! </strong>
+                            <?php echo rtrim($this->session->flashdata('success'),',');?>
+                        </div>
+                    <?php } ?>
+
     				<div class="row">
     					<div class="page-width">	
     						<div class="col-md-12">
@@ -324,8 +338,7 @@
                             </h4>
                         </div>
                         <form id="form_distributor_out_model" role="form" class="form-horizontal" method="post" action="<?php echo base_url().'index.php/distributor_out/set_delivery_status2'; ?>" enctype="multipart/form-data" >
-                          <div class="modal-body">
-                       
+                        <div class="modal-body">
                             <?php if($access[0]->r_approvals=='1' && $status=='pending_for_approval'){ ?>
                                 <label class="control-label">Authorisation <span class="asterisk_sign">*</span></label>
                                 <br/>
@@ -393,7 +406,6 @@
                                     </select>
                                 </div>
                             <?php } ?>
-                            
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
@@ -409,31 +421,57 @@
     	<!-- END PAGE CONTAINER -->
 
         <div class="modal fade" id="delivery_comments" role="dialog">
-                <div class="modal-dialog">
-                    <!-- Modal content-->
-                    <form id="form_distributor_po_comments" role="form" class="form-horizontal" method="post" action="<?php echo base_url().'index.php/distributor_out/add_comments'; ?>">
-                         <div class="modal-content" >
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                 <h4 class="modal-title">Delivery Comments</h4>
-                            </div>
-                            <div class="modal-body">
-                                <br/>
-                                <div class="">
-                                    <label class="control-label">Comments </label>
-                                    <textarea name="delivery_comments" id="delivery_comments" class="form-control"></textarea>
-                                    <input type="hidden" id="delivery_comments_id" name="delivery_comments_id" >
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
-                                <button id="btn_comment_save" class="btn btn-success pull-right"  >Save</button>
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <form id="form_distributor_po_comments" role="form" class="form-horizontal" method="post" action="<?php echo base_url().'index.php/distributor_out/add_comments'; ?>">
+                     <div class="modal-content" >
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                             <h4 class="modal-title">Delivery Comments</h4>
+                        </div>
+                        <div class="modal-body">
+                            <br/>
+                            <div class="">
+                                <label class="control-label">Comments </label>
+                                <textarea name="delivery_comments" id="delivery_comments" class="form-control"></textarea>
+                                <input type="hidden" id="delivery_comments_id" name="delivery_comments_id" >
                             </div>
                         </div>
-                    </form>
-                    
-                </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                            <button id="btn_comment_save" class="btn btn-success pull-right"  >Save</button>
+                        </div>
+                    </div>
+                </form>
             </div>
+        </div>
+
+        <div class="modal fade" id="excelUploadModal" role="dialog" style="">
+          <div class="modal-dialog">
+            <div class="modal-content" style="">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">
+                  Upload Sales Delivery Details
+                </h4>
+              </div>
+              <form method="POST" action="<?php echo base_url();?>index.php/distributor_out/upload_file" class="form-horizontal excelform" enctype="multipart/form-data">
+                <div class="modal-body">
+                  <div class="form-group">
+
+                    <label class="col-md-4 col-sm-4 col-xs-12 control-label">Add Excel <span class="asterisk_sign"></span></label>
+
+                    <input type="file" class="fileinput btn btn-info btn-small  bar_image" name="upload" id="upload_excel" placeholder="Upload" value=""/>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                  <input type="submit" class="btn btn-success pull-right" value="Upload" />
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
 
 	<?php $this->load->view('templates/footer');?>
     <script type="text/javascript">

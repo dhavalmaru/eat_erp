@@ -1700,7 +1700,7 @@ function view_gate_pass_old($distid) {
     }
 }
 
-function get_final_data($check, $sales_rep_id){
+function get_final_data($check, $sales_rep_id, $for_invoice=false){
     $now=date('Y-m-d H:i:s');
     $curusr=$this->session->userdata('session_id');
 
@@ -2287,254 +2287,256 @@ function get_final_data($check, $sales_rep_id){
     $final_data['distributor_details']=array();
     $final_data['sku_batch_details']=array();
 
-    if(count($check)>0){
-        $distributor_out_id = implode(", ", $check);
-    } else {
-        $distributor_out_id = "";
-    }
-
-    if($distributor_out_id!=""){
-        $now=date('Y-m-d H:i:s');
-        $curusr=$this->session->userdata('session_id');
-        if(isset($sales_rep_id)){
-            $sql = "update distributor_out set delivery_status = 'GP Issued', delivery_sales_rep_id = '$sales_rep_id', 
-                                                modified_by = '$curusr', modified_on = '$now' 
-                    where id in (".$distributor_out_id.") and delivery_status = 'pending'";
-            $this->db->query($sql);
+    if($for_invoice==false){
+        if(count($check)>0){
+            $distributor_out_id = implode(", ", $check);
+        } else {
+            $distributor_out_id = "";
         }
 
-        $data['sku_details']=array();
-        $sql = "select AA.sku_name, AA.type, sum(AA.qty) as total_qty from 
-                (select A.*, case when A.type='Bar' then B.short_name else C.short_name end as sku_name 
-                    from distributor_out_items A left join product_master B on(A.item_id=B.id and A.type='Bar') 
-                    left join box_master C on(A.item_id=C.id and A.type='Box') 
-                    where A.distributor_out_id in (".$distributor_out_id.")) AA group by AA.sku_name, AA.type";
-        $query=$this->db->query($sql);
-        $result=$query->result();
-        if(count($result)>0){
-            $final_data['sku_details']=$result;
-        }
-
-        $final_data['delivery_for']=array();
-        $sql = "select A.*, datediff(curdate(), A.date_of_processing) as days, B.distributor_name 
-                from distributor_out A left join distributor_master B on(A.distributor_id=B.id) 
-                where A.id in (".$distributor_out_id.")";
-        $query=$this->db->query($sql);
-        $result=$query->result();
-        if(count($result)>0){
-            $final_data['delivery_for']=$result;
-        }
-        $invoice_no=array();
-        foreach($result as $row) {
-            $invoice_no[]=$row->invoice_no;
-            
-        }
-        $invoice_no1 = join("','",$invoice_no);   
-
-
-        $final_data['pending_payments']=array();
-        $sql = "select DD.distributor_id, DD.distributor_name, DD.total_pending_amount, EE.invoice_date, EE.invoice_no, EE.invoice_amount, EE.voucher_no from 
-                (select CC.distributor_id, CC.distributor_name, sum(pending_amount) as total_pending_amount from 
-                (select AA.*, ifnull(BB.payment_amount,0) as payment_amount, (round(AA.final_amount,0)-ifnull(BB.payment_amount,0)) as pending_amount from 
-                (select A.*, B.distributor_name from distributor_out A left join distributor_master B on(A.distributor_id=B.id) 
-                    where A.status = 'Approved' and A.invoice_no is not null and A.invoice_no!='' and invoice_no not in ('".$invoice_no1."') and 
-                    A.distributor_id in (select distinct distributor_id from distributor_out where id in (".$distributor_out_id.") )) AA 
-                left join 
-                (select A.id, B.distributor_id, B.invoice_no, round(B.payment_amount,0) as payment_amount from payment_details A left join payment_details_items B 
-                    on(A.id=B.payment_id) where A.status = 'Approved') BB 
-                on (AA.distributor_id = BB.distributor_id and AA.invoice_no = BB.invoice_no)) CC 
-                group by CC.distributor_id, CC.distributor_name) DD 
-                left join 
-                (select CC.distributor_id, CC.distributor_name, CC.date_of_processing as invoice_date, CC.invoice_no, 
-                    sum(CC.pending_amount) as invoice_amount, CC.voucher_no from 
-                (select AA.*, ifnull(BB.payment_amount,0) as payment_amount, (round(AA.final_amount,0)-ifnull(BB.payment_amount,0)) as pending_amount from 
-                (select A.*, B.distributor_name from distributor_out A left join distributor_master B on(A.distributor_id=B.id) 
-                    where A.status = 'Approved' and A.invoice_no is not null and A.invoice_no!='' and invoice_no not in ('".$invoice_no1."') and 
-                    A.distributor_id in (select distinct distributor_id from distributor_out where id in (".$distributor_out_id."))) AA 
-                left join 
-                (select A.id, B.distributor_id, B.invoice_no, round(B.payment_amount,0) as payment_amount from payment_details A left join payment_details_items B 
-                    on(A.id=B.payment_id) where A.status = 'Approved') BB 
-                on (AA.distributor_id = BB.distributor_id and AA.invoice_no = BB.invoice_no)) CC where CC.pending_amount > 0 
-                group by CC.distributor_id, CC.distributor_name, CC.date_of_processing, CC.invoice_no, CC.voucher_no) EE 
-                on (DD.distributor_id = EE.distributor_id and DD.distributor_name = EE.distributor_name) 
-                order by DD.distributor_id, EE.invoice_date";
-        $query=$this->db->query($sql);
-        $result=$query->result();
-        if(count($result)>0){
-            $final_data['pending_payments']=$result;
-        }
-
-
-        $sql = "select Q.* from 
-                (select O.*, P.batch_id_as_per_fssai from 
-                (select M.*, N.location from 
-                (select K.*, L.sales_rep_name from 
-                (select I.*, J.depot_name, J.address as depot_address, J.city as depot_city, J.pincode as depot_pincode, 
-                    J.state as depot_state, J.state_code as depot_state_code, J.country as depot_country, 
-                    J.gst_no as depot_gst_no from 
-                (select G.*, H.distributor_name, H.sell_out, H.state as distributor_state, H.class, H.location_id from 
-                (select E.*, F.product_name from 
-                (select C.*, D.box_name from 
-                (select A.*, B.id as sales_item_id, B.type, B.item_id, B.qty, B.rate, B.sell_rate, B.amount as item_amt, B.batch_no from 
-                (select * from distributor_out where id in (".$distributor_out_id.")) A 
-                left join 
-                (select * from distributor_out_items where distributor_out_id in (".$distributor_out_id.")) B 
-                on (A.id = B.distributor_out_id)) C 
-                left join 
-                (select * from box_master) D 
-                on (C.type = 'Box' and C.item_id = D.id)) E 
-                left join 
-                (select * from product_master) F 
-                on (E.type = 'Bar' and E.item_id = F.id)) G 
-                left join 
-                (select * from distributor_master) H 
-                on (G.distributor_id=H.id)) I 
-                left join 
-                (select * from depot_master) J 
-                on (I.depot_id=J.id)) K 
-                left join 
-                (select * from sales_rep_master) L 
-                on (K.sales_rep_id=L.id)) M 
-                left join 
-                (select * from location_master) N 
-                on (M.location_id=N.id)) O 
-                left join 
-                (select * from batch_processing) P 
-                on (O.batch_no=P.id)) Q 
-                order by Q.invoice_no, Q.batch_id_as_per_fssai";
-        $query=$this->db->query($sql);
-        $result=$query->result_array();
-        if(count($result)>0){
-            for($i=0; $i<count($result); $i++){
-                $batch_no = $result[$i]['batch_no'];
-                $total_batch_no = explode(",", $batch_no);
-                for($j=0; $j<count($total_batch_no); $j++){
-                    $total_batch_no[$j] = intval($total_batch_no[$j]);
-                }
-                $batch_no = implode(', ', $total_batch_no);
-
-                // echo $batch_no;
-                // echo '<br/>';
-
-                $sql = "select batch_no from batch_master where id in (".$batch_no.")"; 
-                $query=$this->db->query($sql);
-                $result2=$query->result_array();
-                if(count($result2)>0){
-                    $batch_no = '';
-                    for($j=0; $j<count($total_batch_no); $j++){
-                        $batch_no = $batch_no . $result2[$j]['batch_no'] . ', ';
-                        // echo $batch_no;
-                        // echo '<br/>';
-                    }
-                    if(strpos($batch_no, ',')>0){
-                        $batch_no = substr($batch_no, 0, strrpos($batch_no, ','));
-                    }
-                    // echo $batch_no;
-                    // echo '<br/>';
-                    $result[$i]['batch_id_as_per_fssai'] = $batch_no;
-                }
+        if($distributor_out_id!=""){
+            $now=date('Y-m-d H:i:s');
+            $curusr=$this->session->userdata('session_id');
+            if(isset($sales_rep_id)){
+                $sql = "update distributor_out set delivery_status = 'GP Issued', delivery_sales_rep_id = '$sales_rep_id', 
+                                                    modified_by = '$curusr', modified_on = '$now' 
+                        where id in (".$distributor_out_id.") and delivery_status = 'pending'";
+                $this->db->query($sql);
             }
 
-            $final_data['sku_batch_details']=$result;
+            $data['sku_details']=array();
+            $sql = "select AA.sku_name, AA.type, sum(AA.qty) as total_qty from 
+                    (select A.*, case when A.type='Bar' then B.short_name else C.short_name end as sku_name 
+                        from distributor_out_items A left join product_master B on(A.item_id=B.id and A.type='Bar') 
+                        left join box_master C on(A.item_id=C.id and A.type='Box') 
+                        where A.distributor_out_id in (".$distributor_out_id.")) AA group by AA.sku_name, AA.type";
+            $query=$this->db->query($sql);
+            $result=$query->result();
+            if(count($result)>0){
+                $final_data['sku_details']=$result;
+            }
+
+            $final_data['delivery_for']=array();
+            $sql = "select A.*, datediff(curdate(), A.date_of_processing) as days, B.distributor_name 
+                    from distributor_out A left join distributor_master B on(A.distributor_id=B.id) 
+                    where A.id in (".$distributor_out_id.")";
+            $query=$this->db->query($sql);
+            $result=$query->result();
+            if(count($result)>0){
+                $final_data['delivery_for']=$result;
+            }
+            $invoice_no=array();
+            foreach($result as $row) {
+                $invoice_no[]=$row->invoice_no;
+                
+            }
+            $invoice_no1 = join("','",$invoice_no);   
+
+
+            $final_data['pending_payments']=array();
+            $sql = "select DD.distributor_id, DD.distributor_name, DD.total_pending_amount, EE.invoice_date, EE.invoice_no, EE.invoice_amount, EE.voucher_no from 
+                    (select CC.distributor_id, CC.distributor_name, sum(pending_amount) as total_pending_amount from 
+                    (select AA.*, ifnull(BB.payment_amount,0) as payment_amount, (round(AA.final_amount,0)-ifnull(BB.payment_amount,0)) as pending_amount from 
+                    (select A.*, B.distributor_name from distributor_out A left join distributor_master B on(A.distributor_id=B.id) 
+                        where A.status = 'Approved' and A.invoice_no is not null and A.invoice_no!='' and invoice_no not in ('".$invoice_no1."') and 
+                        A.distributor_id in (select distinct distributor_id from distributor_out where id in (".$distributor_out_id.") )) AA 
+                    left join 
+                    (select A.id, B.distributor_id, B.invoice_no, round(B.payment_amount,0) as payment_amount from payment_details A left join payment_details_items B 
+                        on(A.id=B.payment_id) where A.status = 'Approved') BB 
+                    on (AA.distributor_id = BB.distributor_id and AA.invoice_no = BB.invoice_no)) CC 
+                    group by CC.distributor_id, CC.distributor_name) DD 
+                    left join 
+                    (select CC.distributor_id, CC.distributor_name, CC.date_of_processing as invoice_date, CC.invoice_no, 
+                        sum(CC.pending_amount) as invoice_amount, CC.voucher_no from 
+                    (select AA.*, ifnull(BB.payment_amount,0) as payment_amount, (round(AA.final_amount,0)-ifnull(BB.payment_amount,0)) as pending_amount from 
+                    (select A.*, B.distributor_name from distributor_out A left join distributor_master B on(A.distributor_id=B.id) 
+                        where A.status = 'Approved' and A.invoice_no is not null and A.invoice_no!='' and invoice_no not in ('".$invoice_no1."') and 
+                        A.distributor_id in (select distinct distributor_id from distributor_out where id in (".$distributor_out_id."))) AA 
+                    left join 
+                    (select A.id, B.distributor_id, B.invoice_no, round(B.payment_amount,0) as payment_amount from payment_details A left join payment_details_items B 
+                        on(A.id=B.payment_id) where A.status = 'Approved') BB 
+                    on (AA.distributor_id = BB.distributor_id and AA.invoice_no = BB.invoice_no)) CC where CC.pending_amount > 0 
+                    group by CC.distributor_id, CC.distributor_name, CC.date_of_processing, CC.invoice_no, CC.voucher_no) EE 
+                    on (DD.distributor_id = EE.distributor_id and DD.distributor_name = EE.distributor_name) 
+                    order by DD.distributor_id, EE.invoice_date";
+            $query=$this->db->query($sql);
+            $result=$query->result();
+            if(count($result)>0){
+                $final_data['pending_payments']=$result;
+            }
+
+
+            $sql = "select Q.* from 
+                    (select O.*, P.batch_id_as_per_fssai from 
+                    (select M.*, N.location from 
+                    (select K.*, L.sales_rep_name from 
+                    (select I.*, J.depot_name, J.address as depot_address, J.city as depot_city, J.pincode as depot_pincode, 
+                        J.state as depot_state, J.state_code as depot_state_code, J.country as depot_country, 
+                        J.gst_no as depot_gst_no from 
+                    (select G.*, H.distributor_name, H.sell_out, H.state as distributor_state, H.class, H.location_id from 
+                    (select E.*, F.product_name from 
+                    (select C.*, D.box_name from 
+                    (select A.*, B.id as sales_item_id, B.type, B.item_id, B.qty, B.rate, B.sell_rate, B.amount as item_amt, B.batch_no from 
+                    (select * from distributor_out where id in (".$distributor_out_id.")) A 
+                    left join 
+                    (select * from distributor_out_items where distributor_out_id in (".$distributor_out_id.")) B 
+                    on (A.id = B.distributor_out_id)) C 
+                    left join 
+                    (select * from box_master) D 
+                    on (C.type = 'Box' and C.item_id = D.id)) E 
+                    left join 
+                    (select * from product_master) F 
+                    on (E.type = 'Bar' and E.item_id = F.id)) G 
+                    left join 
+                    (select * from distributor_master) H 
+                    on (G.distributor_id=H.id)) I 
+                    left join 
+                    (select * from depot_master) J 
+                    on (I.depot_id=J.id)) K 
+                    left join 
+                    (select * from sales_rep_master) L 
+                    on (K.sales_rep_id=L.id)) M 
+                    left join 
+                    (select * from location_master) N 
+                    on (M.location_id=N.id)) O 
+                    left join 
+                    (select * from batch_processing) P 
+                    on (O.batch_no=P.id)) Q 
+                    order by Q.invoice_no, Q.batch_id_as_per_fssai";
+            $query=$this->db->query($sql);
+            $result=$query->result_array();
+            if(count($result)>0){
+                for($i=0; $i<count($result); $i++){
+                    $batch_no = $result[$i]['batch_no'];
+                    $total_batch_no = explode(",", $batch_no);
+                    for($j=0; $j<count($total_batch_no); $j++){
+                        $total_batch_no[$j] = intval($total_batch_no[$j]);
+                    }
+                    $batch_no = implode(', ', $total_batch_no);
+
+                    // echo $batch_no;
+                    // echo '<br/>';
+
+                    $sql = "select batch_no from batch_master where id in (".$batch_no.")"; 
+                    $query=$this->db->query($sql);
+                    $result2=$query->result_array();
+                    if(count($result2)>0){
+                        $batch_no = '';
+                        for($j=0; $j<count($total_batch_no); $j++){
+                            $batch_no = $batch_no . $result2[$j]['batch_no'] . ', ';
+                            // echo $batch_no;
+                            // echo '<br/>';
+                        }
+                        if(strpos($batch_no, ',')>0){
+                            $batch_no = substr($batch_no, 0, strrpos($batch_no, ','));
+                        }
+                        // echo $batch_no;
+                        // echo '<br/>';
+                        $result[$i]['batch_id_as_per_fssai'] = $batch_no;
+                    }
+                }
+
+                $final_data['sku_batch_details']=$result;
+            }
+
+
+            $distributor = array();
+            // $sql = "select distinct distributor_id from distributor_out where id in (".$distributor_out_id.")";
+            // $query=$this->db->query($sql);
+            // $distributor=$query->result();
+
+            // for($i=0; $i<count($distributor); $i++){
+            //     $final_data['distributor_details'][$i]=$this->distributor_model->get_data('Approved', $distributor[$i]->distributor_id);
+            //     $final_data['distributor_payments'][$i]=array();
+            //     $final_data['distributor_payments_ageing'][$i]=array();
+
+            //     $sql = "select DD.distributor_id, DD.distributor_name, DD.total_pending_amount, EE.invoice_date, EE.invoice_no, EE.invoice_amount, EE.voucher_no from 
+            //             (select CC.distributor_id, CC.distributor_name, sum(pending_amount) as total_pending_amount from 
+            //             (select AA.*, ifnull(BB.payment_amount,0) as payment_amount, (round(AA.final_amount,0)-ifnull(BB.payment_amount,0)) as pending_amount from 
+            //             (select A.*, B.distributor_name from distributor_out A left join distributor_master B on(A.distributor_id=B.id) 
+            //                 where A.status = 'Approved' and A.invoice_no is not null and A.invoice_no!='' and 
+            //                 A.distributor_id = '".$distributor[$i]->distributor_id."') AA 
+            //             left join 
+            //             (select A.id, B.distributor_id, B.invoice_no, round(B.payment_amount,0) as payment_amount from payment_details A left join payment_details_items B 
+            //                 on(A.id=B.payment_id) where A.status = 'Approved') BB 
+            //             on (AA.distributor_id = BB.distributor_id and AA.invoice_no = BB.invoice_no)) CC 
+            //             group by CC.distributor_id, CC.distributor_name) DD 
+            //             left join 
+            //             (select CC.distributor_id, CC.distributor_name, CC.date_of_processing as invoice_date, CC.invoice_no, 
+            //                 sum(CC.pending_amount) as invoice_amount, CC.voucher_no from 
+            //             (select AA.*, ifnull(BB.payment_amount,0) as payment_amount, (round(AA.final_amount,0)-ifnull(BB.payment_amount,0)) as pending_amount from 
+            //             (select A.*, B.distributor_name from distributor_out A left join distributor_master B on(A.distributor_id=B.id) 
+            //                 where A.status = 'Approved' and A.invoice_no is not null and A.invoice_no!='' and 
+            //                 A.distributor_id = '".$distributor[$i]->distributor_id."') AA 
+            //             left join 
+            //             (select A.id, B.distributor_id, B.invoice_no, round(B.payment_amount,0) as payment_amount from payment_details A left join payment_details_items B 
+            //                 on(A.id=B.payment_id) where A.status = 'Approved') BB 
+            //             on (AA.distributor_id = BB.distributor_id and AA.invoice_no = BB.invoice_no)) CC where CC.pending_amount > 0 
+            //             group by CC.distributor_id, CC.distributor_name, CC.date_of_processing, CC.invoice_no) EE 
+            //             on (DD.distributor_id = EE.distributor_id and DD.distributor_name = EE.distributor_name) 
+            //             order by DD.distributor_id, EE.invoice_date";
+            //     $query=$this->db->query($sql);
+            //     $result=$query->result();
+            //     if(count($result)>0){
+            //         $final_data['distributor_payments'][$i]=$result;
+            //     }
+
+            //     $date = date('Y-m-d');
+            //     $sql = "select G.*, (G.days_30_45+G.days_46_60) as days_30_60, H.distributor_name from 
+            //             (select F.distributor_id, F.days_0_30, F.days_30_45, F.days_46_60, F.days_61_90, F.days_91_above, 
+            //                 (F.days_0_30+F.days_30_45+F.days_46_60+F.days_61_90+F.days_91_above) as tot_receivable from 
+            //             (select E.distributor_id, case when (E.days_91_above-E.paid_amount)>0 then 
+            //                 (E.days_91_above-E.paid_amount) else 0 end as days_91_above, 
+            //             case when (E.days_91_above-E.paid_amount)>0 then E.days_61_90 else case when 
+            //                 (E.days_61_90-(E.paid_amount-E.days_91_above))>0 then 
+            //                 (E.days_61_90-(E.paid_amount-E.days_91_above)) else 0 end end as days_61_90, 
+            //             case when (E.days_61_90-(E.paid_amount-E.days_91_above))>0 then 
+            //             E.days_46_60 else case when (E.days_46_60-(E.paid_amount-E.days_91_above-E.days_61_90))>0 then 
+            //             (E.days_46_60-(E.paid_amount-E.days_91_above-E.days_61_90)) else 0 end end as days_46_60, 
+            //             case when (E.days_46_60-(E.paid_amount-E.days_91_above-E.days_61_90))>0 then E.days_30_45 else case 
+            //                 when (E.days_30_45-(E.paid_amount-E.days_91_above-E.days_61_90-E.days_46_60))>0 
+            //                 then (E.days_30_45-(E.paid_amount-E.days_91_above-E.days_61_90-E.days_46_60)) else 0 end end as days_30_45, 
+            //             case when (E.days_30_45-(E.paid_amount-E.days_91_above-E.days_61_90-E.days_46_60))>0 then E.days_0_30 else case 
+            //                 when (E.days_0_30-(E.paid_amount-E.days_91_above-E.days_61_90-E.days_46_60-E.days_30_45))>0 
+            //                 then (E.days_0_30-(E.paid_amount-E.days_91_above-E.days_61_90-E.days_46_60-E.days_30_45)) else 0 end end as days_0_30 from 
+            //             (select C.distributor_id, C.days_0_30, C.days_30_45, C.days_46_60, C.days_61_90, C.days_91_above, 
+            //                 ifnull(D.paid_amount,0) as paid_amount from 
+            //             (select distributor_id, ifnull(round(sum(days_0_30),0),0) as days_0_30, 
+            //                 ifnull(round(sum(days_30_45),0),0) as days_30_45, 
+            //                 ifnull(round(sum(days_46_60),0),0) as days_46_60, 
+            //             ifnull(round(sum(days_61_90),0),0) as days_61_90, ifnull(round(sum(days_91_above),0),0) as days_91_above from 
+            //             (select distributor_id, case when no_of_days<30 then final_amount else 0 end as days_0_30, 
+            //             case when no_of_days>=30 and no_of_days<=45 then final_amount else 0 end as days_30_45, 
+            //             case when no_of_days>=46 and no_of_days<=60 then final_amount else 0 end as days_46_60, 
+            //             case when no_of_days>=61 and no_of_days<=90 then final_amount else 0 end as days_61_90, 
+            //             case when no_of_days>=91 then final_amount else 0 end as days_91_above from 
+            //             (select id, distributor_id, datediff('$date', date_of_processing) as no_of_days, 
+            //                 round(final_amount,0) as final_amount from distributor_out where status = 'Approved' and date_of_processing<='$date') A) B 
+            //             group by distributor_id) C 
+            //             left join 
+            //             (select distributor_id, round(sum(payment_amount),0) as paid_amount from payment_details_items 
+            //                 where payment_id in (select distinct id from payment_details where status = 'Approved' and 
+            //                     date_of_deposit<='$date') group by distributor_id) D 
+            //             on (C.distributor_id = D.distributor_id)) E) F) G 
+            //             left join 
+            //             (select * from distributor_master) H 
+            //             on (G.distributor_id = H.id) where G.distributor_id = '".$distributor[$i]->distributor_id."' and 
+            //             G.tot_receivable > 0";
+            //     $query=$this->db->query($sql);
+            //     $result=$query->result();
+            //     if(count($result)>0){
+            //         $final_data['distributor_payments_ageing'][$i]=$result;
+            //     }
+
+            //     $total_amount = 0;
+            //     for($j=0; $j<count($final_data['distributor_payments'][$i]); $j++){
+            //         if(isset($final_data['distributor_payments'][$i][$j]->invoice_amount)){
+            //             $total_amount = $total_amount + floatval($final_data['distributor_payments'][$i][$j]->invoice_amount);
+            //         }
+            //     }
+            //     $final_data['total_amount'][$i]=$total_amount;
+            // }
         }
-
-
-        $distributor = array();
-        // $sql = "select distinct distributor_id from distributor_out where id in (".$distributor_out_id.")";
-        // $query=$this->db->query($sql);
-        // $distributor=$query->result();
-
-        // for($i=0; $i<count($distributor); $i++){
-        //     $final_data['distributor_details'][$i]=$this->distributor_model->get_data('Approved', $distributor[$i]->distributor_id);
-        //     $final_data['distributor_payments'][$i]=array();
-        //     $final_data['distributor_payments_ageing'][$i]=array();
-
-        //     $sql = "select DD.distributor_id, DD.distributor_name, DD.total_pending_amount, EE.invoice_date, EE.invoice_no, EE.invoice_amount, EE.voucher_no from 
-        //             (select CC.distributor_id, CC.distributor_name, sum(pending_amount) as total_pending_amount from 
-        //             (select AA.*, ifnull(BB.payment_amount,0) as payment_amount, (round(AA.final_amount,0)-ifnull(BB.payment_amount,0)) as pending_amount from 
-        //             (select A.*, B.distributor_name from distributor_out A left join distributor_master B on(A.distributor_id=B.id) 
-        //                 where A.status = 'Approved' and A.invoice_no is not null and A.invoice_no!='' and 
-        //                 A.distributor_id = '".$distributor[$i]->distributor_id."') AA 
-        //             left join 
-        //             (select A.id, B.distributor_id, B.invoice_no, round(B.payment_amount,0) as payment_amount from payment_details A left join payment_details_items B 
-        //                 on(A.id=B.payment_id) where A.status = 'Approved') BB 
-        //             on (AA.distributor_id = BB.distributor_id and AA.invoice_no = BB.invoice_no)) CC 
-        //             group by CC.distributor_id, CC.distributor_name) DD 
-        //             left join 
-        //             (select CC.distributor_id, CC.distributor_name, CC.date_of_processing as invoice_date, CC.invoice_no, 
-        //                 sum(CC.pending_amount) as invoice_amount, CC.voucher_no from 
-        //             (select AA.*, ifnull(BB.payment_amount,0) as payment_amount, (round(AA.final_amount,0)-ifnull(BB.payment_amount,0)) as pending_amount from 
-        //             (select A.*, B.distributor_name from distributor_out A left join distributor_master B on(A.distributor_id=B.id) 
-        //                 where A.status = 'Approved' and A.invoice_no is not null and A.invoice_no!='' and 
-        //                 A.distributor_id = '".$distributor[$i]->distributor_id."') AA 
-        //             left join 
-        //             (select A.id, B.distributor_id, B.invoice_no, round(B.payment_amount,0) as payment_amount from payment_details A left join payment_details_items B 
-        //                 on(A.id=B.payment_id) where A.status = 'Approved') BB 
-        //             on (AA.distributor_id = BB.distributor_id and AA.invoice_no = BB.invoice_no)) CC where CC.pending_amount > 0 
-        //             group by CC.distributor_id, CC.distributor_name, CC.date_of_processing, CC.invoice_no) EE 
-        //             on (DD.distributor_id = EE.distributor_id and DD.distributor_name = EE.distributor_name) 
-        //             order by DD.distributor_id, EE.invoice_date";
-        //     $query=$this->db->query($sql);
-        //     $result=$query->result();
-        //     if(count($result)>0){
-        //         $final_data['distributor_payments'][$i]=$result;
-        //     }
-
-        //     $date = date('Y-m-d');
-        //     $sql = "select G.*, (G.days_30_45+G.days_46_60) as days_30_60, H.distributor_name from 
-        //             (select F.distributor_id, F.days_0_30, F.days_30_45, F.days_46_60, F.days_61_90, F.days_91_above, 
-        //                 (F.days_0_30+F.days_30_45+F.days_46_60+F.days_61_90+F.days_91_above) as tot_receivable from 
-        //             (select E.distributor_id, case when (E.days_91_above-E.paid_amount)>0 then 
-        //                 (E.days_91_above-E.paid_amount) else 0 end as days_91_above, 
-        //             case when (E.days_91_above-E.paid_amount)>0 then E.days_61_90 else case when 
-        //                 (E.days_61_90-(E.paid_amount-E.days_91_above))>0 then 
-        //                 (E.days_61_90-(E.paid_amount-E.days_91_above)) else 0 end end as days_61_90, 
-        //             case when (E.days_61_90-(E.paid_amount-E.days_91_above))>0 then 
-        //             E.days_46_60 else case when (E.days_46_60-(E.paid_amount-E.days_91_above-E.days_61_90))>0 then 
-        //             (E.days_46_60-(E.paid_amount-E.days_91_above-E.days_61_90)) else 0 end end as days_46_60, 
-        //             case when (E.days_46_60-(E.paid_amount-E.days_91_above-E.days_61_90))>0 then E.days_30_45 else case 
-        //                 when (E.days_30_45-(E.paid_amount-E.days_91_above-E.days_61_90-E.days_46_60))>0 
-        //                 then (E.days_30_45-(E.paid_amount-E.days_91_above-E.days_61_90-E.days_46_60)) else 0 end end as days_30_45, 
-        //             case when (E.days_30_45-(E.paid_amount-E.days_91_above-E.days_61_90-E.days_46_60))>0 then E.days_0_30 else case 
-        //                 when (E.days_0_30-(E.paid_amount-E.days_91_above-E.days_61_90-E.days_46_60-E.days_30_45))>0 
-        //                 then (E.days_0_30-(E.paid_amount-E.days_91_above-E.days_61_90-E.days_46_60-E.days_30_45)) else 0 end end as days_0_30 from 
-        //             (select C.distributor_id, C.days_0_30, C.days_30_45, C.days_46_60, C.days_61_90, C.days_91_above, 
-        //                 ifnull(D.paid_amount,0) as paid_amount from 
-        //             (select distributor_id, ifnull(round(sum(days_0_30),0),0) as days_0_30, 
-        //                 ifnull(round(sum(days_30_45),0),0) as days_30_45, 
-        //                 ifnull(round(sum(days_46_60),0),0) as days_46_60, 
-        //             ifnull(round(sum(days_61_90),0),0) as days_61_90, ifnull(round(sum(days_91_above),0),0) as days_91_above from 
-        //             (select distributor_id, case when no_of_days<30 then final_amount else 0 end as days_0_30, 
-        //             case when no_of_days>=30 and no_of_days<=45 then final_amount else 0 end as days_30_45, 
-        //             case when no_of_days>=46 and no_of_days<=60 then final_amount else 0 end as days_46_60, 
-        //             case when no_of_days>=61 and no_of_days<=90 then final_amount else 0 end as days_61_90, 
-        //             case when no_of_days>=91 then final_amount else 0 end as days_91_above from 
-        //             (select id, distributor_id, datediff('$date', date_of_processing) as no_of_days, 
-        //                 round(final_amount,0) as final_amount from distributor_out where status = 'Approved' and date_of_processing<='$date') A) B 
-        //             group by distributor_id) C 
-        //             left join 
-        //             (select distributor_id, round(sum(payment_amount),0) as paid_amount from payment_details_items 
-        //                 where payment_id in (select distinct id from payment_details where status = 'Approved' and 
-        //                     date_of_deposit<='$date') group by distributor_id) D 
-        //             on (C.distributor_id = D.distributor_id)) E) F) G 
-        //             left join 
-        //             (select * from distributor_master) H 
-        //             on (G.distributor_id = H.id) where G.distributor_id = '".$distributor[$i]->distributor_id."' and 
-        //             G.tot_receivable > 0";
-        //     $query=$this->db->query($sql);
-        //     $result=$query->result();
-        //     if(count($result)>0){
-        //         $final_data['distributor_payments_ageing'][$i]=$result;
-        //     }
-
-        //     $total_amount = 0;
-        //     for($j=0; $j<count($final_data['distributor_payments'][$i]); $j++){
-        //         if(isset($final_data['distributor_payments'][$i][$j]->invoice_amount)){
-        //             $total_amount = $total_amount + floatval($final_data['distributor_payments'][$i][$j]->invoice_amount);
-        //         }
-        //     }
-        //     $final_data['total_amount'][$i]=$total_amount;
-        // }
     }
 
     return $final_data;
@@ -2619,7 +2621,7 @@ function generate_tax_invoice($dist_out_id) {
                     $check[$b]=$data_result[$b]->id;
                 }
                 
-                $final_data = $this->get_final_data($check, $sales_rep_id);
+                $final_data = $this->get_final_data($check, $sales_rep_id, true);
                 
 
                 if(count($final_data['voucher_details'])>0){
@@ -2633,6 +2635,57 @@ function generate_tax_invoice($dist_out_id) {
                 } else {
                     $this->load->library('parser');
                     $output = $this->parser->parse('invoice/tax_invoice.php',$final_data,true);
+                    $pdf='';   
+                    if ($pdf=='print')
+                        $this->_gen_pdf($output);
+                    else
+                        $this->output->set_output($output);
+                }
+            }
+        }
+    }
+}
+
+function generate_multiple_tax_invoice($dist_out_id) {
+    $now=date('Y-m-d H:i:s');
+    $curusr=$this->session->userdata('session_id');
+
+    $sql = "select distinct delivery_sales_rep_id from distributor_out where id in (".$dist_out_id.") order by delivery_sales_rep_id";
+    $query=$this->db->query($sql);
+    $query_result=$query->result();
+    if(count($query_result)>0){
+        for($a=0; $a<count($query_result); $a++){
+            $sales_rep_id=$query_result[$a]->delivery_sales_rep_id;
+
+            if(isset($sales_rep_id) && $sales_rep_id!=''){
+                $sql = "select * from distributor_out where id in (".$dist_out_id.") and 
+                        delivery_sales_rep_id = '".$sales_rep_id."' order by id";
+            } else {
+                $sql = "select * from distributor_out where id in (".$dist_out_id.") order by id";
+            }
+            
+            $query=$this->db->query($sql);
+            $data_result=$query->result();
+            if(count($data_result)>0){
+                $check = array();
+                for($b=0; $b<count($data_result); $b++){
+                    $check[$b]=$data_result[$b]->id;
+                }
+                
+                $final_data = $this->get_final_data($check, $sales_rep_id, true);
+                
+
+                if(count($final_data['voucher_details'])>0){
+                    $this->load->library('parser');
+                    $output = $this->parser->parse('invoice/voucher.php',$final_data,true);
+                    $pdf='';   
+                    if ($pdf=='print')
+                        $this->_gen_pdf($output);
+                    else
+                        $this->output->set_output($output);
+                } else {
+                    $this->load->library('parser');
+                    $output = $this->parser->parse('invoice/multiple_tax_invoice.php',$final_data,true);
                     $pdf='';   
                     if ($pdf=='print')
                         $this->_gen_pdf($output);
@@ -2670,7 +2723,7 @@ function generate_tax_invoice_test($dist_out_id) {
                     $check[$b]=$data_result[$b]->id;
                 }
                 
-                $final_data = $this->get_final_data($check, $sales_rep_id);
+                $final_data = $this->get_final_data($check, $sales_rep_id, true);
 
                 echo json_encode($final_data['invoice_details']);
                 
@@ -2702,6 +2755,9 @@ function view_gate_pass($distid) {
     $curusr=$this->session->userdata('session_id');
 
     $check=array();
+    $check[0]=$distid;
+    $gpid=0;
+
     $sql = "select gp_id from gp_data where dist_id='".$distid."' order by gp_id desc";
     $query=$this->db->query($sql);
     $result=$query->result();

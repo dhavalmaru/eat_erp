@@ -5,7 +5,6 @@
 if ( ! defined('BASEPATH')) {exit('No direct script access allowed');}
 
 class Sales_upload extends CI_Controller{
-
     public function __construct(){
         parent::__construct();
         $this->load->helper('url');
@@ -15,6 +14,7 @@ class Sales_upload extends CI_Controller{
         $this->load->helper('common_functions');
         $this->load->model('sales_upload_model');
         $this->load->model('distributor_out_model');
+        $this->load->model('tax_invoice_model');
         $this->load->library('excel');
         $this->load->database();
     }
@@ -286,7 +286,6 @@ class Sales_upload extends CI_Controller{
 
         echo 'upload file';
         exit;
-        
     }
 
     public function upload_file(){
@@ -403,7 +402,7 @@ class Sales_upload extends CI_Controller{
         $order_array = [];
 
         for($i=5; $i<=$highestrow; $i++){
-            $creation_date = $objPHPExcel->getActiveSheet()->getCell('A'.$i)->getCalculatedValue();
+            $creation_date = $objPHPExcel->getActiveSheet()->getCell('A'.$i)->getValue();
             $depot = $objPHPExcel->getActiveSheet()->getCell('B'.$i)->getCalculatedValue();
             $distributor_name = $objPHPExcel->getActiveSheet()->getCell('C'.$i)->getCalculatedValue();
             $name_of_customer = $objPHPExcel->getActiveSheet()->getCell('D'.$i)->getCalculatedValue();
@@ -457,6 +456,7 @@ class Sales_upload extends CI_Controller{
                         }
                     }
                 }
+
                 if($depot==''){
                     $error.='Depot Name cannot be blank.';
                     $objerror=1;
@@ -782,7 +782,8 @@ class Sales_upload extends CI_Controller{
                 if($bl_flag==false){
                     $j=count($order_array);
 
-                    $order_array[$j]['creation_date']=FormatDate($creation_date);
+                    // $order_array[$j]['creation_date']=FormatDate($creation_date);
+                    $order_array[$j]['creation_date']=$creation_date;
                     $order_array[$j]['depot']=$depot;
                     $order_array[$j]['depot_id']=$depot_id;
                     $order_array[$j]['depot_state']=$depot_state;
@@ -1054,8 +1055,7 @@ class Sales_upload extends CI_Controller{
         redirect(base_url().'index.php/Sales_upload');
     }
 
-    public function common_excel($objValidation)
-    {
+    public function common_excel($objValidation){
         $objValidation->setType( PHPExcel_Cell_DataValidation::TYPE_LIST );
         $objValidation->setErrorStyle( PHPExcel_Cell_DataValidation::STYLE_INFORMATION );
         $objValidation->setAllowBlank(false);
@@ -1078,8 +1078,8 @@ class Sales_upload extends CI_Controller{
         if(count($result)>0){
             for($i=0; $i<count($result); $i++){
                 $sql = "insert into distributor_out (date_of_processing, invoice_no, depot_id, 
-                            distributor_id, sales_rep_id, amount, tax, tax_per, tax_amount, final_amount, due_date, order_no, order_date, supplier_ref, despatch_doc_no, despatch_through, destination, status, remarks, created_by, created_on, modified_by, modified_on, approved_by, approved_on, rejected_by, rejected_on, voucher_no, gate_pass_no, client_name, address, city, pincode, state, country, mobile_no, discount, sample_distributor_id, delivery_status, delivery_date, delivery_sales_rep_id, receivable_doc, distributor_in_id, distributor_in_type, transport_type, vehicle_number, cgst, sgst, igst, cgst_amount, sgst_amount, igst_amount, reverse_charge, shipping_address, distributor_consignee_id, con_name, con_address, con_city, con_pincode, con_state, con_country, con_state_code, con_gst_number, state_code, sample_type, gifting_remarks, promoter_sales_rep_id, blogger_name, blogger_address, blogger_phone_no, blogger_email_id, round_off_amount, invoice_amount, ref_id, invoice_date, gatepass_date, gpid, freezed, tracking_id, basis_of_sales, email_from, email_approved_by, email_date_time, distributor_po_id, comments, gstin, modified_approved_date, proof_of_dispatch, date_of_dispatch, person_receiving, proof_of_delivery, ref_invoice_no, ref_invoice_details, ref_invoice_date)
-                        select date_of_processing, invoice_no, depot_id, distributor_id, sales_rep_id, amount, tax, tax_per, tax_amount, final_amount, due_date, order_no, order_date, supplier_ref, despatch_doc_no, despatch_through, destination, status, remarks, created_by, created_on, modified_by, modified_on, approved_by, approved_on, rejected_by, rejected_on, voucher_no, gate_pass_no, client_name, address, city, pincode, state, country, mobile_no, discount, sample_distributor_id, delivery_status, delivery_date, delivery_sales_rep_id, receivable_doc, distributor_in_id, distributor_in_type, transport_type, vehicle_number, cgst, sgst, igst, cgst_amount, sgst_amount, igst_amount, reverse_charge, shipping_address, distributor_consignee_id, con_name, con_address, con_city, con_pincode, con_state, con_country, con_state_code, con_gst_number, state_code, sample_type, gifting_remarks, promoter_sales_rep_id, blogger_name, blogger_address, blogger_phone_no, blogger_email_id, round_off_amount, invoice_amount, ref_id, invoice_date, gatepass_date, gpid, freezed, tracking_id, basis_of_sales, email_from, email_approved_by, email_date_time, distributor_po_id, comments, gstin, modified_approved_date, proof_of_dispatch, date_of_dispatch, person_receiving, proof_of_delivery, ref_invoice_no, ref_invoice_details, ref_invoice_date 
+                            distributor_id, sales_rep_id, amount, tax, tax_per, tax_amount, final_amount, due_date, order_no, order_date, supplier_ref, despatch_doc_no, despatch_through, destination, status, remarks, created_by, created_on, modified_by, modified_on, approved_by, approved_on, rejected_by, rejected_on, voucher_no, gate_pass_no, client_name, address, city, pincode, state, country, mobile_no, discount, sample_distributor_id, delivery_status, delivery_date, delivery_sales_rep_id, receivable_doc, distributor_in_id, distributor_in_type, transport_type, vehicle_number, cgst, sgst, igst, cgst_amount, sgst_amount, igst_amount, reverse_charge, shipping_address, distributor_consignee_id, con_name, con_address, con_city, con_pincode, con_state, con_country, con_state_code, con_gst_number, state_code, sample_type, gifting_remarks, promoter_sales_rep_id, blogger_name, blogger_address, blogger_phone_no, blogger_email_id, round_off_amount, invoice_amount, ref_id, invoice_date, gatepass_date, gpid, freezed, tracking_id, basis_of_sales, email_from, email_approved_by, email_date_time, distributor_po_id, comments, gstin, modified_approved_date, proof_of_dispatch, date_of_dispatch, person_receiving, proof_of_delivery, ref_invoice_no, ref_invoice_details, ref_invoice_date, file_id)
+                        select date_of_processing, invoice_no, depot_id, distributor_id, sales_rep_id, amount, tax, tax_per, tax_amount, final_amount, due_date, order_no, order_date, supplier_ref, despatch_doc_no, despatch_through, destination, status, remarks, created_by, created_on, modified_by, modified_on, approved_by, approved_on, rejected_by, rejected_on, voucher_no, gate_pass_no, client_name, address, city, pincode, state, country, mobile_no, discount, sample_distributor_id, delivery_status, delivery_date, delivery_sales_rep_id, receivable_doc, distributor_in_id, distributor_in_type, transport_type, vehicle_number, cgst, sgst, igst, cgst_amount, sgst_amount, igst_amount, reverse_charge, shipping_address, distributor_consignee_id, con_name, con_address, con_city, con_pincode, con_state, con_country, con_state_code, con_gst_number, state_code, sample_type, gifting_remarks, promoter_sales_rep_id, blogger_name, blogger_address, blogger_phone_no, blogger_email_id, round_off_amount, invoice_amount, ref_id, invoice_date, gatepass_date, gpid, freezed, tracking_id, basis_of_sales, email_from, email_approved_by, email_date_time, distributor_po_id, comments, gstin, modified_approved_date, proof_of_dispatch, date_of_dispatch, person_receiving, proof_of_delivery, ref_invoice_no, ref_invoice_details, ref_invoice_date, '".$file_id."' 
                         from sales_upload_details where id = '".$result[$i]->id."'";
                 $this->db->query($sql);
                 $id = $this->db->insert_id();
@@ -1130,6 +1130,39 @@ class Sales_upload extends CI_Controller{
         }
 
         redirect(base_url().'index.php/Sales_upload');
+    }
+
+    public function get_file_invoices($file_id){
+        $sql = "select id from distributor_out where file_id='$file_id'";
+        $result = $this->db->query($sql)->result_array();
+
+        $dist_out_id = '';
+        $dist_out_id_arr = array();
+        if(count($result)>0){
+            for($i=0; $i<count($result); $i++){
+                // $dist_out_id_arr[] = $result[$i]['id'];
+                $dist_out_id = $dist_out_id . $result[$i]['id'] . ', ';
+            }
+        }
+
+        // echo '<pre>'; print_r($dist_out_id_arr); echo '</pre>';
+        // exit;
+
+        // $dist_out_id = '';
+        // if(count($result)>0){
+        //     $dist_out_id = implode(', ', $result);
+        // }
+
+        if($dist_out_id!=''){
+            $dist_out_id = substr($dist_out_id, 0, strlen($dist_out_id)-2);
+        }
+
+        // echo $dist_out_id;
+        // exit;
+
+        if($dist_out_id!=''){
+            $this->tax_invoice_model->generate_multiple_tax_invoice($dist_out_id);
+        }
     }
 }
 ?>

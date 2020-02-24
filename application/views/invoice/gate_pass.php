@@ -208,10 +208,11 @@
         <center style="width:100%;display:inline-block;margin:0 auto;">
             <img src="<?php echo base_url().'/assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:150px;" />
             <p style="font-size:12px;line-height:18px;margin:0;margin-bottom:10px;">
-                C/109, Hind Saurashtra Ind. Estate. 85/86, Andheri Kurla Road, Marol Naka, Andheri East. Mumbai 400059
+                REG. ADDRESS
+                <br /> C/109, Hind Saurashtra Ind. Estate. 85/86, Andheri Kurla Road, Marol Naka, Andheri East. Mumbai 400059
                 <br /> +91 8268000456 
-                <br><a href="mailto:cs@eatanytime.in">cs@eatanytime.in</a><br>
-                GSTIN: 27AABCW7811R1ZN
+                <br /><a href="mailto:cs@eatanytime.in">cs@eatanytime.in</a>
+                <!-- GSTIN: 27AABCW7811R1ZN -->
             </p>
         </center>
         <table cellspacing="0" cellpadding="5" border="1" style="border-collapse: collapse; width:100%; margin:auto; font-family:Arcon-Regular, OpenSans-Regular, Arcon, Verdana, Geneva, sans-serif; font-size:8px; font-weight:400; border:1px solid #666;"    >
@@ -272,24 +273,33 @@
                         <td width="50%" rowspan="3" style="line-height:12px; border-bottom:0px solid #666; ">
                             <table width="100%"  border="0" cellspacing="0" cellpadding="2"  style="border-collapse: collapse;    ">
                                 <tr>
-                                    <td width="30%">Reverse Charge:</td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['reverse_charge'])) echo $invoice_details[$inv_cnt]['reverse_charge']; ?></td>
+                                    <td width="20%">Reverse Charge:</td>
+                                    <td width="20%"><?php if (isset($invoice_details[$inv_cnt]['reverse_charge'])) echo $invoice_details[$inv_cnt]['reverse_charge']; ?></td>
+                                    <td width="20%">Shipped From:</td>
+                                    <td width="40%" rowspan="2"><?php if (isset($invoice_details[$inv_cnt]['depot_address'])) echo $invoice_details[$inv_cnt]['depot_address']; ?></td>
                                 </tr>
                                 <tr>
-                                    <td>Invoice No: </td><td><?php if (isset($invoice_details[$inv_cnt]['invoice_no'])) echo $invoice_details[$inv_cnt]['invoice_no']; ?></td>
+                                    <td>Invoice No: </td>
+                                    <td><?php if (isset($invoice_details[$inv_cnt]['invoice_no'])) echo $invoice_details[$inv_cnt]['invoice_no']; ?></td>
                                 </tr>
                                 <tr>
-                                    <td>Invoice Date: </td><td><?php if (isset($invoice_details[$inv_cnt]['invoice_date'])) echo (($invoice_details[$inv_cnt]['invoice_date']!=null && $invoice_details[$inv_cnt]['invoice_date']!='')?date('d-M-y',strtotime($invoice_details[$inv_cnt]['invoice_date'])):''); ?></td>
+                                    <td>Invoice Date: </td>
+                                    <td><?php if (isset($invoice_details[$inv_cnt]['invoice_date'])) echo (($invoice_details[$inv_cnt]['invoice_date']!=null && $invoice_details[$inv_cnt]['invoice_date']!='')?date('d-M-y',strtotime($invoice_details[$inv_cnt]['invoice_date'])):''); ?></td>
+                                    <td>GST No:</td>
+                                    <td><?php if (isset($invoice_details[$inv_cnt]['depot_gst_no'])) echo $invoice_details[$inv_cnt]['depot_gst_no']; ?></td>
                                 </tr>
-                                <tr >
+                                <tr>
                                     <td>State: </td>
                                     <td><?php if (isset($invoice_details[$inv_cnt]['depot_state'])) echo $invoice_details[$inv_cnt]['depot_state']; ?>
-                                        <table style="float: right;border-collapse:collapse;margin-right:10px;">
+                                    </td>
+                                    <td>State Code:</td>
+                                    <td><?php if (isset($invoice_details[$inv_cnt]['depot_state_code'])) echo $invoice_details[$inv_cnt]['depot_state_code']; ?>
+                                        <!-- <table style="float: right;border-collapse:collapse;margin-right:10px;">
                                             <tr style="border-top:1px solid #666;">
                                                 <td style="border-left:1px solid #666;border-right:1px solid #666;width:80px;" align="right">State Code: &nbsp;</td>
-                                                <td style="border-right:1px solid #666;width:20px;text-align:center;"><?php if (isset($invoice_details[$inv_cnt]['depot_state_code'])) echo $invoice_details[$inv_cnt]['depot_state_code']; ?></td>
+                                                <td style="border-right:1px solid #666;width:20px;text-align:center;"><?php //if (isset($invoice_details[$inv_cnt]['depot_state_code'])) echo $invoice_details[$inv_cnt]['depot_state_code']; ?></td>
                                             </tr>
-                                        </table>
+                                        </table> -->
                                     </td>
                                 </tr>
                             </table>
@@ -297,7 +307,7 @@
                         <td width="50%" valign="top" style="line-height:12px;  border-right:1px solid #666; border-left:1px solid #666; border-bottom:1px solid #666; border-right:none;">
                             <table width="100%"  border="0" cellspacing="0" cellpadding="2"  style="border-collapse: collapse;    ">
                                 <tr>
-                                    <td width="30%">Transporter Mode:</td>
+                                    <td width="25%">Transporter Mode:</td>
                                     <td><?php if (isset($invoice_details[$inv_cnt]['transport_type'])) echo $invoice_details[$inv_cnt]['transport_type']; ?></td>
                                 </tr>
                                
@@ -343,63 +353,64 @@
                         <td width="50%" rowspan="3" style="line-height:12px; border-bottom:0px solid #666; ">
                             <table width="100%"  border="0" cellspacing="0" cellpadding="2"  style="border-collapse: collapse;    ">
                                 <tr>
-                                    <td width="30%">Name:</td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['distributor_name'])) echo $invoice_details[$inv_cnt]['distributor_name']; ?></td>
+                                    <td width="20%">Name:</td>
+                                    <td colspan="3"><?php if (isset($invoice_details[$inv_cnt]['distributor_name'])) echo $invoice_details[$inv_cnt]['distributor_name']; ?></td>
                                 </tr>
                                 <tr>
                                     <td>Address: </td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['address'])) echo $invoice_details[$inv_cnt]['address']; ?></td>
+                                    <td colspan="3"><?php if (isset($invoice_details[$inv_cnt]['address'])) echo $invoice_details[$inv_cnt]['address']; ?></td>
                                 </tr>
                                 <tr>
                                     <td>GSTIN: </td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['gst_number'])) echo $invoice_details[$inv_cnt]['gst_number']; ?></td>
+                                    <td colspan="3"><?php if (isset($invoice_details[$inv_cnt]['gst_number'])) echo $invoice_details[$inv_cnt]['gst_number']; ?></td>
                                 </tr>
                                 <tr style="<?php if(!isset($invoice_details[$inv_cnt]['mobile_no'])) echo 'display: none;'; ?>">
                                     <td>Mobile No: </td>
-                                    <td><?php if(isset($invoice_details[$inv_cnt]['mobile_no'])) echo $invoice_details[$inv_cnt]['mobile_no']; ?></td>
+                                    <td colspan="3"><?php if(isset($invoice_details[$inv_cnt]['mobile_no'])) echo $invoice_details[$inv_cnt]['mobile_no']; ?></td>
                                 </tr>
-                                <tr >
+                                <tr>
                                     <td>State: </td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['state'])) echo $invoice_details[$inv_cnt]['state']; ?>
-                                        <table style="float: right;border-collapse:collapse;margin-right:10px;">
-                                            <tr style="border-top:1px solid #666;">
-                                                <td style="border-left:1px solid #666;border-right:1px solid #666;width:80px;" align="right">State Code: &nbsp;</td>
-                                                <td style="border-right:1px solid #666;width:20px;text-align:center;"><?php if (isset($invoice_details[$inv_cnt]['state_code'])) echo $invoice_details[$inv_cnt]['state_code']; ?></td>
-                                            </tr>
-                                        </table>
-                                    </td>
+                                    <td width="20%"><?php if (isset($invoice_details[$inv_cnt]['state'])) echo $invoice_details[$inv_cnt]['state']; ?></td>
+                                    <td width="20%">State Code: &nbsp;</td>
+                                    <td width="40%"><?php if (isset($invoice_details[$inv_cnt]['state_code'])) echo $invoice_details[$inv_cnt]['state_code']; ?></td>
                                 </tr>
                             </table>
                         </td>
                         <td width="50%" valign="top" style="line-height:12px;  border-right:1px solid #666; border-left:1px solid #666; border-bottom:1px solid #666;border-right:none; ">
                             <table width="100%"  border="0" cellspacing="0" cellpadding="2"  style="border-collapse: collapse;    ">
                                 <tr>
-                                    <td width="30%">Name:</td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['con_name'])) echo $invoice_details[$inv_cnt]['con_name']; ?></td>
+                                    <td width="20%">Name:</td>
+                                    <td colspan="3"><?php if (isset($invoice_details[$inv_cnt]['con_name'])) echo $invoice_details[$inv_cnt]['con_name']; ?></td>
                                 </tr>
                                 <tr>
                                     <td>Address: </td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['con_address'])) echo $invoice_details[$inv_cnt]['con_address']; ?></td>
+                                    <td colspan="3"><?php if (isset($invoice_details[$inv_cnt]['con_address'])) echo $invoice_details[$inv_cnt]['con_address']; ?></td>
                                 </tr>
                                 <tr>
                                     <td>GSTIN: </td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['con_gst_number'])) echo $invoice_details[$inv_cnt]['con_gst_number']; ?></td>
+                                    <td colspan="3"><?php if (isset($invoice_details[$inv_cnt]['con_gst_number'])) echo $invoice_details[$inv_cnt]['con_gst_number']; ?></td>
                                 </tr>
                                 <tr style="<?php if(!isset($invoice_details[$inv_cnt]['mobile_no'])) echo 'display: none;'; ?>">
                                     <td>Mobile No: </td>
-                                    <td><?php if(isset($invoice_details[$inv_cnt]['mobile_no'])) echo $invoice_details[$inv_cnt]['mobile_no']; ?></td>
+                                    <td colspan="3"><?php if (isset($invoice_details[$inv_cnt]['mobile_no'])) echo $invoice_details[$inv_cnt]['mobile_no']; ?></td>
                                 </tr>
-                                <tr >
+                                <tr>
                                     <td>State: </td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['con_state'])) echo $invoice_details[$inv_cnt]['con_state']; ?>
+                                    <td width="20%"><?php if (isset($invoice_details[$inv_cnt]['state'])) echo $invoice_details[$inv_cnt]['state']; ?></td>
+                                    <td width="20%">State Code: &nbsp;</td>
+                                    <td width="40%"><?php if (isset($invoice_details[$inv_cnt]['state_code'])) echo $invoice_details[$inv_cnt]['state_code']; ?></td>
+                                </tr>
+                                <!-- <tr>
+                                    <td>State: </td>
+                                    <td><?php //if (isset($invoice_details[$inv_cnt]['con_state'])) echo $invoice_details[$inv_cnt]['con_state']; ?>
                                         <table style="float: right;border-collapse:collapse;margin-right:10px;">
                                             <tr style="border-top:1px solid #666;">
                                                 <td style="border-left:1px solid #666;border-right:1px solid #666;width:80px;" align="right">State Code: &nbsp;</td>
-                                                <td style="border-right:1px solid #666;width:20px;text-align:center;"><?php if (isset($invoice_details[$inv_cnt]['con_state_code'])) echo $invoice_details[$inv_cnt]['con_state_code']; ?></td>
+                                                <td style="border-right:1px solid #666;width:20px;text-align:center;"><?php //if (isset($invoice_details[$inv_cnt]['con_state_code'])) echo $invoice_details[$inv_cnt]['con_state_code']; ?></td>
                                             </tr>
                                         </table>
                                     </td>
-                                </tr>
+                                </tr> -->
                             </table>
                         </td>
                     </tr>
@@ -554,8 +565,8 @@
                 $tot_igst_amt=0;
                 $tot_gst_amt=0;
 
-                $tax_desc_body='<td width="840" colspan="4" rowspan="3" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;padding:0;">
-                    <table style="width: 100%;border-spacing: 0;height: 100%; min-height: 100%">
+                $tax_desc_body='<td width="840" colspan="4" rowspan="4" align="center" valign="middle" style="border-right:1px solid #666;border-bottom:1px solid #666;padding:0;">
+                    <table style="width: 100%;border-spacing: 0;height: 83px; min-height: 83px;">
                         <tr>
                             <td colspan="2" style="border-right:1px solid #666;border-bottom:0px solid #666;text-align: center;font-weight:900;background:#ececec">CGST</td>
                             <td colspan="2" style="border-right:1px solid #666;border-bottom:0px solid #666;text-align: center;font-weight:900;background:#ececec">SGST</td>
@@ -620,6 +631,13 @@
             <td style=" font-size:10px; font-weight:900; background:#ececec;">  
                 <span style="text-align:left; float:left"> &#8377; </span> 
                 <span style="text-align:right; float:right"><?php if (isset($tot_gst_amt)) echo $tot_gst_amt; ?></span> 
+            </td>
+        </tr>
+        <tr>
+            <td colspan="1" valign="top" style="font-size:10px; font-weight:500;">Shipping Amount</td>
+            <td style=" font-size:10px; font-weight:500;"  >  
+                <span style="text-align:left; float:left"> &#8377; </span> 
+                <span style="text-align:right; float:right"><?php if (isset($invoice_details[$inv_cnt]['shipping_charges'])) echo $invoice_details[$inv_cnt]['shipping_charges']; ?></span> 
             </td>
         </tr>
         <tr>
@@ -694,10 +712,11 @@
         <center style="width:100%;display:inline-block;margin:0 auto;">
             <img src="<?php echo base_url().'/assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:150px;" />
             <p style="font-size:12px;line-height:18px;margin:0;margin-bottom:10px;">
-                B-505, Veena sur, Mahavir Nagar Kandivali-West,Mumbai - 67 
+                REG. ADDRESS
+                <br /> C/109, Hind Saurashtra Ind. Estate. 85/86, Andheri Kurla Road, Marol Naka, Andheri East. Mumbai 400059
                 <br /> +91 8268000456 
-                <br><a href="mailto:cs@eatanytime.in">cs@eatanytime.in</a><br>
-                GSTIN: 27AABCW7811R1ZN
+                <br /><a href="mailto:cs@eatanytime.in">cs@eatanytime.in</a>
+                <!-- GSTIN: 27AABCW7811R1ZN -->
             </p>
         </center>
         <table cellspacing="0" cellpadding="5" border="1" style="border-collapse: collapse; width:100%; margin:auto; font-family:Arcon-Regular, OpenSans-Regular, Arcon, Verdana, Geneva, sans-serif; font-size:8px; font-weight:400; border:1px solid #666;"    >
@@ -758,24 +777,33 @@
                         <td width="50%" rowspan="3" style="line-height:12px; border-bottom:0px solid #666; ">
                             <table width="100%"  border="0" cellspacing="0" cellpadding="2"  style="border-collapse: collapse;    ">
                                 <tr>
-                                    <td width="30%">Reverse Charge:</td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['reverse_charge'])) echo $invoice_details[$inv_cnt]['reverse_charge']; ?></td>
+                                    <td width="20%">Reverse Charge:</td>
+                                    <td width="20%"><?php if (isset($invoice_details[$inv_cnt]['reverse_charge'])) echo $invoice_details[$inv_cnt]['reverse_charge']; ?></td>
+                                    <td width="20%">Shipped From:</td>
+                                    <td width="40%" rowspan="2"><?php if (isset($invoice_details[$inv_cnt]['depot_address'])) echo $invoice_details[$inv_cnt]['depot_address']; ?></td>
                                 </tr>
                                 <tr>
-                                    <td>Invoice No: </td><td><?php if (isset($invoice_details[$inv_cnt]['invoice_no'])) echo $invoice_details[$inv_cnt]['invoice_no']; ?></td>
+                                    <td>Invoice No: </td>
+                                    <td><?php if (isset($invoice_details[$inv_cnt]['invoice_no'])) echo $invoice_details[$inv_cnt]['invoice_no']; ?></td>
                                 </tr>
                                 <tr>
-                                    <td>Invoice Date: </td><td><?php if (isset($invoice_details[$inv_cnt]['invoice_date'])) echo (($invoice_details[$inv_cnt]['invoice_date']!=null && $invoice_details[$inv_cnt]['invoice_date']!='')?date('d-M-y',strtotime($invoice_details[$inv_cnt]['invoice_date'])):''); ?></td>
+                                    <td>Invoice Date: </td>
+                                    <td><?php if (isset($invoice_details[$inv_cnt]['invoice_date'])) echo (($invoice_details[$inv_cnt]['invoice_date']!=null && $invoice_details[$inv_cnt]['invoice_date']!='')?date('d-M-y',strtotime($invoice_details[$inv_cnt]['invoice_date'])):''); ?></td>
+                                    <td>GST No:</td>
+                                    <td><?php if (isset($invoice_details[$inv_cnt]['depot_gst_no'])) echo $invoice_details[$inv_cnt]['depot_gst_no']; ?></td>
                                 </tr>
-                                <tr >
+                                <tr>
                                     <td>State: </td>
                                     <td><?php if (isset($invoice_details[$inv_cnt]['depot_state'])) echo $invoice_details[$inv_cnt]['depot_state']; ?>
-                                        <table style="float: right;border-collapse:collapse;margin-right:10px;">
+                                    </td>
+                                    <td>State Code:</td>
+                                    <td><?php if (isset($invoice_details[$inv_cnt]['depot_state_code'])) echo $invoice_details[$inv_cnt]['depot_state_code']; ?>
+                                        <!-- <table style="float: right;border-collapse:collapse;margin-right:10px;">
                                             <tr style="border-top:1px solid #666;">
                                                 <td style="border-left:1px solid #666;border-right:1px solid #666;width:80px;" align="right">State Code: &nbsp;</td>
-                                                <td style="border-right:1px solid #666;width:20px;text-align:center;"><?php if (isset($invoice_details[$inv_cnt]['depot_state_code'])) echo $invoice_details[$inv_cnt]['depot_state_code']; ?></td>
+                                                <td style="border-right:1px solid #666;width:20px;text-align:center;"><?php //if (isset($invoice_details[$inv_cnt]['depot_state_code'])) echo $invoice_details[$inv_cnt]['depot_state_code']; ?></td>
                                             </tr>
-                                        </table>
+                                        </table> -->
                                     </td>
                                 </tr>
                             </table>
@@ -783,10 +811,11 @@
                         <td width="50%" valign="top" style="line-height:12px;  border-right:1px solid #666; border-left:1px solid #666; border-bottom:1px solid #666; border-right:none;">
                             <table width="100%"  border="0" cellspacing="0" cellpadding="2"  style="border-collapse: collapse;    ">
                                 <tr>
-                                    <td width="30%">Transporter Mode:</td>
+                                    <td width="25%">Transporter Mode:</td>
                                     <td><?php if (isset($invoice_details[$inv_cnt]['transport_type'])) echo $invoice_details[$inv_cnt]['transport_type']; ?></td>
                                 </tr>
-                                <tr>
+                               
+                                 <tr>
                                     <td>PO Number: </td>
                                     <td><?php if (isset($invoice_details[$inv_cnt]['order_no'])) echo $invoice_details[$inv_cnt]['order_no']; ?></td>
                                 </tr>
@@ -828,63 +857,64 @@
                         <td width="50%" rowspan="3" style="line-height:12px; border-bottom:0px solid #666; ">
                             <table width="100%"  border="0" cellspacing="0" cellpadding="2"  style="border-collapse: collapse;    ">
                                 <tr>
-                                    <td width="30%">Name:</td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['distributor_name'])) echo $invoice_details[$inv_cnt]['distributor_name']; ?></td>
+                                    <td width="20%">Name:</td>
+                                    <td colspan="3"><?php if (isset($invoice_details[$inv_cnt]['distributor_name'])) echo $invoice_details[$inv_cnt]['distributor_name']; ?></td>
                                 </tr>
                                 <tr>
                                     <td>Address: </td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['address'])) echo $invoice_details[$inv_cnt]['address']; ?></td>
+                                    <td colspan="3"><?php if (isset($invoice_details[$inv_cnt]['address'])) echo $invoice_details[$inv_cnt]['address']; ?></td>
                                 </tr>
                                 <tr>
                                     <td>GSTIN: </td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['gst_number'])) echo $invoice_details[$inv_cnt]['gst_number']; ?></td>
+                                    <td colspan="3"><?php if (isset($invoice_details[$inv_cnt]['gst_number'])) echo $invoice_details[$inv_cnt]['gst_number']; ?></td>
                                 </tr>
                                 <tr style="<?php if(!isset($invoice_details[$inv_cnt]['mobile_no'])) echo 'display: none;'; ?>">
                                     <td>Mobile No: </td>
-                                    <td><?php if(isset($invoice_details[$inv_cnt]['mobile_no'])) echo $invoice_details[$inv_cnt]['mobile_no']; ?></td>
+                                    <td colspan="3"><?php if(isset($invoice_details[$inv_cnt]['mobile_no'])) echo $invoice_details[$inv_cnt]['mobile_no']; ?></td>
                                 </tr>
-                                <tr >
+                                <tr>
                                     <td>State: </td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['state'])) echo $invoice_details[$inv_cnt]['state']; ?>
-                                        <table style="float: right;border-collapse:collapse;margin-right:10px;">
-                                            <tr style="border-top:1px solid #666;">
-                                                <td style="border-left:1px solid #666;border-right:1px solid #666;width:80px;" align="right">State Code: &nbsp;</td>
-                                                <td style="border-right:1px solid #666;width:20px;text-align:center;"><?php if (isset($invoice_details[$inv_cnt]['state_code'])) echo $invoice_details[$inv_cnt]['state_code']; ?></td>
-                                            </tr>
-                                        </table>
-                                    </td>
+                                    <td width="20%"><?php if (isset($invoice_details[$inv_cnt]['state'])) echo $invoice_details[$inv_cnt]['state']; ?></td>
+                                    <td width="20%">State Code: &nbsp;</td>
+                                    <td width="40%"><?php if (isset($invoice_details[$inv_cnt]['state_code'])) echo $invoice_details[$inv_cnt]['state_code']; ?></td>
                                 </tr>
                             </table>
                         </td>
                         <td width="50%" valign="top" style="line-height:12px;  border-right:1px solid #666; border-left:1px solid #666; border-bottom:1px solid #666;border-right:none; ">
                             <table width="100%"  border="0" cellspacing="0" cellpadding="2"  style="border-collapse: collapse;    ">
                                 <tr>
-                                    <td width="30%">Name:</td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['con_name'])) echo $invoice_details[$inv_cnt]['con_name']; ?></td>
+                                    <td width="20%">Name:</td>
+                                    <td colspan="3"><?php if (isset($invoice_details[$inv_cnt]['con_name'])) echo $invoice_details[$inv_cnt]['con_name']; ?></td>
                                 </tr>
                                 <tr>
                                     <td>Address: </td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['con_address'])) echo $invoice_details[$inv_cnt]['con_address']; ?></td>
+                                    <td colspan="3"><?php if (isset($invoice_details[$inv_cnt]['con_address'])) echo $invoice_details[$inv_cnt]['con_address']; ?></td>
                                 </tr>
                                 <tr>
                                     <td>GSTIN: </td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['con_gst_number'])) echo $invoice_details[$inv_cnt]['con_gst_number']; ?></td>
+                                    <td colspan="3"><?php if (isset($invoice_details[$inv_cnt]['con_gst_number'])) echo $invoice_details[$inv_cnt]['con_gst_number']; ?></td>
                                 </tr>
                                 <tr style="<?php if(!isset($invoice_details[$inv_cnt]['mobile_no'])) echo 'display: none;'; ?>">
                                     <td>Mobile No: </td>
-                                    <td><?php if(isset($invoice_details[$inv_cnt]['mobile_no'])) echo $invoice_details[$inv_cnt]['mobile_no']; ?></td>
+                                    <td colspan="3"><?php if (isset($invoice_details[$inv_cnt]['mobile_no'])) echo $invoice_details[$inv_cnt]['mobile_no']; ?></td>
                                 </tr>
-                                <tr >
+                                <tr>
                                     <td>State: </td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['con_state'])) echo $invoice_details[$inv_cnt]['con_state']; ?>
+                                    <td width="20%"><?php if (isset($invoice_details[$inv_cnt]['state'])) echo $invoice_details[$inv_cnt]['state']; ?></td>
+                                    <td width="20%">State Code: &nbsp;</td>
+                                    <td width="40%"><?php if (isset($invoice_details[$inv_cnt]['state_code'])) echo $invoice_details[$inv_cnt]['state_code']; ?></td>
+                                </tr>
+                                <!-- <tr>
+                                    <td>State: </td>
+                                    <td><?php //if (isset($invoice_details[$inv_cnt]['con_state'])) echo $invoice_details[$inv_cnt]['con_state']; ?>
                                         <table style="float: right;border-collapse:collapse;margin-right:10px;">
                                             <tr style="border-top:1px solid #666;">
                                                 <td style="border-left:1px solid #666;border-right:1px solid #666;width:80px;" align="right">State Code: &nbsp;</td>
-                                                <td style="border-right:1px solid #666;width:20px;text-align:center;"><?php if (isset($invoice_details[$inv_cnt]['con_state_code'])) echo $invoice_details[$inv_cnt]['con_state_code']; ?></td>
+                                                <td style="border-right:1px solid #666;width:20px;text-align:center;"><?php //if (isset($invoice_details[$inv_cnt]['con_state_code'])) echo $invoice_details[$inv_cnt]['con_state_code']; ?></td>
                                             </tr>
                                         </table>
                                     </td>
-                                </tr>
+                                </tr> -->
                             </table>
                         </td>
                     </tr>
@@ -1043,6 +1073,13 @@
             </td>
         </tr>
         <tr>
+            <td colspan="1" valign="top" style="font-size:10px; font-weight:500;">Shipping Amount</td>
+            <td style=" font-size:10px; font-weight:500;"  >  
+                <span style="text-align:left; float:left"> &#8377; </span> 
+                <span style="text-align:right; float:right"><?php if (isset($invoice_details[$inv_cnt]['shipping_charges'])) echo $invoice_details[$inv_cnt]['shipping_charges']; ?></span> 
+            </td>
+        </tr>
+        <tr>
             <td colspan="1" valign="top" style="font-size:10px; font-weight:500;">Round Off Amount</td>
             <td style=" font-size:10px; font-weight:500;"  >  
                 <span style="text-align:left; float:left"> &#8377; </span> 
@@ -1114,10 +1151,11 @@
         <center style="width:100%;display:inline-block;margin:0 auto;">
             <img src="<?php echo base_url().'/assets/invoice/'; ?>logo.png" alt=""  style="vertical-align: top;margin-top: 0px;width:150px;" />
             <p style="font-size:12px;line-height:18px;margin:0;margin-bottom:10px;">
-                B-505, Veena sur, Mahavir Nagar Kandivali-West,Mumbai - 67 
+                REG. ADDRESS
+                <br /> C/109, Hind Saurashtra Ind. Estate. 85/86, Andheri Kurla Road, Marol Naka, Andheri East. Mumbai 400059
                 <br /> +91 8268000456 
-                <br><a href="mailto:cs@eatanytime.in">cs@eatanytime.in</a><br>
-                GSTIN: 27AABCW7811R1ZN
+                <br /><a href="mailto:cs@eatanytime.in">cs@eatanytime.in</a>
+                <!-- GSTIN: 27AABCW7811R1ZN -->
             </p>
         </center>
         <table cellspacing="0" cellpadding="5" border="1" style="border-collapse: collapse; width:100%; margin:auto; font-family:Arcon-Regular, OpenSans-Regular, Arcon, Verdana, Geneva, sans-serif; font-size:8px; font-weight:400; border:1px solid #666;"    >
@@ -1178,24 +1216,33 @@
                         <td width="50%" rowspan="3" style="line-height:12px; border-bottom:0px solid #666; ">
                             <table width="100%"  border="0" cellspacing="0" cellpadding="2"  style="border-collapse: collapse;    ">
                                 <tr>
-                                    <td width="30%">Reverse Charge:</td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['reverse_charge'])) echo $invoice_details[$inv_cnt]['reverse_charge']; ?></td>
+                                    <td width="20%">Reverse Charge:</td>
+                                    <td width="20%"><?php if (isset($invoice_details[$inv_cnt]['reverse_charge'])) echo $invoice_details[$inv_cnt]['reverse_charge']; ?></td>
+                                    <td width="20%">Shipped From:</td>
+                                    <td width="40%" rowspan="2"><?php if (isset($invoice_details[$inv_cnt]['depot_address'])) echo $invoice_details[$inv_cnt]['depot_address']; ?></td>
                                 </tr>
                                 <tr>
-                                    <td>Invoice No: </td><td><?php if (isset($invoice_details[$inv_cnt]['invoice_no'])) echo $invoice_details[$inv_cnt]['invoice_no']; ?></td>
+                                    <td>Invoice No: </td>
+                                    <td><?php if (isset($invoice_details[$inv_cnt]['invoice_no'])) echo $invoice_details[$inv_cnt]['invoice_no']; ?></td>
                                 </tr>
                                 <tr>
-                                    <td>Invoice Date: </td><td><?php if (isset($invoice_details[$inv_cnt]['invoice_date'])) echo (($invoice_details[$inv_cnt]['invoice_date']!=null && $invoice_details[$inv_cnt]['invoice_date']!='')?date('d-M-y',strtotime($invoice_details[$inv_cnt]['invoice_date'])):''); ?></td>
+                                    <td>Invoice Date: </td>
+                                    <td><?php if (isset($invoice_details[$inv_cnt]['invoice_date'])) echo (($invoice_details[$inv_cnt]['invoice_date']!=null && $invoice_details[$inv_cnt]['invoice_date']!='')?date('d-M-y',strtotime($invoice_details[$inv_cnt]['invoice_date'])):''); ?></td>
+                                    <td>GST No:</td>
+                                    <td><?php if (isset($invoice_details[$inv_cnt]['depot_gst_no'])) echo $invoice_details[$inv_cnt]['depot_gst_no']; ?></td>
                                 </tr>
-                                <tr >
+                                <tr>
                                     <td>State: </td>
                                     <td><?php if (isset($invoice_details[$inv_cnt]['depot_state'])) echo $invoice_details[$inv_cnt]['depot_state']; ?>
-                                        <table style="float: right;border-collapse:collapse;margin-right:10px;">
+                                    </td>
+                                    <td>State Code:</td>
+                                    <td><?php if (isset($invoice_details[$inv_cnt]['depot_state_code'])) echo $invoice_details[$inv_cnt]['depot_state_code']; ?>
+                                        <!-- <table style="float: right;border-collapse:collapse;margin-right:10px;">
                                             <tr style="border-top:1px solid #666;">
                                                 <td style="border-left:1px solid #666;border-right:1px solid #666;width:80px;" align="right">State Code: &nbsp;</td>
-                                                <td style="border-right:1px solid #666;width:20px;text-align:center;"><?php if (isset($invoice_details[$inv_cnt]['depot_state_code'])) echo $invoice_details[$inv_cnt]['depot_state_code']; ?></td>
+                                                <td style="border-right:1px solid #666;width:20px;text-align:center;"><?php //if (isset($invoice_details[$inv_cnt]['depot_state_code'])) echo $invoice_details[$inv_cnt]['depot_state_code']; ?></td>
                                             </tr>
-                                        </table>
+                                        </table> -->
                                     </td>
                                 </tr>
                             </table>
@@ -1203,10 +1250,11 @@
                         <td width="50%" valign="top" style="line-height:12px;  border-right:1px solid #666; border-left:1px solid #666; border-bottom:1px solid #666; border-right:none;">
                             <table width="100%"  border="0" cellspacing="0" cellpadding="2"  style="border-collapse: collapse;    ">
                                 <tr>
-                                    <td width="30%">Transporter Mode:</td>
+                                    <td width="25%">Transporter Mode:</td>
                                     <td><?php if (isset($invoice_details[$inv_cnt]['transport_type'])) echo $invoice_details[$inv_cnt]['transport_type']; ?></td>
                                 </tr>
-                                <tr>
+                               
+                                 <tr>
                                     <td>PO Number: </td>
                                     <td><?php if (isset($invoice_details[$inv_cnt]['order_no'])) echo $invoice_details[$inv_cnt]['order_no']; ?></td>
                                 </tr>
@@ -1248,63 +1296,64 @@
                         <td width="50%" rowspan="3" style="line-height:12px; border-bottom:0px solid #666; ">
                             <table width="100%"  border="0" cellspacing="0" cellpadding="2"  style="border-collapse: collapse;    ">
                                 <tr>
-                                    <td width="30%">Name:</td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['distributor_name'])) echo $invoice_details[$inv_cnt]['distributor_name']; ?></td>
+                                    <td width="20%">Name:</td>
+                                    <td colspan="3"><?php if (isset($invoice_details[$inv_cnt]['distributor_name'])) echo $invoice_details[$inv_cnt]['distributor_name']; ?></td>
                                 </tr>
                                 <tr>
                                     <td>Address: </td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['address'])) echo $invoice_details[$inv_cnt]['address']; ?></td>
+                                    <td colspan="3"><?php if (isset($invoice_details[$inv_cnt]['address'])) echo $invoice_details[$inv_cnt]['address']; ?></td>
                                 </tr>
                                 <tr>
                                     <td>GSTIN: </td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['gst_number'])) echo $invoice_details[$inv_cnt]['gst_number']; ?></td>
+                                    <td colspan="3"><?php if (isset($invoice_details[$inv_cnt]['gst_number'])) echo $invoice_details[$inv_cnt]['gst_number']; ?></td>
                                 </tr>
                                 <tr style="<?php if(!isset($invoice_details[$inv_cnt]['mobile_no'])) echo 'display: none;'; ?>">
                                     <td>Mobile No: </td>
-                                    <td><?php if(isset($invoice_details[$inv_cnt]['mobile_no'])) echo $invoice_details[$inv_cnt]['mobile_no']; ?></td>
+                                    <td colspan="3"><?php if(isset($invoice_details[$inv_cnt]['mobile_no'])) echo $invoice_details[$inv_cnt]['mobile_no']; ?></td>
                                 </tr>
-                                <tr >
+                                <tr>
                                     <td>State: </td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['state'])) echo $invoice_details[$inv_cnt]['state']; ?>
-                                        <table style="float: right;border-collapse:collapse;margin-right:10px;">
-                                            <tr style="border-top:1px solid #666;">
-                                                <td style="border-left:1px solid #666;border-right:1px solid #666;width:80px;" align="right">State Code: &nbsp;</td>
-                                                <td style="border-right:1px solid #666;width:20px;text-align:center;"><?php if (isset($invoice_details[$inv_cnt]['state_code'])) echo $invoice_details[$inv_cnt]['state_code']; ?></td>
-                                            </tr>
-                                        </table>
-                                    </td>
+                                    <td width="20%"><?php if (isset($invoice_details[$inv_cnt]['state'])) echo $invoice_details[$inv_cnt]['state']; ?></td>
+                                    <td width="20%">State Code: &nbsp;</td>
+                                    <td width="40%"><?php if (isset($invoice_details[$inv_cnt]['state_code'])) echo $invoice_details[$inv_cnt]['state_code']; ?></td>
                                 </tr>
                             </table>
                         </td>
                         <td width="50%" valign="top" style="line-height:12px;  border-right:1px solid #666; border-left:1px solid #666; border-bottom:1px solid #666;border-right:none; ">
                             <table width="100%"  border="0" cellspacing="0" cellpadding="2"  style="border-collapse: collapse;    ">
                                 <tr>
-                                    <td width="30%">Name:</td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['con_name'])) echo $invoice_details[$inv_cnt]['con_name']; ?></td>
+                                    <td width="20%">Name:</td>
+                                    <td colspan="3"><?php if (isset($invoice_details[$inv_cnt]['con_name'])) echo $invoice_details[$inv_cnt]['con_name']; ?></td>
                                 </tr>
                                 <tr>
                                     <td>Address: </td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['con_address'])) echo $invoice_details[$inv_cnt]['con_address']; ?></td>
+                                    <td colspan="3"><?php if (isset($invoice_details[$inv_cnt]['con_address'])) echo $invoice_details[$inv_cnt]['con_address']; ?></td>
                                 </tr>
                                 <tr>
                                     <td>GSTIN: </td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['con_gst_number'])) echo $invoice_details[$inv_cnt]['con_gst_number']; ?></td>
+                                    <td colspan="3"><?php if (isset($invoice_details[$inv_cnt]['con_gst_number'])) echo $invoice_details[$inv_cnt]['con_gst_number']; ?></td>
                                 </tr>
                                 <tr style="<?php if(!isset($invoice_details[$inv_cnt]['mobile_no'])) echo 'display: none;'; ?>">
                                     <td>Mobile No: </td>
-                                    <td><?php if(isset($invoice_details[$inv_cnt]['mobile_no'])) echo $invoice_details[$inv_cnt]['mobile_no']; ?></td>
+                                    <td colspan="3"><?php if (isset($invoice_details[$inv_cnt]['mobile_no'])) echo $invoice_details[$inv_cnt]['mobile_no']; ?></td>
                                 </tr>
-                                <tr >
+                                <tr>
                                     <td>State: </td>
-                                    <td><?php if (isset($invoice_details[$inv_cnt]['con_state'])) echo $invoice_details[$inv_cnt]['con_state']; ?>
+                                    <td width="20%"><?php if (isset($invoice_details[$inv_cnt]['state'])) echo $invoice_details[$inv_cnt]['state']; ?></td>
+                                    <td width="20%">State Code: &nbsp;</td>
+                                    <td width="40%"><?php if (isset($invoice_details[$inv_cnt]['state_code'])) echo $invoice_details[$inv_cnt]['state_code']; ?></td>
+                                </tr>
+                                <!-- <tr>
+                                    <td>State: </td>
+                                    <td><?php //if (isset($invoice_details[$inv_cnt]['con_state'])) echo $invoice_details[$inv_cnt]['con_state']; ?>
                                         <table style="float: right;border-collapse:collapse;margin-right:10px;">
                                             <tr style="border-top:1px solid #666;">
                                                 <td style="border-left:1px solid #666;border-right:1px solid #666;width:80px;" align="right">State Code: &nbsp;</td>
-                                                <td style="border-right:1px solid #666;width:20px;text-align:center;"><?php if (isset($invoice_details[$inv_cnt]['con_state_code'])) echo $invoice_details[$inv_cnt]['con_state_code']; ?></td>
+                                                <td style="border-right:1px solid #666;width:20px;text-align:center;"><?php //if (isset($invoice_details[$inv_cnt]['con_state_code'])) echo $invoice_details[$inv_cnt]['con_state_code']; ?></td>
                                             </tr>
                                         </table>
                                     </td>
-                                </tr>
+                                </tr> -->
                             </table>
                         </td>
                     </tr>
@@ -1458,6 +1507,13 @@
             <td  style=" font-size:10px; font-weight:900;background:#ececec;">  
                 <span style="text-align:left; float:left"> &#8377; </span> 
                 <span style="text-align:right; float:right"><?php if (isset($tot_gst_amt)) echo $tot_gst_amt; ?></span> 
+            </td>
+        </tr>
+        <tr>
+            <td colspan="1" valign="top" style="font-size:10px; font-weight:500;">Shipping Amount</td>
+            <td style=" font-size:10px; font-weight:500;"  >  
+                <span style="text-align:left; float:left"> &#8377; </span> 
+                <span style="text-align:right; float:right"><?php if (isset($invoice_details[$inv_cnt]['shipping_charges'])) echo $invoice_details[$inv_cnt]['shipping_charges']; ?></span> 
             </td>
         </tr>
         <tr>
