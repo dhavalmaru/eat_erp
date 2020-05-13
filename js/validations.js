@@ -7172,3 +7172,64 @@ $('#form_report_master').submit(function() {
         return true;
     }
 });
+
+
+
+
+// ----------------- PINCODE MASTER FORM VALIDATION -------------------------------------
+$("#form_pincode_details").validate({
+    rules: {
+        pincode: {
+            required: true,
+            check_pincode_availablity: true
+        },
+        state_name: {
+            required: true
+        }
+    },
+
+    ignore: false,
+
+    errorPlacement: function (error, element) {
+        var placement = $(element).data('error');
+        if (placement) {
+            $(placement).append(error);
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
+$.validator.addMethod("check_pincode_availablity", function (value, element) {
+    var result = 1;
+
+    $.ajax({
+        url: BASE_URL+'index.php/pincode_master/check_pincode_availablity',
+        data: 'id='+$("#id").val()+'&pincode='+$("#pincode").val(),
+        type: "POST",
+        dataType: 'html',
+        global: false,
+        async: false,
+        success: function (data) {
+            result = parseInt(data);
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+        }
+    });
+
+    if (result) {
+        return false;
+    } else {
+        return true;
+    }
+}, 'Pincode already in use.');
+
+$('#form_pincode_details').submit(function() {
+    if (!$("#form_pincode_details").valid()) {
+        return false;
+    } else {
+        return true;
+    }
+});

@@ -5646,7 +5646,13 @@ function get_product_stock_details_old2($from_date, $to_date) {
 }
 
 function get_product_stock_details($from_date, $to_date) {
-    $sql = "select A.* from 
+    $sql = "select A.state, A.city, A.depot_name, A.type, A.item_name, A.unit_weight, 
+                sum(A.opening_qty) as opening_qty, sum(A.production_qty) as production_qty, 
+                sum(A.depot_in_qty) as depot_in_qty, sum(A.depot_out_qty) as depot_out_qty, 
+                sum(A.sale_qty) as sale_qty, sum(A.sample_qty) as sample_qty, 
+                sum(A.expire_qty) as expire_qty, sum(A.sale_return_qty) as sale_return_qty, 
+                sum(A.convert_out_qty) as convert_out_qty, sum(A.convert_in_qty) as convert_in_qty, 
+                sum(A.del_pending_qty) as del_pending_qty from 
             (select YY.*, ZZ.del_pending_qty from 
             (select WW.*, XX.state, XX.city, XX.depot_name from 
             (select UU.*, VV.item_name, VV.grams as unit_weight from 
@@ -5708,7 +5714,11 @@ function get_product_stock_details($from_date, $to_date) {
             group by C.depot_id, C.type, C.product_id 
             union all 
             select C.depot_id, C.type, C.product_id, sum(C.qty) as tot_qty from 
-            (select A.id, A.depot_id as depot_id, B.type, B.item_id as product_id, B.qty from distributor_out A left join distributor_out_items B on (A.id=B.distributor_out_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and A.date_of_processing<'$from_date' and B.item_id is not null) C 
+            (select A.id, A.depot_id as depot_id, B.type, B.item_id as product_id, B.qty from distributor_out A left join distributor_out_items B on (A.id=B.distributor_out_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and A.invoice_date<'$from_date' and A.distributor_id not in (1, 63, 64, 65, 66, 189) and B.item_id is not null) C 
+            group by C.depot_id, C.type, C.product_id 
+            union all 
+            select C.depot_id, C.type, C.product_id, sum(C.qty) as tot_qty from 
+            (select A.id, A.depot_id as depot_id, B.type, B.item_id as product_id, B.qty from distributor_out A left join distributor_out_items B on (A.id=B.distributor_out_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and A.date_of_processing<'$from_date' and A.distributor_id in (1, 63, 64, 65, 66, 189) and B.item_id is not null) C 
             group by C.depot_id, C.type, C.product_id 
             union all 
             select C.depot_id, C.type, C.product_id, sum(C.qty) as tot_qty from 
@@ -5811,6 +5821,8 @@ function get_product_stock_details($from_date, $to_date) {
             (select A.id, A.depot_id as depot_id, B.type, B.item_id as product_id, B.qty from distributor_out A left join distributor_out_items B on (A.id=B.distributor_out_id) where A.status = 'Approved' and A.date_of_processing>'2018-09-21' and A.date_of_processing>='$from_date' and date_of_processing<='$to_date' and delivery_status = 'Pending' and B.item_id is not null) C 
             group by C.depot_id, C.type, C.product_id) ZZ 
             on (YY.depot_id=ZZ.depot_id and YY.type=ZZ.type and YY.product_id=ZZ.product_id)) A 
+
+            group by A.state, A.city, A.depot_name, A.type, A.item_name, A.unit_weight 
 
             order by A.depot_name, A.type, A.item_name";
 

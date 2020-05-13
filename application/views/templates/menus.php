@@ -310,6 +310,9 @@
             
                 <ul class="sub_menu menu--item__has_sub_menu-3"> 
                     <li class="sub_menu--item" <?php if ($City_Master==0) echo 'style="display: none;"'; ?>>
+                        <a href="<?php echo base_url().'index.php/Pincode_master'; ?>" class="sub_menu--link"> Pincode Master</a>
+                    </li>
+                    <li class="sub_menu--item" <?php if ($City_Master==0) echo 'style="display: none;"'; ?>>
                         <a href="<?php echo base_url().'index.php/City_master'; ?>" class="sub_menu--link"> City Master</a>
                     </li>
                     <li  class="sub_menu--item" <?php if ($Bank_Master==0) echo 'style="display: none;"'; ?>>
