@@ -180,5 +180,26 @@ class Order extends CI_Controller{
         $id = $this->order_model->save_data($id);
         redirect(base_url().'index.php/order');
     }
+
+    public function test_offer_api(){
+        load_view_without_data('order/test_offer_api');
+    }
+
+    public function set_offer_data(){
+        $response = array();
+
+        try{
+            $response = $this->order_model->set_offer_data();
+        } catch (Exception $e) {
+            $response = array(
+                            'status'=>'Error',
+                            'message'=>$e->getMessage()
+                        );
+        } finally {
+            echo json_encode($response);
+        }
+
+        return $response;
+    }
 }
 ?>

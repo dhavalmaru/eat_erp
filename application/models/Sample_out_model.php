@@ -102,11 +102,11 @@ function get_distributor_out_data1($status='', $id=''){
             $cond=" where ((status='Pending' and (delivery_status='Pending' or delivery_status='GP Issued' or delivery_status='Delivered Not Complete' or delivery_status='Delivered')) or status='Deleted') and 
                 (distributor_id='1' or distributor_id='189')";
         } else if ($status=="pending_for_delivery"){
-            $cond=" where (status='Approved' or status='Rejected') and delivery_status='Pending' and (distributor_id='1' or distributor_id='189')";
+            $cond=" where status='Approved' and delivery_status='Pending' and (distributor_id='1' or distributor_id='189')";
         } else if ($status=="gp_issued"){
-            $cond=" where (status='Approved' or status='Rejected') and delivery_status='GP Issued' and (distributor_id='1' or distributor_id='189')";
+            $cond=" where status='Approved' and delivery_status='GP Issued' and (distributor_id='1' or distributor_id='189')";
         } else if ($status=="delivered_not_complete"){
-            $cond=" where (status='Approved' or status='Rejected') and delivery_status='Delivered Not Complete' and (distributor_id='1' or distributor_id='189')";
+            $cond=" where status='Approved' and delivery_status='Delivered Not Complete' and (distributor_id='1' or distributor_id='189')";
         } else {
             $cond=" where status='".$status."' and (distributor_id='1' or distributor_id='189')";
         }

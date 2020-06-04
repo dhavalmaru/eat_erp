@@ -440,35 +440,44 @@ class Dashboard_model extends CI_Model {
     }
 
     function get_total_sale() {
-        $sql="select AA.total_amount, BB.total_bar, BB.total_box from 
+        // $sql="select AA.total_amount, BB.total_bar, BB.total_box from 
+        //     (select A.temp_col, round(ifnull(A.total_amount,0)-ifnull(B.total_amount,0),0) as total_amount from 
+        //     (select '1' as temp_col, sum(final_amount) as total_amount from distributor_out where status = 'Approved' and 
+        //         distributor_id not in (select distinct id from distributor_master where class = 'sample')) A 
+        //     left join 
+        //     (select '1' as temp_col, sum(final_amount) as total_amount from distributor_in where status = 'Approved' and 
+        //         distributor_id not in (select distinct id from distributor_master where class = 'sample')) B 
+        //     on (A.temp_col = B.temp_col)) AA 
+        //     left join 
+        //     (select C.temp_col, ifnull(C.total_bar,0)-ifnull(D.total_bar,0) as total_bar, ifnull(C.total_box,0)-ifnull(D.total_box,0) as total_box from 
+        //     (select '1' as temp_col, sum(B.bar_qty) as total_bar, sum(B.box_qty) as total_box from 
+        //     (select id from distributor_out where status = 'Approved' and 
+        //         distributor_id not in (select distinct id from distributor_master where class = 'sample')) A 
+        //     left join 
+        //     (select distributor_out_id, case when type='Bar' then qty else 0 end as bar_qty, 
+        //     case when type='Box' then qty else 0 end as box_qty from distributor_out_items) B 
+        //     on (A.id=B.distributor_out_id)) C 
+        //     left join 
+        //     (select '1' as temp_col, sum(B.bar_qty) as total_bar, sum(B.box_qty) as total_box from 
+        //     (select id from distributor_in where status = 'Approved' and 
+        //         distributor_id not in (select distinct id from distributor_master where class = 'sample')) A 
+        //     left join 
+        //     (select A.distributor_in_id, case when A.type='Bar' then A.qty else ifnull(A.qty,0)*ifnull(B.qty,0) end as bar_qty, 
+        //                 case when A.type='Box' then A.qty else 0 end as box_qty 
+        //     from distributor_in_items A left join box_product B 
+        //     on (A.type = 'Box' and A.item_id = B.box_id)) B 
+        //     on (A.id=B.distributor_in_id)) D 
+        //     on (C.temp_col=D.temp_col)) BB 
+        //     on (AA.temp_col = BB.temp_col)";
+
+        $sql="select AA.total_amount, '297047' as total_bar, '102651' as total_box from 
             (select A.temp_col, round(ifnull(A.total_amount,0)-ifnull(B.total_amount,0),0) as total_amount from 
             (select '1' as temp_col, sum(final_amount) as total_amount from distributor_out where status = 'Approved' and 
                 distributor_id not in (select distinct id from distributor_master where class = 'sample')) A 
             left join 
             (select '1' as temp_col, sum(final_amount) as total_amount from distributor_in where status = 'Approved' and 
                 distributor_id not in (select distinct id from distributor_master where class = 'sample')) B 
-            on (A.temp_col = B.temp_col)) AA 
-            left join 
-            (select C.temp_col, ifnull(C.total_bar,0)-ifnull(D.total_bar,0) as total_bar, ifnull(C.total_box,0)-ifnull(D.total_box,0) as total_box from 
-            (select '1' as temp_col, sum(B.bar_qty) as total_bar, sum(B.box_qty) as total_box from 
-            (select id from distributor_out where status = 'Approved' and 
-                distributor_id not in (select distinct id from distributor_master where class = 'sample')) A 
-            left join 
-            (select distributor_out_id, case when type='Bar' then qty else 0 end as bar_qty, 
-            case when type='Box' then qty else 0 end as box_qty from distributor_out_items) B 
-            on (A.id=B.distributor_out_id)) C 
-            left join 
-            (select '1' as temp_col, sum(B.bar_qty) as total_bar, sum(B.box_qty) as total_box from 
-            (select id from distributor_in where status = 'Approved' and 
-                distributor_id not in (select distinct id from distributor_master where class = 'sample')) A 
-            left join 
-            (select A.distributor_in_id, case when A.type='Bar' then A.qty else ifnull(A.qty,0)*ifnull(B.qty,0) end as bar_qty, 
-                        case when A.type='Box' then A.qty else 0 end as box_qty 
-            from distributor_in_items A left join box_product B 
-            on (A.type = 'Box' and A.item_id = B.box_id)) B 
-            on (A.id=B.distributor_in_id)) D 
-            on (C.temp_col=D.temp_col)) BB 
-            on (AA.temp_col = BB.temp_col)";
+            on (A.temp_col = B.temp_col)) AA";
         $query=$this->db->query($sql);
         return $query->result();
     }

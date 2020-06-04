@@ -24,12 +24,15 @@ class Dashboard extends CI_Controller
         } else {
             $result=$this->dashboard_model->get_access();
             // echo json_encode($result);
+            // $data = [];
 
             if(count($result)>0) {
                 $data['total_sale']=$this->dashboard_model->get_total_sale();
                 $data['total_dist']=$this->dashboard_model->get_total_distributor();
                 $data['total_stock']=$this->dashboard_model->get_total_stock();
                 $data['total_receivable']=$this->dashboard_model->get_total_receivable();
+
+                // echo json_encode($data);
 
                 load_view('dashboard/dashboard_new', $data);
             } else {

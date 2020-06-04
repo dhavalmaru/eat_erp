@@ -53,16 +53,48 @@ class Distributor_out extends CI_Controller{
     public function get_data($status){
         // $status = 'Approved';
 
-        $draw = intval($this->input->get("draw"));
-        $start = intval($this->input->get("start"));
-        $length = intval($this->input->get("length"));
+        // $draw = intval($this->input->get("draw"));
+        // $start = intval($this->input->get("start"));
+        // $length = intval($this->input->get("length"));
         // $status = intval($this->input->get("status"));
 
-        $r = $this->distributor_out_model->get_distributor_out_data1($status);
-        // echo "<pre>";
-        // print_r($r[0]);
-        // echo "</pre>";
-        // die();
+        // $draw = 1;
+        // $start = 0;
+        // $length = 10;
+        // $search_value = '';
+        // $status = '';
+
+        $draw = intval($this->input->post("draw"));
+        $start = intval($this->input->post("start"));
+        $length = intval($this->input->post("length"));
+        $search = $this->input->post("search");
+        $status = $this->input->post("status");
+
+        $search_val = $search['value'];
+
+        // echo $draw;
+        // echo '<br/><br/>';
+        // echo $start;
+        // echo '<br/><br/>';
+        // echo $length;
+        // echo '<br/><br/>';
+        // echo json_encode($search);
+        // echo '<br/><br/>';
+        // echo $status;
+        // echo '<br/><br/>';
+        // echo $search_val;
+        // echo '<br/><br/>';
+
+        $result = $this->distributor_out_model->get_list_data($status, $start, $length, $search_val);
+        // echo json_encode($result);
+        // echo '<br/><br/>';
+
+        $totalRecords = 0;
+        $count = $result['count'];
+        if(count($count)>0) $totalRecords = $count[0]->total_records;
+
+        $r = $result['rows'];
+
         $data = array();
 
         for($i=0;$i<count($r);$i++){
@@ -107,7 +139,7 @@ class Distributor_out extends CI_Controller{
 
                 $data[] = array(
                             $ulr,
-                            $i+1,
+                            $i+$start+1,
                             
 
                             '<span style="display:none;">
@@ -187,7 +219,7 @@ class Distributor_out extends CI_Controller{
                             '<input type="checkbox" id="check_'.$i.'" class="check icheckbox" name="check_val[]" value="'.$r[$i]->id.'" onChange="set_checkbox(this);" />
                             <input type="hidden" id="input_check_'.$i.'" name="check[]" value="false" />',
 
-                            $i+1,
+                            $i+$start+1,
                             
 
                             '<span style="display:none;">
@@ -266,8 +298,8 @@ class Distributor_out extends CI_Controller{
 
         $output = array(
                         "draw" => $draw,
-                        "recordsTotal" => count($r),
-                        "recordsFiltered" => count($r),
+                        "recordsTotal" => $totalRecords,
+                        "recordsFiltered" => $totalRecords,
                         "data" => $data
                         // ,
                         // "columns" => $columns
@@ -285,10 +317,25 @@ class Distributor_out extends CI_Controller{
 			if($status=='All') {
 				$status='';
 			}
-            $data['data']=$this->distributor_out_model->get_distributor_out_data1($status);
+
+            if($status=="Approved") $selectedstatus='Approved';
+            else if($status=="pending") $selectedstatus='Pending';
+            else if($status=="pending_for_approval") $selectedstatus='Approval Pending';
+            else if($status=="InActive") $selectedstatus='Cancelled';
+            else if($status=="pending_for_delivery") $selectedstatus='Delivery Pending';
+            else if($status=="gp_issued") $selectedstatus='GP Issued';
+            else if($status=="delivered_not_complete") $selectedstatus="InComplete";
+            else $selectedstatus=$status;
+
+            // $data['data']=$this->distributor_out_model->get_distributor_out_data1($status);
+            // $count_data=$this->distributor_out_model->get_distributor_out_data1();
+            
+            // $data['data']=$this->distributor_out_model->get_list_data($status);
+
+            $count_data = array();
+            $count_data=$this->distributor_out_model->get_data_count();
 			
-            $count_data=$this->distributor_out_model->get_distributor_out_data1();
-			
+            $total_count=0;
             $active=0;
             $inactive=0;
             $pending=0;
@@ -296,79 +343,57 @@ class Distributor_out extends CI_Controller{
             $pending_for_delivery=0;
             $gp_issued=0;
             $delivered_not_complete=0;
-			
-			//responsive drop down list code 
-			if($status=="Approved")
-			{
-				$selectedstatus='Approved';//$status;
-			}
-			else if($status=="pending")
-			{
-				$selectedstatus='Pending';//$status;
-			}
-			else if($status=="pending_for_approval")
-			{
-				$selectedstatus='Approval Pending';//$status;
-			}
-			else if($status=="InActive")
-			{
-				$selectedstatus='Cancelled';//$status;
-			}
-			else if($status=="pending_for_delivery")
-			{
-				$selectedstatus='Delivery Pending';//$status;
-			}
-			else if($status=="gp_issued")
-			{
-				$selectedstatus='GP Issued';//$status;
-			}
-			else if($status=="delivered_not_complete")
-			{
-				$selectedstatus="InComplete";
-			}
-			else
-			{
-				$selectedstatus=$status;
-			}
-			//responsive drop down list code 
-			
-            if (count($result)>0){
-                for($i=0;$i<count($count_data);$i++){
-                    if (strtoupper(trim($count_data[$i]->status))=="APPROVED")
-                        $active=$active+1;
-						
 
-                    if ((strtoupper(trim($count_data[$i]->status))=="PENDING" && 
-                        (strtoupper(trim($count_data[$i]->delivery_status))=="PENDING" || 
-                            strtoupper(trim($count_data[$i]->delivery_status))=="GP ISSUED" || 
-                            strtoupper(trim($count_data[$i]->delivery_status))=="DELIVERED NOT COMPLETE" || 
-                            strtoupper(trim($count_data[$i]->delivery_status))=="DELIVERED")) || 
-                        strtoupper(trim($count_data[$i]->status))=="DELETED")
-                        $pending_for_approval=$pending_for_approval+1;
-						
-                    else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && 
-                                (strtoupper(trim($count_data[$i]->delivery_status))=="DELIVERED" || $count_data[$i]->delivery_status==null))
-                        // $active=$active+1;
-                        $active=$active;
-                    else if (strtoupper(trim($count_data[$i]->status))=="INACTIVE")
-                        $inactive=$inactive+1;
-					
-                    else if (strtoupper(trim($count_data[$i]->status))=="PENDING" && 
-                                ($count_data[$i]->delivery_status==null || $count_data[$i]->delivery_status==''))
-                        $pending=$pending+1;
-						
-                    else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && strtoupper(trim($count_data[$i]->delivery_status))=="PENDING")
-                        $pending_for_delivery=$pending_for_delivery+1;
-					
-                    else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && strtoupper(trim($count_data[$i]->delivery_status))=="GP ISSUED")
-                        $gp_issued=$gp_issued+1;
-					
-                    else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && strtoupper(trim($count_data[$i]->delivery_status))=="DELIVERED NOT COMPLETE")
-                        $delivered_not_complete=$delivered_not_complete+1;
-					
-                }
+            if (count($count_data)>0){
+                $total_count=$count_data[0]->total_count;
+                $active=$count_data[0]->active;
+                $inactive=$count_data[0]->inactive;
+                $pending=$count_data[0]->pending;
+                $pending_for_approval=$count_data[0]->pending_for_approval;
+                $pending_for_delivery=$count_data[0]->pending_for_delivery;
+                $gp_issued=$count_data[0]->gp_issued;
+                $delivered_not_complete=$count_data[0]->delivered_not_complete;
             }
+			
+            // if (count($result)>0){
+            //     for($i=0;$i<count($count_data);$i++){
+            //         if (strtoupper(trim($count_data[$i]->status))=="APPROVED")
+            //             $active=$active+1;
+						
+            //         if ((strtoupper(trim($count_data[$i]->status))=="PENDING" && 
+            //             (strtoupper(trim($count_data[$i]->delivery_status))=="PENDING" || 
+            //                 strtoupper(trim($count_data[$i]->delivery_status))=="GP ISSUED" || 
+            //                 strtoupper(trim($count_data[$i]->delivery_status))=="DELIVERED NOT COMPLETE" || 
+            //                 strtoupper(trim($count_data[$i]->delivery_status))=="DELIVERED")) || 
+            //             strtoupper(trim($count_data[$i]->status))=="DELETED")
+            //             $pending_for_approval=$pending_for_approval+1;
+						
+            //         else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && 
+            //                     (strtoupper(trim($count_data[$i]->delivery_status))=="DELIVERED" || $count_data[$i]->delivery_status==null))
+            //             // $active=$active+1;
+            //             $active=$active;
+            //         else if (strtoupper(trim($count_data[$i]->status))=="INACTIVE")
+            //             $inactive=$inactive+1;
+					
+            //         else if (strtoupper(trim($count_data[$i]->status))=="PENDING" && 
+            //                     ($count_data[$i]->delivery_status==null || $count_data[$i]->delivery_status==''))
+            //             $pending=$pending+1;
+						
+            //         else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && strtoupper(trim($count_data[$i]->delivery_status))=="PENDING")
+            //             $pending_for_delivery=$pending_for_delivery+1;
+					
+            //         else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && strtoupper(trim($count_data[$i]->delivery_status))=="GP ISSUED")
+            //             $gp_issued=$gp_issued+1;
+					
+            //         else if (strtoupper(trim($count_data[$i]->status))=="APPROVED" && strtoupper(trim($count_data[$i]->delivery_status))=="DELIVERED NOT COMPLETE")
+            //             $delivered_not_complete=$delivered_not_complete+1;
+					
+            //     }
+            // }
+
+            $data['status']=$status;
 			$data['selectedstatus']=$selectedstatus;
+            $data['all']=$total_count;
             $data['active']=$active;
             $data['inactive']=$inactive;
             $data['pending']=$pending;
@@ -376,9 +401,8 @@ class Distributor_out extends CI_Controller{
             $data['pending_for_delivery']=$pending_for_delivery;
             $data['gp_issued']=$gp_issued;
             $data['delivered_not_complete']=$delivered_not_complete;
-            $data['all']=count($count_data);
-            $data['status']=$status;
-            $data['sales_rep'] = $this->sales_rep_model->get_data('Approved');
+
+            // $data['sales_rep'] = $this->sales_rep_model->get_data('Approved');
 
     		$query=$this->db->query("SELECT * FROM sales_rep_master WHERE sr_type='Merchandizer'");
             $result=$query->result();
@@ -1511,6 +1535,12 @@ class Distributor_out extends CI_Controller{
         } catch (Exception $e) {
             echo $e->getMessage();
         }
+    }
+
+    public function approve_records_from_backend(){
+        $distributor_out_id = array(26640, 26659, 26999, 27002, 27005, 27064, 27066, 27068, 27069, 27166, 27088, 27090, 27248, 27259, 27275, 27439, 27343, 27348, 27353, 27648, 27649, 27650, 27651, 27652, 27653, 27654, 27655, 27607, 27640, 27641, 27642, 27643, 27644, 27645, 27646, 27647, 27656, 27657, 27658, 27659, 27667, 27668, 27669, 27670, 27671, 27672, 27673, 27674, 27675, 27676, 27677, 27678, 27679, 27680, 27681, 27682, 27685, 27739, 27740, 27741, 27742, 27743, 27760, 27761, 27762, 27763, 27764, 27765, 27766, 27767, 27768, 27769, 27770, 27771, 27772, 27773, 27774, 27775, 27776, 27779);
+
+        $this->distributor_out_model->approve_records_from_backend($distributor_out_id);
     }
 }
 ?>

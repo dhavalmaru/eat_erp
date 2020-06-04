@@ -195,5 +195,233 @@ function save_data($id=''){
 
     return $id;
 }
+
+function set_offer_data(){
+    $response = array();
+    $now=date('Y-m-d H:i:s');
+
+    try{
+        $data = json_decode( file_get_contents( 'php://input' ), true );
+
+        $file_content = json_encode($data);
+        
+        // $file_content = '{"phone":"8130820435","offer_id":"cred01","order_Id":"X73EY0PPZ7","customer_name":"Priyanshi Poddar","shipping_address_line1":"Kholi","shipping_address_line2":"420","shipping_address_email":"priyanshi53@gmail.com","shipping_address_phone":"8130820435","shipping_address_pincode":"700026","shipping_address_city":"Kolkata","shipping_address_state":"WEST BENGAL","order_SKU":"MWMMHRK.1012.B0_N","order_sales_value":"0.0"}';
+        
+        $test_data = array(
+                            'data' => $file_content,
+                            'created_on' => $now
+                        );
+        $this->db->insert('offer_data_test', $test_data);
+
+        $data = json_decode($file_content);
+
+        // $secret_key = $this->input->post('secret_key');
+        // $secret_key = $data['secret_key'];
+        // $secret_key = $data->secret_key;
+
+        // if($secret_key!='MzE1NDE='){
+        //     $response = array(
+        //                 'status'=>'error',
+        //                 'message'=>'Key does not match'
+        //             );
+
+        //     return $response;
+        // }
+
+        
+
+        // $body = $data['body'];
+
+        // $phone = $this->input->post('phone');
+        // $offer_id = $this->input->post('offer_id');
+        // $order_Id = $this->input->post('order_Id');
+        // $customer_name = $this->input->post('customer_name');
+        // $shipping_address_line1 = $this->input->post('shipping_address_line1');
+        // $shipping_address_line2 = $this->input->post('shipping_address_line2');
+        // $shipping_address_email = $this->input->post('shipping_address_email');
+        // $shipping_address_phone = $this->input->post('shipping_address_phone');
+        // $shipping_address_pincode = $this->input->post('shipping_address_pincode');
+        // $shipping_address_city = $this->input->post('shipping_address_city');
+        // $shipping_address_state = $this->input->post('shipping_address_state');
+        // $order_SKU = $this->input->post('order_SKU');
+        // $order_sales_value = $this->input->post('order_sales_value');
+
+        // $phone = $body['phone'];
+        // $offer_id = $body['offer_id'];
+        // $order_Id = $body['order_Id'];
+        // $customer_name = $body['customer_name'];
+        // $shipping_address_line1 = $body['shipping_address_line1'];
+        // $shipping_address_line2 = $body['shipping_address_line2'];
+        // $shipping_address_email = $body['shipping_address_email'];
+        // $shipping_address_phone = $body['shipping_address_phone'];
+        // $shipping_address_pincode = $body['shipping_address_pincode'];
+        // $shipping_address_city = $body['shipping_address_city'];
+        // $shipping_address_state = $body['shipping_address_state'];
+        // $order_SKU = $body['order_SKU'];
+        // $order_sales_value = $body['order_sales_value'];
+
+        // $phone = $data->phone;
+        // $offer_id = $data->offer_id;
+        // $order_Id = $data->order_Id;
+        // $customer_name = $data->customer_name;
+        // $shipping_address_line1 = $data->shipping_address_line1;
+        // $shipping_address_line2 = (isset($data->shipping_address_line2)? $data->shipping_address_line2: '');
+        // $shipping_address_email = $data->shipping_address_email;
+        // $shipping_address_phone = $data->shipping_address_phone;
+        // $shipping_address_pincode = $data->shipping_address_pincode;
+        // $shipping_address_city = $data->shipping_address_city;
+        // $shipping_address_state = $data->shipping_address_state;
+        // $order_SKU = $data->order_SKU;
+        // $order_sales_value = $data->order_sales_value;
+
+        $phone = '';
+        $offer_id = '';
+        $order_Id = '';
+        $customer_name = '';
+        $shipping_address_line1 = '';
+        $shipping_address_line2 = '';
+        $shipping_address_email = '';
+        $shipping_address_phone = '';
+        $shipping_address_pincode = '';
+        $shipping_address_city = '';
+        $shipping_address_state = '';
+        $order_SKU = '';
+        $order_sales_value = '';
+
+        if(is_object($data)){
+            if(isset($data->phone)) $phone = $data->phone;
+            if(isset($data->offer_id)) $offer_id = $data->offer_id;
+            if(isset($data->order_Id)) $order_Id = $data->order_Id;
+            if(isset($data->customer_name)) $customer_name = $data->customer_name;
+            if(isset($data->shipping_address_line1)) $shipping_address_line1 = $data->shipping_address_line1;
+            if(isset($data->shipping_address_line2)) $shipping_address_line2 = $data->shipping_address_line2;
+            if(isset($data->shipping_address_email)) $shipping_address_email = $data->shipping_address_email;
+            if(isset($data->shipping_address_phone)) $shipping_address_phone = $data->shipping_address_phone;
+            if(isset($data->shipping_address_pincode)) $shipping_address_pincode = $data->shipping_address_pincode;
+            if(isset($data->shipping_address_city)) $shipping_address_city = $data->shipping_address_city;
+            if(isset($data->shipping_address_state)) $shipping_address_state = $data->shipping_address_state;
+            if(isset($data->order_SKU)) $order_SKU = $data->order_SKU;
+            if(isset($data->order_sales_value)) $order_sales_value = $data->order_sales_value;
+        }
+
+        if(is_array($data)){
+            if(array_key_exists('phone', $data)) $phone = $data['phone'];
+            if(array_key_exists('offer_id', $data)) $offer_id = $data['offer_id'];
+            if(array_key_exists('order_Id', $data)) $order_Id = $data['order_Id'];
+            if(array_key_exists('customer_name', $data)) $customer_name = $data['customer_name'];
+            if(array_key_exists('shipping_address_line1', $data)) $shipping_address_line1 = $data['shipping_address_line1'];
+            if(array_key_exists('shipping_address_line2', $data)) $shipping_address_line2 = $data['shipping_address_line2'];
+            if(array_key_exists('shipping_address_email', $data)) $shipping_address_email = $data['shipping_address_email'];
+            if(array_key_exists('shipping_address_phone', $data)) $shipping_address_phone = $data['shipping_address_phone'];
+            if(array_key_exists('shipping_address_pincode', $data)) $shipping_address_pincode = $data['shipping_address_pincode'];
+            if(array_key_exists('shipping_address_city', $data)) $shipping_address_city = $data['shipping_address_city'];
+            if(array_key_exists('shipping_address_state', $data)) $shipping_address_state = $data['shipping_address_state'];
+            if(array_key_exists('order_SKU', $data)) $order_SKU = $data['order_SKU'];
+            if(array_key_exists('order_sales_value', $data)) $order_sales_value = $data['order_sales_value'];
+        }
+
+        $data = array(
+            'phone' => addslashes($phone),
+            'offer_id' => addslashes($offer_id),
+            'order_id' => addslashes($order_Id),
+            'customer_name' => addslashes($customer_name),
+            'shipping_address_line1' => addslashes($shipping_address_line1),
+            'shipping_address_line2' => addslashes($shipping_address_line2),
+            'shipping_address_email' => addslashes($shipping_address_email),
+            'shipping_address_phone' => addslashes($shipping_address_phone),
+            'shipping_address_pincode' => addslashes($shipping_address_pincode),
+            'shipping_address_city' => addslashes($shipping_address_city),
+            'shipping_address_state' => addslashes($shipping_address_state),
+            'order_SKU' => addslashes($order_SKU),
+            'order_sales_value' => addslashes($order_sales_value),
+            'created_on' => $now,
+            'modified_on' => $now
+        );
+
+        $this->db->insert('offer_data',$data);
+        $id=$this->db->insert_id();
+        // $id = 1;
+        $action='Offer Entry Created.';
+
+        $this->send_mail($id);
+
+        $logarray['table_id']=$id;
+        $logarray['module_name']='Offer_data';
+        $logarray['cnt_name']='Order';
+        $logarray['action']=$action;
+        $this->user_access_log_model->insertAccessLog($logarray);
+
+        $response = array(
+                        'status'=>'success'
+                    );
+    } catch (Exception $e) {
+        $response = array(
+                        'status'=>'error',
+                        'message'=>$e->getMessage()
+                    );
+    } finally {
+        return $response;
+    }
+
+    return $response;
+}
+
+function send_mail($id) {
+    try {
+        $sql = "select * from offer_data where id='$id'";
+        $query=$this->db->query($sql);
+        $result = $query->result();
+
+        if(count($result)>0){
+            $subject = 'CRED Order #'.$result[0]->order_id.' placed by '.$result[0]->customer_name;
+
+            $message = '<html>
+                        <body>
+                            Hello EAT Anytime,
+                            <br/><br/><br/>
+                            <b>'.$result[0]->customer_name.'</b> placed a new order with your store, '.date("M d H:ia", strtotime($result[0]->created_on)).':
+                            <br/><br/>
+                            <ul><li>1 x Cred essential for Rs. '.$result[0]->order_sales_value.' each</li></ul>
+                            <br/><br/>
+                            <b>Shipping address:</b>
+                            <br/><br/>
+                            '.$result[0]->customer_name.'
+                            <br/><br/>
+                            '.$result[0]->shipping_address_line1.', '.$result[0]->shipping_address_line2.'
+                            <br/><br/>
+                            '.$result[0]->shipping_address_city.', '.$result[0]->shipping_address_state.' '.$result[0]->shipping_address_pincode.'
+                            <br/><br/>
+                            India
+                            <br/><br/>
+                            '.(($result[0]->shipping_address_phone==null || $result[0]->shipping_address_phone=="")? $result[0]->phone: $result[0]->shipping_address_phone).'
+                            <br/><br/><br/>
+                            Regards,
+                            <br/><br/>
+                            CS
+                        </body>
+                        </html>';
+
+            $from_email = 'cs@eatanytime.in';
+            $from_email_sender = 'Wholesome Habits Pvt Ltd';
+            $to_email = "orders@eatanytime.in";
+            $cc = '';
+            $bcc = '';
+            // $to_email = "prasad.bhisale@otbconsulting.co.in";
+            // $cc = 'dhaval.maru@otbconsulting.co.in';
+            // $cc = 'prasad.bhisale@otbconsulting.co.in';
+            // $bcc = 'prasad.bhisale@otbconsulting.co.in';
+
+            // echo $subject.'<br/><br/>'.$message;
+            // echo '<br/><br/>';
+
+            $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc, $cc, '');
+
+            // echo $mailSent;
+            // echo '<br/><br/>';
+        }
+    } catch (Exception $e) {
+        
+    }
+}
 }
 ?>

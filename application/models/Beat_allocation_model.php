@@ -97,15 +97,13 @@ function get_distributors(){
 function get_beat_plan($distributor_id='', $type_id=''){
     $cond = "";
     if($distributor_id!=''){
-        $cond = " and A.distributor_id = '$distributor_id'";
+        //$cond = " and A.distributor_id = '$distributor_id'";
     }
     if($type_id!=''){
-        $cond = " and B.type_id = '$type_id'";
+        //$cond = " and B.type_id = '$type_id'";
     }
-    $sql = "select distinct B.id, B.beat_id, B.beat_name 
-            from distributor_beat_plans A 
-            left join beat_master B on (A.beat_id = B.id) 
-            where B.status = 'Approved' ".$cond." 
+    $sql = "select B.id, B.beat_id, B.beat_name 
+            from beat_master B 
             order by B.id";
     $query=$this->db->query($sql);
     return $query->result();

@@ -764,19 +764,50 @@
                                 ];
             }
 
+            // $('#customers10').DataTable({
+            //     // "pageLength" : 10,
+            //     "columnDefs": columnDefs,
+            //     "iDisplayLength": len,
+            //     aLengthMenu: [
+            //                     [10,25, 50, 100, 200, -1],
+            //                     [10,25, 50, 100, 200, "All"]
+            //                 ],
+            //     "ajax": {
+            //         url : BASE_URL+'index.php/Distributor_out/get_data/'+status,
+            //         // data: {status: status},
+            //         type : 'GET'
+            //     },
+            // });
+            
             $('#customers10').DataTable({
                 // "pageLength" : 10,
+                "bProcessing": true,
+                "searchDelay": 3000,
+                "serverSide": true,
                 "columnDefs": columnDefs,
                 "iDisplayLength": len,
                 aLengthMenu: [
                                 [10,25, 50, 100, 200, -1],
                                 [10,25, 50, 100, 200, "All"]
                             ],
-                "ajax": {
-                    url : BASE_URL+'index.php/Distributor_out/get_data/'+status,
-                    // data: {status: status},
-                    type : 'GET'
-                },
+                "ajax":{
+                        url : BASE_URL+'index.php/Distributor_out/get_data/'+status,
+                        type: "post",
+                        async: false,
+                        data: function(data) {       
+                            data.status = status;
+                            // data._token = csrfToken;
+                            // data.shopId = shopId;
+                            // data.surveyMasterId = surveyMasterId;
+                            // data.clientLocationId = clientLocationId;
+                        },
+                        "dataSrc": function ( json ) {
+                            return json.data;
+                        },
+                        // error: function() {
+                        //     $(table+"_processing").css("display","none");
+                        // }
+                    }
             });
             
             // $('input[name="check_val[]"]').on('ifChanged', function(event){

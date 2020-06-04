@@ -459,6 +459,9 @@
                     <li  class="sub_menu--item"  <?php if ($Credit_Debit_Note==0) echo 'style="display: none;"'; ?>>
                         <a  class="sub_menu--link" href="<?php echo base_url().'index.php/Credit_debit_note'; ?>"> Credit Debit Note</a>
                     </li>
+                    <li  class="sub_menu--item"  <?php if ($Payment==0) echo 'style="display: none;"'; ?>>
+                        <a class="sub_menu--link" href="<?php echo base_url().'index.php/Payment_upload'; ?>"> Payment Upload</a>
+                    </li>
                 </ul>
 
                 <li class="menu--item  menu--item__has_sub_menu1 main-submenu-5" <?php if ($Transfer==0) echo 'style="display: none;"'; ?>> 

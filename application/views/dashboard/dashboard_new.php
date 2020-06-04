@@ -170,14 +170,14 @@
                                                 <div class="widget-int"> &#8377; <span data-toggle="counter" data-to="<?php if(isset($total_sale[0]->total_amount)) echo format_money($total_sale[0]->total_amount,0);?>" style="font-size: 25px;"><?php if(isset($total_sale[0]->total_amount)) echo format_money(($total_sale[0]->total_amount/100000),2) . ' L';?></span></div>
                                             </div>   
                                         </div>
-                                        <div>  
+                                        <!-- <div>  
                                             <div class="widget-item-left">
                                                 <span class="fa fa-exchange"></span>
                                             </div>                             
                                             <div class="widget-data">
                                                 <div class="widget-title">Total Sale</div>
                                                 <div class="widget-subtitle">(In Bar)</div>
-                                                <div class="widget-int"> <span data-toggle="counter" data-to="<?php if(isset($total_sale[0]->total_bar)) echo format_money($total_sale[0]->total_bar,2);?>"><?php if(isset($total_sale[0]->total_bar)) echo format_money($total_sale[0]->total_bar,2);?></span></div>
+                                                <div class="widget-int"> <span data-toggle="counter" data-to="<?php //if(isset($total_sale[0]->total_bar)) echo format_money($total_sale[0]->total_bar,2);?>"><?php //if(isset($total_sale[0]->total_bar)) echo format_money($total_sale[0]->total_bar,2);?></span></div>
                                             </div>  
                                         </div>
 
@@ -188,9 +188,9 @@
                                             <div class="widget-data">
                                                 <div class="widget-title">Total Sale</div>
                                                 <div class="widget-subtitle">(In Box)</div>
-                                                <div class="widget-int">   <span data-toggle="counter" data-to="<?php if(isset($total_sale[0]->total_box)) echo format_money($total_sale[0]->total_box,2);?>"><?php if(isset($total_sale[0]->total_box)) echo format_money($total_sale[0]->total_box,2);?></span></div>
+                                                <div class="widget-int">   <span data-toggle="counter" data-to="<?php //if(isset($total_sale[0]->total_box)) echo format_money($total_sale[0]->total_box,2);?>"><?php //if(isset($total_sale[0]->total_box)) echo format_money($total_sale[0]->total_box,2);?></span></div>
                                             </div> 
-                                        </div>
+                                        </div> -->
                                     </div>
                                 </div>
                                 <!-- END WIDGET SLIDER -->
@@ -479,7 +479,6 @@
                                         </div>
                                         <div class="x_content">
                                             <canvas id="canvas_bar-2"></canvas>
-                                            <!-- <div id="graph_bar" style="width:100%; height:350px;"></div> -->
                                         </div>
                                     </div>
                                 </div>
@@ -580,7 +579,7 @@
                 type: "POST",
                 dataType: 'json',
                 global: false,
-                async: false,
+                // async: false,
                 success: function (data) {
                     for (var i = 0; i<data.length; i++) {
                         data[i][0] = toDate(data[i][0]).getTime();
@@ -708,7 +707,7 @@
                 type: "POST",
                 dataType: 'json',
                 global: false,
-                async: false,
+                // async: false,
                 success: function (data) {
                     data_len = data.length;
                     for (var i = 0; i<data.length; i++) {
@@ -742,7 +741,7 @@
                 type: "POST",
                 dataType: 'json',
                 global: false,
-                async: false,
+                // async: false,
                 success: function (data) {
                     data_len = data.length;
                     for (var i = 0; i<data.length; i++) {
@@ -788,7 +787,7 @@
                 type: "POST",
                 dataType: 'json',
                 global: false,
-                async: false,
+                // async: false,
                 success: function (data) {
                     for (var i = 0; i<data.length; i++) {
                         data[i][0] = toDate(data[i][0]).getTime();
@@ -916,7 +915,7 @@
                 type: "POST",
                 dataType: 'json',
                 global: false,
-                async: false,
+                // async: false,
                 success: function (data) {
                     data_len=data.length;
                     for (var i = 0; i<data.length; i++) {
@@ -950,7 +949,7 @@
                 type: "POST",
                 dataType: 'json',
                 global: false,
-                async: false,
+                // async: false,
                 success: function (data) {
                     data_len=data.length;
                     for (var i = 0; i<data.length; i++) {
@@ -998,7 +997,7 @@
                     type: "POST",
                     dataType: 'json',
                     global: false,
-                    async: false,
+                    // async: false,
                     success: function (data) {
                         if(typeof data.json_data !== 'undefined') {
                             var json_data = data.json_data;
@@ -1050,7 +1049,7 @@
                     type: "POST",
                     dataType: 'json',
                     global: false,
-                    async: false,
+                    // async: false,
                     success: function (data) {
                         for (var i = 0; i<data.length; i++) {
                             d1.push(data[i][0]);
@@ -1085,7 +1084,7 @@
                     type: "POST",
                     dataType: 'json',
                     global: false,
-                    async: false,
+                    // async: false,
                     success: function (data) {
                         for (var i = 0; i<data.length; i++) {
                             d1.push(data[i][0]);
@@ -1139,7 +1138,7 @@
                     type: "POST",
                     dataType: 'json',
                     global: false,
-                    async: false,
+                    // async: false,
                     success: function (data) {
                         if(typeof data.json_data !== 'undefined') {
                             var json_data = data.json_data;
@@ -1191,7 +1190,7 @@
                     type: "POST",
                     dataType: 'json',
                     global: false,
-                    async: false,
+                    // async: false,
                     success: function (data) {
                         if(typeof data.json_data !== 'undefined') {
                             var json_data = data.json_data;
@@ -1243,7 +1242,7 @@
                     type: "POST",
                     dataType: 'json',
                     global: false,
-                    async: false,
+                    // async: false,
                     success: function (data) {
                         for (var i = 0; i<data.length; i++) {
                             d1.push(data[i][0]);
@@ -1297,7 +1296,7 @@
                     type: "POST",
                     dataType: 'json',
                     global: false,
-                    async: false,
+                    // async: false,
                     success: function (data) {
                         if(typeof data.json_data !== 'undefined') {
                             var json_data = data.json_data;
@@ -1349,7 +1348,7 @@
                     type: "POST",
                     dataType: 'json',
                     global: false,
-                    async: false,
+                    // async: false,
                     success: function (data) {
                         if(typeof data !== 'undefined') {
                             for (var i = 0; i<data.length; i++) {

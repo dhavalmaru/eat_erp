@@ -186,11 +186,8 @@ function get_retailer($beat_id='', $type_id='', $zone_id='', $area_id='', $locat
         $sql = "select A.*, case when B.dist_id is null then '0' else '1' end as is_selected, 
                     ifnull(B.sequence,'') as sequence, ifnull(C.no_of_beat,0) as no_of_beat from 
                 (select concat('d_', id) as id, distributor_name from distributor_master 
-                where status = 'Approved'".$cond." 
-                union 
-                select concat('s_', id) as id, distributor_name from sales_rep_distributors 
-                where distributor_name is not null and distributor_name<>'' and 
-                    (status <> 'Inactive' or status is null)".$cond4.") A 
+                where status = 'Approved' 
+                ) A 
                 left join 
                 (select A.id, B.dist_id, B.sequence from beat_master A 
                 left join beat_details B on (A.id = B.beat_id)".$cond3.") B 
@@ -200,6 +197,8 @@ function get_retailer($beat_id='', $type_id='', $zone_id='', $area_id='', $locat
                 on (A.id = C.dist_id) 
                 order by A.distributor_name";
     }
+	//echo $sql;
+	//exit;
 
     $query=$this->db->query($sql);
     return $query->result();

@@ -43,9 +43,7 @@ function get_data($status='', $beat_id=''){
 
 function get_beat_plans($beat_id=''){
     $sql = "select distinct A.id, concat(A.beat_id,' - ',A.beat_name) as beat_name 
-            from beat_master A 
-            left join distributor_beat_plans B on (A.id = B.beat_id) 
-            where A.status = 'Approved' and (B.id is null or B.beat_id='$beat_id') 
+            from beat_master A
             order by A.id";
     $query=$this->db->query($sql);
     return $query->result();

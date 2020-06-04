@@ -93,6 +93,79 @@ function get_dist_consignee($distributor_id){
     return $query->result();
 }
 
+function get_all_data(){
+    $sql = "select * from distributor_out where (distributor_id!='1' and distributor_id!='189')";
+    $query = $this->db->query($sql);
+    return $query->result();
+}
+
+function get_data_count(){
+    $sql = "select count(id) as total_count, sum(case when status='Approved' then 1 else 0 end) as active, sum(case when ((status='Pending' and (delivery_status='Pending' or delivery_status='GP Issued' or delivery_status='Delivered Not Complete' or delivery_status='Delivered')) or status='Deleted') then 1 else 0 end) as pending_for_approval, sum(case when status='Inactive' then 1 else 0 end) as inactive, sum(case when (status='Pending' and (delivery_status='' or delivery_status=null)) then 1 else 0 end) as pending, sum(case when (status='Approved' and delivery_status='Pending') then 1 else 0 end) as pending_for_delivery, sum(case when (status='Approved' and delivery_status='GP Issued') then 1 else 0 end) as gp_issued, sum(case when (status='Approved' and delivery_status='Delivered Not Complete') then 1 else 0 end) as delivered_not_complete from distributor_out where (distributor_id!='1' and distributor_id!='189')";
+    $query = $this->db->query($sql);
+    return $query->result();
+}
+
+function get_list_data($status='', $start=0, $length=0, $search_val=''){
+    $curusr = $this->session->userdata('session_id');
+
+    if($status!=""){
+        if ($status=="Approved"){
+            $cond=" where status='Approved' and (distributor_id!='1' and distributor_id!='189')";
+        } else if ($status=="pending"){
+            $cond=" where (status='Pending' and (delivery_status is null or delivery_status = '')) and (distributor_id!='1' and distributor_id!='189')";
+        } else if ($status=="pending_for_approval"){
+            $cond=" where ((status='Pending' and (delivery_status='Pending' or delivery_status='GP Issued' or 
+                                delivery_status='Delivered Not Complete' or delivery_status='Delivered')) or status='Deleted') and 
+                                (distributor_id!='1' and distributor_id!='189')";
+        } else if ($status=="pending_for_delivery"){
+            $cond=" where status='Approved' and delivery_status='Pending' and (distributor_id!='1' and distributor_id!='189')";
+        } else if ($status=="gp_issued"){
+            $cond=" where status='Approved' and delivery_status='GP Issued' and (distributor_id!='1' and distributor_id!='189')";
+        } else if ($status=="delivered_not_complete"){
+            $cond=" where status='Approved' and delivery_status='Delivered Not Complete' and 
+                            (distributor_id!='1' and distributor_id!='189')";
+        } else {
+            $cond=" where status='".$status."' and (distributor_id!='1' and distributor_id!='189')";
+        }
+    } else {
+        $cond=" where (distributor_id!='1' and distributor_id!='189')";
+    }
+
+    $cond2="";
+    if($search_val!=''){
+        $cond2=" where (AA.id like '%".$search_val."%' or DATE_FORMAT(AA.date_of_processing, '%d/%m/%Y') like '%".$search_val."%' or AA.invoice_no like '%".$search_val."%' or AA.voucher_no like '%".$search_val."%' or AA.gate_pass_no like '%".$search_val."%' or AA.final_amount like '%".$search_val."%' or AA.status like '%".$search_val."%' or AA.client_name like '%".$search_val."%' or AA.delivery_status like '%".$search_val."%' or AA.invoice_amount like '%".$search_val."%' or DATE_FORMAT(AA.invoice_date, '%d/%m/%Y') like '%".$search_val."%' or AA.order_no like '%".$search_val."%' or AA.tracking_id like '%".$search_val."%' or AA.proof_of_delivery like '%".$search_val."%' or AA.shipping_charges like '%".$search_val."%' or AA.distributor_name like '%".$search_val."%' or AA.class like '%".$search_val."%' or AA.location like '%".$search_val."%' or AA.depot_name like '%".$search_val."%')";
+    }
+
+    $data = array();
+
+    $sql = "select count(id) as total_records from distributor_out ".$cond;
+    $query=$this->db->query($sql);
+    $data['count']=$query->result();
+
+    $limit = "";
+    if($start>0 && $length>0) $limit .= " limit ".$start.", ".$length;
+    elseif($length>0) $limit .= " limit ".$length;
+
+    $sql = "select AA.* from 
+            (select concat('d_',A.id) as d_id, A.id, A.date_of_processing, A.invoice_no, 
+                A.voucher_no, A.gate_pass_no, A.distributor_id, A.final_amount, A.status,
+                A.client_name, A.delivery_status, A.invoice_amount, A.invoice_date, A.order_no, A.tracking_id, 
+                A.proof_of_delivery, A.shipping_charges, A.modified_on, B.distributor_name, B.class, C.location, D.depot_name, 
+                E.id as credit_debit_note_id from 
+            (select id, date_of_processing, invoice_no, 
+                voucher_no, gate_pass_no, distributor_id, depot_id, final_amount, status,
+                client_name, delivery_status, invoice_amount, invoice_date, order_no, tracking_id, 
+                proof_of_delivery, shipping_charges, modified_on from distributor_out ".$cond." order by modified_on desc ".(($cond2=='')? $limit: '').") A 
+            left join distributor_master B on (A.distributor_id=B.id) 
+            left join location_master C on (B.location_id=C.id) 
+            left join depot_master D on (A.depot_id=D.id) 
+            left join credit_debit_note E on (A.id=E.distributor_out_id)) AA ".$cond2. " order by AA.modified_on desc ".$limit;
+    $query=$this->db->query($sql);
+    $data['rows']=$query->result();
+
+    return $data;
+}
+
 function get_distributor_out_data1($status='', $id=''){
     $curusr = $this->session->userdata('session_id');
 
@@ -358,8 +431,9 @@ function get_distributor_out_expired_data($status='', $id=''){
     //     }
         
     // } else {
-    $cond=" where status='Approved' and distributor_name='Product Expired'";
     //}
+    // $cond=" where status='Approved' and distributor_name='Product Expired'";
+    $cond=" where status='Approved' and (distributor_id='189' or sample_distributor_id='189')";
 
     // if($id!=""){
     //     if($cond=="") {
@@ -383,7 +457,7 @@ function get_distributor_out_expired_data($status='', $id=''){
             (select N.*, P.location from 
             (select C.*, M.distributor_name as sample_distributor_name from 
             (select A.*, B.distributor_name, B.sell_out, B.state as distributor_state,B.location_id, B.class from 
-            (select * from distributor_out) A 
+            (select * from distributor_out".$cond.") A 
             left join 
             (select * from distributor_master) B 
             on (A.distributor_id=B.id)) C 
@@ -403,7 +477,7 @@ function get_distributor_out_expired_data($status='', $id=''){
             (select * from user_master) H 
             on (G.modified_by=H.id) 
 
-            ) I".$cond."
+            ) I 
             order by I.modified_on desc";
 
     $query=$this->db->query($sql);
@@ -2006,6 +2080,67 @@ public function get_sales_item_data($status){
 
     $query=$this->db->query($sql);
     return $query->result();
+}
+
+public function approve_records_from_backend($distributor_out_id){
+    foreach ($distributor_out_id as $id){
+        $invoice_no = '';
+        $invoice_date = '';
+
+        $sql="select * from distributor_out where id='$id'";
+        $query=$this->db->query($sql);
+        $result=$query->result();
+        if(count($result)>0){
+            $invoice_no = $result[0]->invoice_no;
+            $invoice_date = $result[0]->invoice_date;
+        }
+
+        if($invoice_no==null || $invoice_no==''){
+            $sql="select * from series_master where type='Tax_Invoice'";
+            $query=$this->db->query($sql);
+            $result=$query->result();
+            if(count($result)>0){
+                $series=intval($result[0]->series)+1;
+
+                $sql="update series_master set series = '$series' where type = 'Tax_Invoice'";
+                $this->db->query($sql);
+            } else {
+                $series=1;
+
+                $sql="insert into series_master (type, series) values ('Tax_Invoice', '$series')";
+                $this->db->query($sql);
+            }
+
+            if($invoice_date==null || $invoice_date==''){
+                $invoice_date = date('Y-m-d');
+            }
+
+            if (isset($invoice_date)){
+                if($invoice_date==''){
+                    $financial_year="";
+                } else {
+                    $financial_year=calculateFiscalYearForDate($invoice_date);
+                }
+            } else {
+                $financial_year="";
+            }
+            
+            $invoice_no = 'WHPL/'.$financial_year.'/'.strval($series);
+        }
+
+        $status = 'Approved';
+        $remarks = 'Approved form backend.';
+        $now = date('Y-m-d H:i:s');
+        $curusr = $this->session->userdata('session_id');
+
+        $sql = "Update distributor_out A 
+                Set A.status='$status', A.remarks=concat(A.remarks,'$remarks'), A.approved_by='$curusr', A.approved_on='$now', A.invoice_no = '$invoice_no', A.invoice_date = '$invoice_date' 
+                WHERE A.id = '$id'";
+        $this->db->query($sql);
+
+        $this->set_ledger($id);
+        $this->set_credit_note($id);
+    }
 }
 
 }
