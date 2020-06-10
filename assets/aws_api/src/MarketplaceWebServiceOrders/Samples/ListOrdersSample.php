@@ -108,24 +108,24 @@ $request2->setSellerId(MERCHANT_ID);
 // $request->setLastUpdatedAfter($date."T".$time."Z");
 // invokeListOrders($service, $request, $request2);
 
+// $date = date('Y-m-d', strtotime('-1 days'));
+// $time = date('H:i:s', time() + 5400);
+// echo "Time: ".$date."T".$time."Z<br/><br/>";
+// $request->setLastUpdatedAfter($date."T".$time."Z");
+// invokeListOrders($service, $request, $request2);
+
+// sleep(3);
+
+// $date = date('Y-m-d', strtotime('-1 days'));
+// $time = date('H:i:s');
+// echo "Time: ".$date."T".$time."Z<br/><br/>";
+// $request->setLastUpdatedAfter($date."T".$time."Z");
+// invokeListOrders($service, $request, $request2);
+
+// sleep(3);
+
 $date = date('Y-m-d', strtotime('-1 days'));
-$time = date('H:i:s', time() + 5400);
-echo "Time: ".$date."T".$time."Z<br/><br/>";
-$request->setLastUpdatedAfter($date."T".$time."Z");
-invokeListOrders($service, $request, $request2);
-
-sleep(3);
-
-$date = date('Y-m-d', strtotime('-1 days'));
-$time = date('H:i:s');
-echo "Time: ".$date."T".$time."Z<br/><br/>";
-$request->setLastUpdatedAfter($date."T".$time."Z");
-invokeListOrders($service, $request, $request2);
-
-sleep(3);
-
-$date = date('Y-m-d', strtotime('-1 days'));
-$time = date('H:i:s', time() + 9000);
+$time = date('H:i:s', time() - 18000);
 echo "Time: ".$date."T".$time."Z<br/><br/>";
 $request->setLastUpdatedAfter($date."T".$time."Z");
 invokeListOrders($service, $request, $request2);
@@ -149,7 +149,23 @@ invokeListOrders($service, $request, $request2);
 sleep(3);
 
 $date = date('Y-m-d');
-$time = date('H:i:s', time() - 9000);
+$time = date('H:i:s', time() + 18000);
+echo "Time: ".$date."T".$time."Z<br/><br/>";
+$request->setLastUpdatedAfter($date."T".$time."Z");
+invokeListOrders($service, $request, $request2);
+
+sleep(3);
+
+$date = date('Y-m-d', strtotime('+1 days'));
+$time = date('H:i:s', time() - 18000);
+echo "Time: ".$date."T".$time."Z<br/><br/>";
+$request->setLastUpdatedAfter($date."T".$time."Z");
+invokeListOrders($service, $request, $request2);
+
+sleep(3);
+
+$date = date('Y-m-d', strtotime('+1 days'));
+$time = date('H:i:s', time() + 18000);
 echo "Time: ".$date."T".$time."Z<br/><br/>";
 $request->setLastUpdatedAfter($date."T".$time."Z");
 invokeListOrders($service, $request, $request2);

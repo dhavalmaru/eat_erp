@@ -159,7 +159,7 @@ function get_list_data($status='', $start=0, $length=0, $search_val=''){
             left join distributor_master B on (A.distributor_id=B.id) 
             left join location_master C on (B.location_id=C.id) 
             left join depot_master D on (A.depot_id=D.id) 
-            left join credit_debit_note E on (A.id=E.distributor_out_id)) AA ".$cond2. " order by AA.modified_on desc ".$limit;
+            left join credit_debit_note E on (A.id=E.distributor_out_id)) AA ".$cond2. " order by AA.modified_on desc ".(($cond2=='')? '' :$limit);
     $query=$this->db->query($sql);
     $data['rows']=$query->result();
 

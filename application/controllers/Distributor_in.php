@@ -117,6 +117,165 @@ class Distributor_in extends CI_Controller{
         }
     }
 
+    public function get_invoice() { 
+        $postData = $this->input->post();
+        $distributor_id = $postData['distributor_id'];
+        $invoice_no = $postData['invoice_no'];
+        $data = $this->distributor_in_model->get_invoice($distributor_id);
+
+        $options = '<option value="">Select</option>';
+        for($i=0; $i<count($data); $i++){
+            $options .= '<option value="'.$data[$i]->invoice_no.'"'.(($data[$i]->invoice_no==$invoice_no)? ' selected': '').'>'.$data[$i]->invoice_no.'</option>';
+        }
+
+        $final_data = array('options'=>$options);
+
+        echo json_encode($final_data); 
+    }
+
+    public function get_invoice_details() {
+        $postData = $this->input->post();
+        $invoice_no = $postData['invoice_no'];
+        $data = $this->distributor_in_model->get_invoice_details($invoice_no);
+        $box = $this->box_model->get_data('Approved');
+        $bar = $this->product_model->get_data('Approved');
+        
+        $date = date("Y-m-d", strtotime("-9 months"));
+        $sql = "select * from batch_master where date_of_processing >= '$date' and status = 'Approved' and batch_no!=''";
+        $query = $this->db->query($sql);
+        $batch = $query->result();
+
+        $invoice_details = '';
+
+        for($i=0; $i<count($data); $i++){
+            $bar_details = '<option value="">Select</option>';
+            if(isset($bar)){
+                for($k=0; $k < count($bar) ; $k++){
+                    $selected = '';
+                    if($data[$i]->type=='Bar' && $data[$i]->item_id==$bar[$k]->id){
+                        $selected = ' selected';
+                    }
+
+                    $bar_details .= '<option value="'.$bar[$k]->id.'"'.$selected.'>'.$bar[$k]->product_name.'</option>';
+                }
+            }
+
+            $box_details = '<option value="">Select</option>';
+            if(isset($box)){
+                for($k=0; $k < count($box) ; $k++){
+                    $selected = '';
+                    if($data[$i]->type=='Box' && $data[$i]->item_id==$box[$k]->id){
+                        $selected = ' selected';
+                    }
+
+                    $box_details .= '<option value="'.$box[$k]->id.'"'.$selected.'>'.$box[$k]->box_name.'</option>';
+                }
+            }
+
+            $batch_details = '<option value="">Select</option>';
+            if(isset($batch)){
+                for($k=0; $k < count($batch) ; $k++){
+                    $selected = '';
+                    if($data[$i]->batch_no==$batch[$k]->id){
+                        $selected = ' selected';
+                    }
+
+                    $batch_details .= '<option value="'.$batch[$k]->id.'"'.$selected.'>'.$batch[$k]->batch_no.'</option>';
+                }
+            }
+
+            $bar_style = '';
+            $box_style = '';
+            $bar_type = '';
+            $box_type = '';
+            if($data[$i]->type=='Bar'){
+                $box_style = 'display: none;';
+                $bar_type = ' selected';
+            } else {
+                $bar_style = 'display: none;';
+                $box_type = ' selected';
+            }
+
+            $invoice_details .= '<tr id="box_'.$i.'_row">'.
+                                    '<td>'.
+                                        '<select name="type[]" class="form-control type" id="type_'.$i.'">'.
+                                            '<option value="">Select</option>'.
+                                            '<option value="Bar"'.$bar_type.'>Bar</option>'.
+                                            '<option value="Box"'.$box_type.'>Box</option>'.
+                                        '</select>'.
+                                    '</td>'.
+                                    '<td>'.
+                                        '<select name="bar[]" class="form-control bar" id="bar_'.$i.'" data-error="#err_item_'.$i.'" style="'.$bar_style.'">'.$bar_details.
+                                        '</select>'.
+                                        '<select name="box[]" class="form-control box" id="box_'.$i.'" data-error="#err_item_'.$i.'" style="'.$box_style.'">'.$box_details.
+                                        '</select>'.
+                                        '<div id="err_item_'.$i.'"></div>'.
+                                    '</td>'.
+                                    '<td>'.
+                                        '<input type="text" class="form-control qty" name="qty[]" id="qty_'.$i.'" placeholder="Qty" value="'.$data[$i]->qty.'"/>'.
+                                    '</td>'.
+                                    '<td class="print_hide">'.
+                                        '<input type="text" class="form-control rate" name="rate[]" id="rate_'.$i.'" placeholder="Rate" value="'.$data[$i]->qty.'" readonly />'.
+                                    '</td>'.
+                                    '<td>'.
+                                        '<input type="hidden" class="form-control" name="cgst[]" id="cgst_'.$i.'" placeholder="cgst" value="0" readonly />'.
+                                        '<input type="hidden" class="form-control" name="sgst[]" id="sgst_'.$i.'" placeholder="sgst" value="0" readonly />'.
+                                        '<input type="hidden" class="form-control" name="igst[]" id="igst_'.$i.'" placeholder="igst" value="0" readonly />'.
+                                        '<input type="hidden" class="form-control tax_per" name="tax_per[]" id="tax_per_'.$i.'" placeholder="tax_per" value="'.$data[$i]->tax_percentage.'"/>'.
+                                        '<input type="hidden" class="form-control sell_margin" name="sell_margin[]" id="sell_margin_'.$i.'" placeholder="Sell Margin" value="0"/>'.
+                                        '<input type="hidden" class="form-control promo_margin" name="promo_margin[]" id="promo_margin_'.$i.'" placeholder="Promo Margin" value="'.$data[$i]->promo_margin.'"/>'.
+                                        '<input type="text" class="form-control sell_rate" name="sell_rate[]" id="sell_rate_'.$i.'" placeholder="Sell Rate" value="'.$data[$i]->sell_rate.'"/>'.
+                                    '</td>'.
+                                    '<td style="display: none;">'.
+                                        '<input type="text" class="form-control cost_rate" name="cost_rate[]" id="cost_rate_'.$i.'" placeholder="Cost Rate" value="'.$data[$i]->rate.'"/>'.
+                                    '</td>'.
+                                    '<td style="display: none;">'.
+                                        '<input type="text" class="form-control grams" name="grams[]" id="grams_'.$i.'" placeholder="Grams" value="'.$data[$i]->grams.'" readonly />'.
+                                    '</td>'.
+                                    '<td class="print_hide">'.
+                                        '<input type="text" class="form-control amount" name="amount[]" id="amount_'.$i.'" placeholder="Amount" value="'.$data[$i]->amount.'" readonly />'.
+                                    '</td>'.
+                                    '<!-- <td>'.
+                                        '<input type="text" class="form-control vat1" name="vat1[]" id="vat1_'.$i.'" placeholder="VAT" value="" readonly />'.
+                                    '</td> -->'.
+                                    '<td class="print_hide">'.
+                                        '<input type="text" class="form-control cgst_amt" name="cgst_amt[]" id="cgst_amt_'.$i.'" placeholder="CGST Amount" value="'.$data[$i]->cgst_amt.'" readonly />'.
+                                    '</td>'.
+                                    '<td class="print_hide">'.
+                                        '<input type="text" class="form-control sgst_amt" name="sgst_amt[]" id="sgst_amt_'.$i.'" placeholder="SGST Amount" value="'.$data[$i]->sgst_amt.'" readonly />'.
+                                    '</td>'.
+                                    '<td class="print_hide">'.
+                                        '<input type="text" class="form-control igst_amt" name="igst_amt[]" id="igst_amt_'.$i.'" placeholder="IGST Amount" value="'.$data[$i]->igst_amt.'" readonly />'.
+                                    '</td>'.
+                                    '<td class="print_hide">'.
+                                        '<input type="text" class="form-control tax_amt" name="tax_amt[]" id="tax_amt_'.$i.'" placeholder="VAT" value="'.$data[$i]->tax_amt.'" readonly />'.
+                                    '</td>'.
+                                    '<td>'.
+                                        '<input type="text" class="form-control total_amt" name="total_amt[]" id="total_amt_'.$i.'" placeholder="Total Amount" value="'.$data[$i]->total_amt.'" readonly />'.
+                                    '</td>'.
+                                    '<td style="display: none;">'.
+                                        '<input type="text" class="form-control cost_total_amt" name="cost_total_amt[]" id="cost_total_amt_'.$i.'" placeholder="Cost Total Amount" value="'.$data[$i]->amount.'" readonly />'.
+                                    '</td>'.
+                                    '<td>'.
+                                        '<select name="batch_no[]" class="form-control batch_no" id="batch_no_'.$i.'" data-error="#err_batch_no_'.$i.'">'.$batch_details.
+                                        '</select>'.
+                                        '<div id="err_batch_no_'.$i.'"></div>'.
+                                    '</td>'.
+                                    '<td style="text-align:center;" class="print_hide table_action">'.
+                                        '<a id="box_'.$i.'_row_delete" class="delete_row_new" href="#"><span class="fa trash fa-trash-o"  ></span></a>'.
+                                    '</td>'.
+                                '</tr>';
+        }
+
+        $final_data = array('discount'=>0, 'invoice_details'=>$invoice_details);
+
+        if(count($data)>0){
+            $final_data['discount'] = $data[0]->discount;
+        }
+
+        echo json_encode($final_data);
+    }
+    
     public function add(){
         $result=$this->distributor_in_model->get_access();
         if(count($result)>0) {

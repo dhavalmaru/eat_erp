@@ -14,6 +14,18 @@ function get_access(){
     return $query->result();
 }
 
+function get_invoice($distributor_id){
+    $sql = "select invoice_no from distributor_out where status='Approved' and distributor_id='".$distributor_id."' and invoice_no <> ''";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+function get_invoice_details($invoice_no){
+    $sql = "select A.discount, B.* from distributor_out A left join distributor_out_items B on(A.id=B.distributor_out_id) where A.status='Approved' and A.invoice_no='".$invoice_no."'";
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
 function get_data($status='', $id=''){
     if($status!=""){
         if($status=="Pending"){

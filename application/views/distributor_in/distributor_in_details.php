@@ -214,7 +214,7 @@
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Invoice No. <span class="asterisk_sign"></span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select name="invoice_no" id="invoice_no" class="form-control">
+                                                <select name="invoice_no" id="invoice_no" class="form-control" onchange="get_invoice_details();">
                                                     <?php
                                                      if(isset($invoice_nos))
                                                      {
@@ -2233,110 +2233,10 @@
                     $('.exc_table').hide();
                 }
 
+                append_total_row();
+                append_total_row1();
+
                 var counter = $('.box').length;
-
-                var newRow1;
-                newRow1 = jQuery('<tr id="box row">' + 
-                                            '<td>' + 
-                                                '&nbsp;' + 
-                                            '</td>' + 
-                                            '<td>' + 
-                                                '&nbsp;' + 
-                                            '</td>' + 
-                                            '<td>' + 
-                                                '&nbsp;' + 
-                                            '</td>' + 
-                                            '<td class="print_hide">' + 
-                                                '&nbsp;' + 
-                                            '</td>' +
-                                            '<td>' + 
-                                                'Total' + 
-                                            '</td>' + 
-                                            '<td style="display: none;" class="print_hide">' + 
-                                                '<input type="text" class="form-control grams" name="grams[]" id="grams_'+counter+'" placeholder="Grams" value="" readonly />' + 
-                                            '</td>' + 
-                                            '<td class="print_hide">' + 
-                                                '<input type="text" class="form-control" name="total_amount" id="total_amount" placeholder="Total Amount" value="<?php if (isset($data)) { echo $data[0]->amount; } ?>" readonly />' + 
-                                            '</td>' + 
-                                            '<!-- <td>' + 
-                                                '<input type="text" class="form-control" name="tax_amount" id="tax_amount" placeholder="CST Amount" value="<?php //if (isset($data)) { echo $data[0]->tax_amount; } ?>" readonly />' + 
-                                            '</td> -->' + 
-                                            '<td class="print_hide">' + 
-                                                '<input type="text" class="form-control" name="cgst_amount" id="cgst_amount" placeholder="CGST Amount" value="<?php if (isset($data)) { echo $data[0]->cgst_amount; } ?>" readonly />' + 
-                                            '</td>' + 
-                                            '<td class="print_hide">' + 
-                                                '<input type="text" class="form-control" name="sgst_amount" id="sgst_amount" placeholder="SGST Amount" value="<?php if (isset($data)) { echo $data[0]->sgst_amount; } ?>" readonly />' + 
-                                            '</td>' + 
-                                            '<td class="print_hide">' + 
-                                                '<input type="text" class="form-control" name="igst_amount" id="igst_amount" placeholder="IGST Amount" value="<?php if (isset($data)) { echo $data[0]->igst_amount; } ?>" readonly />' + 
-                                            '</td>' + 
-                                            '<td class="print_hide">' + 
-                                                '<input type="text" class="form-control" name="tax_amount" id="tax_amount" placeholder="Tax Amount" value="<?php if (isset($data)) { echo $data[0]->tax_amount; } ?>" readonly />' + 
-                                            '</td>' + 
-                                            '<td>' + 
-                                                '<input type="text" class="form-control" name="final_amount" id="final_amount" placeholder="Final Amount" value="<?php if(isset($data)) { echo $data[0]->final_amount; } ?>" readonly />' + 
-                                            '</td>' + 
-                                            '<td style="display: none;">' + 
-                                                '<input type="text" class="form-control" name="cost_final_amount" id="cost_final_amount" placeholder="Cost Final Amount" value="<?php if(isset($data)) { echo $data[0]->final_cost_amount; } ?>" readonly />' + 
-                                            '</td>' + 
-                                            '<td style="text-align:center;">' + 
-                                                '&nbsp;' + 
-                                            '</td>' + 
-                                            '<td style="text-align:center;" class="print_hide table_action">' + 
-                                                '&nbsp;' + 
-                                            '</td>' + 
-                                        '</tr>');
-                $('#box_details').append(newRow1);
-
-                var newRow1_ex;
-                newRow1_ex = jQuery('<tr id="box row">' + 
-                                            '<td>' + 
-                                                '&nbsp;' + 
-                                            '</td>' + 
-                                            '<td>' + 
-                                                '&nbsp;' + 
-                                            '</td>' + 
-                                            '<td>' + 
-                                                '&nbsp;' + 
-                                            '</td>' + 
-                                            '<td class="print_hide">' + 
-                                                '&nbsp;' + 
-                                            '</td>' +
-                                            '<td>' + 
-                                                'Total' + 
-                                            '</td>' + 
-                                            '<td style="display: none;">' + 
-                                                '<input type="text" class="form-control grams" name="grams_ex[]" id="grams_ex_'+counter+'" placeholder="Grams" value="" readonly />' + 
-                                            '</td>' + 
-                                            '<td class="print_hide">' + 
-                                                '<input type="text" class="form-control" name="total_amount_ex" id="total_amount_ex" placeholder="Total Amount" value="<?php if (isset($data)) { echo $data[0]->amount; } ?>" readonly />' + 
-                                            '</td>' + 
-                                            '<!-- <td>' + 
-                                                '<input type="text" class="form-control" name="tax_amount_ex" id="tax_amount_ex" placeholder="CST Amount" value="<?php //if (isset($data)) { echo $data[0]->tax_amount; } ?>" readonly />' + 
-                                            '</td> -->' + 
-                                            '<td class="print_hide">' + 
-                                                '<input type="text" class="form-control" name="cgst_amoun_ex" id="cgst_amount_ex" placeholder="CGST Amount" value="<?php if (isset($data)) { echo $data[0]->cgst_amount; } ?>" readonly />' + 
-                                            '</td>' + 
-                                            '<td class="print_hide">' + 
-                                                '<input type="text" class="form-control" name="sgst_amount_ex" id="sgst_amount_ex" placeholder="SGST Amount" value="<?php if (isset($data)) { echo $data[0]->sgst_amount; } ?>" readonly />' + 
-                                            '</td>' + 
-                                            '<td class="print_hide">' + 
-                                                '<input type="text" class="form-control" name="igst_amount_ex" id="igst_amount_ex" placeholder="IGST Amount" value="<?php if (isset($data)) { echo $data[0]->igst_amount; } ?>" readonly />' + 
-                                            '</td>' + 
-                                            '<td class="print_hide">' + 
-                                                '<input type="text" class="form-control" name="tax_amount_ex" id="tax_amount_ex" placeholder="Tax Amount" value="<?php if (isset($data)) { echo $data[0]->tax_amount; } ?>" readonly />' + 
-                                            '</td>' + 
-                                            '<td>' + 
-                                                '<input type="text" class="form-control" name="final_amount_ex" id="final_amount_ex" placeholder="Final Amount" value="<?php if(isset($data)) { echo $data[0]->final_amount; } ?>" readonly />' + 
-                                            '</td>' + 
-                                            '<td style="display: none;">' + 
-                                                '<input type="text" class="form-control" name="cost_final_amount_ex" id="cost_final_amount_ex" placeholder="Cost Final Amount" value="<?php if(isset($data)) { echo $data[0]->final_cost_amount; } ?>" readonly />' + 
-                                            '</td>' + 
-                                            '<td style="text-align:center;" class="print_hide table_action">' + 
-                                                '&nbsp;' + 
-                                            '</td>' + 
-                                        '</tr>');
-                $('#box_details_ex').append(newRow1_ex);
 
                 $('#repeat-box').click(function(event){
                     event.preventDefault();
@@ -2572,55 +2472,176 @@
                     counter++;
                 });
             });
+
+            function append_total_row(){
+                var newRow1;
+                newRow1 = jQuery('<tr id="box row">' + 
+                                            '<td>' + 
+                                                '&nbsp;' + 
+                                            '</td>' + 
+                                            '<td>' + 
+                                                '&nbsp;' + 
+                                            '</td>' + 
+                                            '<td>' + 
+                                                '&nbsp;' + 
+                                            '</td>' + 
+                                            '<td class="print_hide">' + 
+                                                '&nbsp;' + 
+                                            '</td>' +
+                                            '<td>' + 
+                                                'Total' + 
+                                            '</td>' + 
+                                            '<td style="display: none;" class="print_hide">' + 
+                                                '<input type="text" class="form-control grams" name="grams[]" id="total_grams" placeholder="Grams" value="" readonly />' + 
+                                            '</td>' + 
+                                            '<td class="print_hide">' + 
+                                                '<input type="text" class="form-control" name="total_amount" id="total_amount" placeholder="Total Amount" value="<?php if (isset($data)) { echo $data[0]->amount; } ?>" readonly />' + 
+                                            '</td>' + 
+                                            '<!-- <td>' + 
+                                                '<input type="text" class="form-control" name="tax_amount" id="tax_amount" placeholder="CST Amount" value="<?php //if (isset($data)) { echo $data[0]->tax_amount; } ?>" readonly />' + 
+                                            '</td> -->' + 
+                                            '<td class="print_hide">' + 
+                                                '<input type="text" class="form-control" name="cgst_amount" id="cgst_amount" placeholder="CGST Amount" value="<?php if (isset($data)) { echo $data[0]->cgst_amount; } ?>" readonly />' + 
+                                            '</td>' + 
+                                            '<td class="print_hide">' + 
+                                                '<input type="text" class="form-control" name="sgst_amount" id="sgst_amount" placeholder="SGST Amount" value="<?php if (isset($data)) { echo $data[0]->sgst_amount; } ?>" readonly />' + 
+                                            '</td>' + 
+                                            '<td class="print_hide">' + 
+                                                '<input type="text" class="form-control" name="igst_amount" id="igst_amount" placeholder="IGST Amount" value="<?php if (isset($data)) { echo $data[0]->igst_amount; } ?>" readonly />' + 
+                                            '</td>' + 
+                                            '<td class="print_hide">' + 
+                                                '<input type="text" class="form-control" name="tax_amount" id="tax_amount" placeholder="Tax Amount" value="<?php if (isset($data)) { echo $data[0]->tax_amount; } ?>" readonly />' + 
+                                            '</td>' + 
+                                            '<td>' + 
+                                                '<input type="text" class="form-control" name="final_amount" id="final_amount" placeholder="Final Amount" value="<?php if(isset($data)) { echo $data[0]->final_amount; } ?>" readonly />' + 
+                                            '</td>' + 
+                                            '<td style="display: none;">' + 
+                                                '<input type="text" class="form-control" name="cost_final_amount" id="cost_final_amount" placeholder="Cost Final Amount" value="<?php if(isset($data)) { echo $data[0]->final_cost_amount; } ?>" readonly />' + 
+                                            '</td>' + 
+                                            '<td style="text-align:center;">' + 
+                                                '&nbsp;' + 
+                                            '</td>' + 
+                                            '<td style="text-align:center;" class="print_hide table_action">' + 
+                                                '&nbsp;' + 
+                                            '</td>' + 
+                                        '</tr>');
+                $('#box_details').append(newRow1);
+            }
+
+            function append_total_row1(){
+                var newRow1_ex;
+                newRow1_ex = jQuery('<tr id="box row">' + 
+                                            '<td>' + 
+                                                '&nbsp;' + 
+                                            '</td>' + 
+                                            '<td>' + 
+                                                '&nbsp;' + 
+                                            '</td>' + 
+                                            '<td>' + 
+                                                '&nbsp;' + 
+                                            '</td>' + 
+                                            '<td class="print_hide">' + 
+                                                '&nbsp;' + 
+                                            '</td>' +
+                                            '<td>' + 
+                                                'Total' + 
+                                            '</td>' + 
+                                            '<td style="display: none;">' + 
+                                                '<input type="text" class="form-control grams" name="grams_ex[]" id="total_grams_ex" placeholder="Grams" value="" readonly />' + 
+                                            '</td>' + 
+                                            '<td class="print_hide">' + 
+                                                '<input type="text" class="form-control" name="total_amount_ex" id="total_amount_ex" placeholder="Total Amount" value="<?php if (isset($data)) { echo $data[0]->amount; } ?>" readonly />' + 
+                                            '</td>' + 
+                                            '<!-- <td>' + 
+                                                '<input type="text" class="form-control" name="tax_amount_ex" id="tax_amount_ex" placeholder="CST Amount" value="<?php //if (isset($data)) { echo $data[0]->tax_amount; } ?>" readonly />' + 
+                                            '</td> -->' + 
+                                            '<td class="print_hide">' + 
+                                                '<input type="text" class="form-control" name="cgst_amoun_ex" id="cgst_amount_ex" placeholder="CGST Amount" value="<?php if (isset($data)) { echo $data[0]->cgst_amount; } ?>" readonly />' + 
+                                            '</td>' + 
+                                            '<td class="print_hide">' + 
+                                                '<input type="text" class="form-control" name="sgst_amount_ex" id="sgst_amount_ex" placeholder="SGST Amount" value="<?php if (isset($data)) { echo $data[0]->sgst_amount; } ?>" readonly />' + 
+                                            '</td>' + 
+                                            '<td class="print_hide">' + 
+                                                '<input type="text" class="form-control" name="igst_amount_ex" id="igst_amount_ex" placeholder="IGST Amount" value="<?php if (isset($data)) { echo $data[0]->igst_amount; } ?>" readonly />' + 
+                                            '</td>' + 
+                                            '<td class="print_hide">' + 
+                                                '<input type="text" class="form-control" name="tax_amount_ex" id="tax_amount_ex" placeholder="Tax Amount" value="<?php if (isset($data)) { echo $data[0]->tax_amount; } ?>" readonly />' + 
+                                            '</td>' + 
+                                            '<td>' + 
+                                                '<input type="text" class="form-control" name="final_amount_ex" id="final_amount_ex" placeholder="Final Amount" value="<?php if(isset($data)) { echo $data[0]->final_amount; } ?>" readonly />' + 
+                                            '</td>' + 
+                                            '<td style="display: none;">' + 
+                                                '<input type="text" class="form-control" name="cost_final_amount_ex" id="cost_final_amount_ex" placeholder="Cost Final Amount" value="<?php if(isset($data)) { echo $data[0]->final_cost_amount; } ?>" readonly />' + 
+                                            '</td>' + 
+                                            '<td style="text-align:center;" class="print_hide table_action">' + 
+                                                '&nbsp;' + 
+                                            '</td>' + 
+                                        '</tr>');
+                $('#box_details_ex').append(newRow1_ex);
+            }
     
             $('.sales_type').on('change',function(){
-                if($(this).val()=='Invoice') {
+                get_invoice_nos();
+            });
+
+            function get_invoice_nos(){
+                if($('#stype_invoice').is(':checked')) {
                     $('#invoice_no_div').show();
                     var distributor_id = $('#distributor_id').val();
+                    var invoice_no = $('#invoice_no').val();
                     $.ajax({
-                            url:BASE_URL+'index.php/credit_debit_note/get_invoice',
+                            url:BASE_URL+'index.php/distributor_in/get_invoice',
                             method: 'post',
-                            data: {distributor_id: distributor_id},
+                            data: {distributor_id: distributor_id, invoice_no: invoice_no},
                             dataType: 'json',
                             success: function(response){
-                              $('#invoice_no').empty();
-                              $('#invoice_no').append('<option value="">Select</option>');
-                              $.each(response,function(index,data){
-                                 $('#invoice_no').append('<option value="'+data['invoice_no']+'">'+data['invoice_no']+'</option>');
-                              });
+                                $('#invoice_no').html(response.options);
+
+                                // $('#invoice_no').empty();
+                                // $('#invoice_no').append('<option value="">Select</option>');
+                                // $.each(response,function(index,data){
+                                //     $('#invoice_no').append('<option value="'+data['invoice_no']+'">'+data['invoice_no']+'</option>');
+                                // });
                             }
                         });
                 } else {
                     $('#invoice_no').empty();
                     $('#invoice_no_div').hide();
                 }
-            });
+            }
+
+            function get_invoice_details(){
+                var invoice_no = $('#invoice_no').val();
+                $.ajax({
+                    url:BASE_URL+'index.php/distributor_in/get_invoice_details',
+                    method: 'post',
+                    data: {invoice_no: invoice_no},
+                    dataType: 'json',
+                    async: false,
+                    success: function(response){
+                        $('#discount').val(response.discount);
+                        $('#box_details').html(response.invoice_details);
+                    }
+                });
+
+                append_total_row();
+
+                $('#sell_out').val($("#discount").val());
+                // get_sell_rate();
+
+                $('.type').each(function(){
+                    show_item($(this));
+                    // console.log('show_item');
+                    // get_product_detail($(this));
+                });
+                get_sell_rate();
+            }
 
             $('#distributor_id').change(function(){
-                if($('input[name="sales_type"]:checked').val()=='Invoice'){
-                    var distributor_id = $('#distributor_id').val();
-                    $.ajax({
-                        url:BASE_URL+'index.php/credit_debit_note/get_invoice',
-                        method: 'post',
-                        data: {distributor_id: distributor_id},
-                        dataType: 'json',
-                        success: function(response){
-                            $('#invoice_no').empty();
-                            $('#invoice_no').append('<option value="">Select</option>');
-                            $.each(response,function(index,data){
-                                $('#invoice_no').append('<option value="'+data['invoice_no']+'">'+data['invoice_no']+'</option>');
-                            });
-                        }
-                    });
-                }
+                get_invoice_nos();
 
                 $(".bar").each(function(){
                     if($(this).val()!=""){
-                        // get_product_detail($(this));   
-                        // get_bar_details($(this));
-                        // get_box_details($(this));
-                        // get_sell_rate();
-
                         get_bar_details($(this));
                         get_product_detail($(this));
                         get_sell_rate();
@@ -2628,11 +2649,6 @@
                 });
                 $(".box").each(function(){
                     if($(this).val()!=""){
-                        // get_product_box_detail_ex($(this));
-                        // get_bar_details_ex($(this));
-                        // get_box_details_ex($(this));
-                        // get_sell_rate_ex();
-
                         get_box_details($(this));
                         get_product_box_detail($(this));
                         get_sell_rate();
@@ -2652,6 +2668,9 @@
                         get_sell_rate_ex();
                     }
                 });
+            });
+
+            $('#distributor_id').change(function(){
             });
             
             $(document).ready(function(){
@@ -2897,8 +2916,6 @@
                 get_distributor_details($('#distributor_id').val(), false);
             });
             
-            
-
             function set_stock_validation(model_name,form_name,elem) {
                     var id =  elem.attr('id');
                     var myarr = id.split("_");
@@ -2977,7 +2994,6 @@
                         delete_row(elem);
                     }
             }
-
 
             // $('#savedata').click(function(){
             //     var in_amt=$('#final_amount').val();
