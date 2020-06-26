@@ -110,35 +110,32 @@ function get_list_data($status='', $start=0, $length=0, $search_val=''){
 
     if($status!=""){
         if ($status=="Approved"){
-            $cond=" where status='Approved' and (distributor_id!='1' and distributor_id!='189')";
+            $cond=" where A.status='Approved' and (A.distributor_id!='1' and A.distributor_id!='189')";
         } else if ($status=="pending"){
-            $cond=" where (status='Pending' and (delivery_status is null or delivery_status = '')) and (distributor_id!='1' and distributor_id!='189')";
+            $cond=" where (A.status='Pending' and (A.delivery_status is null or A.delivery_status = '')) and (A.distributor_id!='1' and A.distributor_id!='189')";
         } else if ($status=="pending_for_approval"){
-            $cond=" where ((status='Pending' and (delivery_status='Pending' or delivery_status='GP Issued' or 
-                                delivery_status='Delivered Not Complete' or delivery_status='Delivered')) or status='Deleted') and 
-                                (distributor_id!='1' and distributor_id!='189')";
+            $cond=" where ((A.status='Pending' and (A.delivery_status='Pending' or A.delivery_status='GP Issued' or A.delivery_status='Delivered Not Complete' or A.delivery_status='Delivered')) or A.status='Deleted') and (A.distributor_id!='1' and A.distributor_id!='189')";
         } else if ($status=="pending_for_delivery"){
-            $cond=" where status='Approved' and delivery_status='Pending' and (distributor_id!='1' and distributor_id!='189')";
+            $cond=" where A.status='Approved' and A.delivery_status='Pending' and (A.distributor_id!='1' and A.distributor_id!='189')";
         } else if ($status=="gp_issued"){
-            $cond=" where status='Approved' and delivery_status='GP Issued' and (distributor_id!='1' and distributor_id!='189')";
+            $cond=" where A.status='Approved' and A.delivery_status='GP Issued' and (A.distributor_id!='1' and A.distributor_id!='189')";
         } else if ($status=="delivered_not_complete"){
-            $cond=" where status='Approved' and delivery_status='Delivered Not Complete' and 
-                            (distributor_id!='1' and distributor_id!='189')";
+            $cond=" where A.status='Approved' and A.delivery_status='Delivered Not Complete' and (A.distributor_id!='1' and A.distributor_id!='189')";
         } else {
-            $cond=" where status='".$status."' and (distributor_id!='1' and distributor_id!='189')";
+            $cond=" where A.status='".$status."' and (A.distributor_id!='1' and A.distributor_id!='189')";
         }
     } else {
-        $cond=" where (distributor_id!='1' and distributor_id!='189')";
+        $cond=" where (A.distributor_id!='1' and A.distributor_id!='189')";
     }
 
     $cond2="";
     if($search_val!=''){
-        $cond2=" where (AA.id like '%".$search_val."%' or DATE_FORMAT(AA.date_of_processing, '%d/%m/%Y') like '%".$search_val."%' or AA.invoice_no like '%".$search_val."%' or AA.voucher_no like '%".$search_val."%' or AA.gate_pass_no like '%".$search_val."%' or AA.final_amount like '%".$search_val."%' or AA.status like '%".$search_val."%' or AA.client_name like '%".$search_val."%' or AA.delivery_status like '%".$search_val."%' or AA.invoice_amount like '%".$search_val."%' or DATE_FORMAT(AA.invoice_date, '%d/%m/%Y') like '%".$search_val."%' or AA.order_no like '%".$search_val."%' or AA.tracking_id like '%".$search_val."%' or AA.proof_of_delivery like '%".$search_val."%' or AA.shipping_charges like '%".$search_val."%' or AA.distributor_name like '%".$search_val."%' or AA.class like '%".$search_val."%' or AA.location like '%".$search_val."%' or AA.depot_name like '%".$search_val."%')";
+        $cond2=" and (A.id like '%".$search_val."%' or DATE_FORMAT(A.date_of_processing, '%d/%m/%Y') like '%".$search_val."%' or A.invoice_no like '%".$search_val."%' or A.voucher_no like '%".$search_val."%' or A.gate_pass_no like '%".$search_val."%' or A.final_amount like '%".$search_val."%' or A.status like '%".$search_val."%' or A.client_name like '%".$search_val."%' or A.delivery_status like '%".$search_val."%' or A.invoice_amount like '%".$search_val."%' or DATE_FORMAT(A.invoice_date, '%d/%m/%Y') like '%".$search_val."%' or A.order_no like '%".$search_val."%' or A.tracking_id like '%".$search_val."%' or A.proof_of_delivery like '%".$search_val."%' or A.shipping_charges like '%".$search_val."%' or B.distributor_name like '%".$search_val."%' or B.class like '%".$search_val."%')";
     }
 
     $data = array();
 
-    $sql = "select count(id) as total_records from distributor_out ".$cond;
+    $sql = "select count(A.id) as total_records from distributor_out A left join distributor_master B on (A.distributor_id=B.id) ".$cond.$cond2;
     $query=$this->db->query($sql);
     $data['count']=$query->result();
 
@@ -146,20 +143,20 @@ function get_list_data($status='', $start=0, $length=0, $search_val=''){
     if($start>0 && $length>0) $limit .= " limit ".$start.", ".$length;
     elseif($length>0) $limit .= " limit ".$length;
 
-    $sql = "select AA.* from 
-            (select concat('d_',A.id) as d_id, A.id, A.date_of_processing, A.invoice_no, 
-                A.voucher_no, A.gate_pass_no, A.distributor_id, A.final_amount, A.status,
+    $sql = "select concat('d_',A.id) as d_id, A.id, A.date_of_processing, A.invoice_no, A.voucher_no, A.gate_pass_no, 
+                A.distributor_id, A.final_amount, A.status, A.client_name, A.delivery_status, A.invoice_amount, 
+                A.invoice_date, A.order_no, A.tracking_id, A.proof_of_delivery, A.shipping_charges, A.modified_on, 
+                A.distributor_name, A.class, C.location, D.depot_name, E.id as credit_debit_note_id from 
+            (select A.id, A.date_of_processing, A.invoice_no, 
+                A.voucher_no, A.gate_pass_no, A.distributor_id, A.depot_id, A.final_amount, A.status,
                 A.client_name, A.delivery_status, A.invoice_amount, A.invoice_date, A.order_no, A.tracking_id, 
-                A.proof_of_delivery, A.shipping_charges, A.modified_on, B.distributor_name, B.class, C.location, D.depot_name, 
-                E.id as credit_debit_note_id from 
-            (select id, date_of_processing, invoice_no, 
-                voucher_no, gate_pass_no, distributor_id, depot_id, final_amount, status,
-                client_name, delivery_status, invoice_amount, invoice_date, order_no, tracking_id, 
-                proof_of_delivery, shipping_charges, modified_on from distributor_out ".$cond." order by modified_on desc ".(($cond2=='')? $limit: '').") A 
-            left join distributor_master B on (A.distributor_id=B.id) 
-            left join location_master C on (B.location_id=C.id) 
+                A.proof_of_delivery, A.shipping_charges, A.modified_on, B.distributor_name, B.class, B.location_id 
+            from distributor_out A 
+            left join distributor_master B on (A.distributor_id=B.id) ".$cond.$cond2." 
+            order by A.modified_on desc ".$limit.") A 
+            left join location_master C on (A.location_id=C.id) 
             left join depot_master D on (A.depot_id=D.id) 
-            left join credit_debit_note E on (A.id=E.distributor_out_id)) AA ".$cond2. " order by AA.modified_on desc ".(($cond2=='')? '' :$limit);
+            left join credit_debit_note E on (A.id=E.distributor_out_id)";
     $query=$this->db->query($sql);
     $data['rows']=$query->result();
 

@@ -838,6 +838,9 @@
         <script type="text/javascript" src="<?php echo base_url(); ?>js/load_autocomplete.js"></script>
         <script type="text/javascript" src="<?php echo base_url(); ?>js/validations.js"></script>
         <script type="text/javascript">
+            var newRow1;
+            var newRow1_ex;
+
             $("#discount").change(function(){
                 $('#sell_out').val($("#discount").val());
                 // get_sell_rate();
@@ -2474,7 +2477,6 @@
             });
 
             function append_total_row(){
-                var newRow1;
                 newRow1 = jQuery('<tr id="box row">' + 
                                             '<td>' + 
                                                 '&nbsp;' + 
@@ -2529,7 +2531,6 @@
             }
 
             function append_total_row1(){
-                var newRow1_ex;
                 newRow1_ex = jQuery('<tr id="box row">' + 
                                             '<td>' + 
                                                 '&nbsp;' + 
@@ -2635,6 +2636,12 @@
                     // get_product_detail($(this));
                 });
                 get_sell_rate();
+
+
+                $('.delete_row_new').click(function(event){
+                    set_stock_validation('distributor_in','form_distributor_in_details',$(this));
+                    get_total();
+                });
             }
 
             $('#distributor_id').change(function(){
@@ -2831,7 +2838,6 @@
                     get_amount_ex($(this));
                 });
                 $('.delete_row_new').click(function(event){
-                    
                     set_stock_validation('distributor_in','form_distributor_in_details',$(this));
                     get_total();
                 });
@@ -2917,82 +2923,82 @@
             });
             
             function set_stock_validation(model_name,form_name,elem) {
-                    var id =  elem.attr('id');
-                    var myarr = id.split("_");
-                    var index = myarr[1];
-                    var validator = $("#"+form_name).validate();
-                    var valid = true;
-                    /*alert('status'+$('#status').val());*/
-                    if($('#status').val()=='Approved' || $('#ref_id').val()!='')
+                var id =  elem.attr('id');
+                var myarr = id.split("_");
+                var index = myarr[1];
+                var validator = $("#"+form_name).validate();
+                var valid = true;
+                /*alert('status'+$('#status').val());*/
+                if($('#status').val()=='Approved' || $('#ref_id').val()!='')
+                {
+                    var entered_qty = 0; 
+                    
+                    var type = $('#type_'+index).val();
+                    var depot_id = $("#prev_depo").val();
+                    var ref_id = $("#ref_id").val();
+                    var pre_qty = parseInt($('#pre_qty_'+index).val());
+                    /*alert(type);*/
+                    var module='distributor_in';
+                     var qty = 0
+                    if(type=='Box')
                     {
-                        var entered_qty = 0; 
-                        
-                        var type = $('#type_'+index).val();
-                        var depot_id = $("#prev_depo").val();
-                        var ref_id = $("#ref_id").val();
-                        var pre_qty = parseInt($('#pre_qty_'+index).val());
-                        /*alert(type);*/
-                        var module='distributor_in';
-                         var qty = 0
-                        if(type=='Box')
-                        {
-                            var box = $('#box_'+index).val();
-                            var url = BASE_URL+'index.php/Stock/check_box_qty_availablity_for_depot';
-                            var data = 'id='+$("#id").val()+'&module='+model_name+'&depot_id='+depot_id+'&box_id='+box+'&qty='+qty+'&ref_id='+ref_id+'&get_stock=1';
-                        }
-                        else
-                        {
-                            var bar = $('#bar_'+index).val();
-                            var url = BASE_URL+'index.php/Stock/check_bar_qty_availablity_for_depot';
-                            var data  = 'id='+$("#id").val()+'&module='+module+'&depot_id='+depot_id+'&product_id='+bar+'&qty='+qty+'&ref_id='+ref_id+'&get_stock=1';
-
-                        }
-
-                        $.ajax({
-                            url: url,
-                            data: data,
-                            type: "POST",
-                            dataType: 'html',
-                            global: false,
-                            async: false,
-                            success: function (data) {
-                                /*console.log('data '+data);*/
-                                current_stock = parseInt(data);
-                            },
-                            error: function (xhr, ajaxOptions, thrownError) {
-                                alert(xhr.status);
-                                alert(thrownError);
-                            }
-                        });
-                        /*console.log('current_stock_box'+current_stock);*/
-                        if(current_stock!=undefined)
-                        {
-                            /*console.log('current_stock'+current_stock+'pre qty'+pre_qty);*/
-                            // var deducted_qty = current_stock-pre_qty;
-                            var final_qty = current_stock+entered_qty;
-                            /*console.log(final_qty);*/
-                            if(final_qty<0)
-                            {
-                                var id = 'qty_'+index;
-                                var errors = {};
-                                var name = $("#"+id).attr('name');
-                                errors[name] = 'Stock Will be negative By '+final_qty;
-                                validator.showErrors(errors);
-                                valid = false;
-                            }
-                            else
-                            {
-                                delete_row(elem);
-                            }
-
-                            return valid;
-                        }
-
+                        var box = $('#box_'+index).val();
+                        var url = BASE_URL+'index.php/Stock/check_box_qty_availablity_for_depot';
+                        var data = 'id='+$("#id").val()+'&module='+model_name+'&depot_id='+depot_id+'&box_id='+box+'&qty='+qty+'&ref_id='+ref_id+'&get_stock=1';
                     }
                     else
                     {
-                        delete_row(elem);
+                        var bar = $('#bar_'+index).val();
+                        var url = BASE_URL+'index.php/Stock/check_bar_qty_availablity_for_depot';
+                        var data  = 'id='+$("#id").val()+'&module='+module+'&depot_id='+depot_id+'&product_id='+bar+'&qty='+qty+'&ref_id='+ref_id+'&get_stock=1';
+
                     }
+
+                    $.ajax({
+                        url: url,
+                        data: data,
+                        type: "POST",
+                        dataType: 'html',
+                        global: false,
+                        async: false,
+                        success: function (data) {
+                            /*console.log('data '+data);*/
+                            current_stock = parseInt(data);
+                        },
+                        error: function (xhr, ajaxOptions, thrownError) {
+                            alert(xhr.status);
+                            alert(thrownError);
+                        }
+                    });
+                    /*console.log('current_stock_box'+current_stock);*/
+                    if(current_stock!=undefined)
+                    {
+                        /*console.log('current_stock'+current_stock+'pre qty'+pre_qty);*/
+                        // var deducted_qty = current_stock-pre_qty;
+                        var final_qty = current_stock+entered_qty;
+                        /*console.log(final_qty);*/
+                        if(final_qty<0)
+                        {
+                            var id = 'qty_'+index;
+                            var errors = {};
+                            var name = $("#"+id).attr('name');
+                            errors[name] = 'Stock Will be negative By '+final_qty;
+                            validator.showErrors(errors);
+                            valid = false;
+                        }
+                        else
+                        {
+                            delete_row(elem);
+                        }
+
+                        return valid;
+                    }
+
+                }
+                else
+                {
+                    delete_row(elem);
+                }
             }
 
             // $('#savedata').click(function(){

@@ -1237,7 +1237,7 @@ function get_distributor_out_sku_details($from_date, $to_date, $status='', $date
     //     $ddateofprocess = "A.invoice_date>='$from_date' and A.invoice_date<='$to_date' ";
     // }
 
-    $ddateofprocess = " date(A.invoice_date)>='$from_date' and date(A.invoice_date)<='$to_date' ";
+    $ddateofprocess = " date(A.invoice_date)>='2019-04-01' and date(A.invoice_date)>='$from_date' and date(A.invoice_date)<='$to_date' ";
 
 
     
@@ -1353,7 +1353,7 @@ function get_distributor_sale_sku_details($from_date, $to_date) {
                 left join sales_rep_master S on(R.reporting_manager_id=S.id) 
                 left join sales_rep_master T on(R.sales_rep_id1=T.id) 
                 left join sales_rep_master U on(R.sales_rep_id2=T.id) 
-            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date') AA 
+            where A.status='Approved' and A.date_of_processing>='2019-04-01' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date') AA 
 
             left join 
 
@@ -1399,7 +1399,7 @@ function get_distributor_sale_sku_details_positive($from_date, $to_date) {
                 left join sales_rep_master S on( R.reporting_manager_id=S.id) 
                 left join sales_rep_master T on(R.sales_rep_id1=T.id) 
                 left join sales_rep_master U on(R.sales_rep_id2=T.id) 
-            where A.status='Approved' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date') AA 
+            where A.status='Approved' and A.date_of_processing>='2019-04-01' and A.date_of_processing>='$from_date' and A.date_of_processing<='$to_date') AA 
             left join 
             (select id, 'Bar' as type, short_name as item_name, null as quantity, short_name, category_id from product_master where status='Approved' 
             union all 
@@ -1436,7 +1436,7 @@ function get_distributor_transfer_sku_details($from_date, $to_date) {
                 left join sales_rep_master F on(J.reporting_manager_id=F.id) 
                 left join sales_rep_master L on(J.sales_rep_id1=L.id) 
                 left join sales_rep_master M on(J.sales_rep_id2=M.id) 
-            where A.status='Approved' and A.date_of_transfer>='$from_date' and A.date_of_transfer<='$to_date') AA 
+            where A.status='Approved' and A.date_of_transfer>='2019-04-01' and A.date_of_transfer>='$from_date' and A.date_of_transfer<='$to_date') AA 
             left join 
             (select id, 'Bar' as type, short_name as item_name, null as quantity, short_name, category_id from product_master 
                 where status='Approved' 
@@ -1476,7 +1476,7 @@ function get_distributor_transfer_sku_details_positive($from_date, $to_date) {
                 left join sales_rep_master F on(J.reporting_manager_id=F.id) 
                 left join sales_rep_master L on(J.sales_rep_id1=L.id) 
                 left join sales_rep_master M on(J.sales_rep_id2=M.id) 
-            where A.status='Approved' and A.date_of_transfer>='$from_date' and A.date_of_transfer<='$to_date') AA 
+            where A.status='Approved' and A.date_of_transfer>='2019-04-01' and A.date_of_transfer>='$from_date' and A.date_of_transfer<='$to_date') AA 
             left join 
             (select id, 'Bar' as type, short_name as item_name, null as quantity, short_name, category_id from product_master 
                 where status='Approved' 
@@ -1514,6 +1514,7 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
     }
 
     $row=11;
+    // $row=58971;
     $template_path=$this->config->item('template_path');
 	// $date = date('Y-m-d H:i:s');
     $file = $template_path.'Sale_Invoice_Sku.xls';
@@ -2891,10 +2892,6 @@ function generate_sale_invoice_sku_report($sales,$ssallocation,$salesreturn,$sam
         $objWriter->save($path.$filename);
     }
 
-    
-
-
-
     $logarray['table_id']=$this->session->userdata('session_id');
 
     $logarray['module_name']='Reports';
@@ -2923,7 +2920,7 @@ function get_credit_debit_sku_details($from_date, $to_date, $date_of_processing,
         //     $ddateofprocess = " and A.approved_on>='$from_date' and A.approved_on<='$to_date' ";
         // }
 
-        $ddateofprocess = " and date(A.date_of_transaction)>='$from_date' and date(A.date_of_transaction)<='$to_date' ";
+        $ddateofprocess = " and date(A.date_of_transaction)>='2019-04-01' and date(A.date_of_transaction)>='$from_date' and date(A.date_of_transaction)<='$to_date' ";
     }
     
 
@@ -2964,7 +2961,7 @@ function get_sample_expired_SKU_details($from_date, $to_date,$date_of_processing
     //     $ddateofprocess = "date(A.approved_on)>='$from_date' and date(A.approved_on)<='$to_date' ";
     // }
 
-    $ddateofprocess = " date(A.invoice_date)>='$from_date' and date(A.invoice_date)<='$to_date' ";
+    $ddateofprocess = " date(A.invoice_date)>='2019-04-01' and date(A.invoice_date)>='$from_date' and date(A.invoice_date)<='$to_date' ";
 
     $sql = "select AA.*, WEEK(date_of_processing,1)-WEEK(STR_TO_DATE(concat(YEAR(date_of_processing),'-',MONTH(date_of_processing),'-',1),'%Y-%m-%d'),1)+1 as dweek, 
 
@@ -3331,7 +3328,7 @@ function get_distributor_in_sku_details($from_date, $to_date) {
 
                 left join sales_rep_master M on(J.sales_rep_id2=M.id) 
 
-            where (A.status='Approved') and date(A.date_of_processing)>='$from_date' and date(A.date_of_processing)<='$to_date') AA 
+            where (A.status='Approved') and date(A.date_of_processing)>='2019-04-01' and date(A.date_of_processing)>='$from_date' and date(A.date_of_processing)<='$to_date') AA 
 
             left join 
 

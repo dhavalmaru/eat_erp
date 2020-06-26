@@ -168,6 +168,10 @@ function check_bar_availablity_for_depot(){
     $depot_id=$this->input->post('depot_id');
     $product_id=$this->input->post('product_id');
 
+    $batch_processing_cond="";
+    if($module=="batch_processing"){
+        $batch_processing_cond=" and id<>'$id' ";
+    }
     $depot_transfer_cond="";
     if($module=="depot_transfer"){
         $depot_transfer_cond=" and id<>'$id' ";
@@ -182,7 +186,7 @@ function check_bar_availablity_for_depot(){
     }
     
     $sql="select id from batch_processing 
-        where status = 'Approved' and depot_id = '$depot_id' and product_id = '$product_id' and date_of_processing>'2018-09-21' 
+        where status = 'Approved' and depot_id = '$depot_id' and product_id = '$product_id' and date_of_processing>'2018-09-21' ".$batch_processing_cond."
         union all 
         select id from depot_transfer 
         where status = 'Approved' and depot_in_id = '$depot_id' and date_of_transfer>'2018-09-21' and 
@@ -217,13 +221,22 @@ function check_bar_qty_availablity_for_depot(){
     {
         $get_stock=$this->input->post('get_stock');
     }
-    // $id=3721;
-    // $module='distributor_out';
-    // $depot_id=2;
-    // $product_id=6;
-    // $qty=0;
+
+    // $id=554;
+    // $module='batch_processing';
+    // $depot_id=1;
+    // $product_id=1;
+    // $qty=1000;
     // $ref_id=0;
+    // $get_stock=1;
     
+    $batch_processing_cond="";
+    if($module=="batch_processing"){
+        $batch_processing_cond=" and id<>'$id' ";
+        if($ref_id!=''){
+            $batch_processing_cond=$batch_processing_cond." and id<>'$ref_id'";
+        }
+    }
     $depot_transfer_cond="";
     if($module=="depot_transfer"){
         $depot_transfer_cond=" and id<>'$id'";
@@ -235,11 +248,11 @@ function check_bar_qty_availablity_for_depot(){
             $distributor_in_cond=$distributor_in_cond." and id<>'$ref_id'";
         }
     }
-
     $box_to_bar_cond="";
     if($module=="box_to_bar"){
         $box_to_bar_cond=" and id<>'$id'";
     }
+    
     $distributor_out_cond="";
     if($module=="distributor_out"){
         $distributor_out_cond=" and id<>'$id'";
@@ -256,7 +269,7 @@ function check_bar_qty_availablity_for_depot(){
     
     $sql="select sum(D.tot_qty) as tot_qty_in from 
         (select sum(qty_in_bar) as tot_qty from batch_processing 
-        where status = 'Approved' and depot_id = '$depot_id' and product_id = '$product_id' and date_of_processing>'2018-09-21' 
+        where status = 'Approved' and depot_id = '$depot_id' and product_id = '$product_id' and date_of_processing>'2018-09-21' ".$batch_processing_cond."
         union all 
         select sum(qty) as tot_qty from depot_transfer_items 
         where item_id = '$product_id' and type = 'Bar' and depot_transfer_id in (select distinct id from depot_transfer 
@@ -312,19 +325,21 @@ function check_bar_qty_availablity_for_depot(){
     // echo $qty;
     // echo '<br/>';
 
-    
-
     if($get_stock!='')
     {
-        return ($tot_qty_in-$tot_qty_out);
+        if (($tot_qty_in-$tot_qty_out+$qty)<0) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
     else
     {
-       if (($tot_qty_in-$tot_qty_out-$qty)<0){
-        return 1;
+        if (($tot_qty_in-$tot_qty_out-$qty)<0) {
+            return 1;
         } else {
             return 0;
-        }  
+        }
     }
     
 }

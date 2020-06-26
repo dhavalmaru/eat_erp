@@ -99,41 +99,9 @@ $request2->setSellerId(MERCHANT_ID);
 
 // $request->setSellerOrderId("408-5824084-9615543");
 
-// $date = date('Y-m-d');
-// $time = date('H:i:s');
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $date = date('Y-m-d');
-// $time = date('H:i:s', time()-3600);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
 
-// $date = date('Y-m-d', strtotime('-1 days'));
-// $time = date('H:i:s', time() + 5400);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d', strtotime('-1 days'));
-// $time = date('H:i:s');
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-$date = date('Y-m-d', strtotime('-1 days'));
-$time = date('H:i:s', time() - 18000);
-echo "Time: ".$date."T".$time."Z<br/><br/>";
-$request->setLastUpdatedAfter($date."T".$time."Z");
-invokeListOrders($service, $request, $request2);
-
-sleep(3);
-
-$date = date('Y-m-d', strtotime('-1 days'));
-$time = date('H:i:s', time() + 18000);
+$date = date('Y-m-d');
+$time = date('H:i:s', time() - 5400);
 echo "Time: ".$date."T".$time."Z<br/><br/>";
 $request->setLastUpdatedAfter($date."T".$time."Z");
 invokeListOrders($service, $request, $request2);
@@ -141,7 +109,7 @@ invokeListOrders($service, $request, $request2);
 sleep(3);
 
 $date = date('Y-m-d');
-$time = date('H:i:s', time()-18000);
+$time = date('H:i:s', time() - 32400);
 echo "Time: ".$date."T".$time."Z<br/><br/>";
 $request->setLastUpdatedAfter($date."T".$time."Z");
 invokeListOrders($service, $request, $request2);
@@ -149,23 +117,23 @@ invokeListOrders($service, $request, $request2);
 sleep(3);
 
 $date = date('Y-m-d');
-$time = date('H:i:s', time() + 18000);
+$time = date('H:i:s', time() - 44100);
 echo "Time: ".$date."T".$time."Z<br/><br/>";
 $request->setLastUpdatedAfter($date."T".$time."Z");
 invokeListOrders($service, $request, $request2);
 
 sleep(3);
 
-$date = date('Y-m-d', strtotime('+1 days'));
-$time = date('H:i:s', time() - 18000);
+$date = date('Y-m-d', strtotime('-1 days'));
+$time = date('H:i:s', time() - 23400);
 echo "Time: ".$date."T".$time."Z<br/><br/>";
 $request->setLastUpdatedAfter($date."T".$time."Z");
 invokeListOrders($service, $request, $request2);
 
 sleep(3);
 
-$date = date('Y-m-d', strtotime('+1 days'));
-$time = date('H:i:s', time() + 18000);
+$date = date('Y-m-d', strtotime('-1 days'));
+$time = date('H:i:s', time() - 44100);
 echo "Time: ".$date."T".$time."Z<br/><br/>";
 $request->setLastUpdatedAfter($date."T".$time."Z");
 invokeListOrders($service, $request, $request2);
@@ -173,138 +141,18 @@ invokeListOrders($service, $request, $request2);
 sleep(3);
 
 $date = date('Y-m-d', strtotime('-2 days'));
-$time = date('H:i:s', time() + 18000);
+$time = date('H:i:s', time() - 23400);
 echo "Time: ".$date."T".$time."Z<br/><br/>";
 $request->setLastUpdatedAfter($date."T".$time."Z");
 invokeListOrders($service, $request, $request2);
 
 sleep(3);
 
-$date = date('Y-m-d', strtotime('-3 days'));
-$time = date('H:i:s', time() + 18000);
+$date = date('Y-m-d', strtotime('-2 days'));
+$time = date('H:i:s', time() - 44100);
 echo "Time: ".$date."T".$time."Z<br/><br/>";
 $request->setLastUpdatedAfter($date."T".$time."Z");
 invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d', strtotime('-10 days'));
-// $time = date('H:i:s', time() + 18000);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d', strtotime('-15 days'));
-// $time = date('H:i:s', time() + 18000);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d', strtotime('-1 days'));
-// $time = date('H:i:s', time() + 9000);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d', strtotime('-1 days'));
-// $time = date('H:i:s', time() + 18000);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d', strtotime('-1 days'));
-// $time = date('H:i:s', time() + 27000);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d', strtotime('-1 days'));
-// $time = date('H:i:s', time() + 36000);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d', strtotime('-1 days'));
-// $time = date('H:i:s', time() + 45000);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d', strtotime('-1 days'));
-// $time = date('H:i:s', time() + 54000);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d', strtotime('-1 days'));
-// $time = date('H:i:s', time() + 63000);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d', strtotime('-1 days'));
-// $time = date('H:i:s', time() + 72000);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d', strtotime('-1 days'));
-// $time = date('H:i:s', time() + 81000);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d', strtotime('-1 days'));
-// $time = date('H:i:s', time() + 90000);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d');
-// $time = date('H:i:s');
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d');
-// $time = date('H:i:s', time() + 1800);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
-
-// sleep(3);
-
-// $date = date('Y-m-d');
-// $time = date('H:i:s', time() + 3600);
-// echo "Time: ".$date."T".$time."Z<br/><br/>";
-// $request->setLastUpdatedAfter($date."T".$time."Z");
-// invokeListOrders($service, $request, $request2);
 
 
 /**

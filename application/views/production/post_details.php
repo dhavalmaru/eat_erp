@@ -317,6 +317,9 @@
                                                     <a class="btn btn-success" href="<?php echo base_url() . 'index.php/batch_processing/add/'.((isset($production_id))?$production_id:'0').'/production'; ?>">
                                                         <span class="fa fa-plus"></span> Add Batch Processing Entry
                                                     </a>
+                                                    <a class="btn btn-success" href="<?php echo base_url() . 'index.php/batch_processing/add_tentative/'.((isset($production_id))?$production_id:'0').'/production'; ?>">
+                                                        <span class="fa fa-plus"></span> Add Tentative Stock
+                                                    </a>
                                                 </div>
                                                 <div class="panel panel-default">
                                                     <div class="panel-body">
@@ -338,6 +341,7 @@
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
+                                                                <?php $is_tentative = false; ?>
                                                                 <?php for ($i=0; $i < count($batch_processing); $i++) { ?>
                                                                 <tr>
                                                                     <td style="text-align:center;"><?php echo $i+1; ?></td>
@@ -348,10 +352,21 @@
                                                                         <?php echo(($batch_processing[$i]->date_of_processing!=null && $batch_processing[$i]->date_of_processing!='')?date('d/m/Y',strtotime($batch_processing[$i]->date_of_processing)):''); ?>
                                                                     </td>
                                                                     <td style="text-align:center; vertical-align: middle; ">
-                                                                        <a href="<?php echo base_url().'index.php/batch_processing/edit/'.$batch_processing[$i]->id.'/production'; ?>"><i class="fa fa-edit"></i></a>
+                                                                        <?php if($batch_processing[$i]->tentative==1) { ?>
+                                                                            <?php $is_tentative = true; ?>
+                                                                            <a href="<?php echo base_url().'index.php/batch_processing/edit_tentative/'.$batch_processing[$i]->id.'/production'; ?>"><i class="fa fa-pencil"></i></a>
+                                                                        <?php } else { ?>
+                                                                            <a href="<?php echo base_url().'index.php/batch_processing/edit/'.$batch_processing[$i]->id.'/production'; ?>"><i class="fa fa-edit"></i></a>
+                                                                        <?php } ?>
+
+                                                                        <?php if($batch_processing[$i]->tentative==1 && $batch_processing[$i]->status=='Approved') { ?>
+                                                                            <a href="<?php echo base_url().'index.php/batch_processing/edit/'.$batch_processing[$i]->id.'/production'; ?>" style="padding-left: 10px;" title="Update Batch Details"><i class="fa fa-edit"></i></a>
+                                                                        <?php } ?>
                                                                     </td>
                                                                     <td>
-                                                                        <a href="<?php echo base_url().'index.php/batch_processing/view_batch_processing_receipt/'.$batch_processing[$i]->id; ?>" target="_blank"><span class="fa fa-file-pdf-o" style=""></span></a>
+                                                                        <?php if($batch_processing[$i]->tentative!=1) { ?>
+                                                                            <a href="<?php echo base_url().'index.php/batch_processing/view_batch_processing_receipt/'.$batch_processing[$i]->id; ?>" target="_blank"><span class="fa fa-file-pdf-o" style=""></span></a>
+                                                                        <?php } ?>
                                                                     </td>
                                                                     <td><?php echo $batch_processing[$i]->batch_no; ?></td>
                                                                     <td><?php echo $batch_processing[$i]->depot_name; ?></td>
@@ -1253,9 +1268,13 @@
                                             <div role="tabpanel" class="tab-pane <?php if($cls_active=='raw_material_recon') echo ' active'; ?>" id="rm_recon">
                                                 <div class="design-process-content">
                                                 <div class="pull-right btn-margin"  style="<?php if($access[0]->r_insert=='0') echo 'display: none;';?>">
-                                                    <a class="btn btn-success" href="<?php echo base_url() . 'index.php/raw_material_recon/add/'.((isset($production_id))?$production_id:'0').'/production'; ?>">
-                                                        <span class="fa fa-plus"></span> Add Raw Material Recon Entry
-                                                    </a>
+                                                    <?php if($is_tentative==false) { ?>
+                                                        <a class="btn btn-success" href="<?php echo base_url() . 'index.php/raw_material_recon/add/'.((isset($production_id))?$production_id:'0').'/production'; ?>">
+                                                            <span class="fa fa-plus"></span> Add Raw Material Recon Entry
+                                                        </a>
+                                                    <?php } else { ?>
+                                                        <p style="color: red;">Please clear tentative batch processing.</p>
+                                                    <?php } ?>
                                                 </div>
                                                 <div class="panel panel-default">
                                                     <div class="panel-body">

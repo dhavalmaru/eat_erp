@@ -101,117 +101,116 @@
                             <div class="col-md-12 custom-padding" style="padding:0;" >
                             <div class="panel panel-default">
 							
-							<div class="panel-body">
-								<div class="form-group" >
-									<div class="col-md-12 col-sm-12 col-xs-12">
-										<label class="col-md-2 col-sm-2 col-xs-12 control-label">Phone <span class="asterisk_sign">*</span></label>
-                                        <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
-                                            <input type="hidden" class="form-control" name="secret_key" id="secret_key" value="MzE1NDE=" />
-                                            <input type="text" class="form-control" name="phone" id="phone" placeholder="Phone" value="<?php if(isset($data)) echo $data[0]->phone; ?>"/>
-                                        </div>
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Offer Id<span class="asterisk_sign">*</span></label>
-                                        <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="text" class="form-control" name="offer_id" id="offer_id" placeholder="Offer Id" value="<?php if (isset($data)) { echo $data[0]->offer_id; } ?>" />
-                                        </div>
-									</div>
-								</div>
-                                <div class="form-group" >
-                                    <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">order_id <span class="asterisk_sign">*</span></label>
-                                        <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="text" class="form-control" name="order_id" id="order_id" placeholder="order_id" value="<?php if(isset($data)) { echo $data[0]->order_id; } ?>"/>
-                                        </div>
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">customer_name <span class="asterisk_sign">*</span></label>
-                                        <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="text" class="form-control" name="customer_name" id="customer_name" placeholder="customer_name" value="<?php if(isset($data)) { echo $data[0]->customer_name; } ?>"/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group" >
-                                    <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">shipping_address_line1 <span class="asterisk_sign">*</span></label>
-                                        <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="text" class="form-control" name="shipping_address_line1" id="shipping_address_line1" placeholder="shipping_address_line1" value="<?php if(isset($data)) { echo $data[0]->shipping_address_line1; } ?>"/>
-                                        </div>
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">shipping_address_line2 <span class="asterisk_sign">*</span></label>
-                                        <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="text" class="form-control" name="shipping_address_line2" id="shipping_address_line2" placeholder="shipping_address_line2" value="<?php if(isset($data)) { echo $data[0]->shipping_address_line2; } ?>"/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group" >
-                                    <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">shipping_address_email <span class="asterisk_sign">*</span></label>
-                                        <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="text" class="form-control" name="shipping_address_email" id="shipping_address_email" placeholder="shipping_address_email" value="<?php if(isset($data)) { echo $data[0]->shipping_address_email; } ?>"/>
-                                        </div>
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">shipping_address_phone <span class="asterisk_sign">*</span></label>
-                                        <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="text" class="form-control" name="shipping_address_phone" id="shipping_address_phone" placeholder="shipping_address_phone" value="<?php if(isset($data)) { echo $data[0]->shipping_address_phone; } ?>"/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">shipping_address_pincode <span class="asterisk_sign">*</span></label>
-                                        <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="text" class="form-control" name="shipping_address_pincode" id="shipping_address_pincode" placeholder="shipping_address_pincode" value="<?php if(isset($data)) { echo $data[0]->shipping_address_pincode; } ?>"/>
-                                        </div>
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">shipping_address_city <span class="asterisk_sign">*</span></label>
-                                        <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="text" class="form-control" name="shipping_address_city" id="shipping_address_city" placeholder="shipping_address_city" value="<?php if(isset($data)) { echo $data[0]->shipping_address_city; } ?>"/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">shipping_address_state <span class="asterisk_sign">*</span></label>
-                                        <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="text" class="form-control" name="shipping_address_state" id="shipping_address_state" placeholder="shipping_address_state" value="<?php if(isset($data)) { echo $data[0]->shipping_address_state; } ?>"/>
-                                        </div>
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">order_SKU <span class="asterisk_sign">*</span></label>
-                                        <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="text" class="form-control" name="order_SKU" id="order_SKU" placeholder="order_SKU" value="<?php if(isset($data)) { echo $data[0]->order_SKU; } ?>"/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">order_sales_value<span class="asterisk_sign">*</span></label>
-                                        <div class="col-md-4 col-sm-4 col-xs-12">
-                                            <input type="text" class="form-control" name="order_sales_value" id="order_sales_value" placeholder="order_sales_value" value="<?php if (isset($data)) { echo $data[0]->order_sales_value; } ?>" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group" style="<?php echo 'display: none;';?>">
-                                    <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <div style="<?php echo 'display: none;';?>">
-                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Status <span class="asterisk_sign">*</span></label>
+    							<div class="panel-body">
+    								<div class="form-group" >
+    									<div class="col-md-12 col-sm-12 col-xs-12">
+    										<label class="col-md-2 col-sm-2 col-xs-12 control-label">Phone <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <select class="form-control" name="status">
-                                                    <option value="Approved" <?php if(isset($data)) {if ($data[0]->status=='Approved') echo 'selected';}?>>Active</option>
-                                                    <option value="InActive" <?php if(isset($data)) {if ($data[0]->status=='InActive') echo 'selected';}?>>InActive</option>
-                                                </select>
+                                                <input type="hidden" class="form-control" name="id" id="id" value="<?php if(isset($data)) echo $data[0]->id;?>"/>
+                                                <input type="hidden" class="form-control" name="secret_key" id="secret_key" value="MzE1NDE=" />
+                                                <input type="text" class="form-control" name="phone" id="phone" placeholder="Phone" value="<?php if(isset($data)) echo $data[0]->phone; ?>"/>
+                                            </div>
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Offer Id<span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="offer_id" id="offer_id" placeholder="Offer Id" value="<?php if (isset($data)) { echo $data[0]->offer_id; } ?>" />
+                                            </div>
+    									</div>
+    								</div>
+                                    <div class="form-group" >
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">order_id <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="order_id" id="order_id" placeholder="order_id" value="<?php if(isset($data)) { echo $data[0]->order_id; } ?>"/>
+                                            </div>
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">customer_name <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="customer_name" id="customer_name" placeholder="customer_name" value="<?php if(isset($data)) { echo $data[0]->customer_name; } ?>"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" >
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">shipping_address_line1 <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="shipping_address_line1" id="shipping_address_line1" placeholder="shipping_address_line1" value="<?php if(isset($data)) { echo $data[0]->shipping_address_line1; } ?>"/>
+                                            </div>
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">shipping_address_line2 <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="shipping_address_line2" id="shipping_address_line2" placeholder="shipping_address_line2" value="<?php if(isset($data)) { echo $data[0]->shipping_address_line2; } ?>"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" >
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">shipping_address_email <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="shipping_address_email" id="shipping_address_email" placeholder="shipping_address_email" value="<?php if(isset($data)) { echo $data[0]->shipping_address_email; } ?>"/>
+                                            </div>
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">shipping_address_phone <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="shipping_address_phone" id="shipping_address_phone" placeholder="shipping_address_phone" value="<?php if(isset($data)) { echo $data[0]->shipping_address_phone; } ?>"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">shipping_address_pincode <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="shipping_address_pincode" id="shipping_address_pincode" placeholder="shipping_address_pincode" value="<?php if(isset($data)) { echo $data[0]->shipping_address_pincode; } ?>"/>
+                                            </div>
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">shipping_address_city <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="shipping_address_city" id="shipping_address_city" placeholder="shipping_address_city" value="<?php if(isset($data)) { echo $data[0]->shipping_address_city; } ?>"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">shipping_address_state <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="shipping_address_state" id="shipping_address_state" placeholder="shipping_address_state" value="<?php if(isset($data)) { echo $data[0]->shipping_address_state; } ?>"/>
+                                            </div>
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">order_SKU <span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="order_SKU" id="order_SKU" placeholder="order_SKU" value="<?php if(isset($data)) { echo $data[0]->order_SKU; } ?>"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">order_sales_value<span class="asterisk_sign">*</span></label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="text" class="form-control" name="order_sales_value" id="order_sales_value" placeholder="order_sales_value" value="<?php if (isset($data)) { echo $data[0]->order_sales_value; } ?>" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" style="<?php echo 'display: none;';?>">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <div style="<?php echo 'display: none;';?>">
+                                                <label class="col-md-2 col-sm-2 col-xs-12 control-label">Status <span class="asterisk_sign">*</span></label>
+                                                <div class="col-md-4 col-sm-4 col-xs-12">
+                                                    <select class="form-control" name="status">
+                                                        <option value="Approved" <?php if(isset($data)) {if ($data[0]->status=='Approved') echo 'selected';}?>>Active</option>
+                                                        <option value="InActive" <?php if(isset($data)) {if ($data[0]->status=='InActive') echo 'selected';}?>>InActive</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">Remarks </label>
+                                            <div class="col-md-10 col-sm-10 col-xs-12 ">
+                                                <textarea class="form-control" name="remarks"><?php if(isset($data)) echo $data[0]->remarks;?></textarea>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <div class="col-md-12 col-sm-12 col-xs-12">
-                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Remarks </label>
-                                        <div class="col-md-10 col-sm-10 col-xs-12 ">
-                                            <textarea class="form-control" name="remarks"><?php if(isset($data)) echo $data[0]->remarks;?></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
 							
-				
-                            	 </div>
-								 			<br clear="all"/>
+                            </div>
+				 			<br clear="all"/>
 							</div>
-						</div>
+                            </div>
                             <div class="panel-footer">
 								<a href="<?php echo base_url(); ?>index.php/order" class="btn btn-danger" type="reset" id="reset">Cancel</a>
                                 <input type="submit" class="btn btn-success pull-right" name="submit" value="Save" />

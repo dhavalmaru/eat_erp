@@ -124,6 +124,7 @@
 											<div class="col-md-12 col-sm-12 col-xs-12">
 												<label class="col-md-2 col-sm-2 col-xs-12 control-label">Depot <span class="asterisk_sign">*</span></label>
 												<div class="col-md-4 col-sm-4 col-xs-12">
+                                                    <input type="hidden" class="form-control" name="old_depot_id" id="old_depot_id" value="<?php if(isset($data)) echo $data[0]->depot_id;?>"/>
 													<select name="depot_id" id="depot_id" class="form-control select2">
 														<option value="">Select</option>
                                                         <?php if(isset($depot)) { for ($k=0; $k < count($depot) ; $k++) { ?>
@@ -148,6 +149,7 @@
                                             <div class="col-md-12 col-sm-12 col-xs-12">
                                                 <label class="col-md-2 col-sm-2 col-xs-12 control-label">Product <span class="asterisk_sign">*</span></label>
                                                 <div class="col-md-4 col-sm-4 col-xs-12">
+                                                    <input type="hidden" class="form-control" name="old_product_id" id="old_product_id" value="<?php if(isset($data)) echo $data[0]->product_id;?>"/>
                                                     <select name="product_id" id="product_id" class="form-control select2">
                                                         <option value="">Select</option>
                                                         <?php if(isset($product)) { for ($k=0; $k < count($product); $k++) { ?>

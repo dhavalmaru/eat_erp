@@ -199,7 +199,6 @@ class Batch_processing extends CI_Controller{
         echo json_encode($result);
     }
 	
-
     public function save(){
         $this->batch_processing_model->save_data();
         // redirect(base_url().'index.php/batch_processing');
@@ -231,6 +230,65 @@ class Batch_processing extends CI_Controller{
         $data['batch_processing_items'] = $this->batch_processing_model->get_batch_raw_material($id);
 
         load_view('invoice/batch_processing_receipt', $data);
+    }
+
+    public function add_tentative($p_id='', $module=''){
+        $result=$this->batch_processing_model->get_access();
+        if(count($result)>0) {
+            if($result[0]->r_insert == 1) {
+                $data['access'] = $this->batch_processing_model->get_access();
+                $data['product'] = $this->product_model->get_data('Approved');
+                $data['depot'] = $this->depot_model->get_data('Approved');
+                $data['batch_no'] = $this->batch_master_model->get_data('Approved');
+                $data['p_id'] = $p_id;
+                $data['production'] = $this->production_model->get_data('Approved');
+                $data['module'] = $module;
+                if($p_id!=''){
+                    $data['p_data'] = $this->production_model->get_data('', $p_id);
+                }
+
+                load_view('batch_processing/tentative_stock_details', $data);
+            } else {
+                echo "Unauthorized access";
+            }
+        } else {
+            echo '<script>alert("You donot have access to this page.");</script>';
+            $this->load->view('login/main_page');
+        }
+    }
+
+    public function edit_tentative($id, $module=''){
+        $result=$this->batch_processing_model->get_access();
+        if(count($result)>0) {
+            if($result[0]->r_view == 1 || $result[0]->r_edit == 1) {
+                $data['access'] = $this->batch_processing_model->get_access();
+                $id = $this->batch_processing_model->get_pending_data($id);
+                $data['data'] = $this->batch_processing_model->get_data('', $id);
+                $data['product'] = $this->product_model->get_data('Approved');
+                $data['depot'] = $this->depot_model->get_data('Approved');
+                $data['batch_no'] = $this->batch_master_model->get_data('Approved');
+                $data['production'] = $this->production_model->get_data('Approved');
+                $data['module'] = $module;
+                
+                load_view('batch_processing/tentative_stock_details', $data);
+            } else {
+                echo "Unauthorized access";
+            }
+        } else {
+            echo '<script>alert("You donot have access to this page.");</script>';
+            $this->load->view('login/main_page');
+        }
+    }
+    
+    public function save_tentative(){
+        $this->batch_processing_model->save_tentative_data();
+        // redirect(base_url().'index.php/batch_processing');
+    }
+
+    public function update_tentative($id){
+        $this->batch_processing_model->save_tentative_data($id);
+        //  redirect(base_url().'index.php/batch_processing');
+        // echo '<script>window.open("'.base_url().'index.php/batch_processing", "_parent")</script>';
     }
 }
 ?>

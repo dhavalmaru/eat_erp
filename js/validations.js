@@ -38,7 +38,7 @@ function addMultiInputNamingRules(form, field, rules, type){
     });
 }
 
-function removeMultiInputNamingRules(form, field){    
+function removeMultiInputNamingRules(form, field){
     $(form).find(field).each(function(index){
         $(this).attr('name', $(this).attr('alt'));
         $(this).removeAttr('alt');
@@ -1483,8 +1483,6 @@ $("#form_batch_processing_details").validate({
         date_of_processing: {
             required: true
         },
-		
-		
         depot_id: {
             required: true
         },
@@ -1541,6 +1539,9 @@ $('#form_batch_processing_details').submit(function() {
     if (!$("#form_batch_processing_details").valid()) {
         return false;
     } else {
+        if (check_product_availablity_for_batch_processing('form_batch_processing_details')==false) {
+            return false;
+        }
         if (check_raw_material_availablity_for_batch_processing()==false) {
             return false;
         }
@@ -1645,6 +1646,153 @@ function check_raw_material_availablity_for_batch_processing() {
 
 
 
+// ----------------- BATCH PROCESSING DETAILS FORM VALIDATION -------------------------------------
+$("#form_tentative_stock_details").validate({
+    rules: {
+        batch_no_id: {
+            required: true
+        },
+        // batch_id_as_per_fssai: {
+        //     required: true,
+        //     check_batch_id_availablity: true
+        // },
+        date_of_processing: {
+            required: true
+        },
+        depot_id: {
+            required: true
+        },
+        product_id: {
+            required: true
+        },
+        // no_of_batch: {
+        //     required: true
+        // },
+        qty_in_bar: {
+            required: true
+        },
+        // actual_wastage: {
+        //     required: true
+        // },
+        // wastage_percent: {
+        //     required: true
+        // },
+        // anticipated_wastage: {
+        //     required: true
+        // },
+        // wastage_variance: {
+        //     required: true
+        // },
+        remarks: {
+            required: {
+                depends: function() {
+                    return (d_status == "Approved");
+                }
+            }
+        }
+    },
+
+    ignore: false,
+
+    errorPlacement: function (error, element) {
+        var placement = $(element).data('error');
+        if (placement) {
+            $(placement).append(error);
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
+$('#form_tentative_stock_details').submit(function(event) {
+    if (!$("#form_tentative_stock_details").valid()) {
+        return false;
+    } else {
+        if (check_product_availablity_for_batch_processing('form_tentative_stock_details')==false) {
+            return false;
+        }
+        return false;
+    }
+});
+
+function check_product_availablity_for_batch_processing(form_name) {
+    var validator = $("#"+form_name).validate();
+    var valid = true;
+
+    var result = 1;
+    var id = $("#id").val();
+    var ref_id = $("#ref_id").val();
+    var depot_id = $("#depot_id").val();
+    var old_depot_id = $("#old_depot_id").val();
+    var product_id = $("#product_id").val();
+    var old_product_id = $("#old_product_id").val();
+    var qty = $("#qty_in_bar").val();
+    var module="batch_processing";
+
+    if($(document.activeElement).val()=='Delete') {
+        qty = 0;
+    }
+
+    if(old_depot_id!='') {
+        if(old_depot_id!=depot_id || old_product_id!=product_id) {
+            $.ajax({
+                url: BASE_URL+'index.php/Stock/check_bar_qty_availablity_for_depot',
+                data: 'id='+id+'&module='+module+'&depot_id='+old_depot_id+'&product_id='+old_product_id+'&qty=0&ref_id='+ref_id+'&get_stock=1',
+                type: "POST",
+                dataType: 'html',
+                global: false,
+                async: false,
+                success: function (data) {
+                    result = parseInt(data);
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    alert(xhr.status);
+                    alert(thrownError);
+                }
+            });
+
+            if (result) {
+                var errors = {};
+                var name = $('#product_id').attr('name');
+                errors[name] = "Stock will be negative. ";
+                validator.showErrors(errors);
+                valid = false;
+            }
+        }
+    }
+
+    result = 1;
+
+    $.ajax({
+        url: BASE_URL+'index.php/Stock/check_bar_qty_availablity_for_depot',
+        data: 'id='+id+'&module='+module+'&depot_id='+depot_id+'&product_id='+product_id+'&qty='+qty+'&ref_id='+ref_id+'&get_stock=1',
+        type: "POST",
+        dataType: 'html',
+        global: false,
+        async: false,
+        success: function (data) {
+            result = parseInt(data);
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+        }
+    });
+
+    if (result) {
+        var errors = {};
+        var name = $('#qty_in_bar').attr('name');
+        errors[name] = "Stock will be negative. ";
+        validator.showErrors(errors);
+        valid = false;
+    }
+
+    return valid;
+}
+
+
+
+
 // ----------------- DISTRIBUTOR OUT LIST FORM VALIDATION -------------------------------------
 $("#form_distributor_out_list").validate({
     rules: {
@@ -1683,8 +1831,6 @@ $('#form_distributor_out_list').submit(function() {
 
 
 // ----------------- DISTRIBUTOR OUT DETAILS FORM VALIDATION -------------------------------------
-
-
 var clkBtn = "";
 $('input[type="submit"]').click(function(evt) {
     $(this).find().attr('form','novalidate');
@@ -2234,7 +2380,6 @@ function check_payment_details() {
     return valid;
 }
 
-
 function add_denomination_amount() {
 
     var denomination_2000=0,denomination_500=0,denomination_100=0;
@@ -2288,8 +2433,10 @@ function add_denomination_amount() {
         return false;
 
     }
-    
 }
+
+
+
 
 // ----------------- DISTRIBUTOR IN DETAILS FORM VALIDATION -------------------------------------
 $("#form_distributor_in_details").validate({
@@ -4504,6 +4651,7 @@ $('#form_area_details').submit(function() {
 
 
 
+
 // ----------------- LOCATION DETAILS FORM VALIDATION -------------------------------------
 $("#form_location_details").validate({
     rules: {
@@ -4686,6 +4834,7 @@ $('#form_zone_details').submit(function() {
 
 
 
+
 // ----------------- Ingredients master FORM VALIDATION -------------------------------------
 $("#form_ingredients_master_details").validate({
     rules: {
@@ -4753,11 +4902,6 @@ $('#form_ingredients_master_details').submit(function() {
         return true;
     }
 });
-
-
-
-
-
 
 
 
@@ -5620,9 +5764,10 @@ $.validator.addMethod("check_mapping_availablity", function (value, element) {
         return true;
     }
 }, 'Mapping already in use.');
-		
-	
-	
+
+
+
+
 
 $('#form_sr_mapping').submit(function() {
     if (!$("#form_sr_mapping").valid()) {
@@ -5631,8 +5776,6 @@ $('#form_sr_mapping').submit(function() {
         return true;
     }
 });
-
-
 
 
 
@@ -5692,7 +5835,6 @@ $("#form_distributor_out_model").validate({
         }
     }
 });
-
 
 
 
@@ -5879,8 +6021,6 @@ function check_product_availablity_for_sku_details() {
 
     return valid;
 }
-
-
 
 
 
@@ -6254,6 +6394,8 @@ $('#form_production_details').submit(function() {
 });
 
 
+
+
 // ----------------- CONFIRM DETAILS FORM VALIDATION -------------------------------------
 $("#form_confirm_details").validate({
     rules: {
@@ -6296,6 +6438,8 @@ $('#form_confirm_details').submit(function() {
         return true;
     }
 });
+
+
 
 
 // ----------------- CONFIRM BATCH FORM VALIDATION -------------------------------------
@@ -6479,6 +6623,7 @@ $('#form_preliminary_details').submit(function() {
         return true;
     }
 });
+
 
 
 
@@ -7097,7 +7242,6 @@ $('#form_sales_rep_attendance_details').submit(function() {
 
 
 
-
 // ----------------- Beat Plan Upload FORM VALIDATION -------------------------------------
 $("#form_beat_plan_upload").validate({
     rules: {
@@ -7125,7 +7269,6 @@ $('#form_beat_plan_upload').submit(function() {
         return true;
     }
 });
-
 
 
 

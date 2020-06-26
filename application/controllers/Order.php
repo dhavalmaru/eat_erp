@@ -201,5 +201,434 @@ class Order extends CI_Controller{
 
         return $response;
     }
+
+    function callAPI($method, $url, $data){
+        $curl = curl_init();
+        switch ($method){
+            case "POST":
+                curl_setopt($curl, CURLOPT_POST, 1);
+                if ($data)
+                curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+            break;
+            case "PUT":
+                curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "PUT");
+                if ($data)
+                curl_setopt($curl, CURLOPT_POSTFIELDS, $data);                              
+            break;
+            default:
+                if ($data)
+                $url = sprintf("%s?%s", $url, http_build_query($data));
+        }
+        // OPTIONS:
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+            'APIKEY: S4Dl7fXu18jlc7cSbfXWHBlhKvpcd2x6ba0r1JWuRfioJbTdASRmLtARquU270v5',
+            'Content-Type: application/json',
+        ));
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        // EXECUTE:
+        $result = curl_exec($curl);
+        if(!$result) {
+            die("Connection Failure");
+        }
+        curl_close($curl);
+        return $result;
+    }
+
+    public function set_transaction($request_id="", $amount=0, $mobile_no="", $email_id="") {
+        // $email_id = "prasadb0910@gmail.com";
+        // echo $email_id;
+        // echo '<br/><br/>';
+
+        // $email_id = urlencode($email_id);
+        // echo $email_id;
+        // echo '<br/><br/>';
+
+        $email_id = urldecode($email_id);
+        // echo $email_id;
+        // echo '<br/><br/>';
+
+        $amount_arr = array("currency"=>"INR", "value"=>$amount);
+        $merchantInfo = array("aid"=>"201712", "mid"=>"092010001058419", "tid"=>"92128093");
+        $purposes = array(array("purpose"=>"FOOD", "amount"=>$amount_arr));
+        // $purposes = array("purpose"=>"FOOD", "amount"=>$amount);
+
+        // $hash = "req_spar_vbdjkahffoasdh874627wqufid";
+        // $hash = password_hash('Delta123', PASSWORD_DEFAULT);
+        // $request_id = "Delta123";
+
+        // $source_id = "src_wqe47hxfjksor89y4";
+        
+        $source_id = "";
+
+        if($mobile_no!="" && $mobile_no!=0 && $mobile_no!=null && $email_id!="" && $email_id!=0 && $email_id!=null) {
+            $sql = "select * from sodexo_source_id where mobile_no = '$mobile_no' and email_id = '$email_id'";
+            $result = $this->db->query($sql)->result();
+            if(count($result)>0) {
+                if(isset($result[0]->source_id)) $source_id = $result[0]->source_id;
+            }
+        }
+        if($source_id=="" || $source_id==0 || $source_id==null) {
+            if($mobile_no!="" && $mobile_no!=0 && $mobile_no!=null) {
+                $sql = "select * from sodexo_source_id where mobile_no = '$mobile_no'";
+                $result = $this->db->query($sql)->result();
+                if(count($result)>0) {
+                    if(isset($result[0]->source_id)) $source_id = $result[0]->source_id;
+                }
+            }
+        }
+        if($source_id=="" || $source_id==0 || $source_id==null) {
+            if($email_id!="" && $email_id!=0 && $email_id!=null) {
+                $sql = "select * from sodexo_source_id where email_id = '$email_id'";
+                $result = $this->db->query($sql)->result();
+                if(count($result)>0) {
+                    if(isset($result[0]->source_id)) $source_id = $result[0]->source_id;
+                }
+            }
+        }
+
+        if($source_id!="") {
+            $data = array("requestId"=>$request_id,
+                            "sourceId"=>$source_id,
+                            "amount"=>$amount_arr,
+                            "merchantInfo"=>$merchantInfo,
+                            "purposes"=>$purposes,
+                            "failureUrl"=>base_url()."index.php/Order/failed/".$request_id,
+                            "successUrl"=>base_url()."index.php/Order/success/".$request_id);
+        } else {
+            $data = array("requestId"=>$request_id,
+                            // "sourceId"=>$source_id,
+                            "amount"=>$amount_arr,
+                            "merchantInfo"=>$merchantInfo,
+                            "purposes"=>$purposes,
+                            "failureUrl"=>base_url()."index.php/Order/failed",
+                            "successUrl"=>base_url()."index.php/Order/success");
+        }
+        
+        $data = json_encode($data);
+        // echo $data;
+        // echo '<br/><br/>';
+
+        $result = $this->callAPI("POST", "https://pay-gw.preprod.zeta.in/v1.0/sodexo/transactions", $data);
+        // echo $result;
+        // echo '<br/><br/>';
+
+        $result = json_decode($result);
+
+        $transaction_id = "";
+        $transaction_state = "";
+        $redirect_user_to = "";
+
+        if(isset($result->transactionId)) {
+            $transaction_id = $result->transactionId;
+        }
+        if(isset($result->transactionState)) {
+            $transaction_state = $result->transactionState;
+        }
+        if(isset($result->sourceId)) {
+            if($result->sourceId!='' && $result->sourceId!=0 && $result->sourceId!=null){
+                if($source_id != $result->sourceId) {
+                    $this->set_source_id($source_id, $mobile_no, $email_id);
+                }
+            }
+        }
+        if(isset($result->redirectUserTo)) {
+            $redirect_user_to = $result->redirectUserTo;
+        }
+
+        $now=date('Y-m-d H:i:s');
+
+        $data = array(
+            'request_id' => $request_id,
+            'amount' => $amount,
+            'mobile_no' => $mobile_no,
+            'email_id' => $email_id,
+            'source_id' => $source_id,
+            'transaction_id' => $transaction_id,
+            'transaction_state' => $transaction_state,
+            'redirect_user_to' => $redirect_user_to,
+            'created_on' => $now,
+            'modified_on' => $now
+        );
+
+        // echo json_encode($data);
+        // echo '<br/><br/>';
+
+        $this->db->insert('sodexo_transaction', $data);
+
+        if($redirect_user_to==""){
+            redirect(base_url().'index.php/failed');
+        } else {
+            redirect($redirect_user_to, 'refresh');
+        }
+    }
+
+    public function success() {
+        $reason = $this->input->get('reason');
+        $request_id = $this->input->get('q');
+
+        // $request_id = 'Request134';
+
+        $this->get_transaction($request_id);
+        echo 'Transaction Successfull.';
+    }
+
+    public function failed() {
+        $reason = $this->input->get('reason');
+        $request_id = $this->input->get('q');
+
+        // echo $reason;
+        // echo '<br/><br/>';
+        // echo $request_id;
+        // echo '<br/><br/>';
+
+        $this->get_transaction($request_id);
+        echo 'Transaction Failed';
+    }
+
+    public function get_transaction($request_id="") {
+        $result = $this->callAPI("GET", "https://pay-gw.preprod.zeta.in/v1.0/sodexo/transactions/request_id/".$request_id, '');
+        // echo $result;
+        // echo '<br/><br/>';
+
+        $amount = "";
+        $source_id = "";
+        $transaction_id = "";
+        $transaction_state = "";
+        $failure_reason = "";
+        $request_time = "";
+        $retrieval_reference_number = "";
+        $transaction_receipt = "";
+        $authorised_amount = 0;
+        $receipt_id = "";
+        $payee_info = "";
+        $payer_info = "";
+        $authorisation_time = "";
+        $trace_id = "";
+        $error_code = "";
+        $error_type = "";
+        $error_message = "";
+        $additional_info = "";
+
+        $result = json_decode($result);
+
+        if(isset($result->amount)) {
+            $amount_arr = $result->amount;
+            if(isset($amount_arr->value)) {
+                $amount = $amount_arr->value;
+            }
+        }
+        if(isset($result->transactionId)) {
+            $transaction_id = $result->transactionId;
+        }
+        if(isset($result->transactionState)) {
+            $transaction_state = $result->transactionState;
+        }
+        if(isset($result->failureReason)) {
+            $failure_reason = $result->failureReason;
+        }
+        if(isset($result->sourceId)) {
+            $source_id = $result->sourceId;
+        }
+        if(isset($result->requestTime)) {
+            $request_time = $result->requestTime;
+        }
+        if(isset($result->retrievalReferenceNumber)) {
+            $retrieval_reference_number = $result->retrievalReferenceNumber;
+        }
+        if(isset($result->transactionReceipt)) {
+            $transaction_receipt = $result->transactionReceipt;
+
+            if(isset($transaction_receipt->authorisedAmount)) {
+                $authorisedAmount = $transaction_receipt->authorisedAmount;
+                if(isset($authorisedAmount->amount)) {
+                    $authorised_amount = $authorisedAmount->amount;
+                }
+            }
+
+            if(isset($transaction_receipt->receiptID)) {
+                $receipt_id = $transaction_receipt->receiptID;
+            }
+            if(isset($transaction_receipt->payeeInfo)) {
+                $payee_info = json_encode($transaction_receipt->payeeInfo);
+            }
+            if(isset($transaction_receipt->payerInfo)) {
+                $payer_info = json_encode($transaction_receipt->payerInfo);
+            }
+            if(isset($transaction_receipt->authorisationTime)) {
+                $authorisation_time = $transaction_receipt->authorisationTime;
+            }
+
+            $transaction_receipt = json_encode($transaction_receipt);
+        }
+
+        if(isset($result->traceId)) {
+            $trace_id = $result->traceId;
+        }
+        if(isset($result->errorCode)) {
+            $error_code = $result->errorCode;
+        }
+        if(isset($result->errorType)) {
+            $error_type = $result->errorType;
+        }
+        if(isset($result->errorMessage)) {
+            $error_message = $result->errorMessage;
+        }
+        if(isset($result->additionalInfo)) {
+            $additional_info = $result->additionalInfo;
+        }
+
+        $now=date('Y-m-d H:i:s');
+
+        $data = array(
+                    'source_id'=>$source_id,
+                    'transaction_id'=>$transaction_id,
+                    'transaction_state'=>$transaction_state,
+                    'failure_reason'=>$failure_reason,
+                    'request_time'=>$request_time,
+                    'retrieval_reference_number'=>$retrieval_reference_number,
+                    'transaction_receipt'=>$transaction_receipt,
+                    'authorised_amount'=>$authorised_amount,
+                    'receipt_id'=>$receipt_id,
+                    'payee_info'=>$payee_info,
+                    'payer_info'=>$payer_info,
+                    'authorisation_time'=>$authorisation_time,
+                    'trace_id'=>$trace_id,
+                    'error_code'=>$error_code,
+                    'error_type'=>$error_type,
+                    'error_message'=>$error_message,
+                    'additional_info'=>$additional_info,
+                    'modified_on'=>$now
+                );
+
+        $sql = "select * from sodexo_transaction where request_id = '$request_id'";
+        $result = $this->db->query($sql)->result();
+        if(count($result)>0) {
+            // echo $source_id;
+            // echo '<br/><br/>';
+            // echo json_encode($result);
+            // echo '<br/><br/>';
+
+            $this->db->where('request_id', $request_id);
+            $this->db->update('sodexo_transaction', $data);
+
+            // echo $result[0]->source_id;
+            // echo '<br/><br/>';
+
+            if(isset($result[0]->source_id)) {
+                // echo $result[0]->source_id;
+                // echo '<br/><br/>';
+
+                if($source_id!=''){
+                    $mobile_no = $result[0]->mobile_no;
+                    $email_id = $result[0]->email_id;
+
+                    // echo $source_id;
+                    // echo '<br/><br/>';
+                    // echo $mobile_no;
+                    // echo '<br/><br/>';
+                    // echo $email_id;
+                    // echo '<br/><br/>';
+
+                    if($mobile_no!='' || $email_id!='') {
+                        $this->set_source_id($source_id, $mobile_no, $email_id);
+                    }
+                }
+            }
+        } else {
+            $data['request_id'] = $request_id;
+            $data['amount'] = $amount;
+            $data['redirect_user_to'] = "https://pay-gw.preprod.zeta.in/z-sodexo/transactions/initiate?q=".$transaction_id;
+            $data['created_on'] = $now;
+            $this->db->insert('sodexo_transaction', $data);
+        }
+    }
+
+    public function set_source_id($source_id="", $mobile_no="", $email_id="") {
+        // echo $source_id;
+        // echo '<br/><br/>';
+        // echo $mobile_no;
+        // echo '<br/><br/>';
+        // echo $email_id;
+        // echo '<br/><br/>';
+
+        if($source_id!="") {
+            $blFlag = false;
+            $id = 0;
+            $sourceId = '';
+
+            if($mobile_no!="" && $mobile_no!=0 && $mobile_no!=null && $email_id!="" && $email_id!=0 && $email_id!=null) {
+                $sql = "select * from sodexo_source_id where mobile_no = '$mobile_no' and email_id = '$email_id'";
+                $result = $this->db->query($sql)->result();
+                if(count($result)>0) {
+                    if(isset($result[0]->id)) {
+                        $blFlag = true;
+                        $id = $result[0]->id;
+                        $sourceId = $result[0]->source_id;
+                    }
+                }
+            }
+            if($id=="" || $id==0 || $id==null || $blFlag==false) {
+                if($mobile_no!="" && $mobile_no!=0 && $mobile_no!=null) {
+                    $sql = "select * from sodexo_source_id where mobile_no = '$mobile_no'";
+                    $result = $this->db->query($sql)->result();
+                    if(count($result)>0) {
+                        if(isset($result[0]->id)) {
+                            $blFlag = true;
+                            $id = $result[0]->id;
+                            $sourceId = $result[0]->source_id;
+                        }
+                    }
+                }
+            }
+            if($id=="" || $id==0 || $id==null || $blFlag==false) {
+                if($email_id!="" && $email_id!=0 && $email_id!=null) {
+                    $sql = "select * from sodexo_source_id where email_id = '$email_id'";
+                    $result = $this->db->query($sql)->result();
+                    if(count($result)>0) {
+                        if(isset($result[0]->id)) {
+                            $blFlag = true;
+                            $id = $result[0]->id;
+                            $sourceId = $result[0]->source_id;
+                        }
+                    }
+                }
+            }
+
+            // echo $sourceId;
+            // echo '<br/><br/>';
+            // echo $source_id;
+            // echo '<br/><br/>';
+            // echo $mobile_no;
+            // echo '<br/><br/>';
+            // echo $email_id;
+            // echo '<br/><br/>';
+
+            if(($mobile_no!="" && $mobile_no!=0 && $mobile_no!=null) || ($email_id!="" && $email_id!=0 && $email_id!=null)) {
+                if($sourceId!=$source_id) {
+                    $now=date('Y-m-d H:i:s');
+                    
+                    $data = array(
+                                'source_id'=>$source_id,
+                                'modified_on'=>$now
+                            );
+
+                    // echo json_encode($data);
+                    // echo '<br/><br/>';
+
+                    if($id!="" && $id!=0 && $id!=null && $blFlag==true) {
+                        $this->db->where('id', $id);
+                        $this->db->update('sodexo_source_id', $data);
+                    } else {
+                        $data['mobile_no'] = $mobile_no;
+                        $data['email_id'] = $email_id;
+                        $data['created_on'] = $now;
+                        $this->db->insert('sodexo_source_id', $data);
+                    }
+                }
+            }
+        }
+    }
 }
 ?>

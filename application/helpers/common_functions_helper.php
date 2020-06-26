@@ -405,7 +405,7 @@
             $CI->email->subject($subject);
             $CI->email->message($message);
             $CI->email->set_mailtype("html");
-            return $CI->email->send();
+            // return $CI->email->send();
 
         } catch (Exception $ex) {
             
@@ -442,11 +442,11 @@
             if($attachment!='')
                 $CI->email->attach($attachment);
             $CI->email->set_mailtype("html");
-            $result = $CI->email->send();
+            // $result = $CI->email->send();
             // echo $CI->email->print_debugger();
             $CI->email->clear(TRUE);
 
-            return $result;
+            // return $result;
 
         } catch (Exception $ex) {
             // echo $ex->getMessage();

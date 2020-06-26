@@ -4,6 +4,9 @@ if (!defined('BASEPATH'))
 
 class Export extends CI_Controller {
     public function __construct() {
+        // ini_set('max_execution_time', 1000); 
+        // ini_set('memory_limit','2048M');
+
         parent::__construct();
         // Load the Library
         // $this->load->library("excel");

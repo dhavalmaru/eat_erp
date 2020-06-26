@@ -718,7 +718,7 @@ class Payment_upload extends CI_Controller{
         if(count($result)>0){
             for($i=0; $i<count($result); $i++){
                 $sql = "insert into payment_details (date_of_deposit, bank_id, payment_mode, total_amount, status, remarks, created_by, created_on, modified_by, modified_on, approved_by, approved_on, rejected_by, rejected_on, distributor_out_id, ref_id, modified_approved_date, file_id) 
-                    select date_of_deposit, bank_id, payment_mode, total_amount, status, remarks, created_by, created_on, modified_by, modified_on, approved_by, approved_on, rejected_by, rejected_on, distributor_out_id, ref_id, modified_approved_date, '".$file_id."' 
+                    select date_of_deposit, bank_id, payment_mode, total_amount, 'Approved', remarks, created_by, created_on, modified_by, modified_on, approved_by, approved_on, rejected_by, rejected_on, distributor_out_id, ref_id, modified_approved_date, '".$file_id."' 
                     from payment_upload_details where id = '".$result[$i]->id."'";
                 $this->db->query($sql);
                 $id = $this->db->insert_id();
