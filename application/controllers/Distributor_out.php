@@ -1537,6 +1537,585 @@ class Distributor_out extends CI_Controller{
         }
     }
 
+    public function download_pending_sales_data($status){
+        $data = $this->distributor_out_model->get_pending_sales_data($status);
+
+        if(count($data)>0){
+            $this->load->library('excel');
+
+            $objPHPExcel = new PHPExcel();
+
+            // Set properties
+            $objPHPExcel->getProperties()->setCreator("OTB Innovtech")
+                             ->setLastModifiedBy("OTB Innovtech")
+                             ->setTitle("Office 2007 XLSX Test Document")
+                             ->setSubject("Office 2007 XLSX Test Document")
+                             ->setDescription("Test document for Office 2007 XLSX, generated using PHP classes.")
+                             ->setKeywords("office 2007 openxml php")
+                             ->setCategory("Test result file");
+
+            $objPHPExcel->setActiveSheetIndex(0);
+
+            $sheetCount = $objPHPExcel->getSheetCount();
+            if($sheetCount<2){
+                $objPHPExcel->createSheet();
+            }
+            $objPHPExcel->setActiveSheetIndex(1);
+            // $sht_name = $objPHPExcel->getActiveSheet()->getTitle();
+            $sht_name = 'Sheet2';
+            $objPHPExcel->getActiveSheet()->setTitle($sht_name);
+
+            $objPHPExcel->getActiveSheet()->setCellValue('A1', 'Delivery Status');
+            $row = 2;
+            $objPHPExcel->getActiveSheet()->setCellValue('A'.$row++, 'Pending');
+            $objPHPExcel->getActiveSheet()->setCellValue('A'.$row++, 'GP Issued');
+            $objPHPExcel->getActiveSheet()->setCellValue('A'.$row++, 'Delivered Not Complete');
+            $objPHPExcel->getActiveSheet()->setCellValue('A'.$row++, 'Delivered');
+            $objPHPExcel->getActiveSheet()->setCellValue('A'.$row++, 'Cancelled');
+            $delivery_status_cnt = $row;
+
+            $objPHPExcel->getActiveSheet()->setCellValue('C1', 'Status');
+            $row = 2;
+            $objPHPExcel->getActiveSheet()->setCellValue('C'.$row++, 'Approved');
+            $objPHPExcel->getActiveSheet()->setCellValue('C'.$row++, 'Rejected');
+            $status_cnt = $row;
+
+            $col_name[]=array();
+            for($i=0; $i<=20; $i++) {
+                $col_name[$i]=PHPExcel_Cell::stringFromColumnIndex($i);
+            }
+
+            $objPHPExcel->setActiveSheetIndex(0);
+            $objPHPExcel->getActiveSheet()->setTitle('Sheet1');
+
+            $row=1;
+            $col=0;
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col++].$row, 'Id');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col++].$row, 'Date Of Processing');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col++].$row, 'Distributor Name');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col++].$row, 'Depot Name');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col++].$row, 'Invoice Amount');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col++].$row, 'Delivery Status');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col++].$row, 'Status');
+
+            for($i=0; $i<count($data); $i++) {
+                $row=$row+1;
+                $col=0;
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col++].$row, $data[$i]->id);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col++].$row, date('d-m-Y', strtotime($data[$i]->date_of_processing)));
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col++].$row, $data[$i]->distributor_name);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col++].$row, $data[$i]->depot_name);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col++].$row, $data[$i]->invoice_amount);
+
+                $objValidation = $objPHPExcel->getActiveSheet()->getCell($col_name[$col].$row)->getDataValidation();
+                $this->common_excel($objValidation);
+                $objValidation->setFormula1('='.$sht_name.'!$A$2:$A$'.($delivery_status_cnt));
+
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col++].$row, $data[$i]->delivery_status);
+
+                $objValidation = $objPHPExcel->getActiveSheet()->getCell($col_name[$col].$row)->getDataValidation();
+                $this->common_excel($objValidation);
+                $objValidation->setFormula1('='.$sht_name.'!$C$2:$C$'.($status_cnt));
+
+                // $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col++].$row, $data[$i]->status);
+            }
+
+            $objPHPExcel->getActiveSheet()->freezePane('A2');
+
+            $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(16);
+            $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(25);
+            $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(15);
+            for($col='E'; $col!=='H'; $col++) {
+                $objPHPExcel->getActiveSheet()->getColumnDimension($col)->setAutoSize(true);
+            }
+
+            // $objPHPExcel->getActiveSheet()->protectCells('A1:F'.$row, 'php');
+            // $objPHPExcel->getActiveSheet()->getProtection()->setSheet(true);
+
+            // $objPHPExcel->getActiveSheet()->getProtection()->setPassword('php');
+            // $objPHPExcel->getActiveSheet()->getProtection()->setSheet(true);
+            // $objPHPExcel->getActiveSheet()->getStyle('H2:M'.$row)->getProtection()->setLocked(PHPExcel_Style_Protection::PROTECTION_UNPROTECTED);
+
+            $objPHPExcel->getSheet(1)->setSheetState(PHPExcel_Worksheet::SHEETSTATE_HIDDEN);
+
+            $filename='pending_sales_data_upload_format.xlsx';
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="'.$filename.'"');
+            header('Cache-Control: max-age=0');
+
+            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+            $objWriter->save('php://output');
+            exit;
+        } else {
+            $this->session->set_flashdata('success', 'No data found.');
+            $this->session->keep_flashdata('success');
+        }
+        
+        redirect(base_url().'index.php/distributor_out/checkstatus/'.$status);
+    }
+
+    public function upload_pending_sales_data_file(){
+        $now=date('Y-m-d H:i:s');
+        $curdate=date('Y-m-d');
+        $curusr=$this->session->userdata('session_id');
+
+        $upload_path=$this->config->item('upload_path');
+        $path=$upload_path.'pending_sales_data_upload/';
+        if(!is_dir($path)) {
+            mkdir($path, 0777, TRUE);
+        }
+        $config = array(
+            'upload_path' => $path,
+            'allowed_types' => "xlsx",
+            'overwrite' => TRUE,
+            'max_size' => "2048000", 
+            'max_height' => "768",
+            'max_width' => "1024"
+        );
+
+        $file_name = $_FILES["upload"]['name'];
+        if(strrpos($file_name, '.')>0){
+            $file_ext = substr($file_name, strrpos($file_name, '.'));
+        } else {
+            $file_ext = '.xlsx';
+        }
+        $file_name = substr($file_name, 0, strrpos($file_name, '.'));
+        $file_name = str_replace(' ', "_", $file_name);
+        $file_name = preg_replace('/[^A-Za-z0-9_\-]/', '', $file_name);
+        $new_name = time().'_'.$file_name.$file_ext;
+
+        $config['file_name'] = $new_name;
+        $this->load->library('upload', $config);
+        if(!$this->upload->do_upload('upload')){ 
+            $this->upload->display_errors();
+        } else {
+            $uploadDetailArray = $this->upload->data();
+        }
+
+        $file_name = $uploadDetailArray['file_name'];
+        // print_r($file_name); echo '<br/><br/>';
+        $filename = $path.$uploadDetailArray['file_name'];
+        // $this->upload_file_data($filename);
+        // print_r($filename);
+        // echo '<br/><br/>';
+        // $filename = str_replace('/', '\\', $filename);
+        // print_r($filename);
+        // exit;
+
+        $this->upload_pending_sales_data($filename);
+
+        // $sql = "insert into sales_upload_files (file_name, file_path, upload_date, status, created_by, created_on, modified_by, modified_on) VALUES ('".$file_name."', '".$path."', '".$curdate."', 'Uploading', '".$curusr."', '".$now."', '".$curusr."', '".$now."')";
+        // $this->db->query($sql);
+        // // $file_id = $this->db->insert_id();
+
+        // sleep(0.50);
+
+        // $this->session->set_flashdata('success', 'File Upload Succeded.<br/>Please upload file data.');
+        // $this->session->keep_flashdata('success');
+        // redirect(base_url().'index.php/Sales_upload');
+    }
+
+    public function upload_pending_sales_data($filename){
+        try{
+            $now=date('Y-m-d H:i:s');
+            $curdate=date('Y-m-d');
+            $curusr=$this->session->userdata('session_id');
+
+            // $sql = "select * from sales_upload_files where id='$file_id'";
+            // $result = $this->db->query($sql)->result();
+            // if(count($result)>0){
+            //     $file_path = $result[0]->file_path;
+            //     $file_name = $result[0]->file_name;
+            //     $filename = $result[0]->file_path.$result[0]->file_name;
+            // } else {
+            //     $file_path = '';
+            //     $file_name = '';
+            //     $filename = '';
+            // }
+
+            if($filename!=''){
+                if(strpos($filename, '/')===false){
+                    $this->session->set_flashdata('error', 'File not found');
+                    $this->session->keep_flashdata('error');
+                    exit;
+                }
+                $file_path = substr($filename, 0, strrpos($filename, '/'));
+                $file_name = substr($filename, strrpos($filename, '/')+1);
+            }
+
+            // echo $file_name;
+            // echo '<br/><br/>';
+
+            $this->load->library('excel');
+
+            // echo 'Loaded';
+            // echo '<br/><br/>';
+            
+            $objPHPExcel = PHPExcel_IOFactory::load($filename);
+            $objPHPExcel->setActiveSheetIndex(0);
+            $highestrow = $objPHPExcel->setActiveSheetIndex(0)->getHighestRow();
+            $objPHPExcel->getActiveSheet()->setCellValue('H1', 'Error Remark');
+            $objPHPExcel->getActiveSheet()->getColumnDimension('H')->setWidth(30);
+            $objerror = 0;
+            $error_line = '';
+            $order_array = [];
+            $sales_id_array = [];
+            $stock_array = [];
+            $row_array = [];
+            $product_array = [];
+
+            $sql = "select * from product_master";
+            $result = $this->db->query($sql)->result();
+            for($i=0; $i<count($result); $i++){
+                $product_array['Bar_'.$result[$i]->id] = $result[$i]->product_name;
+            }
+
+            $sql = "select * from box_master";
+            $result = $this->db->query($sql)->result();
+            for($i=0; $i<count($result); $i++){
+                $product_array['Box_'.$result[$i]->id] = $result[$i]->box_name;
+            }
+
+            for($i=2; $i<=$highestrow; $i++){
+                $sales_id = $objPHPExcel->getActiveSheet()->getCell('A'.$i)->getCalculatedValue();
+                $inv_amt = $objPHPExcel->getActiveSheet()->getCell('E'.$i)->getCalculatedValue();
+                $delivery_status = $objPHPExcel->getActiveSheet()->getCell('F'.$i)->getCalculatedValue();
+                $status = $objPHPExcel->getActiveSheet()->getCell('G'.$i)->getCalculatedValue();
+
+                $inv_amt = round(doubleval($inv_amt),2);
+
+                $error = '';
+
+                if($sales_id==''){
+                    continue;
+                }
+
+                if(isset($order_array[$sales_id])){
+                    $cnt = count($order_array[$sales_id]);
+                } else {
+                    $cnt = 0;
+                    $sales_id_array[] = $sales_id;
+                }
+
+                $order_array[$sales_id] = array('sales_id'=>$sales_id,
+                                                'delivery_status'=>$delivery_status, 
+                                                'status'=>$status);
+
+                //-------------- Validation Start ------------------------------
+                    $bl_error_line = false;
+                    $bl_empty = false;
+                    $bl_not_empty = false;
+
+                    if($delivery_status==''){
+                        $bl_empty = true;
+                    } else {
+                        $bl_not_empty = true;
+                    }
+                    if($status==''){
+                        $bl_empty = true;
+                    } else {
+                        $bl_not_empty = true;
+                    }
+
+                    if($bl_empty==true && $bl_not_empty==false){
+                        continue;
+                    } else if($bl_empty==true && $bl_not_empty==true) {
+                        $error.='All values should be filled.';
+                        $objerror=1;
+                        if($bl_error_line==false){
+                            $error_line.=$i.', ';
+                            $bl_error_line=true;
+                        }
+                    }
+
+                    if($sales_id==''){
+                        $error.='Sales Id cannot be blank.';
+                        $objerror=1;
+                        if($bl_error_line==false){
+                            $error_line.=$i.', ';
+                            $bl_error_line=true;
+                        }
+                    } else {
+                        $sql = "select * from distributor_out where id='$sales_id'";
+                        $result = $this->db->query($sql)->result();
+                        if(count($result)==0){
+                            $error.='Sales Id '.$sales_id.' not found.';
+                            $objerror=1;
+                            if($bl_error_line==false){
+                                $error_line.=$i.', ';
+                                $bl_error_line=true;
+                            }
+                        } else {
+                            $invoice_amount = round(doubleval($result[0]->invoice_amount),2);
+                            $depot_id = $result[0]->depot_id;
+                            $ref_id = $result[0]->ref_id;
+
+                            if($invoice_amount==0){
+                                $error.='Invoice amount is zero.';
+                                $objerror=1;
+                                if($bl_error_line==false){
+                                    $error_line.=$i.', ';
+                                    $bl_error_line=true;
+                                }
+                            }
+                            if($inv_amt!=$invoice_amount){
+                                $error.='Invoice amount does not match.';
+                                $objerror=1;
+                                if($bl_error_line==false){
+                                    $error_line.=$i.', ';
+                                    $bl_error_line=true;
+                                }
+                            }
+
+                            if(strtoupper(trim($result[0]->status))=='APPROVED'){
+                                $error.='Sales already approved.';
+                                $objerror=1;
+                                if($bl_error_line==false){
+                                    $error_line.=$i.', ';
+                                    $bl_error_line=true;
+                                }
+                            }
+
+                            if(isset($ref_id)){
+                                if($ref_id!=''){
+                                    $error.='This is already approved entry. Approve it manually.';
+                                    $objerror=1;
+                                    if($bl_error_line==false){
+                                        $error_line.=$i.', ';
+                                        $bl_error_line=true;
+                                    }
+                                }
+                            }
+
+                            $sql = "select * from distributor_out_items where distributor_out_id='$sales_id'";
+                            $result = $this->db->query($sql)->result();
+                            if(count($result)==0){
+                                $error.='Please add sales items.';
+                                $objerror=1;
+                                if($bl_error_line==false){
+                                    $error_line.=$i.', ';
+                                    $bl_error_line=true;
+                                }
+                            } else {
+                                if(strtoupper(trim($status))=='APPROVED'){
+                                    for($j=0; $j<count($result); $j++){
+                                        $type = $result[$j]->type;
+                                        $item_id = $result[$j]->item_id;
+                                        $qty = $result[$j]->qty;
+
+                                        if(!isset($item_id) || $item_id==0){
+                                            $error.='Please select item in all entries.';
+                                            $objerror=1;
+                                            if($bl_error_line==false){
+                                                $error_line.=$i.', ';
+                                                $bl_error_line=true;
+                                            }
+                                        } else {
+                                            $bl_found = false;
+                                            if(array_key_exists($depot_id, $stock_array)){
+                                                if(array_key_exists($type.'_'.$item_id, $stock_array[$depot_id])){
+                                                    $bl_found = true;
+                                                }
+                                            }
+
+                                            if($bl_found==false){
+                                                $stock_array[$depot_id][$type.'_'.$item_id] = intval($qty);
+                                            } else {
+                                                $stock_array[$depot_id][$type.'_'.$item_id] = intval($stock_array[$depot_id][$type.'_'.$item_id]) + intval($qty);
+                                            }
+
+                                            if(array_key_exists($type.'_'.$item_id, $row_array)){
+                                                $row_array[$type.'_'.$item_id] = $row_array[$type.'_'.$item_id].','.strval($i);
+                                            } else {
+                                                $row_array[$type.'_'.$item_id] = strval($i);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if($delivery_status==''){
+                        $error.='Delivery Status cannot be blank.';
+                        $objerror=1;
+                        if($bl_error_line==false){
+                            $error_line.=$i.', ';
+                            $bl_error_line=true;
+                        }
+                    }
+
+                    if($error!=""){
+                        $objPHPExcel->getActiveSheet()->setCellValue('H'.$i, $error);
+                        // $objPHPExcel->getActiveSheet()->getStyle('M'.$i)->getAlignment()->setWrapText(false);  
+                    }
+
+                    // $objPHPExcel->getActiveSheet()->setCellValue('I1', json_encode($stock_array));
+                    // $objPHPExcel->getActiveSheet()->setCellValue('J1', json_encode($row_array));
+
+                    foreach ($stock_array as $depot_id => $qty_array) {
+                        foreach ($qty_array as $key => $value) {
+                            if(strpos($key, '_')!==false) {
+                                $item_array = explode('_', $key);
+                                $result2 = $this->check_stock($item_array[0], $depot_id, $item_array[1], $value);
+                                if($result2){
+                                    if(array_key_exists($key, $product_array)) {
+                                        $error=$product_array[$key].' Qty is not enough in selected depot.';
+                                    } else {
+                                        $error=$key.' Qty is not enough in selected depot.';
+                                    }
+                                    
+                                    $objerror=1;
+
+                                    // if($bl_error_line==false){
+                                    //     $error_line.=$i.', ';
+                                    //     $bl_error_line=true;
+                                    // }
+
+                                    if(array_key_exists($key, $row_array)) {
+                                        if(strpos($row_array[$key], ',')!==false) {
+                                            $row_index_array = explode(',', $row_array[$key]);
+                                            foreach ($row_index_array as $row_index) {
+                                                $cell_value = $objPHPExcel->getActiveSheet()->getCell('H'.$row_index)->getCalculatedValue();
+                                                if($cell_value!=''){
+                                                    if(strpos($cell_value, $error)===False){
+                                                        $objPHPExcel->getActiveSheet()->setCellValue('H'.$row_index, $cell_value.$error);
+                                                    }
+                                                } else {
+                                                    $objPHPExcel->getActiveSheet()->setCellValue('H'.$row_index, $error);
+                                                    $error_line.=$row_index.', ';
+                                                }
+                                            }
+                                        } else {
+                                            $cell_value = $objPHPExcel->getActiveSheet()->getCell('H'.$row_array[$key])->getCalculatedValue();
+                                            if($cell_value!=''){
+                                                if(strpos($cell_value, $error)===False){
+                                                    $objPHPExcel->getActiveSheet()->setCellValue('H'.$row_array[$key], $cell_value.$error);
+                                                }
+                                            } else {
+                                                $objPHPExcel->getActiveSheet()->setCellValue('H'.$row_array[$key], $error);
+                                                $error_line.=$row_index.', ';
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                //-------------- Validation End ------------------------------
+            }
+
+            if($objerror==1){
+                $upload_path=$this->config->item('upload_path');
+                $path=$upload_path.'pending_sales_data_upload/';
+                if(strrpos($file_name, '.')>0){
+                    $ext = substr($file_name, strrpos($file_name, '.'));
+                } else {
+                    $ext = '.xlsx';
+                }
+
+                $error_file_path = $path;
+                $error_file_name = time().'_pending_sales_data_upload_file_error'.$ext;
+                $status = 'Error';
+                // $remarks = 'There are errors in file on line '.$error_line.'. <br/>Please check - '.$error_file_name;
+                $remarks = 'Please check - '.$error_file_name.' file for errors.<br/>
+                            <a href="'.base_url().'assets/uploads/pending_sales_data_upload/'.$error_file_name.'" style="color:lime; text-decoration: underline;">Click Here</a> to download error file.';
+
+                // echo $remarks;
+                // echo '<br/><br/>';
+
+                // header('Content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                // header('Content-Disposition: attachment;filename="'.$error_file_name.'"');
+                // header('Cache-Control: max-age=0');
+                // $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+                // $objWriter->save('php://output');
+
+                $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+                $objWriter->save($error_file_path.$error_file_name);
+            
+                sleep(0.50);
+
+                $this->session->set_flashdata('error', $remarks);
+                $this->session->keep_flashdata('error');
+            } else {
+                $success_cnt = 0;
+
+                // echo '<pre>'; print_r($sales_id_array); echo '</pre><br/><br/>';
+                // echo '<pre>'; print_r($order_array); echo '</pre><br/><br/>';
+
+                for($i=0; $i<count($sales_id_array); $i++){
+                    $sales_id = $sales_id_array[$i];
+
+                    if(count($order_array[$sales_id])>0){
+                        $arr = $order_array[$sales_id];
+
+                        if($arr['delivery_status']!=''){
+                            $delivery_status = $arr['delivery_status'];
+                            $status = $arr['status'];
+
+                            if(strtoupper(trim($status))=='APPROVED') {
+                                $sql = "update distributor_out set delivery_status = '$delivery_status', status = '$status', modified_by = '$curusr', modified_on = '$now', approved_by = '$curusr', approved_on = '$now' where id in (".$sales_id.")";
+                                // echo $sql;
+                                // echo '<br/><br/>';
+                                $this->db->query($sql);
+
+                                $this->distributor_out_model->approve_pending_sales_data($sales_id);
+
+                                $success_cnt = $success_cnt + 1;
+                            }
+
+                            // $this->tax_invoice_model->generate_gate_pass($sales_id);
+                        }
+                    }
+                }
+
+                $remarks = 'No of records uploaded - '.$success_cnt;
+
+                // echo $remarks;
+                // echo '<br/><br/>';
+
+                $this->session->set_flashdata('success', $remarks);
+                $this->session->keep_flashdata('success');
+            }
+
+            // echo $remarks;
+
+            redirect(base_url().'index.php/Distributor_out/checkstatus/pending_for_approval');
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+    }
+
+    public function check_stock($type, $depot_id, $item_id, $qty){
+        if($type=='Bar'){
+            $url = base_url().'index.php/Stock/check_bar_qty_availablity_for_depot';
+            $params = array('depot_id' => $depot_id, 'product_id' => $item_id, 'qty' => $qty);
+        } else {
+            $url = base_url().'index.php/Stock/check_box_qty_availablity_for_depot';
+            $params = array('depot_id' => $depot_id, 'box_id' => $item_id, 'qty' => $qty);
+        }
+        
+        $result = 1;
+        $query_content = http_build_query($params);
+        $fp = fopen($url, 'r', FALSE, // do not use_include_path
+        stream_context_create([
+            'http' => [
+                'header'  => [ // header array does not need '\r\n'
+                    'Content-type: application/x-www-form-urlencoded',
+                    'Content-Length: ' . strlen($query_content)
+                ],
+                'method'  => 'POST',
+                'content' => $query_content
+            ]
+        ]));
+        if ($fp === FALSE) {
+            // echo json_encode(['error' => 'Failed to get contents...']);
+        } else {
+            $result = stream_get_contents($fp);
+        }
+        fclose($fp);
+        return $result;
+    }
+
     public function approve_records_from_backend(){
         $distributor_out_id = array(26640, 26659, 26999, 27002, 27005, 27064, 27066, 27068, 27069, 27166, 27088, 27090, 27248, 27259, 27275, 27439, 27343, 27348, 27353, 27648, 27649, 27650, 27651, 27652, 27653, 27654, 27655, 27607, 27640, 27641, 27642, 27643, 27644, 27645, 27646, 27647, 27656, 27657, 27658, 27659, 27667, 27668, 27669, 27670, 27671, 27672, 27673, 27674, 27675, 27676, 27677, 27678, 27679, 27680, 27681, 27682, 27685, 27739, 27740, 27741, 27742, 27743, 27760, 27761, 27762, 27763, 27764, 27765, 27766, 27767, 27768, 27769, 27770, 27771, 27772, 27773, 27774, 27775, 27776, 27779);
 

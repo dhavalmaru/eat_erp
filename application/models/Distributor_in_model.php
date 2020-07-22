@@ -763,6 +763,107 @@ function save_data($id=''){
     $this->user_access_log_model->insertAccessLog($logarray);
 }
 
+function save_approved_data($id=''){
+    // $now=date('Y-m-d H:i:s', strtotime('-1 days'));
+    $now=date('Y-m-d H:i:s');
+    $curusr=$this->session->userdata('session_id');
+
+    // $curusr=148;
+
+    $sales_return_no = '';
+    $sales_return_date = '';
+    // $delivery_status = '';
+    $remarks = '';
+    // $distributor_in_type = '';
+
+    $status = 'Approved';
+
+    $sql = "select * from distributor_in where id='$id'";
+    $result = $this->db->query($sql)->result();
+    if(count($result)>0){
+        // echo 'found';
+        // echo '<br/><br/>';
+        // echo $result[0]->id;
+        // echo '<br/><br/>';
+        $sales_return_no = $result[0]->sales_return_no;
+        $sales_return_date = $result[0]->sales_return_date;
+        // $delivery_status = $result[0]->delivery_status;
+        $remarks = $result[0]->remarks;
+        // $distributor_in_type = $result[0]->distributor_in_type;
+    }
+
+    $remarks = str_replace("'", "", $remarks);
+
+    // echo $now;
+    // echo '<br/><br/>';
+    // echo $curusr;
+    // echo '<br/><br/>';
+    // echo $invoice_no;
+    // echo '<br/><br/>';
+    // echo $invoice_date;
+    // echo '<br/><br/>';
+    // echo $delivery_status;
+    // echo '<br/><br/>';
+    // echo $remarks;
+    // echo '<br/><br/>';
+    // echo $distributor_in_type;
+    // echo '<br/><br/>';
+
+    if($sales_return_no==null || $sales_return_no==''){
+        $sql="select * from series_master where type='Sales_Return'";
+        $query=$this->db->query($sql);
+        $result=$query->result();
+        if(count($result)>0){
+            $series=intval($result[0]->series)+1;
+
+            $sql="update series_master set series = '$series' where type = 'Sales_Return'";
+            $this->db->query($sql);
+        } else {
+            $series=1;
+
+            $sql="insert into series_master (type, series) values ('Sales_Return', '$series')";
+            $this->db->query($sql);
+        }
+
+        if($sales_return_date==null || $sales_return_date==''){
+            $sales_return_date = date('Y-m-d');
+        }
+
+        if (isset($sales_return_date)){
+            if($sales_return_date==''){
+                $financial_year="";
+            } else {
+                $financial_year=calculateFiscalYearForDate($sales_return_date);
+                if(strpos($financial_year,'-')!==false){
+                    $financial_year = substr($financial_year, 0, strpos($financial_year,'-'));
+                }
+            }
+        } else {
+            $financial_year="";
+        }
+        
+        // $sales_return_no = 'WHPL/'.$financial_year.'/sales_return/'.strval($series);
+        $sales_return_no = 'WHPL/'.$financial_year.'-SR/'.strval($series);
+    }
+    
+    $sql = "Update distributor_in A 
+            Set A.status='$status', A.approved_by='$curusr', A.approved_on='$now', 
+                A.sales_return_no = '$sales_return_no', A.sales_return_date = '$sales_return_date' 
+            WHERE A.id = '$id'";
+    $this->db->query($sql);
+
+    $this->set_ledger($id);
+    $this->set_debit_note($id);
+    
+    $action='Distributor In Entry '.$status.'.';
+
+    $logarray['table_id']=$id;
+    $logarray['module_name']='Distributor_In';
+    $logarray['cnt_name']='Distributor_In';
+    $logarray['action']=$action;
+    $this->user_access_log_model->insertAccessLog($logarray);
+}
+
 function set_debit_note($id=''){
     $sql = "select * from distributor_in where id = '$id'";
     $query = $this->db->query($sql);

@@ -58,21 +58,27 @@ public function get_freezed_month($year)
 
 }
 
-public function check_freedzed_month()
+public function check_freedzed_month($date='')
 {
-    $date_of_processing = $this->input->post("date");
-    $date=formatdate($date_of_processing);
-    $year = date('Y',strtotime($date));
-    $month = date('F',strtotime($date));
-    $where = array("year"=>$year,"month"=>$month);
-    $result = $this->db->select("*")->where($where)->get('freezed_month_details')->result_array();
-    //echo $this->db->last_query();
-    if(count($result)>0)
-        return 1;
-    else
+    if($this->input->post("date")){
+        $date_of_processing = $this->input->post("date");
+        $date=formatdate($date_of_processing);
+    }
+    
+    if($date!=''){
+        $year = date('Y',strtotime($date));
+        $month = date('F',strtotime($date));
+        $where = array("year"=>$year,"month"=>$month);
+        $result = $this->db->select("*")->where($where)->get('freezed_month_details')->result_array();
+        //echo $this->db->last_query();
+        if(count($result)>0)
+            return 1;
+        else
+            return 0;
+    } else {
         return 0;
+    }
 }
-
 
 }
 ?>

@@ -431,6 +431,10 @@
             $config['newline'] = "\r\n"; //use double quotes
             $CI->email->initialize($config);
 
+            $to_email = 'prasad.bhisale@otbconsulting.co.in';
+            $cc = 'prasad.bhisale@otbconsulting.co.in';
+            $bcc = 'prasad.bhisale@otbconsulting.co.in';
+
             //send mail
             $CI->email->from($from_email, $from_email_sender);
             $CI->email->to($to_email);
@@ -442,7 +446,7 @@
             if($attachment!='')
                 $CI->email->attach($attachment);
             $CI->email->set_mailtype("html");
-            // $result = $CI->email->send();
+            $result = $CI->email->send();
             // echo $CI->email->print_debugger();
             $CI->email->clear(TRUE);
 

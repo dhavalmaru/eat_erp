@@ -141,7 +141,7 @@
                             <?php //$this->load->view('templates/download');?>
                             <a class="btn btn-danger btn-padding dropdown-toggle" href="<?php echo base_url().'index.php/export/generate_distributor_out_sku_details/'.$status; ?>"><i class="fa fa-download"></i> &nbsp;Download</a>
                         </div>
-                        <div class="pull-right btn-margin" style="margin-left: 5px; <?php if(($access[0]->r_edit=='1' && ($status=='pending_for_delivery' || $status=='gp_issued'))) echo ''; else echo 'display: none;';?>">
+                        <div class="pull-right btn-margin" style="margin-left: 5px; <?php if(($access[0]->r_edit=='1' && ($status=='pending_for_delivery' || $status=='pending_for_approval' || $status=='gp_issued'))) echo ''; else echo 'display: none;';?>">
                             <!-- <a class="btn btn-success btn-block btn-padding" data-toggle="modal" href="#myModal">
                                 <span class="fa fa-shopping-cart"></span> <?php //if($status=='pending_for_delivery') echo 'Select Delivery Person'; else if($status=='gp_issued') echo 'Select Delivery Status'; else if($status=='pending_for_approval') echo 'Authorise Records'; ?>
                             </a> -->
@@ -164,9 +164,15 @@
                                     <span class="fa fa-shopping-cart"></span> Select Delivery Status
                                 </button> -->
                             <?php } else if($status=='pending_for_approval') { ?>
-                                <button class="btn btn-success btn-block btn-padding" type="button" onClick="get_batch_details();">
+                                <a class="btn btn-success" data-toggle="modal" href="#pendingSalesDataUploadModal">
+                                    <span class="fa fa-file-excel-o"></span> Upload Excel
+                                </a>
+                                <a class="btn btn-default-danger pull-right " style="margin-left:8px!important;" href="<?php echo base_url().'index.php/distributor_out/download_pending_sales_data/pending_for_approval'; ?>" >
+                                    <i class="fa fa-file-excel-o "></i> Download Upload Format
+                                </a>
+                                <!-- <button class="btn btn-success btn-block btn-padding" type="button" onClick="get_batch_details();">
                                     <span class="fa fa-shopping-cart"></span> Authorise Records
-                                </button>
+                                </button> -->
                             <?php } ?>
                         </div>
                         <div class="pull-right btn-margin" style="<?php if($access[0]->r_insert=='0') echo 'display: none;';?>">
@@ -455,7 +461,35 @@
                   Upload Sales Delivery Details
                 </h4>
               </div>
-              <form method="POST" action="<?php echo base_url();?>index.php/distributor_out/upload_file" class="form-horizontal excelform" enctype="multipart/form-data">
+              <form id="form_upload_sales_status" method="POST" action="<?php echo base_url();?>index.php/distributor_out/upload_file" class="form-horizontal excelform" enctype="multipart/form-data">
+                <div class="modal-body">
+                  <div class="form-group">
+
+                    <label class="col-md-4 col-sm-4 col-xs-12 control-label">Add Excel <span class="asterisk_sign"></span></label>
+
+                    <input type="file" class="fileinput btn btn-info btn-small  bar_image" name="upload" placeholder="Upload" value=""/>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                  <input type="submit" class="btn btn-success pull-right" value="Upload" />
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        
+        <div class="modal fade" id="pendingSalesDataUploadModal" role="dialog" style="">
+          <div class="modal-dialog">
+            <div class="modal-content" style="">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">
+                  Upload Pending Sales Data
+                </h4>
+              </div>
+              <form id="form_upload_pending_sales_status" method="POST" action="<?php echo base_url();?>index.php/distributor_out/upload_pending_sales_data_file" class="form-horizontal excelform" enctype="multipart/form-data">
                 <div class="modal-body">
                   <div class="form-group">
 

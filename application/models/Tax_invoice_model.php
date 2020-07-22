@@ -2137,6 +2137,12 @@ function get_final_data($check, $sales_rep_id, $for_invoice=false){
                     } else {
                         $data['gst_number']='';
                     }
+
+                    if(isset($con_gst_number)) {
+                        if($con_gst_number!='') {
+                            $data['gst_number']=$con_gst_number;
+                        }
+                    }
                 } else {
                     $data['distributor_name']=$distributor_name;
                     $data['address']=$address;
@@ -2166,6 +2172,12 @@ function get_final_data($check, $sales_rep_id, $for_invoice=false){
                     $data['state']=$state;
                     $data['state_code']=$state_code;
                     $data['gst_number']=$gst_number;
+
+                    if(isset($con_gst_number)) {
+                        if($con_gst_number!='') {
+                            $data['gst_number']=$con_gst_number;
+                        }
+                    }
                 }
 
                 if($shipping_address!='no'){
@@ -2174,6 +2186,12 @@ function get_final_data($check, $sales_rep_id, $for_invoice=false){
                     $data['con_state']=$data['state'];
                     $data['con_state_code']=$data['state_code'];
                     $data['con_gst_number']=$data['gst_number'];
+
+                    if(isset($con_gst_number)) {
+                        if($con_gst_number!='') {
+                            $data['con_gst_number']=$con_gst_number;
+                        }
+                    }
                 }
                 
                 $voucher_details[$vou_cnt] = $data;
@@ -2251,6 +2269,12 @@ function get_final_data($check, $sales_rep_id, $for_invoice=false){
                     } else {
                         $data['gst_number']='';
                     }
+
+                    if(isset($con_gst_number)) {
+                        if($con_gst_number!='') {
+                            $data['gst_number']=$con_gst_number;
+                        }
+                    }
                 } else {
                     $data['distributor_name']=$distributor_name;
                     $data['address']=$address;
@@ -2265,6 +2289,12 @@ function get_final_data($check, $sales_rep_id, $for_invoice=false){
                     $data['con_state']=$data['state'];
                     $data['con_state_code']=$data['state_code'];
                     $data['con_gst_number']=$data['gst_number'];
+
+                    if(isset($con_gst_number)) {
+                        if($con_gst_number!='') {
+                            $data['con_gst_number']=$con_gst_number;
+                        }
+                    }
                 }
 
                 $invoice_details[$inv_cnt] = $data;

@@ -262,6 +262,9 @@
                     <li class="sub_menu--item" <?php if ($Box==0) echo 'style="display: none;"'; ?>>
                         <a href="<?php echo base_url().'index.php/Box'; ?>" class="sub_menu--link">Box</a>
                     </li>
+                    <li class="sub_menu--item" <?php if ($Box==0) echo 'style="display: none;"'; ?>>
+                        <a href="<?php echo base_url().'index.php/Combo_box'; ?>" class="sub_menu--link">Combo Box</a>
+                    </li>
                     <li class="sub_menu--item" <?php if ($Ingredient_Master==0) echo 'style="display: none;"'; ?>>
                         <a href="<?php echo base_url().'index.php/ingredients_master'; ?>" class="sub_menu--link">Ingredients Master</a>
                     </li>
@@ -429,6 +432,9 @@
                     <li class="sub_menu--item" <?php if ($Distributor_Out==0) echo 'style="display: none;"'; ?>>
                         <a href="<?php echo base_url().'index.php/Sales_upload'; ?>" class="sub_menu--link"> Sales Upload </a>
                     </li>
+                    <li class="sub_menu--item" <?php if ($this->session->userdata('role_id')!=1) echo 'style="display: none;"'; ?>>
+                        <a href="<?php echo base_url().'index.php/Sales_return_upload'; ?>" class="sub_menu--link"> Sales Return Upload </a>
+                    </li>
                 </ul>
 
                 <li class="menu--item  menu--item__has_sub_menu1 main-submenu-3"> 
@@ -461,6 +467,12 @@
                     </li>
                     <li  class="sub_menu--item"  <?php if ($Payment==0) echo 'style="display: none;"'; ?>>
                         <a class="sub_menu--link" href="<?php echo base_url().'index.php/Payment_upload'; ?>"> Payment Upload</a>
+                    </li>
+                    <li  class="sub_menu--item"  <?php if ($Payment==0) echo 'style="display: none;"'; ?>>
+                        <a class="sub_menu--link" href="<?php echo base_url().'index.php/Order/sodexo'; ?>"> Sodexo Details</a>
+                    </li>
+                    <li  class="sub_menu--item"  <?php if ($Payment==0) echo 'style="display: none;"'; ?>>
+                        <a class="sub_menu--link" href="<?php echo base_url().'index.php/Order/sodexo_upload_files'; ?>"> Sodexo Upload Files</a>
                     </li>
                 </ul>
 

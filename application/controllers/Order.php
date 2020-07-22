@@ -16,6 +16,7 @@ class Order extends CI_Controller{
         $this->load->model('order_model');
         $this->load->model('box_model');
         $this->load->model('product_model');
+        $this->load->model('payment_model');
         $this->load->database();
     }
 
@@ -202,6 +203,24 @@ class Order extends CI_Controller{
         return $response;
     }
 
+    public function sodexo(){
+        $result=$this->payment_model->get_access();
+        if(count($result)>0) {
+            $curusr = $this->session->userdata('session_id');
+
+            $data['access']=$result;
+
+            $sql = "select * from sodexo_transaction order by modified_on desc";
+            $data['data']=$this->db->query($sql)->result();
+
+            load_view('order/sodexo_list', $data);
+
+        } else {
+            echo '<script>alert("You donot have access to this page.");</script>';
+            $this->load->view('login/main_page');
+        }
+    }
+
     function callAPI($method, $url, $data){
         $curl = curl_init();
         switch ($method){
@@ -222,13 +241,28 @@ class Order extends CI_Controller{
         // OPTIONS:
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-            'APIKEY: S4Dl7fXu18jlc7cSbfXWHBlhKvpcd2x6ba0r1JWuRfioJbTdASRmLtARquU270v5',
+            'APIKEY: hlaSKUbnU9XWXTFaFhtPVHd0Hx6NQzYYNv0hQNTwUeDirXymcOSpEiuUXK4GGAGi',
             'Content-Type: application/json',
         ));
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+
+        // echo json_encode($curl);
+        // echo '<br/><br/>';
+        // echo $curl;
+        // echo '<br/><br/>';
+
+        $info = curl_getinfo($curl);
+        // echo json_encode($info);
+        // echo '<br/><br/>';
+
         // EXECUTE:
         $result = curl_exec($curl);
+
+        $info = curl_getinfo($curl);
+        // echo json_encode($info);
+        // echo '<br/><br/>';
+
         if(!$result) {
             die("Connection Failure");
         }
@@ -237,20 +271,27 @@ class Order extends CI_Controller{
     }
 
     public function set_transaction($request_id="", $amount=0, $mobile_no="", $email_id="") {
-        // $email_id = "prasadb0910@gmail.com";
-        // echo $email_id;
-        // echo '<br/><br/>';
+        $now=date('Y-m-d H:i:s');
 
-        // $email_id = urlencode($email_id);
-        // echo $email_id;
-        // echo '<br/><br/>';
+        if($mobile_no!=""){
+            $mobile_no = urldecode($mobile_no);
+            $mobile_no = str_replace('+91', '', $mobile_no);
+            $mobile_no = str_replace(' ', '', $mobile_no);
+            // echo $mobile_no;
+            // echo '<br/><br/>';
+        }
 
-        $email_id = urldecode($email_id);
-        // echo $email_id;
-        // echo '<br/><br/>';
+        if($email_id!=""){
+            $email_id = urldecode($email_id);
+            // echo $email_id;
+            // echo '<br/><br/>';
+        }
+
+        $amount = str_replace(',', '', $amount);
+        
 
         $amount_arr = array("currency"=>"INR", "value"=>$amount);
-        $merchantInfo = array("aid"=>"201712", "mid"=>"092010001058419", "tid"=>"92128093");
+        $merchantInfo = array("aid"=>"201712", "mid"=>"092010001124019", "tid"=>"92198782");
         $purposes = array(array("purpose"=>"FOOD", "amount"=>$amount_arr));
         // $purposes = array("purpose"=>"FOOD", "amount"=>$amount);
 
@@ -262,15 +303,15 @@ class Order extends CI_Controller{
         
         $source_id = "";
 
-        if($mobile_no!="" && $mobile_no!=0 && $mobile_no!=null && $email_id!="" && $email_id!=0 && $email_id!=null) {
+        if($mobile_no!="" && $mobile_no!="0" && $mobile_no!=null && $email_id!="" && $email_id!="0" && $email_id!=null) {
             $sql = "select * from sodexo_source_id where mobile_no = '$mobile_no' and email_id = '$email_id'";
             $result = $this->db->query($sql)->result();
             if(count($result)>0) {
                 if(isset($result[0]->source_id)) $source_id = $result[0]->source_id;
             }
         }
-        if($source_id=="" || $source_id==0 || $source_id==null) {
-            if($mobile_no!="" && $mobile_no!=0 && $mobile_no!=null) {
+        if($source_id=="" || $source_id=="0" || $source_id==null) {
+            if($mobile_no!="" && $mobile_no!="0" && $mobile_no!=null) {
                 $sql = "select * from sodexo_source_id where mobile_no = '$mobile_no'";
                 $result = $this->db->query($sql)->result();
                 if(count($result)>0) {
@@ -278,8 +319,8 @@ class Order extends CI_Controller{
                 }
             }
         }
-        if($source_id=="" || $source_id==0 || $source_id==null) {
-            if($email_id!="" && $email_id!=0 && $email_id!=null) {
+        if($source_id=="" || $source_id=="0" || $source_id==null) {
+            if($email_id!="" && $email_id!="0" && $email_id!=null) {
                 $sql = "select * from sodexo_source_id where email_id = '$email_id'";
                 $result = $this->db->query($sql)->result();
                 if(count($result)>0) {
@@ -288,16 +329,46 @@ class Order extends CI_Controller{
             }
         }
 
+        $new_request_id = $request_id;
+        $id = '';
+
+        $sql = "select * from sodexo_transaction where request_id = '$request_id' and transaction_state <> 'AUTHORIZED'";
+        $result = $this->db->query($sql)->result();
+        if(count($result)>0) {
+            $id = $result[0]->id;
+
+            if(isset($result[0]->counter)) {
+                $counter = intval($result[0]->counter);
+            } else {
+                $counter = 0;
+            }
+
+            $counter = $counter + 1;
+
+            $data = array("counter"=>$counter);
+
+            $this->db->where('request_id', $request_id);
+            $this->db->update('sodexo_transaction', $data);
+
+            $new_request_id = $request_id.'-'.$counter;
+            $data = array("request_id"=>$request_id,
+                            "counter"=>$counter,
+                            "new_request_id"=>$new_request_id,
+                            "created_on" => $now,
+                            "modified_on" => $now);
+            $this->db->insert('sodexo_request_id', $data);
+        }
+
         if($source_id!="") {
-            $data = array("requestId"=>$request_id,
+            $data = array("requestId"=>$new_request_id,
                             "sourceId"=>$source_id,
                             "amount"=>$amount_arr,
                             "merchantInfo"=>$merchantInfo,
                             "purposes"=>$purposes,
-                            "failureUrl"=>base_url()."index.php/Order/failed/".$request_id,
-                            "successUrl"=>base_url()."index.php/Order/success/".$request_id);
+                            "failureUrl"=>base_url()."index.php/Order/failed",
+                            "successUrl"=>base_url()."index.php/Order/success");
         } else {
-            $data = array("requestId"=>$request_id,
+            $data = array("requestId"=>$new_request_id,
                             // "sourceId"=>$source_id,
                             "amount"=>$amount_arr,
                             "merchantInfo"=>$merchantInfo,
@@ -310,7 +381,7 @@ class Order extends CI_Controller{
         // echo $data;
         // echo '<br/><br/>';
 
-        $result = $this->callAPI("POST", "https://pay-gw.preprod.zeta.in/v1.0/sodexo/transactions", $data);
+        $result = $this->callAPI("POST", "https://pay.gw.zetapay.in/v1.0/sodexo/transactions", $data);
         // echo $result;
         // echo '<br/><br/>';
 
@@ -327,7 +398,7 @@ class Order extends CI_Controller{
             $transaction_state = $result->transactionState;
         }
         if(isset($result->sourceId)) {
-            if($result->sourceId!='' && $result->sourceId!=0 && $result->sourceId!=null){
+            if($result->sourceId!='' && $result->sourceId!="0" && $result->sourceId!=null){
                 if($source_id != $result->sourceId) {
                     $this->set_source_id($source_id, $mobile_no, $email_id);
                 }
@@ -337,29 +408,32 @@ class Order extends CI_Controller{
             $redirect_user_to = $result->redirectUserTo;
         }
 
-        $now=date('Y-m-d H:i:s');
-
-        $data = array(
-            'request_id' => $request_id,
-            'amount' => $amount,
-            'mobile_no' => $mobile_no,
-            'email_id' => $email_id,
-            'source_id' => $source_id,
-            'transaction_id' => $transaction_id,
-            'transaction_state' => $transaction_state,
-            'redirect_user_to' => $redirect_user_to,
-            'created_on' => $now,
-            'modified_on' => $now
-        );
-
-        // echo json_encode($data);
-        // echo '<br/><br/>';
-
-        $this->db->insert('sodexo_transaction', $data);
-
         if($redirect_user_to==""){
-            redirect(base_url().'index.php/failed');
+            redirect('https://eatanytime.in/pages/payment-failed', 'refresh');
         } else {
+            $data = array(
+                'request_id' => $request_id,
+                'amount' => $amount,
+                'mobile_no' => $mobile_no,
+                'email_id' => $email_id,
+                'source_id' => $source_id,
+                'transaction_id' => $transaction_id,
+                'transaction_state' => $transaction_state,
+                'redirect_user_to' => $redirect_user_to,
+                'modified_on' => $now
+            );
+
+            // echo json_encode($data);
+            // echo '<br/><br/>';
+
+            if($id=='') {
+                $data['created_on'] = $now;
+                $this->db->insert('sodexo_transaction', $data);
+            } else {
+                $this->db->where('id', $id);
+                $this->db->update('sodexo_transaction', $data);
+            }
+            
             redirect($redirect_user_to, 'refresh');
         }
     }
@@ -368,10 +442,21 @@ class Order extends CI_Controller{
         $reason = $this->input->get('reason');
         $request_id = $this->input->get('q');
 
-        // $request_id = 'Request134';
+        // $request_id = 'Request201';
+        // echo $request_id;
+        // echo '<br/><br/>';
+        // $request_id = base64_encode($request_id);
+        // echo $request_id;
+        // echo '<br/><br/>';
+        // $request_id = base64_decode($request_id);
+        // echo $request_id;
+        // echo '<br/><br/>';
 
         $this->get_transaction($request_id);
-        echo 'Transaction Successfull.';
+
+        // echo 'Transaction Successfull.';
+
+        redirect('https://eatanytime.in/pages/payment-successful', 'refresh');
     }
 
     public function failed() {
@@ -383,12 +468,15 @@ class Order extends CI_Controller{
         // echo $request_id;
         // echo '<br/><br/>';
 
-        $this->get_transaction($request_id);
-        echo 'Transaction Failed';
+        $this->get_transaction($request_id, $reason);
+
+        // echo 'Transaction Failed';
+
+        redirect('https://eatanytime.in/pages/payment-failed', 'refresh');
     }
 
-    public function get_transaction($request_id="") {
-        $result = $this->callAPI("GET", "https://pay-gw.preprod.zeta.in/v1.0/sodexo/transactions/request_id/".$request_id, '');
+    public function get_transaction($request_id="", $reason="") {
+        $result = $this->callAPI("GET", "https://pay.gw.zetapay.in/v1.0/sodexo/transactions/request_id/".$request_id, '');
         // echo $result;
         // echo '<br/><br/>';
 
@@ -427,6 +515,9 @@ class Order extends CI_Controller{
         }
         if(isset($result->failureReason)) {
             $failure_reason = $result->failureReason;
+        }
+        if($failure_reason==""){
+            $failure_reason = $reason;
         }
         if(isset($result->sourceId)) {
             $source_id = $result->sourceId;
@@ -502,47 +593,120 @@ class Order extends CI_Controller{
                     'modified_on'=>$now
                 );
 
+        $id = '';
+
         $sql = "select * from sodexo_transaction where request_id = '$request_id'";
         $result = $this->db->query($sql)->result();
         if(count($result)>0) {
+            $id = $result[0]->id;
+            $request_id = $result[0]->request_id;
+            $mobile_no = $result[0]->mobile_no;
+            $email_id = $result[0]->email_id;
+        } else {
+            $sql = "select * from sodexo_request_id where request_id = '$request_id' or new_request_id = '$request_id'";
+            $result = $this->db->query($sql)->result();
+            if(count($result)>0) {
+                $request_id = $result[0]->request_id;
+
+                $sql = "update sodexo_request_id set status='".$transaction_state."', modified_on='".$now."' where id = '".$result[0]->id."'";
+                $this->db->query($sql);
+
+                $sql = "select * from sodexo_transaction where request_id = '$request_id'";
+                $result = $this->db->query($sql)->result();
+                if(count($result)>0) {
+                    $id = $result[0]->id;
+                    $request_id = $result[0]->request_id;
+                    $mobile_no = $result[0]->mobile_no;
+                    $email_id = $result[0]->email_id;
+                }
+            }
+        }
+
+        if($id!='') {
             // echo $source_id;
+            // echo '<br/><br/>';
+            // echo $mobile_no;
+            // echo '<br/><br/>';
+            // echo $email_id;
             // echo '<br/><br/>';
             // echo json_encode($result);
             // echo '<br/><br/>';
 
-            $this->db->where('request_id', $request_id);
+            $this->db->where('id', $id);
             $this->db->update('sodexo_transaction', $data);
 
-            // echo $result[0]->source_id;
-            // echo '<br/><br/>';
-
-            if(isset($result[0]->source_id)) {
-                // echo $result[0]->source_id;
-                // echo '<br/><br/>';
-
-                if($source_id!=''){
-                    $mobile_no = $result[0]->mobile_no;
-                    $email_id = $result[0]->email_id;
-
-                    // echo $source_id;
-                    // echo '<br/><br/>';
-                    // echo $mobile_no;
-                    // echo '<br/><br/>';
-                    // echo $email_id;
-                    // echo '<br/><br/>';
-
-                    if($mobile_no!='' || $email_id!='') {
-                        $this->set_source_id($source_id, $mobile_no, $email_id);
-                    }
+            if($source_id!=''){
+                if($mobile_no!='' || $email_id!='') {
+                    $this->set_source_id($source_id, $mobile_no, $email_id);
                 }
             }
+
+            // $email_id = $result[0]->email_id;
+            // if($email_id!='') {
+            //     $this->send_email($email_id, $request_id, $authorised_amount);
+            // }
+
         } else {
+            // echo $source_id;
+            // echo '<br/><br/>';
+            // echo $mobile_no;
+            // echo '<br/><br/>';
+            // echo $email_id;
+            // echo '<br/><br/>';
+            // echo json_encode($result);
+            // echo '<br/><br/>';
+
             $data['request_id'] = $request_id;
             $data['amount'] = $amount;
-            $data['redirect_user_to'] = "https://pay-gw.preprod.zeta.in/z-sodexo/transactions/initiate?q=".$transaction_id;
+            $data['redirect_user_to'] = "https://pay.gw.zetapay.in/v1.0/sodexo/transactions/initiate?q=".$transaction_id;
             $data['created_on'] = $now;
+
+            // echo json_encode($data);
+            // echo '<br/><br/>';
+
             $this->db->insert('sodexo_transaction', $data);
         }
+    }
+
+    public function send_email($email_to, $request_id, $amount) {
+        // $now=date('Y-m-d H:i:s');
+        // $curusr=$this->session->userdata('session_id');
+        $login_name = $this->session->userdata('login_name');
+        
+        // $email_ref_id = '';
+        // $email_type = 'distributor_po_mismatch';
+        $email_from = 'orders@eatanytime.in';
+        $email_sender = 'Wholesome Habits Pvt Ltd';
+        $email_to = 'prasad.bhisale@otbconsulting.co.in';
+        $email_cc = 'prasad.bhisale@otbconsulting.co.in';
+        $email_bcc = 'prasad.bhisale@otbconsulting.co.in';
+        $email_subject = 'Order Details';
+        $email_body = 'Hi, Order No '.$request_id.' for amount '.$amount.' is processed successfully.';
+        
+        // $email_cc = 'dhaval.maru@otbconsulting.co.in';
+
+        $message = '<html>
+                        <head>
+                        <style type="text/css">
+                            pre {
+                                font: small/1.5 Arial,Helvetica,sans-serif;
+                            }
+                        </style>
+                        </head>
+                        <body><pre>'.$email_body.'</pre><br/><br/>
+                        Team EAT Anytime<br/><br/>'.ucwords(trim($login_name)).'
+                        </body>
+                        </html>';
+
+        $mailSent=send_email_new($email_from, $email_sender, $email_to, $email_subject, $message, $email_bcc, $email_cc);
+
+        if($mailSent==1){
+            $status = 1;
+        } else {
+            $status = 0;
+        }
+
+        return $status;
     }
 
     public function set_source_id($source_id="", $mobile_no="", $email_id="") {
@@ -558,7 +722,7 @@ class Order extends CI_Controller{
             $id = 0;
             $sourceId = '';
 
-            if($mobile_no!="" && $mobile_no!=0 && $mobile_no!=null && $email_id!="" && $email_id!=0 && $email_id!=null) {
+            if($mobile_no!="" && $mobile_no!="0" && $mobile_no!=null && $email_id!="" && $email_id!="0" && $email_id!=null) {
                 $sql = "select * from sodexo_source_id where mobile_no = '$mobile_no' and email_id = '$email_id'";
                 $result = $this->db->query($sql)->result();
                 if(count($result)>0) {
@@ -569,8 +733,8 @@ class Order extends CI_Controller{
                     }
                 }
             }
-            if($id=="" || $id==0 || $id==null || $blFlag==false) {
-                if($mobile_no!="" && $mobile_no!=0 && $mobile_no!=null) {
+            if($id=="" || $id=="0" || $id==null || $blFlag==false) {
+                if($mobile_no!="" && $mobile_no!="0" && $mobile_no!=null) {
                     $sql = "select * from sodexo_source_id where mobile_no = '$mobile_no'";
                     $result = $this->db->query($sql)->result();
                     if(count($result)>0) {
@@ -582,8 +746,8 @@ class Order extends CI_Controller{
                     }
                 }
             }
-            if($id=="" || $id==0 || $id==null || $blFlag==false) {
-                if($email_id!="" && $email_id!=0 && $email_id!=null) {
+            if($id=="" || $id=="0" || $id==null || $blFlag==false) {
+                if($email_id!="" && $email_id!="0" && $email_id!=null) {
                     $sql = "select * from sodexo_source_id where email_id = '$email_id'";
                     $result = $this->db->query($sql)->result();
                     if(count($result)>0) {
@@ -596,7 +760,7 @@ class Order extends CI_Controller{
                 }
             }
 
-            // echo $sourceId;
+            // echo $id;
             // echo '<br/><br/>';
             // echo $source_id;
             // echo '<br/><br/>';
@@ -605,30 +769,58 @@ class Order extends CI_Controller{
             // echo $email_id;
             // echo '<br/><br/>';
 
-            if(($mobile_no!="" && $mobile_no!=0 && $mobile_no!=null) || ($email_id!="" && $email_id!=0 && $email_id!=null)) {
-                if($sourceId!=$source_id) {
-                    $now=date('Y-m-d H:i:s');
-                    
-                    $data = array(
-                                'source_id'=>$source_id,
-                                'modified_on'=>$now
-                            );
+            if(isset($mobile_no) || isset($email_id)) {
+                if(($mobile_no!="" && $mobile_no!="0") || ($email_id!="" && $email_id!="0")) {
+                    if($sourceId!=$source_id) {
+                        $now=date('Y-m-d H:i:s');
+                        
+                        $data = array(
+                                    'source_id'=>$source_id,
+                                    'modified_on'=>$now
+                                );
 
-                    // echo json_encode($data);
-                    // echo '<br/><br/>';
+                        // echo json_encode($data);
+                        // echo '<br/><br/>';
 
-                    if($id!="" && $id!=0 && $id!=null && $blFlag==true) {
-                        $this->db->where('id', $id);
-                        $this->db->update('sodexo_source_id', $data);
-                    } else {
-                        $data['mobile_no'] = $mobile_no;
-                        $data['email_id'] = $email_id;
-                        $data['created_on'] = $now;
-                        $this->db->insert('sodexo_source_id', $data);
+                        if($id!="" && $id!="0" && $id!=null && $blFlag==true) {
+                            // echo 'Update';
+                            // echo '<br/><br/>';
+                            $this->db->where('id', $id);
+                            $this->db->update('sodexo_source_id', $data);
+                        } else {
+                            // echo 'Insert';
+                            // echo '<br/><br/>';
+                            $data['mobile_no'] = $mobile_no;
+                            $data['email_id'] = $email_id;
+                            $data['created_on'] = $now;
+                            $this->db->insert('sodexo_source_id', $data);
+                        }
                     }
                 }
             }
         }
+    }
+
+    public function sodexo_upload_files(){
+        $result=$this->payment_model->get_access();
+        if(count($result)>0) {
+            $curusr = $this->session->userdata('session_id');
+
+            $data['access']=$result;
+
+            $sql = "select * from sodexo_upload_files order by modified_on desc";
+            $data['data']=$this->db->query($sql)->result();
+
+            load_view('order/sodexo_upload_files', $data);
+
+        } else {
+            echo '<script>alert("You donot have access to this page.");</script>';
+            $this->load->view('login/main_page');
+        }
+    }
+
+    public function send_sodexo_upload_file() {
+        $this->order_model->send_sodexo_upload_file();
     }
 }
 ?>

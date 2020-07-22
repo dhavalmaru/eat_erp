@@ -1028,6 +1028,10 @@ class Export extends CI_Controller {
        echo $result;
     }
     
+    public function send_product_stock_report() {
+        $this->export_model->send_product_stock_report();
+    }
+    
     public function send_mt_stock_tracker() {
         $this->export_model->send_mt_stock_tracker();
     }

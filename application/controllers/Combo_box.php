@@ -4,7 +4,7 @@
  */
 if ( ! defined('BASEPATH')) {exit('No direct script access allowed');}
 
-class Box extends CI_Controller{
+class Combo_box extends CI_Controller{
 
     public function __construct(){
         parent::__construct();
@@ -13,20 +13,21 @@ class Box extends CI_Controller{
         $this->load->library('session');
         $this->load->library('email');
         $this->load->helper('common_functions');
-        $this->load->model('box_model');
+        $this->load->model('combo_box_model');
         $this->load->model('product_model');
+        $this->load->model('box_model');
         $this->load->model('category_master_model','category');
         $this->load->database();
     }
 
     //index function
     public function index(){
-        $result=$this->box_model->get_access();
+        $result=$this->combo_box_model->get_access();
         if(count($result)>0) {
             $data['access']=$result;
-            $data['data'] = $this->box_model->get_data();
+            $data['data'] = $this->combo_box_model->get_data();
 
-            load_view('box/box_list', $data);
+            load_view('combo_box/combo_box_list', $data);
         } else {
             echo '<script>alert("You donot have access to this page.");</script>';
             $this->load->view('login/main_page');
@@ -37,11 +38,11 @@ class Box extends CI_Controller{
         $id=$this->input->post('id');
         // $id=1;
 
-        $result=$this->box_model->get_data('', $id);
+        $result=$this->combo_box_model->get_data('', $id);
         $data['result'] = 0;
         if(count($result)>0) {
             $data['result'] = 1;
-            $data['box_name'] = $result[0]->box_name;
+            $data['combo_box_name'] = $result[0]->combo_box_name;
             $data['barcode'] = $result[0]->barcode;
             $data['grams'] = $result[0]->grams;
             $data['rate'] = $result[0]->rate;
@@ -51,17 +52,17 @@ class Box extends CI_Controller{
         echo json_encode($data);
     }
 
-    public function get_products(){
+    public function get_items(){
         $id=$this->input->post('id');
         // $id=1;
 
-        $result=$this->box_model->get_box_product($id);
+        $result=$this->combo_box_model->get_combo_box_items($id);
         $data['result'] = 0;
         if(count($result)>0) {
             $data['result'] = 1;
             for($i=0; $i<count($result); $i++){
-                $data['product'][$i]=$result[$i]->product_id;
-                $data['product_name'][$i]=$result[$i]->product_name;
+                $data['item_id'][$i]=$result[$i]->item_id;
+                $data['item_name'][$i]=$result[$i]->item_name;
                 $data['qty'][$i]=$result[$i]->qty;
             }
         }
@@ -70,14 +71,15 @@ class Box extends CI_Controller{
     }
 
     public function add(){
-        $result=$this->box_model->get_access();
+        $result=$this->combo_box_model->get_access();
         if(count($result)>0) {
             if($result[0]->r_insert == 1) {
-                $data['access'] = $this->box_model->get_access();
-                $data['product'] = $this->product_model->get_data('Approved');
+                $data['access'] = $this->combo_box_model->get_access();
+                $data['bar'] = $this->product_model->get_data('Approved');
+                $data['box'] = $this->box_model->get_data('Approved');
                 $data['category_detail']=$this->category->getCategoryDetails();
 
-                load_view('box/box_details', $data);
+                load_view('combo_box/combo_box_details', $data);
             } else {
                 echo "Unauthorized access";
             }
@@ -88,15 +90,16 @@ class Box extends CI_Controller{
     }
 
     public function edit($id){
-        $result=$this->box_model->get_access();
+        $result=$this->combo_box_model->get_access();
         if(count($result)>0) {
             if($result[0]->r_view == 1 || $result[0]->r_edit == 1) {
-                $data['access'] = $this->box_model->get_access();
-                $data['product'] = $this->product_model->get_data('Approved');
-                $data['data'] = $this->box_model->get_data('', $id);
-                $data['box_products'] = $this->box_model->get_box_product($id);
+                $data['access'] = $this->combo_box_model->get_access();
+                $data['bar'] = $this->product_model->get_data('Approved');
+                $data['box'] = $this->box_model->get_data('Approved');
+                $data['data'] = $this->combo_box_model->get_data('', $id);
+                $data['combo_box_items'] = $this->combo_box_model->get_combo_box_items($id);
                 $data['category_detail']=$this->category->getCategoryDetails();
-                load_view('box/box_details', $data);
+                load_view('combo_box/combo_box_details', $data);
             } else {
                 echo "Unauthorized access";
             }
@@ -107,27 +110,27 @@ class Box extends CI_Controller{
     }
 
     public function save(){
-        $this->box_model->save_data();
-        redirect(base_url().'index.php/box');
+        $this->combo_box_model->save_data();
+        redirect(base_url().'index.php/combo_box');
     }
 
     public function update($id){
-        $this->box_model->save_data($id);
-        redirect(base_url().'index.php/box');
+        $this->combo_box_model->save_data($id);
+        redirect(base_url().'index.php/combo_box');
     }
 
-    public function check_box_name_availablity(){
-        $result = $this->box_model->check_box_name_availablity();
+    public function check_combo_box_name_availablity(){
+        $result = $this->combo_box_model->check_combo_box_name_availablity();
         echo $result;
     }
     
     public function check_barcode_availablity(){
-        $result = $this->box_model->check_barcode_availablity();
+        $result = $this->combo_box_model->check_barcode_availablity();
         echo $result;
     }
     
     public function check_sku_code_availablity(){
-        $result = $this->box_model->check_sku_code_availablity();
+        $result = $this->combo_box_model->check_sku_code_availablity();
         echo $result;
     }
     

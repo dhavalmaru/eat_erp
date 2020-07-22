@@ -5752,9 +5752,16 @@ function get_product_stock_details($from_date, $to_date) {
     return $result;
 }
 
-function generate_product_stock_report() {
-    $from_date = formatdate($this->input->post('from_date'));
-    $to_date = formatdate($this->input->post('to_date'));
+function generate_product_stock_report($action='') {
+    $from_date = '2001-01-01';
+    $to_date = date('Y-m-d');
+
+    if($this->input->post('from_date')!='') {
+        $from_date = formatdate($this->input->post('from_date'));
+    }
+    if($this->input->post('from_date')!='') {
+        $to_date = formatdate($this->input->post('to_date'));
+    }
     $data = $this->get_product_stock_details($from_date, $to_date);
     if(count($data)>0) {
         $template_path=$this->config->item('template_path');
@@ -5771,15 +5778,17 @@ function generate_product_stock_report() {
 
         $col=0;
 
+        $tr = '<tr style="font-weight: bold;"><td>State</td><td>City</td><td>Depot Name</td><td>Type</td><td>Product</td><td>Unit Weight</td><td>Opening Qty</td><td>Production Qty</td><td>Depot In Qty</td><td>Depot Out Qty</td><td>Sale Qty</td><td>Sample Qty</td><td>Expire Qty</td><td>Sale Return Qty</td><td>Convert Out Qty</td><td>Convert In Qty</td><td>Closing Balance</td><td>Pending Qty</td><td>Physical Qty</td></tr>';
+
 		$objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row1, "Wholesome Habits Private Limited ");
 		$row1=$row1+1;
 		$objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row1, "Product Stock Report");
 	  	$row1=$row1+1;
 		
-			$from_date1=date("d-M-y", strtotime($from_date));
-			
-			$to_date1=date("d-M-y", strtotime($to_date));
-		  $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row1, $from_date1.' to '. $to_date1) ;
+        $from_date1=date("d-M-y", strtotime($from_date));
+
+        $to_date1=date("d-M-y", strtotime($to_date));
+        $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col].$row1, $from_date1.' to '. $to_date1) ;
 
         for($i=0; $i<count($data); $i++){
             $row=$row+1;
@@ -5802,6 +5811,28 @@ function generate_product_stock_report() {
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+16].$row, '=+'.$col_name[$col+6].$row.'+'.$col_name[$col+7].$row.'+'.$col_name[$col+8].$row.'-'.$col_name[$col+9].$row.'-'.$col_name[$col+10].$row.'-'.$col_name[$col+11].$row.'-'.$col_name[$col+12].$row.'+'.$col_name[$col+13].$row.'-'.$col_name[$col+14].$row.'+'.$col_name[$col+15].$row);
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+17].$row, $data[$i]->del_pending_qty);
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col+18].$row, '=+'.$col_name[$col+16].$row.'+'.$col_name[$col+17].$row);
+
+            $tr = $tr . '<tr>
+                            <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col].$row)->getCalculatedValue().'</td>
+                            <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col+1].$row)->getCalculatedValue().'</td>
+                            <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col+2].$row)->getCalculatedValue().'</td>
+                            <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col+3].$row)->getCalculatedValue().'</td>
+                            <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col+4].$row)->getCalculatedValue().'</td>
+                            <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col+5].$row)->getCalculatedValue().'</td>
+                            <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col+6].$row)->getCalculatedValue().'</td>
+                            <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col+7].$row)->getCalculatedValue().'</td>
+                            <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col+8].$row)->getCalculatedValue().'</td>
+                            <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col+9].$row)->getCalculatedValue().'</td>
+                            <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col+10].$row)->getCalculatedValue().'</td>
+                            <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col+11].$row)->getCalculatedValue().'</td>
+                            <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col+12].$row)->getCalculatedValue().'</td>
+                            <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col+13].$row)->getCalculatedValue().'</td>
+                            <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col+14].$row)->getCalculatedValue().'</td>
+                            <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col+15].$row)->getCalculatedValue().'</td>
+                            <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col+16].$row)->getCalculatedValue().'</td>
+                            <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col+17].$row)->getCalculatedValue().'</td>
+                            <td>'.$objPHPExcel->getActiveSheet()->getCell($col_name[$col+18].$row)->getCalculatedValue().'</td>
+                        </tr>';
         }
 
         $objPHPExcel->getActiveSheet()->getStyle('A5:'.$col_name[$col+18].$row)->applyFromArray(array(
@@ -5819,22 +5850,156 @@ function generate_product_stock_report() {
 		$objPHPExcel->getActiveSheet()->getStyle("A1")->getFont()->setBold( true );
 		$objPHPExcel->getActiveSheet()->getStyle("A1")->getFont()->setName('Arial');
 
-		$date1 = date('d-m-Y_H-i-A');
-        $filename='Product_Stock_Report_'.$date1.'.xls';
-       
-        header('Content-Type: application/vnd.ms-excel');
-        header('Content-Disposition: attachment;filename="'.$filename.'"');
-        header('Cache-Control: max-age=0');
-        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
-        $objWriter->save('php://output');
+        $date1 = date('d-m-Y_H-i-A');
+        $filename='Product_Stock_Report_'.$date1.'.xlsx';
+        
+        if($action=="save") {
+            // $path  = '/home/eatangcp/public_html/test/assets/uploads/mt_stock_reports/';
+            // $upload_path = '/home/eatangcp/public_html/test/assets/uploads/mt_stock_reports';
 
-        $logarray['table_id']=$this->session->userdata('session_id');
-        $logarray['module_name']='Reports';
-        $logarray['cnt_name']='Reports';
-        $logarray['action']='Product Stock report generated.';
-        $this->user_access_log_model->insertAccessLog($logarray);
+            // $path  = '/home/eatangcp/public_html/eat_erp/assets/uploads/mt_stock_reports/';
+            // $upload_path = '/home/eatangcp/public_html/eat_erp/assets/uploads/mt_stock_reports';
+
+            // $path  = '/var/www/html/eat_erp/assets/uploads/mt_stock_reports/';
+            // $upload_path = '/var/www/html/eat_erp/assets/uploads/mt_stock_reports';
+
+            // $path  = 'C:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports/';
+            // $upload_path = 'C:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports';
+
+            // $path  = 'E:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports/';
+            // $upload_path = 'E:/wamp64/www/eat_erp/assets/uploads/mt_stock_reports';
+
+
+            $path = $this->config->item('upload_path').'Product_stock_reports/';
+            $upload_path = $this->config->item('upload_path').'Product_stock_reports';
+
+            if(!is_dir($upload_path)) {
+                mkdir($upload_path, 0777, TRUE);
+            }
+
+            $reportpath = $path.$filename;
+
+            // header('Content-Type: application/vnd.ms-excel');
+            // header('Content-Disposition: attachment;filename="'.$filename.'"');
+            // header('Cache-Control: max-age=0');
+
+            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007'); 
+            $objWriter->save($reportpath);
+
+            // echo $reportpath;
+            // echo '<br/><br/>';
+
+            $return_arr = array('reportpath'=>$reportpath, 'tr'=> $tr);
+
+            // return $reportpath;
+            return $return_arr;
+        } else {
+            header('Content-Type: application/openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="'.$filename.'"');
+            header('Cache-Control: max-age=0');
+            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+            $objWriter->save('php://output');
+
+            $logarray['table_id']=$this->session->userdata('session_id');
+            $logarray['module_name']='Reports';
+            $logarray['cnt_name']='Reports';
+            $logarray['action']='Product Stock report generated.';
+            $this->user_access_log_model->insertAccessLog($logarray);
+
+            exit;
+        }
+
     } else {
         echo '<script>alert("No data found");</script>';
+    }
+}
+
+public function send_product_stock_report() {
+    $date = date('Y-m-d');
+    // $date = '2019-07-16';
+
+    $reportpath = '';
+    $tr = '';
+    
+    $return_arr = $this->generate_product_stock_report('save');
+
+    if(isset($return_arr['reportpath'])){
+        $reportpath = $return_arr['reportpath'];
+    }
+    if(isset($return_arr['tr'])){
+        $tr = $return_arr['tr'];
+    }
+
+    if($reportpath!=''){
+        $report_date = date('d-m-Y', strtotime($date));
+
+        $message = '<html>
+                    <head>
+                        <style>
+                            td { padding: 5px; width: 100px; }
+                        </style>
+                    </head>
+                    <body>
+                        <h3>Wholesome Habits Private Limited</h3>
+                        <h4>Product Stock Report</h4>
+                        <p>Reporting Date - '.$report_date.'</p>
+                        <p>PFA</p>
+                        <br/><br/>
+
+                        <table class="body_table" border="1px" style="border-collapse: collapse;">
+                        <tbody>
+                        '.$tr.'
+                        </tbody>
+                        </table>
+
+                        <br/><br/>
+                        Regards,
+                        <br/><br/>
+                        CS
+                    </body>
+                    </html>';
+        $from_email = 'cs@eatanytime.in';
+        $from_email_sender = 'EAT MIS';
+        $subject = 'Product_stock_report_'.$report_date;
+
+
+        /*$to_email = "dhaval.maru@otbconsulting.co.in";
+        $cc="prasad.bhisale@otbconsulting.co.in";
+        $bcc="prasad.bhisale@otbconsulting.co.in";*/
+        
+        // $to_email = "prasad.bhisale@otbconsulting.co.in";
+        // $cc = 'prasad.bhisale@otbconsulting.co.in';
+        // $bcc = 'prasad.bhisale@otbconsulting.co.in';
+
+        // if($zone_email_array[$x]!=''){
+        //     $to_email = "operations@eatanytime.in,priti.tripathi@eatanytime.in,".$zone_email_array[$x];
+        // } else {
+        //     $to_email = "operations@eatanytime.in,priti.tripathi@eatanytime.in";
+        // }
+
+        $to_email = "operations@eatanytime.in, priti.tripathi@eatanytime.in, vaibhav.desai@eatanytime.in, dinesh.parkhi@eatanytime.in";
+        $cc = 'rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, dhaval.maru@otbconsulting.co.in';
+        $bcc = 'prasad.bhisale@otbconsulting.co.in';
+
+        sleep(15);
+
+        echo $attachment = $reportpath;
+        echo '<br/><br/>';
+        echo $message;
+        echo '<br/><br/>';
+
+        $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc, $cc, $attachment);
+
+        echo $mailSent;
+        echo '<br/><br/>';
+
+        if($mailSent==1){
+            $logarray['table_id']=$this->session->userdata('session_id');
+            $logarray['module_name']='Reports';
+            $logarray['cnt_name']='Reports';
+            $logarray['action']='Product Stock report sent.';
+            $this->user_access_log_model->insertAccessLog($logarray);
+        }
     }
 }
 

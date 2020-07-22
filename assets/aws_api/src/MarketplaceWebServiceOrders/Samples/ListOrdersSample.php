@@ -373,6 +373,7 @@ invokeListOrders($service, $request, $request2);
               $ItemAmt = 0;
               $PromotionDiscount = array();
               $PromotionAmt = 0;
+              $a = 0;
 
               if(count($row2)>0) {
                 if(isset($row2[0]->ASIN)) {
@@ -456,12 +457,19 @@ invokeListOrders($service, $request, $request2);
                 $tax_type = 'Inter';
               }
 
+              if(strtoupper(trim($FulfillmentChannel))=='MFN'){
+                $qty = $QuantityOrdered;
+              } else {
+                $qty = $QuantityShipped;
+              }
+              
               $item_id = 0;
+              $item_qty = 0;
               $item_grams = 0;
               $item_rate = 0;
               $item_tax_per = 0;
 
-              $sql = "select * from box_master where asin ='".$ASIN."'";
+              $sql = "select * from combo_box_master where asin ='".$ASIN."'";
               $result = $conn->query($sql);
               if ($result->num_rows > 0) {
                 $row_arr = $result->fetch_all(MYSQLI_ASSOC);
@@ -469,34 +477,120 @@ invokeListOrders($service, $request, $request2);
                 // echo json_encode($row_arr);
                 // echo '<br/><br/>';
 
+                $combo_box_id = 0;
                 if(count($row_arr)>0) {
-                  if(isset($row_arr[0]['id'])) {
-                    $item_id = $row_arr[0]['id'];
-                  }
-                  if(isset($row_arr[0]['grams'])) {
-                    $item_grams = $row_arr[0]['grams'];
-                  }
-                  if(isset($row_arr[0]['rate'])) {
-                    $item_rate = $row_arr[0]['rate'];
-                  }
-                  if(isset($row_arr[0]['tax_percentage'])) {
-                    $item_tax_per = $row_arr[0]['tax_percentage'];
+                  $combo_box_id = $row_arr[0]['id'];
+
+                  $sql = "select A.item_id, A.qty as item_qty, 
+                        case when A.type='Bar' then B.product_name else C.box_name end as item_name, 
+                        case when A.type='Bar' then B.grams else C.grams end as item_grams, 
+                        case when A.type='Bar' then B.rate else C.rate end as item_rate, 
+                        case when A.type='Bar' then B.tax_percentage else C.tax_percentage end as item_tax_per from 
+                        (select * from combo_box_items where combo_box_id = '$combo_box_id') A 
+                        left join 
+                        (select * from product_master) B 
+                        on (A.type='Bar' and A.item_id=B.id) 
+                        left join 
+                        (select * from box_master) C 
+                        on (A.type='Box' and A.item_id=C.id)";
+                  $result2 = $conn->query($sql);
+                  if ($result2->num_rows > 0) {
+                    $row_arr2 = $result2->fetch_all(MYSQLI_ASSOC);
+
+                    // echo json_encode($row_arr2);
+                    // echo '<br/><br/>';
+
+                    $item_id = 0;
+                    $item_qty = 0;
+                    $item_grams = 0;
+                    $item_rate = 0;
+                    $item_tax_per = 0;
+
+                    if(count($row_arr2)>0) {
+                      if(isset($row_arr2[0]['item_id'])) {
+                        $item_id = $row_arr2[0]['item_id'];
+                      }
+                      if(isset($row_arr2[0]['item_qty'])) {
+                        $item_qty = $row_arr2[0]['item_qty'];
+                      }
+                      if(isset($row_arr2[0]['item_grams'])) {
+                        $item_grams = $row_arr2[0]['item_grams'];
+                      }
+                      if(isset($row_arr2[0]['item_rate'])) {
+                        $item_rate = $row_arr2[0]['item_rate'];
+                      }
+                      if(isset($row_arr2[0]['item_tax_per'])) {
+                        $item_tax_per = $row_arr2[0]['item_tax_per'];
+                      }
+                    }
+
+                    $item_qty = $item_qty * $qty;
+
+                    $total_amt = ($item_qty*$item_rate);
+
+                    $total_order_amt = $total_order_amt + $total_amt;
+
+                    $item_data[$a++] = array(
+                                    'distributor_out_id' => 0,
+                                    'type' => 'Box',
+                                    'item_id' => $item_id,
+                                    'qty' => $item_qty,
+                                    'sell_rate' => $item_rate,
+                                    'grams' => $item_grams,
+                                    'rate' => $item_rate,
+                                    'amount' => $total_amt,
+                                    'cgst_amt' => 0,
+                                    'sgst_amt' => 0,
+                                    'igst_amt' => 0,
+                                    'tax_amt' => 0,
+                                    'total_amt' => $total_amt,
+                                    'margin_per' => 0,
+                                    'promo_margin' => 0,
+                                    'tax_percentage' => $item_tax_per,
+                                    'fc_id' => $fc_id,
+                                    'depot_state' => $depot_state,
+                                    'depot_id' => $depot_id,
+                                    'tax_type' => $tax_type,
+                                    'combo_box_id' => $combo_box_id
+                                );
+
+                    $result2->free();
                   }
                 }
+
                 $result->free();
+              } else {
+                $sql = "select * from box_master where asin ='".$ASIN."'";
+                $result = $conn->query($sql);
+                if ($result->num_rows > 0) {
+                  $row_arr = $result->fetch_all(MYSQLI_ASSOC);
+
+                  // echo json_encode($row_arr);
+                  // echo '<br/><br/>';
+
+                  if(count($row_arr)>0) {
+                    if(isset($row_arr[0]['id'])) {
+                      $item_id = $row_arr[0]['id'];
+                    }
+                    if(isset($row_arr[0]['grams'])) {
+                      $item_grams = $row_arr[0]['grams'];
+                    }
+                    if(isset($row_arr[0]['rate'])) {
+                      $item_rate = $row_arr[0]['rate'];
+                    }
+                    if(isset($row_arr[0]['tax_percentage'])) {
+                      $item_tax_per = $row_arr[0]['tax_percentage'];
+                    }
+                  }
+                  $result->free();
+                }
               }
 
               $total_amt = $ItemAmt - $PromotionAmt;
 
-              if(strtoupper(trim($FulfillmentChannel))=='MFN'){
-                $qty = $QuantityOrdered;
-              } else {
-                $qty = $QuantityShipped;
-              }
-              
               $total_order_amt = $total_order_amt + ($qty*$item_rate);
 
-              $item_data[$j] = array(
+              $item_data[$a++] = array(
                               'distributor_out_id' => 0,
                               'type' => 'Box',
                               'item_id' => $item_id,
@@ -516,7 +610,8 @@ invokeListOrders($service, $request, $request2);
                               'fc_id' => $fc_id,
                               'depot_state' => $depot_state,
                               'depot_id' => $depot_id,
-                              'tax_type' => $tax_type
+                              'tax_type' => $tax_type,
+                              'combo_box_id' => 0
                           );
             }
 
@@ -538,6 +633,7 @@ invokeListOrders($service, $request, $request2);
             // echo 'discount_per: '.$discount_per;
             // echo '<br/><br/><br/>';
 
+            $status = 'Approved';
             $tot_amount = 0;
             $tot_cgst_amount = 0;
             $tot_sgst_amount = 0;
@@ -572,6 +668,7 @@ invokeListOrders($service, $request, $request2);
               $depot_state = $item_data[$j]['depot_state'];
               $depot_id = $item_data[$j]['depot_id'];
               $tax_type = $item_data[$j]['tax_type'];
+              $combo_box_id = $item_data[$j]['combo_box_id'];
 
               $sell_rate = $rate - (($rate*$discount_per)/100);
               if($tax_per!=0){
@@ -676,7 +773,8 @@ invokeListOrders($service, $request, $request2);
                               'fc_id' => $fc_id,
                               'depot_state' => $depot_state,
                               'depot_id' => $depot_id,
-                              'tax_type' => $tax_type
+                              'tax_type' => $tax_type,
+                              'combo_box_id' => $combo_box_id
                           );
 
               $tot_order_amount = $order_data[$k]['final_amount'];
@@ -685,10 +783,16 @@ invokeListOrders($service, $request, $request2);
 
               if(strtoupper(trim($FulfillmentChannel))=='MFN') {
                 $depot_id = '2';
-                $round_off_amt = 0;
-                $invoice_amount = 0;
-                $delivery_status='Pending';
-                $delivery_date='Null';
+
+                // $round_off_amt = 0;
+                // $invoice_amount = 0;
+                // $delivery_status='Pending';
+                // $delivery_date='Null';
+
+                $round_off_amt = round(round($tot_order_amount,0) - round($tot_order_amount,2),2);
+                $invoice_amount = round($tot_order_amount,0);
+                $delivery_status = 'Delivered';
+                $delivery_date = "'".$curdate."'";
               } else {
                 if($depot_id==''){
                   $depot_id = '3';
@@ -696,14 +800,18 @@ invokeListOrders($service, $request, $request2);
                 
                 $round_off_amt = round(round($tot_order_amount,0) - round($tot_order_amount,2),2);
                 $invoice_amount = round($tot_order_amount,0);
-                $delivery_status='Delivered';
-                $delivery_date="'".$curdate."'";
+                $delivery_status = 'Delivered';
+                $delivery_date = "'".$curdate."'";
               }
 
               // $round_off_amt = round(round($tot_order_amount,0) - round($tot_order_amount,2),2);
               // $invoice_amount = round($tot_order_amount,0);
               // $delivery_status='Delivered';
               // $delivery_date="'".$curdate."'";
+
+              if($item_id==0){
+                $status = 'Pending';
+              }
 
               $order_data[$k]['date_of_processing'] = $curdate;
               $order_data[$k]['invoice_no'] = '';
@@ -721,7 +829,7 @@ invokeListOrders($service, $request, $request2);
               $order_data[$k]['despatch_doc_no'] = Null;
               $order_data[$k]['despatch_through'] = Null;
               $order_data[$k]['destination'] = Null;
-              $order_data[$k]['status'] = 'Pending';
+              $order_data[$k]['status'] = $status;
               $order_data[$k]['remarks'] = 'This is system generated entry.';
               $order_data[$k]['modified_by'] = $curusr;
               $order_data[$k]['modified_on'] = $now;
@@ -780,6 +888,7 @@ invokeListOrders($service, $request, $request2);
             echo '<br/><br/>';
 
             for($k=0; $k<count($order_data); $k++) {
+              $status = $order_data[$k]['status'];
               $depot_id = $order_data[$k]['depot_id'];
               $distributor_id = $order_data[$k]['distributor_id'];
               $tot_amount = $order_data[$k]['amount'];
@@ -796,7 +905,7 @@ invokeListOrders($service, $request, $request2);
               $item_data = $order_data[$k]['item_data'];
 
               if(strtoupper(trim($FulfillmentChannel))=='MFN' || $invoice_amount>0){
-                $sql = "insert into distributor_out (date_of_processing, invoice_no, depot_id, distributor_id, sales_rep_id, amount, tax, tax_per, tax_amount, final_amount, due_date, order_no, order_date, supplier_ref, despatch_doc_no, despatch_through, destination, status, remarks, modified_by, modified_on, client_name, address, city, pincode, state, country, mobile_no, discount, sample_distributor_id, date_of_dispatch, delivery_status, delivery_date, delivery_sales_rep_id, transport_type, vehicle_number, cgst, sgst, igst, cgst_amount, sgst_amount, igst_amount, reverse_charge, shipping_address, distributor_consignee_id, con_name, con_address, con_city, con_pincode, con_state, con_country, con_state_code, con_gst_number, state_code, round_off_amount, invoice_amount, ref_id, invoice_date, email_date_time, basis_of_sales, email_from, email_approved_by, gstin, created_by, created_on) VALUES ('".$curdate."', '', '".$depot_id."', '".$distributor_id."', Null, ".$tot_amount.", Null, 1, ".$tot_tax_amount.", ".$tot_order_amount.", '".$curdate."', '".$AmazonOrderId."', '".$order_date."', Null, Null, Null, Null, 'Pending', 'This is system generated entry.', '".$curusr."', '".$now."', '".$client_name."', '".$address."', '".$city."', '".$pincode."', '".$state."', '".$country."', '".$phone."', ".$discount_per.", Null, '".$curdate."', '".$delivery_status."', ".$delivery_date.", '".$sales_rep_id."', '', '', 1, 1, 1, ".$tot_cgst_amount.", ".$tot_sgst_amount.", ".$tot_igst_amount.", 'no', 'yes', Null, Null, Null, Null, Null, Null, Null, Null, Null, '".$state_code."', ".$round_off_amt.", ".$invoice_amount.", Null, Null, '".$now."', 'PO Number', '', '', '', '".$curusr."', '".$now."')";
+                $sql = "insert into distributor_out (date_of_processing, invoice_no, depot_id, distributor_id, sales_rep_id, amount, tax, tax_per, tax_amount, final_amount, due_date, order_no, order_date, supplier_ref, despatch_doc_no, despatch_through, destination, status, remarks, modified_by, modified_on, client_name, address, city, pincode, state, country, mobile_no, discount, sample_distributor_id, date_of_dispatch, delivery_status, delivery_date, delivery_sales_rep_id, transport_type, vehicle_number, cgst, sgst, igst, cgst_amount, sgst_amount, igst_amount, reverse_charge, shipping_address, distributor_consignee_id, con_name, con_address, con_city, con_pincode, con_state, con_country, con_state_code, con_gst_number, state_code, round_off_amount, invoice_amount, ref_id, invoice_date, email_date_time, basis_of_sales, email_from, email_approved_by, gstin, created_by, created_on) VALUES ('".$curdate."', '', '".$depot_id."', '".$distributor_id."', Null, ".$tot_amount.", Null, 1, ".$tot_tax_amount.", ".$tot_order_amount.", '".$curdate."', '".$AmazonOrderId."', '".$order_date."', Null, Null, Null, Null, '".$status."', 'This is system generated entry.', '".$curusr."', '".$now."', '".$client_name."', '".$address."', '".$city."', '".$pincode."', '".$state."', '".$country."', '".$phone."', ".$discount_per.", Null, '".$curdate."', '".$delivery_status."', ".$delivery_date.", '".$sales_rep_id."', '', '', 1, 1, 1, ".$tot_cgst_amount.", ".$tot_sgst_amount.", ".$tot_igst_amount.", 'no', 'yes', Null, Null, Null, Null, Null, Null, Null, Null, Null, '".$state_code."', ".$round_off_amt.", ".$invoice_amount.", Null, Null, '".$now."', 'PO Number', '', '', '', '".$curusr."', '".$now."')";
                 if ($conn->query($sql) === TRUE) {
                   $distributor_out_id = $conn->insert_id;
 

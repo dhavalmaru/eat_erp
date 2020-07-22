@@ -1827,6 +1827,60 @@ $('#form_distributor_out_list').submit(function() {
     }
 });
 
+$("#form_upload_sales_status").validate({
+    rules: {
+        upload: {
+            required: true
+        }
+    },
+
+    ignore: ":not(:visible)",
+
+    errorPlacement: function (error, element) {
+        var placement = $(element).data('error');
+        if (placement) {
+            $(placement).append(error);
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
+$('#form_upload_sales_status').submit(function() {
+    if (!$("#form_upload_sales_status").valid()) {
+        return false;
+    } else {
+        return true;
+    }
+});
+
+$("#form_upload_pending_sales_status").validate({
+    rules: {
+        upload: {
+            required: true
+        }
+    },
+
+    ignore: ":not(:visible)",
+
+    errorPlacement: function (error, element) {
+        var placement = $(element).data('error');
+        if (placement) {
+            $(placement).append(error);
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
+$('#form_upload_pending_sales_status').submit(function() {
+    if (!$("#form_upload_pending_sales_status").valid()) {
+        return false;
+    } else {
+        return true;
+    }
+});
+
 
 
 
@@ -2785,7 +2839,7 @@ function check_product_availablity_for_distributor_in() {
 
 
 
-// ----------------- DISTRIBUTOR IN DETAILS FORM VALIDATION -------------------------------------
+// ----------------- DISTRIBUTOR SALE DETAILS FORM VALIDATION -------------------------------------
 $("#form_distributor_sale_details").validate({
     rules: {
         date_of_processing: {
@@ -3225,7 +3279,10 @@ $("#form_box_details").validate({
         sku_code:{
             required: true,
             check_sku_code_availablity: true
-        }
+        },
+        // asin:{
+        //     check_asin_availablity: true
+        // }
     },
 
     ignore: false,
@@ -3364,6 +3421,243 @@ function check_product_availablity_for_box() {
                     }
                 }
             });
+        });
+    }
+    
+    return valid;
+}
+
+
+
+
+// ----------------- BOX DETAILS FORM VALIDATION -------------------------------------
+$("#form_combo_box_details").validate({
+    rules: {
+        combo_box_name: {
+            required: true,
+            check_combo_box_name_availablity: true
+        },
+        barcode: {
+            required: true,
+            check_combo_barcode_availablity: true
+        },
+        box_rate: {
+            required: true
+        },
+        hsn_code: {
+            required: true
+        },
+        short_name: {
+            required: true
+        },
+        category_id:{
+            required: true
+        },
+        tax_percentage:{
+            required: true
+        },
+        sku_code:{
+            required: true,
+            check_combo_sku_code_availablity: true
+        },
+        asin:{
+            required: true,
+            check_combo_asin_availablity: true
+        }
+    },
+
+    ignore: ":not(:visible)",
+
+    errorPlacement: function (error, element) {
+        var placement = $(element).data('error');
+        if (placement) {
+            $(placement).append(error);
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
+$.validator.addMethod("check_combo_box_name_availablity", function (value, element) {
+    var result = 1;
+
+    $.ajax({
+        url: BASE_URL+'index.php/Combo_box/check_combo_box_name_availablity',
+        data: 'id='+$("#id").val()+'&combo_box_name='+$("#combo_box_name").val(),
+        type: "POST",
+        dataType: 'html',
+        global: false,
+        async: false,
+        success: function (data) {
+            result = parseInt(data);
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+        }
+    });
+
+    if (result) {
+        return false;
+    } else {
+        return true;
+    }
+}, 'Combo Box Name already in use.');
+
+$.validator.addMethod("check_combo_barcode_availablity", function (value, element) {
+    var result = 1;
+
+    $.ajax({
+        url: BASE_URL+'index.php/Combo_box/check_barcode_availablity',
+        data: 'id='+$("#id").val()+'&barcode='+$("#barcode").val(),
+        type: "POST",
+        dataType: 'html',
+        global: false,
+        async: false,
+        success: function (data) {
+            result = parseInt(data);
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+        }
+    });
+
+    if (result) {
+        return false;
+    } else {
+        return true;
+    }
+}, 'Barcode already in use.');
+
+$.validator.addMethod("check_combo_sku_code_availablity", function (value, element) {
+    var result = 1;
+
+    $.ajax({
+        url: BASE_URL+'index.php/Combo_box/check_sku_code_availablity',
+        data: 'id='+$("#id").val()+'&sku_code='+$("#sku_code").val(),
+        type: "POST",
+        dataType: 'html',
+        global: false,
+        async: false,
+        success: function (data) {
+            result = parseInt(data);
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+        }
+    });
+
+    if (result) {
+        return false;
+    } else {
+        return true;
+    }
+}, 'SKU Code already in use.');
+
+$.validator.addMethod("check_combo_asin_availablity", function (value, element) {
+    var result = 1;
+
+    $.ajax({
+        url: BASE_URL+'index.php/Combo_box/check_asin_availablity',
+        data: 'id='+$("#id").val()+'&asin='+$("#asin").val(),
+        type: "POST",
+        dataType: 'html',
+        global: false,
+        async: false,
+        success: function (data) {
+            result = parseInt(data);
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+        }
+    });
+
+    if (result) {
+        return false;
+    } else {
+        return true;
+    }
+}, 'ASIN already in use.');
+
+$('#form_combo_box_details').submit(function() {
+    removeMultiInputNamingRules('#form_combo_box_details', 'select[alt="type[]"]');
+    removeMultiInputNamingRules('#form_combo_box_details', 'select[alt="bar[]"]');
+    removeMultiInputNamingRules('#form_combo_box_details', 'select[alt="box[]"]');
+    removeMultiInputNamingRules('#form_combo_box_details', 'input[alt="qty[]"]');
+
+    addMultiInputNamingRules('#form_combo_box_details', 'select[name="type[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_combo_box_details', 'select[name="bar[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_combo_box_details', 'select[name="box[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_combo_box_details', 'input[name="qty[]"]', { required: true }, "");
+    if (!$("#form_combo_box_details").valid()) {
+        return false;
+    } else {
+        if (check_item_availablity_for_combo_box()==false) {
+            return false;
+        }
+
+        removeMultiInputNamingRules('#form_combo_box_details', 'select[alt="type[]"]');
+        removeMultiInputNamingRules('#form_combo_box_details', 'select[alt="bar[]"]');
+        removeMultiInputNamingRules('#form_combo_box_details', 'select[alt="box[]"]');
+        removeMultiInputNamingRules('#form_combo_box_details', 'input[alt="qty[]"]');
+        
+        return true;
+    }
+});
+
+function check_item_availablity_for_combo_box() {
+    var validator = $("#form_combo_box_details").validate();
+    var valid = true;
+
+    if($('.type').length=='0'){
+        var errors = {};
+        var name = $('#combo_box_name').attr('name');
+        errors[name] = "Please add atleast one product.";
+        validator.showErrors(errors);
+        valid = false;
+    } else {
+        $('.type').each(function(){
+            var counter = $(this).attr('counter');
+            var type = $(this).val();
+
+            if(type=='Bar'){
+                var item_id = $('#bar_'+counter).attr('id');
+                var item_val = $('#bar_'+counter).val();
+
+                $('.bar').each(function(){
+                    if($(this).is(':visible')){
+                        if(item_id != $(this).attr('id')){
+                            if(item_val == $(this).val()){
+                                var errors = {};
+                                var name = $(this).attr('name');
+                                errors[name] = "Please select different product for all records.";
+                                validator.showErrors(errors);
+                                valid = false;
+                            }
+                        }
+                    }
+                });
+            } else {
+                var item_id = $('#box_'+counter).attr('id');
+                var item_val = $('#box_'+counter).val();
+
+                $('.box').each(function(){
+                    if($(this).is(':visible')){
+                        if(item_id != $(this).attr('id')){
+                            if(item_val == $(this).val()){
+                                var errors = {};
+                                var name = $(this).attr('name');
+                                errors[name] = "Please select different product for all records.";
+                                validator.showErrors(errors);
+                                valid = false;
+                            }
+                        }
+                    }
+                });
+            }
         });
     }
     

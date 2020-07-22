@@ -2079,6 +2079,82 @@ public function get_sales_item_data($status){
     return $query->result();
 }
 
+public function get_pending_sales_data($status){
+    if ($status=="pending_for_approval"){
+        $cond=" where ((A.status='Pending' and (A.delivery_status='Pending' or A.delivery_status='GP Issued' or A.delivery_status='Delivered Not Complete' or A.delivery_status='Delivered')) or A.status='Deleted') and (A.distributor_id!='1' and A.distributor_id!='189') and (A.ref_id is null or A.ref_id='')";
+    }
+
+    $sql = "select A.*, B.distributor_name, B.location_id, C.location, D.depot_name from 
+            (select A.id, A.date_of_processing, A.distributor_id, A.depot_id, A.invoice_amount, A.delivery_status, A.status, A.modified_on from distributor_out A".$cond.") A 
+            left join 
+            (select id, distributor_name, location_id from distributor_master) B 
+            on (A.distributor_id=B.id) 
+            left join 
+            (select id, location from location_master) C 
+            on (B.location_id=C.id) 
+            left join
+            (select id, depot_name from depot_master) D 
+            on (A.depot_id=D.id) 
+            order by A.id desc";
+
+    $query=$this->db->query($sql);
+    return $query->result();
+}
+
+public function approve_pending_sales_data($id){
+    $invoice_no = '';
+    $invoice_date = '';
+
+    $sql="select * from distributor_out where id='$id'";
+    $query=$this->db->query($sql);
+    $result=$query->result();
+    if(count($result)>0){
+        $invoice_no = $result[0]->invoice_no;
+        $invoice_date = $result[0]->invoice_date;
+    }
+
+    if($invoice_no==null || $invoice_no==''){
+        $sql="select * from series_master where type='Tax_Invoice'";
+        $query=$this->db->query($sql);
+        $result=$query->result();
+        if(count($result)>0){
+            $series=intval($result[0]->series)+1;
+
+            $sql="update series_master set series = '$series' where type = 'Tax_Invoice'";
+            $this->db->query($sql);
+        } else {
+            $series=1;
+
+            $sql="insert into series_master (type, series) values ('Tax_Invoice', '$series')";
+            $this->db->query($sql);
+        }
+
+        if($invoice_date==null || $invoice_date==''){
+            $invoice_date = date('Y-m-d');
+        }
+
+        if (isset($invoice_date)){
+            if($invoice_date==''){
+                $financial_year="";
+            } else {
+                $financial_year=calculateFiscalYearForDate($invoice_date);
+            }
+        } else {
+            $financial_year="";
+        }
+        
+        $invoice_no = 'WHPL/'.$financial_year.'/'.strval($series);
+
+        $sql = "Update distributor_out A 
+                Set A.invoice_no = '$invoice_no', A.invoice_date = '$invoice_date' 
+                Where A.id = '$id'";
+        $this->db->query($sql);
+    }
+
+    $this->set_ledger($id);
+    $this->set_credit_note($id);
+}
+
 public function approve_records_from_backend($distributor_out_id){
     foreach ($distributor_out_id as $id){
         $invoice_no = '';
