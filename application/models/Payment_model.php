@@ -24,10 +24,6 @@ function get_data_count(){
 function get_list_data($status='', $start=0, $length=0, $search_val=''){
     $curusr = $this->session->userdata('session_id');
 
-    $limit = "";
-    if($start>0 && $length>0) $limit .= " limit ".$start.", ".$length;
-    elseif($length>0) $limit .= " limit ".$length;
-
     if($status!=""){
         if($status=="Pending"){
             $cond=" where A.status='Pending' or A.status='Deleted'";
@@ -42,9 +38,7 @@ function get_list_data($status='', $start=0, $length=0, $search_val=''){
     if($search_val!=''){
         // $cond2=" and (E.id like '%".$search_val."%' or DATE_FORMAT(E.date_of_deposit, '%d/%m/%Y') like '%".$search_val."%' or E.b_name like '%".$search_val."%' or E.total_amount like '%".$search_val."%' or F.distributor_name like '%".$search_val."%') and F.distributor_name is not null and F.distributor_name<>''";
 
-        $cond2=" where (G.id like '%".$search_val."%' or DATE_FORMAT(G.date_of_deposit, '%d/%m/%Y') like '%".$search_val."%' or G.b_name like '%".$search_val."%' or G.total_amount like '%".$search_val."%' or G.distributor_name like '%".$search_val."%') order by G.modified_on desc ".$limit;
-    } else {
-        $cond = $cond . " order by A.modified_on desc ".$limit;
+        $cond2=" where (G.id like '%".$search_val."%' or DATE_FORMAT(G.date_of_deposit, '%d/%m/%Y') like '%".$search_val."%' or G.b_name like '%".$search_val."%' or G.total_amount like '%".$search_val."%' or G.distributor_name like '%".$search_val."%')";
     }
 
     $data = array();
@@ -63,6 +57,15 @@ function get_list_data($status='', $start=0, $length=0, $search_val=''){
             on (E.id = F.payment_id)) G".$cond2;
     $query=$this->db->query($sql);
     $data['count']=$query->result();
+
+    $limit = "";
+    if($start>0 && $length>0) $limit .= " limit ".$start.", ".$length;
+    elseif($length>0) $limit .= " limit ".$length;
+    if($search_val!=''){
+        $cond2 = $cond2 . " order by G.modified_on desc ".$limit;
+    } else {
+        $cond = $cond . " order by A.modified_on desc ".$limit;
+    }
 
     $sql = "select G.* from 
             (select E.*, F.distributor_name from 
