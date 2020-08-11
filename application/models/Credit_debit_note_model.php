@@ -16,9 +16,54 @@ function get_access(){
 }
 
 function get_invoice($distributor_id){
-    $sql = "select invoice_no from distributor_out where distributor_id='".$distributor_id  ."' and invoice_no <> ''";
+    $sql = "select distinct invoice_no from distributor_out where status='Approved' and distributor_id='".$distributor_id."' and invoice_no<>''";
     $query=$this->db->query($sql);
     return $query->result();
+}
+
+function get_data_count(){
+    $sql = "select count(id) as total_count, sum(case when status='Approved' then 1 else 0 end) as approved, sum(case when (status='Pending'or status='Deleted') then 1 else 0 end) as pending, sum(case when status='Rejected' then 1 else 0 end) as rejected, sum(case when status='Inactive' then 1 else 0 end) as inactive from credit_debit_note where remarks!='Adjusted through Ledger Balance'";
+    $query = $this->db->query($sql);
+    return $query->result();
+}
+
+function get_list_data($status='', $start=0, $length=0, $search_val=''){
+    $curusr = $this->session->userdata('session_id');
+
+    if($status!=""){
+        if($status=="Pending"){
+            $cond=" and A.status='Pending' or A.status='Deleted'";
+        } else{
+            $cond=" and A.status='".$status."'";
+        }
+    } else {
+        $cond="";
+    }
+
+    $cond2="";
+    if($search_val!=''){
+        $cond2=" and (A.id like '%".$search_val."%' or DATE_FORMAT(A.date_of_transaction, '%d/%m/%Y') like '%".$search_val."%' or A.ref_no like '%".$search_val."%' or A.transaction like '%".$search_val."%' or A.amount like '%".$search_val."%' or A.remarks like '%".$search_val."%' or B.distributor_name like '%".$search_val."%')";
+    }
+
+    $data = array();
+
+    $sql = "select count(A.id) as total_records from credit_debit_note A left join distributor_master B on (A.distributor_id=B.id) where A.remarks!='Adjusted through Ledger Balance' ".$cond.$cond2;
+    $query=$this->db->query($sql);
+    $data['count']=$query->result();
+
+    $limit = "";
+    if($start>0 && $length>0) $limit .= " limit ".$start.", ".$length;
+    elseif($length>0) $limit .= " limit ".$length;
+
+    $sql = "select A.id, A.date_of_transaction, A.ref_no, B.distributor_name, A.transaction, A.amount, A.remarks 
+            from credit_debit_note A 
+            left join distributor_master B on (A.distributor_id=B.id) 
+            where A.remarks!='Adjusted through Ledger Balance' ".$cond.$cond2." 
+            order by A.modified_on desc ".$limit;
+    $query=$this->db->query($sql);
+    $data['rows']=$query->result();
+
+    return $data;
 }
 
 function get_data($status='', $id=''){

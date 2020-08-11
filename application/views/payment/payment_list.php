@@ -29,28 +29,29 @@
     <body>								
      	<!-- START PAGE CONTAINER -->
         <div class="page-container page-navigation-top">            
-            <!-- PAGE CONTENT -->
-			   <?php $this->load->view('templates/menus');?>
-              <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
+			<!-- PAGE CONTENT -->
+			<?php $this->load->view('templates/menus');?>
+			<div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
                 
-                   <div class="heading-h3"> 
-                   <div class="heading-h3-heading mobile-head">	 <a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp;  Payment List  </div>						 
-					  <div class="heading-h3-heading mobile-head">
-					  <div class="pull-right btn-margin">	
-								<?php $this->load->view('templates/download');?>	
-								</div>	
-                       	<div class="pull-right btn-margin" style="<?php if($access[0]->r_insert=='0') echo 'display: none;';?>">
-									<a class="btn btn-success " href="<?php echo base_url() . 'index.php/payment/add'; ?>">
-										<span class="fa fa-plus"></span> Add Payment Entry
-									</a>
-								</div>
-				     </div>	      
-                </div>	
+				<div class="heading-h3"> 
+					<div class="heading-h3-heading mobile-head">
+						<a href="<?php echo base_url().'index.php/dashboard'; ?>"> Dashboard </a> &nbsp; &#10095; &nbsp;  Payment List
+					</div>						 
+					<div class="heading-h3-heading mobile-head">
+						<div class="pull-right btn-margin">	
+							<?php $this->load->view('templates/download');?>	
+						</div>	
+						<div class="pull-right btn-margin" style="<?php if($access[0]->r_insert=='0') echo 'display: none;';?>">
+							<a class="btn btn-success " href="<?php echo base_url() . 'index.php/payment/add'; ?>">
+								<span class="fa fa-plus"></span> Add Payment Entry
+							</a>
+						</div>
+					</div>	      
+				</div>	
                 
     			<div class="nav-contacts ng-scope" ui-view="@nav">
     				<div class="u-borderBottom u-bgColorBreadcrumb ng-scope">
     					<div class="container u-posRelative u-textRight">
-    						
 
     						<ul class="m-nav--linetriangle" ng-swipe-left="app.onInnerSwipe($event);" ng-swipe-right="app.onInnerSwipe($event);">
     							<!--<li class="all">
@@ -95,105 +96,111 @@
     			</div>
 
                 <!-- PAGE CONTENT WRAPPER -->
-                   <div class="page-content-wrap">                
-                    <div class="row">
-					  <div class="page-width">	
-                        <div class="col-md-12">
-					      <div class="panel panel-default">		
-							<div class="panel-body">
-								<div class="table-responsive">
-								<table id="customers2" class="table datatable table-bordered"  >
-									<thead>
-										<tr>
-										    <th width="58" style="text-align:center;"> Sr. No.</th>
-									
-											<th width="110">Date Of Deposit</th>
-											<th width="58" style="text-align:center;"> Edit</th>
-											<th width="100" class="view_payment_slip" style="text-align:center; <?php if(strtoupper(trim($status))=='APPROVED') echo ''; else echo 'display: none;'; ?>">View Payment Slip</th>
-											<th width="50">Id</th>
-											<th width="90">Bank Name</th>
-											<th width="290">Distributor Name</th>
-									      	<th width="80"> Total Amount (In Rs) </th>
-											<!--<th width="110"> Creation Date</th>
-											<th width="110"> Status</th>-->
-										
-										</tr>
-									</thead>
-									<tbody>
-										<?php for ($i=0; $i < count($data); $i++) { ?>
-										<tr>
-											<td style="text-align:center;"><?php echo $i+1; ?></td>
-											<td>
-                                            <span style="display:none;">
-                                                    <?php echo (($data[$i]->date_of_deposit!=null && $data[$i]->date_of_deposit!='')?date('Ymd',strtotime($data[$i]->date_of_deposit)):''); ?>
-                                            </span>
-                                              <?php echo (($data[$i]->date_of_deposit!=null && $data[$i]->date_of_deposit!='')?date('d/m/Y',strtotime($data[$i]->date_of_deposit)):''); ?>
-                                            </td>
-											<td style="text-align:center; vertical-align: middle; "><a href="<?php echo base_url().'index.php/payment/edit/'.$data[$i]->id; ?>"><i class="fa fa-edit"></i></a></td>
-											<td class="view_payment_slip" style="text-align:center;vertical-align: middle; <?php if(strtoupper(trim($status))=='APPROVED') echo ''; else echo 'display: none;'; ?>"><?php if ($data[$i]->id!=null) { ?><a href="<?php echo base_url().'index.php/payment/view_payment_slip/'.$data[$i]->id; ?>" target="_blank"> <span class="fa fa-file-pdf-o"></span></a><?php } ?></td>
-											
-											<td><?php echo $data[$i]->id; ?></td>
-											<td><?php echo $data[$i]->b_name; ?></td>
-											<td ><?php 
-												if (strlen(trim($data[$i]->distributor_name))>50) {
-													echo ' <span class="distributor_name" data-attr="'.$data[$i]->distributor_name.'" style="cursor:pointer">'.substr($data[$i]->distributor_name,0,30).' <span style="color:#41a541"> &nbsp Read More...</span>  </span>';
-												}
-												else
-												{
-													echo $data[$i]->distributor_name;
-												}
-											?></td>
-											<td><?php echo format_money($data[$i]->total_amount,2); ?></td>
-											<!--<td>
+               	<div class="page-content-wrap">                
+					<div class="row">
+					<div class="page-width">	
+					<div class="col-md-12">
+					<div class="panel panel-default">		
+					<div class="panel-body">
+					<div class="table-responsive">
+						<table id="customers10" class="table datatable table-bordered" style="width: 1295px;">
+							<thead>
+								<tr>
+									<th width="58" style="text-align:center;"> Sr. No.</th>
+									<th width="110">Date Of Deposit</th>
+									<th width="58" style="text-align:center;"> Edit</th>
+									<th width="100" class="view_payment_slip" style="text-align:center; <?php if(strtoupper(trim($status))=='APPROVED') echo ''; else echo 'display: none;'; ?>">View Payment Slip</th>
+									<th width="50">Id</th>
+									<th width="90">Bank Name</th>
+									<th width="290">Distributor Name</th>
+									<th width="80"> Total Amount (In Rs) </th>
+									<!--<th width="110"> Creation Date</th>
+									<th width="110"> Status</th>-->
+								</tr>
+							</thead>
+							<tbody>
+								<?php 
+									if(isset($data)) {
+										for ($i=0; $i < count($data); $i++) { 
+								?>
+											<tr>
+												<td style="text-align:center;"><?php echo $i+1; ?></td>
+												<td>
+													<span style="display:none;">
+														<?php echo (($data[$i]->date_of_deposit!=null && $data[$i]->date_of_deposit!='')?date('Ymd',strtotime($data[$i]->date_of_deposit)):''); ?>
+													</span>
+													<?php echo (($data[$i]->date_of_deposit!=null && $data[$i]->date_of_deposit!='')?date('d/m/Y',strtotime($data[$i]->date_of_deposit)):''); ?>
+												</td>
+												<td style="text-align:center; vertical-align: middle;">
+													<a href="<?php echo base_url().'index.php/payment/edit/'.$data[$i]->id; ?>"><i class="fa fa-edit"></i></a>
+												</td>
+												<td class="view_payment_slip" style="text-align:center;vertical-align: middle; <?php if(strtoupper(trim($status))=='APPROVED') echo ''; else echo 'display: none;'; ?>">
+													<?php if ($data[$i]->id!=null) { ?><a href="<?php echo base_url().'index.php/payment/view_payment_slip/'.$data[$i]->id; ?>" target="_blank"> <span class="fa fa-file-pdf-o"></span></a><?php } ?>
+												</td>
+												<td><?php echo $data[$i]->id; ?></td>
+												<td><?php echo $data[$i]->b_name; ?></td>
+												<td>
+													<?php 
+														if (strlen(trim($data[$i]->distributor_name))>50) {
+														echo ' <span class="distributor_name" data-attr="'.$data[$i]->distributor_name.'" style="cursor:pointer">'.substr($data[$i]->distributor_name,0,30).' <span style="color:#41a541"> &nbsp Read More...</span>  </span>';
+														}
+														else
+														{
+														echo $data[$i]->distributor_name;
+														}
+													?>
+												</td>
+												<td><?php echo format_money($data[$i]->total_amount,2); ?></td>
+												<!--<td>
 												<span style="display:none;">
-                                                    <?php //echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
-                                                </span>
+												<?php //echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('Ymd',strtotime($data[$i]->modified_on)):''); ?>
+												</span>
 												<?php// echo (($data[$i]->modified_on!=null && $data[$i]->modified_on!='')?date('d/m/Y',strtotime($data[$i]->modified_on)):''); ?></td>
-											<td><?php //echo $data[$i]->status; ?></td>-->
-										
-										</tr>
-										<?php } ?>
-									</tbody>
-								</table>
-								</div>
-							</div>
-                            <!-- END DEFAULT DATATABLE -->
-                            
-						</div>
-						</div>
-					 </div>
-						
-                    </div>
-                    
+												<td><?php //echo $data[$i]->status; ?></td>-->
+											</tr>
+								<?php 
+										} 
+									}
+								?>
+							</tbody>
+						</table>
+					</div>
+					</div>
+					</div>
+					</div>
+					</div>
+					</div>
                 </div>
                 <!-- END PAGE CONTENT WRAPPER -->
+
             </div>            
             <!-- END PAGE CONTENT -->
         </div>
-
-         <div class="modal fade" id="myModal" role="dialog">
-		    <div class="modal-dialog">
-		      <!-- Modal content-->
-		      <div class="modal-content">
-		        <div class="modal-header">
-		          <button type="button" class="close" data-dismiss="modal">&times;</button>
-		          <h4 class="modal-title">Distributor Name</h4>
-		        </div>
-		        <div class="modal-body">
-		        </div>
-		        <div class="modal-footer">
-		          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-		        </div>
-		      </div>
-		      
-		    </div>
-		</div>
         <!-- END PAGE CONTAINER -->
+
+		<div class="modal fade" id="myModal" role="dialog">
+			<div class="modal-dialog">
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Distributor Name</h4>
+					</div>
+					<div class="modal-body">
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
 						
         <?php $this->load->view('templates/footer');?>
 		<script>
 	    	$(document).ready(function() {
+	    		var BASE_URL = "<?php echo base_url()?>";
 	    		var url = window.location.href;
+	    		var status = "<?php echo $status; ?>";
 
 	    		if(url.includes('All')){
 	                $('.all').attr('class','active');
@@ -225,8 +232,136 @@
 	            	modal.find('.modal-body').html(content);
 	            	modal.modal('show'); 
 	            });
+
+	            var status = '<?php echo $status; ?>';
+	            var len = 10;
+	            var columnDefs = [];
+
+	            if(status.toUpperCase()=='APPROVED') {
+	            	columnDefs = [    
+	                                {
+	                                    "targets": [0],
+	                                    "searchable": false
+	                                },
+	                                {
+	                                    "targets": [2],
+	                                    "searchable": false
+	                                }, 
+									{ className: "dt-body-center", targets: [ 0,2,3 ] },
+									{ className: "text-right", targets: [ 7 ] }
+	                            ];
+                } else {
+	                columnDefs = [    
+	                                {
+	                                    "targets": [0],
+	                                    "searchable": false
+	                                },       
+	                                {
+	                                    "targets": [2],
+	                                    "searchable": false
+	                                },
+	                                {
+	                                    "targets": [3],
+	                                    "visible": false
+	                                }, 
+									{ className: "dt-body-center", targets: [ 0,2,3 ] },
+									{ className: "text-right", targets: [ 7 ] }
+	                            ];
+                }
+                
+
+	            $('#customers10').DataTable({
+	                // "pageLength" : 10,
+	                "bProcessing": true,
+	                "searchDelay": 3000,
+	                "serverSide": true,
+	                "columnDefs": columnDefs,
+	                "iDisplayLength": len,
+	                aLengthMenu: [
+	                                [10,25, 50, 100, 200, -1],
+	                                [10,25, 50, 100, 200, "All"]
+	                            ],
+	                "ajax":{
+	                        url : BASE_URL+'index.php/Payment/get_data/'+status,
+	                        type: "post",
+	                        async: false,
+	                        data: function(data) {       
+	                            data.status = status;
+	                        },
+	                        "dataSrc": function ( json ) {
+	                            return json.data;
+	                        },
+	                        // error: function() {
+	                        //     $(table+"_processing").css("display","none");
+	                        // }
+	                    }
+	            });
+	            
+	            $("#csv").click(function(){
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = false;
+	                table.DataTable(tableOptions);
+	                table.tableExport({type:'csv',escape:'false'});
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = true;
+	                table.DataTable(tableOptions);
+	            });
+	            $("#xls").click(function(){
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = false;
+	                table.DataTable(tableOptions);
+	                table.tableExport({type:'excel',escape:'false'});
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = true;
+	                table.DataTable(tableOptions);
+	            });
+	            $("#txt").click(function(){
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = false;
+	                table.DataTable(tableOptions);
+	                table.tableExport({type:'txt',escape:'false'});
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = true;
+	                table.DataTable(tableOptions);
+	            });
+	            $("#doc").click(function(){
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = false;
+	                table.DataTable(tableOptions);
+	                table.tableExport({type:'doc',escape:'false'});
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = true;
+	                table.DataTable(tableOptions);
+	            });
+	            $("#powerpoint").click(function(){
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = false;
+	                table.DataTable(tableOptions);
+	                table.tableExport({type:'powerpoint',escape:'false'});
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = true;
+	                table.DataTable(tableOptions);
+	            });
+	            $("#png").click(function(){
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = false;
+	                table.DataTable(tableOptions);
+	                table.tableExport({type:'png',escape:'false'});
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = true;
+	                table.DataTable(tableOptions);
+	            });
+				$("#pdf").click(function(){
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = false;
+	                table.DataTable(tableOptions);
+	                table.tableExport({type:'pdf',escape:'false'});
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = true;
+	                table.DataTable(tableOptions);
+	            });
 	    	});
 		</script>
-    <!-- END SCRIPTS -->      
+    	<!-- END SCRIPTS -->
     </body>
 </html>

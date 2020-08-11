@@ -1594,6 +1594,7 @@ class Distributor_out extends CI_Controller{
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col++].$row, 'Date Of Processing');
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col++].$row, 'Distributor Name');
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col++].$row, 'Depot Name');
+            $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col++].$row, 'Order No');
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col++].$row, 'Invoice Amount');
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col++].$row, 'Delivery Status');
             $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col++].$row, 'Status');
@@ -1605,6 +1606,7 @@ class Distributor_out extends CI_Controller{
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col++].$row, date('d-m-Y', strtotime($data[$i]->date_of_processing)));
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col++].$row, $data[$i]->distributor_name);
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col++].$row, $data[$i]->depot_name);
+                $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col++].$row, $data[$i]->order_no);
                 $objPHPExcel->getActiveSheet()->setCellValue($col_name[$col++].$row, $data[$i]->invoice_amount);
 
                 $objValidation = $objPHPExcel->getActiveSheet()->getCell($col_name[$col].$row)->getDataValidation();
@@ -1625,7 +1627,8 @@ class Distributor_out extends CI_Controller{
             $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(16);
             $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(25);
             $objPHPExcel->getActiveSheet()->getColumnDimension('D')->setWidth(15);
-            for($col='E'; $col!=='H'; $col++) {
+            $objPHPExcel->getActiveSheet()->getColumnDimension('E')->setWidth(15);
+            for($col='F'; $col!=='I'; $col++) {
                 $objPHPExcel->getActiveSheet()->getColumnDimension($col)->setAutoSize(true);
             }
 
@@ -1754,8 +1757,8 @@ class Distributor_out extends CI_Controller{
             $objPHPExcel = PHPExcel_IOFactory::load($filename);
             $objPHPExcel->setActiveSheetIndex(0);
             $highestrow = $objPHPExcel->setActiveSheetIndex(0)->getHighestRow();
-            $objPHPExcel->getActiveSheet()->setCellValue('H1', 'Error Remark');
-            $objPHPExcel->getActiveSheet()->getColumnDimension('H')->setWidth(30);
+            $objPHPExcel->getActiveSheet()->setCellValue('I1', 'Error Remark');
+            $objPHPExcel->getActiveSheet()->getColumnDimension('I')->setWidth(30);
             $objerror = 0;
             $error_line = '';
             $order_array = [];
@@ -1778,9 +1781,9 @@ class Distributor_out extends CI_Controller{
 
             for($i=2; $i<=$highestrow; $i++){
                 $sales_id = $objPHPExcel->getActiveSheet()->getCell('A'.$i)->getCalculatedValue();
-                $inv_amt = $objPHPExcel->getActiveSheet()->getCell('E'.$i)->getCalculatedValue();
-                $delivery_status = $objPHPExcel->getActiveSheet()->getCell('F'.$i)->getCalculatedValue();
-                $status = $objPHPExcel->getActiveSheet()->getCell('G'.$i)->getCalculatedValue();
+                $inv_amt = $objPHPExcel->getActiveSheet()->getCell('F'.$i)->getCalculatedValue();
+                $delivery_status = $objPHPExcel->getActiveSheet()->getCell('G'.$i)->getCalculatedValue();
+                $status = $objPHPExcel->getActiveSheet()->getCell('H'.$i)->getCalculatedValue();
 
                 $inv_amt = round(doubleval($inv_amt),2);
 
@@ -1945,7 +1948,7 @@ class Distributor_out extends CI_Controller{
                     }
 
                     if($error!=""){
-                        $objPHPExcel->getActiveSheet()->setCellValue('H'.$i, $error);
+                        $objPHPExcel->getActiveSheet()->setCellValue('I'.$i, $error);
                         // $objPHPExcel->getActiveSheet()->getStyle('M'.$i)->getAlignment()->setWrapText(false);  
                     }
 
@@ -1975,24 +1978,24 @@ class Distributor_out extends CI_Controller{
                                         if(strpos($row_array[$key], ',')!==false) {
                                             $row_index_array = explode(',', $row_array[$key]);
                                             foreach ($row_index_array as $row_index) {
-                                                $cell_value = $objPHPExcel->getActiveSheet()->getCell('H'.$row_index)->getCalculatedValue();
+                                                $cell_value = $objPHPExcel->getActiveSheet()->getCell('I'.$row_index)->getCalculatedValue();
                                                 if($cell_value!=''){
                                                     if(strpos($cell_value, $error)===False){
-                                                        $objPHPExcel->getActiveSheet()->setCellValue('H'.$row_index, $cell_value.$error);
+                                                        $objPHPExcel->getActiveSheet()->setCellValue('I'.$row_index, $cell_value.$error);
                                                     }
                                                 } else {
-                                                    $objPHPExcel->getActiveSheet()->setCellValue('H'.$row_index, $error);
+                                                    $objPHPExcel->getActiveSheet()->setCellValue('I'.$row_index, $error);
                                                     $error_line.=$row_index.', ';
                                                 }
                                             }
                                         } else {
-                                            $cell_value = $objPHPExcel->getActiveSheet()->getCell('H'.$row_array[$key])->getCalculatedValue();
+                                            $cell_value = $objPHPExcel->getActiveSheet()->getCell('I'.$row_array[$key])->getCalculatedValue();
                                             if($cell_value!=''){
                                                 if(strpos($cell_value, $error)===False){
-                                                    $objPHPExcel->getActiveSheet()->setCellValue('H'.$row_array[$key], $cell_value.$error);
+                                                    $objPHPExcel->getActiveSheet()->setCellValue('I'.$row_array[$key], $cell_value.$error);
                                                 }
                                             } else {
-                                                $objPHPExcel->getActiveSheet()->setCellValue('H'.$row_array[$key], $error);
+                                                $objPHPExcel->getActiveSheet()->setCellValue('I'.$row_array[$key], $error);
                                                 $error_line.=$row_index.', ';
                                             }
                                         }
@@ -2117,7 +2120,13 @@ class Distributor_out extends CI_Controller{
     }
 
     public function approve_records_from_backend(){
-        $distributor_out_id = array(26640, 26659, 26999, 27002, 27005, 27064, 27066, 27068, 27069, 27166, 27088, 27090, 27248, 27259, 27275, 27439, 27343, 27348, 27353, 27648, 27649, 27650, 27651, 27652, 27653, 27654, 27655, 27607, 27640, 27641, 27642, 27643, 27644, 27645, 27646, 27647, 27656, 27657, 27658, 27659, 27667, 27668, 27669, 27670, 27671, 27672, 27673, 27674, 27675, 27676, 27677, 27678, 27679, 27680, 27681, 27682, 27685, 27739, 27740, 27741, 27742, 27743, 27760, 27761, 27762, 27763, 27764, 27765, 27766, 27767, 27768, 27769, 27770, 27771, 27772, 27773, 27774, 27775, 27776, 27779);
+        // $distributor_out_id = array(26640, 26659, 26999, 27002, 27005, 27064, 27066, 27068, 27069, 27166, 27088, 27090, 27248, 27259, 27275, 27439, 27343, 27348, 27353, 27648, 27649, 27650, 27651, 27652, 27653, 27654, 27655, 27607, 27640, 27641, 27642, 27643, 27644, 27645, 27646, 27647, 27656, 27657, 27658, 27659, 27667, 27668, 27669, 27670, 27671, 27672, 27673, 27674, 27675, 27676, 27677, 27678, 27679, 27680, 27681, 27682, 27685, 27739, 27740, 27741, 27742, 27743, 27760, 27761, 27762, 27763, 27764, 27765, 27766, 27767, 27768, 27769, 27770, 27771, 27772, 27773, 27774, 27775, 27776, 27779);
+
+        // $distributor_out_id = array(40277, 40471, 40472, 40473, 40474, 40475, 40476, 40477, 40478, 40479, 40480, 40481, 40482, 40483, 40484, 40485, 40486, 40487, 40488, 40489, 40490, 40492, 40493, 40500, 40501, 40502, 40503, 40504, 40505, 40506, 40507, 40508, 40509, 40510, 40511, 40512, 40513, 40514, 40515, 40516, 40517, 40523, 40524, 40525, 40526, 40527, 40528, 40529, 40530, 40532, 40533, 40534, 40577, 40578, 40579, 40580, 40581, 40583, 40584, 40585, 40586, 40587, 40588, 40589, 40590, 40591, 40592, 40593, 40595, 40596, 40597, 40598, 40599, 40600, 40601, 40602, 40603, 40604, 40605, 40606, 40609, 40610, 40611, 40612, 40613, 40614, 40615, 40616, 40617, 40618, 40619, 40620, 40621, 40622, 40623, 40624, 40625, 40626, 40627, 40628, 40629, 40630, 40631, 40632, 40633, 40634, 40635, 40636, 40637, 40638, 40639, 40640, 40641, 40642, 40643, 40644, 40645, 40646, 40647, 40648, 40649, 40650, 40651, 40652, 40653, 40654, 40655, 40656, 40657, 40658, 40659, 40660, 40661, 40662, 40663, 40664, 40665, 40666, 40667, 40668, 40669, 40670, 40671, 40672, 40673, 40674, 40675, 40676, 40677, 40678, 40679, 40680, 40681, 40682, 40683, 40684, 40685, 40686, 40687, 40688, 40689, 40690, 40691, 40692, 40693, 40694, 40695, 40696, 40697, 40698, 40699, 40700, 40701, 40702, 40703, 40705, 40706, 40707, 40708, 40709, 40710, 40711, 40712, 40713, 40714, 40715, 40717, 40718, 40719, 40720, 40721, 40722, 40723, 40724, 40726, 40727, 40728, 40729, 40730, 40731, 40732, 40733, 40734, 40735, 40736, 40737, 40739, 40740, 40741, 40742, 40743, 40744, 40745, 40746, 40747, 40748, 40756, 40761, 40762, 40763, 40764, 40765, 40766, 40767, 40768, 40769, 40770, 40771, 40772, 40773, 40774, 40775, 40776, 40777, 40778, 40779, 40780, 40781, 40782, 40783, 40784, 40785, 40786, 40787, 40788, 40789, 40790, 40791, 40792, 40793, 40794, 40795, 40796, 40797, 40798, 40799, 40800, 40801, 40984, 40985, 40986, 40987, 40989, 40990, 40991, 40992, 40995, 40996, 40997, 40998, 40999, 41000, 41001, 41002, 41003, 41004, 41005, 41013, 41014, 41015, 41016, 41017, 41056, 41057, 41058, 41059, 41060, 41061, 41062, 41063, 41064, 41065, 41067, 41068, 41069, 41070, 41071, 41072, 41073, 41074, 41075, 41076, 41077, 41078, 41079, 41080, 41081, 41082, 41083, 41084, 41085, 41086, 41087, 41088, 41089, 41090, 41091, 41093, 41094, 41095, 41096, 41097, 41098, 41099, 41100, 41101, 41102, 41103, 41104, 41105, 41106, 41107, 41108, 41109, 41111, 41112, 41113, 41114, 41115, 41116, 41117, 41118, 41119, 41120, 41121, 41122, 41123, 41124, 41125, 41126, 41127, 41128, 41129, 41130, 41131, 41132, 41133, 41134, 41135, 41136, 41137, 41138, 41139, 41140, 41141, 41142, 41143, 41144, 41145, 41146, 41147, 41148, 41149, 41150, 41151, 41152, 41153, 41154, 41155, 41156, 41157, 41158, 41159, 41160, 41161, 41162, 41163, 41164, 41165, 41166, 41167, 41168, 41169, 41170, 41171, 41172, 41173, 41174, 41175, 41176, 41177, 41178, 41179, 41180, 41181, 41182, 41183, 41184, 41185, 41186, 41187, 41188, 41189, 41190, 41191, 41224, 41225, 41226, 41227, 41228, 41229, 41230, 41231, 41232, 41236, 41237, 41238, 41239, 41240, 41241, 41242, 41243, 41244, 41245, 41246, 41247, 41248, 41249, 41250, 41251, 41252, 41253, 41254, 41255, 41256, 41257, 41258, 41259, 41260, 41261, 41262, 41263, 41264, 41265, 41266, 41267, 41268, 41271, 41273, 41275, 41276, 41277, 41279, 41280, 41281, 41282, 41284, 41285, 41286, 41288, 41289, 41290, 41291, 41293, 41294, 41295, 41296, 41297, 41298, 41300, 41303, 41304, 41305, 41306, 41307, 41308, 41310, 41311, 41312, 41313, 41314, 41315, 41316, 41317, 41318, 41319, 41320, 41321, 41322, 41323, 41325, 41332, 41333, 41334, 41335, 41336, 41337, 41338, 41339, 41340, 41346, 41347, 41348, 41349, 41350, 41353, 41355, 41356, 41357, 41358, 41359, 41360, 41361, 41362, 41363, 41479, 41480, 41486, 41487, 41488, 41489, 41562, 41563, 41564, 41565, 41566, 41567, 41568, 41569, 41570, 41571, 41572, 41573, 41574, 41575, 41576, 41577, 41578, 41579, 41580, 41581, 41582, 41583, 41584, 41585, 41586, 41588, 41589, 41590, 41591, 41592, 41593, 41594, 41596, 41597, 41600, 41601, 41602, 41603, 41604, 41607, 41608, 41609, 41610, 41611, 41612, 41613, 41614, 41615, 41616, 41617, 41618, 41619, 41620, 41621, 41622, 41623, 41624, 41625, 41626, 41627, 41628, 41629, 41630, 41632, 41633, 41634, 41635, 41636, 41637, 41638, 41639, 41640, 41641, 41642, 41643, 41645, 41646, 41647, 41648, 41649, 41650, 41651, 41652, 41654, 41655, 41656, 41657, 41658, 41659, 41660, 41661, 41662, 41663, 41664, 41665, 41667, 41668, 41669, 41671, 41672, 41673, 41674, 41675, 41676, 41678, 41679, 41680, 41681, 41682, 41683, 41684, 41685, 41686, 41687, 41688, 41689, 41690, 41691, 41692, 41694, 41695, 41696, 41697, 41698, 41699, 41700, 41701, 41703, 41704, 41705, 41706, 41707, 41708, 41709, 41710, 41711, 41713, 41714, 41715, 41717, 41718, 41719, 41720, 41722, 41764, 41765, 41766, 41769, 41770, 41771, 41772, 41773, 41774, 41775, 41776, 41777, 41778, 41780, 41781, 41782, 41783, 41784, 41785, 41786, 41787, 41788, 41789, 41790, 41791, 41792, 41794, 41795, 41796, 41797, 41798, 41800, 41801, 41802, 41803, 41805, 41806, 41807, 41808, 41809, 41810, 41811, 41812, 41813, 41814, 41815, 41816, 41817, 41818, 41819, 41820, 41821, 41822, 41823, 41824, 41825, 41826, 41827, 41828, 41829, 41830, 41831, 41834, 41835, 41836, 41837, 41838, 41842, 41843, 41844, 41845, 41846, 41849, 41850, 41851, 41852, 41854, 41855, 41856, 41857, 41858, 41859, 41860, 41861, 41862, 41867, 41868, 41869, 41870, 41871, 41872, 41873, 41874, 41875, 41876, 41877, 41878, 41883, 41884, 41885, 41886, 41887, 41888, 41889, 41890, 41891, 41892, 41893, 41894, 41895, 41896, 41897, 41898, 41899, 41900, 41901, 41902, 41903, 41904, 41905, 41906, 41907, 41908, 41909, 41910, 41911, 41912, 41913, 41914, 41915, 41919, 41920, 41921, 41922, 41923, 41924, 41925, 41926, 41927, 41928, 41929, 41931, 41932, 41933, 41934, 41935, 41936, 41937, 41938, 41939, 41940, 41941, 41942, 41943, 41944, 41945, 41946, 41947, 41948, 41949, 41950, 41951, 41952, 41953, 41954, 41955, 41956, 41957, 41958, 41959, 41960, 41961, 41962, 41963, 41964, 41965, 41966, 41967, 41968, 41969, 41970, 41971, 41972, 41973, 41974, 41975, 41976, 41977, 41978, 41979, 41980, 41981, 41982, 41983, 41984, 41985, 41986, 41987, 41988, 41989, 41990, 41991, 41992, 41993, 41994, 41995, 41996, 41997, 41998, 41999, 42000, 42001, 42002, 42003, 42004, 42005, 42006, 42007, 42008, 42009, 42010, 42011, 42012, 42013, 42014, 42015, 42016, 42017, 42018, 42262, 42263, 42264, 42265, 42266, 42267, 42268, 42269, 42270, 42271, 42272, 42273, 42274, 42275, 42276, 42277, 42278, 42279, 42280, 42281, 42282, 42283, 42284, 42285, 42286, 42287, 42288, 42289, 42290, 42291, 42292, 42293, 42294, 42295, 42296, 42297, 42298);
+
+        // $distributor_out_id = array(42299, 42300);
+
+        $distributor_out_id = array(42301, 42302, 42303, 42305, 42313, 42316, 42317, 42320, 42402, 42403);
 
         $this->distributor_out_model->approve_records_from_backend($distributor_out_id);
     }

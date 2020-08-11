@@ -101,11 +101,10 @@
 					      <div class="panel panel-default">		
 							<div class="panel-body">
 								<div class="table-responsive">
-								<table id="customers2" class="table datatable table-bordered"  >
+								<table id="customers10" class="table datatable table-bordered"  >
 									<thead>
 										<tr>
 										    <th width="58" style="text-align:center;"> Sr. No.</th>
-										 
 											<th width="90">Date Of Transaction</th>
 											<th width="58" style="text-align:center;"> Edit </th>
 											<th width="80">View Credit Debit Note</th>
@@ -116,14 +115,15 @@
 											<!--<th width="100">Creation Date</th>-->
 											<th width="300">Remarks</th>
 											<!--<th width="110">Status</th>-->
-										
 										</tr>
 									</thead>
 									<tbody>
-										<?php for ($i=0; $i < count($data); $i++) { ?>
+									<?php 
+										if(isset($data)) {
+											for ($i=0; $i < count($data); $i++) { 
+									?>
 										<tr>
 											<td style="text-align:center;"><?php echo $i+1; ?></td>
-											
 											<td>
                                                 <span style="display:none;">
                                                     <?php echo (($data[$i]->date_of_transaction!=null && $data[$i]->date_of_transaction!='')?date('Ymd',strtotime($data[$i]->date_of_transaction)):''); ?>
@@ -151,7 +151,10 @@
 											<!--<td><?php //echo $data[$i]->status; ?></td>-->
 										
 										</tr>
-										<?php } ?>
+									<?php 
+											}
+										} 
+									?>
 									</tbody>
 								</table>
 								</div>
@@ -173,6 +176,7 @@
         <?php $this->load->view('templates/footer');?>
 		<script>
 	    	$(document).ready(function() {
+	    		var BASE_URL="<?php echo base_url()?>";
 	    		var url = window.location.href;
 
 	    		if(url.includes('All')){
@@ -193,7 +197,115 @@
 	            else {
 	                $('.approved').attr('class','active');
 	            }
-	    	});
+
+	            var status = '<?php echo $status; ?>';
+	            var len = 10;
+	            var columnDefs = [];
+
+                columnDefs = [    
+                                {
+                                    "targets": [0],
+                                    "searchable": false
+                                },       
+                                {
+                                    "targets": [2],
+                                    "searchable": false
+                                }, 
+								// { "width": "10%", "targets": 8 },
+								{ className: "dt-body-center", targets: [ 0,2 ] }
+                            ];
+
+	            $('#customers10').DataTable({
+	                // "pageLength" : 10,
+	                "bProcessing": true,
+	                "searchDelay": 3000,
+	                "serverSide": true,
+	                "columnDefs": columnDefs,
+	                "iDisplayLength": len,
+	                aLengthMenu: [
+	                                [10,25, 50, 100, 200, -1],
+	                                [10,25, 50, 100, 200, "All"]
+	                            ],
+	                "ajax":{
+	                        url : BASE_URL+'index.php/Credit_debit_note/get_data/'+status,
+	                        type: "post",
+	                        async: false,
+	                        data: function(data) {       
+	                            data.status = status;
+	                        },
+	                        "dataSrc": function ( json ) {
+	                            return json.data;
+	                        },
+	                        // error: function() {
+	                        //     $(table+"_processing").css("display","none");
+	                        // }
+	                    }
+	            });
+	            
+	            $("#csv").click(function(){
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = false;
+	                table.DataTable(tableOptions);
+	                table.tableExport({type:'csv',escape:'false'});
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = true;
+	                table.DataTable(tableOptions);
+	            });
+	            $("#xls").click(function(){
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = false;
+	                table.DataTable(tableOptions);
+	                table.tableExport({type:'excel',escape:'false'});
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = true;
+	                table.DataTable(tableOptions);
+	            });
+	            $("#txt").click(function(){
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = false;
+	                table.DataTable(tableOptions);
+	                table.tableExport({type:'txt',escape:'false'});
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = true;
+	                table.DataTable(tableOptions);
+	            });
+	            $("#doc").click(function(){
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = false;
+	                table.DataTable(tableOptions);
+	                table.tableExport({type:'doc',escape:'false'});
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = true;
+	                table.DataTable(tableOptions);
+	            });
+	            $("#powerpoint").click(function(){
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = false;
+	                table.DataTable(tableOptions);
+	                table.tableExport({type:'powerpoint',escape:'false'});
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = true;
+	                table.DataTable(tableOptions);
+	            });
+	            $("#png").click(function(){
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = false;
+	                table.DataTable(tableOptions);
+	                table.tableExport({type:'png',escape:'false'});
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = true;
+	                table.DataTable(tableOptions);
+	            });
+				$("#pdf").click(function(){
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = false;
+	                table.DataTable(tableOptions);
+	                table.tableExport({type:'pdf',escape:'false'});
+	                table.DataTable().destroy();
+	                tableOptions.bPaginate = true;
+	                table.DataTable(tableOptions);
+	            });
+	        });
 		</script>
     <!-- END SCRIPTS -->      
     </body>

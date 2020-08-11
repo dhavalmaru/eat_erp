@@ -15,6 +15,87 @@ function get_access(){
     return $query->result();
 }
 
+function get_data_count(){
+    $sql = "select count(id) as total_count, sum(case when status='Approved' then 1 else 0 end) as approved, sum(case when (status='Pending'or status='Deleted') then 1 else 0 end) as pending, sum(case when status='Rejected' then 1 else 0 end) as rejected, sum(case when status='Inactive' then 1 else 0 end) as inactive from payment_details";
+    $query = $this->db->query($sql);
+    return $query->result();
+}
+
+function get_list_data($status='', $start=0, $length=0, $search_val=''){
+    $curusr = $this->session->userdata('session_id');
+
+    $limit = "";
+    if($start>0 && $length>0) $limit .= " limit ".$start.", ".$length;
+    elseif($length>0) $limit .= " limit ".$length;
+
+    if($status!=""){
+        if($status=="Pending"){
+            $cond=" where A.status='Pending' or A.status='Deleted'";
+        } else{
+            $cond=" where A.status='".$status."'";
+        }
+    } else {
+        $cond="";
+    }
+
+    $cond2="";
+    if($search_val!=''){
+        // $cond2=" and (E.id like '%".$search_val."%' or DATE_FORMAT(E.date_of_deposit, '%d/%m/%Y') like '%".$search_val."%' or E.b_name like '%".$search_val."%' or E.total_amount like '%".$search_val."%' or F.distributor_name like '%".$search_val."%') and F.distributor_name is not null and F.distributor_name<>''";
+
+        $cond2=" where (G.id like '%".$search_val."%' or DATE_FORMAT(G.date_of_deposit, '%d/%m/%Y') like '%".$search_val."%' or G.b_name like '%".$search_val."%' or G.total_amount like '%".$search_val."%' or G.distributor_name like '%".$search_val."%') order by G.modified_on desc ".$limit;
+    } else {
+        $cond = $cond . " order by A.modified_on desc ".$limit;
+    }
+
+    $data = array();
+
+    $sql = "select count(G.id) as total_records from 
+            (select E.*, F.distributor_name from 
+            (select C.*, D.b_name from 
+            (select A.id, A.date_of_deposit, A.bank_id, A.total_amount, A.modified_on 
+            from payment_details A ".$cond.") C 
+            left join 
+            (select * from bank_master) D 
+            on (C.bank_id=D.id)) E 
+            left join 
+            (select A.payment_id, group_concat(B.distributor_name) as distributor_name from payment_details_items A 
+                left join distributor_master B on(A.distributor_id = B.id) group by A.payment_id) F 
+            on (E.id = F.payment_id)) G".$cond2;
+    $query=$this->db->query($sql);
+    $data['count']=$query->result();
+
+    $sql = "select G.* from 
+            (select E.*, F.distributor_name from 
+            (select C.*, D.b_name from 
+            (select A.id, A.date_of_deposit, A.bank_id, A.status, A.total_amount, A.modified_on 
+            from payment_details A ".$cond.") C 
+            left join 
+            (select * from bank_master) D 
+            on (C.bank_id=D.id)) E 
+            left join 
+            (select C.payment_id, group_concat(C.distributor_name) as distributor_name from 
+            (select distinct A.payment_id, B.distributor_name from payment_details_items A 
+                left join distributor_master B on(A.distributor_id = B.id)) C group by C.payment_id) F 
+            on (E.id = F.payment_id)) G".$cond2;
+
+    // $sql = "select E.*, F.distributor_name from 
+    //         (select C.*, D.b_name from 
+    //         (select A.id, A.date_of_deposit, A.bank_id, A.status, A.total_amount, A.modified_on 
+    //         from payment_details A where A.id is not null ".$cond.") C 
+    //         left join 
+    //         (select * from bank_master) D 
+    //         on (C.bank_id=D.id)) E 
+    //         left join 
+    //         (select A.payment_id, group_concat(B.distributor_name) as distributor_name from payment_details_items A 
+    //             left join distributor_master B on(A.distributor_id = B.id) group by A.payment_id) F 
+    //         on (E.id = F.payment_id)".$cond2." 
+    //         order by E.modified_on desc ".$limit;
+    $query=$this->db->query($sql);
+    $data['rows']=$query->result();
+
+    return $data;
+}
+
 function get_data($status='', $id=''){
     if($status!=""){
         if($status=="Pending"){

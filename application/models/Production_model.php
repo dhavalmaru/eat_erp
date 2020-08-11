@@ -1098,6 +1098,7 @@ class Production_model Extends CI_Model{
             $total_bars = $batch_processing[$i]->qty_in_bar;
             $short_name = $batch_processing[$i]->short_name;
             $batch_no = $batch_processing[$i]->batch_no;
+            $batch_no_id = $batch_processing[$i]->batch_no_id;
 
             $pack_of_20_id = '';
             $sql = "select A.*, B.qty from box_master A left join box_product B on (A.id = B.box_id) 
@@ -1110,7 +1111,7 @@ class Production_model Extends CI_Model{
                 $sql = "select sum(B.qty) as pack_of_20 from depot_transfer A 
                         left join depot_transfer_items B on (A.id = B.depot_transfer_id) 
                         where A.status='Approved' and A.production_id='$id' and 
-                            B.type = 'Box' and B.item_id = '$pack_of_20_id'";
+                            B.type = 'Box' and B.item_id = '$pack_of_20_id' and B.batch_no='$batch_no_id'";
                 $result = $this->db->query($sql)->result();
                 if(count($result)>0){
                     $pack_of_20 = $result[0]->pack_of_20;
@@ -1128,7 +1129,7 @@ class Production_model Extends CI_Model{
                 $sql = "select sum(B.qty) as variety_pack from depot_transfer A 
                         left join depot_transfer_items B on (A.id = B.depot_transfer_id) 
                         where A.status='Approved' and A.production_id='$id' and 
-                            B.type = 'Box' and B.item_id = '$variety_pack_id'";
+                            B.type = 'Box' and B.item_id = '$variety_pack_id' and B.batch_no='$batch_no_id'";
                 $result = $this->db->query($sql)->result();
                 if(count($result)>0){
                     $variety_pack = $result[0]->variety_pack;
@@ -1146,7 +1147,7 @@ class Production_model Extends CI_Model{
                 $sql = "select sum(B.qty) as pack_of_6 from depot_transfer A 
                         left join depot_transfer_items B on (A.id = B.depot_transfer_id) 
                         where A.status='Approved' and A.production_id='$id' and 
-                            B.type = 'Box' and B.item_id = '$pack_of_6_id'";
+                            B.type = 'Box' and B.item_id = '$pack_of_6_id' and B.batch_no='$batch_no_id'";
                 $result = $this->db->query($sql)->result();
                 if(count($result)>0){
                     $pack_of_6 = $result[0]->pack_of_6;
@@ -1155,7 +1156,7 @@ class Production_model Extends CI_Model{
 
             $sql = "select sum(B.qty) as single_bars from depot_transfer A 
                     left join depot_transfer_items B on (A.id = B.depot_transfer_id) 
-                    where A.status='Approved' and A.production_id='$id' and B.type = 'Bar' and B.item_id = '$product_id'";
+                    where A.status='Approved' and A.production_id='$id' and B.type = 'Bar' and B.item_id = '$product_id' and B.batch_no='$batch_no_id'";
             $result = $this->db->query($sql)->result();
             if(count($result)>0){
                 $single_bars = $result[0]->single_bars;
@@ -1167,7 +1168,7 @@ class Production_model Extends CI_Model{
                     from depot_transfer A 
                     left join depot_transfer_items B on (A.id = B.depot_transfer_id) 
                     left join box_product C on (B.type = 'Box' and B.item_id = C.box_id) 
-                    where A.status='Approved' and A.production_id='$id' and A.depot_in_id='5') AA  
+                    where A.status='Approved' and A.production_id='$id' and A.depot_in_id='5' and B.batch_no='$batch_no_id') AA 
                     where AA.item_id = '$product_id'";
             $result = $this->db->query($sql)->result();
             if(count($result)>0){
@@ -1180,7 +1181,7 @@ class Production_model Extends CI_Model{
                     from depot_transfer A 
                     left join depot_transfer_items B on (A.id = B.depot_transfer_id) 
                     left join box_product C on (B.type = 'Box' and B.item_id = C.box_id) 
-                    where A.status='Approved' and A.production_id='$id' and A.depot_in_id='2') AA  
+                    where A.status='Approved' and A.production_id='$id' and A.depot_in_id='2' and B.batch_no='$batch_no_id') AA 
                     where AA.item_id = '$product_id'";
             $result = $this->db->query($sql)->result();
             if(count($result)>0){

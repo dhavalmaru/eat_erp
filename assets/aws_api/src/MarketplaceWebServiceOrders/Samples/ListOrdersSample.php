@@ -22,6 +22,84 @@
  */
 
 require_once('.config.inc.php');
+// require_once('E:/wamp64/www/eat_erp/application/models/Distributor_out_model.php');
+// require_once('../../../../../application/models/Distributor_out_model.php');
+
+// $distributor_out_model = new Distributor_out_model;
+
+// require_once('E:/wamp64/www/eat_erp/index.php');
+
+// define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
+
+// $application_folder = 'E:/wamp64/www/eat_erp/application';
+// $system_path = 'E:/wamp64/www/eat_erp/system';
+// if (($_temp = realpath($system_path)) !== FALSE)
+// {
+//   $system_path = $_temp.'/';
+// }
+// else
+// {
+//   // Ensure there's a trailing slash
+//   $system_path = rtrim($system_path, '/').'/';
+// }
+// define('BASEPATH', str_replace('\\', '/', $system_path));
+// define('SYSDIR', trim(strrchr(trim(BASEPATH, '/'), '/'), '/'));
+
+// if (is_dir($application_folder))
+// {
+//   if (($_temp = realpath($application_folder)) !== FALSE)
+//   {
+//     $application_folder = $_temp;
+//   }
+
+//   define('APPPATH', $application_folder.DIRECTORY_SEPARATOR);
+// }
+// else
+// {
+//   if ( ! is_dir(BASEPATH.$application_folder.DIRECTORY_SEPARATOR))
+//   {
+//     header('HTTP/1.1 503 Service Unavailable.', TRUE, 503);
+//     echo 'Your application folder path does not appear to be set correctly. Please open the following file and correct this: '.SELF;
+//     exit(3); // EXIT_CONFIG
+//   }
+
+//   define('APPPATH', BASEPATH.$application_folder.DIRECTORY_SEPARATOR);
+// }
+
+// $view_folder = '';
+// if ( ! is_dir($view_folder))
+// {
+//   if ( ! empty($view_folder) && is_dir(APPPATH.$view_folder.DIRECTORY_SEPARATOR))
+//   {
+//     $view_folder = APPPATH.$view_folder;
+//   }
+//   elseif ( ! is_dir(APPPATH.'views'.DIRECTORY_SEPARATOR))
+//   {
+//     header('HTTP/1.1 503 Service Unavailable.', TRUE, 503);
+//     echo 'Your view folder path does not appear to be set correctly. Please open the following file and correct this: '.SELF;
+//     exit(3); // EXIT_CONFIG
+//   }
+//   else
+//   {
+//     $view_folder = APPPATH.'views';
+//   }
+// }
+
+// if (($_temp = realpath($view_folder)) !== FALSE)
+// {
+//   $view_folder = $_temp.DIRECTORY_SEPARATOR;
+// }
+// else
+// {
+//   $view_folder = rtrim($view_folder, '/\\').DIRECTORY_SEPARATOR;
+// }
+
+// define('VIEWPATH', $view_folder);
+
+// require_once BASEPATH.'core/CodeIgniter.php';
+
+// require_once('../../../../../system/core/CodeIgniter.php');
+// require_once('E:/wamp64/www/eat_erp/system/core/CodeIgniter.php');
 // require_once('PHPMailer3/PHPMailerAutoload.php');
 
 /************************************************************************
@@ -153,6 +231,7 @@ $time = date('H:i:s', time() - 44100);
 echo "Time: ".$date."T".$time."Z<br/><br/>";
 $request->setLastUpdatedAfter($date."T".$time."Z");
 invokeListOrders($service, $request, $request2);
+
 
 
 /**
@@ -914,6 +993,18 @@ invokeListOrders($service, $request, $request2);
                     $conn->query($sql);
                   }
 
+                  if($status=='Approved') {
+                    // ob_start();
+                    // $CI =& get_instance();
+                    // $CI->load->model('Distributor_out_model');
+                    // $CI->Distributor_out_model->approve_pending_sales_data($distributor_out_id);
+                    // ob_clean();
+                    // ob_flush();
+                    // ob_end_flush();
+
+                    approve_pending_sales_data($distributor_out_id, $conn);
+                  }
+
                   $sql = "insert into user_access_log (user_id, module_name, controller_name, action, table_id, date) VALUES ('" . $curusr . "', 'Distributor_Out', 'Distributor_Out', 'System Generated Sales Entry created successfully.', '".$distributor_out_id."', '".$now."')";
                   $conn->query($sql);
 
@@ -947,6 +1038,487 @@ invokeListOrders($service, $request, $request2);
         echo("XML: " . $ex->getXML() . "\n");
         echo("ResponseHeaderMetadata: " . $ex->getResponseHeaderMetadata() . "\n");
       }
+  }
+
+  function get_series($type, $conn){
+      $series = 0;
+
+      $sql="select * from series_master where type='$type'";
+      $result = $conn->query($sql);
+      if ($result->num_rows > 0) {
+          $row_arr = $result->fetch_all(MYSQLI_ASSOC);
+          if(count($row_arr)>0) {
+              $series=intval($row_arr[0]['series'])+1;
+
+              $sql="update series_master set series = '$series' where type = '$type'";
+              $conn->query($sql);
+          }
+      }
+
+      if($series==0){
+          $series=1;
+
+          $sql="insert into series_master (type, series) values ('$type', '$series')";
+          $conn->query($sql);
+      }
+
+      return $series;
+  }
+
+  function approve_pending_sales_data($id, $conn){
+      $invoice_no = '';
+      $invoice_date = '';
+
+      // Create connection
+      $conn = new mysqli(SERVERNAME, USERNAME, PASSWORD, DBNAME);
+
+      // Check connection
+      if ($conn->connect_error) {
+          die("Connection failed: " . $conn->connect_error);
+      }
+
+      $sql="select * from distributor_out where id='$id'";
+      $result = $conn->query($sql);
+      if ($result->num_rows > 0) {
+          $row_arr = $result->fetch_all(MYSQLI_ASSOC);
+          if(count($row_arr)>0) {
+              $invoice_no = $row_arr[0]['invoice_no'];
+              $invoice_date = $row_arr[0]['invoice_date'];
+          }
+      }
+
+      if($invoice_no==null || $invoice_no==''){
+          $series = get_series('Tax_Invoice', $conn);
+
+          if($invoice_date==null || $invoice_date==''){
+              $invoice_date = date('Y-m-d');
+          }
+
+          if (isset($invoice_date)){
+              if($invoice_date==''){
+                  $financial_year="";
+              } else {
+                  $financial_year=calculateFiscalYearForDate($invoice_date);
+              }
+          } else {
+              $financial_year="";
+          }
+          
+          $invoice_no = 'WHPL/'.$financial_year.'/'.strval($series);
+
+          $sql = "Update distributor_out A 
+                  Set A.invoice_no = '$invoice_no', A.invoice_date = '$invoice_date' 
+                  Where A.id = '$id'";
+          $conn->query($sql);
+
+          // echo $invoice_no;
+          // echo '<br/><br/>';
+      }
+
+      set_ledger($id, $conn);
+      set_credit_note($id, $conn);
+  }
+
+  function update_ledger($id, $entry_type, $data, $conn) {
+      $amount = 'Null';
+      if(isset($data['amount'])){
+          if($data['amount']!=''){
+              $amount = $data['amount'];
+          }
+      }
+
+      $sql = "update account_ledger_entries set ref_id='".$data['ref_id']."', ref_type='".$data['ref_type']."', entry_type='".$data['entry_type']."', invoice_no='".$data['invoice_no']."', vendor_id='".$data['vendor_id']."', acc_id='".$data['acc_id']."', ledger_name='".$data['ledger_name']."', type='".$data['type']."', amount=".$amount.", status='".$data['status']."', is_active='".$data['is_active']."', ledger_type='".$data['ledger_type']."', narration='".$data['narration']."', ref_date='".$data['ref_date']."', modified_by='".$data['modified_by']."', modified_on='".$data['modified_on']."' where ref_id='".$id."' and ref_type='Distributor_Sales' and entry_type='".$entry_type."'";
+      // echo $sql;
+      // echo '<br/><br/>';
+      $conn->query($sql);
+  }
+
+  function insert_ledger($data, $conn) {
+      $amount = 'Null';
+      if(isset($data['amount'])){
+          if($data['amount']!=''){
+              $amount = $data['amount'];
+          }
+      }
+
+      $sql = "insert into account_ledger_entries (voucher_id, ref_id, ref_type, entry_type, invoice_no, vendor_id, acc_id, ledger_name, type, amount, status, is_active, ledger_type, narration, ref_date, created_by, created_on, modified_by, modified_on) values ('".$data['voucher_id']."', '".$data['ref_id']."', '".$data['ref_type']."', '".$data['entry_type']."', '".$data['invoice_no']."', '".$data['vendor_id']."', '".$data['acc_id']."', '".$data['ledger_name']."', '".$data['type']."', ".$amount.", '".$data['status']."', '".$data['is_active']."', '".$data['ledger_type']."', '".$data['narration']."', '".$data['ref_date']."', '".$data['created_by']."', '".$data['created_on']."', '".$data['modified_by']."', '".$data['modified_on']."')";
+      // echo $sql;
+      // echo '<br/><br/>';
+      $conn->query($sql);
+  }
+
+  function set_ledger($id, $conn) {
+      $now=date('Y-m-d H:i:s');
+      $curusr='191';
+
+      $sql = "select A.*, B.id as acc_id, B.ledger_name from distributor_out A left join account_ledger_master B 
+                  on (A.distributor_id = B.ref_id and B.ref_type = 'Distributor') 
+              where A.id = '$id' and B.status = 'Approved'";
+      // echo $sql;
+      // echo '<br/><br/>';
+
+      $result = $conn->query($sql);
+      if ($result->num_rows > 0) {
+          $row_arr = $result->fetch_all(MYSQLI_ASSOC);
+
+          // echo json_encode($row_arr);
+          // echo '<br/><br/>';
+
+          if(count($row_arr)>0) {
+              if(isset($row_arr[0]['invoice_date']) && $row_arr[0]['invoice_date']!=''){
+                  $ref_date = $row_arr[0]['invoice_date'];
+              } else {
+                  $ref_date = $row_arr[0]['date_of_processing'];
+              }
+          
+              $data = array(
+                          'ref_id' => $id,
+                          'ref_type' => 'Distributor_Sales',
+                          'entry_type' => 'Total Amount',
+                          'invoice_no' => $row_arr[0]['invoice_no'],
+                          'vendor_id' => $row_arr[0]['distributor_id'],
+                          'acc_id' => $row_arr[0]['acc_id'],
+                          'ledger_name' => $row_arr[0]['ledger_name'],
+                          'type' => 'Debit',
+                          // 'amount' => $row_arr[0]['final_amount'],
+                          'amount' => $row_arr[0]['invoice_amount'],
+                          'status' => $row_arr[0]['status'],
+                          'is_active' => '1',
+                          'ledger_type' => 'Main Entry',
+                          'narration' => $row_arr[0]['remarks'],
+                          'ref_date' => $ref_date,
+                          'modified_by' => $curusr,
+                          'modified_on' => $now
+                      );
+
+              $ledger_array[0] = $data;
+              $ledger_array[1] = $data;
+              $ledger_array[2] = $data;
+              $ledger_array[3] = $data;
+
+              // echo json_encode($ledger_array);
+              // echo '<br/>';
+
+              $ledger_array[1]['entry_type'] = 'Taxable Amount';
+              $ledger_array[1]['acc_id'] = '1';
+              $ledger_array[1]['ledger_name'] = 'Sales';
+              $ledger_array[1]['type'] = 'Credit';
+              $ledger_array[1]['amount'] = $row_arr[0]['amount'];
+              $ledger_array[1]['ledger_type'] = 'Sub Entry';
+
+              $ledger_array[2]['entry_type'] = 'Tax';
+              $ledger_array[2]['acc_id'] = '2';
+              $ledger_array[2]['ledger_name'] = 'GST';
+              $ledger_array[2]['type'] = 'Credit';
+              $ledger_array[2]['amount'] = $row_arr[0]['tax_amount'];
+              $ledger_array[2]['ledger_type'] = 'Sub Entry';
+
+              $ledger_array[3]['entry_type'] = 'Shipping Charges';
+              $ledger_array[3]['acc_id'] = '2';
+              $ledger_array[3]['ledger_name'] = 'Shipping Charges';
+              $ledger_array[3]['type'] = 'Credit';
+              $ledger_array[3]['amount'] = $row_arr[0]['shipping_charges'];
+              $ledger_array[3]['ledger_type'] = 'Sub Entry';
+
+              // echo json_encode($ledger_array);
+              // echo '<br/>';
+
+              $bl_flag = false;
+              $sql = "select * from account_ledger_entries where ref_id = '$id' and 
+                      ref_type = 'Distributor_Sales'";
+              $result = $conn->query($sql);
+              if ($result->num_rows > 0) {
+                  $row_arr = $result->fetch_all(MYSQLI_ASSOC);
+                  if(count($row_arr)>0) {
+                      $bl_flag = true;
+
+                      // $this->db->where('ref_id', $id);
+                      // $this->db->where('ref_type', 'Distributor_Sales');
+                      // $this->db->where('entry_type', 'Total Amount');
+                      // $this->db->update('account_ledger_entries', $ledger_array[0]);
+
+                      // $this->db->where('ref_id', $id);
+                      // $this->db->where('ref_type', 'Distributor_Sales');
+                      // $this->db->where('entry_type', 'Taxable Amount');
+                      // $this->db->update('account_ledger_entries', $ledger_array[1]);
+
+                      // $this->db->where('ref_id', $id);
+                      // $this->db->where('ref_type', 'Distributor_Sales');
+                      // $this->db->where('entry_type', 'Tax');
+                      // $this->db->update('account_ledger_entries', $ledger_array[2]);
+
+                      // $this->db->where('ref_id', $id);
+                      // $this->db->where('ref_type', 'Distributor_Sales');
+                      // $this->db->where('entry_type', 'Shipping Charges');
+                      // $this->db->update('account_ledger_entries', $ledger_array[3]);
+
+                      update_ledger($id, 'Total Amount', $ledger_array[0], $conn);
+                      update_ledger($id, 'Taxable Amount', $ledger_array[1], $conn);
+                      update_ledger($id, 'Tax', $ledger_array[2], $conn);
+                      update_ledger($id, 'Shipping Charges', $ledger_array[3], $conn);
+                  }
+              } 
+              if($bl_flag==false) {
+                  $series = get_series('Account_Voucher', $conn);
+
+                  $voucher_id = $series;
+
+                  $ledger_array[0]['voucher_id'] = $voucher_id;
+                  $ledger_array[0]['created_by']=$curusr;
+                  $ledger_array[0]['created_on']=$now;
+
+                  $ledger_array[1]['voucher_id'] = $voucher_id;
+                  $ledger_array[1]['created_by']=$curusr;
+                  $ledger_array[1]['created_on']=$now;
+
+                  $ledger_array[2]['voucher_id'] = $voucher_id;
+                  $ledger_array[2]['created_by']=$curusr;
+                  $ledger_array[2]['created_on']=$now;
+
+                  $ledger_array[3]['voucher_id'] = $voucher_id;
+                  $ledger_array[3]['created_by']=$curusr;
+                  $ledger_array[3]['created_on']=$now;
+
+                  // $this->db->insert('account_ledger_entries', $ledger_array[0]);
+                  // $this->db->insert('account_ledger_entries', $ledger_array[1]);
+                  // $this->db->insert('account_ledger_entries', $ledger_array[2]);
+                  // $this->db->insert('account_ledger_entries', $ledger_array[3]);
+
+                  insert_ledger($ledger_array[0], $conn);
+                  insert_ledger($ledger_array[1], $conn);
+                  insert_ledger($ledger_array[2], $conn);
+                  insert_ledger($ledger_array[3], $conn);
+              }
+
+              // echo json_encode($ledger_array);
+          }
+      }
+  }
+
+  function set_credit_note($id='', $conn){
+      $sql = "select * from distributor_out where id = '$id'";
+      $result = $conn->query($sql);
+      if ($result->num_rows > 0) {
+          $row_arr = $result->fetch_all(MYSQLI_ASSOC);
+          if(count($row_arr)>0) {
+              // $date_of_processing = $row_arr[0]['date_of_processing'];
+              if(isset($row_arr[0]['invoice_date']) && $row_arr[0]['invoice_date']!=''){
+                  $date_of_processing = $row_arr[0]['invoice_date'];
+              } else {
+                  $date_of_processing = $row_arr[0]['date_of_processing'];
+              }
+              $invoice_no = $row_arr[0]['invoice_no'];
+              $distributor_id = $row_arr[0]['distributor_id'];
+              $created_by = $row_arr[0]['created_by'];
+              $created_on = $row_arr[0]['created_on'];
+              $modified_by = $row_arr[0]['modified_by'];
+              $modified_on = $row_arr[0]['modified_on'];
+              $approved_by = $row_arr[0]['approved_by'];
+              $approved_on = $row_arr[0]['approved_on'];
+              $rejected_by = $row_arr[0]['rejected_by'];
+              $rejected_on = $row_arr[0]['rejected_on'];
+              $discount = $row_arr[0]['discount'];
+
+              if($discount==null || $discount==''){
+                  $discount = 0;
+              } else {
+                  $discount = doubleval($discount);
+              }
+
+              $total_inv_amount = 0;
+              $total_amount = 0;
+              $tax_type = 'Intra';
+              $promo_margin = 0;
+              $bal_amount = 0;
+
+              $sql = "select * from distributor_out_items where distributor_out_id = '$id'";
+              $result = $conn->query($sql);
+              if ($result->num_rows > 0) {
+                  $row_arr = $result->fetch_all(MYSQLI_ASSOC);
+                  if(count($row_arr)>0) {
+                      // echo json_encode($row_arr);
+                      // echo '<br/>';
+
+                      for($i=0; $i<count($row_arr); $i++){
+                          $qty = doubleval($row_arr[$i]['qty']);
+                          $rate = doubleval($row_arr[$i]['rate']);
+                          $total_amt = doubleval($row_arr[$i]['total_amt']);
+                          $margin_per = doubleval($row_arr[$i]['margin_per']);
+                          $tax_percentage = doubleval($row_arr[$i]['tax_percentage']);
+                          $promo_margin = doubleval($row_arr[$i]['promo_margin']);
+                          $cgst_amt = doubleval($row_arr[$i]['cgst_amt']);
+                          $sgst_amt = doubleval($row_arr[$i]['sgst_amt']);
+                          $igst_amt = doubleval($row_arr[$i]['igst_amt']);
+
+                          if($igst_amt>0){
+                              $tax_type = 'Inter';
+                          }
+
+                          $total_inv_amount = $total_inv_amount + $total_amt;
+
+                          $total_margin = $margin_per + $promo_margin + $discount;
+                          $sell_rate = $rate - (($rate*$total_margin)/100);
+                          // $sell_rate = $sell_rate/(100+$tax_percentage)*100;
+
+                          $tot_amt = $qty * $sell_rate;
+                          $total_amount = $total_amount + $tot_amt;
+
+                          // echo $total_margin.'<br/>';
+                          // echo $rate.'<br/>';
+                          // echo $sell_rate.'<br/>';
+                          // echo $tot_amt.'<br/>';
+                      }
+                  }
+              }
+
+              $total_inv_amount = round($total_inv_amount, 2);
+              $total_amount = round($total_amount, 2);
+
+              $bal_amount = round($total_inv_amount - $total_amount, 0);
+
+              $credit_debit_note_id = '';
+              $ref_no = '';
+              $ref_date = null;
+              $modified_approved_date = null;
+              $action = '';
+
+              $sql = "select * from credit_debit_note where distributor_out_id = '$id'";
+              $result = $conn->query($sql);
+              if ($result->num_rows==0) {
+                  if($bal_amount<=-1 && $bal_amount>=1){
+                      $series = get_series('Credit_debit_note', $conn);
+
+                      $ref_date = date('Y-m-d');
+
+                      if (isset($ref_date)){
+                          if($ref_date==''){
+                              $financial_year="";
+                          } else {
+                              $financial_year=calculateFiscalYearForDate($ref_date);
+                              if(strpos($financial_year,'-')!==false){
+                                  $financial_year = substr($financial_year, 0, strpos($financial_year,'-'));
+                              }
+                          }
+                      } else {
+                          $financial_year="";
+                      }
+                      
+                      // $ref_no = 'WHPL/exp/'.$financial_year.'/'.strval($series);
+                      $ref_no = 'WHPL/'.$financial_year.'-EXP/'.strval($series);
+                      $modified_approved_date = null;
+                  }
+              } else {
+                  $row_arr = $result->fetch_all(MYSQLI_ASSOC);
+                  if(count($row_arr)>0) {
+                      $credit_debit_note_id = $row_arr[0]['id'];
+                      $ref_no = $row_arr[0]['ref_no'];
+                      $ref_date = $row_arr[0]['ref_date'];
+                      $modified_approved_date = $row_arr[0]['modified_approved_date'];
+                  }
+              }
+
+              if($bal_amount!=0){
+                  $bal_amount = round($total_inv_amount - $total_amount, 0);
+
+                  // echo $total_inv_amount.'<br/>';
+                  // echo $total_amount.'<br/>';
+                  // echo $bal_amount.'<br/>';
+
+                  $tax_per = 18;
+                  $amount_without_tax = round($bal_amount/(1+($tax_per/100)), 4);
+                  $cgst_amt = 0;
+                  $sgst_amt = 0;
+                  $igst_amt = 0;
+                  if($tax_type == 'Intra'){
+                      $cgst_amt = round(($amount_without_tax*($tax_per/2))/100, 4);
+                      $sgst_amt = round(($amount_without_tax*($tax_per/2))/100, 4);
+                  } else {
+                      $igst_amt = round(($amount_without_tax*$tax_per)/100, 4);
+                  }
+
+                  $amount = round(($amount_without_tax + $cgst_amt + $sgst_amt + $igst_amt), 0);
+
+                  // echo $amount_without_tax.'<br/>';
+                  // echo $cgst_amt.'<br/>';
+                  // echo $sgst_amt.'<br/>';
+                  // echo $igst_amt.'<br/>';
+                  // echo $amount.'<br/>';
+
+                  $data = array(
+                      'date_of_transaction' => $date_of_processing,
+                      'distributor_id' => $distributor_id,
+                      'transaction' => 'Expense Voucher',
+                      'invoice_no' => $invoice_no,
+                      'distributor_type' => 'Invoice',
+                      'amount' => $amount,
+                      'tax' => $tax_per,
+                      'igst' => $igst_amt,
+                      'cgst' => $cgst_amt,
+                      'sgst' => $sgst_amt,
+                      'amount_without_tax' => $amount_without_tax,
+                      'status' => 'Approved',
+                      'remarks' => 'SG - Promotion Charges Expense Voucher against invoice no '.$invoice_no,
+                      'created_by' => $created_by,
+                      'created_on' => $created_on,
+                      'modified_by' => $modified_by,
+                      'modified_on' => $modified_on,
+                      'approved_by' => $approved_by,
+                      'approved_on' => $approved_on,
+                      'rejected_by' => $rejected_by,
+                      'rejected_on' => $rejected_on,
+                      'ref_no' => $ref_no,
+                      'ref_date' => $ref_date,
+                      'modified_approved_date' => $modified_approved_date,
+                      'distributor_out_id' => $id,
+                      'exp_category_id' => '1'
+                  );
+
+                  if($credit_debit_note_id==''){
+                      $sql = "insert into credit_debit_note (date_of_transaction, distributor_id, transaction, invoice_no, distributor_type, amount, tax, igst, cgst, sgst, amount_without_tax, status, remarks, created_by, created_on, modified_by, modified_on, approved_by, approved_on, rejected_by, rejected_on, ref_no, ref_date, modified_approved_date, distributor_out_id, exp_category_id) values ('$date_of_processing', '$distributor_id', 'Expense Voucher', '$invoice_no', 'Invoice', '$amount', '$tax_per', '$igst_amt', '$cgst_amt', '$sgst_amt', '$amount_without_tax', 'Approved', 'SG - Promotion Charges Expense Voucher against invoice no ".$invoice_no."', '$created_by', '$created_on', '$modified_by', '$modified_on', '$approved_by', '$approved_on', '$rejected_by', '$rejected_on', '$ref_no', '$ref_date', '$modified_approved_date', '$id', '1')";
+                      if ($conn->query($sql) === TRUE) {
+                          $credit_debit_note_id = $conn->insert_id;
+                          $action='Credit_debit_note Entry Created.';
+                      }
+                  } else {
+                      $sql = "update credit_debit_note set date_of_transaction='$date_of_processing', distributor_id='$distributor_id', transaction='Expense Voucher', invoice_no='$invoice_no', distributor_type='Invoice', amount='$amount', tax='$tax_per', igst='$igst_amt', cgst='$cgst_amt', sgst='$sgst_amt', amount_without_tax='$amount_without_tax', status='Approved', remarks='SG - Promotion Charges Expense Voucher against invoice no ".$invoice_no."', created_by='$created_by', created_on='$created_on', modified_by='$modified_by', modified_on='$modified_on', approved_by='$approved_by', approved_on='$approved_on', rejected_by='$rejected_by', rejected_on='$rejected_on', ref_no='$ref_no', ref_date='$ref_date', modified_approved_date='$modified_approved_date', distributor_out_id='$id', exp_category_id='1' where id='$credit_debit_note_id'";
+                      if ($conn->query($sql) === TRUE) {
+                          $action='Credit_debit_note Entry Modified.';
+                      }
+                  }
+
+                  $sql = "insert into user_access_log (user_id, module_name, controller_name, action, table_id, date) values ('$curusr', 'Credit_debit_note', 'Credit_debit_note', '$action', '$credit_debit_note_id', '$now')";
+                  $conn->query($sql);
+              } else {
+                  if($credit_debit_note_id!=''){
+                      $sql = "update credit_debit_note set status='InActive' where id='$credit_debit_note_id'";
+                      $conn->query($sql);
+                  }
+              }
+          }
+      }
+  }
+
+  function calculateFiscalYearForDate($inputDate){
+      $year=substr($inputDate, 0, strpos($inputDate, "-"));
+      $month=substr($inputDate, strpos($inputDate, "-")+1, strrpos($inputDate, "-")-1);
+
+      $year=intval($year);
+      $month=intval($month);
+
+      if($month<4){
+          $fyStart=$year-1;
+          $fyEnd=$year;
+      } else {
+          $fyStart=$year;
+          $fyEnd=$year+1;
+      }
+
+      $fyStart=substr(strval($fyStart),2);
+      $fyEnd=substr(strval($fyEnd),2);
+
+      $financial_year=$fyStart.'-'.$fyEnd;
+
+      return $financial_year;
   }
 
   function invokeListOrderItems(MarketplaceWebServiceOrders_Interface $service, $request)

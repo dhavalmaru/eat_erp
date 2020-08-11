@@ -83,7 +83,7 @@ class Dashboard extends CI_Controller
     // }
 
     public function stock(){
-        $data['raw_material_details']=$this->dashboard_model->get_raw_material_stock();
+        // $data['raw_material_details']=$this->dashboard_model->get_raw_material_stock();
         $data['product_details1']=$this->dashboard_model->get_product_stock();
         $data['box_details']=$this->dashboard_model->get_box_stock();
 
@@ -151,136 +151,132 @@ class Dashboard extends CI_Controller
       
 
 
-        // $data['product_details_for_distributor']=$this->dashboard_model->get_product_stock_for_distributor();
-        $stock_details=$this->dashboard_model->get_product_stock_for_distributor();
-        $j=0;
-        $k=0;
-        $l=0;
-        $bl_found = false;
-        $distributor_id = '';
-        $product_id = '';
-        $prv_distributor_id = '';
-        $prv_product_id = '';
-        $distributor = array();
-        $product = array();
-        $distributor_name = array();
-        $product_name = array();
-        $product_details = array();
-        for($i=0;$i<count($stock_details);$i++){
-            $distributor_id = $stock_details[$i]->distributor_id;
-            if($distributor_id!=$prv_distributor_id){
-                $distributor[$j] = $distributor_id;
-                $distributor_name[$j] = $stock_details[$i]->distributor_name;
-                $prv_distributor_id = $distributor_id;
-                $j = $j + 1;
-            }
+        // $stock_details=$this->dashboard_model->get_product_stock_for_distributor();
+        // $j=0;
+        // $k=0;
+        // $l=0;
+        // $bl_found = false;
+        // $distributor_id = '';
+        // $product_id = '';
+        // $prv_distributor_id = '';
+        // $prv_product_id = '';
+        // $distributor = array();
+        // $product = array();
+        // $distributor_name = array();
+        // $product_name = array();
+        // $product_details = array();
+        // for($i=0;$i<count($stock_details);$i++){
+        //     $distributor_id = $stock_details[$i]->distributor_id;
+        //     if($distributor_id!=$prv_distributor_id){
+        //         $distributor[$j] = $distributor_id;
+        //         $distributor_name[$j] = $stock_details[$i]->distributor_name;
+        //         $prv_distributor_id = $distributor_id;
+        //         $j = $j + 1;
+        //     }
 
-            $product_id = $stock_details[$i]->product_id;
-            $bl_found = false;
-            for($l=0;$l<count($product);$l++){
-                if($product[$l]==$product_id){
-                    $bl_found = true;
-                }
-            }
-            if($bl_found == false){
-                $product[$k] = $product_id;
-                $product_name[$k] = $stock_details[$i]->short_name;
-                $k = $k + 1;
-            }
-            // if($product_id!=$prv_product_id){
-            //     $product[$k] = $product_id;
-            //     $product_name[$k] = $stock_details[$i]->short_name;
-            //     $prv_product_id = $product_id;
-            //     $k = $k + 1;
-            // }
-        }
+        //     $product_id = $stock_details[$i]->product_id;
+        //     $bl_found = false;
+        //     for($l=0;$l<count($product);$l++){
+        //         if($product[$l]==$product_id){
+        //             $bl_found = true;
+        //         }
+        //     }
+        //     if($bl_found == false){
+        //         $product[$k] = $product_id;
+        //         $product_name[$k] = $stock_details[$i]->short_name;
+        //         $k = $k + 1;
+        //     }
+        //     // if($product_id!=$prv_product_id){
+        //     //     $product[$k] = $product_id;
+        //     //     $product_name[$k] = $stock_details[$i]->short_name;
+        //     //     $prv_product_id = $product_id;
+        //     //     $k = $k + 1;
+        //     // }
+        // }
 
-        for($i=0;$i<count($distributor);$i++){
-            for($j=0;$j<count($product);$j++){
-                $product_details[$distributor[$i]][$product[$j]] = 0;
-            }
-        }
+        // for($i=0;$i<count($distributor);$i++){
+        //     for($j=0;$j<count($product);$j++){
+        //         $product_details[$distributor[$i]][$product[$j]] = 0;
+        //     }
+        // }
 
-        for($i=0;$i<count($stock_details);$i++){
-            $product_details[$stock_details[$i]->distributor_id][$stock_details[$i]->product_id] = $stock_details[$i]->bal_qty;
-        }
+        // for($i=0;$i<count($stock_details);$i++){
+        //     $product_details[$stock_details[$i]->distributor_id][$stock_details[$i]->product_id] = $stock_details[$i]->bal_qty;
+        // }
 
-        $data['ss_distributor']=$distributor;
-        $data['ss_product']=$product;
-        $data['ss_distributor_name']=$distributor_name;
-        $data['ss_product_name']=$product_name;
-        $data['ss_product_details']=$product_details;
-
+        // $data['ss_distributor']=$distributor;
+        // $data['ss_product']=$product;
+        // $data['ss_distributor_name']=$distributor_name;
+        // $data['ss_product_name']=$product_name;
+        // $data['ss_product_details']=$product_details;
 
 
-        // $data['box_details_for_distributor']=$this->dashboard_model->get_box_stock_for_distributor();
-        $stock_details=$this->dashboard_model->get_box_stock_for_distributor();
-        $j=0;
-        $k=0;
-        $l=0;
-        $bl_found = false;
-        $distributor_id = '';
-        $box_id = '';
-        $prv_distributor_id = '';
-        $prv_box_id = '';
-        $distributor = array();
-        $product = array();
-        $distributor_name = array();
-        $product_name = array();
-        $product_details = array();
-        for($i=0;$i<count($stock_details);$i++){
-            $distributor_id = $stock_details[$i]->distributor_id;
-            if($distributor_id!=$prv_distributor_id){
-                $distributor[$j] = $distributor_id;
-                $distributor_name[$j] = $stock_details[$i]->distributor_name;
-                $prv_distributor_id = $distributor_id;
-                $j = $j + 1;
-            }
 
-            // $box_id = $stock_details[$i]->box_id;
-            // $bl_found = false;
-            // for($l=0;$l<count($product);$l++){
-            //     if($product[$l]==$box_id){
-            //         $bl_found = true;
-            //     }
-            // }
-            $short_name = $stock_details[$i]->short_name;
-            $bl_found = false;
-            for($l=0;$l<count($product);$l++){
-                if($product[$l]==$short_name){
-                    $bl_found = true;
-                }
-            }
-            if($bl_found == false){
-                $product[$k] = $short_name;
-                $product_name[$k] = $stock_details[$i]->short_name;
-                $k = $k + 1;
-            }
-            // if($box_id!=$prv_box_id){
-            //     $product[$k] = $box_id;
-            //     $product_name[$k] = $stock_details[$i]->short_name;
-            //     $prv_box_id = $box_id;
-            //     $k = $k + 1;
-            // }
-        }
+        // $stock_details=$this->dashboard_model->get_box_stock_for_distributor();
+        // $j=0;
+        // $k=0;
+        // $l=0;
+        // $bl_found = false;
+        // $distributor_id = '';
+        // $box_id = '';
+        // $prv_distributor_id = '';
+        // $prv_box_id = '';
+        // $distributor = array();
+        // $product = array();
+        // $distributor_name = array();
+        // $product_name = array();
+        // $product_details = array();
+        // for($i=0;$i<count($stock_details);$i++){
+        //     $distributor_id = $stock_details[$i]->distributor_id;
+        //     if($distributor_id!=$prv_distributor_id){
+        //         $distributor[$j] = $distributor_id;
+        //         $distributor_name[$j] = $stock_details[$i]->distributor_name;
+        //         $prv_distributor_id = $distributor_id;
+        //         $j = $j + 1;
+        //     }
 
-        for($i=0;$i<count($distributor);$i++){
-            for($j=0;$j<count($product);$j++){
-                $product_details[$distributor[$i]][$product[$j]] = 0;
-            }
-        }
+        //     // $box_id = $stock_details[$i]->box_id;
+        //     // $bl_found = false;
+        //     // for($l=0;$l<count($product);$l++){
+        //     //     if($product[$l]==$box_id){
+        //     //         $bl_found = true;
+        //     //     }
+        //     // }
+        //     $short_name = $stock_details[$i]->short_name;
+        //     $bl_found = false;
+        //     for($l=0;$l<count($product);$l++){
+        //         if($product[$l]==$short_name){
+        //             $bl_found = true;
+        //         }
+        //     }
+        //     if($bl_found == false){
+        //         $product[$k] = $short_name;
+        //         $product_name[$k] = $stock_details[$i]->short_name;
+        //         $k = $k + 1;
+        //     }
+        //     // if($box_id!=$prv_box_id){
+        //     //     $product[$k] = $box_id;
+        //     //     $product_name[$k] = $stock_details[$i]->short_name;
+        //     //     $prv_box_id = $box_id;
+        //     //     $k = $k + 1;
+        //     // }
+        // }
 
-        for($i=0;$i<count($stock_details);$i++){
-            $product_details[$stock_details[$i]->distributor_id][$stock_details[$i]->short_name] = $stock_details[$i]->bal_qty;
-        }
+        // for($i=0;$i<count($distributor);$i++){
+        //     for($j=0;$j<count($product);$j++){
+        //         $product_details[$distributor[$i]][$product[$j]] = 0;
+        //     }
+        // }
 
-        $data['ss_box_distributor']=$distributor;
-        $data['ss_box']=$product;
-        $data['ss_box_distributor_name']=$distributor_name;
-        $data['ss_box_name']=$product_name;
-        $data['ss_box_details']=$product_details;
+        // for($i=0;$i<count($stock_details);$i++){
+        //     $product_details[$stock_details[$i]->distributor_id][$stock_details[$i]->short_name] = $stock_details[$i]->bal_qty;
+        // }
 
-        // dump($data);
+        // $data['ss_box_distributor']=$distributor;
+        // $data['ss_box']=$product;
+        // $data['ss_box_distributor_name']=$distributor_name;
+        // $data['ss_box_name']=$product_name;
+        // $data['ss_box_details']=$product_details;
 
         load_view('dashboard/dashboard', $data);
     }

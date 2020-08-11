@@ -145,10 +145,10 @@
                                                             <option value="<?php echo $invoice[$k]->invoice_no; ?>" <?php if (isset($data)) { if($invoice[$k]->invoice_no==$data[0]->invoice_no) { echo 'selected'; } } ?>><?php echo $invoice[$k]->invoice_no; ?></option>
                                                     <?php }} ?>
                                                 </select>
-                                          
-                                                
                                             </div>
-                                            
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <button type="button" class="btn btn-sm" onclick="get_invoice_nos();">Get Invoice Nos</button>
+                                            </div>
                                         </div>
                                     </div>
 									
@@ -276,25 +276,31 @@
 
                 $("#distributor_id").change(function(){
                     get_distributor_details();
-					// get_distributor_details1();
-                    get_tax();
-                    // get_tax1();
+					get_tax();
+                    // get_invoice_nos();
                 });
 
                 $("#amount_without_tax").change(function(){
                     get_tax();
-                    // get_tax1();
                 });
 
                 $("#tax").change(function(){
                     get_tax();
-					// get_tax1();
                 });
 
                 $(".datepicker1").datepicker({ maxDate: 0,changeMonth: true,yearRange:'-100:+0',changeYear: true });
 
                 get_distributor_details();
-                // get_distributor_details1();
+            });
+            
+            $('#distributor_type').change(function(){   
+                if($('#distributor_type').val()=='Invoice') {
+                    $('#invoice_no_div').show();
+                    $('#tax').val('5');
+                } else {
+                    $('#invoice_no_div').hide();
+                    $('#tax').val('');
+                }
             });
 
 
@@ -365,81 +371,33 @@
                 });
             }
 			
-            // function get_tax1(){
-            //     $.ajax({
-            //         url:BASE_URL+'index.php/Distributor/get_data',
-            //         method:"post",
-            //         data:{id:$('#distributor_id').val()},
-            //         dataType:"json",
-            //         async:false,
-            //         success: function(data){
-            //             if(data.result==1){
-            //                 if(!isNaN($('#amount_without_tax').val()) && $('#amount_without_tax').val()!='' && !isNaN($('#tax').val()) && $('#tax').val()!=''){
-            //                     // if($('#distributor_id').val()!="214" && $('#distributor_id').val()!="550") {
-            //                         var state = data.state;
-            //                         var state_code = data.state_code;
-            //                         if (state_code=='27')
-            //                         {
-            //                             $('#igst1').text("0");
-            //                             var tax = $('#tax').val();
-            //                             var amount = $('#amount_without_tax').val();
-            //                             cgst=(tax/2)*amount/100;
-            //                             sgst=(tax/2)*amount/100;
-            //                             $('#cgst1').text(cgst);
-            //                             $('#sgst1').text(sgst);
-            //                             var total_amount = parseInt(amount)+parseInt(cgst)+parseInt(sgst);
-            //                             $('#total_amount1').text(total_amount);
-            //                         }
-            //                         else {
-            //                             $('#cgst1').text('IGST (In Rs)0');
-            //                             $('#sgst1').text('0');
-            //                             var tax = $('#tax').val();
-            //                             var amount = $('#amount_without_tax').val();
-            //                             igst=tax*amount/100;
-            //                             $('#igst1').text(igst);
-            //                             var total_amount = parseInt(amount)+parseInt(igst);
-            //                             $('#total_amount1').val(total_amount);
-            //                         }
-            //                     // }
-            //                 }
-            //             }
-            //         },
-            //         error: function (response) {
-            //             var r = jQuery.parseJSON(response.responseText);
-            //             alert("Message: " + r.Message);
-            //             alert("StackTrace: " + r.StackTrace);
-            //             alert("ExceptionType: " + r.ExceptionType);
-            //         }
-            //     });
-            // }
-			
-			
-			$('#distributor_id').change(function(){
-				  var distributor_id = $('#distributor_id').val();
-					//console.log(reporting_manager_id);
-				  // AJAX request
-				  $.ajax({
-					url:'<?=base_url()?>index.php/credit_debit_note/get_invoice',
-					method: 'post',
-					data: {distributor_id: distributor_id},
-					dataType: 'json',
-					success: function(response){
+			function get_invoice_nos() {
+                var distributor_id = $('#distributor_id').val();
+                var invoice_no = $('#invoice_no').val();
+                //console.log(reporting_manager_id);
+                // AJAX request
+                $.ajax({
+                    url:'<?=base_url()?>index.php/credit_debit_note/get_invoice',
+                    method: 'post',
+                    data: {distributor_id: distributor_id},
+                    dataType: 'html',
+                    async: false,
+                    success: function(response){
+                        $('#invoice_no').html(response);
 
-			 
-					  $('#invoice_no').find('option').not(':first').remove();
-				  
+                        $('#invoice_no').val(invoice_no);
 
-					  // Add options
-					  // response = $.parseJSON(response);
-					  // console.log(response);
-					  $.each(response,function(index,data){
-						 $('#invoice_no').append('<option value="'+data['invoice_no']+'">'+data['invoice_no']+'</option>');
-					
-					  });
-					}
-				 });
-			   });
-			
+                        // $('#invoice_no').find('option').not(':first').remove();
+
+                        // // Add options
+                        // // response = $.parseJSON(response);
+                        // // console.log(response);
+                        // $.each(response,function(index,data){
+                        //     $('#invoice_no').append('<option value="'+data['invoice_no']+'">'+data['invoice_no']+'</option>');
+                        // });
+                    }
+                });
+            }
 
             function get_distributor_details(){
                 var distributor_id = $('#distributor_id').val();
@@ -454,8 +412,8 @@
                         async:false,
                         success: function(data){
                             if(data.result==1){
-                                $('#total_outstanding').val(data.total_outstanding);
-                                $('#total_outstanding1').text(data.total_outstanding);
+                                $('#total_outstanding').val(Math.round(data.total_outstanding*100)/100);
+                                $('#total_outstanding1').text(Math.round(data.total_outstanding*100)/100);
                             }
                         },
                         error: function (response) {
@@ -467,42 +425,6 @@
                     });
                 }
             }
-			
-            // function get_distributor_details1(){
-            //     var distributor_id = $('#distributor_id').val();
-            //     var module = 'credit_debit_note';
-
-            //     if(distributor_id!=''){
-            //         $.ajax({
-            //             url:BASE_URL+'index.php/Payment/get_total_outstanding',
-            //             method:"post",
-            //             data:'id='+$("#id").val()+'&distributor_id='+distributor_id+'&module='+module,
-            //             dataType:"json",
-            //             async:false,
-            //             success: function(data){
-            //                 if(data.result==1){
-            //                     $('#total_outstanding1').text(data.total_outstanding);
-            //                 }
-            //             },
-            //             error: function (response) {
-            //                 var r = jQuery.parseJSON(response.responseText);
-            //                 alert("Message: " + r.Message);
-            //                 alert("StackTrace: " + r.StackTrace);
-            //                 alert("ExceptionType: " + r.ExceptionType);
-            //             }
-            //         });
-            //     }
-            // }
-
-    		$('#distributor_type').change(function(){	
-        		if($('#distributor_type').val()=='Invoice') {
-        			$('#invoice_no_div').show();
-        			$('#tax').val('5');
-        		} else {
-        			$('#invoice_no_div').hide();
-        			$('#tax').val('');
-        		}
-    		});
         </script>
         <!-- END SCRIPTS -->      
     </body>

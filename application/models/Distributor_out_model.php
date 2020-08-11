@@ -1179,6 +1179,8 @@ function set_credit_note($id=''){
 
         if($discount==null || $discount==''){
             $discount = 0;
+        } else {
+            $discount = doubleval($discount);
         }
 
         $sql = "select * from distributor_out_items where distributor_out_id = '$id'";
@@ -1196,15 +1198,15 @@ function set_credit_note($id=''){
 
         if(count($result)>0){
             for($i=0; $i<count($result); $i++){
-                $qty = floatval($result[$i]->qty);
-                $rate = floatval($result[$i]->rate);
-                $total_amt = floatval($result[$i]->total_amt);
-                $margin_per = floatval($result[$i]->margin_per);
-                $tax_percentage = floatval($result[$i]->tax_percentage);
-                $promo_margin = floatval($result[$i]->promo_margin);
-                $cgst_amt = floatval($result[$i]->cgst_amt);
-                $sgst_amt = floatval($result[$i]->sgst_amt);
-                $igst_amt = floatval($result[$i]->igst_amt);
+                $qty = doubleval($result[$i]->qty);
+                $rate = doubleval($result[$i]->rate);
+                $total_amt = doubleval($result[$i]->total_amt);
+                $margin_per = doubleval($result[$i]->margin_per);
+                $tax_percentage = doubleval($result[$i]->tax_percentage);
+                $promo_margin = doubleval($result[$i]->promo_margin);
+                $cgst_amt = doubleval($result[$i]->cgst_amt);
+                $sgst_amt = doubleval($result[$i]->sgst_amt);
+                $igst_amt = doubleval($result[$i]->igst_amt);
 
                 if($igst_amt>0){
                     $tax_type = 'Inter';
@@ -1226,6 +1228,9 @@ function set_credit_note($id=''){
             }
         }
 
+        $total_inv_amount = round($total_inv_amount, 2);
+        $total_amount = round($total_amount, 2);
+
         $bal_amount = round($total_inv_amount - $total_amount, 0);
 
         $credit_debit_note_id = '';
@@ -1237,7 +1242,7 @@ function set_credit_note($id=''){
         $query = $this->db->query($sql);
         $result = $query->result();
         if(count($result)==0){
-            if($bal_amount!=0){
+            if($bal_amount<=-1 && $bal_amount>=1){
                 $sql="select * from series_master where type='Credit_debit_note'";
                 $query=$this->db->query($sql);
                 $result=$query->result();
@@ -2085,7 +2090,7 @@ public function get_pending_sales_data($status){
     }
 
     $sql = "select A.*, B.distributor_name, B.location_id, C.location, D.depot_name from 
-            (select A.id, A.date_of_processing, A.distributor_id, A.depot_id, A.invoice_amount, A.delivery_status, A.status, A.modified_on from distributor_out A".$cond.") A 
+            (select A.id, A.date_of_processing, A.distributor_id, A.depot_id, A.order_no, A.invoice_amount, A.delivery_status, A.status, A.modified_on from distributor_out A".$cond.") A 
             left join 
             (select id, distributor_name, location_id from distributor_master) B 
             on (A.distributor_id=B.id) 
@@ -2149,6 +2154,9 @@ public function approve_pending_sales_data($id){
                 Set A.invoice_no = '$invoice_no', A.invoice_date = '$invoice_date' 
                 Where A.id = '$id'";
         $this->db->query($sql);
+
+        // echo $invoice_no;
+        // echo '<br/><br/>';
     }
 
     $this->set_ledger($id);

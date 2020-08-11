@@ -34,44 +34,118 @@ class Credit_debit_note extends CI_Controller{
 
         $this->checkstatus('Approved');
     }
+
+    public function get_data($status){
+        // $status = 'Approved';
+
+        // $draw = intval($this->input->get("draw"));
+        // $start = intval($this->input->get("start"));
+        // $length = intval($this->input->get("length"));
+        // $status = intval($this->input->get("status"));
+
+        // $draw = 1;
+        // $start = 0;
+        // $length = 10;
+        // $search_value = '';
+        // $status = '';
+
+        $draw = intval($this->input->post("draw"));
+        $start = intval($this->input->post("start"));
+        $length = intval($this->input->post("length"));
+        $search = $this->input->post("search");
+        $status = $this->input->post("status");
+
+        $search_val = $search['value'];
+
+        // echo $draw;
+        // echo '<br/><br/>';
+        // echo $start;
+        // echo '<br/><br/>';
+        // echo $length;
+        // echo '<br/><br/>';
+        // echo json_encode($search);
+        // echo '<br/><br/>';
+        // echo $status;
+        // echo '<br/><br/>';
+        // echo $search_val;
+        // echo '<br/><br/>';
+
+        $result = $this->credit_debit_note_model->get_list_data($status, $start, $length, $search_val);
+        // echo json_encode($result);
+        // echo '<br/><br/>';
+
+        $totalRecords = 0;
+        $count = $result['count'];
+        if(count($count)>0) $totalRecords = $count[0]->total_records;
+
+        $r = $result['rows'];
+
+        $data = array();
+
+        for($i=0;$i<count($r);$i++){
+            $data[] = array(
+                        $i+$start+1,
+
+                        '<span style="display:none;">'.
+                            (($r[$i]->date_of_transaction!=null && $r[$i]->date_of_transaction!='')?date('Ymd',strtotime($r[$i]->date_of_transaction)):'')
+                        .'</span>'.
+                        (($r[$i]->date_of_transaction!=null && $r[$i]->date_of_transaction!='')?date('d/m/Y',strtotime($r[$i]->date_of_transaction)):''),
+
+                        '<a href="'.base_url().'index.php/credit_debit_note/edit/'.$r[$i]->id.'" class=""><i class="fa fa-edit"></i></a>',
+
+                        (($r[$i]->ref_no!=null && $r[$i]->ref_no!='')? '<a href="'.base_url().'index.php/credit_debit_note/view_credit_debit_note/'.$r[$i]->id.'" target="_blank"><span class="fa fa-file-pdf-o" style="font-size:20px;text-align:center;vertical-align:middle;"></span></a>': ''),
+
+                        $r[$i]->ref_no,
+
+                        $r[$i]->distributor_name,
+
+                        $r[$i]->transaction,
+
+                        format_money($r[$i]->amount,2),
+
+                        $r[$i]->remarks
+                    );
+        }
+
+        $output = array(
+                        "draw" => $draw,
+                        "recordsTotal" => $totalRecords,
+                        "recordsFiltered" => $totalRecords,
+                        "data" => $data
+                        // ,
+                        // "columns" => $columns
+                    );
+        echo json_encode($output);
+    }
     
-	public function get_invoice() { 
-        $postData = $this->input->post();
-    	$distributor_id = $postData['distributor_id'];
-        $data = $this->credit_debit_note_model->get_invoice($distributor_id);
-        echo json_encode($data); 
-	}
-	
     public function checkstatus($status=''){
         $result=$this->credit_debit_note_model->get_access();
         if(count($result)>0) {
             $data['access']=$result;
-            $data['data']=$this->credit_debit_note_model->get_data($status);
 
-            $count_data=$this->credit_debit_note_model->get_data();
+            $count_data = array();
+            $count_data=$this->credit_debit_note_model->get_data_count();
+            
+            $total_count=0;
             $approved=0;
             $pending=0;
             $rejected=0;
             $inactive=0;
 
-            if (count($result)>0){
-                for($i=0;$i<count($count_data);$i++){
-                    if (strtoupper(trim($count_data[$i]->status))=="APPROVED")
-                        $approved=$approved+1;
-                    else if (strtoupper(trim($count_data[$i]->status))=="PENDING" || strtoupper(trim($count_data[$i]->status))=="DELETED")
-                        $pending=$pending+1;
-                    else if (strtoupper(trim($count_data[$i]->status))=="REJECTED")
-                        $rejected=$rejected+1;
-                    else if (strtoupper(trim($count_data[$i]->status))=="INACTIVE")
-                        $inactive=$inactive+1;
-                }
+            if (count($count_data)>0){
+                $total_count=$count_data[0]->total_count;
+                $approved=$count_data[0]->approved;
+                $pending=$count_data[0]->pending;
+                $rejected=$count_data[0]->rejected;
+                $inactive=$count_data[0]->inactive;
             }
 
+            $data['status']=$status;
             $data['approved']=$approved;
             $data['pending']=$pending;
             $data['rejected']=$rejected;
             $data['inactive']=$inactive;
-            $data['all']=count($count_data);
+            $data['all']=$total_count;
 
             load_view('credit_debit_note/credit_debit_note_list', $data);
 
@@ -81,6 +155,18 @@ class Credit_debit_note extends CI_Controller{
         }
     }
 
+    public function get_invoice() { 
+        $postData = $this->input->post();
+        $distributor_id = $postData['distributor_id'];
+        $data = $this->credit_debit_note_model->get_invoice($distributor_id);
+
+        $options = '<option value="">Select</option>';
+        for($i=0; $i<count($data); $i++){
+            $options = $options . '<option value="'.$data[$i]->invoice_no.'">'.$data[$i]->invoice_no.'</option>';
+        }
+        echo $options;
+    }
+    
     public function add(){
         $result=$this->credit_debit_note_model->get_access();
         if(count($result)>0) {
