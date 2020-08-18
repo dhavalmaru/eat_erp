@@ -24,13 +24,121 @@ class Sales_upload extends CI_Controller{
         $result=$this->sales_upload_model->get_access();
         if(count($result)>0) {
             $data['access']=$result;
-            $data['data'] = $this->sales_upload_model->get_data();
+            // $data['data'] = $this->sales_upload_model->get_data();
 
             load_view('sales_upload/sales_upload', $data);
         } else {
             echo '<script>alert("You donot have access to this page.");</script>';
             $this->load->view('login/main_page');
         }
+    }
+
+    public function get_data(){
+        // $status = 'Approved';
+
+        // $draw = intval($this->input->get("draw"));
+        // $start = intval($this->input->get("start"));
+        // $length = intval($this->input->get("length"));
+        // $status = intval($this->input->get("status"));
+
+        // $draw = 1;
+        // $start = 0;
+        // $length = 10;
+        // $search_value = '';
+        // $status = '';
+
+        $draw = intval($this->input->post("draw"));
+        $start = intval($this->input->post("start"));
+        $length = intval($this->input->post("length"));
+        $search = $this->input->post("search");
+        $status = $this->input->post("status");
+
+        $search_val = $search['value'];
+
+        // echo $draw;
+        // echo '<br/><br/>';
+        // echo $start;
+        // echo '<br/><br/>';
+        // echo $length;
+        // echo '<br/><br/>';
+        // echo json_encode($search);
+        // echo '<br/><br/>';
+        // echo $status;
+        // echo '<br/><br/>';
+        // echo $search_val;
+        // echo '<br/><br/>';
+
+        $result = $this->sales_upload_model->get_list_data($start, $length, $search_val);
+        // echo json_encode($result);
+        // echo '<br/><br/>';
+
+        $totalRecords = 0;
+        $count = $result['count'];
+        if(count($count)>0) $totalRecords = $count[0]->total_records;
+
+        $r = $result['rows'];
+
+        $data = array();
+
+        for($i=0;$i<count($r);$i++){
+            $action = '';
+
+            if($r[$i]->status=='Uploading'){
+                $action = '<a href="'.base_url().'index.php/Sales_upload/upload_file_data/'.$r[$i]->id.'">
+                                <button type="button" class="btn btn-default">Upload Data</button>
+                            </a>';
+            } else if($r[$i]->status=='Pending') {
+                $action = '<a href="'.base_url().'index.php/Sales_upload/approve_file_data/'.$r[$i]->id.'" style="margin-right: 5px;">
+                                <button type="button" class="btn btn-success">Approve File</button>
+                            </a>
+                            <a href="'.base_url().'index.php/Sales_upload/reject_file_data/'.$r[$i]->id.'">
+                                <button type="button" class="btn btn-danger">Reject File</button>
+                            </a>';
+            } else if($r[$i]->status=='Approved') {
+                $action = '<a href="'.base_url().'index.php/Sales_upload/get_file_invoices/'.$r[$i]->id.'" style="margin-right: 5px;" target="_blank">
+                                <button type="button" class="btn btn-success">Get Invoices</button>
+                            </a>';
+            }
+
+            $data[] = array(
+                        $i+$start+1,
+
+                        '<span style="display:none;">'.
+                            (($r[$i]->upload_date!=null && $r[$i]->upload_date!='')?date('Ymd',strtotime($r[$i]->upload_date)):'')
+                        .'</span>'.
+                        (($r[$i]->upload_date!=null && $r[$i]->upload_date!='')?date('d/m/Y',strtotime($r[$i]->upload_date)):''),
+
+                        $r[$i]->file_name,
+
+                        $r[$i]->status,
+
+                        $r[$i]->remarks,
+
+                        '<a href="'.base_url().'assets/uploads/sales_upload/'.$r[$i]->file_name.'" target="_blank">
+                            <span class="fa fa-download" style="font-size:20px;"></span>
+                        </a>',
+
+                        (($r[$i]->error_file_name!=null && $r[$i]->error_file_name!='')? '<a href="'.base_url().'assets/uploads/sales_upload/'.$r[$i]->error_file_name.'" target="_blank">
+                            <span class="fa fa-download" style="font-size:20px;"></span>
+                        </a>': ''),
+
+                        (($r[$i]->check_file_name!=null && $r[$i]->check_file_name!='')? '<a href="'.base_url().'assets/uploads/sales_upload/'.$r[$i]->check_file_name.'" target="_blank">
+                            <span class="fa fa-download" style="font-size:20px;"></span>
+                        </a>': ''),
+
+                        $action
+                    );
+        }
+
+        $output = array(
+                        "draw" => $draw,
+                        "recordsTotal" => $totalRecords,
+                        "recordsFiltered" => $totalRecords,
+                        "data" => $data
+                        // ,
+                        // "columns" => $columns
+                    );
+        echo json_encode($output);
     }
 
     function download_upload_format(){

@@ -408,32 +408,32 @@ class Order extends CI_Controller{
             $redirect_user_to = $result->redirectUserTo;
         }
 
+        $data = array(
+            'request_id' => $request_id,
+            'amount' => $amount,
+            'mobile_no' => $mobile_no,
+            'email_id' => $email_id,
+            'source_id' => $source_id,
+            'transaction_id' => $transaction_id,
+            'transaction_state' => $transaction_state,
+            'redirect_user_to' => $redirect_user_to,
+            'modified_on' => $now
+        );
+
+        // echo json_encode($data);
+        // echo '<br/><br/>';
+
+        if($id=='') {
+            $data['created_on'] = $now;
+            $this->db->insert('sodexo_transaction', $data);
+        } else {
+            $this->db->where('id', $id);
+            $this->db->update('sodexo_transaction', $data);
+        }
+
         if($redirect_user_to==""){
             redirect('https://eatanytime.in/pages/payment-failed', 'refresh');
         } else {
-            $data = array(
-                'request_id' => $request_id,
-                'amount' => $amount,
-                'mobile_no' => $mobile_no,
-                'email_id' => $email_id,
-                'source_id' => $source_id,
-                'transaction_id' => $transaction_id,
-                'transaction_state' => $transaction_state,
-                'redirect_user_to' => $redirect_user_to,
-                'modified_on' => $now
-            );
-
-            // echo json_encode($data);
-            // echo '<br/><br/>';
-
-            if($id=='') {
-                $data['created_on'] = $now;
-                $this->db->insert('sodexo_transaction', $data);
-            } else {
-                $this->db->where('id', $id);
-                $this->db->update('sodexo_transaction', $data);
-            }
-            
             redirect($redirect_user_to, 'refresh');
         }
     }

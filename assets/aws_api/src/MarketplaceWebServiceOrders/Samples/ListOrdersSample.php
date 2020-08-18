@@ -529,6 +529,9 @@ invokeListOrders($service, $request, $request2);
                   echo 'Order No '.$AmazonOrderId.' & Order Item Id '.$OrderItemId.' depot state not found.<br/><br/>';
                   continue;
                 }
+              } else {
+                $depot_state = 'MAHARASHTRA';
+                $depot_id = '2';
               }
 
               $tax_type = 'Intra';

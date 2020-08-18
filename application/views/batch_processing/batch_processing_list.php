@@ -27,24 +27,34 @@
         <!-- START PAGE CONTAINER -->
             <div class="page-container page-navigation-top">            
             <!-- PAGE CONTENT -->
-			   <?php $this->load->view('templates/menus');?>
-              <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
-                
-                   <div class="heading-h3"> 
-                   <div class="heading-h3-heading mobile-head">	 <a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp;  Batch Processing List  </div>						 
-					  <div class="heading-h3-heading  mobile-head">
-					  <div class="pull-right btn-margin">	
-								<?php $this->load->view('templates/download');?>	
-								</div>	
-                       	<div class="pull-right btn-margin" style="<?php if($access[0]->r_insert=='0') echo 'display: none;';?>">
-									<a class="btn btn-success " href="<?php echo base_url() . 'index.php/batch_processing/add'; ?>">
-										<span class="fa fa-plus"> </span> Add Batch Processing Entry
-									</a>
-								</div>
-				     </div>	      
-                </div>	
+                <?php $this->load->view('templates/menus');?>
+                <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
+
+                    <div class="heading-h3"> 
+                        <div class="heading-h3-heading mobile-head">
+                            <a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp;  Batch Processing List
+                        </div>
+                        <div class="heading-h3-heading  mobile-head">
+                            <div class="pull-right btn-margin">	
+                                <div class="btn-group pull-right">
+                                    <?php if(isset($access)) { if($access[0]->r_export == 1) { ?>
+                                        <button class="btn btn-danger btn-padding dropdown-toggle" data-toggle="dropdown"><i class="fa fa-download"></i> &nbsp;Download</button>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="#" onClick ="$('#customers10').tableExport({type:'csv',escape:'false'});"><img src='<?php echo base_url(); ?>img/icons/csv.png' width="24"/> CSV</a></li>
+                                            <li><a href="#" onClick ="$('#customers10').tableExport({type:'excel',escape:'false'});"><img src='<?php echo base_url(); ?>img/icons/xls.png' width="24"/> XLS</a></li>
+                                        </ul>
+                                    <?php } } ?>
+                                </div>
+                            </div>	
+                            <div class="pull-right btn-margin" style="<?php if($access[0]->r_insert=='0') echo 'display: none;';?>">
+                                <a class="btn btn-success " href="<?php echo base_url() . 'index.php/batch_processing/add'; ?>">
+                                    <span class="fa fa-plus"> </span> Add Batch Processing Entry
+                                </a>
+                            </div>
+                        </div>	      
+                    </div>	
                    
-                   <div class="nav-contacts ng-scope" ui-view="@nav">
+                    <div class="nav-contacts ng-scope" ui-view="@nav">
     				<div class="u-borderBottom u-bgColorBreadcrumb ng-scope">
     					<div class="container u-posRelative u-textRight">
     						

@@ -7670,3 +7670,64 @@ $('#form_pincode_details').submit(function() {
         return true;
     }
 });
+
+
+
+
+// ----------------- ASIN DETAILS FORM VALIDATION -------------------------------------
+$("#form_asin_details").validate({
+    rules: {
+        asin: {
+            required: true,
+            check_asin_availablity: true
+        },
+        product_name: {
+            required: true
+        }
+    },
+
+    ignore: false,
+
+    errorPlacement: function (error, element) {
+        var placement = $(element).data('error');
+        if (placement) {
+            $(placement).append(error);
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
+$.validator.addMethod("check_asin_availablity", function (value, element) {
+    var result = 1;
+
+    $.ajax({
+        url: BASE_URL+'index.php/Asin_master/check_asin_availablity',
+        data: 'id='+$("#id").val()+'&asin='+$("#asin").val(),
+        type: "POST",
+        dataType: 'html',
+        global: false,
+        async: false,
+        success: function (data) {
+            result = parseInt(data);
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+        }
+    });
+
+    if (result) {
+        return false;
+    } else {
+        return true;
+    }
+}, 'ASIN already in use.');
+
+$('#form_asin_details').submit(function() {
+    if (!$("#form_asin_details").valid()) {
+        return false;
+    } else {
+        return true;
+    }
+});

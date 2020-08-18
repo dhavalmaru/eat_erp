@@ -541,6 +541,21 @@
             </ul>
         </li>
 
+        <li class="menu--item menu--item__has_sub_menu" <?php if ($Distributor_Out==0) echo 'style="display: none;"'; ?>>
+            <label class="menu--link" title="">
+                <i class="menu--icon  fa fa-fw fa-upload"></i>
+                <span class="menu--label">PDF Upload</span>
+            </label>
+            <ul class="sub_menu">
+                <li class="sub_menu--item" <?php if ($Distributor_Out==0) echo 'style="display: none;"'; ?>>
+                    <a href="<?php echo base_url().'index.php/Asin_master'; ?>" class="sub_menu--link"> ASIN Master</a>
+                </li>
+                <li class="sub_menu--item" <?php if ($Distributor_Out==0) echo 'style="display: none;"'; ?>>
+                    <a href="<?php echo base_url().'index.php/Pdf_upload'; ?>" class="sub_menu--link"> PDF Upload</a>
+                </li>
+            </ul>
+        </li>
+
         <!-- <li class="menu--item"  <?php //if ($Sales_Rep_Target==0) echo 'style="display: none;"'; ?>>
             <a href="<?php //echo  base_url().'index.php/Sales_rep_target'; ?>" class="menu--link" title="">
                 <i class="menu--icon  fa fa-fw fa-bullseye"></i>

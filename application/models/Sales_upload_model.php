@@ -14,6 +14,31 @@ class Sales_upload_model Extends CI_Model{
         return $query->result();
     }
 
+    function get_list_data($start=0, $length=0, $search_val=''){
+        $curusr = $this->session->userdata('session_id');
+
+        $cond="";
+        if($search_val!=''){
+            $cond=" where (id like '%".$search_val."%' or DATE_FORMAT(upload_date, '%d/%m/%Y') like '%".$search_val."%' or file_name like '%".$search_val."%' or file_path like '%".$search_val."%' or check_file_name like '%".$search_val."%' or check_file_path like '%".$search_val."%')";
+        }
+
+        $data = array();
+
+        $sql = "select count(id) as total_records from sales_upload_files ".$cond;
+        $query=$this->db->query($sql);
+        $data['count']=$query->result();
+
+        $limit = "";
+        if($start>0 && $length>0) $limit .= " limit ".$start.", ".$length;
+        elseif($length>0) $limit .= " limit ".$length;
+
+        $sql = "select * from sales_upload_files ".$cond." order by modified_on desc".$limit;
+        $query=$this->db->query($sql);
+        $data['rows']=$query->result();
+
+        return $data;
+    }
+
     function get_data($status='', $id=''){
         if($status!=""){
             $cond=" where status='".$status."'";

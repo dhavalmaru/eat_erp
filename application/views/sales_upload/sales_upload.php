@@ -41,7 +41,15 @@
           </div>
 				  <div class="heading-h3-heading mobile-head">
 					  <div class="pull-right btn-margin">
-              <?php $this->load->view('templates/download');?>
+              <div class="btn-group pull-right">
+                  <?php if(isset($access)) { if($access[0]->r_export == 1) { ?>
+                      <button class="btn btn-danger btn-padding dropdown-toggle" data-toggle="dropdown"><i class="fa fa-download"></i> &nbsp;Download</button>
+                      <ul class="dropdown-menu">
+                          <li><a href="#" onClick ="$('#customers10').tableExport({type:'csv',escape:'false'});"><img src='<?php echo base_url(); ?>img/icons/csv.png' width="24"/> CSV</a></li>
+                          <li><a href="#" onClick ="$('#customers10').tableExport({type:'excel',escape:'false'});"><img src='<?php echo base_url(); ?>img/icons/xls.png' width="24"/> XLS</a></li>
+                      </ul>
+                  <?php } } ?>
+              </div>
               <a class="btn btn-default-danger pull-right " style="margin:0px 8px!important;" href="<?php echo base_url().'index.php/Sales_upload/download_upload_format'; ?>" >
                 <i class="fa fa-file-excel-o "></i> Download Sample
               </a>
@@ -101,7 +109,7 @@
                 <div class="panel panel-default">   
                   <div class="panel-body">
                     <div class="table-responsive">
-                      <table id="customers2" class="table datatable table-bordered"  >
+                      <table id="customers10" class="table datatable table-bordered" style="width: 1295px;">
                         <thead>
                           <tr>
                             <th width="50" style="text-align:center;">Sr No</th>
@@ -116,7 +124,10 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <?php for ($i=0; $i < count($data); $i++) { ?>
+                          <?php 
+                            if(isset($data)) {
+                            for ($i=0; $i < count($data); $i++) { 
+                          ?>
                             <tr>
                               <td style="text-align:center;"><?php echo $i+1; ?></td>
                               <td>
@@ -149,21 +160,21 @@
                               </td>
                               <td>
                                 <?php if($data[$i]->status=='Uploading'){ ?>
-                                  <a href="<?php echo base_url();?>index.php/Sales_upload/upload_file_data/<?php echo $data[$i]->id;?>">
+                                  <a href="<?php echo base_url();?>index.php/sales_upload/upload_file_data/<?php echo $data[$i]->id;?>">
                                     <button type="button" class="btn btn-default">Upload Data</button>
                                   </a>
                                 <?php } else if($data[$i]->status=='Pending') { ?>
-                                  <a href="<?php echo base_url();?>index.php/Sales_upload/approve_file_data/<?php echo $data[$i]->id;?>" style="margin-right: 5px;">
+                                  <a href="<?php echo base_url();?>index.php/sales_upload/approve_file_data/<?php echo $data[$i]->id;?>" style="margin-right: 5px;">
                                     <button type="button" class="btn btn-success">Approve File</button>
                                   </a>
-                                  <a href="<?php echo base_url();?>index.php/Sales_upload/reject_file_data/<?php echo $data[$i]->id;?>">
+                                  <a href="<?php echo base_url();?>index.php/sales_upload/reject_file_data/<?php echo $data[$i]->id;?>">
                                     <button type="button" class="btn btn-danger">Reject File</button>
                                   </a>
                                 <?php } else if($data[$i]->status=='Approved') { ?>
-                                  <a href="<?php echo base_url();?>index.php/Sales_upload/get_file_invoices/<?php echo $data[$i]->id;?>" style="margin-right: 5px;" target="_blank">
+                                  <a href="<?php echo base_url();?>index.php/sales_upload/get_file_invoices/<?php echo $data[$i]->id;?>" style="margin-right: 5px;" target="_blank">
                                     <button type="button" class="btn btn-success">Get Invoices</button>
                                   </a>
-                                <?php } ?>
+                                <?php }} ?>
                               </td>
                             </tr>
                           <?php } ?>
@@ -186,13 +197,117 @@
       $(document).on('submit','form.excelform',function(){
         setTimeout(function(){ 
           document.location.reload();
-        }, 1000);
+        }, 5000);
       });
     </script>
-		<!-- <script>
-      var get_batch_details = function() {
-        $('#myModal').modal('show');
-      }
-		</script> -->
+    <script>
+      $(document).ready(function() {
+        var BASE_URL = "<?php echo base_url()?>";
+        var url = window.location.href;
+        
+        var len = 10;
+        var columnDefs = [];
+
+        columnDefs = [    
+                        // {
+                        //     "targets": [0],
+                        //     "searchable": false
+                        // }, 
+                        { className: "dt-body-center", targets: [ 0,5,6,7 ] },
+                        // { className: "text-right", targets: [ 7 ] }
+                    ];
+
+        $('#customers10').DataTable({
+            // "pageLength" : 10,
+            "bProcessing": true,
+            "searchDelay": 3000,
+            "serverSide": true,
+            "columnDefs": columnDefs,
+            "iDisplayLength": len,
+            aLengthMenu: [
+                            [10,25, 50, 100, 200, -1],
+                            [10,25, 50, 100, 200, "All"]
+                        ],
+            "ajax":{
+                    url : BASE_URL+'index.php/sales_upload/get_data/'+status,
+                    type: "post",
+                    async: false,
+                    data: function(data) {       
+                        data.status = status;
+                    },
+                    "dataSrc": function ( json ) {
+                        return json.data;
+                    },
+                    // error: function() {
+                    //     $(table+"_processing").css("display","none");
+                    // }
+                }
+        });
+        
+        $("#csv").click(function(){
+            table.DataTable().destroy();
+            tableOptions.bPaginate = false;
+            table.DataTable(tableOptions);
+            table.tableExport({type:'csv',escape:'false'});
+            table.DataTable().destroy();
+            tableOptions.bPaginate = true;
+            table.DataTable(tableOptions);
+        });
+        $("#xls").click(function(){
+            table.DataTable().destroy();
+            tableOptions.bPaginate = false;
+            table.DataTable(tableOptions);
+            table.tableExport({type:'excel',escape:'false'});
+            table.DataTable().destroy();
+            tableOptions.bPaginate = true;
+            table.DataTable(tableOptions);
+        });
+        $("#txt").click(function(){
+            table.DataTable().destroy();
+            tableOptions.bPaginate = false;
+            table.DataTable(tableOptions);
+            table.tableExport({type:'txt',escape:'false'});
+            table.DataTable().destroy();
+            tableOptions.bPaginate = true;
+            table.DataTable(tableOptions);
+        });
+        $("#doc").click(function(){
+            table.DataTable().destroy();
+            tableOptions.bPaginate = false;
+            table.DataTable(tableOptions);
+            table.tableExport({type:'doc',escape:'false'});
+            table.DataTable().destroy();
+            tableOptions.bPaginate = true;
+            table.DataTable(tableOptions);
+        });
+        $("#powerpoint").click(function(){
+            table.DataTable().destroy();
+            tableOptions.bPaginate = false;
+            table.DataTable(tableOptions);
+            table.tableExport({type:'powerpoint',escape:'false'});
+            table.DataTable().destroy();
+            tableOptions.bPaginate = true;
+            table.DataTable(tableOptions);
+        });
+        $("#png").click(function(){
+            table.DataTable().destroy();
+            tableOptions.bPaginate = false;
+            table.DataTable(tableOptions);
+            table.tableExport({type:'png',escape:'false'});
+            table.DataTable().destroy();
+            tableOptions.bPaginate = true;
+            table.DataTable(tableOptions);
+        });
+        $("#pdf").click(function(){
+            table.DataTable().destroy();
+            tableOptions.bPaginate = false;
+            table.DataTable(tableOptions);
+            table.tableExport({type:'pdf',escape:'false'});
+            table.DataTable().destroy();
+            tableOptions.bPaginate = true;
+            table.DataTable(tableOptions);
+        });
+      });
+    </script>
   </body>
 </html>

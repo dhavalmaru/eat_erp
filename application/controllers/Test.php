@@ -16,6 +16,13 @@ class Test extends CI_Controller{
         $this->load->database();
     }
 
+    public function php_pdf() {
+        echo 'Php Pdf';
+        echo '<br/><br/>';
+
+        php_pdf(2);
+    }
+
     public function test_location_api() {
         if(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             $ip_address = $_SERVER['HTTP_X_FORWARDED_FOR'];
