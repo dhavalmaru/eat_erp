@@ -115,7 +115,8 @@
                             <th width="35">Status</th>
                             <th width="35">Remarks</th>
                             <th width="50">Original File</th>
-                            <th width="50">Check File</th>
+                            <th width="50">Label File</th>
+                            <th width="50">Invoice File</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -142,6 +143,13 @@
                               <td>
                                 <?php if($data[$i]->check_file_name!=null && $data[$i]->check_file_name!=''){ ?>
                                 <a href="<?php echo base_url().'assets/uploads/pdf_upload/'.$data[$i]->check_file_name;?>" target="_blank">
+                                  <span class="fa fa-download" style="font-size:20px;"></span>
+                                </a>
+                                <?php } ?>
+                              </td>
+                              <td>
+                                <?php if($data[$i]->check_file_name2!=null && $data[$i]->check_file_name2!=''){ ?>
+                                <a href="<?php echo base_url().'assets/uploads/pdf_upload/'.$data[$i]->check_file_name2;?>" target="_blank">
                                   <span class="fa fa-download" style="font-size:20px;"></span>
                                 </a>
                                 <?php } ?>
@@ -188,7 +196,7 @@
                         //     "targets": [0],
                         //     "searchable": false
                         // }, 
-                        { className: "dt-body-center", targets: [ 0,5,6 ] },
+                        { className: "dt-body-center", targets: [ 0,5,6,7 ] },
                         // { className: "text-right", targets: [ 7 ] }
                     ];
 

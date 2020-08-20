@@ -501,7 +501,7 @@ class Payment_upload extends CI_Controller{
                             if($final_amount<=-5){
                                 // echo $sql;
                                 // echo '<br/><br/>'
-                                $error.=$sql.' Payment Amount '.$payment_amount.' is greater than balance invoice amount.';
+                                $error.=' Payment Amount '.$payment_amount.' is greater than balance invoice amount.';
                                 $objerror=1;
                                 if($bl_error_line==false){
                                     $error_line.=$i.', ';

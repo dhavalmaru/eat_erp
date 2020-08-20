@@ -88,8 +88,13 @@ class Pdf_upload_model Extends CI_Model{
             $invoiceArr = [];
             $yAxis = [];
 
-            $pdf = new FPDI();
-            $pdf->setSourceFile($fileName);
+            $pdf1 = new FPDI();
+            $pdf1->setSourceFile($fileName);
+            $blPdf1 = false;
+
+            $pdf2 = new FPDI();
+            $pdf2->setSourceFile($fileName);
+            $blPdf2 = false;
 
             foreach ($pages as $page) {
                 $text = '';
@@ -131,9 +136,11 @@ class Pdf_upload_model Extends CI_Model{
                 }
 
                 if(count($textArr)==0) {
-                    $pdf->AddPage();
-                    $tplIdx = $pdf->importPage($i++);
-                    $pdf->useTemplate($tplIdx);
+                    $pdf1->AddPage();
+                    $tplIdx = $pdf1->importPage($i++);
+                    $pdf1->useTemplate($tplIdx);
+
+                    $blPdf1 = true;
                 } else {
                     $yAxis[$i] = $y;
                     $invoiceArr[$i++] = $textArr;
@@ -143,13 +150,15 @@ class Pdf_upload_model Extends CI_Model{
             foreach ($invoiceArr as $i => $textArr) {
                 $y = $yAxis[$i];
 
-                $pdf->AddPage();
-                $tplIdx = $pdf->importPage($i);
-                $pdf->useTemplate($tplIdx);
-                $pdf->SetFont('Arial', 'B', '15');
-                $pdf->SetTextColor(225, 10, 10);
-                $pdf->SetXY(10, $y);
-                $pdf->MultiCell(190, 8, 'Dispatch Instructions', 1, 'C');
+                $blPdf2 = true;
+
+                $pdf2->AddPage();
+                $tplIdx = $pdf2->importPage($i);
+                $pdf2->useTemplate($tplIdx);
+                $pdf2->SetFont('Arial', 'B', '15');
+                $pdf2->SetTextColor(225, 10, 10);
+                $pdf2->SetXY(10, $y);
+                $pdf2->MultiCell(190, 8, 'Dispatch Instructions', 1, 'C');
                 $y = $y + 8;
                 
                 foreach ($textArr as $key => $value) {
@@ -162,10 +171,10 @@ class Pdf_upload_model Extends CI_Model{
                         $box_name = $result[0]->product_name;
                     }
 
-                    $pdf->SetXY(10, $y);
+                    $pdf2->SetXY(10, $y);
 
                     $pdf_text = $value.' : '.$box_name;
-                    $pdf->MultiCell(190, 8, $value.' : '.$box_name, 1);
+                    $pdf2->MultiCell(190, 8, $value.' : '.$box_name, 1);
                     if(strlen($pdf_text)>68){
                         $y = $y + 16;
                     } else {
@@ -173,21 +182,29 @@ class Pdf_upload_model Extends CI_Model{
                     }
 
                     if($y>=270) {
-                        $pdf->AddPage();
+                        $pdf2->AddPage();
                         $y = 8;
                     }
                 }
             }
 
-            $file_name = time().'_file_'.$file_id.'.pdf';
-            $fileName = $file_path.$file_name;
+            if($blPdf1==true) {
+                $file_name1 = date('d_m_Y_h_i').'_file_'.$file_id.'_label.pdf';
+                $fileName = $file_path.$file_name1;
+                $pdf1->Output($fileName, 'F');
+            }
 
-            $pdf->Output($fileName, 'F');
+            if($blPdf2==true) {
+                $file_name2 = date('d_m_Y_h_i').'_file_'.$file_id.'_invoice.pdf';
+                $fileName = $file_path.$file_name2;
+                $pdf2->Output($fileName, 'F');
+            }
 
-            $sql = "UPDATE pdf_upload_files SET status='Uploaded', check_file_path='$file_path', check_file_name='$file_name' WHERE id='$file_id'";
+            $sql = "UPDATE pdf_upload_files SET status='Uploaded', check_file_path='$file_path', check_file_name='$file_name1', check_file_name2='$file_name2' WHERE id='$file_id'";
             $this->db->query($sql);
 
-            $output_file_name = $file_name;
+            $output_file_name[0] = $file_name1;
+            $output_file_name[1] = $file_name2;
 
             return $output_file_name;
         } catch (Exception $e) {

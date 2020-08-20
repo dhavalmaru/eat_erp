@@ -98,6 +98,10 @@ class Pdf_upload extends CI_Controller{
 
                         (($r[$i]->check_file_name!=null && $r[$i]->check_file_name!='')? '<a href="'.base_url().'assets/uploads/pdf_upload/'.$r[$i]->check_file_name.'" target="_blank">
                             <span class="fa fa-download" style="font-size:20px;"></span>
+                        </a>': ''),
+
+                        (($r[$i]->check_file_name2!=null && $r[$i]->check_file_name2!='')? '<a href="'.base_url().'assets/uploads/pdf_upload/'.$r[$i]->check_file_name2.'" target="_blank">
+                            <span class="fa fa-download" style="font-size:20px;"></span>
                         </a>': '')
                     );
         }
@@ -179,7 +183,7 @@ class Pdf_upload extends CI_Controller{
         sleep(4);
 
         if($output_file_name!='') {
-            $this->session->set_flashdata('success', 'File Upload Succeded.<br/>Please check  output file <a href="'.base_url().'assets/uploads/pdf_upload/'.$output_file_name.'" target="_blank">'.$output_file_name.'</a>');
+            $this->session->set_flashdata('success', 'File Upload Succeded.<br/>Label output file <a href="'.base_url().'assets/uploads/pdf_upload/'.$output_file_name[0].'" target="_blank">'.$output_file_name[0].'</a><br/>Invoice output file <a href="'.base_url().'assets/uploads/pdf_upload/'.$output_file_name[1].'" target="_blank">'.$output_file_name[1].'</a>');
             $this->session->keep_flashdata('success');
         } else {
             $sql = "UPDATE pdf_upload_files SET status='Failed', remarks='File Upload Failed.' WHERE id='$file_id'";
