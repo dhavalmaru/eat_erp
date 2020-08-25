@@ -87,6 +87,7 @@ class Pdf_upload_model Extends CI_Model{
             $i = 1;
             $invoiceArr = [];
             $yAxis = [];
+            $noOfItems = 0;
 
             $pdf1 = new FPDI();
             $pdf1->setSourceFile($fileName);
@@ -97,17 +98,42 @@ class Pdf_upload_model Extends CI_Model{
             $blPdf2 = false;
 
             foreach ($pages as $page) {
+                // if($i<133 || $i>134) {
+                //     $i++;
+                //     continue;
+                // }
+                // if($i>5) {
+                //     $i++;
+                //     continue;
+                // }
                 $text = '';
                 $textArr = [];
-                $y = 230;
+                $y = 214;
 
                 $text = $page->getText();
+
+                if(substr_count($text, "GST Registration No")>1) {
+                    $y = 220;
+                }
 
                 if(isset($text)) {
                     if($text!='') {
                         if(strpos($text, 'Invoice Date')!==False) {
                             $text = substr($text, strpos($text, 'Invoice Date')+12);
                             $text2 = $text;
+                            $sku_name = '';
+
+                            if(strpos($text, 'Total')!==False) {
+                                $sku_name = substr($text, strpos($text, 'Total')+15);
+                            }
+
+                            if(strpos($sku_name, '|')!==False) {
+                                $sku_name = substr($sku_name, 0, strpos($sku_name, '|'));
+                            }
+
+                            if(strlen($sku_name)>90) {
+                                $y = $y + 6;
+                            }
                             
                             while(strpos($text2, '|')!==False) {
                                 $text2 = substr($text2, strpos($text2, '|')+1);
@@ -115,10 +141,18 @@ class Pdf_upload_model Extends CI_Model{
 
                                 if(strpos($text2, '|')!==False) {
                                     $text3 = substr($text2, 0, strpos($text2, '|'));
-                                    $y = $y + 12;
+                                    $y = $y + 5;
                                 } else {
                                     $text3 = $text2;
                                 }
+
+                                if(strpos($text3, 'HSN')!==False) {
+                                    $y = $y + 4;
+                                }
+                                if(strpos($text3, 'CGST')!==False) {
+                                    $y = $y + 6;
+                                }
+
                                 $text3 = trim($text3);
 
                                 if(strlen($text3)>=10){
@@ -148,8 +182,6 @@ class Pdf_upload_model Extends CI_Model{
             }
 
             foreach ($invoiceArr as $i => $textArr) {
-                $y = $yAxis[$i];
-
                 $blPdf2 = true;
 
                 $pdf2->AddPage();
@@ -157,6 +189,20 @@ class Pdf_upload_model Extends CI_Model{
                 $pdf2->useTemplate($tplIdx);
                 $pdf2->SetFont('Arial', 'B', '15');
                 $pdf2->SetTextColor(225, 10, 10);
+                
+                $y = $yAxis[$i];
+
+                // echo $y;
+                // echo '<br/><br/>';
+
+                if($y>=246) {
+                    $pdf2->AddPage();
+                    $y = 8;
+                }
+
+                // echo $y;
+                // echo '<br/><br/>';
+
                 $pdf2->SetXY(10, $y);
                 $pdf2->MultiCell(190, 8, 'Dispatch Instructions', 1, 'C');
                 $y = $y + 8;
@@ -179,11 +225,6 @@ class Pdf_upload_model Extends CI_Model{
                         $y = $y + 16;
                     } else {
                         $y = $y + 8;
-                    }
-
-                    if($y>=270) {
-                        $pdf2->AddPage();
-                        $y = 8;
                     }
                 }
             }

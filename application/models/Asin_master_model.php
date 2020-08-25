@@ -10,7 +10,7 @@ function __Construct(){
 
 function get_access(){
     $role_id=$this->session->userdata('role_id');
-    $query=$this->db->query("SELECT * FROM user_role_options WHERE section = 'Box' AND role_id='$role_id' AND (r_insert = 1 OR r_view = 1 OR r_edit=1 OR r_approvals = 1 OR r_export = 1)");
+    $query=$this->db->query("SELECT * FROM user_role_options WHERE section = 'Distributor_Out' AND role_id='$role_id' AND (r_insert = 1 OR r_view = 1 OR r_edit=1 OR r_approvals = 1 OR r_export = 1)");
     return $query->result();
 }
 
