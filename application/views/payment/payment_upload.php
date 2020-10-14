@@ -160,9 +160,12 @@
                                     <button type="button" class="btn btn-danger">Reject File</button>
                                   </a>
                                 <?php } else if($data[$i]->status=='Approved') { ?>
-                                  <!-- <a href="<?php //echo base_url();?>index.php/Payment_upload/get_file_invoices/<?php //echo $data[$i]->id;?>" style="margin-right: 5px;" target="_blank">
-                                    <button type="button" class="btn btn-success">Get Invoices</button>
-                                  </a> -->
+                                  <a href="<?php echo base_url();?>index.php/Payment_upload/generate_payment_slip/<?php echo $data[$i]->id;?>" style="margin-right: 5px;" target="_blank">
+                                    <button type="button" class="btn btn-success">Get Payment Slips</button>
+                                  </a>
+                                  <a href="<?php echo base_url();?>index.php/Payment_upload/generate_credit_debit_note/<?php echo $data[$i]->id;?>" style="margin-right: 5px;" target="_blank">
+                                    <button type="button" class="btn btn-success">Get Credit Notes</button>
+                                  </a>
                                 <?php } ?>
                               </td>
                             </tr>

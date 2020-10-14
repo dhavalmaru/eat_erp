@@ -1796,7 +1796,6 @@ function get_final_data($check, $sales_rep_id, $for_invoice=false){
             $invoice_amount=$result[0]->invoice_amount;
             $invoice_date=$result[0]->invoice_date;
             $sales_rep_name = $result[0]->sales_rep_name;
-            $sales_rep_name = $result[0]->sales_rep_name;
             $gstin=$result[0]->gstin;
             $shipping_charges=((!isset($result[0]->shipping_charges))?0:$result[0]->shipping_charges);
 
@@ -1866,6 +1865,8 @@ function get_final_data($check, $sales_rep_id, $for_invoice=false){
             $round_off_amount = 0;
             $invoice_amount = 0;
             $invoice_date = null;
+            $sales_rep_name = null;
+            $gstin = null;
             $shipping_charges = 0;
         }
 
@@ -2131,12 +2132,13 @@ function get_final_data($check, $sales_rep_id, $for_invoice=false){
                     $data['state']=$client_state;
                     $data['state_code']=$client_state_code;
                     $data['mobile_no']=$client_mobile_no;
+                    $data['gst_number']=$gstin;
 
-                    if(strtoupper(trim($distributor_name))=='DIRECT') {
-                        $data['gst_number']=$gstin;
-                    } else {
-                        $data['gst_number']='';
-                    }
+                    // if(strtoupper(trim($distributor_name))=='DIRECT') {
+                    //     $data['gst_number']=$gstin;
+                    // } else {
+                    //     $data['gst_number']='';
+                    // }
 
                     if(isset($con_gst_number)) {
                         if($con_gst_number!='') {
@@ -2263,12 +2265,13 @@ function get_final_data($check, $sales_rep_id, $for_invoice=false){
                     $data['state']=$client_state;
                     $data['state_code']=$client_state_code;
                     $data['mobile_no']=$client_mobile_no;
+                    $data['gst_number']=$gstin;
 
-                    if(strtoupper(trim($distributor_name))=='DIRECT') {
-                        $data['gst_number']=$gstin;
-                    } else {
-                        $data['gst_number']='';
-                    }
+                    // if(strtoupper(trim($distributor_name))=='DIRECT') {
+                    //     $data['gst_number']=$gstin;
+                    // } else {
+                    //     $data['gst_number']='';
+                    // }
 
                     if(isset($con_gst_number)) {
                         if($con_gst_number!='') {

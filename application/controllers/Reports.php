@@ -53,7 +53,7 @@ class Reports extends CI_Controller
         $data['rep_grp_2']=0;
         $data['rep_grp_3']=0;
 		$data['rep_grp_4']=0;
-  //$data['rep_grp_5']=0;
+        //$data['rep_grp_5']=0;
         // $data['rep_grp_6']=0;
 
         if (isset($data['rep_1'])) {if ($data['rep_1']==1) {if (isset($data['rep_1_view'])) {if ($data['rep_1_view']==1) $data['rep_grp_1']=1;}}}
@@ -84,8 +84,8 @@ class Reports extends CI_Controller
 
 		
 		
-		 if (isset($data['rep_13'])) {if ($data['rep_13']==1) {if (isset($data['rep_13_view'])) {if ($data['rep_13_view']==1) $data['rep_grp_4']=1;}}}
-	if (isset($data['rep_20'])) {if ($data['rep_20']==1) {if (isset($data['rep_20_view'])) {if ($data['rep_20_view']==1) $data['rep_grp_4']=1;}}}
+        if (isset($data['rep_13'])) {if ($data['rep_13']==1) {if (isset($data['rep_13_view'])) {if ($data['rep_13_view']==1) $data['rep_grp_4']=1;}}}
+        if (isset($data['rep_20'])) {if ($data['rep_20']==1) {if (isset($data['rep_20_view'])) {if ($data['rep_20_view']==1) $data['rep_grp_4']=1;}}}
 
 		if (isset($data['rep_21'])) {if ($data['rep_21']==1) {if (isset($data['rep_21_view'])) {if ($data['rep_21_view']==1) $data['rep_grp_5']=1;}}}
 
@@ -106,7 +106,7 @@ class Reports extends CI_Controller
         $data['rep_grp_2']=0;
 		$data['rep_grp_3']=0;
         $data['rep_grp_4']=0;
-      //  $data['rep_grp_5']=0;
+        //  $data['rep_grp_5']=0;
         // $data['rep_grp_6']=0;
 
         if (isset($data['rep_1_view'])) {if ($data['rep_1_view']==1) $data['rep_grp_1']=1;}
@@ -158,7 +158,7 @@ class Reports extends CI_Controller
 
         // $data['rep_grp_1']=0;
         // $data['rep_grp_2']=0;
-       // $data['rep_grp_3']=0;
+        // $data['rep_grp_3']=0;
 
         load_view('reports/view_reports', $data);
     }

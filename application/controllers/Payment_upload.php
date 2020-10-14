@@ -13,7 +13,7 @@ class Payment_upload extends CI_Controller{
         $this->load->library('email');
         $this->load->helper('common_functions');
         $this->load->model('payment_upload_model');
-        $this->load->model('distributor_out_model');
+        $this->load->model('payment_model');
         $this->load->model('tax_invoice_model');
         $this->load->library('excel');
         $this->load->database();
@@ -64,6 +64,10 @@ class Payment_upload extends CI_Controller{
         }
         $dist_cnt = $row;
 
+        $objPHPExcel->getActiveSheet()->setCellValue('G2', 'Yes');
+        $objPHPExcel->getActiveSheet()->setCellValue('G3', 'No');
+        $credit_note_cnt = 4;
+
         $objPHPExcel->setActiveSheetIndex(0);
         for($row=5; $row<=105; $row++) {
             $objValidation = $objPHPExcel->getActiveSheet()->getCell('B'.$row)->getDataValidation();
@@ -77,6 +81,10 @@ class Payment_upload extends CI_Controller{
             $objValidation = $objPHPExcel->getActiveSheet()->getCell('D'.$row)->getDataValidation();
             $this->common_excel($objValidation);
             $objValidation->setFormula1('=Sheet2!$E$2:$E$'.($dist_cnt-1));
+
+            $objValidation = $objPHPExcel->getActiveSheet()->getCell('I'.$row)->getDataValidation();
+            $this->common_excel($objValidation);
+            $objValidation->setFormula1('=Sheet2!$G$2:$G$'.($credit_note_cnt-1));
         }
 
         $objPHPExcel->getSheetByName('Sheet2')->setSheetState(PHPExcel_Worksheet::SHEETSTATE_HIDDEN);
@@ -345,8 +353,8 @@ class Payment_upload extends CI_Controller{
         $objPHPExcel = PHPExcel_IOFactory::load($filename);
         $objPHPExcel->setActiveSheetIndex(0);
         $highestrow = $objPHPExcel->setActiveSheetIndex(0)->getHighestRow();
-        $objPHPExcel->getActiveSheet()->setCellValue('I4', 'Error Remark');
-        $objPHPExcel->getActiveSheet()->getColumnDimension('I')->setWidth(30);
+        $objPHPExcel->getActiveSheet()->setCellValue('K4', 'Error Remark');
+        $objPHPExcel->getActiveSheet()->getColumnDimension('K')->setWidth(30);
         $objerror = 0;
         $error_line = '';
         $payment_array = [];
@@ -360,6 +368,8 @@ class Payment_upload extends CI_Controller{
             $neft_no = $objPHPExcel->getActiveSheet()->getCell('F'.$i)->getCalculatedValue();
             $payment_amount = $objPHPExcel->getActiveSheet()->getCell('G'.$i)->getCalculatedValue();
             $remarks = $objPHPExcel->getActiveSheet()->getCell('H'.$i)->getCalculatedValue();
+            $credit_note = $objPHPExcel->getActiveSheet()->getCell('I'.$i)->getCalculatedValue();
+            $narration = $objPHPExcel->getActiveSheet()->getCell('J'.$i)->getCalculatedValue();
             $error = '';
             $bank_id = '';
             $distributor_id = '';
@@ -480,7 +490,7 @@ class Payment_upload extends CI_Controller{
                                 on (A.distributor_id=B.distributor_id and A.invoice_no=B.invoice_no) 
                                 left join 
                                 (select A.distributor_id, A.invoice_no, sum(A.payment_amount) as tot_payment_amount from payment_upload_items A left join payment_upload_details B on (A.payment_id=B.id) 
-                                    where A.invoice_no = '$invoice_no' and B.status <> 'Rejected' group by A.distributor_id, A.invoice_no) C 
+                                    where A.invoice_no = '$invoice_no' and B.status <> 'Rejected' and B.status <> 'InActive' group by A.distributor_id, A.invoice_no) C 
                                 on (A.distributor_id=C.distributor_id and A.invoice_no=C.invoice_no)) D";
                         $result = $this->db->query($sql)->result();
                         if(count($result)==0){
@@ -527,17 +537,35 @@ class Payment_upload extends CI_Controller{
                         $bl_error_line=true;
                     }
                 } else if($payment_amount==0){
-                    $error.='Payment Amount should be greater zero.';
+                    $error.='Payment Amount should be greater than zero.';
                     $objerror=1;
                     if($bl_error_line==false){
                         $error_line.=$i.', ';
                         $bl_error_line=true;
                     }
+                } else if($payment_amount<0){
+                    if(strtoupper(trim($credit_note))=='YES' && $narration==''){
+                        $error.='Narration cannot be blank.';
+                        $objerror=1;
+                        if($bl_error_line==false){
+                            $error_line.=$i.', ';
+                            $bl_error_line=true;
+                        }
+                    }
+                } else {
+                    if(strtoupper(trim($credit_note))=='YES'){
+                        $error.='Payment Amount should be negative.';
+                        $objerror=1;
+                        if($bl_error_line==false){
+                            $error_line.=$i.', ';
+                            $bl_error_line=true;
+                        }
+                    }
                 }
 
                 if($error!=""){
-                    $objPHPExcel->getActiveSheet()->setCellValue('I'.$i, $error);
-                    $objPHPExcel->getActiveSheet()->getStyle('I'.$i)->getAlignment()->setWrapText(true);  
+                    $objPHPExcel->getActiveSheet()->setCellValue('K'.$i, $error);
+                    $objPHPExcel->getActiveSheet()->getStyle('K'.$i)->getAlignment()->setWrapText(true);  
                 }
             //-------------- Validation End ------------------------------
 
@@ -578,6 +606,8 @@ class Payment_upload extends CI_Controller{
                 $items_array[$k]['invoice_amount']=$invoice_amount;
                 $items_array[$k]['balance_amount']=$balance_amount;
                 $items_array[$k]['final_amount']=$final_amount;
+                $items_array[$k]['credit_note']=$credit_note;
+                $items_array[$k]['narration']=$narration;
 
                 $payment_array[$j]['items_array']=$items_array;
 
@@ -619,16 +649,16 @@ class Payment_upload extends CI_Controller{
             $this->session->set_flashdata('error', $remarks);
             $this->session->keep_flashdata('error');
         } else {
-            $objPHPExcel->getActiveSheet()->setCellValue('I4', 'Inv Amount');
-            $objPHPExcel->getActiveSheet()->setCellValue('J4', 'Bal Amount');
+            $objPHPExcel->getActiveSheet()->setCellValue('K4', 'Inv Amount');
+            $objPHPExcel->getActiveSheet()->setCellValue('L4', 'Bal Amount');
 
             for($i=0; $i<count($payment_array); $i++){
                 $items_array = $payment_array[$i]['items_array'];
 
                 for($j=0; $j<count($items_array); $j++) {
                     $row_num = $items_array[$j]['row_num'];
-                    $objPHPExcel->getActiveSheet()->setCellValue('I'.$row_num, $items_array[$j]['invoice_amount']);
-                    $objPHPExcel->getActiveSheet()->setCellValue('J'.$row_num, $items_array[$j]['final_amount']);
+                    $objPHPExcel->getActiveSheet()->setCellValue('K'.$row_num, $items_array[$j]['invoice_amount']);
+                    $objPHPExcel->getActiveSheet()->setCellValue('L'.$row_num, $items_array[$j]['final_amount']);
                 }
             }
 
@@ -652,7 +682,7 @@ class Payment_upload extends CI_Controller{
                     $payment_id = $this->db->insert_id();
 
                     for($j=0; $j<count($items_array); $j++) {
-                        $sql = "insert into payment_upload_items (payment_id, distributor_id, ref_no, invoice_no, payment_amount) VALUES ('".$payment_id."', '".$items_array[$j]['distributor_id']."', '".$items_array[$j]['ref_no']."', '".$items_array[$j]['invoice_no']."', '".$items_array[$j]['payment_amount']."')";
+                        $sql = "insert into payment_upload_items (payment_id, distributor_id, ref_no, invoice_no, payment_amount, credit_note, narration) VALUES ('".$payment_id."', '".$items_array[$j]['distributor_id']."', '".$items_array[$j]['ref_no']."', '".$items_array[$j]['invoice_no']."', '".$items_array[$j]['payment_amount']."', '".$items_array[$j]['credit_note']."', '".$items_array[$j]['narration']."')";
                         if ($this->db->query($sql) === TRUE) {
                             $success_cnt = $success_cnt + 1;
                         } else {
@@ -718,17 +748,19 @@ class Payment_upload extends CI_Controller{
         if(count($result)>0){
             for($i=0; $i<count($result); $i++){
                 $sql = "insert into payment_details (date_of_deposit, bank_id, payment_mode, total_amount, status, remarks, created_by, created_on, modified_by, modified_on, approved_by, approved_on, rejected_by, rejected_on, distributor_out_id, ref_id, modified_approved_date, file_id) 
-                    select date_of_deposit, bank_id, payment_mode, total_amount, 'Approved', remarks, created_by, created_on, modified_by, modified_on, approved_by, approved_on, rejected_by, rejected_on, distributor_out_id, ref_id, modified_approved_date, '".$file_id."' 
+                    select date_of_deposit, bank_id, payment_mode, total_amount, 'Approved', remarks, created_by, created_on, modified_by, modified_on, '$curusr', '$now', rejected_by, rejected_on, distributor_out_id, ref_id, modified_approved_date, '".$file_id."' 
                     from payment_upload_details where id = '".$result[$i]->id."'";
                 $this->db->query($sql);
                 $id = $this->db->insert_id();
 
                 $sql = "insert into payment_details_items (payment_id, distributor_id, ref_no, invoice_no, bank_name, 
-                            bank_city, payment_amount, settlement_id, settlement_start_date, settlement_end_date) 
+                            bank_city, payment_amount, settlement_id, settlement_start_date, settlement_end_date, credit_note, narration) 
                         select '".$id."', distributor_id, ref_no, invoice_no, bank_name, 
-                            bank_city, payment_amount, settlement_id, settlement_start_date, settlement_end_date 
+                            bank_city, payment_amount, settlement_id, settlement_start_date, settlement_end_date, credit_note, narration 
                         from payment_upload_items where payment_id = '".$result[$i]->id."'";
                 $this->db->query($sql);
+
+                $this->payment_model->generate_credit_debit_note($id, 'Approved');
             }
 
             $sql = "update payment_upload_files set status='Approved', approved_by='$curusr', approved_on='$now' where id='$file_id'";
@@ -770,37 +802,12 @@ class Payment_upload extends CI_Controller{
         redirect(base_url().'index.php/Payment_upload');
     }
 
-    public function get_file_invoices($file_id){
-        $sql = "select id from distributor_out where file_id='$file_id'";
-        $result = $this->db->query($sql)->result_array();
+    public function generate_payment_slip($file_id){
+        $this->payment_upload_model->generate_payment_slip($file_id);
+    }
 
-        $dist_out_id = '';
-        $dist_out_id_arr = array();
-        if(count($result)>0){
-            for($i=0; $i<count($result); $i++){
-                // $dist_out_id_arr[] = $result[$i]['id'];
-                $dist_out_id = $dist_out_id . $result[$i]['id'] . ', ';
-            }
-        }
-
-        // echo '<pre>'; print_r($dist_out_id_arr); echo '</pre>';
-        // exit;
-
-        // $dist_out_id = '';
-        // if(count($result)>0){
-        //     $dist_out_id = implode(', ', $result);
-        // }
-
-        if($dist_out_id!=''){
-            $dist_out_id = substr($dist_out_id, 0, strlen($dist_out_id)-2);
-        }
-
-        // echo $dist_out_id;
-        // exit;
-
-        if($dist_out_id!=''){
-            $this->tax_invoice_model->generate_multiple_tax_invoice($dist_out_id);
-        }
+    public function generate_credit_debit_note($file_id){
+        $this->payment_upload_model->generate_credit_debit_note($file_id);
     }
 }
 ?>

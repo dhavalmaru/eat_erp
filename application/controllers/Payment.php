@@ -275,7 +275,7 @@ class Payment extends CI_Controller{
     public function update($id){
         $this->payment_model->save_data($id);
         // redirect(base_url().'index.php/payment');
-        // echo '<script>window.open("'.base_url().'index.php/payment", "_parent")</script>';
+        echo '<script>window.open("'.base_url().'index.php/payment", "_parent")</script>';
     }
 
     public function view_payment_slip($id){

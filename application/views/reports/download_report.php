@@ -361,7 +361,7 @@ tfoot tr th:last-child {
 											<label class="col-md-4  col-sm-4 col-xs-12 control-label" >From</label>
 											<div class="col-md-6  col-sm-6 col-xs-12">                                                                  
 												<div class="input-group" style="display:block">
-                                                    <input type="text" class="form-control datepicker" id="from_date" name="from_date" value="<?php echo "01/04/2016"?>">
+                                                    <input type="text" class="form-control datepicker" id="from_date" name="from_date" value="<?php echo "01/01/2020"; ?>">
                                                     <!--<span class="input-group-addon"><span class="fa fa-calendar"></span></span>-->
                                                 </div>
 											</div>
@@ -370,7 +370,7 @@ tfoot tr th:last-child {
 											<label class="col-md-4  col-sm-4 col-xs-12 control-label">To</label>
 											<div class="col-md-6  col-sm-6 col-xs-12">
 											    <div class="input-group" style="<?php if($report_type=='gt_store') echo 'display:none;'; else echo 'display:block;'; ?>" >
-                                            		<input type="text" class="form-control datepicker" id="to_date" name="to_date" value="<?php echo date('d/m/Y')?>">
+                                            		<input type="text" class="form-control datepicker" id="to_date" name="to_date" value="<?php echo "15/01/2020"; // echo date('d/m/Y'); ?>">
                                                <!--<span class="input-group-addon"><span class="fa fa-calendar"></span></span>-->
                                         		</div>
 											</div>

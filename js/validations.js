@@ -2372,6 +2372,7 @@ $('#form_payment_details').submit(function() {
     // removeMultiInputNamingRules('#form_payment_details', 'input[alt="payment_date[]"]');
     removeMultiInputNamingRules('#form_payment_details', 'input[alt="payment_amount[]"]');
     // removeMultiInputNamingRules('#form_payment_details', 'input[alt="deposit_date[]"]');
+    removeMultiInputNamingRules('#form_payment_details', 'input[alt="narration[]"]');
 
     addMultiInputNamingRules('#form_payment_details', 'select[name="distributor_id[]"]', { required: true }, "");
     addMultiInputNamingRules('#form_payment_details', 'input[name="ref_no[]"]', { required: true }, "");
@@ -2380,6 +2381,7 @@ $('#form_payment_details').submit(function() {
     // addMultiInputNamingRules('#form_payment_details', 'input[name="payment_date[]"]', { required: true }, "");
     addMultiInputNamingRules('#form_payment_details', 'input[name="payment_amount[]"]', { required: true }, "");
     // addMultiInputNamingRules('#form_payment_details', 'input[name="deposit_date[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_payment_details', 'input[name="narration[]"]', { }, "");
 
     if (!$("#form_payment_details").valid()) {
         return false;
@@ -2395,6 +2397,7 @@ $('#form_payment_details').submit(function() {
         // removeMultiInputNamingRules('#form_payment_details', 'input[alt="payment_date[]"]');
         removeMultiInputNamingRules('#form_payment_details', 'input[alt="payment_amount[]"]');
         // removeMultiInputNamingRules('#form_payment_details', 'input[alt="deposit_date[]"]');
+        removeMultiInputNamingRules('#form_payment_details', 'input[alt="narration[]"]');
         
         return true;
     }
@@ -2430,6 +2433,22 @@ function check_payment_details() {
         //     valid = false;
         // }
     }
+
+    $('.credit_note').each(function(){
+        if($(this).is(":visible") == true){
+            var id = $(this).attr('id');
+            var index = id.substr(id.lastIndexOf('_')+1);
+            if($(this).val()=='Yes'){
+                if($('#narration_'+index).val()==''){
+                    var name = $('#narration_'+index).attr('name');
+                    var errors = {};
+                    errors[name] = 'This field is required.';
+                    validator.showErrors(errors);
+                    valid = false;
+                }
+            }
+        }    
+    });
 
     return valid;
 }

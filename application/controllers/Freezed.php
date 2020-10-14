@@ -71,11 +71,13 @@ class Freezed extends CI_Controller{
                 $rowmont =  $result[$key]['month'];
                 $added_on =  $result[$key]['added_on'];
                 $button = '';
+                $button2 = '<a href="'.base_url('index.php/export/generate_sales_summary_report/'.$m.'/'.$year).'"><span class="fa fa-download"></span></a>';
             }
             else
             {
                 $button = "<input type='button' class='btn btn-success freezed' value='Freeze' data-attr='$month' >";
                 $added_on = '';
+                $button2 = '';
             }
 
             if($year==date('Y') && $current_month==$month)
@@ -85,14 +87,15 @@ class Freezed extends CI_Controller{
 
             if($flag==0)
             {
-                if($added_on!="")
-                    $added_on = date("d-m-Y H:i:s",strtotime($added_on));
+                if($added_on!="") $added_on = date("d-m-Y H:i:s",strtotime($added_on));
+
                 $table.= "<tr>
-                    <td style='text-align:center;vertical-align: middle;'>$m</td>
-                    <td style='text-align:center;vertical-align: middle;'>$month </td>  
-                    <td style='text-align:center;vertical-align: middle;'>$added_on</td>
-                    <td style='text-align:center;vertical-align: middle;'>$button</td>
-                 </tr>";
+                            <td style='text-align:center;vertical-align: middle;'>".$m."</td>
+                            <td style='text-align:center;vertical-align: middle;'>".$month."</td>  
+                            <td style='text-align:center;vertical-align: middle;'>".$added_on."</td>
+                            <td style='text-align:center;vertical-align: middle;'>".$button."</td>
+                            <td style='text-align:center;vertical-align: middle;'>".$button2."</td>
+                        </tr>";
             }
        
          }

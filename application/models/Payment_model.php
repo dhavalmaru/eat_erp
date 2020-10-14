@@ -245,6 +245,7 @@ function save_data($id=''){
         }
 
         $ref_id = $this->input->post('ref_id');
+        $file_id = $this->input->post('file_id');
 
         $remarks = $this->input->post('remarks');
 
@@ -314,6 +315,9 @@ function save_data($id=''){
                     $sql = "Update payment_slip_denomination set payment_id='$ref_id' WHERE payment_id = '$id'";
                     $this->db->query($sql);
 
+                    $sql = "Update payment_upload_details Set status='$status', approved_by='$curusr', approved_on='$now' where file_id = '$file_id'";
+                    $this->db->query($sql);
+
                     $id = $ref_id;
                 } else {
                     $sql = "Update payment_details A 
@@ -322,10 +326,12 @@ function save_data($id=''){
                     $this->db->query($sql);
                 }
 
+                $this->generate_credit_debit_note($id, $status);
+
                 $action='Payment Entry '.$status.'.';
-				 echo '<script>
-				 var win = window.open("'.base_url().'index.php/payment/view_payment_slip/'.$id.'");
-				 win.print();
+                echo '<script>
+                var win = window.open("'.base_url().'index.php/payment/view_payment_slip/'.$id.'");
+                win.print();
 				</script>';
             }
         }
@@ -351,6 +357,12 @@ function save_data($id=''){
             $ref_id = null;
         }
 
+        $file_id = $this->input->post('file_id');
+
+        if($file_id==""){
+            $file_id = null;
+        }
+
         $data = array(
             'date_of_deposit' => $date_of_deposit,
             'bank_id' => $this->input->post('bank_id'),
@@ -360,9 +372,9 @@ function save_data($id=''){
             'remarks' => $this->input->post('remarks'),
             'modified_by' => $curusr,
             'modified_on' => $now,
-            'ref_id' => $ref_id
+            'ref_id' => $ref_id,
+            'file_id' => $file_id
         );
-
 
         $date_p=strtotime($date_of_deposit);
         $current_d=strtotime($now);
@@ -404,9 +416,20 @@ function save_data($id=''){
         $settlement_id=$this->input->post('settlement_id[]');
         $settlement_start_date=$this->input->post('settlement_start_date[]');
         $settlement_end_date=$this->input->post('settlement_end_date[]');
+        $credit_note=$this->input->post('credit_note[]');
+        $narration=$this->input->post('narration[]');
 
-        for ($k=0; $k<count($distributor_id); $k++) {
+        for($k=0; $k<count($distributor_id); $k++) {
             if(isset($distributor_id[$k]) and $distributor_id[$k]!="") {
+                $payment_amt = format_number($payment_amount[$k],2);
+                $credit_note_val = '';
+                $narration_val = '';
+
+                if($payment_amt<0){
+                    $credit_note_val = $credit_note[$k];
+                    $narration_val = $narration[$k];
+                }
+
                 $data = array(
                             'payment_id' => $id,
                             'distributor_id' => $distributor_id[$k],
@@ -416,13 +439,14 @@ function save_data($id=''){
                             'invoice_no' => $invoice_no[$k],
                             'payment_amount' => format_number($payment_amount[$k],2),
                             'settlement_id' => $settlement_id[$k],
-                            'settlement_start_date' => $settlement_start_date[$k],
-                            'settlement_end_date' => $settlement_end_date[$k]
+                            'settlement_start_date' => (($settlement_start_date[$k]=='')? Null: $settlement_start_date[$k]),
+                            'settlement_end_date' => (($settlement_end_date[$k]=='')? Null: $settlement_end_date[$k]),
+                            'credit_note' => $credit_note_val,
+                            'narration' => $narration_val
                         );
                 $this->db->insert('payment_details_items', $data);
             }
         }
-
 
         $this->db->where('payment_id', $id);
         $this->db->delete('payment_slip_denomination');
@@ -449,6 +473,201 @@ function save_data($id=''){
     $logarray['cnt_name']='Payment';
     $logarray['action']=$action;
     $this->user_access_log_model->insertAccessLog($logarray);
+}
+
+function generate_credit_debit_note($id='', $status=''){
+    $now=date('Y-m-d H:i:s');
+    $curusr=$this->session->userdata('session_id');
+    $action='';
+
+    // $date_of_transaction=$this->input->post('date_of_deposit');
+    // if($date_of_transaction==''){
+    //     $date_of_transaction=NULL;
+    // } else {
+    //     $date_of_transaction=formatdate($date_of_transaction);
+    // }
+
+    $date_of_transaction=date('Y-m-d');
+
+    $sql = "select * from payment_details where id = '$id'";
+    $result = $this->db->query($sql)->result();
+    if(count($result)>0){
+        $date_of_transaction=$result[0]->date_of_deposit;
+    }
+    
+    $ref_date='';
+
+    // echo '1';
+    // echo '<br/><br/>';
+
+    if($status!=''){
+        // echo $status;
+        // echo '<br/><br/>';
+
+        if($status!='Approved'){
+            $sql = "Update credit_debit_note Set status='$status', approved_by='$curusr', approved_on='$now' where payment_id = '$id'";
+            $this->db->query($sql);
+
+            // $action='Credit_debit_note Entry '.$status.'.';
+        } else {
+            $sql = "Update credit_debit_note Set status='InActive', remarks = concat(remarks, ' System generated update for payment entry modification.'), approved_by='$curusr', approved_on='$now' where payment_id = '$id'";
+            $this->db->query($sql);
+
+            // $distributor_id=$this->input->post('distributor_id[]');
+            // $ref_no=$this->input->post('ref_no[]');
+            // $bank_name=$this->input->post('bank_name[]');
+            // $bank_city=$this->input->post('bank_city[]');
+            // $invoice_no=$this->input->post('invoice_no[]');
+            // $payment_amount=$this->input->post('payment_amount[]');
+            // $settlement_id=$this->input->post('settlement_id[]');
+            // $settlement_start_date=$this->input->post('settlement_start_date[]');
+            // $settlement_end_date=$this->input->post('settlement_end_date[]');
+            // $credit_note=$this->input->post('credit_note[]');
+            // $narration=$this->input->post('narration[]');
+
+            $sql = "select * from payment_details_items where payment_id = '$id'";
+            $result = $this->db->query($sql)->result();
+
+            // echo count($result);
+            // echo '<br/><br/>';
+        
+            if(count($result)>0){
+                for($k=0; $k<count($result); $k++) {
+                    $distributor_id=$result[$k]->distributor_id;
+                    $ref_no=$result[$k]->ref_no;
+                    $bank_name=$result[$k]->bank_name;
+                    $bank_city=$result[$k]->bank_city;
+                    $invoice_no=$result[$k]->invoice_no;
+                    $payment_amount=$result[$k]->payment_amount;
+                    $settlement_id=$result[$k]->settlement_id;
+                    $settlement_start_date=$result[$k]->settlement_start_date;
+                    $settlement_end_date=$result[$k]->settlement_end_date;
+                    $credit_note=$result[$k]->credit_note;
+                    $narration=$result[$k]->narration;
+                    
+                    if(isset($distributor_id) and $distributor_id!="") {
+                        $payment_amt = format_number($payment_amount,2);
+                        $credit_note_val = '';
+                        $narration_val = '';
+
+                        if($payment_amt<0){
+                            $credit_note_val = $credit_note;
+                            $narration_val = $narration;
+                        }
+
+                        if($credit_note_val=='Yes'){
+                            $reference = 'CN';
+
+                            $sql="select * from series_master where type='Credit_debit_note'";
+                            $query=$this->db->query($sql);
+                            $result2=$query->result();
+                            if(count($result2)>0){
+                                $series=intval($result2[0]->series)+1;
+
+                                $sql="update series_master set series = '$series' where type = 'Credit_debit_note'";
+                                $this->db->query($sql);
+                            } else {
+                                $series=1;
+
+                                $sql="insert into series_master (type, series) values ('Credit_debit_note', '$series')";
+                                $this->db->query($sql);
+                            }
+
+                            if($ref_date==null || $ref_date==''){
+                                $ref_date = date('Y-m-d');
+                            }
+
+                            if (isset($ref_date)){
+                                if($ref_date==''){
+                                    $financial_year="";
+                                } else {
+                                    $financial_year=calculateFiscalYearForDate($ref_date);
+                                    if(strpos($financial_year,'-')!==false){
+                                        $financial_year = substr($financial_year, 0, strpos($financial_year,'-')-1);
+                                    }
+                                }
+                            } else {
+                                $financial_year="";
+                            }
+                            
+                            // $ref_no = 'WHPL/'.$reference.'/'.$financial_year.'/'.strval($series);
+                            $ref_no = 'WHPL/'.$financial_year.'-'.$reference.'/'.strval($series);
+
+                            if($invoice_no=='On Account'){
+                                $distributor_type = 'Promotion';
+                                $inv_no = '';
+                            } else {
+                                $distributor_type = 'Invoice';
+                                $inv_no = $invoice_no;
+                            }
+
+                            $payment_amt = $payment_amt * -1;
+                            $tax = 18;
+                            $amount = round($payment_amt/1.18,2);
+                            $igst = 0;
+                            $cgst = 0;
+                            $sgst = 0;
+
+                            $state_code = '';
+                            $sql="select * from distributor_master where id='$distributor_id'";
+                            $query=$this->db->query($sql);
+                            $result2=$query->result();
+                            if(count($result2)>0){
+                                $state_code=$result2[0]->state_code;
+                            }
+
+                            if($state_code=='27'){
+                                $cgst = round($amount*($tax/2)/100,2);
+                                $sgst = round($amount*($tax/2)/100,2);
+                            } else {
+                                $igst = round($amount*$tax/100,2);
+                            }
+
+                            $data = array(
+                                        'date_of_transaction' => $date_of_transaction,
+                                        'distributor_id' => $distributor_id,
+                                        'transaction' => 'Credit Note',
+                                        'invoice_no' => $inv_no,
+                                        'distributor_type' => $distributor_type,
+                                        'amount' => $payment_amt,
+                                        'tax' => $tax,
+                                        'igst' => $igst,
+                                        'cgst' => $cgst,
+                                        'sgst' => $sgst,
+                                        'amount_without_tax' => $amount,
+                                        'status' => $status,
+                                        'remarks' => str_replace("'", "", $narration),
+                                        'created_by' => $curusr,
+                                        'created_on' => $now,
+                                        'modified_by' => $curusr,
+                                        'modified_on' => $now,
+                                        'approved_by' => $curusr,
+                                        'approved_on' => $now,
+                                        // 'ref_id' => $ref_id,
+                                        'ref_no' => $ref_no,
+                                        'ref_date' => $ref_date,
+                                        'exp_category_id' => '6',
+                                        'payment_id' => $id
+                                    );
+
+                            // echo json_encode($data);
+                            // echo '<br/><br/>';
+
+                            $this->db->insert('credit_debit_note',$data);
+                            $credit_debit_note_id=$this->db->insert_id();
+                            $action='Credit_debit_note Entry Created By System For Payment.';
+                    
+                            $logarray['table_id']=$credit_debit_note_id;
+                            $logarray['module_name']='Credit_debit_note';
+                            $logarray['cnt_name']='Credit_debit_note';
+                            $logarray['action']=$action;
+                            $this->user_access_log_model->insertAccessLog($logarray);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 function generate_payment_slip($id) {

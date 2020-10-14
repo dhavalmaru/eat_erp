@@ -16,13 +16,6 @@ class Test extends CI_Controller{
         $this->load->database();
     }
 
-    public function php_pdf() {
-        echo 'Php Pdf';
-        echo '<br/><br/>';
-
-        php_pdf(2);
-    }
-
     public function test_location_api() {
         if(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             $ip_address = $_SERVER['HTTP_X_FORWARDED_FOR'];
@@ -218,15 +211,5 @@ class Test extends CI_Controller{
             return $headers;
 
         }
-    }
-
-    public function test_redirect(){
-        load_view_without_data('area/test');
-    }
-
-    public function test11(){
-        // echo 'hello';
-        $islogin = $_GET['islogin'];
-        echo $islogin;
     }
 }

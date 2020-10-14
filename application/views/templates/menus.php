@@ -435,6 +435,9 @@
                     <li class="sub_menu--item" <?php if ($this->session->userdata('role_id')!=1) echo 'style="display: none;"'; ?>>
                         <a href="<?php echo base_url().'index.php/Sales_return_upload'; ?>" class="sub_menu--link"> Sales Return Upload </a>
                     </li>
+                    <li class="sub_menu--item" <?php if ($Distributor_Out==0) echo 'style="display: none;"'; ?>>
+                        <a href="<?php echo base_url().'index.php/Shopify'; ?>" class="sub_menu--link"> Shopify Upload </a>
+                    </li>
                 </ul>
 
                 <li class="menu--item  menu--item__has_sub_menu1 main-submenu-3"> 

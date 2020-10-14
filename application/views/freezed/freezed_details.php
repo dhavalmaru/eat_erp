@@ -113,6 +113,7 @@
     							<th width="150">Freeze Month</th>
     	                        <th width="120">Freezed Date</th>
     	                        <th width="90">Action</th>
+                                <th width="90">Download Summary</th>
     					</thead>
     					<tbody id="tbody" style="background-color: #fff;">
     						

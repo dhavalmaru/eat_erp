@@ -208,6 +208,10 @@ class Export extends CI_Controller {
             $data['report_type'] = 'Daily Merchandizer performance report';
             $data['report_name'] = 'Daily Merchandizer performance report';
             $data['sample_report_name'] = 'Daily_merchandiser_performance_report.xls';
+        } else if($rep_id==36){
+            $data['report_type'] = 'Sales Summary report';
+            $data['report_name'] = 'Sales Summary report';
+            $data['sample_report_name'] = 'Sales_summary_report.xls';
         }
 
         if($rep_id==16 || $rep_id==17){
@@ -264,7 +268,6 @@ class Export extends CI_Controller {
         } else if($rep_id==17) {
             $this->gettrialbalancereport();
         } else if($rep_id==18) {
-
             $this->load->library('zip');
 
             $sales=$this->input->post('sales');
@@ -328,7 +331,6 @@ class Export extends CI_Controller {
         } else if($rep_id==19) {
             $this->export_model->generate_sample_expired_report();
         } else if($rep_id==20) {
-
             if($this->input->post('btn_adjus')!=null)
             {
                 $result = $this->export_model->get_adjustment_bal();
@@ -410,7 +412,6 @@ class Export extends CI_Controller {
         } else if($rep_id==22) {
             $this->export_model->generate_loader_screen_report();
         } else if($rep_id==23) {
-
             $result1 = $this->export_model->sales_rep_route_plan();
             $result2 = $this->export_model->sales_rep_route_plan_summary();
 
@@ -767,6 +768,19 @@ class Export extends CI_Controller {
             $this->export_model->generate_daily_sales_performance_report();
         } else if($rep_id==35) {
             $this->export_model->generate_daily_merchandiser_performance_report();
+        } else if($rep_id==36) {
+            if($this->input->post('from_date')=="" && $this->input->post('to_date')=="")
+            {
+                $from_date = '2017-01-01';
+                $to_date = date("Y-m-d");
+            }
+            else
+            {
+                $from_date = formatdate($this->input->post('from_date'));
+                $to_date = formatdate($this->input->post('to_date'));
+            }
+
+            $this->export_model->generate_sales_summary_report($from_date, $to_date);
         }
         
         $this->set_report_criteria($rep_id);
@@ -1101,5 +1115,38 @@ class Export extends CI_Controller {
         $this->export_model->send_daily_merchandiser_performance_report('Weekly');
     }
     
+    public function generate_sales_summary_report($month, $year){
+        if($month=="" || $year=="" || is_numeric($month)==false || is_numeric($year)==false)
+        {
+            $from_date = '2017-01-01';
+            $to_date = date("Y-m-d");
+        }
+        else
+        {
+            if(strlen($month)==1){
+                $month = '0'.$month;
+            }
+
+            $from_date = $year.'-'.$month.'-01';
+            $to_date = $year.'-'.$month;
+
+            $month = intval($month);
+
+            if($month==2){
+                $year = intval($year);
+                if(($year%4)==0){
+                    $to_date = $to_date.'-29';
+                } else {
+                    $to_date = $to_date.'-28';
+                }
+            } else if($month==4 || $month==6 || $month==9 || $month==11){
+                $to_date = $to_date.'-30';
+            } else {
+                $to_date = $to_date.'-31';
+            }
+        }
+
+        $this->export_model->generate_sales_summary_report($from_date, $to_date);
+    }
 } 
 ?>
