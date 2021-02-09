@@ -1955,11 +1955,25 @@ class CI_Email {
 
 		$ssl = ($this->smtp_crypto === 'ssl') ? 'ssl://' : '';
 
-		$this->_smtp_connect = fsockopen($ssl.$this->smtp_host,
-							$this->smtp_port,
-							$errno,
-							$errstr,
-							$this->smtp_timeout);
+		// $this->_smtp_connect = fsockopen($ssl.$this->smtp_host,
+		// 					$this->smtp_port,
+		// 					$errno,
+		// 					$errstr,
+		// 					$this->smtp_timeout);
+
+		$context = stream_context_create([
+            'ssl' => [
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true
+            ]
+        ]);
+
+        $this->_smtp_connect = stream_socket_client($ssl.$this->smtp_host . ':' 
+                                        . $this->smtp_port,
+                                        $errno,
+                                        $errstr,
+                                        $this->smtp_timeout, STREAM_CLIENT_CONNECT, $context);
 
 		if ( ! is_resource($this->_smtp_connect))
 		{

@@ -1084,6 +1084,7 @@ class Eat_Attendence extends CI_controller {
 
           $from_email = 'cs@eatanytime.co.in';
           $from_email_sender = 'Wholesome Habits Pvt Ltd';
+          $to_email2 = '';
 
           if($result[0]->email_id2!="" || $result[0]->email_id2!=NULL)
           {

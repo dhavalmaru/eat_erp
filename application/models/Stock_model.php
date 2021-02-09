@@ -184,22 +184,30 @@ function check_bar_availablity_for_depot(){
     if($module=="box_to_bar"){
         $box_to_bar_cond=" and id<>'$id' ";
     }
+    $bar_to_bar_cond="";
+    if($module=="bar_to_bar"){
+        $bar_to_bar_cond=" and id<>'$id' ";
+    }
     
     $sql="select id from batch_processing 
-        where status = 'Approved' and depot_id = '$depot_id' and product_id = '$product_id' and date_of_processing>'2018-09-21' ".$batch_processing_cond."
+        where status = 'Approved' and depot_id = '$depot_id' and product_id = '$product_id' and date_of_processing>'2018-09-21' ".$batch_processing_cond." 
         union all 
         select id from depot_transfer 
         where status = 'Approved' and depot_in_id = '$depot_id' and date_of_transfer>'2018-09-21' and 
-        id in (select distinct depot_transfer_id from depot_transfer_items where type = 'Bar' and item_id = '$product_id') ".$depot_transfer_cond."
+        id in (select distinct depot_transfer_id from depot_transfer_items where type = 'Bar' and item_id = '$product_id') ".$depot_transfer_cond." 
         union all 
         select id from distributor_in 
         where status = 'Approved' and depot_id = '$depot_id' and date_of_processing>'2018-09-21' and 
-        id in (select distinct distributor_in_id from distributor_in_items where type = 'Bar' and item_id = '$product_id') ".$distributor_in_cond."
+        id in (select distinct distributor_in_id from distributor_in_items where type = 'Bar' and item_id = '$product_id') ".$distributor_in_cond." 
         union all 
         select id from box_to_bar 
         where status = 'Approved' and depot_id = '$depot_id' and date_of_processing>'2018-09-21' and 
         id in (select distinct box_to_bar_id from box_to_bar_qty where box_id in 
-            (select distinct box_id from box_product where product_id = '$product_id')".$box_to_bar_cond.")";
+            (select distinct box_id from box_product where product_id = '$product_id')".$box_to_bar_cond.") 
+        union all 
+        select id from bar_to_bar 
+        where status = 'Approved' and depot_id = '$depot_id' and date_of_transfer>'2018-09-21' and 
+        product_in_id = '$product_id' ".$bar_to_bar_cond;
     $query=$this->db->query($sql);
     $result=$query->result();
     if (count($result)==0){
@@ -265,6 +273,10 @@ function check_bar_qty_availablity_for_depot(){
     if($module=="bar_to_box"){
         $bar_to_box_cond=" and id<>'$id'";
     }
+    $bar_to_bar_cond="";
+    if($module=="bar_to_bar"){
+        $bar_to_bar_cond=" and id<>'$id'";
+    }
     
     
     $sql="select sum(D.tot_qty) as tot_qty_in from 
@@ -285,7 +297,10 @@ function check_bar_qty_availablity_for_depot(){
             where status = 'Approved' and depot_id = '$depot_id' and date_of_processing>'2018-09-21'".$box_to_bar_cond.")) A 
         left join 
         (select * from box_product where product_id = '$product_id') B 
-        on (A.box_id = B.box_id)) C where C.product_id = '$product_id') D";
+        on (A.box_id = B.box_id)) C where C.product_id = '$product_id' 
+        union all 
+        select sum(qty) as tot_qty from bar_to_bar 
+        where status = 'Approved' and depot_id = '$depot_id' and product_in_id = '$product_id' and date_of_transfer>'2018-09-21' ".$bar_to_bar_cond.") D";
     $query=$this->db->query($sql);
     $result=$query->result();
     if (count($result)>0){
@@ -309,7 +324,10 @@ function check_bar_qty_availablity_for_depot(){
             where status = 'Approved' and depot_id = '$depot_id' and date_of_processing>'2018-09-21'".$bar_to_box_cond.")) A 
         left join 
         (select * from box_product where product_id = '$product_id') B 
-        on (A.box_id = B.box_id)) C where C.product_id = '$product_id') D";
+        on (A.box_id = B.box_id)) C where C.product_id = '$product_id' 
+        union all 
+        select sum(qty) as tot_qty from bar_to_bar 
+        where status = 'Approved' and depot_id = '$depot_id' and product_out_id = '$product_id' and date_of_transfer>'2018-09-21' ".$bar_to_bar_cond.") D";
     $query=$this->db->query($sql);
     $result=$query->result();
     if (count($result)>0){
@@ -699,11 +717,12 @@ function get_depot_bar_qty(){
     $id=$this->input->post('id');
     $module=$this->input->post('module');
     $depot_id=$this->input->post('depot_id');
+    $product_id=$this->input->post('product_id');
 
-    // $id=4;
-    // $module="depot_transfer";
-    // $depot_id=4;
-    // $raw_material_id=5;
+    // $id=2;
+    // $module="bar_to_bar";
+    // $depot_id=2;
+    // $product_id=2;
     // $qty=floatval(format_number('1,00,00,000'));
     
     $bar_to_box_cond="";
@@ -716,66 +735,112 @@ function get_depot_bar_qty(){
         $box_to_bar_cond=" and id<>'$id'";
     }
     
+    $bar_to_bar_cond="";
+    if($module=="bar_to_bar"){
+        $bar_to_bar_cond=" and id<>'$id'";
+    }
+
+    $product_cond="";
+    if(isset($product_id)){
+        if($product_id!=''){
+            $product_cond=" where product_id='$product_id'";
+        }
+    }
     
     $sql="select H.*, I.product_name from
         (select F.*, G.depot_name from 
-        (select E.depot_id, E.product_id, sum(tot_qty) as tot_qty from 
-        (select C.depot_id, C.product_id, ifnull(C.qty_in,0)-ifnull(D.qty_out,0) as tot_qty from 
+        (select E.depot_id, E.product_id, sum(E.tot_qty) as tot_qty from 
+        (select A.depot_id, A.product_id, ifnull(C.qty_in,0)-ifnull(D.qty_out,0) as tot_qty from 
+        (select distinct AA.depot_id, AA.product_id from 
+        (select distinct depot_id, product_id from batch_processing where status = 'Approved' and date_of_processing>'2018-09-21' and depot_id = '$depot_id' 
+        union all 
+        select distinct A.depot_in_id as depot_id, B.item_id as product_id from 
+        (select * from depot_transfer where status = 'Approved' and date_of_transfer>'2018-09-21' and depot_in_id = '$depot_id') A 
+        inner join 
+        (select * from depot_transfer_items where type = 'Bar') B 
+        on (A.id = B.depot_transfer_id) 
+        union all 
+        select distinct A.depot_id, B.item_id as product_id from 
+        (select * from distributor_in where status = 'Approved' and date_of_processing>'2018-09-21' and depot_id = '$depot_id') A 
+        inner join 
+        (select * from distributor_in_items where type = 'Bar') B 
+        on (A.id = B.distributor_in_id) 
+        union all 
+        select distinct C.depot_id, D.product_id from 
+        (select A.depot_id, B.box_id, B.qty from 
+        (select * from box_to_bar where status = 'Approved' and date_of_processing>'2018-09-21' and depot_id = '$depot_id') A 
+        inner join 
+        (select * from box_to_bar_qty) B 
+        on (A.id = B.box_to_bar_id)) C 
+        inner join 
+        (select * from box_product) D 
+        on (C.box_id = D.box_id) 
+        union all 
+        select distinct depot_id, product_in_id as product_id from bar_to_bar where status = 'Approved' and date_of_transfer>'2018-09-21' and depot_id = '$depot_id') AA) A 
+        left join 
         (select AA.depot_id, AA.product_id, sum(AA.qty) as qty_in from 
-        (select depot_id, product_id, qty_in_bar as qty from batch_processing where status = 'Approved' and date_of_processing>'2018-09-21' 
+        (select depot_id, product_id, qty_in_bar as qty from batch_processing where status = 'Approved' and date_of_processing>'2018-09-21' and depot_id = '$depot_id' 
         union all 
         select A.depot_in_id as depot_id, B.item_id as product_id, B.qty from 
-        (select * from depot_transfer where status = 'Approved' and date_of_transfer>'2018-09-21') A 
+        (select * from depot_transfer where status = 'Approved' and date_of_transfer>'2018-09-21' and depot_in_id = '$depot_id') A 
         inner join 
         (select * from depot_transfer_items where type = 'Bar') B 
         on (A.id = B.depot_transfer_id) 
         union all 
         select A.depot_id, B.item_id as product_id, B.qty from 
-        (select * from distributor_in where status = 'Approved' and date_of_processing>'2018-09-21') A 
+        (select * from distributor_in where status = 'Approved' and date_of_processing>'2018-09-21' and depot_id = '$depot_id') A 
         inner join 
         (select * from distributor_in_items where type = 'Bar') B 
         on (A.id = B.distributor_in_id) 
         union all 
         select C.depot_id, D.product_id, ifnull(C.qty,0)*ifnull(D.qty,0) as qty from 
         (select A.depot_id, B.box_id, B.qty from 
-        (select * from box_to_bar where status = 'Approved' and date_of_processing>'2018-09-21'".$box_to_bar_cond.") A 
+        (select * from box_to_bar where status = 'Approved' and date_of_processing>'2018-09-21' and depot_id = '$depot_id'".$box_to_bar_cond.") A 
         inner join 
         (select * from box_to_bar_qty) B 
         on (A.id = B.box_to_bar_id)) C 
         inner join 
         (select * from box_product) D 
-        on (C.box_id = D.box_id)) AA group by AA.depot_id, AA.product_id) C 
+        on (C.box_id = D.box_id) 
+        union all 
+        select depot_id, product_in_id as product_id, qty from bar_to_bar where status = 'Approved' and date_of_transfer>'2018-09-21' and depot_id = '$depot_id'".$bar_to_bar_cond.") AA 
+        group by AA.depot_id, AA.product_id) C 
+        on (A.depot_id=C.depot_id and A.product_id=C.product_id) 
         left join 
         (select BB.depot_id, BB.product_id, sum(BB.qty) as qty_out from 
         (select A.depot_out_id as depot_id, B.item_id as product_id, B.qty from 
-        (select * from depot_transfer where status = 'Approved' and date_of_transfer>'2018-09-21') A 
+        (select * from depot_transfer where status = 'Approved' and date_of_transfer>'2018-09-21' and depot_out_id = '$depot_id') A 
         inner join 
         (select * from depot_transfer_items where type = 'Bar') B 
         on (A.id = B.depot_transfer_id) 
         union all 
         select A.depot_id, B.item_id as product_id, B.qty from 
-        (select * from distributor_out where status = 'Approved' and date_of_processing>'2018-09-21') A 
+        (select * from distributor_out where status = 'Approved' and date_of_processing>'2018-09-21' and depot_id = '$depot_id') A 
         inner join 
         (select * from distributor_out_items where type = 'Bar') B 
         on (A.id = B.distributor_out_id) 
         union all 
         select C.depot_id, D.product_id, ifnull(C.qty,0)*ifnull(D.qty,0) as qty from 
         (select A.depot_id, B.box_id, B.qty from 
-        (select * from bar_to_box where status = 'Approved' and date_of_processing>'2018-09-21'".$bar_to_box_cond.") A 
+        (select * from bar_to_box where status = 'Approved' and date_of_processing>'2018-09-21' and depot_id = '$depot_id'".$bar_to_box_cond.") A 
         inner join 
         (select * from bar_to_box_qty) B 
         on (A.id = B.bar_to_box_id)) C 
         inner join 
         (select * from box_product) D 
-        on (C.box_id = D.box_id)) BB group by BB.depot_id, BB.product_id) D 
-        on (C.depot_id=D.depot_id and C.product_id=D.product_id)) E 
+        on (C.box_id = D.box_id) 
+        union all 
+        select depot_id, product_out_id as product_id, qty from bar_to_bar where status = 'Approved' and date_of_transfer>'2018-09-21' and depot_id = '$depot_id'".$bar_to_bar_cond.") BB 
+        group by BB.depot_id, BB.product_id) D 
+        on (A.depot_id=D.depot_id and A.product_id=D.product_id)) E 
         group by E.depot_id, E.product_id) F 
         left join 
         (select * from depot_master) G 
         on (F.depot_id=G.id)) H 
         left join 
         (select * from product_master) I 
-        on (H.product_id=I.id) where depot_id = '$depot_id'";
+        on (H.product_id=I.id)".$product_cond;
+
     $query=$this->db->query($sql);
     return $query->result();
 }

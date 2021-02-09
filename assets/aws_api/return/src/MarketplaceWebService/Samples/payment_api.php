@@ -102,10 +102,10 @@ $config = array (
  
 $request = new MarketplaceWebService_Model_GetReportListRequest();
 $request->setMerchant(MERCHANT_ID);
-// $request->setAvailableToDate(new DateTime('now', new DateTimeZone('UTC')));
-// $request->setAvailableFromDate(new DateTime('-8 months', new DateTimeZone('UTC')));
-$request->setAvailableToDate(new DateTime('2019-08-05'));
-$request->setAvailableFromDate(new DateTime('2019-07-14'));
+$request->setAvailableToDate(new DateTime('now', new DateTimeZone('UTC')));
+$request->setAvailableFromDate(new DateTime('-8 months', new DateTimeZone('UTC')));
+// $request->setAvailableToDate(new DateTime('2019-08-05'));
+// $request->setAvailableFromDate(new DateTime('2019-07-14'));
 $request->setAcknowledged(false);
 $request->setMWSAuthToken('529421203372'); // Optional
 $request->setMaxCount('100000');
@@ -396,7 +396,7 @@ invokeGetReportList($service, $request);
                               $sql = "insert into user_access_log (user_id, module_name, controller_name, action, table_id, date) VALUES ('$curusr', 'Payment', 'Payment', 'System Generated Payment Entry created successfully.', '$payment_id', '$now')";
                               $conn->query($sql);
 
-                              echo 'System Generated Sales Return Entry created successfully.<br/><br/>';
+                              echo 'System Generated Payment created successfully.<br/><br/>';
                           } else {
                               echo "Error: " . $sql . "<br>" . $conn->error;
                           }

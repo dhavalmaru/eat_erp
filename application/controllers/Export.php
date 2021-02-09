@@ -212,6 +212,10 @@ class Export extends CI_Controller {
             $data['report_type'] = 'Sales Summary report';
             $data['report_name'] = 'Sales Summary report';
             $data['sample_report_name'] = 'Sales_summary_report.xls';
+        } else if($rep_id==37){
+            $data['report_type'] = 'Amazon reconciliation report';
+            $data['report_name'] = 'Amazon reconciliation report';
+            $data['sample_report_name'] = 'Amazon_reconciliation_report.xls';
         }
 
         if($rep_id==16 || $rep_id==17){
@@ -781,6 +785,8 @@ class Export extends CI_Controller {
             }
 
             $this->export_model->generate_sales_summary_report($from_date, $to_date);
+        } else if($rep_id==37) {
+            $this->export_model->generate_amazon_reconciliation_report();
         }
         
         $this->set_report_criteria($rep_id);

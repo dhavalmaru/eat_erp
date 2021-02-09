@@ -338,11 +338,11 @@
         </tr>
 
         <tr style="border-top: 1px solid #666;">
-            <td colspan="4" rowspan="4" valign="top" style="padding:0;width:50%">
-                <p style="margin:0;text-align:center;font-size:22px;margin-bottom:8px">
-                    <span style="font-size:18px; font-weight:500; margin-top: 5px;display: block;" >Amount in words: <br/><br><br><br></span> 
-                    <span style="line-height:25px;">
-                    <?php if (isset($invoice_details[$inv_cnt]['total_amount_in_words'])) echo $invoice_details[$inv_cnt]['total_amount_in_words']; ?>
+            <td colspan="4" rowspan="4" valign="top" style="padding:0; width:50%;">
+                <p style="margin:5px 5px; font-size:15px; line-height: 18px;">
+                    <span style="margin-bottom: 5px; display: block; <?php if (!isset($invoice_details[$inv_cnt]['combo_box_name'])) echo 'display: none;'; ?>" >Products: <?php if (isset($invoice_details[$inv_cnt]['combo_box_name'])) echo $invoice_details[$inv_cnt]['combo_box_name']; ?>
+                    </span>
+                    <span style="display: block;" >Amount in words: <?php if (isset($invoice_details[$inv_cnt]['total_amount_in_words'])) echo $invoice_details[$inv_cnt]['total_amount_in_words']; ?>
                     </span>
                 </p>
             </td>
@@ -842,11 +842,11 @@
         </tr>
 
        <tr style="border-top: 1px solid #666;">
-            <td colspan="4" rowspan="4" valign="top" style="padding:0;width:50%">
-                <p style="margin:0;text-align:center;font-size:22px;margin-bottom:8px">
-                    <span style="font-size:18px; font-weight:500; margin-top: 5px;display: block;" >Amount in words: <br/><br><br><br></span> 
-                    <span style="line-height:25px;">
-                    <?php if (isset($invoice_details[$inv_cnt]['total_amount_in_words'])) echo $invoice_details[$inv_cnt]['total_amount_in_words']; ?>
+            <td colspan="4" rowspan="4" valign="top" style="padding:0;width:50%;">
+                <p style="margin:5px 5px; font-size:15px; line-height: 18px;">
+                    <span style="margin-bottom: 5px; display: block; <?php if (!isset($invoice_details[$inv_cnt]['combo_box_name'])) echo 'display: none;'; ?>" >Products: <?php if (isset($invoice_details[$inv_cnt]['combo_box_name'])) echo $invoice_details[$inv_cnt]['combo_box_name']; ?>
+                    </span>
+                    <span style="display: block;" >Amount in words: <?php if (isset($invoice_details[$inv_cnt]['total_amount_in_words'])) echo $invoice_details[$inv_cnt]['total_amount_in_words']; ?>
                     </span>
                 </p>
             </td>
@@ -1279,11 +1279,11 @@
         </tr>
 
         <tr style="border-top: 1px solid #666;">
-            <td colspan="4" rowspan="4" valign="top" style="padding:0;width:50%">
-                <p style="margin:0;text-align:center;font-size:22px;margin-bottom:8px">
-                    <span style="font-size:18px; font-weight:500; margin-top: 5px;display: block;" >Amount in words: <br/><br><br><br></span> 
-                    <span style="line-height:25px;">
-                    <?php if (isset($invoice_details[$inv_cnt]['total_amount_in_words'])) echo $invoice_details[$inv_cnt]['total_amount_in_words']; ?>
+            <td colspan="4" rowspan="4" valign="top" style="padding:0;width:50%;">
+                <p style="margin:5px 5px; font-size:15px; line-height: 18px;">
+                    <span style="margin-bottom: 5px; display: block; <?php if (!isset($invoice_details[$inv_cnt]['combo_box_name'])) echo 'display: none;'; ?>" >Products: <?php if (isset($invoice_details[$inv_cnt]['combo_box_name'])) echo $invoice_details[$inv_cnt]['combo_box_name']; ?>
+                    </span>
+                    <span style="display: block;" >Amount in words: <?php if (isset($invoice_details[$inv_cnt]['total_amount_in_words'])) echo $invoice_details[$inv_cnt]['total_amount_in_words']; ?>
                     </span>
                 </p>
             </td>

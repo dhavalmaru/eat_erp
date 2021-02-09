@@ -2032,6 +2032,21 @@ function get_final_data($check, $sales_rep_id, $for_invoice=false){
                 }
             }
 
+            $sql = "select group_concat(C.combo_box_name) as combo_box_name from 
+                    (select A.combo_box_id, B.combo_box_name from 
+                    (select distinct combo_box_id from distributor_out_items 
+                        where distributor_out_id = '$id') A 
+                    left join 
+                    (select * from combo_box_master) B 
+                    on (A.combo_box_id=B.id)) C";
+            $query=$this->db->query($sql);
+            $result=$query->result();
+            if(count($result)>0){
+                if(isset($result[0]->combo_box_name)){
+                    $data['combo_box_name']=$result[0]->combo_box_name;
+                }
+            }
+
             $sql = "select A.tax_percentage, round(sum(ifnull(A.qty,0)*ifnull(A.grams,0)),2) as total_grams, 
                         round(sum(A.cgst_amt),2) as cgst_amt, round(sum(A.sgst_amt),2) as sgst_amt, 
                         round(sum(A.igst_amt),2) as igst_amt from 

@@ -547,6 +547,7 @@ function save_data($id=''){
         $invoice_date=formatdate($invoice_date);
     }
 
+    $class = $this->input->post('class');
     $delivery_status = $this->input->post('delivery_status');
 
     if($this->input->post('btn_approve')!=null || $this->input->post('btn_reject')!=null){
@@ -699,9 +700,11 @@ function save_data($id=''){
 
                     $id = $ref_id;
                 } else {
+                    if(strtoupper(trim($class))=='DIRECT') {
+                        $delivery_status = 'Delivered';
+                    }
                     $sql = "Update distributor_out A 
-                            Set A.status='$status', A.remarks='$remarks', A.approved_by='$curusr', A.approved_on='$now', 
-                                A.invoice_no = '$invoice_no', A.invoice_date = '$invoice_date' 
+                            Set A.delivery_status = '$delivery_status', A.status='$status', A.remarks='$remarks', A.approved_by='$curusr', A.approved_on='$now', A.invoice_no = '$invoice_no', A.invoice_date = '$invoice_date' 
                             WHERE A.id = '$id'";
                     $this->db->query($sql);
                 }
@@ -1284,7 +1287,7 @@ function set_credit_note($id=''){
             $modified_approved_date = $result[0]->modified_approved_date;
         }
 
-        if($bal_amount!=0){
+        if($bal_amount<=-1 && $bal_amount>=1){
             $bal_amount = round($total_inv_amount - $total_amount, 0);
 
             // echo $total_inv_amount.'<br/>';

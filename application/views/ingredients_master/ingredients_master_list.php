@@ -31,14 +31,14 @@
               <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
                 
                    <div class="heading-h3"> 
-						<div class="heading-h3-heading mobile-head">	 <a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  	</a> &nbsp; &#10095; &nbsp;  Ingredients Master List  </div>						 
+						<div class="heading-h3-heading mobile-head">	 <a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  	</a> &nbsp; &#10095; &nbsp;  Recipe Master List  </div>						 
 					  <div class="heading-h3-heading  mobile-head">
 					  <div class="pull-right btn-margin">	
 								<?php $this->load->view('templates/download');?>	
 								</div>	
                        	<div class="pull-right btn-margin" style="<?php if($access[0]->r_insert=='0') echo 'display: none;';?>">
 									<a class="btn btn-success " href="<?php echo base_url() . 'index.php/ingredients_master/add'; ?>">
-										<span class="fa fa-plus"> </span> Add Ingredients Master Entry
+										<span class="fa fa-plus"> </span> Add Recipe Master Entry
 									</a>
 								</div>
 				     </div>	      

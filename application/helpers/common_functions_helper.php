@@ -369,9 +369,6 @@
     function FormatDate($date, $format = 'd/m/Y') {
         $d = DateTime::createFromFormat($format, $date);
         $returnDate = null;
-        if(strpos($date, '-')>0){
-            str_replace('-', '/', $date);
-        }
         if ($d && $d->format($format) == $date) {
             // $returnDate = DateTime::createFromFormat($format, $date)->format('Y-m-d');
             $dateInput = explode('/',$date);
@@ -405,7 +402,7 @@
             $CI->email->subject($subject);
             $CI->email->message($message);
             $CI->email->set_mailtype("html");
-            // return $CI->email->send();
+            return $CI->email->send();
 
         } catch (Exception $ex) {
             
@@ -416,24 +413,43 @@
         try {
             $CI =& get_instance();
 
-            $from_email1 = 'orders@eatanytime.in';
+            $from_email1 = "orders@eatanytime.in";
 
-            //configure email settings
-            $config['protocol'] = 'smtp';
-            // $config['smtp_host'] = 'smtp.rediffmailpro.com'; //smtp host name
-            $config['smtp_host'] = 'ssl://smtp.googlemail.com'; //smtp host name
-            $config['smtp_port'] = '465'; //smtp port number
+            // //configure email settings
+            // $config['protocol'] = "mail";
+            // // $config['smtp_host'] = 'smtp.rediffmailpro.com'; //smtp host name
+            // $config['smtp_host'] = "ssl://smtp.googlemail.com"; //smtp host name
+            // $config['smtp_port'] = "465"; //smtp port number
+            // $config['smtp_user'] = $from_email1;
+            // $config['smtp_pass'] = "team@003"; //$from_email password
+            // $config['mailtype'] = "html";
+            // $config['charset'] = "iso-8859-1";
+            // $config['wordwrap'] = TRUE;
+            // $config['newline'] = "\r\n"; //use double quotes
+            // $config['verify_peer'] = FALSE;
+            // $config['verify_peer_name'] = FALSE;
+            // $config['allow_self_signed'] = TRUE;
+
+            // $CI->email->initialize($config);
+
+
+            $config['smtp_host'] = 'smtp.gmail.com';
+            $config['smtp_port'] = '465';
             $config['smtp_user'] = $from_email1;
-            $config['smtp_pass'] = 'team@003'; //$from_email password
+            $config['smtp_auth'] = TRUE;
+            $config['smtp_pass'] = 'team@003';
+            $config['smtp_crypto'] = 'ssl';
+            $config['protocol'] = 'smtp';
             $config['mailtype'] = 'html';
+            $config['send_multipart'] = FALSE;
             $config['charset'] = 'iso-8859-1';
+            $config['newline'] = "\r\n";
             $config['wordwrap'] = TRUE;
-            $config['newline'] = "\r\n"; //use double quotes
+            $config['validate'] = False;
             $CI->email->initialize($config);
 
-            $to_email = 'prasad.bhisale@otbconsulting.co.in';
-            $cc = 'prasad.bhisale@otbconsulting.co.in';
-            $bcc = 'prasad.bhisale@otbconsulting.co.in';
+            $CI->email->set_newline("\r\n");
+
 
             //send mail
             $CI->email->from($from_email, $from_email_sender);
@@ -446,14 +462,15 @@
             if($attachment!='')
                 $CI->email->attach($attachment);
             $CI->email->set_mailtype("html");
-            $result = $CI->email->send();
+            $result = 1;
+            // $result = $CI->email->send();
             // echo $CI->email->print_debugger();
             $CI->email->clear(TRUE);
 
-            // return $result;
+            return $result;
 
         } catch (Exception $ex) {
-            // echo $ex->getMessage();
+            return $ex->getMessage();
         }
     }
 

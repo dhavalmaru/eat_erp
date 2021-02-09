@@ -266,7 +266,7 @@
                         <a href="<?php echo base_url().'index.php/Combo_box'; ?>" class="sub_menu--link">Combo Box</a>
                     </li>
                     <li class="sub_menu--item" <?php if ($Ingredient_Master==0) echo 'style="display: none;"'; ?>>
-                        <a href="<?php echo base_url().'index.php/ingredients_master'; ?>" class="sub_menu--link">Ingredients Master</a>
+                        <a href="<?php echo base_url().'index.php/ingredients_master'; ?>" class="sub_menu--link">Recipe Master</a>
                     </li>
                 </ul>
 
@@ -494,6 +494,9 @@
                     </li>
                     <li  class="sub_menu--item"  <?php if ($Box_To_Bar==0) echo 'style="display: none;"'; ?>>
                         <a href="<?php echo base_url().'index.php/Box_to_bar'; ?>" class="sub_menu--link"> Box To Bar</a>
+                    </li>
+                    <li  class="sub_menu--item"  <?php if ($Bar_To_Box==0) echo 'style="display: none;"'; ?>>
+                        <a href="<?php echo base_url().'index.php/Bar_to_bar'; ?>" class="sub_menu--link">Bar To Bar</a>
                     </li>
                 </ul>
             </ul>

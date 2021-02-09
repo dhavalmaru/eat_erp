@@ -242,7 +242,6 @@ function get_bar_qty(model_name,form_name,depochange='') {
             
             /*var depot_id = $("#prev_depo").val();*/
             var ref_id = $("#ref_id").val();
-            var ref_id = $("#ref_id").val();
             var qty = 0
             current_stock = 0;
             var pre_qty = parseInt($('#pre_qty_'+index).val());
@@ -1455,20 +1454,6 @@ $.validator.addMethod("check_batch_id_availablity", function (value, element) {
 
 
 
-var add_loader = function() {
-    console.log('add_loader');
-    $('body').append('<div id="cover"></div>');
-    setTimeout(removeLoader, 1000);
-}
-
-var remove_loader = function() {
-    $( "#cover" ).fadeOut(500, function() {
-        $( "#cover" ).remove();
-    });
-    console.log('remove_loader');
-}
-
-
 
 // ----------------- BATCH PROCESSING DETAILS FORM VALIDATION -------------------------------------
 $("#form_batch_processing_details").validate({
@@ -1527,6 +1512,19 @@ $("#form_batch_processing_details").validate({
         }
     }
 });
+
+var add_loader = function() {
+    console.log('add_loader');
+    $('body').append('<div id="cover"></div>');
+    setTimeout(removeLoader, 1000);
+}
+
+var remove_loader = function() {
+    $( "#cover" ).fadeOut(500, function() {
+        $( "#cover" ).remove();
+    });
+    console.log('remove_loader');
+}
 
 $('#form_batch_processing_details').submit(function() {
     // add_loader();
@@ -2327,7 +2325,6 @@ function check_product_availablity_for_distributor_out() {
 
 
 
-
 // ----------------- DISTRIBUTOR PAYMENT DETAILS FORM VALIDATION -------------------------------------
 $("#form_payment_details").validate({
     rules: {
@@ -2372,6 +2369,7 @@ $('#form_payment_details').submit(function() {
     // removeMultiInputNamingRules('#form_payment_details', 'input[alt="payment_date[]"]');
     removeMultiInputNamingRules('#form_payment_details', 'input[alt="payment_amount[]"]');
     // removeMultiInputNamingRules('#form_payment_details', 'input[alt="deposit_date[]"]');
+    removeMultiInputNamingRules('#form_payment_details', 'select[alt="tax[]"]');
     removeMultiInputNamingRules('#form_payment_details', 'input[alt="narration[]"]');
 
     addMultiInputNamingRules('#form_payment_details', 'select[name="distributor_id[]"]', { required: true }, "");
@@ -2381,6 +2379,7 @@ $('#form_payment_details').submit(function() {
     // addMultiInputNamingRules('#form_payment_details', 'input[name="payment_date[]"]', { required: true }, "");
     addMultiInputNamingRules('#form_payment_details', 'input[name="payment_amount[]"]', { required: true }, "");
     // addMultiInputNamingRules('#form_payment_details', 'input[name="deposit_date[]"]', { required: true }, "");
+    addMultiInputNamingRules('#form_payment_details', 'select[name="tax[]"]', { }, "");
     addMultiInputNamingRules('#form_payment_details', 'input[name="narration[]"]', { }, "");
 
     if (!$("#form_payment_details").valid()) {
@@ -2397,6 +2396,7 @@ $('#form_payment_details').submit(function() {
         // removeMultiInputNamingRules('#form_payment_details', 'input[alt="payment_date[]"]');
         removeMultiInputNamingRules('#form_payment_details', 'input[alt="payment_amount[]"]');
         // removeMultiInputNamingRules('#form_payment_details', 'input[alt="deposit_date[]"]');
+        removeMultiInputNamingRules('#form_payment_details', 'select[alt="tax[]"]');
         removeMultiInputNamingRules('#form_payment_details', 'input[alt="narration[]"]');
         
         return true;
@@ -2434,11 +2434,19 @@ function check_payment_details() {
         // }
     }
 
-    $('.credit_note').each(function(){
-        if($(this).is(":visible") == true){
+    $('.credit_debit').each(function(){
+        // if($(this).is(":visible") == true){
             var id = $(this).attr('id');
             var index = id.substr(id.lastIndexOf('_')+1);
             if($(this).val()=='Yes'){
+                if($('#tax_'+index).val()==''){
+                    var name = $('#tax_'+index).attr('name');
+                    var errors = {};
+                    errors[name] = 'This field is required.';
+                    validator.showErrors(errors);
+                    valid = false;
+                }
+
                 if($('#narration_'+index).val()==''){
                     var name = $('#narration_'+index).attr('name');
                     var errors = {};
@@ -2447,7 +2455,7 @@ function check_payment_details() {
                     valid = false;
                 }
             }
-        }    
+        // }
     });
 
     return valid;
@@ -3482,6 +3490,12 @@ $("#form_combo_box_details").validate({
         asin:{
             required: true,
             check_combo_asin_availablity: true
+        },
+        gst:{
+            required: true
+        },
+        gst_rate:{
+            required: true
         }
     },
 
@@ -4078,6 +4092,148 @@ function check_box_availablity_for_box_to_bar() {
         });
     }
     
+    return valid;
+}
+
+
+
+
+// ----------------- BAR TO BAR DETAILS FORM VALIDATION -------------------------------------
+$("#form_bar_to_bar_details").validate({
+    rules: {
+        date_of_transfer: {
+            required: true
+        },
+        depot_id: {
+            required: true
+        },
+        batch_no: {
+            required: true
+        },
+        product_out_id: {
+            required: true
+        },
+        product_in_id: {
+            required: true
+        },
+        qty: {
+            required: true
+        }
+    },
+
+    ignore: ":not(:visible)",
+
+    errorPlacement: function (error, element) {
+        var placement = $(element).data('error');
+        if (placement) {
+            $(placement).append(error);
+        } else {
+            error.insertAfter(element);
+        }
+    }
+});
+
+$('#form_bar_to_bar_details').submit(function() {
+    if (!$("#form_bar_to_bar_details").valid()) {
+        return false;
+    } else {
+        // var check_bar_qty = get_bar_qty('depot_transfer','form_depot_transfer_details'); 
+        // var check_box_qty = get_box_qty('depot_transfer','form_depot_transfer_details');
+        // var check_raw_material_qty = get_raw_material_qty('depot_transfer','form_depot_transfer_details');
+        var check_product_availablity = check_product_availablity_for_bar_to_bar();
+
+        // if (check_product_availablity==false || check_bar_qty==false || check_box_qty==false || check_raw_material_qty==false) {
+        //     return false;
+        // }
+
+        if (check_product_availablity==false) {
+            return false;
+        }
+
+        // $('.type').each(function(){
+        //     var id = $(this).attr('id');
+        //     var index = id.substr(id.lastIndexOf('_')+1);
+        //     if($('.type').val()=='Bar' || $('.type').val()=='Box')
+        //     {
+        //       var name = $('#batch_no_'+index).attr('name')
+        //       removeMultiInputNamingRules('#form_depot_transfer_details', 'select[name="'+name+'"]');
+        //     }
+        // });
+        
+        return true;
+    }
+});
+
+function check_product_availablity_for_bar_to_bar() {
+    var validator = $("#form_bar_to_bar_details").validate();
+    var valid = true;
+
+    if($('#product_out_id').val()==$('#product_in_id').val()){
+        var errors = {};
+        var name = $('#product_in_id').attr('name');
+        errors[name] = "Please select different product for transfer.";
+        validator.showErrors(errors);
+        valid = false;
+    }
+
+    var module="bar_to_bar";
+    var qty = parseFloat(get_number($('#qty').val()));
+    if (isNaN(qty)) qty=0;
+
+    var result = 1;
+
+    $.ajax({
+        url: BASE_URL+'index.php/Stock/check_bar_availablity_for_depot',
+        data: 'id='+$("#id").val()+'&module='+module+'&depot_id='+$("#depot_id").val()+'&product_id='+$("#product_out_id").val(),
+        type: "POST",
+        dataType: 'html',
+        global: false,
+        async: false,
+        success: function (data) {
+            result = parseInt(data);
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+        }
+    });
+
+    if (result) {
+        var id = "product_out_id";
+        var errors = {};
+        var name = $("#"+id).attr('name');
+        errors[name] = "Product not available in selected depot.";
+        validator.showErrors(errors);
+        valid = false;
+    }
+
+    result = 1;
+
+    $.ajax({
+        url: BASE_URL+'index.php/Stock/check_bar_qty_availablity_for_depot',
+        data: 'id='+$("#id").val()+'&module='+module+'&depot_id='+$("#depot_id").val()+'&product_id='+$("#product_out_id").val()+'&qty='+qty,
+        type: "POST",
+        dataType: 'html',
+        global: false,
+        async: false,
+        success: function (data) {
+            result = parseInt(data);
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert(xhr.status);
+            alert(thrownError);
+        }
+    });
+
+    if (result) {
+        var id = "qty";
+        var errors = {};
+        var name = $("#"+id).attr('name');
+        errors[name] = "Product qty is not enough in selected depot.";
+        validator.showErrors(errors);
+        valid = false;
+    }
+
     return valid;
 }
 
@@ -4808,6 +4964,7 @@ function checkAuthSign() {
     
     return valid;
 }
+
 
 
 
@@ -5830,6 +5987,7 @@ $('#form_group_details').submit(function() {
 
 
 
+
 // ----------------- ACCOUNT LEDGER FORM VALIDATION -------------------------------------
 $("#form_ledger_details").validate({
     rules: {
@@ -5943,9 +6101,6 @@ $('#form_ledger_details').submit(function() {
 
 
 
-
-
-
 // ----------------- SALES REP Mapping DETAILS FORM VALIDATION -------------------------------------
 $("#form_sr_mapping").validate({
     rules: {
@@ -6023,9 +6178,6 @@ $("#form_sr_mapping").validate({
     // }
 // }, 'Sales Mapping Name already in use.');
 
-
-
-
 $.validator.addMethod("check_mapping_availablity", function (value, element) {
     var result = 1;
 
@@ -6077,10 +6229,6 @@ $.validator.addMethod("check_mapping_availablity", function (value, element) {
         return true;
     }
 }, 'Mapping already in use.');
-
-
-
-
 
 $('#form_sr_mapping').submit(function() {
     if (!$("#form_sr_mapping").valid()) {
@@ -6148,9 +6296,6 @@ $("#form_distributor_out_model").validate({
         }
     }
 });
-
-
-
 
 $('#form_distributor_out_sku_details').submit(function() {
     removeMultiInputNamingRules('#form_distributor_out_sku_details', '.batch_no_qty');
@@ -6524,8 +6669,6 @@ $.validator.addMethod("check_po_number_availablity", function (value, element) {
     }
 }, 'Po Number Already in use.');
 
-
-
 $("#form_distributor_po_list").validate({
     rules: {    
         delivery_status:{
@@ -6552,7 +6695,6 @@ $("#form_distributor_po_list").validate({
         }
     }
 });
-
 
 function check_po_invoice_amount() {
     var validator = $("#form_distributor_po_details").validate();
@@ -7066,7 +7208,6 @@ $('#task_detail').submit(function() {
         return true;
     }
 });
-
 
 function checkstock_out(){
     var validator = $("#form_distributor_in_details").validate();

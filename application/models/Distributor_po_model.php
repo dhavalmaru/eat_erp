@@ -2621,7 +2621,7 @@ function send_po_delivery_report() {
         $from_email = 'cs@eatanytime.in';
         $from_email_sender = 'Wholesome Habits Pvt Ltd';
         $to_email = "priti.tripathi@eatanytime.in, operations@eatanytime.in";
-        $cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in, rohit@pecanadvisors.com";
+        $cc = "rishit.sanghvi@eatanytime.in, swapnil.darekar@eatanytime.in";
         $bcc = "dhaval.maru@otbconsulting.co.in, prasad.bhisale@otbconsulting.co.in";
 
         $sql = "select * from report_master where report_name = 'Distributor Po Delivery Report'";

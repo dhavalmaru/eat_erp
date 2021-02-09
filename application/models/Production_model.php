@@ -472,6 +472,19 @@ class Production_model Extends CI_Model{
         $now=date('Y-m-d H:i:s');
         $curusr=$this->session->userdata('session_id');
 
+        $confirm_from_date=$this->input->post('confirm_from_date');
+        if($confirm_from_date==''){
+            $confirm_from_date=NULL;
+        } else {
+            $confirm_from_date=formatdate($confirm_from_date);
+        }
+        $confirm_to_date=$this->input->post('confirm_to_date');
+        if($confirm_to_date==''){
+            $confirm_to_date=NULL;
+        } else {
+            $confirm_to_date=formatdate($confirm_to_date);
+        }
+        
         $data = array(
             'p_status' => $this->input->post('p_status'),
             'batch_rivision' => $this->input->post('batch_rivision'),

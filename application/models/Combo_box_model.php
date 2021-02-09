@@ -60,21 +60,33 @@ function save_data($id=''){
 
     if($total_grams==''){
         $total_grams = null;
+    } else {
+        $total_grams = format_number($total_grams,2);
     }
     if($combo_box_rate==''){
         $combo_box_rate = null;
+    } else {
+        $combo_box_rate = format_number($combo_box_rate,2);
     }
     if($combo_box_cost==''){
         $combo_box_cost = null;
+    } else {
+        $combo_box_cost = format_number($combo_box_cost,2);
     }
     if($total_amount==''){
         $total_amount = null;
+    } else {
+        $total_amount = format_number($total_amount,2);
     }
     if($tax_percentage==''){
         $tax_percentage = null;
+    } else {
+        $tax_percentage = format_number($tax_percentage,2);
     }
     if($category_id==''){
         $category_id = null;
+    } else {
+        $category_id = format_number($category_id,0);
     }
     
     $data = array(
@@ -94,7 +106,9 @@ function save_data($id=''){
         'category_id' => $category_id,
         'tax_percentage' => $tax_percentage,
         'asin' => $this->input->post('asin'),
-        'sku_code' => $this->input->post('sku_code')
+        'sku_code' => $this->input->post('sku_code'),
+        'gst' => $this->input->post('gst'),
+        'gst_rate' => format_number($this->input->post('gst_rate'),2)
     );
 
     if($id==''){

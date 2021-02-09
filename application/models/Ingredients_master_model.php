@@ -79,11 +79,11 @@ function save_data($id=''){
 
         $this->db->insert('ingredients_master',$data);
         $id=$this->db->insert_id();
-        $action='Ingredients Master Entry Created.';
+        $action='Recipe Master Entry Created.';
     } else {
         $this->db->where('id', $id);
         $this->db->update('ingredients_master',$data);
-        $action='Ingredients Master Entry Modified.';
+        $action='Recipe Master Entry Modified.';
     }
 
 

@@ -899,14 +899,17 @@ class Sales_upload extends CI_Controller{
                                     case when A.type='Bar' then B.product_name else C.box_name end as item_name, 
                                     case when A.type='Bar' then B.grams else C.grams end as item_grams, 
                                     case when A.type='Bar' then B.rate else C.rate end as item_rate, 
-                                    case when A.type='Bar' then B.tax_percentage else C.tax_percentage end as item_tax_per from 
+                                    case when D.gst='Yes' then D.gst_rate when A.type='Bar' then B.tax_percentage else C.tax_percentage end as item_tax_per from 
                                     (select * from combo_box_items where combo_box_id = '$combo_box_id') A 
                                     left join 
                                     (select * from product_master) B 
                                     on (A.type='Bar' and A.item_id=B.id) 
                                     left join 
                                     (select * from box_master) C 
-                                    on (A.type='Box' and A.item_id=C.id)";
+                                    on (A.type='Box' and A.item_id=C.id) 
+                                    left join 
+                                    (select * from combo_box_master where id = '$combo_box_id') D 
+                                    on (A.combo_box_id=D.id)";
                             $result = $this->db->query($sql)->result();
                             if(count($result)==0){
                                 $error.='Combo Box '.$sku_name.' items not found.';

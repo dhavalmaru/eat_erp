@@ -209,18 +209,31 @@
                                         </tfoot>
                                         </table>
                                     </div>
-										</div>
+									</div>
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Total Grams </label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control format_number" name="total_grams" id="total_grams" placeholder="Total Grams" value="<?php if (isset($data)) { echo format_money($data[0]->grams,2); } ?>" readonly />
                                             </div>
-                                        
-								
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Total Amount (In Rs)</label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
                                                 <input type="text" class="form-control format_number" name="total_amount" id="total_amount" placeholder="Total Amount" value="<?php if (isset($data)) { echo format_money($data[0]->amount,2); } ?>" readonly />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <label class="col-md-2 col-sm-2 col-xs-12 control-label">GST </label>
+                                            <div class="col-md-4 col-sm-4 col-xs-12">
+                                                <input type="radio" class="" name="gst" id="gst_yes" value="Yes" <?php if (isset($data)) { if($data[0]->gst=='Yes') echo 'checked'; } ?> onchange="set_gst_rate('Yes');" />&nbsp;&nbsp;Yes&nbsp;&nbsp;
+                                                <input type="radio" class="" name="gst" id="gst_no" value="No" <?php if (isset($data)) { if($data[0]->gst=='No') echo 'checked'; } else echo 'checked'; ?> onchange="set_gst_rate('No');" />&nbsp;&nbsp;No
+                                            </div>
+                                            <div id="gst_rate_div" style="<?php if (isset($data)) { if($data[0]->gst=='Yes') echo ''; else echo 'display: none;'; } else echo 'display: none;'; ?>">
+                                                <label class="col-md-2 col-sm-2 col-xs-12 control-label">GST Rate</label>
+                                                <div class="col-md-4 col-sm-4 col-xs-12">
+                                                    <input type="text" class="form-control format_number" name="gst_rate" id="gst_rate" placeholder="GST Rate" value="<?php if (isset($data)) { echo format_money($data[0]->gst_rate,2); } ?>" />
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -557,6 +570,14 @@
                     counter++;
                 });
             });
+
+            function set_gst_rate(gst){
+                if(gst=='Yes'){
+                    $('#gst_rate_div').show();
+                } else {
+                    $('#gst_rate_div').hide();
+                }
+            }
 
         </script>
     <!-- END SCRIPTS -->      

@@ -66,7 +66,11 @@ class Payment_upload extends CI_Controller{
 
         $objPHPExcel->getActiveSheet()->setCellValue('G2', 'Yes');
         $objPHPExcel->getActiveSheet()->setCellValue('G3', 'No');
-        $credit_note_cnt = 4;
+        $credit_debit_cnt = 4;
+
+        $objPHPExcel->getActiveSheet()->setCellValue('I2', 'Yes');
+        $objPHPExcel->getActiveSheet()->setCellValue('I3', 'No');
+        $tax_cnt = 4;
 
         $objPHPExcel->setActiveSheetIndex(0);
         for($row=5; $row<=105; $row++) {
@@ -84,7 +88,11 @@ class Payment_upload extends CI_Controller{
 
             $objValidation = $objPHPExcel->getActiveSheet()->getCell('I'.$row)->getDataValidation();
             $this->common_excel($objValidation);
-            $objValidation->setFormula1('=Sheet2!$G$2:$G$'.($credit_note_cnt-1));
+            $objValidation->setFormula1('=Sheet2!$G$2:$G$'.($credit_debit_cnt-1));
+
+            $objValidation = $objPHPExcel->getActiveSheet()->getCell('J'.$row)->getDataValidation();
+            $this->common_excel($objValidation);
+            $objValidation->setFormula1('=Sheet2!$I$2:$I$'.($tax_cnt-1));
         }
 
         $objPHPExcel->getSheetByName('Sheet2')->setSheetState(PHPExcel_Worksheet::SHEETSTATE_HIDDEN);
@@ -101,149 +109,6 @@ class Payment_upload extends CI_Controller{
         // header('Cache-Control: max-age=0');
         // $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'PDF');
         // $objWriter->save('php://output');
-    }
-
-    public function test(){
-        // $template_path=$this->config->item('template_path');
-        // $file = 'E:/wamp64/www/eat_erp/assets/uploads/payment_upload/1580471219_payment_upload_format_1.xlsx';
-        $file = 'E:/wamp64/www/eat_erp/assets/uploads/payment_upload/1580554512_GOQII_payment_upload_format.xlsx';
-        // $this->load->library('excel');
-
-        $objPHPExcel = PHPExcel_IOFactory::load($file);
-
-        $objPHPExcel->setActiveSheetIndex(0);
-        $highestrow = $objPHPExcel->setActiveSheetIndex(0)->getHighestRow();
-        $objPHPExcel->getActiveSheet()->setCellValue('W4', 'Error Remark');
-
-        $creation_date = $objPHPExcel->getActiveSheet()->getCell('A5')->getValue();
-        $creation_date = date('Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($creation_date));
-        echo $creation_date;
-        echo '<br/><br/>';
-
-        if(validateDate($creation_date, 'Y-m-d')==false){
-            echo 'not valid';
-        } else {
-            echo 'valid';
-        }
-
-        unset($objPHPExcel);
-
-        // $objPHPExcel->getSheetByName('Sheet2')->setSheetState(PHPExcel_Worksheet::SHEETSTATE_HIDDEN);
-        // $filename='payment_upload_format.xlsx';
-        // header('Content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        // header('Content-Disposition: attachment;filename="'.$filename.'"');
-        // header('Cache-Control: max-age=0');
-        // $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
-        // $objWriter->save('php://output');
-
-        // $url = base_url().'index.php/Stock/check_box_availablity_for_depot';
-        // $r = new HttpRequest($url, HttpRequest::METH_POST);
-        // // $r->setOptions(array('cookies' => array('lang' => 'de')));
-        // $r->addPostFields(array('depot_id' => 'mike', 'box_id' => '49'));
-
-        // try {
-        //     echo $r->send()->getBody();
-        // } catch (HttpException $ex) {
-        //     echo $ex;
-        // }
-
-        // $url = base_url().'index.php/Stock/check_box_availablity_for_depot';
-        // $url = base_url().'index.php/Stock/check_box_qty_availablity_for_depot';
-        // $params = array('depot_id' => '2', 'box_id' => '56', 'qty' => '5');
-
-        // $query_content = http_build_query($params);
-        // $fp = fopen($url, 'r', FALSE, // do not use_include_path
-        // stream_context_create([
-        //     'http' => [
-        //         'header'  => [ // header array does not need '\r\n'
-        //             'Content-type: application/x-www-form-urlencoded',
-        //             'Content-Length: ' . strlen($query_content)
-        //         ],
-        //         'method'  => 'POST',
-        //         'content' => $query_content
-        //     ]
-        // ]));
-        // if ($fp === FALSE) {
-        //     echo json_encode(['error' => 'Failed to get contents...']);
-        // }
-        // $result = stream_get_contents($fp); // no maxlength/offset
-        // fclose($fp);
-        // echo $result;
-    }
-
-    public function test_upload(){
-        //Check valid spreadsheet has been uploaded
-        // echo 'test_upload';
-        // exit;
-
-        if(isset($_FILES['upload'])){
-            if($_FILES['upload']['name']){
-                if(!$_FILES['upload']['error'])
-                {
-                    $inputFile = $_FILES['upload']['name'];
-                    $extension = strtoupper(pathinfo($inputFile, PATHINFO_EXTENSION));
-                    if($extension == 'XLSX' || $extension == 'ODS'){
-
-                        //Read spreadsheeet workbook
-                        try {
-                            $inputFile = $_FILES['upload']['tmp_name'];
-                            $inputFileType = PHPExcel_IOFactory::identify($inputFile);
-                            $objReader = PHPExcel_IOFactory::createReader($inputFileType);
-                            $objPHPExcel = $objReader->load($inputFile);
-                        } catch(Exception $e) {
-                            die($e->getMessage());
-                        }
-
-                        //Get worksheet dimensions
-                        $sheet = $objPHPExcel->getSheet(0); 
-                        $highestRow = $sheet->getHighestRow(); 
-                        $highestColumn = $sheet->getHighestColumn();
-
-                        echo $sheet->cell('A1').getValue();
-
-                        //Loop through each row of the worksheet in turn
-                        // for ($row = 1; $row <= $highestRow; $row++){ 
-                            //  Read a row of data into an array
-                            // echo $sheet->cell('A1').getValue();
-                            // $rowData = $sheet->rangeToArray('A' . $row . ':' . $highestColumn . $row, NULL, TRUE, FALSE);
-                            // echo json_encode($rowData);
-                            //Insert into database
-                        // }
-                    }
-                    else{
-                        echo "Please upload an XLSX or ODS file";
-                    }
-                }
-                else{
-                    echo $_FILES['spreadsheet']['error'];
-                }
-            }
-        }
-
-        $template_path=$this->config->item('template_path');
-        $file = 'E:/wamp64/www/eat_erp/assets/uploads/payment_upload/1580471219_payment_upload_format_1.xlsx';
-        $this->load->library('excel');
-
-        $objPHPExcel = PHPExcel_IOFactory::load($file);
-
-        // $objPHPExcel->setActiveSheetIndex(0);
-        // $highestrow = $objPHPExcel->setActiveSheetIndex(0)->getHighestRow();
-        // $objPHPExcel->getActiveSheet()->setCellValue('W4', 'Error Remark');
-        
-        // $objPHPExcel->getSheetByName('Sheet2')->setSheetState(PHPExcel_Worksheet::SHEETSTATE_HIDDEN);
-        $filename='payment_upload_format.xlsx';
-
-        header('Content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="'.$filename.'"');
-        header('Cache-Control: max-age=0');
-
-        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
-        $objWriter->save('php://output');
-
-        sleep(0.50);
-
-        echo 'upload file';
-        exit;
     }
 
     public function upload_file(){
@@ -301,37 +166,6 @@ class Payment_upload extends CI_Controller{
         redirect(base_url().'index.php/Payment_upload');
     }
 
-    public function check_stock($type, $depot_id, $item_id, $qty){
-        if($type=='Bar'){
-            $url = base_url().'index.php/Stock/check_bar_qty_availablity_for_depot';
-            $params = array('depot_id' => $depot_id, 'product_id' => $item_id, 'qty' => $qty);
-        } else {
-            $url = base_url().'index.php/Stock/check_box_qty_availablity_for_depot';
-            $params = array('depot_id' => $depot_id, 'box_id' => $item_id, 'qty' => $qty);
-        }
-        
-        $result = 1;
-        $query_content = http_build_query($params);
-        $fp = fopen($url, 'r', FALSE, // do not use_include_path
-        stream_context_create([
-            'http' => [
-                'header'  => [ // header array does not need '\r\n'
-                    'Content-type: application/x-www-form-urlencoded',
-                    'Content-Length: ' . strlen($query_content)
-                ],
-                'method'  => 'POST',
-                'content' => $query_content
-            ]
-        ]));
-        if ($fp === FALSE) {
-            // echo json_encode(['error' => 'Failed to get contents...']);
-        } else {
-            $result = stream_get_contents($fp);
-        }
-        fclose($fp);
-        return $result;
-    }
-
     public function upload_file_data($file_id){
         $now=date('Y-m-d H:i:s');
         $curdate=date('Y-m-d');
@@ -353,8 +187,8 @@ class Payment_upload extends CI_Controller{
         $objPHPExcel = PHPExcel_IOFactory::load($filename);
         $objPHPExcel->setActiveSheetIndex(0);
         $highestrow = $objPHPExcel->setActiveSheetIndex(0)->getHighestRow();
-        $objPHPExcel->getActiveSheet()->setCellValue('K4', 'Error Remark');
-        $objPHPExcel->getActiveSheet()->getColumnDimension('K')->setWidth(30);
+        $objPHPExcel->getActiveSheet()->setCellValue('L4', 'Error Remark');
+        $objPHPExcel->getActiveSheet()->getColumnDimension('L')->setWidth(30);
         $objerror = 0;
         $error_line = '';
         $payment_array = [];
@@ -368,8 +202,9 @@ class Payment_upload extends CI_Controller{
             $neft_no = $objPHPExcel->getActiveSheet()->getCell('F'.$i)->getCalculatedValue();
             $payment_amount = $objPHPExcel->getActiveSheet()->getCell('G'.$i)->getCalculatedValue();
             $remarks = $objPHPExcel->getActiveSheet()->getCell('H'.$i)->getCalculatedValue();
-            $credit_note = $objPHPExcel->getActiveSheet()->getCell('I'.$i)->getCalculatedValue();
-            $narration = $objPHPExcel->getActiveSheet()->getCell('J'.$i)->getCalculatedValue();
+            $credit_debit = $objPHPExcel->getActiveSheet()->getCell('I'.$i)->getCalculatedValue();
+            $tax = $objPHPExcel->getActiveSheet()->getCell('J'.$i)->getCalculatedValue();
+            $narration = $objPHPExcel->getActiveSheet()->getCell('K'.$i)->getCalculatedValue();
             $error = '';
             $bank_id = '';
             $distributor_id = '';
@@ -543,29 +378,27 @@ class Payment_upload extends CI_Controller{
                         $error_line.=$i.', ';
                         $bl_error_line=true;
                     }
-                } else if($payment_amount<0){
-                    if(strtoupper(trim($credit_note))=='YES' && $narration==''){
-                        $error.='Narration cannot be blank.';
-                        $objerror=1;
-                        if($bl_error_line==false){
-                            $error_line.=$i.', ';
-                            $bl_error_line=true;
-                        }
+                }
+                if(strtoupper(trim($credit_debit))=='YES' && $tax==''){
+                    $error.='Tax cannot be blank.';
+                    $objerror=1;
+                    if($bl_error_line==false){
+                        $error_line.=$i.', ';
+                        $bl_error_line=true;
                     }
-                } else {
-                    if(strtoupper(trim($credit_note))=='YES'){
-                        $error.='Payment Amount should be negative.';
-                        $objerror=1;
-                        if($bl_error_line==false){
-                            $error_line.=$i.', ';
-                            $bl_error_line=true;
-                        }
+                }
+                if(strtoupper(trim($credit_debit))=='YES' && $narration==''){
+                    $error.='Narration cannot be blank.';
+                    $objerror=1;
+                    if($bl_error_line==false){
+                        $error_line.=$i.', ';
+                        $bl_error_line=true;
                     }
                 }
 
                 if($error!=""){
-                    $objPHPExcel->getActiveSheet()->setCellValue('K'.$i, $error);
-                    $objPHPExcel->getActiveSheet()->getStyle('K'.$i)->getAlignment()->setWrapText(true);  
+                    $objPHPExcel->getActiveSheet()->setCellValue('L'.$i, $error);
+                    $objPHPExcel->getActiveSheet()->getStyle('L'.$i)->getAlignment()->setWrapText(true);  
                 }
             //-------------- Validation End ------------------------------
 
@@ -606,7 +439,8 @@ class Payment_upload extends CI_Controller{
                 $items_array[$k]['invoice_amount']=$invoice_amount;
                 $items_array[$k]['balance_amount']=$balance_amount;
                 $items_array[$k]['final_amount']=$final_amount;
-                $items_array[$k]['credit_note']=$credit_note;
+                $items_array[$k]['credit_debit']=$credit_debit;
+                $items_array[$k]['tax']=$tax;
                 $items_array[$k]['narration']=$narration;
 
                 $payment_array[$j]['items_array']=$items_array;
@@ -682,7 +516,7 @@ class Payment_upload extends CI_Controller{
                     $payment_id = $this->db->insert_id();
 
                     for($j=0; $j<count($items_array); $j++) {
-                        $sql = "insert into payment_upload_items (payment_id, distributor_id, ref_no, invoice_no, payment_amount, credit_note, narration) VALUES ('".$payment_id."', '".$items_array[$j]['distributor_id']."', '".$items_array[$j]['ref_no']."', '".$items_array[$j]['invoice_no']."', '".$items_array[$j]['payment_amount']."', '".$items_array[$j]['credit_note']."', '".$items_array[$j]['narration']."')";
+                        $sql = "insert into payment_upload_items (payment_id, distributor_id, ref_no, invoice_no, payment_amount, credit_debit, tax, narration) VALUES ('".$payment_id."', '".$items_array[$j]['distributor_id']."', '".$items_array[$j]['ref_no']."', '".$items_array[$j]['invoice_no']."', '".$items_array[$j]['payment_amount']."', '".$items_array[$j]['credit_debit']."', '".$items_array[$j]['tax']."', '".$items_array[$j]['narration']."')";
                         if ($this->db->query($sql) === TRUE) {
                             $success_cnt = $success_cnt + 1;
                         } else {
@@ -754,9 +588,9 @@ class Payment_upload extends CI_Controller{
                 $id = $this->db->insert_id();
 
                 $sql = "insert into payment_details_items (payment_id, distributor_id, ref_no, invoice_no, bank_name, 
-                            bank_city, payment_amount, settlement_id, settlement_start_date, settlement_end_date, credit_note, narration) 
+                            bank_city, payment_amount, settlement_id, settlement_start_date, settlement_end_date, credit_debit, tax, narration) 
                         select '".$id."', distributor_id, ref_no, invoice_no, bank_name, 
-                            bank_city, payment_amount, settlement_id, settlement_start_date, settlement_end_date, credit_note, narration 
+                            bank_city, payment_amount, settlement_id, settlement_start_date, settlement_end_date, credit_debit, tax, narration 
                         from payment_upload_items where payment_id = '".$result[$i]->id."'";
                 $this->db->query($sql);
 

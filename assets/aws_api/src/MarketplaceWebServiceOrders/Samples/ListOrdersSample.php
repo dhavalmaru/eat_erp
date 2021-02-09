@@ -567,14 +567,17 @@ invokeListOrders($service, $request, $request2);
                         case when A.type='Bar' then B.product_name else C.box_name end as item_name, 
                         case when A.type='Bar' then B.grams else C.grams end as item_grams, 
                         case when A.type='Bar' then B.rate else C.rate end as item_rate, 
-                        case when A.type='Bar' then B.tax_percentage else C.tax_percentage end as item_tax_per from 
+                        case when D.gst='Yes' then D.gst_rate when A.type='Bar' then B.tax_percentage else C.tax_percentage end as item_tax_per from 
                         (select * from combo_box_items where combo_box_id = '$combo_box_id') A 
                         left join 
                         (select * from product_master) B 
                         on (A.type='Bar' and A.item_id=B.id) 
                         left join 
                         (select * from box_master) C 
-                        on (A.type='Box' and A.item_id=C.id)";
+                        on (A.type='Box' and A.item_id=C.id) 
+                        left join 
+                        (select * from combo_box_master where id = '$combo_box_id') D 
+                        on (A.combo_box_id=D.id)";
                   $result2 = $conn->query($sql);
                   if ($result2->num_rows > 0) {
                     $row_arr2 = $result2->fetch_all(MYSQLI_ASSOC);
@@ -992,7 +995,7 @@ invokeListOrders($service, $request, $request2);
                   $distributor_out_id = $conn->insert_id;
 
                   for($j=0; $j<count($item_data); $j++) {
-                    $sql = "insert into distributor_out_items (distributor_out_id, type, item_id, qty, sell_rate, grams, rate, amount, cgst_amt, sgst_amt, igst_amt, tax_amt, total_amt, margin_per, promo_margin, tax_percentage, batch_no, batch_qty) VALUES ('".$distributor_out_id."', '".$item_data[$j]['type']."', '".$item_data[$j]['item_id']."', '".$item_data[$j]['qty']."', '".$item_data[$j]['sell_rate']."', '".$item_data[$j]['grams']."', '".$item_data[$j]['rate']."', '".$item_data[$j]['amount']."', '".$item_data[$j]['cgst_amt']."', '".$item_data[$j]['sgst_amt']."', '".$item_data[$j]['igst_amt']."', '".$item_data[$j]['tax_amt']."', '".$item_data[$j]['total_amt']."', '".$item_data[$j]['margin_per']."', '".$item_data[$j]['promo_margin']."', '".$item_data[$j]['tax_percentage']."', '182', '".$item_data[$j]['qty']."')";
+                    $sql = "insert into distributor_out_items (distributor_out_id, type, item_id, qty, sell_rate, grams, rate, amount, cgst_amt, sgst_amt, igst_amt, tax_amt, total_amt, margin_per, promo_margin, tax_percentage, batch_no, batch_qty, combo_box_id) VALUES ('".$distributor_out_id."', '".$item_data[$j]['type']."', '".$item_data[$j]['item_id']."', '".$item_data[$j]['qty']."', '".$item_data[$j]['sell_rate']."', '".$item_data[$j]['grams']."', '".$item_data[$j]['rate']."', '".$item_data[$j]['amount']."', '".$item_data[$j]['cgst_amt']."', '".$item_data[$j]['sgst_amt']."', '".$item_data[$j]['igst_amt']."', '".$item_data[$j]['tax_amt']."', '".$item_data[$j]['total_amt']."', '".$item_data[$j]['margin_per']."', '".$item_data[$j]['promo_margin']."', '".$item_data[$j]['tax_percentage']."', '182', '".$item_data[$j]['qty']."', '".$item_data[$j]['combo_box_id']."')";
                     $conn->query($sql);
                   }
 

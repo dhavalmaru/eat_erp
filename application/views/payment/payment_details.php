@@ -117,7 +117,8 @@
                                                 <th style="width: 200px" class="chq_ref">Bank City <span class="asterisk_sign">*</span></th>
                                                 <!-- <th>Payment Date <span class="asterisk_sign">*</span></th> -->
                                                 <th style="width: 200px">Payment Amount (In Rs)  <span class="asterisk_sign">*</span></th>
-                                                <th style="width: 200px">Credit Note <span class="asterisk_sign">*</span></th>
+                                                <th style="width: 200px">Credit Debit <span class="asterisk_sign">*</span></th>
+                                                <th style="width: 200px">Tax <span class="asterisk_sign">*</span></th>
                                                 <th style="width: 200px">Narration <span class="asterisk_sign">*</span></th>
                                                 <th width="70" style="text-align:center;" class="table_action">Action</th>
                                             </tr>
@@ -166,17 +167,24 @@
                                                     <input type="text" class="form-control datepicker1 payment_date" name="payment_date[]" id="payment_date_<?php //echo $i; ?>" placeholder="Payment Date" value="<?php //if(isset($payment_items)) echo (($payment_items[0]->payment_date!=null && $payment_items[0]->payment_date!='')?date('d/m/Y',strtotime($payment_items[0]->payment_date)):''); ?>"/>
                                                 </td> -->
                                                 <td>
-                                                    <input type="text" class="form-control payment_amount" name="payment_amount[]" id="payment_amount_<?php echo $i; ?>" placeholder="Payment Amount" value="<?php if (isset($payment_items)) { echo $payment_items[$i]->payment_amount; } ?>" onchange="set_credit_note(<?php echo $i; ?>);" />
+                                                    <input type="text" class="form-control payment_amount" name="payment_amount[]" id="payment_amount_<?php echo $i; ?>" placeholder="Payment Amount" value="<?php if (isset($payment_items)) { echo $payment_items[$i]->payment_amount; } ?>" />
                                                 </td>
                                                 <td>
-                                                    <select name="credit_note[]" class="form-control credit_note" id="credit_note_<?php echo $i;?>" style="<?php if (isset($payment_items)) { if($payment_items[$i]->payment_amount>=0) echo 'display: none;'; } ?>">
+                                                    <select name="credit_debit[]" class="form-control credit_debit" id="credit_debit_<?php echo $i;?>">
                                                         <option value="">Select</option>
-                                                        <option value="Yes" <?php if($payment_items[$i]->credit_note=='Yes') { echo 'selected'; } ?>>Yes</option>
-                                                        <option value="No" <?php if($payment_items[$i]->credit_note=='No') { echo 'selected'; } ?>>No</option>
+                                                        <option value="Yes" <?php if($payment_items[$i]->credit_debit=='Yes') { echo 'selected'; } ?>>Yes</option>
+                                                        <option value="No" <?php if($payment_items[$i]->credit_debit=='No') { echo 'selected'; } ?>>No</option>
                                                     </select>
                                                 </td>
                                                 <td>
-                                                    <input type="text" class="form-control narration" name="narration[]" id="narration_<?php echo $i; ?>" placeholder="Narration" value="<?php if (isset($payment_items)) { echo $payment_items[$i]->narration; } ?>" style="<?php if (isset($payment_items)) { if($payment_items[$i]->payment_amount>=0) echo 'display: none;'; } ?>" />
+                                                    <select name="tax[]" class="form-control tax" id="tax_<?php echo $i;?>">
+                                                        <option value="">Select</option>
+                                                        <option value="Yes" <?php if($payment_items[$i]->tax=='Yes') { echo 'selected'; } ?>>Yes</option>
+                                                        <option value="No" <?php if($payment_items[$i]->tax=='No') { echo 'selected'; } ?>>No</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control narration" name="narration[]" id="narration_<?php echo $i; ?>" placeholder="Narration" value="<?php if (isset($payment_items)) { echo $payment_items[$i]->narration; } ?>" />
                                                 </td>
                                                 <td style="text-align:center; vertical-align: middle;" class="table_action">
                                                     <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>
@@ -224,17 +232,24 @@
                                                     <input type="text" class="form-control datepicker1 payment_date" name="payment_date[]" id="payment_date_<?php //echo $i; ?>" placeholder="Payment Date" value=""/>
                                                 </td> -->
                                                 <td>
-                                                    <input type="text" class="form-control payment_amount" name="payment_amount[]" id="payment_amount_<?php echo $i; ?>" placeholder="Payment Amount" value="" onchange="set_credit_note(<?php echo $i; ?>);" />
+                                                    <input type="text" class="form-control payment_amount" name="payment_amount[]" id="payment_amount_<?php echo $i; ?>" placeholder="Payment Amount" value="" />
                                                 </td>
                                                 <td>
-                                                    <select name="credit_note[]" class="form-control credit_note" id="credit_note_<?php echo $i;?>" style="display: none;">
+                                                    <select name="credit_debit[]" class="form-control credit_debit" id="credit_debit_<?php echo $i;?>">
                                                         <option value="">Select</option>
                                                         <option value="Yes">Yes</option>
                                                         <option value="No">No</option>
                                                     </select>
                                                 </td>
                                                 <td>
-                                                    <input type="text" class="form-control narration" name="narration[]" id="narration_<?php echo $i; ?>" placeholder="Narration" value="" style="display: none;" />
+                                                    <select name="tax[]" class="form-control tax" id="tax_<?php echo $i;?>">
+                                                        <option value="">Select</option>
+                                                        <option value="Yes">Yes</option>
+                                                        <option value="No">No</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control narration" name="narration[]" id="narration_<?php echo $i; ?>" placeholder="Narration" value="" />
                                                 </td>
                                                 <td style="text-align:center; vertical-align: middle;" class="table_action">
                                                     <a id="box_<?php echo $i; ?>_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>
@@ -469,6 +484,8 @@
                 // addMultiInputNamingRules('#form_payment_details', 'input[name="payment_date[]"]', { required: true }, "");
                 addMultiInputNamingRules('#form_payment_details', 'input[name="payment_amount[]"]', { required: true }, "");
                 // addMultiInputNamingRules('#form_payment_details', 'input[name="deposit_date[]"]', { required: true }, "");
+                addMultiInputNamingRules('#form_payment_details', 'select[name="tax[]"]', { }, "");
+                addMultiInputNamingRules('#form_payment_details', 'input[name="narration[]"]', { }, "");
 
                 $('#payment_mode').change();
                 
@@ -654,17 +671,24 @@
                                                 '<input type="text" class="form-control datepicker1 payment_date" name="payment_date[]" id="payment_date_'+counter+'" placeholder="Payment Date" value=""/>' + 
                                             '</td> -->' + 
                                             '<td>' + 
-                                                '<input type="text" class="form-control payment_amount" name="payment_amount[]" id="payment_amount_'+counter+'" placeholder="Payment Amount" value="" onchange="set_credit_note('+counter+');" />' + 
+                                                '<input type="text" class="form-control payment_amount" name="payment_amount[]" id="payment_amount_'+counter+'" placeholder="Payment Amount" value="" />' + 
                                             '</td>' + 
                                             '<td>' + 
-                                                '<select name="credit_note[]" class="form-control credit_note" id="credit_note_'+counter+'" style="display: none;">' + 
+                                                '<select name="credit_debit[]" class="form-control credit_debit" id="credit_debit_'+counter+'">' + 
                                                     '<option value="">Select</option>' + 
                                                     '<option value="Yes">Yes</option>' + 
                                                     '<option value="No">No</option>' + 
                                                 '</select>' + 
                                             '</td>' + 
                                             '<td>' + 
-                                                '<input type="text" class="form-control narration" name="narration[]" id="narration_'+counter+'" placeholder="Narration" value="" style="display: none;" />' + 
+                                                '<select name="tax[]" class="form-control tax" id="tax_'+counter+'">' + 
+                                                    '<option value="">Select</option>' + 
+                                                    '<option value="Yes">Yes</option>' + 
+                                                    '<option value="No">No</option>' + 
+                                                '</select>' + 
+                                            '</td>' + 
+                                            '<td>' + 
+                                                '<input type="text" class="form-control narration" name="narration[]" id="narration_'+counter+'" placeholder="Narration" value="" />' + 
                                             '</td>' + 
                                             '<td style="text-align:center; vertical-align: middle;" class="table_action">' + 
                                                 '<a id="box_'+counter+'_row_delete" class="delete_row" href="#"><span class="fa trash fa-trash-o"  ></span></a>' + 
@@ -695,15 +719,15 @@
                 });
             });
 
-            function set_credit_note(counter){
+            function set_credit_debit(counter){
                 var payment_amount = $('#payment_amount_'+counter).val();
                 payment_amount = parseFloat(payment_amount);
 
                 if(payment_amount<0){
-                    $('#credit_note_'+counter).show();
+                    $('#credit_debit_'+counter).show();
                     $('#narration_'+counter).show();
                 } else {
-                    $('#credit_note_'+counter).hide();
+                    $('#credit_debit_'+counter).hide();
                     $('#narration_'+counter).hide();
                 }
             }

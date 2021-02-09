@@ -384,7 +384,6 @@ function save_data($id=''){
             $data['modified_approved_date']=$now;
         }
 
-
         if($id==''){
             $data['created_by']=$curusr;
             $data['created_on']=$now;
@@ -416,19 +415,20 @@ function save_data($id=''){
         $settlement_id=$this->input->post('settlement_id[]');
         $settlement_start_date=$this->input->post('settlement_start_date[]');
         $settlement_end_date=$this->input->post('settlement_end_date[]');
-        $credit_note=$this->input->post('credit_note[]');
+        $credit_debit=$this->input->post('credit_debit[]');
+        $tax=$this->input->post('tax[]');
         $narration=$this->input->post('narration[]');
 
         for($k=0; $k<count($distributor_id); $k++) {
             if(isset($distributor_id[$k]) and $distributor_id[$k]!="") {
                 $payment_amt = format_number($payment_amount[$k],2);
-                $credit_note_val = '';
-                $narration_val = '';
+                // $credit_debit_val = '';
+                // $narration_val = '';
 
-                if($payment_amt<0){
-                    $credit_note_val = $credit_note[$k];
-                    $narration_val = $narration[$k];
-                }
+                // if($payment_amt<0){
+                //     $credit_debit_val = $credit_debit[$k];
+                //     $narration_val = $narration[$k];
+                // }
 
                 $data = array(
                             'payment_id' => $id,
@@ -441,8 +441,9 @@ function save_data($id=''){
                             'settlement_id' => $settlement_id[$k],
                             'settlement_start_date' => (($settlement_start_date[$k]=='')? Null: $settlement_start_date[$k]),
                             'settlement_end_date' => (($settlement_end_date[$k]=='')? Null: $settlement_end_date[$k]),
-                            'credit_note' => $credit_note_val,
-                            'narration' => $narration_val
+                            'credit_debit' => $credit_debit[$k],
+                            'tax' => $tax[$k],
+                            'narration' => $narration[$k]
                         );
                 $this->db->insert('payment_details_items', $data);
             }
@@ -522,7 +523,8 @@ function generate_credit_debit_note($id='', $status=''){
             // $settlement_id=$this->input->post('settlement_id[]');
             // $settlement_start_date=$this->input->post('settlement_start_date[]');
             // $settlement_end_date=$this->input->post('settlement_end_date[]');
-            // $credit_note=$this->input->post('credit_note[]');
+            // $credit_debit=$this->input->post('credit_debit[]');
+            // $tax=$this->input->post('tax[]');
             // $narration=$this->input->post('narration[]');
 
             $sql = "select * from payment_details_items where payment_id = '$id'";
@@ -542,21 +544,29 @@ function generate_credit_debit_note($id='', $status=''){
                     $settlement_id=$result[$k]->settlement_id;
                     $settlement_start_date=$result[$k]->settlement_start_date;
                     $settlement_end_date=$result[$k]->settlement_end_date;
-                    $credit_note=$result[$k]->credit_note;
+                    $credit_debit=$result[$k]->credit_debit;
+                    $tax=$result[$k]->tax;
                     $narration=$result[$k]->narration;
                     
                     if(isset($distributor_id) and $distributor_id!="") {
                         $payment_amt = format_number($payment_amount,2);
-                        $credit_note_val = '';
-                        $narration_val = '';
+                        // $credit_debit_val = '';
+                        // $narration_val = '';
 
-                        if($payment_amt<0){
-                            $credit_note_val = $credit_note;
-                            $narration_val = $narration;
-                        }
+                        // if($payment_amt<0){
+                        //     $credit_debit_val = $credit_debit;
+                        //     $narration_val = $narration;
+                        // }
 
-                        if($credit_note_val=='Yes'){
-                            $reference = 'CN';
+                        if(strtoupper(trim($credit_debit))=='YES'){
+                            if($payment_amt<0){
+                                $transaction = 'Credit Note';
+                                $reference = 'CN';
+                                $payment_amt = $payment_amt*-1;
+                            } else {
+                                $transaction = 'Debit Note';
+                                $reference = 'DN';
+                            }
 
                             $sql="select * from series_master where type='Credit_debit_note'";
                             $query=$this->db->query($sql);
@@ -601,32 +611,40 @@ function generate_credit_debit_note($id='', $status=''){
                                 $inv_no = $invoice_no;
                             }
 
-                            $payment_amt = $payment_amt * -1;
-                            $tax = 18;
-                            $amount = round($payment_amt/1.18,2);
-                            $igst = 0;
-                            $cgst = 0;
-                            $sgst = 0;
+                            if(strtoupper(trim($tax))=='YES'){
+                                $tax = 18;
+                                $amount = round($payment_amt/1.18,2);
+                                $igst = 0;
+                                $cgst = 0;
+                                $sgst = 0;
 
-                            $state_code = '';
-                            $sql="select * from distributor_master where id='$distributor_id'";
-                            $query=$this->db->query($sql);
-                            $result2=$query->result();
-                            if(count($result2)>0){
-                                $state_code=$result2[0]->state_code;
-                            }
+                                $state_code = '';
+                                $sql="select * from distributor_master where id='$distributor_id'";
+                                $query=$this->db->query($sql);
+                                $result2=$query->result();
+                                if(count($result2)>0){
+                                    $state_code=$result2[0]->state_code;
+                                }
 
-                            if($state_code=='27'){
-                                $cgst = round($amount*($tax/2)/100,2);
-                                $sgst = round($amount*($tax/2)/100,2);
+                                if($state_code=='27'){
+                                    $cgst = round($amount*($tax/2)/100,2);
+                                    $sgst = round($amount*($tax/2)/100,2);
+                                } else {
+                                    $igst = round($amount*$tax/100,2);
+                                }
                             } else {
-                                $igst = round($amount*$tax/100,2);
+                                $tax = 0;
+                                $amount = round($payment_amt,2);
+                                $igst = 0;
+                                $cgst = 0;
+                                $sgst = 0;
                             }
+                            
 
                             $data = array(
                                         'date_of_transaction' => $date_of_transaction,
                                         'distributor_id' => $distributor_id,
-                                        'transaction' => 'Credit Note',
+                                        'transaction' => $transaction,
                                         'invoice_no' => $inv_no,
                                         'distributor_type' => $distributor_type,
                                         'amount' => $payment_amt,

@@ -16,6 +16,49 @@ class Test extends CI_Controller{
         $this->load->database();
     }
 
+    public function send_mail() {
+        $date = date('Y-m-d');
+        // $date = '2019-07-16';
+
+        $report_date = date('d-m-Y', strtotime($date));
+
+        $message = '<html>
+                    <head>
+                        <style>
+                            td { padding: 5px; width: 100px; }
+                        </style>
+                    </head>
+                    <body>
+                        <h3>Wholesome Habits Private Limited</h3>
+                        <h4>Test Mail</h4>
+                        <p>Date - '.$report_date.'</p>
+                        <p>PFA</p>
+                        <br/><br/>
+                        Regards,
+                        <br/><br/>
+                        CS
+                    </body>
+                    </html>';
+        $from_email = 'cs@eatanytime.in';
+        $from_email_sender = 'EAT MIS';
+        $subject = 'Test_mail_'.$report_date;
+
+        $to_email = "prasad.bhisale@otbconsulting.co.in";
+        $cc="prasad.bhisale@otbconsulting.co.in";
+        $bcc="prasad.bhisale@otbconsulting.co.in";
+        $attachment='';
+        
+        sleep(15);
+
+        echo $message;
+        echo '<br/><br/>';
+
+        $mailSent=send_email_new($from_email,  $from_email_sender, $to_email, $subject, $message, $bcc, $cc, $attachment);
+
+        echo $mailSent;
+        echo '<br/><br/>';
+    }
+
     public function test_location_api() {
         if(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             $ip_address = $_SERVER['HTTP_X_FORWARDED_FOR'];

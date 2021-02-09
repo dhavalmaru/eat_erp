@@ -491,7 +491,7 @@
                                     
                                             <label class="col-md-2 col-sm-2 col-xs-12 control-label">Due Date <span class="asterisk_sign">*</span></label>
                                             <div class="col-md-4 col-sm-4 col-xs-12">
-                                                <input type="text" class="form-control datepicker" name="due_date" id="due_date" placeholder="Due Date" value="<?php if(isset($data)) { echo (($data[0]->due_date!=null && $data[0]->due_date!='')? ($data[0]->due_date):''); } ?>"/>
+                                                <input type="text" class="form-control datepicker" name="due_date" id="due_date" placeholder="Due Date" value="<?php if(isset($data)) { echo (($data[0]->due_date!=null && $data[0]->due_date!='')?date('d/m/Y',strtotime($data[0]->due_date)):''); } ?>"/>
                                             </div>
                                         </div>
                                     </div>
@@ -1068,7 +1068,21 @@
                 addMultiInputNamingRules('#form_distributor_out_details', 'input[name="sell_rate[]"]', { required: true }, "");
 
                 // get_distributor_details($('#distributor_id').val());
-                set_distributor_details(false);
+                // set_distributor_details(false);
+
+                get_sell_rate();
+
+                if($('#class').val()=='direct'){
+                    $('.direct').show();
+                } else {
+                    $('.direct').hide();
+                }
+
+                if($('#tax_gst').is(':checked')==false && $('#tax_vat').is(':checked')==false && $('#tax_cst').is(':checked')==false) {
+                    $('#tax_gst').prop('checked', true);
+                    $('#tax_vat').prop('checked', false);
+                    $('#tax_cst').prop('checked', false);
+                }
 
                 if($('#distributor_consignee_id').val()!='') {
                     get_consignee_details1($('#distributor_consignee_id').val());

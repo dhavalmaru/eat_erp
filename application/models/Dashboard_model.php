@@ -128,7 +128,10 @@ class Dashboard_model extends CI_Model {
             on (A.id = B.box_to_bar_id)) C 
             inner join 
             (select * from box_product) D 
-            on (C.box_id = D.box_id)) AA group by AA.depot_id, AA.product_id) C 
+            on (C.box_id = D.box_id) 
+            union all 
+            select A.depot_id, A.product_in_id as product_id, A.qty from bar_to_bar A 
+            where A.status = 'Approved' and A.date_of_transfer>'2018-09-21') AA group by AA.depot_id, AA.product_id) C 
             left join 
             (select BB.depot_id, BB.product_id, sum(BB.qty) as qty_out from 
             (select A.depot_out_id as depot_id, B.item_id as product_id, B.qty from 
@@ -151,7 +154,10 @@ class Dashboard_model extends CI_Model {
             on (A.id = B.bar_to_box_id)) C 
             inner join 
             (select * from box_product) D 
-            on (C.box_id = D.box_id)) BB group by BB.depot_id, BB.product_id) D 
+            on (C.box_id = D.box_id) 
+            union all 
+            select A.depot_id, A.product_out_id as product_id, A.qty from bar_to_bar A 
+            where A.status = 'Approved' and A.date_of_transfer>'2018-09-21') BB group by BB.depot_id, BB.product_id) D 
             on (C.depot_id=D.depot_id and C.product_id=D.product_id)) E 
             group by E.depot_id, E.product_id) F 
             left join 
@@ -224,9 +230,9 @@ class Dashboard_model extends CI_Model {
 
     function get_total_product_stock() {
         $sql = "select UU.*, UU.tot_qty as total_bars from 
-                (select SS.depot_id, SS.product_id, (ifnull(SS.production_qty,0)+ifnull(SS.depot_in_qty,0)-ifnull(SS.depot_out_qty,0)-ifnull(SS.sale_qty,0)-ifnull(SS.sample_qty,0)-ifnull(SS.expire_qty,0)+ifnull(SS.sale_return_qty,0)) as tot_qty, SS.short_name, SS.unit_weight, TT.state, TT.city, TT.depot_name from 
-                (select QQ.depot_id, QQ.product_id, QQ.production_qty, QQ.depot_in_qty, QQ.depot_out_qty, QQ.sale_qty, QQ.sample_qty, QQ.expire_qty, QQ.sale_return_qty, RR.short_name, RR.grams as unit_weight from 
-                (select OO.depot_id, OO.product_id, OO.production_qty, OO.depot_in_qty, OO.depot_out_qty, OO.sale_qty, OO.sample_qty, OO.expire_qty, PP.sale_return_qty from 
+                (select SS.depot_id, SS.product_id, (ifnull(SS.production_qty,0)+ifnull(SS.depot_in_qty,0)-ifnull(SS.depot_out_qty,0)-ifnull(SS.sale_qty,0)-ifnull(SS.sample_qty,0)-ifnull(SS.expire_qty,0)+ifnull(SS.sale_return_qty,0)-ifnull(SS.bar_trf_out_qty,0)+ifnull(SS.bar_trf_in_qty,0)) as tot_qty, SS.short_name, SS.unit_weight, TT.state, TT.city, TT.depot_name from 
+                (select QQ.depot_id, QQ.product_id, QQ.production_qty, QQ.depot_in_qty, QQ.depot_out_qty, QQ.sale_qty, QQ.sample_qty, QQ.expire_qty, QQ.sale_return_qty, QQ.bar_trf_out_qty, QQ.bar_trf_in_qty, RR.short_name, RR.grams as unit_weight from 
+                (select OO.depot_id, OO.product_id, OO.production_qty, OO.depot_in_qty, OO.depot_out_qty, OO.sale_qty, OO.sample_qty, OO.expire_qty, PP.sale_return_qty, VV.bar_trf_out_qty, WW.bar_trf_in_qty from 
                 (select MM.depot_id, MM.product_id, MM.production_qty, MM.depot_in_qty, MM.depot_out_qty, MM.sale_qty, MM.sample_qty, NN.expire_qty from 
                 (select KK.depot_id, KK.product_id, KK.production_qty, KK.depot_in_qty, KK.depot_out_qty, KK.sale_qty, LL.sample_qty from 
                 (select II.depot_id, II.product_id, II.production_qty, II.depot_in_qty, II.depot_out_qty, JJ.sale_qty from 
@@ -234,7 +240,7 @@ class Dashboard_model extends CI_Model {
                 (select EE.depot_id, EE.product_id, EE.production_qty, FF.depot_in_qty from 
                 (select AA.depot_id, AA.product_id, DD.production_qty from 
                 (select distinct depot_id, product_id from 
-                (select depot_id, product_id from batch_processing where status = 'Approved' and date_of_processing>'2018-09-21' 
+                (select distinct depot_id, product_id from batch_processing where status = 'Approved' and date_of_processing>'2018-09-21' 
                 union all 
                 select distinct A.depot_id, B.product_id from 
                 (select id, depot_in_id as depot_id from depot_transfer where status = 'Approved' and date_of_transfer>'2018-09-21') A 
@@ -248,7 +254,11 @@ class Dashboard_model extends CI_Model {
                 left join 
                 (select C.distributor_in_id, case when C.type='Bar' then C.item_id else D.product_id end as product_id from distributor_in_items C left join box_product D on (C.type = 'Box' and C.item_id = D.box_id)) B 
                 on (A.id=B.distributor_in_id) 
-                where B.product_id is not null) E) AA 
+                where B.product_id is not null 
+                union all 
+                select distinct A.depot_id, A.product_in_id as product_id from bar_to_bar A where A.status = 'Approved' and A.date_of_transfer>'2018-09-21' 
+                union all 
+                select distinct A.depot_id, A.product_out_id as product_id from bar_to_bar A where A.status = 'Approved' and A.date_of_transfer>'2018-09-21') E) AA 
                 left join 
                 (select depot_id, product_id, sum(qty_in_bar) as production_qty from batch_processing 
                 where status = 'Approved' and date_of_processing>'2018-09-21' group by depot_id, product_id) DD 
@@ -318,7 +328,14 @@ class Dashboard_model extends CI_Model {
                 on (A.id=B.distributor_in_id) 
                 where B.product_id is not null 
                 group by A.depot_id, B.product_id) PP 
-                on (OO.depot_id=PP.depot_id and OO.product_id=PP.product_id)) QQ 
+                on (OO.depot_id=PP.depot_id and OO.product_id=PP.product_id) 
+                left join 
+                (select depot_id, product_out_id, sum(qty) as bar_trf_out_qty from bar_to_bar where status = 'Approved' and date_of_transfer>'2018-09-21' group by depot_id, product_out_id) VV 
+                on (OO.depot_id=VV.depot_id and OO.product_id=VV.product_out_id) 
+                left join 
+                (select depot_id, product_in_id, sum(qty) as bar_trf_in_qty from bar_to_bar where status = 'Approved' and date_of_transfer>'2018-09-21' group by depot_id, product_in_id) WW 
+                on (OO.depot_id=WW.depot_id and OO.product_id=WW.product_in_id) 
+                ) QQ 
                 left join 
                 (select * from product_master) RR 
                 on (QQ.product_id=RR.id)) SS 

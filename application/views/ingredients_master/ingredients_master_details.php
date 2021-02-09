@@ -44,7 +44,7 @@
             <!-- PAGE CONTENT -->
 			   <?php $this->load->view('templates/menus');?>
               <div class="page-content1 page-overflow wrapper wrapper__minify" style="height:auto!important;">
-                   <div class="heading-h2"><a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp; <a href="<?php echo base_url().'index.php/ingredients_master'; ?>" > Ingredients Master List </a>  &nbsp; &#10095; &nbsp; Ingredients Master Details</div>
+                   <div class="heading-h2"><a href="<?php echo base_url().'index.php/dashboard'; ?>" >  Dashboard  </a> &nbsp; &#10095; &nbsp; <a href="<?php echo base_url().'index.php/ingredients_master'; ?>" > Recipe Master List </a>  &nbsp; &#10095; &nbsp; Recipe Master Details</div>
                 
                 <!-- PAGE CONTENT WRAPPER -->
                    
