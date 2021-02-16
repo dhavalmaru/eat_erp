@@ -733,6 +733,33 @@ class Sales_upload extends CI_Controller{
                         }
                     }
                 }
+
+                if($track_id!='') {
+                    $track_id = str_replace('"', '', $track_id);
+                    $track_id = str_replace("'", "", $track_id);
+
+                    $sql = "select * from distributor_out where unique_ref_no='$track_id' and status<>'Rejected' and status<>'InActive'";
+                    $result = $this->db->query($sql)->result();
+                    if(count($result)>0){
+                        $error.='Track ID '.$track_id.' already exist.';
+                        $objerror=1;
+                        if($bl_error_line==false){
+                            $error_line.=$i.', ';
+                            $bl_error_line=true;
+                        }
+                    } else {
+                        $sql = "select * from sales_upload_details where unique_ref_no='$track_id' and status<>'Rejected' and status<>'InActive'";
+                        $result = $this->db->query($sql)->result();
+                        if(count($result)>0){
+                            $error.='Track ID '.$track_id.' already exist.';
+                            $objerror=1;
+                            if($bl_error_line==false){
+                                $error_line.=$i.', ';
+                                $bl_error_line=true;
+                            }
+                        }
+                    }
+                }
                 
                 if($sku_qty==''){
                     $error.='Quantity cannot be blank.';
@@ -1008,7 +1035,7 @@ class Sales_upload extends CI_Controller{
                     $order_array[$j]['country_name']=$country_name;
                     $order_array[$j]['mobile_no']=$mobile_no;
                     $order_array[$j]['po_no']=$po_no;
-                    $order_array[$j]['track_id']=$track_id;
+                    $order_array[$j]['unique_ref_no']=$track_id;
                     $order_array[$j]['remarks']=$remarks;
                     $order_array[$j]['total_order_amt']=0;
                     $order_array[$j]['total_order_value']=0;
@@ -1089,7 +1116,7 @@ class Sales_upload extends CI_Controller{
                 $total_discount_amt = $total_order_amt - $total_order_value;
                 $discount_per = 0;
                 if($total_order_amt!=0){
-                  $discount_per=round(($total_discount_amt/$total_order_amt)*100,2);
+                    $discount_per=round(($total_discount_amt/$total_order_amt)*100,2);
                 }
 
                 $tot_amount = 0;
@@ -1241,11 +1268,12 @@ class Sales_upload extends CI_Controller{
                 $state_code = $order_array[$k]['state_code'];
                 $round_off_amt = $order_array[$k]['round_off_amount'];
                 $invoice_amount = $order_array[$k]['invoice_amount'];
+                $unique_ref_no = $order_array[$k]['unique_ref_no'];
                 $remarks = $order_array[$k]['remarks'];
 
                 $sku_array = $order_array[$k]['sku_array'];
 
-                $sql = "insert into sales_upload_details (file_id, date_of_processing, invoice_no, depot_id, distributor_id, sales_rep_id, amount, tax, tax_per, tax_amount, final_amount, due_date, order_no, order_date, supplier_ref, despatch_doc_no, despatch_through, destination, status, remarks, modified_by, modified_on, client_name, address, city, pincode, state, country, mobile_no, discount, sample_distributor_id, date_of_dispatch, delivery_status, delivery_date, delivery_sales_rep_id, transport_type, vehicle_number, cgst, sgst, igst, cgst_amount, sgst_amount, igst_amount, reverse_charge, shipping_address, distributor_consignee_id, con_name, con_address, con_city, con_pincode, con_state, con_country, con_state_code, con_gst_number, state_code, round_off_amount, invoice_amount, ref_id, invoice_date, email_date_time, basis_of_sales, email_from, email_approved_by, gstin, created_by, created_on) VALUES ('".$file_id."', '".$date_of_processing."', '', '".$depot_id."', '".$distributor_id."', Null, ".$tot_amount.", Null, 1, ".$tot_tax_amount.", ".$tot_order_amount.", '".$curdate."', '".$po_no."', Null, Null, Null, Null, Null, 'Pending', '".$remarks."', '".$curusr."', '".$now."', '".$client_name."', '".$address."', '".$city."', '".$pincode."', '".$state."', '".$country."', '".$phone."', ".$discount_per.", Null, '".$curdate."', '".$delivery_status."', ".$delivery_date.", Null, '', '', 1, 1, 1, ".$tot_cgst_amount.", ".$tot_sgst_amount.", ".$tot_igst_amount.", 'no', 'yes', Null, Null, Null, Null, Null, Null, Null, Null, Null, '".$state_code."', ".$round_off_amt.", ".$invoice_amount.", Null, Null, '".$now."', 'PO Number', '', '', '', '".$curusr."', '".$now."')";
+                $sql = "insert into sales_upload_details (file_id, date_of_processing, invoice_no, depot_id, distributor_id, sales_rep_id, amount, tax, tax_per, tax_amount, final_amount, due_date, order_no, order_date, supplier_ref, despatch_doc_no, despatch_through, destination, status, remarks, modified_by, modified_on, client_name, address, city, pincode, state, country, mobile_no, discount, sample_distributor_id, date_of_dispatch, delivery_status, delivery_date, delivery_sales_rep_id, transport_type, vehicle_number, cgst, sgst, igst, cgst_amount, sgst_amount, igst_amount, reverse_charge, shipping_address, distributor_consignee_id, con_name, con_address, con_city, con_pincode, con_state, con_country, con_state_code, con_gst_number, state_code, round_off_amount, invoice_amount, ref_id, invoice_date, email_date_time, basis_of_sales, email_from, email_approved_by, gstin, created_by, created_on, unique_ref_no) VALUES ('".$file_id."', '".$date_of_processing."', '', '".$depot_id."', '".$distributor_id."', Null, ".$tot_amount.", Null, 1, ".$tot_tax_amount.", ".$tot_order_amount.", '".$curdate."', '".$po_no."', Null, Null, Null, Null, Null, 'Pending', '".$remarks."', '".$curusr."', '".$now."', '".$client_name."', '".$address."', '".$city."', '".$pincode."', '".$state."', '".$country."', '".$phone."', ".$discount_per.", Null, '".$curdate."', '".$delivery_status."', ".$delivery_date.", Null, '', '', 1, 1, 1, ".$tot_cgst_amount.", ".$tot_sgst_amount.", ".$tot_igst_amount.", 'no', 'yes', Null, Null, Null, Null, Null, Null, Null, Null, Null, '".$state_code."', ".$round_off_amt.", ".$invoice_amount.", Null, Null, '".$now."', 'PO Number', '', '', '', '".$curusr."', '".$now."', '".$unique_ref_no."')";
                 if ($this->db->query($sql) === TRUE) {
                     $distributor_out_id = $this->db->insert_id();
 
@@ -1316,8 +1344,8 @@ class Sales_upload extends CI_Controller{
         if(count($result)>0){
             for($i=0; $i<count($result); $i++){
                 $sql = "insert into distributor_out (date_of_processing, invoice_no, depot_id, 
-                            distributor_id, sales_rep_id, amount, tax, tax_per, tax_amount, final_amount, due_date, order_no, order_date, supplier_ref, despatch_doc_no, despatch_through, destination, status, remarks, created_by, created_on, modified_by, modified_on, approved_by, approved_on, rejected_by, rejected_on, voucher_no, gate_pass_no, client_name, address, city, pincode, state, country, mobile_no, discount, sample_distributor_id, delivery_status, delivery_date, delivery_sales_rep_id, receivable_doc, distributor_in_id, distributor_in_type, transport_type, vehicle_number, cgst, sgst, igst, cgst_amount, sgst_amount, igst_amount, reverse_charge, shipping_address, distributor_consignee_id, con_name, con_address, con_city, con_pincode, con_state, con_country, con_state_code, con_gst_number, state_code, sample_type, gifting_remarks, promoter_sales_rep_id, blogger_name, blogger_address, blogger_phone_no, blogger_email_id, round_off_amount, invoice_amount, ref_id, invoice_date, gatepass_date, gpid, freezed, tracking_id, basis_of_sales, email_from, email_approved_by, email_date_time, distributor_po_id, comments, gstin, modified_approved_date, proof_of_dispatch, date_of_dispatch, person_receiving, proof_of_delivery, ref_invoice_no, ref_invoice_details, ref_invoice_date, file_id)
-                        select date_of_processing, invoice_no, depot_id, distributor_id, sales_rep_id, amount, tax, tax_per, tax_amount, final_amount, due_date, order_no, order_date, supplier_ref, despatch_doc_no, despatch_through, destination, status, remarks, created_by, created_on, modified_by, modified_on, approved_by, approved_on, rejected_by, rejected_on, voucher_no, gate_pass_no, client_name, address, city, pincode, state, country, mobile_no, discount, sample_distributor_id, delivery_status, delivery_date, delivery_sales_rep_id, receivable_doc, distributor_in_id, distributor_in_type, transport_type, vehicle_number, cgst, sgst, igst, cgst_amount, sgst_amount, igst_amount, reverse_charge, shipping_address, distributor_consignee_id, con_name, con_address, con_city, con_pincode, con_state, con_country, con_state_code, con_gst_number, state_code, sample_type, gifting_remarks, promoter_sales_rep_id, blogger_name, blogger_address, blogger_phone_no, blogger_email_id, round_off_amount, invoice_amount, ref_id, invoice_date, gatepass_date, gpid, freezed, tracking_id, basis_of_sales, email_from, email_approved_by, email_date_time, distributor_po_id, comments, gstin, modified_approved_date, proof_of_dispatch, date_of_dispatch, person_receiving, proof_of_delivery, ref_invoice_no, ref_invoice_details, ref_invoice_date, '".$file_id."' 
+                            distributor_id, sales_rep_id, amount, tax, tax_per, tax_amount, final_amount, due_date, order_no, order_date, supplier_ref, despatch_doc_no, despatch_through, destination, status, remarks, created_by, created_on, modified_by, modified_on, approved_by, approved_on, rejected_by, rejected_on, voucher_no, gate_pass_no, client_name, address, city, pincode, state, country, mobile_no, discount, sample_distributor_id, delivery_status, delivery_date, delivery_sales_rep_id, receivable_doc, distributor_in_id, distributor_in_type, transport_type, vehicle_number, cgst, sgst, igst, cgst_amount, sgst_amount, igst_amount, reverse_charge, shipping_address, distributor_consignee_id, con_name, con_address, con_city, con_pincode, con_state, con_country, con_state_code, con_gst_number, state_code, sample_type, gifting_remarks, promoter_sales_rep_id, blogger_name, blogger_address, blogger_phone_no, blogger_email_id, round_off_amount, invoice_amount, ref_id, invoice_date, gatepass_date, gpid, freezed, tracking_id, basis_of_sales, email_from, email_approved_by, email_date_time, distributor_po_id, comments, gstin, modified_approved_date, proof_of_dispatch, date_of_dispatch, person_receiving, proof_of_delivery, ref_invoice_no, ref_invoice_details, ref_invoice_date, file_id, unique_ref_no)
+                        select date_of_processing, invoice_no, depot_id, distributor_id, sales_rep_id, amount, tax, tax_per, tax_amount, final_amount, due_date, order_no, order_date, supplier_ref, despatch_doc_no, despatch_through, destination, status, remarks, created_by, created_on, modified_by, modified_on, approved_by, approved_on, rejected_by, rejected_on, voucher_no, gate_pass_no, client_name, address, city, pincode, state, country, mobile_no, discount, sample_distributor_id, delivery_status, delivery_date, delivery_sales_rep_id, receivable_doc, distributor_in_id, distributor_in_type, transport_type, vehicle_number, cgst, sgst, igst, cgst_amount, sgst_amount, igst_amount, reverse_charge, shipping_address, distributor_consignee_id, con_name, con_address, con_city, con_pincode, con_state, con_country, con_state_code, con_gst_number, state_code, sample_type, gifting_remarks, promoter_sales_rep_id, blogger_name, blogger_address, blogger_phone_no, blogger_email_id, round_off_amount, invoice_amount, ref_id, invoice_date, gatepass_date, gpid, freezed, tracking_id, basis_of_sales, email_from, email_approved_by, email_date_time, distributor_po_id, comments, gstin, modified_approved_date, proof_of_dispatch, date_of_dispatch, person_receiving, proof_of_delivery, ref_invoice_no, ref_invoice_details, ref_invoice_date, '".$file_id."', unique_ref_no 
                         from sales_upload_details where id = '".$result[$i]->id."'";
                 $this->db->query($sql);
                 $id = $this->db->insert_id();

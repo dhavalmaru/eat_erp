@@ -60,7 +60,7 @@ function get_data($status='', $id=''){
             G.vehicle_number, G.cgst, G.sgst, G.igst, G.cgst_amount, G.sgst_amount, G.igst_amount, G.reverse_charge, 
             G.shipping_address, G.distributor_consignee_id, G.con_name, G.con_address, G.con_city, G.con_pincode, 
             G.con_state, G.con_country, G.con_state_code, G.con_gst_number, G.state_code, G.round_off_amount, G.invoice_amount, G.ref_id, 
-            G.invoice_date,G.gatepass_date,G.freezed,G.gstin,G.shipping_charges from 
+            G.invoice_date,G.gatepass_date,G.freezed,G.gstin,G.unique_ref_no,G.shipping_charges from 
             (select E.*, F.sales_rep_name from 
             (select C.*, D.depot_name, D.address as depot_address, D.city as depot_city, D.pincode as depot_pincode, 
                 D.state as depot_state, D.state_code as depot_state_code, D.country as depot_country, 
@@ -337,7 +337,7 @@ function get_distributor_out_data($status='', $id=''){
             G.promoter_sales_rep_id, G.blogger_name, G.blogger_address, G.blogger_phone_no, G.blogger_email_id, 
             G.round_off_amount, G.invoice_amount, G.ref_id, G.invoice_date, G.freezed, 
             G.distributor_in_type, G.basis_of_sales, G.email_from, G.email_approved_by, G.email_date_time,
-            G.gstin, I.status as po_status, I.mismatch, G.shipping_charges from 
+            G.gstin, G.unique_ref_no, I.status as po_status, I.mismatch, G.shipping_charges from 
             (select E.*, F.sales_rep_name from 
             (select Q.*, D.depot_name, D.state as depot_state from 
             (select C.*, P.location from 
@@ -384,7 +384,7 @@ function get_distributor_out_data($status='', $id=''){
             null as gifting_remarks, null as promoter_sales_rep_id, null as blogger_name, null as blogger_address, 
             null as blogger_phone_no, null as blogger_email_id, null as round_off_amount, null as invoice_amount, null as ref_id, 
             null as invoice_date,null as freezed, null as distributor_in_type, null as basis_of_sales, null as email_from, 
-            null as email_approved_by, null as email_date_time, null as gstin, null as po_status, null as mismatch, null as shipping_charges from 
+            null as email_approved_by, null as email_date_time, null as gstin, null as unique_ref_no, null as po_status, null as mismatch, null as shipping_charges from 
             (select A.*, B.distributor_name, B.state, B.sell_out, B.contact_person, B.contact_no, B.area, B.location from 
             (select * from sales_rep_orders where status = 'Approved') A 
             left join 
@@ -651,7 +651,7 @@ function save_data($id=''){
                                 A.blogger_name = B.blogger_name, A.blogger_address = B.blogger_address, A.blogger_phone_no = B.blogger_phone_no, 
                                 A.blogger_email_id = B.blogger_email_id, A.round_off_amount = B.round_off_amount, A.invoice_amount = B.invoice_amount, 
                                 A.invoice_date = '$invoice_date',A.modified_approved_date='$modified_approved_date' ,
-                                A.gstin=B.gstin, A.shipping_charges = B.shipping_charges 
+                                A.gstin=B.gstin, A.unique_ref_no=B.unique_ref_no, A.shipping_charges = B.shipping_charges 
                             WHERE A.id = '$ref_id' and B.id = '$id'";
                     } else {
                         $sql = "Update distributor_out A, distributor_out B 
@@ -682,7 +682,7 @@ function save_data($id=''){
                                 A.blogger_name = B.blogger_name, A.blogger_address = B.blogger_address, A.blogger_phone_no = B.blogger_phone_no, 
                                 A.blogger_email_id = B.blogger_email_id, A.round_off_amount = B.round_off_amount, A.invoice_amount = B.invoice_amount, 
                                 A.invoice_date = '$invoice_date',
-                                A.gstin=B.gstin,A.modified_approved_date=NULL, A.shipping_charges = B.shipping_charges 
+                                A.gstin=B.gstin, A.unique_ref_no=B.unique_ref_no, A.modified_approved_date=NULL, A.shipping_charges = B.shipping_charges 
                             WHERE A.id = '$ref_id' and B.id = '$id'";
                     }
 
@@ -878,6 +878,7 @@ function save_data($id=''){
             'email_from' => $this->input->post('email_from'),
             'email_approved_by' => $this->input->post('email_approved_by'),
             'gstin'=> $this->input->post('gstin'),
+            'unique_ref_no' => $this->input->post('unique_ref_no'),
             'shipping_charges' => format_number($this->input->post('shipping_charges'),2)
             //'tracking_id' => $this->input->post('tracking_id')
         );

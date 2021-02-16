@@ -489,11 +489,13 @@ function generate_credit_debit_note($id='', $status=''){
     // }
 
     $date_of_transaction=date('Y-m-d');
+    $upload_type='';
 
     $sql = "select * from payment_details where id = '$id'";
     $result = $this->db->query($sql)->result();
     if(count($result)>0){
         $date_of_transaction=$result[0]->date_of_deposit;
+        $upload_type=$result[0]->upload_type;
     }
     
     $ref_date='';
@@ -547,8 +549,11 @@ function generate_credit_debit_note($id='', $status=''){
                     $credit_debit=$result[$k]->credit_debit;
                     $tax=$result[$k]->tax;
                     $narration=$result[$k]->narration;
+                    $commission=$result[$k]->commission;
+                    $gst=$result[$k]->gst;
+                    $unique_ref_no=$result[$k]->unique_ref_no;
                     
-                    if(isset($distributor_id) and $distributor_id!="") {
+                    if(isset($distributor_id) && $distributor_id!="") {
                         $payment_amt = format_number($payment_amount,2);
                         // $credit_debit_val = '';
                         // $narration_val = '';
@@ -559,13 +564,18 @@ function generate_credit_debit_note($id='', $status=''){
                         // }
 
                         if(strtoupper(trim($credit_debit))=='YES'){
-                            if($payment_amt<0){
+                            if($upload_type=='Paytm' || $upload_type=='Razorpay'){
                                 $transaction = 'Credit Note';
                                 $reference = 'CN';
-                                $payment_amt = $payment_amt*-1;
                             } else {
-                                $transaction = 'Debit Note';
-                                $reference = 'DN';
+                                if($payment_amt<0){
+                                    $transaction = 'Credit Note';
+                                    $reference = 'CN';
+                                    $payment_amt = $payment_amt*-1;
+                                } else {
+                                    $transaction = 'Debit Note';
+                                    $reference = 'DN';
+                                }
                             }
 
                             $sql="select * from series_master where type='Credit_debit_note'";
@@ -611,35 +621,67 @@ function generate_credit_debit_note($id='', $status=''){
                                 $inv_no = $invoice_no;
                             }
 
-                            if(strtoupper(trim($tax))=='YES'){
-                                $tax = 18;
-                                $amount = round($payment_amt/1.18,2);
-                                $igst = 0;
-                                $cgst = 0;
-                                $sgst = 0;
+                            if($upload_type=='Paytm' || $upload_type=='Razorpay'){
+                                if(strtoupper(trim($tax))=='YES'){
+                                    $tax = round($gst,2);
+                                    $amount = round($commission,2);
+                                    $igst = 0;
+                                    $cgst = 0;
+                                    $sgst = 0;
 
-                                $state_code = '';
-                                $sql="select * from distributor_master where id='$distributor_id'";
-                                $query=$this->db->query($sql);
-                                $result2=$query->result();
-                                if(count($result2)>0){
-                                    $state_code=$result2[0]->state_code;
-                                }
+                                    $state_code = '';
+                                    $sql="select * from distributor_master where id='$distributor_id'";
+                                    $query=$this->db->query($sql);
+                                    $result2=$query->result();
+                                    if(count($result2)>0){
+                                        $state_code=$result2[0]->state_code;
+                                    }
 
-                                if($state_code=='27'){
-                                    $cgst = round($amount*($tax/2)/100,2);
-                                    $sgst = round($amount*($tax/2)/100,2);
+                                    if($state_code=='27'){
+                                        $cgst = round($tax/2,2);
+                                        $sgst = round($tax/2,2);
+                                    } else {
+                                        $igst = round($tax,2);
+                                    }
                                 } else {
-                                    $igst = round($amount*$tax/100,2);
+                                    $tax = 0;
+                                    $amount = round($commission,2);
+                                    $igst = 0;
+                                    $cgst = 0;
+                                    $sgst = 0;
                                 }
+
+                                $payment_amt = $amount + $tax;
                             } else {
-                                $tax = 0;
-                                $amount = round($payment_amt,2);
-                                $igst = 0;
-                                $cgst = 0;
-                                $sgst = 0;
+                                if(strtoupper(trim($tax))=='YES'){
+                                    $tax = 18;
+                                    $amount = round($payment_amt/1.18,2);
+                                    $igst = 0;
+                                    $cgst = 0;
+                                    $sgst = 0;
+
+                                    $state_code = '';
+                                    $sql="select * from distributor_master where id='$distributor_id'";
+                                    $query=$this->db->query($sql);
+                                    $result2=$query->result();
+                                    if(count($result2)>0){
+                                        $state_code=$result2[0]->state_code;
+                                    }
+
+                                    if($state_code=='27'){
+                                        $cgst = round($amount*($tax/2)/100,2);
+                                        $sgst = round($amount*($tax/2)/100,2);
+                                    } else {
+                                        $igst = round($amount*$tax/100,2);
+                                    }
+                                } else {
+                                    $tax = 0;
+                                    $amount = round($payment_amt,2);
+                                    $igst = 0;
+                                    $cgst = 0;
+                                    $sgst = 0;
+                                }
                             }
-                            
 
                             $data = array(
                                         'date_of_transaction' => $date_of_transaction,

@@ -78,11 +78,18 @@
               </div>
               <form method="POST" action="<?php echo base_url();?>index.php/Payment_upload/upload_file" class="form-horizontal excelform" enctype="multipart/form-data">
                 <div class="modal-body">
-                  <div class="form-group">
-
+                  <div class="form-group" style="border: none;">
+                    <label class="col-md-4 col-sm-4 col-xs-12 control-label">Upload Type <span class="asterisk_sign"></span></label>
+                    <select name="upload_type" id="upload_type" class="form-control select2" accept=".xlsx" required>
+                      <option value="">Select</option>
+                      <option value="Normal">Normal</option>
+                      <option value="Paytm">Paytm</option>
+                      <option value="Razorpay">Razorpay</option>
+                    </select>
+                  </div>
+                  <div class="form-group" style="border: none;">
                     <label class="col-md-4 col-sm-4 col-xs-12 control-label">Add Excel <span class="asterisk_sign"></span></label>
-
-                    <input type="file" class="fileinput btn btn-info btn-small  bar_image" name="upload" id="image" placeholder="image" value=""/>
+                    <input type="file" class="fileinput btn btn-info btn-small  bar_image" name="upload" id="image" placeholder="image" value="" required />
                   </div>
                 </div>
                 <div class="modal-footer">

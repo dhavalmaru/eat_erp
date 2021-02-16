@@ -115,6 +115,7 @@ class Payment_upload extends CI_Controller{
         $now=date('Y-m-d H:i:s');
         $curdate=date('Y-m-d');
         $curusr=$this->session->userdata('session_id');
+        $upload_type=$this->input->post("upload_type");
 
         $upload_path=$this->config->item('upload_path');
         $path=$upload_path.'payment_upload/';
@@ -155,7 +156,7 @@ class Payment_upload extends CI_Controller{
         // print_r($filename);
         // exit;
 
-        $sql = "insert into payment_upload_files (file_name, file_path, upload_date, status, created_by, created_on, modified_by, modified_on) VALUES ('".$file_name."', '".$path."', '".$curdate."', 'Uploading', '".$curusr."', '".$now."', '".$curusr."', '".$now."')";
+        $sql = "insert into payment_upload_files (file_name, file_path, upload_date, status, created_by, created_on, modified_by, modified_on, upload_type) VALUES ('".$file_name."', '".$path."', '".$curdate."', 'Uploading', '".$curusr."', '".$now."', '".$curusr."', '".$now."', '".$upload_type."')";
         $this->db->query($sql);
         // $file_id = $this->db->insert_id();
 
@@ -177,34 +178,98 @@ class Payment_upload extends CI_Controller{
             $file_path = $result[0]->file_path;
             $file_name = $result[0]->file_name;
             $filename = $result[0]->file_path.$result[0]->file_name;
+            $upload_type = $result[0]->upload_type;
         } else {
             $file_path = '';
             $file_name = '';
             $filename = '';
+            $upload_type = '';
         }
 
         $this->load->library('excel');
         $objPHPExcel = PHPExcel_IOFactory::load($filename);
         $objPHPExcel->setActiveSheetIndex(0);
         $highestrow = $objPHPExcel->setActiveSheetIndex(0)->getHighestRow();
-        $objPHPExcel->getActiveSheet()->setCellValue('L4', 'Error Remark');
-        $objPHPExcel->getActiveSheet()->getColumnDimension('L')->setWidth(30);
+
+        if($upload_type=='Paytm'){
+            $remarks_col = 'AU';
+            $inv_amt_col = 'AU';
+            $bal_amt_col = 'AV';
+            $start_row = 2;
+        } elseif($upload_type=='Razorpay'){
+            $remarks_col = 'AB';
+            $inv_amt_col = 'AB';
+            $bal_amt_col = 'AC';
+            $start_row = 2;
+        } else {
+            $remarks_col = 'L';
+            $inv_amt_col = 'L';
+            $bal_amt_col = 'M';
+            $start_row = 5;
+        }
+
+        $objPHPExcel->getActiveSheet()->setCellValue($remarks_col.($start_row-1), 'Error Remark');
+        $objPHPExcel->getActiveSheet()->getColumnDimension($remarks_col)->setWidth(30);
+
         $objerror = 0;
         $error_line = '';
         $payment_array = [];
 
-        for($i=5; $i<=$highestrow; $i++){
-            $creation_date = $objPHPExcel->getActiveSheet()->getCell('A'.$i)->getValue();
-            $bank = $objPHPExcel->getActiveSheet()->getCell('B'.$i)->getCalculatedValue();
-            $payment_mode = $objPHPExcel->getActiveSheet()->getCell('C'.$i)->getCalculatedValue();
-            $distributor_name = $objPHPExcel->getActiveSheet()->getCell('D'.$i)->getCalculatedValue();
-            $invoice_no = $objPHPExcel->getActiveSheet()->getCell('E'.$i)->getCalculatedValue();
-            $neft_no = $objPHPExcel->getActiveSheet()->getCell('F'.$i)->getCalculatedValue();
-            $payment_amount = $objPHPExcel->getActiveSheet()->getCell('G'.$i)->getCalculatedValue();
-            $remarks = $objPHPExcel->getActiveSheet()->getCell('H'.$i)->getCalculatedValue();
-            $credit_debit = $objPHPExcel->getActiveSheet()->getCell('I'.$i)->getCalculatedValue();
-            $tax = $objPHPExcel->getActiveSheet()->getCell('J'.$i)->getCalculatedValue();
-            $narration = $objPHPExcel->getActiveSheet()->getCell('K'.$i)->getCalculatedValue();
+        for($i=$start_row; $i<=$highestrow; $i++){
+            if($upload_type=='Paytm'){
+                $creation_date = $objPHPExcel->getActiveSheet()->getCell('U'.$i)->getValue();
+                $bank = 'HDFC Bank';
+                $payment_mode = 'NEFT';
+                $distributor_name = 'EAT Anytime Direct';
+                $invoice_no = '';
+                $neft_no = $objPHPExcel->getActiveSheet()->getCell('T'.$i)->getCalculatedValue();
+                $payment_amount = $objPHPExcel->getActiveSheet()->getCell('N'.$i)->getCalculatedValue();
+                $remarks = '';
+                $credit_debit = 'Yes';
+                $tax = 'Yes';
+                $narration = '';
+                $commission = $objPHPExcel->getActiveSheet()->getCell('O'.$i)->getCalculatedValue();
+                $gst = $objPHPExcel->getActiveSheet()->getCell('P'.$i)->getCalculatedValue();
+                $unique_ref_no = $objPHPExcel->getActiveSheet()->getCell('C'.$i)->getCalculatedValue();
+
+                $creation_date = str_replace("'", "", $creation_date);
+                $neft_no = str_replace("'", "", $neft_no);
+                $payment_amount = str_replace("'", "", $payment_amount);
+                $commission = str_replace("'", "", $commission);
+                $gst = str_replace("'", "", $gst);
+                $unique_ref_no = str_replace("'", "", $unique_ref_no);
+            } elseif($upload_type=='Razorpay'){
+                $creation_date = $objPHPExcel->getActiveSheet()->getCell('Y'.$i)->getValue();
+                $bank = 'HDFC Bank';
+                $payment_mode = 'NEFT';
+                $distributor_name = 'EAT Anytime Direct';
+                $invoice_no = '';
+                $neft_no = $objPHPExcel->getActiveSheet()->getCell('X'.$i)->getCalculatedValue();
+                $payment_amount = $objPHPExcel->getActiveSheet()->getCell('C'.$i)->getCalculatedValue();
+                $remarks = '';
+                $credit_debit = 'Yes';
+                $tax = 'Yes';
+                $narration = '';
+                $commission = $objPHPExcel->getActiveSheet()->getCell('E'.$i)->getCalculatedValue();
+                $gst = $objPHPExcel->getActiveSheet()->getCell('F'.$i)->getCalculatedValue();
+                $unique_ref_no = $objPHPExcel->getActiveSheet()->getCell('S'.$i)->getCalculatedValue();
+            } else {
+                $creation_date = $objPHPExcel->getActiveSheet()->getCell('A'.$i)->getValue();
+                $bank = $objPHPExcel->getActiveSheet()->getCell('B'.$i)->getCalculatedValue();
+                $payment_mode = $objPHPExcel->getActiveSheet()->getCell('C'.$i)->getCalculatedValue();
+                $distributor_name = $objPHPExcel->getActiveSheet()->getCell('D'.$i)->getCalculatedValue();
+                $invoice_no = $objPHPExcel->getActiveSheet()->getCell('E'.$i)->getCalculatedValue();
+                $neft_no = $objPHPExcel->getActiveSheet()->getCell('F'.$i)->getCalculatedValue();
+                $payment_amount = $objPHPExcel->getActiveSheet()->getCell('G'.$i)->getCalculatedValue();
+                $remarks = $objPHPExcel->getActiveSheet()->getCell('H'.$i)->getCalculatedValue();
+                $credit_debit = $objPHPExcel->getActiveSheet()->getCell('I'.$i)->getCalculatedValue();
+                $tax = $objPHPExcel->getActiveSheet()->getCell('J'.$i)->getCalculatedValue();
+                $narration = $objPHPExcel->getActiveSheet()->getCell('K'.$i)->getCalculatedValue();
+                $commission = 0;
+                $gst = 0;
+                $unique_ref_no = '';
+            }
+            
             $error = '';
             $bank_id = '';
             $distributor_id = '';
@@ -222,13 +287,38 @@ class Payment_upload extends CI_Controller{
                         $bl_error_line=true;
                     }
                 } else {
-                    $creation_date = date('Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($creation_date));
-                    if(validateDate($creation_date, 'Y-m-d')==false){
-                        $error.='Creation date should be in d-m-Y format.';
-                        $objerror=1;
-                        if($bl_error_line==false){
-                            $error_line.=$i.', ';
-                            $bl_error_line=true;
+                    if($upload_type=='Paytm'){
+                        $format = 'd-m-Y';
+                        $d = DateTime::createFromFormat($format, $creation_date);
+                        $returnDate = null;
+                        if ($d && $d->format($format) == $creation_date) {
+                            // $returnDate = DateTime::createFromFormat($format, $creation_date)->format('Y-m-d');
+                            $dateInput = explode('-',$creation_date);
+                            $returnDate = $dateInput[2].'-'.$dateInput[1].'-'.$dateInput[0];
+                        }
+
+                        $creation_date = $returnDate;
+                    } else if($upload_type=='Razorpay'){
+                        $creation_date = substr($creation_date, 0, strpos($creation_date, ' '));
+                        $format = 'd/m/Y';
+                        $d = DateTime::createFromFormat($format, $creation_date);
+                        $returnDate = null;
+                        if ($d && $d->format($format) == $creation_date) {
+                            // $returnDate = DateTime::createFromFormat($format, $creation_date)->format('Y-m-d');
+                            $dateInput = explode('/',$creation_date);
+                            $returnDate = $dateInput[2].'-'.$dateInput[1].'-'.$dateInput[0];
+                        }
+
+                        $creation_date = $returnDate;
+                    } else {
+                        $creation_date = date('Y-m-d', PHPExcel_Shared_Date::ExcelToPHP($creation_date));
+                        if(validateDate($creation_date, 'Y-m-d')==false){
+                            $error.='Creation date should be in d-m-Y format.';
+                            $objerror=1;
+                            if($bl_error_line==false){
+                                $error_line.=$i.', ';
+                                $bl_error_line=true;
+                            }
                         }
                     }
                 }
@@ -292,6 +382,35 @@ class Payment_upload extends CI_Controller{
                         $distributor_id = $result[0]->id;
                     }
                 }
+
+                if($upload_type=='Paytm' || $upload_type=='Razorpay'){
+                    if($unique_ref_no==''){
+                        $error.='Merchant unique ref cannot be blank.';
+                        $objerror=1;
+                        if($bl_error_line==false){
+                            $error_line.=$i.', ';
+                            $bl_error_line=true;
+                        }
+                    } else {
+                        $sql = "select * from distributor_out where status='Approved' and unique_ref_no='$unique_ref_no'";
+                        $result = $this->db->query($sql)->result();
+                        if(count($result)==0){
+                            $error.='Merchant unique ref '.$unique_ref_no.' Not Found.';
+                            $objerror=1;
+                            if($bl_error_line==false){
+                                $error_line.=$i.', ';
+                                $bl_error_line=true;
+                            }
+                        } else {
+                            if(isset($result[0]->invoice_no)){
+                                $invoice_no = $result[0]->invoice_no;
+                            } else {
+                                $invoice_no = '';
+                            }
+                        }
+                    }
+                }
+
                 if($invoice_no==''){
                     $error.='Invoice No cannot be blank.';
                     $objerror=1;
@@ -356,6 +475,7 @@ class Payment_upload extends CI_Controller{
                         }
                     }
                 }
+                
                 if($neft_no==''){
                     $error.='NEFT No cannot be blank.';
                     $objerror=1;
@@ -387,7 +507,7 @@ class Payment_upload extends CI_Controller{
                         $bl_error_line=true;
                     }
                 }
-                if(strtoupper(trim($credit_debit))=='YES' && $narration==''){
+                if(strtoupper(trim($credit_debit))=='YES' && $narration=='' && $upload_type!='Paytm' && $upload_type!='Razorpay'){
                     $error.='Narration cannot be blank.';
                     $objerror=1;
                     if($bl_error_line==false){
@@ -397,8 +517,8 @@ class Payment_upload extends CI_Controller{
                 }
 
                 if($error!=""){
-                    $objPHPExcel->getActiveSheet()->setCellValue('L'.$i, $error);
-                    $objPHPExcel->getActiveSheet()->getStyle('L'.$i)->getAlignment()->setWrapText(true);  
+                    $objPHPExcel->getActiveSheet()->setCellValue($remarks_col.$i, $error);
+                    $objPHPExcel->getActiveSheet()->getStyle($remarks_col.$i)->getAlignment()->setWrapText(true);  
                 }
             //-------------- Validation End ------------------------------
 
@@ -408,12 +528,22 @@ class Payment_upload extends CI_Controller{
                 $items_array = [];
                 $k=0;
 
-                for($j=0; $j<count($payment_array); $j++){
-                    if($payment_array[$j]['date_of_deposit']==$creation_date && $payment_array[$j]['bank_id']==$bank_id && $payment_array[$j]['payment_mode']==$payment_mode){
-                        $bl_flag=true;
-                        break;
+                if($upload_type=='Paytm' || $upload_type=='Razorpay'){
+                    for($j=0; $j<count($payment_array); $j++){
+                        if($payment_array[$j]['date_of_deposit']==$creation_date && $payment_array[$j]['bank_id']==$bank_id && $payment_array[$j]['payment_mode']==$payment_mode && $payment_array[$j]['neft_no']==$neft_no){
+                            $bl_flag=true;
+                            break;
+                        }
+                    }
+                } else {
+                    for($j=0; $j<count($payment_array); $j++){
+                        if($payment_array[$j]['date_of_deposit']==$creation_date && $payment_array[$j]['bank_id']==$bank_id && $payment_array[$j]['payment_mode']==$payment_mode){
+                            $bl_flag=true;
+                            break;
+                        }
                     }
                 }
+                
 
                 if($bl_flag==false){
                     $j=count($payment_array);
@@ -424,6 +554,8 @@ class Payment_upload extends CI_Controller{
                     $payment_array[$j]['payment_mode']=$payment_mode;
                     $payment_array[$j]['remarks']=$remarks;
                     $payment_array[$j]['total_amount']=0;
+                    $payment_array[$j]['neft_no']=$neft_no;
+                    $payment_array[$j]['upload_type']=$upload_type;
 
                     $k=0;
                 } else {
@@ -442,6 +574,9 @@ class Payment_upload extends CI_Controller{
                 $items_array[$k]['credit_debit']=$credit_debit;
                 $items_array[$k]['tax']=$tax;
                 $items_array[$k]['narration']=$narration;
+                $items_array[$k]['commission']=$commission;
+                $items_array[$k]['gst']=$gst;
+                $items_array[$k]['unique_ref_no']=$unique_ref_no;
 
                 $payment_array[$j]['items_array']=$items_array;
 
@@ -483,16 +618,16 @@ class Payment_upload extends CI_Controller{
             $this->session->set_flashdata('error', $remarks);
             $this->session->keep_flashdata('error');
         } else {
-            $objPHPExcel->getActiveSheet()->setCellValue('K4', 'Inv Amount');
-            $objPHPExcel->getActiveSheet()->setCellValue('L4', 'Bal Amount');
+            $objPHPExcel->getActiveSheet()->setCellValue($inv_amt_col.($start_row-1), 'Inv Amount');
+            $objPHPExcel->getActiveSheet()->setCellValue($bal_amt_col.($start_row-1), 'Bal Amount');
 
             for($i=0; $i<count($payment_array); $i++){
                 $items_array = $payment_array[$i]['items_array'];
 
                 for($j=0; $j<count($items_array); $j++) {
                     $row_num = $items_array[$j]['row_num'];
-                    $objPHPExcel->getActiveSheet()->setCellValue('K'.$row_num, $items_array[$j]['invoice_amount']);
-                    $objPHPExcel->getActiveSheet()->setCellValue('L'.$row_num, $items_array[$j]['final_amount']);
+                    $objPHPExcel->getActiveSheet()->setCellValue($inv_amt_col.$row_num, $items_array[$j]['invoice_amount']);
+                    $objPHPExcel->getActiveSheet()->setCellValue($bal_amt_col.$row_num, $items_array[$j]['final_amount']);
                 }
             }
 
@@ -508,15 +643,17 @@ class Payment_upload extends CI_Controller{
                 $payment_mode = $payment_array[$k]['payment_mode'];
                 $total_amount = $payment_array[$k]['total_amount'];
                 $remarks = $payment_array[$k]['remarks'];
+                $neft_no = $payment_array[$k]['neft_no'];
+                $upload_type = $payment_array[$k]['upload_type'];
 
                 $items_array = $payment_array[$k]['items_array'];
 
-                $sql = "insert into payment_upload_details (file_id, date_of_deposit, bank_id, payment_mode, total_amount, status, remarks, created_by, created_on, modified_by, modified_on) VALUES ('".$file_id."', '".$date_of_deposit."', '".$bank_id."', '".$payment_mode."', ".$total_amount.", 'Pending', '".$remarks."', '".$curusr."', '".$now."', '".$curusr."', '".$now."')";
+                $sql = "insert into payment_upload_details (file_id, date_of_deposit, bank_id, payment_mode, total_amount, status, remarks, created_by, created_on, modified_by, modified_on, neft_no, upload_type) VALUES ('".$file_id."', '".$date_of_deposit."', '".$bank_id."', '".$payment_mode."', ".$total_amount.", 'Pending', '".$remarks."', '".$curusr."', '".$now."', '".$curusr."', '".$now."', '".$neft_no."', '".$upload_type."')";
                 if ($this->db->query($sql) === TRUE) {
                     $payment_id = $this->db->insert_id();
 
                     for($j=0; $j<count($items_array); $j++) {
-                        $sql = "insert into payment_upload_items (payment_id, distributor_id, ref_no, invoice_no, payment_amount, credit_debit, tax, narration) VALUES ('".$payment_id."', '".$items_array[$j]['distributor_id']."', '".$items_array[$j]['ref_no']."', '".$items_array[$j]['invoice_no']."', '".$items_array[$j]['payment_amount']."', '".$items_array[$j]['credit_debit']."', '".$items_array[$j]['tax']."', '".$items_array[$j]['narration']."')";
+                        $sql = "insert into payment_upload_items (payment_id, distributor_id, ref_no, invoice_no, payment_amount, credit_debit, tax, narration, commission, gst, unique_ref_no) VALUES ('".$payment_id."', '".$items_array[$j]['distributor_id']."', '".$items_array[$j]['ref_no']."', '".$items_array[$j]['invoice_no']."', '".$items_array[$j]['payment_amount']."', '".$items_array[$j]['credit_debit']."', '".$items_array[$j]['tax']."', '".$items_array[$j]['narration']."', '".$items_array[$j]['commission']."', '".$items_array[$j]['gst']."', '".$items_array[$j]['unique_ref_no']."')";
                         if ($this->db->query($sql) === TRUE) {
                             $success_cnt = $success_cnt + 1;
                         } else {
@@ -581,16 +718,16 @@ class Payment_upload extends CI_Controller{
         $result = $this->db->query($sql)->result();
         if(count($result)>0){
             for($i=0; $i<count($result); $i++){
-                $sql = "insert into payment_details (date_of_deposit, bank_id, payment_mode, total_amount, status, remarks, created_by, created_on, modified_by, modified_on, approved_by, approved_on, rejected_by, rejected_on, distributor_out_id, ref_id, modified_approved_date, file_id) 
-                    select date_of_deposit, bank_id, payment_mode, total_amount, 'Approved', remarks, created_by, created_on, modified_by, modified_on, '$curusr', '$now', rejected_by, rejected_on, distributor_out_id, ref_id, modified_approved_date, '".$file_id."' 
+                $sql = "insert into payment_details (date_of_deposit, bank_id, payment_mode, total_amount, status, remarks, created_by, created_on, modified_by, modified_on, approved_by, approved_on, rejected_by, rejected_on, distributor_out_id, ref_id, modified_approved_date, file_id, neft_no, upload_type) 
+                    select date_of_deposit, bank_id, payment_mode, total_amount, 'Approved', remarks, created_by, created_on, modified_by, modified_on, '$curusr', '$now', rejected_by, rejected_on, distributor_out_id, ref_id, modified_approved_date, '".$file_id."', neft_no, upload_type 
                     from payment_upload_details where id = '".$result[$i]->id."'";
                 $this->db->query($sql);
                 $id = $this->db->insert_id();
 
                 $sql = "insert into payment_details_items (payment_id, distributor_id, ref_no, invoice_no, bank_name, 
-                            bank_city, payment_amount, settlement_id, settlement_start_date, settlement_end_date, credit_debit, tax, narration) 
+                            bank_city, payment_amount, settlement_id, settlement_start_date, settlement_end_date, credit_debit, tax, narration, commission, gst, unique_ref_no) 
                         select '".$id."', distributor_id, ref_no, invoice_no, bank_name, 
-                            bank_city, payment_amount, settlement_id, settlement_start_date, settlement_end_date, credit_debit, tax, narration 
+                            bank_city, payment_amount, settlement_id, settlement_start_date, settlement_end_date, credit_debit, tax, narration, commission, gst, unique_ref_no 
                         from payment_upload_items where payment_id = '".$result[$i]->id."'";
                 $this->db->query($sql);
 
@@ -600,7 +737,7 @@ class Payment_upload extends CI_Controller{
             $sql = "update payment_upload_files set status='Approved', approved_by='$curusr', approved_on='$now' where id='$file_id'";
             $this->db->query($sql);
 
-            $sql = "update payment_upload_details set status='Approved', approved_by='$curusr', approved_on='$now' where id='$file_id'";
+            $sql = "update payment_upload_details set status='Approved', approved_by='$curusr', approved_on='$now' where file_id='$file_id'";
             $this->db->query($sql);
 
             $this->session->set_flashdata('success', 'File approve succeded.');

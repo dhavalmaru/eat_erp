@@ -256,6 +256,12 @@
                                             <input type="text" class="form-control" name="gstin" id="gstin" placeholder="GSTIN" value="<?php if(isset($data)) { echo $data[0]->gstin; } ?>" />
                                         </div>
                                     </div>
+                                    <div class="form-group direct">
+                                        <label class="col-md-2 col-sm-2 col-xs-12 control-label">Unique Reference No </label>
+                                        <div class="col-md-4 col-sm-4 col-xs-12">
+                                            <input type="text" class="form-control" name="unique_ref_no" id="unique_ref_no" placeholder="Unique Reference No" value="<?php if(isset($data)) { echo $data[0]->unique_ref_no; } ?>" />
+                                        </div>
+                                    </div>
 										
                                     <div class="form-group">
                                         <div class="col-md-12 col-sm-12 col-xs-12">
